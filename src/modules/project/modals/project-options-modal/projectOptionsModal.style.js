@@ -3,11 +3,6 @@ import {StyleSheet} from 'react-native';
 import * as themes from '../../../../shared/styles.constants';
 
 const projectOptionsModalStyle = StyleSheet.create({
-  sectionViewButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: 10,
-  },
   backupViewInputHeaderText: {
     fontSize: 12,
     padding: 5,
@@ -21,16 +16,21 @@ const projectOptionsModalStyle = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  projectNameText: {
-    fontWeight: 'bold',
-  },
   modalContainer: {
+    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    borderRadius: 20,
+    maxHeight: '90%',
     position: 'absolute',
     top: '10%',
     width: 300,
-    maxHeight: '90%',
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
-    borderRadius: 20,
+  },
+  projectNameText: {
+    fontWeight: 'bold',
+  },
+  sectionViewButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 10,
   },
 });
 

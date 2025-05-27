@@ -237,7 +237,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const updateMapsFromDevice = async () => {
     setLoading(true);
     await getSavedMapsFromDevice();
-    console.log(`Got maps from device`);
+    console.log('Got maps from device');
     setLoading(false);
   };
 

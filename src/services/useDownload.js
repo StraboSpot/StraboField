@@ -49,7 +49,15 @@ const useDownload = () => {
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {gatherNeededImages} = useImages();
   const {clearProject} = useResetState();
-  const {getDatasets, getDatasetSpots, getImageUrl, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
+  const {
+    getDatasets,
+    getDatasetSpots,
+    getImageUrl,
+    getProfile,
+    getProfileImage,
+    getProject,
+    testCustomMapUrl,
+  } = useServerRequests();
 
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
@@ -271,15 +279,15 @@ const useDownload = () => {
       if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
         mapId = map.id.split('/').slice(3).join('/');
       }
-      let providerInfo =  MAP_PROVIDERS[map.source];
+      let providerInfo = MAP_PROVIDERS[map.source];
       if (map.source === 'strabospot_mymaps') {
         if (!isEmpty(endpoint) && isSelected) {
           let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)){
+          if (await testCustomMapUrl(tileEndpoint + map.id)) {
             tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
             providerInfo = {...providerInfo, url: [tileEndpoint]};
           }
-          else throw Error('Invalid IP address')
+          else throw Error('Invalid IP address');
         }
       }
       const customMap = {

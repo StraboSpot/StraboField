@@ -4,7 +4,7 @@ import * as themes from '../../../shared/styles.constants';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
-const {height, width} = Dimensions.get(platform);
+const {height} = Dimensions.get(platform);
 
 const styles = StyleSheet.create({
   attributionText: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   urlText: {
     color: themes.BLUE,
-  }
+  },
 });
 
 export default styles;

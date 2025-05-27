@@ -166,8 +166,8 @@ const MacrostratOverlay = ({
                 type={'clear'}
                 title={showMore ? 'Hide Description' : 'Show Description'}
                 // containerStyle={commonStyles.buttonContainer}
-                onPress={handleShowMore}>
-              </Button>
+                onPress={handleShowMore}
+              />
               {renderDescription()}
 
             </View>

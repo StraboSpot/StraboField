@@ -75,7 +75,6 @@ const useSamples = () => {
       const newTokens = await getValidToken(sesarTokens);
       return await getAndSaveSesarCode(newTokens);
     }
-    ;
   };
 
   const getMaterialName = (materialType) => {

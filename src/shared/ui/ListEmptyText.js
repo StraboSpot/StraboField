@@ -8,7 +8,7 @@ const ListEmptyText = ({text, textStyle, containerStyle}) => {
     <View style={containerStyle}>
       <Text style={[commonStyles.noValueText, textStyle]}>{text}</Text>
     </View>
-)
+  );
 };
 
 export default ListEmptyText;

@@ -54,11 +54,11 @@ const useCustomMap = () => {
       console.log(customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId));
       const bboxEndpoint = customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId);
       const response = await getMyMapsBbox(bboxEndpoint);
-      console.log(response)
+      console.log(response);
     }
     const response = await getMyMapsBbox(STRABO_APIS.MY_MAPS_BBOX + mapId);
-    console.log(response)
-  }
+    console.log(response);
+  };
 
   const getProviderInfo = (source) => {
     let providerInfo = {...MAP_PROVIDERS[source]};

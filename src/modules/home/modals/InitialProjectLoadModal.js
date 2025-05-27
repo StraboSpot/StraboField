@@ -169,17 +169,11 @@ const InitialProjectLoadModal = ({closeModal, openMainMenuPanel, visible}) => {
   const renderSectionView = () => {
     switch (visibleInitialSection) {
       case 'serverProjects':
-        return (
-          renderListOfProjectsOnServer()
-        );
+        return renderListOfProjectsOnServer();
       case 'deviceProjects':
-        return (
-          renderListOfProjectsOnDevice()
-        );
+        return renderListOfProjectsOnDevice();
       case 'project':
-        return (
-          renderStartNewProject()
-        );
+        return renderStartNewProject();
       case 'importData':
         return (
           <ImportProjectFromZip
@@ -192,9 +186,7 @@ const InitialProjectLoadModal = ({closeModal, openMainMenuPanel, visible}) => {
           />
         );
       default:
-        return (
-          renderProjectTypesButtons()
-        );
+        return renderProjectTypesButtons();
     }
   };
 

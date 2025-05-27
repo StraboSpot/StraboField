@@ -1,6 +1,6 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
-import {errorCodes, isErrorWithCode, keepLocalCopy,  types} from '@react-native-documents/picker';
+import {errorCodes, isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -11,11 +11,11 @@ import {setLoadingStatus} from '../modules/home/home.slice';
 import {deletedOfflineMap} from '../modules/maps/offline-maps/offlineMaps.slice';
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../modules/project/projects.slice';
 import usePermissions from '../services/usePermissions';
-import {useSafeDocumentPicker} from '../services/useSafeDocumentPicker'
+import {useSafeDocumentPicker} from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
-  const { pick } = useSafeDocumentPicker();
+  const {pick} = useSafeDocumentPicker();
   const {checkPermission} = usePermissions();
 
   const dispatch = useDispatch();

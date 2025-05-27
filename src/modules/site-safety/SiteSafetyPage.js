@@ -26,10 +26,12 @@ const SiteSafetyPage = () => {
 
   let initialValues = spot.properties?.site_safety || {};
   const coord = spot?.geometry?.type === 'Point' ? turf.getCoord(spot) : undefined;
-  if (isEmpty(initialValues) && !isEmpty(coord)) initialValues = {
-    latitude: coord[1].toString(),
-    longitude: coord[0].toString(),
-  };
+  if (isEmpty(initialValues) && !isEmpty(coord)) {
+    initialValues = {
+      latitude: coord[1].toString(),
+      longitude: coord[0].toString(),
+    };
+  }
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));

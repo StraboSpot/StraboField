@@ -4,14 +4,14 @@ import {DARKGREY} from '../../../shared/styles.constants';
 
 const projectModalStyle = StyleSheet.create({
   gridItem: {
-    width: '30%', // Width of each item (a bit less than 33.33% to leave space between)
-    margin: '1.5%', // To add space between grid items
-    height: 75, // Set height of each grid item
-    borderColor: DARKGREY,
     // borderWidth: 1,
-    borderRadius: 15,
-    justifyContent: 'center',
     alignItems: 'center',
+    borderColor: DARKGREY,
+    borderRadius: 15,
+    height: 75, // Set height of each grid item
+    justifyContent: 'center',
+    margin: '1.5%', // To add space between grid items
+    width: '30%', // Width of each item (a bit less than 33.33% to leave space between)
   },
   imageTotalUploadContainer: {
     padding: 10,

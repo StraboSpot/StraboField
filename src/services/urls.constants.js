@@ -3,7 +3,7 @@ import config from '../utils/config';
 const account = '/account';
 const orcid = 'https://orcid.org/oauth';
 const orcidClientId = config.get('orcid_client_id');
-const sesarAPI =  __DEV__ ? 'https://app-sandbox.geosamples.org/webservices' :  'https://app.geosamples.org/webservices';
+const sesarAPI = __DEV__ ? 'https://app-sandbox.geosamples.org/webservices' : 'https://app.geosamples.org/webservices';
 const straboSpotAPI = 'https://strabospot.org';
 const tilehost = 'https://tiles.strabospot.org';
 
@@ -62,5 +62,5 @@ export const ORCID_PATHS = {
   AUTH: '/authorize',
   ORCID: orcid,
   REDIRECT_URL: 'redirect_uri=https://www.strabospot.org/orcid_callback%3Fcreds%3D$',
-  SCOPE:`?client_id=${orcidClientId}&response_type=code&scope=openid&`,
-}
+  SCOPE: `?client_id=${orcidClientId}&response_type=code&scope=openid&`,
+};

@@ -280,7 +280,7 @@ const useServerRequests = () => {
       };
 
       const response = await fetch(SESAR_API + SESAR_PATHS.UPLOAD, requestOptions);
-      return response
+      return response;
     }
     catch (err) {
       console.error(err);
@@ -320,7 +320,7 @@ const useServerRequests = () => {
       console.error(err);
       alert('Error Posting to SESAR', `${err.toString()}`);
     }
-  }
+  };
 
   const handleError = async (response) => {
     console.log('RESPONSE', response);
@@ -625,7 +625,7 @@ const useServerRequests = () => {
     getOrcidToken: getOrcidToken,
     postToSesar: postToSesar,
     refreshSesarToken: refreshSesarToken,
-    updateSampleWithSesar:updateSampleWithSesar,
+    updateSampleWithSesar: updateSampleWithSesar,
     registerUser: registerUser,
     testCustomMapUrl: testCustomMapUrl,
     testEndpoint: testEndpoint,

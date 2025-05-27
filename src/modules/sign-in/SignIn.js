@@ -17,7 +17,6 @@ import {login} from '../user/userProfile.slice';
 const SignIn = ({navigation, route}) => {
 
   const dispatch = useDispatch();
-  const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const isOnline = useSelector(state => state.connections.isOnline);
 
   const [errorMessage, setErrorMessage] = useState('');

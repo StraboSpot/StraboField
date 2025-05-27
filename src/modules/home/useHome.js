@@ -94,7 +94,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
         setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error)
+        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
         break;
       case 'addToReport':
