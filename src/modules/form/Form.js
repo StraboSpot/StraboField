@@ -1,8 +1,8 @@
 import React from 'react';
 import {FlatList} from 'react-native';
 
-import {Field} from 'formik';
 import {ListItem} from '@rn-vui/base';
+import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
 import commonStyles from '../../shared/common.styles';

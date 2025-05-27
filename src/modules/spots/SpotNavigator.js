@@ -5,13 +5,13 @@ import {useSelector} from 'react-redux';
 
 import {SpotsList, SpotsListItem} from './index';
 import {isEmpty} from '../../shared/Helpers';
+import * as themes from '../../shared/styles.constants';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import styles from '../../shared/ui/ui.styles';
 import {ImageGallery} from '../images';
 import {ReportsList} from '../reports';
 import SamplesMenuItem from '../samples/SamplesMenuItem';
-import * as themes from '../../shared/styles.constants';
 
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {
   console.log('Rendering SpotsNavigator...');

@@ -1,8 +1,8 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Text, TextInput, View} from 'react-native';
 
-import {Field, Formik} from 'formik';
 import {Button, ListItem} from '@rn-vui/base';
+import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';

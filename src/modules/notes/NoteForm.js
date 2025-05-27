@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Field, Formik} from 'formik';
 import {ListItem} from '@rn-vui/base';
+import {Field, Formik} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import {TextInputField} from '../form';

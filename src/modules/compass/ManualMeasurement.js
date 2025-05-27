@@ -1,8 +1,8 @@
 import React, {useRef} from 'react';
 import {Text, View} from 'react-native';
 
-import {Field, Formik} from 'formik';
 import {ListItem} from '@rn-vui/base';
+import {Field, Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';

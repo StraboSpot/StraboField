@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import moment from 'moment/moment';
 import {Icon, ListItem} from '@rn-vui/base';
+import moment from 'moment/moment';
 import {useSelector} from 'react-redux';
 
 import MicroProjectPDFOverlay from './MicroProjectPDFOverlay';

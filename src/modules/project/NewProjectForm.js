@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 
-import {Formik} from 'formik';
 import {Button} from '@rn-vui/base';
+import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ProjectOptionsDialogBox from './modals/project-options-modal/ProjectOptionsModal';

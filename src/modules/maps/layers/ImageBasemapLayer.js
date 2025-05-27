@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';

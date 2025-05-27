@@ -5,9 +5,9 @@ import proj4 from 'proj4';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION} from './maps.constants';
+import {STRABO_APIS} from '../../services/urls.constants';
 import useServerRequests from '../../services/useServerRequests';
 import {isEmpty} from '../../shared/Helpers';
-import {STRABO_APIS} from '../../services/urls.constants';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
 const useMapCoords = () => {

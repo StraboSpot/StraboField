@@ -1,8 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {v4 as uuidv4} from 'uuid';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
-import {isEmpty, isEqual, getNewId} from '../../shared/Helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/Helpers';
 
 const initialProjectState = {
   activeDatasetsIds: [],

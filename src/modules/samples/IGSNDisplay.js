@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button, Image} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {Image} from '@rn-vui/base';
 
 import sampleStyles from './samples.styles';
 import IGSNLogo from '../../assets/images/logos/IGSN_Logo_200.jpg';

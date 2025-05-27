@@ -3,10 +3,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {STRABO_APIS} from '../../../services/urls.constants';
 import useServerRequests from '../../../services/useServerRequests';
 import {isEmpty} from '../../../shared/Helpers';
-import {addedStatusMessage, clearedStatusMessages, setIsWarningMessagesModalVisible} from '../../home/home.slice';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import {addedProject, updatedProject} from '../../project/projects.slice';
+import {updatedProject} from '../../project/projects.slice';
 import {MAP_PROVIDERS} from '../maps.constants';
 import {
   addedCustomMap,

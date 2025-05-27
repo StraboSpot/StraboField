@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Switch, Text} from 'react-native';
 
-import {Formik} from 'formik';
 import {Button, Input, ListItem} from '@rn-vui/base';
+import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SpotDataModelModal from './SpotDataModelModal';

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import moment from 'moment/moment';
 import {Button, CheckBox, Input, Overlay} from '@rn-vui/base';
+import moment from 'moment/moment';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 

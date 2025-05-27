@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {Tab} from '@rn-vui/base';
+import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TEPHRA_SUBPAGES} from './tephra.constants';

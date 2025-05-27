@@ -9,7 +9,6 @@ import forms from '../../assets/forms';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import Modal from '../../shared/ui/modal/Modal';
-import SectionDivider from '../../shared/ui/SectionDivider';
 
 const SpotDataModelModal = ({close}) => {
 

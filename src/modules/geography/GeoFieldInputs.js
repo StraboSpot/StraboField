@@ -1,8 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Field} from 'formik';
 import {Button, ListItem} from '@rn-vui/base';
+import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import {NumberInputField} from '../form';

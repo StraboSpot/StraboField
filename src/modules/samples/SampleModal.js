@@ -1,19 +1,17 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
+import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
-import {Button, ButtonGroup, CheckBox, Image} from '@rn-vui/base';
 import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import IGSNModal from './IGSNModal';
 import {getNewId, isEmpty, numToLetter} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import Modal from '../../shared/ui/modal/Modal';
 import SaveButton from '../../shared/ui/SaveButton';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
-import useSamples from './useSamples'
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';

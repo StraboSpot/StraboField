@@ -1,8 +1,8 @@
 import React, {useEffect, useState, forwardRef} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
-import moment from 'moment';
 import {Button, Overlay, Image} from '@rn-vui/base';
+import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNModalStyles from './IGSNModal.styles';

@@ -1,8 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {PointAnnotation} from '@rnmapbox/maps';
 import {Icon} from '@rn-vui/base';
+import {PointAnnotation} from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/Helpers';

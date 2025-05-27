@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {ButtonGroup} from '@rn-vui/base';
+import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';

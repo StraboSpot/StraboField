@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Appearance, Platform, Text, View} from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
 import {Button} from '@rn-vui/base';
+import moment from 'moment';
 import {useDispatch} from 'react-redux';
 
 import DateDialogBox from '../../shared/ui/StatusDialogBox';

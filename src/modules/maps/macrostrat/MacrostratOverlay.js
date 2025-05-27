@@ -1,13 +1,12 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert, Linking, ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Linking, ScrollView, Text, View} from 'react-native';
 
-import {Button, Card, Icon} from '@rn-vui/base';
+import {Button, Card} from '@rn-vui/base';
 
 import macrostratOverlayStyles from './macrostratOverlay.styles';
 import useServerRequests from '../../../services/useServerRequests';
-import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import commonStyles from '../../../shared/common.styles';
 import alert from '../../../shared/ui/alert';
 
 const MacrostratOverlay = ({

@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Field, Formik} from 'formik';
 import {ListItem} from '@rn-vui/base';
+import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';

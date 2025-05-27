@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {TextInput, View} from 'react-native';
 
-import * as turf from '@turf/turf';
 import {Button, Image} from '@rn-vui/base';
+import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
