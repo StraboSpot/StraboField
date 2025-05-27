@@ -7,10 +7,15 @@ const useDeviceOrientation = () => {
   const toast = useToast();
   const {width, height} = useWindowSize();
 
+  const lockToPortrait = () => {
+    RNOrientationDirector.lockTo(Orientation.portrait);
+  };
+
   const lockOrientation = () => {
     const orientation = width > height ? Orientation.landscape : Orientation.portrait;
     RNOrientationDirector.lockTo(orientation);
-    toast.show(`Screen orientation LOCKED to  ${RNOrientationDirector.convertOrientationToHumanReadableString(orientation)}`);
+    toast.show(
+      `Screen orientation LOCKED to  ${RNOrientationDirector.convertOrientationToHumanReadableString(orientation)}`);
   };
 
   const unlockOrientation = () => {
@@ -19,6 +24,7 @@ const useDeviceOrientation = () => {
   };
 
   return {
+    lockToPortrait: lockToPortrait,
     lockOrientation: lockOrientation,
     unlockOrientation: unlockOrientation,
   };

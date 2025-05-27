@@ -13,6 +13,7 @@ import SaveButton from '../../shared/ui/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyle from '../../shared/ui/modal/modal.style';
+import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -27,6 +28,7 @@ const TagsModal = ({
                      isFeatureLevelTagging,
                      zoomToCurrentLocation,
                    }) => {
+  const {height} = useWindowSize();
   const toast = useToast();
   const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -195,7 +197,10 @@ const TagsModal = ({
 
   return (
     <>
-      <View style={{padding: 20, flex: 1}}>
+      <View style={{
+        padding: 20,
+        maxHeight: height * 0.8,
+      }}>
         <View style={modalStyle.textContainer}>
           <AddButton
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
@@ -208,7 +213,7 @@ const TagsModal = ({
             : <Text style={modalStyle.textStyle}>No {label}</Text>}
         </View>
         {renderSpotTagsList()}
-        {(!isEmpty(tags) && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS
+        {(!isEmpty(tags) && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS
           && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
           <SaveButton
             buttonStyle={{backgroundColor: 'red'}}

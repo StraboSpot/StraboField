@@ -71,6 +71,7 @@ const Form = ({
         onMyChange={onMyChange}
         onShowFieldInfo={showFieldInfo}
         editable={getIsDisabled ? !getIsDisabled(field.name) : true}
+        autoFocus={field.name === 'name'}
       />
     );
   };

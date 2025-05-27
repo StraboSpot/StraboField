@@ -100,7 +100,6 @@ const Modal = ({
       style={{
         ...overlayStyles.overlayContainer,
         ...overlayStyles.overlayPosition,
-        maxHeight: height * 0.80,
         zIndex: 1000,
       }}
     >

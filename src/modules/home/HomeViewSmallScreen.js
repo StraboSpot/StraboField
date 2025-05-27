@@ -1,4 +1,4 @@
-import React, {forwardRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import { View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -11,6 +11,7 @@ import homeStyles from './home.style';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
+import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
@@ -47,6 +48,11 @@ const HomeViewSmallScreen = forwardRef(({
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
   const {height, width} = useWindowSize();
+  const {lockToPortrait} = useDeviceOrientation();
+
+  useEffect(() => {
+    lockToPortrait();
+  }, [])
 
   const navigationOptions = {
     gestureEnabled: false,
