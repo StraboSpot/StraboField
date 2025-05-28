@@ -4,6 +4,7 @@ import * as themes from '../../styles.constants';
 
 const modalStyle = StyleSheet.create({
   modalHeaderButtonsContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginLeft: 10,

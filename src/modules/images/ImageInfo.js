@@ -100,17 +100,17 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
             source={require('../../assets/icons/DeleteButton.png')}
             onPress={() => handleDeleteImageOnPress()}
           />
-          {isImagePropertiesModalVisible && (
-            <ImagePropertiesModal
-              closeModal={() => setIsImagePropertiesModalVisible(false)}
-              image={image}
-              saveUpdatedImage={saveUpdatedImage}
-              setImageToView={setImageToView}
-            />
-          )}
-          {renderDeleteImageModal()}
         </View>
       </View>
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={image}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+        />
+      )}
+      {renderDeleteImageModal()}
       {isSketchModalVisible && (
         <SketchModal image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
       )}
