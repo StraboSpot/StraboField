@@ -47,17 +47,9 @@ const useDownload = () => {
   const project = useSelector(state => state.project.project);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
-  const {gatherNeededImages} = useImages();
+  const {doesImageExistOnDevice, gatherNeededImages} = useImages();
   const {clearProject} = useResetState();
-  const {
-    getDatasets,
-    getDatasetSpots,
-    getImageUrl,
-    getProfile,
-    getProfileImage,
-    getProject,
-    testCustomMapUrl,
-  } = useServerRequests();
+  const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
 
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
@@ -89,17 +81,59 @@ const useDownload = () => {
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       if (!isEmpty(project)) clearProject();
       dispatch(addedProject(projectResponse));
-      const customMaps = projectResponse.other_maps;
+      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
+        loadCustomMaps(projectResponse.other_maps);
+      }
       console.log('Finished Downloading Project Properties.', projectResponse);
-      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) loadCustomMaps(customMaps);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
+      if (projectResponse.reports && !isEmpty(projectResponse.reports)) {
+        await downloadReportImages(projectResponse.reports);
+      }
     }
     catch (err) {
       console.error('Error Downloading Project Properties.', err);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Downloading Project Properties. ' + err));
       throw Error;
+    }
+  };
+
+  const downloadReportImages = async (reports) => {
+    try {
+      let neededImagesIds = [];
+      await Promise.all(reports.map(async (report) => {
+        await Promise.all(report.images?.map(async (image) => {
+          const doesExist = await doesImageExistOnDevice(image.id);
+          if (!doesExist) {
+            console.log('Need to download report image:', image.id);
+            neededImagesIds.push(image.id);
+          }
+          else console.log('Image', image.id, 'already exists on device. Not downloading.');
+        }));
+      }));
+
+      if (!isEmpty(neededImagesIds)) {
+        console.log('Downloading Needed Report Images...');
+        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Report Images...'));
+        // Check path first and if it doesn't exist, then create
+        await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
+        for (const imageId of neededImagesIds) {
+          const success = await downloadImageAndSave(imageId);
+          if (success) imagesDownloadedCount++;
+          else imagesFailedCount++;
+        }
+        dispatch(removedLastStatusMessage());
+        dispatch(addedStatusMessage('Finished Downloading Report Images'));
+        if (imagesFailedCount > 0) {
+          dispatch(addedStatusMessage(imagesFailedCount + ' Report Image' + (imagesFailedCount === 1 ? '' : 's')
+            + ' Failed To Download'));
+        }
+      }
+    }
+    catch (err) {
+      dispatch(addedStatusMessage('Error Downloading Report Images!'));
+      console.warn('Error Downloading Report Images: ' + err);
     }
   };
 
@@ -228,8 +262,7 @@ const useDownload = () => {
         // Check path first and if it doesn't exist, then create
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of updatedNeededImagesIds) {
-          const imageUrl = await getImageUrl();
-          const success = await downloadImageAndSave(imageUrl + imageId, imageId);
+          const success = await downloadImageAndSave(imageId);
           if (success) {
             imagesDownloadedCount++;
             updatedNeededImagesIds = updatedNeededImagesIds.filter(id => id !== imageId);

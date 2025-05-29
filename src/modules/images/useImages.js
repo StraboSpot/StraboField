@@ -10,7 +10,7 @@ import {APP_DIRECTORIES} from '../../services/directories.constants';
 import {STRABO_APIS} from '../../services/urls.constants';
 import useDevice from '../../services/useDevice';
 import usePermissions from '../../services/usePermissions';
-import {getNewId} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
@@ -33,6 +33,7 @@ const useImages = () => {
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const project = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
@@ -122,9 +123,11 @@ const useImages = () => {
     return imageIds;
   };
 
+  // Get images from Spots and Reports
   const getAllImages = () => {
     const images = [];
     Object.values(spots).forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
+    if (!isEmpty(project.reports)) project.reports.forEach(report => report.images?.map(image => images.push(image)));
     return images;
   };
 
@@ -365,7 +368,7 @@ const useImages = () => {
   const setAnnotation = (image, annotation, title) => {
     const imageCopy = JSON.parse(JSON.stringify(image));
     imageCopy.annotated = annotation;
-    if (annotation && !imageCopy.title) imageCopy.title =  title;
+    if (annotation && !imageCopy.title) imageCopy.title = title;
     if (selectedSpot && selectedSpot.properties && selectedSpot.properties.images) {
       const updatedImages = selectedSpot.properties.images.filter(image2 => imageCopy.id !== image2.id);
       console.log(updatedImages);

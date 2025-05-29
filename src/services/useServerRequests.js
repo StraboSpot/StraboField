@@ -608,7 +608,6 @@ const useServerRequests = () => {
     getDatasets: getDatasets, //TODO: Is encoded login being passed because of web autolog? Is there a better way to pass this?
     getDbUrl: getDbUrl,
     getImage: getImage,
-    getImageUrl: getImageUrl,
     getMacrostratData: getMacrostratData,
     getTileCountFromHost: getTileCountFromHost,
     getMapTilesFromHost: getMapTilesFromHost,

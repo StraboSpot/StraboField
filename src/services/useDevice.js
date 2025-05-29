@@ -187,7 +187,7 @@ const useDevice = () => {
     return await RNFS.exists(microPDF);
   };
 
-  const downloadImageAndSave = async (url, imageId) => {
+  const downloadImageAndSave = async (imageId) => {
     try {
       const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
 
