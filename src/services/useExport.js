@@ -113,6 +113,21 @@ const useExport = () => {
         }
         else dispatch(addedStatusMessage(`${imageSuccess} Images backed up.`));
       }
+      // Copies report images to /Images folder
+      if (data.projectDb.project.reports) {
+        await Promise.all(
+          Object.values(data.projectDb.project.reports).map(async (report) => {
+            if (!isEmpty(report?.images)) {
+              console.log('Report images:');
+              await Promise.all(
+                report.images.map(async (image) => {
+                  await moveDistributedImage(image.id, fileName, deviceDir);
+                }),
+              );
+            }
+          }),
+        );
+      }
     }
     catch (err) {
       console.error('Error Backing Up Images!', err);
