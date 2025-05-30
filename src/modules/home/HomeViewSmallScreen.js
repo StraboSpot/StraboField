@@ -1,5 +1,5 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import { View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {Button, Header, Icon} from '@rn-vui/base';
@@ -51,8 +51,9 @@ const HomeViewSmallScreen = forwardRef(({
   const {lockToPortrait} = useDeviceOrientation();
 
   useEffect(() => {
-    lockToPortrait();
-  }, [])
+    Platform.OS !== 'web'
+    && lockToPortrait();
+  }, []);
 
   const navigationOptions = {
     gestureEnabled: false,
