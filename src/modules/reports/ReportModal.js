@@ -84,23 +84,23 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
             containerStyle={{padding: 10, alignSelf: 'flex-end'}}
           />
         </View>
+
+        <WarningModal
+          title={'Delete Report?'}
+          isVisible={isDeleteReportModalVisible}
+          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
+          closeModal={() => setIsDeleteReportModalVisible(false)}
+          showCancelButton={true}
+          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          confirmText={'DELETE'}
+          confirmTitleStyle={overlayStyles.importantText}
+          onConfirmPress={deleteReport}
+        >
+          {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
+            : <Text>Are you sure you want to delete this report?</Text>}
+        </WarningModal>
+
       </Modal>
-
-      <WarningModal
-        title={'Delete Report?'}
-        isVisible={isDeleteReportModalVisible}
-        closeTitle={errorMessage ? 'Ok' : 'Cancel'}
-        closeModal={() => setIsDeleteReportModalVisible(false)}
-        showCancelButton={true}
-        showConfirmButton={isDeleteReportModalVisible && !errorMessage}
-        confirmText={'DELETE'}
-        confirmTitleStyle={overlayStyles.importantText}
-        onConfirmPress={deleteReport}
-      >
-        {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
-          : <Text>Are you sure you want to delete this report?</Text>}
-      </WarningModal>
-
     </>
   );
 };
