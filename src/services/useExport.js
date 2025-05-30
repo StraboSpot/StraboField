@@ -243,35 +243,35 @@ const useExport = () => {
     }
   };
 
-  const zipAndExportProjectFolder = async (isBeingExported) => {
+  const zipAndExportProjectFolder = async (selectedBackupFile, exportedFilename, isBeingExported) => {
     try {
       // dispatch(setLoadingStatus({view: 'modal', bool: true}));
-      await makeDirectory(appExportDirectory + backupFileName);
+      await makeDirectory(appExportDirectory + selectedBackupFile);
 
       // Make temp directory for the export files to be zipped up.
       console.log('Directory made:', appExportDirectory);
 
       // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
-      const source = APP_DIRECTORIES.BACKUP_DIR + backupFileName + '/data.json';
-      const destination = appExportDirectory + backupFileName;
+      const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
+      const destination = appExportDirectory + selectedBackupFile;
       Platform.OS === 'android' && await requestWriteDirectoryPermission();
-      console.log(backupFileName);
+      console.log(selectedBackupFile);
 
-      const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + backupFileName + '/data.json');
+      const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
       const exportedJSON = JSON.parse(dataFile);
       await copyFiles(source, `${destination}/data.json`);
       console.log('Files Copied', exportedJSON);
       dispatch(removedLastStatusMessage());
-      await gatherImagesForDistribution(exportedJSON, backupFileName, isBeingExported);
+      await gatherImagesForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
       console.log('Images copied to:', destination);
-      await gatherMapsForDistribution(exportedJSON, backupFileName, isBeingExported);
+      await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
       console.log('Map tiles copied to:', destination);
-      await gatherOtherMapsForDistribution(backupFileName, isBeingExported);
+      await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
       const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
-      const path = await zip(appExportDirectory + backupFileName,
-        zipPath + backupFileName + '.zip');
+      const path = await zip(appExportDirectory + selectedBackupFile,
+        zipPath + exportedFilename + '.zip');
 
-      const deleteTempFolder = deleteFromDevice(appExportDirectory, backupFileName);
+      const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
       console.log('Folder', deleteTempFolder);
       console.log(`zip completed at ${path}`);
       console.log('All Done Exporting');
