@@ -15,7 +15,7 @@ const imageStyles = StyleSheet.create({
   },
   cardContainer: {
     margin: 5,
-    padding: 5,
+    padding: 0,
   },
   cardImageContainer: {
     alignSelf: 'center',

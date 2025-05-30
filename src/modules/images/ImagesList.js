@@ -82,16 +82,21 @@ const ImagesList = ({deleteImage, images, isOnReport = false, saveImages, saveUp
     return (
       <FlatList
         data={sortedImages}
-        renderItem={({item, index}) => renderImageCard(item, index)}
-        numColumns={2}
         ListEmptyComponent={<ListEmptyText text={'No Images'}/>}
+        ListHeaderComponent={
+          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+            {sortedImages.map((image, index) => {
+              return renderImageCard(image, index);
+            })}
+          </View>
+        }
       />
     );
   };
 
   return (
     <>
-      <View style={{padding: 5, flex: 1}}>
+      <View style={{flex: 1}}>
         {isError ? renderError() : renderImages()}
       </View>
       {isImageModalVisible && (

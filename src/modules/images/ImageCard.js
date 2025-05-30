@@ -83,10 +83,9 @@ const ImageCard = ({
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
           <Switch
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
-            style={{height: 20, alignSelf: 'center'}}
             value={image.annotated}
           />
-          <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'left', paddingRight: 10}}>
+          <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'center', paddingHorizontal: 5}}>
             Use Image as{'\n'}a Basemap?
           </Text>
           <Button
