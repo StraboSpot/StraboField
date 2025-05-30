@@ -39,19 +39,19 @@ const OverlaysContainer = forwardRef(({
     dispatch(setIsProjectLoadSelectionModalVisible(false));
   };
 
-  const exportProject = async () => {
-    dispatch(clearedStatusMessages());
-    // console.log('Exporting Project');
-    dispatch(addedStatusMessage(`Exporting ${backupFileName}!`));
-    await zipAndExportProjectFolder(true);
-    const exportCompleteMessage = Platform.OS === 'ios' ? `\n\nProject (${backupFileName}) has been exported!`
-      : `\n\nProject (${backupFileName}) has been exported to the Downloads folder!`;
-    dispatch(addedStatusMessage(exportCompleteMessage));
-    dispatch(setLoadingStatus({view: 'modal', bool: false}));
-    // console.log(`Project ${backupFileName} has been exported!`);
-  };
+  // const exportProject = async () => {
+  //   dispatch(clearedStatusMessages());
+  //   // console.log('Exporting Project');
+  //   dispatch(addedStatusMessage(`Exporting ${backupFileName}!`));
+  //   await zipAndExportProjectFolder(null, null, true);
+  //   const exportCompleteMessage = Platform.OS === 'ios' ? `\n\nProject (${backupFileName}) has been exported!`
+  //     : `\n\nProject (${backupFileName}) has been exported to the Downloads folder!`;
+  //   dispatch(addedStatusMessage(exportCompleteMessage));
+  //   dispatch(setLoadingStatus({view: 'modal', bool: false}));
+  //   // console.log(`Project ${backupFileName} has been exported!`);
+  // };
 
-  const openStraboSpotURL = () => openURL('https://www.strabospot.org/login');
+  // const openStraboSpotURL = () => openURL('https://www.strabospot.org/login');
 
   return (
     <>
@@ -63,11 +63,12 @@ const OverlaysContainer = forwardRef(({
         />
       )}
       <ErrorModal/>
-      <StatusModal
-        exportProject={exportProject}
-        openMainMenuPanel={openMainMenuPanel}
-        openUrl={openStraboSpotURL}
-      />
+      // TODO: Fix this so user can export from Status Modal after backup
+      {/*<StatusModal*/}
+      {/*  exportProject={exportProject}*/}
+      {/*  openMainMenuPanel={openMainMenuPanel}*/}
+      {/*  openUrl={openStraboSpotURL}*/}
+      {/*/>*/}
       <WarningModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
