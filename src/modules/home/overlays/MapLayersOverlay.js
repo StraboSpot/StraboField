@@ -213,17 +213,11 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   );
 
   const onSetBasemap = async (customMap) => {
-    let baseMap = {};
     if ((isInternetReachable && isConnected) || (!isInternetReachable && isConnected)) {
-      if (!customMap.url) baseMap = await setOfflineMapTiles(customMap);
-      else baseMap = await setBasemap(customMap.id);
-      baseMap.bbox && setTimeout(() => mapComponentRef.current?.zoomToCustomMap(baseMap?.bbox), 1000);
+      if (!customMap.url) await setOfflineMapTiles(customMap);
+      else await setBasemap(customMap.id);
     }
-    else {
-      await setOfflineMapTiles(customMap);
-      offlineMaps[customMap.id].bbox
-      && setTimeout(() => mapComponentRef.current?.zoomToCustomMap(offlineMaps[customMap.id].bbox, 10), 1000);
-    }
+    else await setOfflineMapTiles(customMap);
   };
 
   const determineWhatCustomMapListToRender = () => {
