@@ -3,7 +3,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import useDevice from './useDevice';
-import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
+import {
+  addedStatusMessage,
+  clearedStatusMessages,
+  removedLastStatusMessage,
+} from '../modules/home/home.slice';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../modules/maps/offline-maps/offlineMaps.slice';
 import {
