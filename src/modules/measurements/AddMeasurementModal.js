@@ -1,7 +1,7 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Switch, Text, View} from 'react-native';
 
-import {ButtonGroup, Switch} from '@rn-vui/base';
+import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -196,7 +196,6 @@ const AddMeasurementModal = ({onPress}) => {
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', padding: 5}}>
                   <Text style={{}}>Compass</Text>
                   <Switch
-                    color={'transparent'}
                     value={isManualMeasurement}
                     onValueChange={value => setIsManualMeasurement(value)}
                   />
