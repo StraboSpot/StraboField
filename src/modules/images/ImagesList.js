@@ -69,6 +69,7 @@ const ImagesList = ({deleteImage, images, isOnReport = false, saveImages, saveUp
         index={index}
         isImageLoadedObj={isImageLoadedObj}
         isOnReport={isOnReport}
+        key={image.id}
         setImageToView={setImageToView}
         setIsImageLoadedObj={setIsImageLoadedObj}
         setIsImageModalVisible={setIsImageModalVisible}
@@ -85,9 +86,7 @@ const ImagesList = ({deleteImage, images, isOnReport = false, saveImages, saveUp
         ListEmptyComponent={<ListEmptyText text={'No Images'}/>}
         ListHeaderComponent={
           <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-            {sortedImages.map((image, index) => {
-              return renderImageCard(image, index);
-            })}
+            {sortedImages.map((image, index) => renderImageCard(image, index))}
           </View>
         }
       />
