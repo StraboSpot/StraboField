@@ -4,12 +4,13 @@ import {ActivityIndicator, Switch, Text, TextInput, View} from 'react-native';
 import {Button, Card, Icon, Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, useImages} from './index';
+import {imageStyles, useImages} from './';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
 
 const ImageCard = ({
@@ -28,8 +29,11 @@ const ImageCard = ({
   const [title, setTitle] = useState(image.title && image.title !== '' ? image.title.toString() : undefined);
 
   const {getImageBasemap, setAnnotation} = useImages();
+  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
 
   const placeholderTitle = 'Untitled ' + (index + 1);
+
+  const getIsSwtichDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
 
   const handleEditImageName = async (value) => {
     if (value && value !== '') setTitle(value);
@@ -82,6 +86,7 @@ const ImageCard = ({
       {!isOnReport && (
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
           <Switch
+            disabled={getIsSwtichDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
             value={image.annotated}
           />

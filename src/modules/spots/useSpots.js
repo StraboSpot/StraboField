@@ -427,14 +427,14 @@ const useSpots = () => {
   // Get all the Spots mapped on a specific image basemap
   const getSpotsMappedOnGivenImageBasemap = (basemapId) => {
     return Object.values(spots).reduce((acc, s) => {
-      return s.properties?.image_basemap == basemapId ? [...acc, s] : acc;
+      return s.properties?.image_basemap?.toString() === basemapId?.toString() ? [...acc, s] : acc;
     }, []);
   };
 
   // Get all the Spots mapped on a specific strat section
   const getSpotsMappedOnGivenStratSection = (stratSectionId) => {
     return Object.values(spots).reduce((acc, s) => {
-      return s.properties?.strat_section_id == stratSectionId ? [...acc, s] : acc;
+      return s.properties?.strat_section_id?.toString() === stratSectionId?.toString() ? [...acc, s] : acc;
     }, []);
   };
 
