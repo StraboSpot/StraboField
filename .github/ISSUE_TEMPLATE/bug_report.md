@@ -1,9 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+title: "[Source- i.e ImageBasemaps]: [Issue Title]"
+labels: bug
+assignees: jessicagood, NathanNovak
 
 ---
 
