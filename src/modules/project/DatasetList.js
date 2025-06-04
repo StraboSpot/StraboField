@@ -131,36 +131,36 @@ const DatasetList = () => {
     return (
       <View style={{backgroundColor: 'red', alignContent: 'flex-start'}}>
         <TextInputModal
-          dialogTitle={'Edit or Delete Dataset'}
+          dialogTitle={'Edit Dataset Name'}
           visible={isDatasetNameModalVisible}
           onPress={() => saveDataset()}
           closeModal={() => setIsDatasetNameModalVisible(false)}
           value={selectedDatasetToEdit.name}
           onChangeText={text => setSelectedDatasetToEdit({...selectedDatasetToEdit, name: text})}
         >
-          <View style={{paddingBottom: 10}}>
-            <Button
-              title={'Delete Dataset'}
-              titleStyle={overlayStyles.importantText}
-              type={'clear'}
-              disabled={isDisabled(selectedDatasetToEdit.id)}
-              onPress={handleDeletePressed}
-              icon={
-                <Icon
-                  iconStyle={{paddingRight: 10}}
-                  name={'trash'}
-                  type={'font-awesome'}
-                  size={20}
-                  color={'red'}
-                />
-              }
-            />
-            {isDisabled(selectedDatasetToEdit.id) && (
-              <Text style={overlayStyles.importantText}>
-                {selectedDatasetToEdit.name} can not be deleted while still selected as the current dataset.
-              </Text>
-            )}
-          </View>
+          {/*<View style={{paddingBottom: 10}}>*/}
+          {/*  <Button*/}
+          {/*    title={'Delete Dataset'}*/}
+          {/*    titleStyle={overlayStyles.importantText}*/}
+          {/*    type={'clear'}*/}
+          {/*    disabled={isDisabled(selectedDatasetToEdit.id)}*/}
+          {/*    onPress={handleDeletePressed}*/}
+          {/*    icon={*/}
+          {/*      <Icon*/}
+          {/*        iconStyle={{paddingRight: 10}}*/}
+          {/*        name={'trash'}*/}
+          {/*        type={'font-awesome'}*/}
+          {/*        size={20}*/}
+          {/*        color={'red'}*/}
+          {/*      />*/}
+          {/*    }*/}
+          {/*  />*/}
+          {/*  {isDisabled(selectedDatasetToEdit.id) && (*/}
+          {/*    <Text style={overlayStyles.importantText}>*/}
+          {/*      {selectedDatasetToEdit.name} can not be deleted while still selected as the current dataset.*/}
+          {/*    </Text>*/}
+          {/*  )}*/}
+          {/*</View>*/}
         </TextInputModal>
       </View>
     );
