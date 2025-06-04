@@ -63,12 +63,12 @@ const OverlaysContainer = forwardRef(({
         />
       )}
       <ErrorModal/>
-      // TODO: Fix this so user can export from Status Modal after backup
-      {/*<StatusModal*/}
-      {/*  exportProject={exportProject}*/}
-      {/*  openMainMenuPanel={openMainMenuPanel}*/}
-      {/*  openUrl={openStraboSpotURL}*/}
-      {/*/>*/}
+      {/*TODO: Fix this so user can export from Status Modal after backup*/}
+      <StatusModal
+        // exportProject={exportProject}
+        openMainMenuPanel={openMainMenuPanel}
+        // openUrl={openStraboSpotURL}
+      />
       <WarningModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
