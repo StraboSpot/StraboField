@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {FlatList, Linking, Platform, View} from 'react-native';
 
 import {Button, Icon, ListItem, Overlay} from '@rn-vui/base';
@@ -7,20 +7,24 @@ import {useSelector} from 'react-redux';
 
 import styles from './documentation.styles';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
+import StandardModalHeaderComponent from './ModalHeader';
 import {STRABO_APIS} from '../../services/urls.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, openUrl} from '../../shared/Helpers';
-import {BLACK, BLUE} from '../../shared/styles.constants';
+import {BLUE, BLACK} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const Documentation = () => {
+  const ref = useRef(null);
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
   const [visible, setVisible] = useState(false);
   const [doc, setDoc] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const helpUrl = STRABO_APIS.STRABO + '/help';
 
@@ -82,31 +86,31 @@ const Documentation = () => {
       supportedOrientations={['portrait', 'landscape']}
       isVisible={visible}
       fullScreen
+      overlayStyle={styles.overlayContainer}
     >
-      <Button
-        type={'clear'}
-        containerStyle={{alignItems: 'flex-end'}}
-        onPress={() => setVisible(!visible)}
-        icon={
-          <Icon
-            name={'close-outline'}
-            type={'ionicon'}
-            size={30}
-            color={BLACK}
-          />
-        }
+      <StandardModalHeaderComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onClose={() => setVisible(false)}
+        onJumpToPage={page => ref.current.setPage(page)}
       />
       {!isEmpty(doc) && (
         <Pdf
+          ref={ref}
           source={doc.file}
-          style={{flex: 1}}
+          style={styles.pdf}
           onLoadComplete={(numberOfPages, filePath) => {
-            console.log(`Number of pages: ${numberOfPages}`);
+            setTotalPages(numberOfPages);
           }}
           onError={(error) => {
             console.log(error);
           }}
           onPressLink={openLink}
+          onPageChanged={(page, numberOfPages) => {
+            setCurrentPage(page);
+            console.log(`Number of pages: ${page}/${numberOfPages}`);
+            realLog('Page changed:', page);
+          }}
         />
       )}
     </Overlay>
