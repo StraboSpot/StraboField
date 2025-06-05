@@ -32,6 +32,7 @@ export const MAIN_MENU_ITEMS = {
   HELP: {
     ABOUT: 'About Strabo',
     DOCUMENTATION: 'Documentation',
+    ISSUES: 'Issues & Requests',
   },
 };
 

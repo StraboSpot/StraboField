@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 
 import About from './About';
 import Documentation from './Documentation';
+import IssuesAndReqests from './IssuesAndReqests';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
@@ -118,6 +119,8 @@ const MainMenuPanel = forwardRef(({
         return <About/>;
       case MAIN_MENU_ITEMS.HELP.DOCUMENTATION:
         return <Documentation/>;
+      case MAIN_MENU_ITEMS.HELP.ISSUES:
+        return <IssuesAndReqests/>;
       default:
         return (
           <MainMenuPanelList
