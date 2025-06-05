@@ -11,9 +11,10 @@ import StandardModalHeaderComponent from './ModalHeader';
 import {STRABO_APIS} from '../../services/urls.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, openUrl} from '../../shared/Helpers';
-import {BLUE, BLACK} from '../../shared/styles.constants';
+import {WHITE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
+import OpenUrlLink from '../../shared/ui/OpenUrlLink';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const Documentation = () => {
@@ -25,8 +26,6 @@ const Documentation = () => {
   const [doc, setDoc] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const helpUrl = STRABO_APIS.STRABO + '/help';
 
   const files = [
     {
@@ -69,18 +68,6 @@ const Documentation = () => {
     }
   };
 
-  const viewOnlineHelp = async (path) => {
-    try {
-      const canOpen = await Linking.canOpenURL(path);
-      if (canOpen) await Linking.openURL(path);
-      else alert('Uh Oh!', `Can not open the url ${path}`);
-    }
-    catch (err) {
-      console.error('Can\t open URL', err);
-      alert(' Unable to open URL!');
-    }
-  };
-
   const viewPDF = () => (
     <Overlay
       supportedOrientations={['portrait', 'landscape']}
@@ -109,7 +96,6 @@ const Documentation = () => {
           onPageChanged={(page, numberOfPages) => {
             setCurrentPage(page);
             console.log(`Number of pages: ${page}/${numberOfPages}`);
-            realLog('Page changed:', page);
           }}
         />
       )}
@@ -157,30 +143,17 @@ const Documentation = () => {
     );
   };
 
-  const renderHelpLink = () => (
-    <View style={styles.bottomButton}>
-      {isOnline && (
-        <Button
-          title={'StraboSpot Help Center'}
-          type={'clear'}
-          onPress={() => viewOnlineHelp(helpUrl)}
-          icon={
-            <Icon
-              name={'globe-outline'}
-              type={'ionicon'}
-              iconStyle={{paddingRight: 10}}
-              size={20}
-              color={BLUE}
-            />
-          }
-        />
-      )}
-    </View>
-  );
 
   return (
-    <View style={{flex: 1}}>
-      {renderHelpLink()}
+    <View style={{flex: 1, padding: 20}}>
+      <OpenUrlLink
+        buttonStyle={styles.button}
+        title={'Strabo Spot Help'}
+        titleStyle={styles.buttonText}
+        url={STRABO_APIS.STRABO + '/help'}
+        icon={'globe-outline'}
+        color={WHITE}
+      />
       <View style={{alignItems: 'center'}}>
         <SectionDivider dividerText={'FAQ\'s'}/>
       </View>
