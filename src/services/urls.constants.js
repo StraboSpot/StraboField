@@ -64,3 +64,8 @@ export const ORCID_PATHS = {
   REDIRECT_URL: 'redirect_uri=https://www.strabospot.org/orcid_callback%3Fcreds%3D$',
   SCOPE: `?client_id=${orcidClientId}&response_type=code&scope=openid&`,
 };
+
+export const SUPPORT_PATHS = {
+  GITHUB: 'https://github.com/StraboSpot/StraboField/issues/new/choose',
+  EMAIL: 'mailto: strabospot@gmail.com?subject=StraboSpot2%20Issue',
+}
