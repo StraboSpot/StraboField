@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {FlatList, Switch, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -9,6 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import DailyNotesSection from './description/DailyNotesSection';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
+import {isEqual} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
@@ -22,8 +23,8 @@ const ProjectDescription = () => {
   const {getLabel, hasErrors, validateForm} = useForm();
   const toast = useToast();
 
-  const formRef = useRef(null);
-  const publicRef = useRef(null);
+  const descriptionFormRef = useRef(null);
+  const preferencesFormRef = useRef(null);
 
   const formName = ['general', 'project_description'];
   const projectDescription = {
@@ -32,66 +33,69 @@ const ProjectDescription = () => {
     magnetic_declination: project.description?.magnetic_declination || 0,
   };
 
-  useLayoutEffect(() => {
-    console.log('ULE ProjectDescription []');
-    console.log('Project Description', projectDescription);
-    console.log('Project Preferences', publicRef.current);
-    return () => saveForm();
-  }, []);
+  const initialPageData = project.preferences && project.preferences.hasOwnProperty('public')
+    ? {public: project.preferences.public, ...projectDescription}
+    : projectDescription;
+  const [pageData, setPageData] = useState(initialPageData);
+
+  const handleBackPressed = async () => {
+    if (isPageDataChanged) {
+      await saveForm();
+      toast.show('Changes Saved!', 'success');
+    }
+    dispatch(setSidePanelVisible({bool: false}));
+  };
+
+  const isPageDataChanged = !isEqual(pageData, initialPageData);
 
   const saveForm = async () => {
-    const formCurrent = formRef.current;
-    const publicCurrent = publicRef.current;
-    if (formCurrent.dirty) {
-      await formCurrent.submitForm();
-      let newDescriptionValues = JSON.parse(JSON.stringify(formCurrent.values));
-      // const newPublicPreferenceValue =
-      if (hasErrors(formCurrent)) {
-        const errorMessages = Object.entries(formCurrent.errors).map(([key, value]) => (
+    const descriptionCurrent = descriptionFormRef.current;
+    const preferencesCurrent = preferencesFormRef.current;
+    if (descriptionCurrent.dirty) {
+      await descriptionCurrent.submitForm();
+      let newDescriptionValues = JSON.parse(JSON.stringify(descriptionCurrent.values));
+      if (hasErrors(descriptionCurrent)) {
+        const errorMessages = Object.entries(descriptionCurrent.errors).map(([key, value]) => (
           getLabel(key, formName) + ': ' + value
         ));
         alert('Project Description Errors!', 'Changes in the following fields were not saved.'
           + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
-        const newValuesWithoutErrors = Object.keys(formCurrent.values).reduce((acc, key) => {
-          return Object.keys(formCurrent.errors).includes(key) ? acc : {...acc, [key]: formCurrent.values[key]};
+        const newValuesWithoutErrors = Object.keys(descriptionCurrent.values).reduce((acc, key) => {
+          return Object.keys(descriptionCurrent.errors).includes(key) ? acc
+            : {...acc, [key]: descriptionCurrent.values[key]};
         }, {});
         const erroredFieldsInitialValues = Object.keys(projectDescription).reduce((acc, key) => {
-          return Object.keys(formCurrent.errors).includes(key) ? {...acc, [key]: projectDescription[key]} : acc;
+          return Object.keys(descriptionCurrent.errors).includes(key) ? {...acc, [key]: projectDescription[key]} : acc;
         }, {});
         newDescriptionValues = {...newValuesWithoutErrors, ...erroredFieldsInitialValues};
       }
       console.log('Saving project description to Project ...', newDescriptionValues);
       dispatch(updatedProject({field: 'description', value: newDescriptionValues}));
     }
-    else if (publicCurrent.dirty) {
-      console.log('Saving Project Preferences', publicCurrent.values);
-      await publicCurrent.submitForm();
-      dispatch(updatedProject({field: 'preferences', value: publicCurrent.values}));
+    if (preferencesCurrent.dirty) {
+      console.log('Saving Project Preferences', preferencesCurrent.values);
+      await preferencesCurrent.submitForm();
+      dispatch(updatedProject({field: 'preferences', value: preferencesCurrent.values}));
     }
-    // else toastRef.current.show('No changes were made.');
   };
 
   return (
     <>
       <SidePanelHeader
-        title={'Active Project (save changes)'}
+        title={isPageDataChanged ? 'Active Project (Save Changes)' : 'Active Project'}
         headerTitle={'Project Description'}
-        backButton={() => {
-          console.log('DIRTY', publicRef.current.dirty);
-          if (!publicRef?.current?.dirty && !formRef?.current?.dirty) {
-            toast.show('No Changes Were Made.');
-          }
-          else toast.show('Changes Saved!', 'success');
-          dispatch(setSidePanelVisible({bool: false}));
-        }}
+        backButton={handleBackPressed}
       />
       <View style={{flex: 1.5}}>
         <FlatList
           ListHeaderComponent={
             <Formik
-              innerRef={formRef}
+              innerRef={descriptionFormRef}
               onSubmit={values => console.log('Submitting form...', values)}
-              validate={values => validateForm({formName: formName, values: values})}
+              validate={(values) => {
+                validateForm({formName: formName, values: values});
+                setPageData(d => ({...d, ...values}));
+              }}
               component={formProps => Form({formName: formName, ...formProps})}
               initialValues={projectDescription}
               validateOnChange={true}
@@ -108,7 +112,7 @@ const ProjectDescription = () => {
               <Formik
                 initialValues={project.preferences || {}}
                 onSubmit={() => console.log('Submitting form project preferences...')}
-                innerRef={publicRef}
+                innerRef={preferencesFormRef}
               >
                 {formProps =>
                   <View>
@@ -119,7 +123,10 @@ const ProjectDescription = () => {
                       </ListItem.Content>
                       <Switch
                         value={formProps.values.public}
-                        onValueChange={bool => formProps.setFieldValue('public', bool)}
+                        onValueChange={(bool) => {
+                          formProps.setFieldValue('public', bool);
+                          setPageData(d => ({...d, public: bool}));
+                        }}
                       />
                     </ListItem>
                     <View style={{paddingBottom: 15}}>
