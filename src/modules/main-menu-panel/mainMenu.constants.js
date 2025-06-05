@@ -41,6 +41,7 @@ export const MAIN_MENU_DATA = Object.entries(MAIN_MENU_ITEMS).map(([key, value])
 });
 
 export const SIDE_PANEL_VIEWS = {
+  DATASET_DETAIL: 'Dataset Detail',
   MANAGE_CUSTOM_MAP: 'manageCustomMap',
   PROJECT_DESCRIPTION: 'project description',
   TAG_DETAIL: 'tag detail',

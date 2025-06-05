@@ -4,10 +4,9 @@ import {Platform, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ActiveDatasetsList from './ActiveDatasetsList';
 import ActiveProjectList from './ActiveProjectList';
 import CustomFeatureTypes from './CustomFeatureTypes';
-import DatasetList from './DatasetList';
+import DatasetList from './dataset/DatasetList';
 import {setActiveDatasets, setSelectedDataset} from './projects.slice';
 import useProject from './useProject';
 import useDownload from '../../services/useDownload';
@@ -19,7 +18,7 @@ import TextInputModal from '../../shared/ui/TextInputModal';
 import {clearedStatusMessages} from '../home/home.slice';
 import {WarningModal} from '../home/modals';
 
-const ActiveProjectPanel = () => {
+const ActiveProjectPanel = ({setDatasetToView}) => {
   const {initializeDownload} = useDownload();
   const {addDataset} = useProject();
 
@@ -97,20 +96,12 @@ const ActiveProjectPanel = () => {
 
         <View style={{flex: 1}}>
           {/*Project Datasets*/}
-          <View style={{flex: 1, flexGrow: 1, overflow: 'hidden'}}>
+          <View style={{flex: 1, flexGrow: 3, overflow: 'hidden'}}>
             <SectionDividerWithRightButton
-              dividerText={'Project Datasets'}
+              dividerText={'Datasets'}
               onPress={() => setIsAddDatasetModalVisible(true)}
             />
-            <DatasetList/>
-          </View>
-          {/*Active Datasets*/}
-          <View style={{flex: 1, flexGrow: 1, overflow: 'hidden'}}>
-            <SectionDivider dividerText={'Active Datasets*'}/>
-            <ActiveDatasetsList/>
-          </View>
-          <View style={{alignItems: 'center', paddingBottom: 10}}>
-            <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the checked dataset.</Text>
+            <DatasetList setDatasetToView={setDatasetToView}/>
           </View>
           <View style={{flex: 1, flexGrow: 1, overflow: 'hidden'}}>
             <SectionDivider dividerText={'Custom Feature Types'}/>

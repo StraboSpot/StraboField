@@ -1,7 +1,6 @@
-import React, {forwardRef} from 'react';
+import React, {forwardRef, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 
-import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
 import About from './About';
@@ -24,6 +23,7 @@ import Miscellaneous from '../preferences/Miscellaneous';
 import NamingConventions from '../preferences/naming-conventions/NamingConventions';
 import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import ActiveProjectPanel from '../project/ActiveProjectPanel';
+import DatasetDetail from '../project/dataset/DatasetDetail';
 import MyStraboSpot from '../project/MyStraboSpot';
 import ProjectDescription from '../project/ProjectDescription';
 import UploadBackupAndExport from '../project/UploadBackupExport';
@@ -46,7 +46,7 @@ const MainMenuPanel = forwardRef(({
   const settingsPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
-  const toast = useToast();
+  const [datasetToView, setDatasetToView] = useState({});
 
   const renderMainMenuContent = () => {
     return (
@@ -62,11 +62,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE.MY_STRABOSPOT:
         return <MyStraboSpot openMainMenuPanel={openMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS:
-        return (
-          <ActiveProjectPanel
-            title={!isEmpty(project) && project.description ? project.description.project_name : 'Un-named'}
-          />
-        );
+        return <ActiveProjectPanel setDatasetToView={setDatasetToView}/>;
       case MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT:
         return <UploadBackupAndExport closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE.STRABOMICRO_PROJECTS:
@@ -133,10 +129,12 @@ const MainMenuPanel = forwardRef(({
 
   const renderSidePanelContent = () => {
     switch (sidePanelView) {
+      case SIDE_PANEL_VIEWS.DATASET_DETAIL:
+        return <DatasetDetail dataset={datasetToView}/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.PROJECT_DESCRIPTION:
-        return <ProjectDescription toastMessage={(message, type) => toast.show(message, {type: type})}/>;
+        return <ProjectDescription/>;
       case SIDE_PANEL_VIEWS.TAG_DETAIL:
         return <TagDetailSidePanel openNotebookPanel={openNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
