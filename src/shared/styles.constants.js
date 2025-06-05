@@ -31,6 +31,7 @@ export const WARNING_COLOR = RED;
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 
 export const TEXT_WEIGHT = '500';
+export const TEXT_WEIGHT_700 = '700';
 export const PRIMARY_TEXT_SIZE = Platform.OS === 'web' ? 12 : 16;
 export const PRIMARY_HEADER_TEXT_SIZE = Platform.OS === 'web' ? 14 : 20;
 export const SMALL_TEXT_SIZE = Platform.OS === 'web' ? 10 : 14;
