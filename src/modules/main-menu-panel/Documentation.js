@@ -145,7 +145,7 @@ const Documentation = () => {
 
 
   return (
-    <View style={{flex: 1, padding: 20}}>
+    <View style={styles.container}>
       <OpenUrlLink
         buttonStyle={styles.button}
         title={'Strabo Spot Help'}
@@ -154,8 +154,8 @@ const Documentation = () => {
         icon={'globe-outline'}
         color={WHITE}
       />
-      <View style={{alignItems: 'center'}}>
-        <SectionDivider dividerText={'FAQ\'s'}/>
+      <View>
+        <SectionDivider dividerText={'Helpful Docs'}/>
       </View>
       {renderFAQItems()}
       {viewPDF()}
