@@ -21,7 +21,7 @@ const DatasetList = ({setDatasetToView}) => {
         ItemSeparatorComponent={FlatListItemSeparator}
         ListFooterComponent={
           <View style={{alignItems: 'center', paddingVertical: 10}}>
-            <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the stared dataset.</Text>
+            <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the starred dataset.</Text>
           </View>
         }
       />
