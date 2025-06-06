@@ -13,20 +13,23 @@ const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, icon
     <View style={styles.sectionDividerWithButtonContainer}>
       <SectionDivider dividerText={dividerText}/>
       <Button
-        title={buttonTitle}
+        disabled={disabled}
         icon={!buttonTitle && (
           <Icon
-            name={iconName || 'add'}
-            style={{paddingRight: 10, paddingLeft: 10}}
-            size={iconSize || 30}
             color={PRIMARY_ACCENT_COLOR}
-            type={iconType}
+            disabled={disabled}
+            name={iconName || 'add'}
+            onPress={onPress}
+            size={iconSize || 20}
+            style={{paddingHorizontal: 5}}
+            type={iconType || 'ionicon'}
           />
         )}
+        onPress={onPress}
+        size={'sm'}
+        title={buttonTitle}
         titleStyle={commonStyles.standardButtonText}
         type={'clear'}
-        onPress={onPress}
-        disabled={disabled}
       />
     </View>
   );

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -7,16 +7,17 @@ import {useDispatch, useSelector} from 'react-redux';
 import ActiveProjectList from './ActiveProjectList';
 import CustomFeatureTypes from './CustomFeatureTypes';
 import DatasetList from './dataset/DatasetList';
+import ProjectPrivacy from './ProjectPrivacy';
 import {setActiveDatasets, setSelectedDataset} from './projects.slice';
 import useProject from './useProject';
 import useDownload from '../../services/useDownload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../shared/ui/TextInputModal';
 import {clearedStatusMessages} from '../home/home.slice';
 import {WarningModal} from '../home/modals';
+import DailyNotesSection from './description/DailyNotesSection';
 
 const ActiveProjectPanel = ({setDatasetToView}) => {
   const {initializeDownload} = useDownload();
@@ -91,22 +92,32 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
   return (
     <>
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'space-between'}}>
+
         {/*Active Projects*/}
         <ActiveProjectList/>
 
+        {/*Project Datasets*/}
+        <View style={{maxHeight: 400}}>
+          <SectionDividerWithRightButton
+            dividerText={'Datasets'}
+            onPress={() => setIsAddDatasetModalVisible(true)}
+          />
+          <DatasetList setDatasetToView={setDatasetToView}/>
+          <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
+            <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the starred dataset.</Text>
+          </View>
+        </View>
+
         <View style={{flex: 1}}>
-          {/*Project Datasets*/}
-          <View style={{flex: 1, flexGrow: 3, overflow: 'hidden'}}>
-            <SectionDividerWithRightButton
-              dividerText={'Datasets'}
-              onPress={() => setIsAddDatasetModalVisible(true)}
-            />
-            <DatasetList setDatasetToView={setDatasetToView}/>
-          </View>
-          <View style={{flex: 1, flexGrow: 1, overflow: 'hidden'}}>
-            <SectionDivider dividerText={'Custom Feature Types'}/>
-            <CustomFeatureTypes/>
-          </View>
+          <FlatList
+            ListHeaderComponent={
+              <>
+                <ProjectPrivacy/>
+                <DailyNotesSection/>
+                <CustomFeatureTypes/>
+              </>
+            }
+          />
         </View>
 
         {/*Footer*/}
@@ -115,14 +126,14 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
             {user.name && (
               <View>
                 <Button
-                  title={'Download server version of project'}
+                  title={'Download Server Version of Project'}
                   titleStyle={commonStyles.standardButtonText}
                   type={'outline'}
                   onPress={() => handleDownloadProject()}
                 />
-                <View style={{alignItems: 'center', paddingTop: 20}}>
+                <View style={{alignItems: 'center', paddingVertical: 10}}>
                   <Text style={commonStyles.standardDescriptionText}>
-                    This will overwrite anything that has not been uploaded to the server
+                    *This will overwrite anything that has not been uploaded to the server
                   </Text>
                 </View>
               </View>
@@ -131,6 +142,8 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
         )}
 
       </View>
+
+      {/* Modals */}
       {renderAddDatasetModal()}
       {renderWarningModal()}
     </>

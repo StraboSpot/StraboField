@@ -53,8 +53,9 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
     <View>
       <ListItem
         key={dataset.id}
-        containerStyle={commonStyles.listItem}
+        containerStyle={{paddingHorizontal: 10, paddingVertical: 5}}
         onPress={() => viewDataset(dataset.id, dataset.name)}
+        pad={10}
       >
         <Switch
           onValueChange={onSwitch}

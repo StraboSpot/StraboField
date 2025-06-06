@@ -1,13 +1,13 @@
 import React from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
-import SectionDivider from '../../../shared/ui/SectionDivider';
+import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {MODAL_KEYS} from '../../page/page.constants';
 
@@ -43,11 +43,8 @@ const DailyNotesSection = () => {
 
   return (
     <View>
-      <SectionDivider dividerText={'Daily Notes'}/>
-      <Button
-        title={'Add New Daily Note'}
-        titleStyle={commonStyles.standardButtonText}
-        type={'clear'}
+      <SectionDividerWithRightButton
+        dividerText={'Daily Notes'}
         onPress={addDailyNote}
       />
       <View style={{flex: 1}}>
@@ -55,7 +52,9 @@ const DailyNotesSection = () => {
           data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
           keyExtractor={item => item.date}
           renderItem={({item}) => renderDailyNotesListItem(item)}
-          ListEmptyComponent={<ListEmptyText text={'No Daily Notes'}/>}
+          ListEmptyComponent={
+            <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
+          }
         />
       </View>
     </View>

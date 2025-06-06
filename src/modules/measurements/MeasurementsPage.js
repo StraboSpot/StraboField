@@ -198,8 +198,14 @@ const MeasurementsPage = ({page}) => {
               </>
               {!modalVisible && (
                 <Button
-                  icon={<Icon name={'add'} size={30} style={{paddingRight: 10, paddingLeft: 10}}
-                              color={PRIMARY_ACCENT_COLOR}/>}
+                  icon={
+                    <Icon
+                      name={'add'}
+                      size={20}
+                      style={{paddingHorizontal: 5}}
+                      color={PRIMARY_ACCENT_COLOR}
+                    />
+                  }
                   type={'clear'}
                   onPress={() => addMeasurement(sectionType)}
                   disabled={isMultipleFeaturesTaggingEnabled}

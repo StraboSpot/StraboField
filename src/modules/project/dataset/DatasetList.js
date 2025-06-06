@@ -1,10 +1,9 @@
 import React from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
 import DatasetListItem from './DatasetListItem';
-import commonStyles from '../../../shared/common.styles';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 
 const DatasetList = ({setDatasetToView}) => {
@@ -13,19 +12,14 @@ const DatasetList = ({setDatasetToView}) => {
   const datasets = useSelector(state => state.project.datasets) || {};
 
   return (
-    <View style={{flex: 1}}>
+    // <View style={{flex: 1, backgroundColor: 'red'}}>
       <FlatList
         keyExtractor={item => item.id}
         data={Object.values(datasets)}
         renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListFooterComponent={
-          <View style={{alignItems: 'center', paddingVertical: 10}}>
-            <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the starred dataset.</Text>
-          </View>
-        }
       />
-    </View>
+    // </View>
   );
 };
 

@@ -1,4 +1,4 @@
-import {Platform, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 import * as themes from './styles.constants';
 
@@ -28,7 +28,7 @@ const commonStyles = StyleSheet.create({
     textAlign: 'center',
   },
   listItem: {
-    padding: Platform.OS === 'web' ? 5 : 10,
+    padding: 10,
   },
   listItemContent: {
     alignItems: 'center',

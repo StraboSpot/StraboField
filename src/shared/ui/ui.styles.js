@@ -120,17 +120,17 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     flexShrink: 1,
-    paddingBottom: 2,
     paddingLeft: 10,
-    paddingTop: 8,
+    paddingTop: 10,
   },
   sectionDividerText: {
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
+    paddingBottom: 5,
   },
   sectionDividerWithButtonContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {DEFAULT_GEOLOGIC_TYPES} from './project.constants';
@@ -12,6 +12,7 @@ import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import SectionDivider from '../../shared/ui/SectionDivider';
 import {useSpots} from '../spots';
 
 const CustomFeatureTypes = () => {
@@ -69,31 +70,38 @@ const CustomFeatureTypes = () => {
     return (
       <View>
         <ListItem key={feature.name} containerStyle={commonStyles.listItem}>
-          <ListItem.Content>
+          <ListItem.Content
+            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+          >
             <ListItem.Title style={commonStyles.listItemTitle}>{feature}</ListItem.Title>
+            <Icon
+              name={'trash'}
+              type={'ionicon'}
+              color={themes.WARNING_COLOR}
+              onPress={() => deleteCustomFeatureValidation(feature)}
+              size={20}
+              style={{paddingHorizontal: 5}}
+            />
           </ListItem.Content>
-          <Button
-            titleStyle={{color: themes.RED}}
-            title={'Delete Feature'}
-            type={'clear'}
-            onPress={() => deleteCustomFeatureValidation(feature)}
-          />
         </ListItem>
       </View>
     );
   };
 
   return (
-    <FlatList
-      keyExtractor={item => item.toString()}
-      extraData={refresh}
-      data={customFeatureTypes}
-      renderItem={item => renderFeature(item.item)}
-      ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No custom feature types added yet. '
-        + 'Add a custom feature type in Other Features tab of a spot by selecting'
-        + ' the type \'other\' when adding a feature.'}/>}
-    />
+    <>
+      <SectionDivider dividerText={'Custom Feature Types'}/>
+      <FlatList
+        keyExtractor={item => item.toString()}
+        extraData={refresh}
+        data={customFeatureTypes}
+        renderItem={item => renderFeature(item.item)}
+        ItemSeparatorComponent={FlatListItemSeparator}
+        ListEmptyComponent={<ListEmptyText text={'No custom feature types added yet. '
+          + 'Add a custom feature type in Other Features tab of a spot by selecting'
+          + ' the type \'other\' when adding a feature.'}/>}
+      />
+    </>
   );
 };
 
