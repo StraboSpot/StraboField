@@ -2,6 +2,7 @@
 const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 
 const appDirectory = path.resolve(__dirname);
@@ -94,7 +95,8 @@ module.exports = {
     publicPath: '/',
     filename: 'bundle.web.js',
   },
-  devtool: 'source-map',
+  mode: 'production',
+  devtool:  false,
   resolve: {
     extensions: ['.web.js', '.js', '.web.ts', '.ts', '.web.jsx', '.jsx', '.web.tsx', '.tsx', '.css', '.json'],
     alias: {
@@ -121,5 +123,17 @@ module.exports = {
     hints: false,
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
   },
 };
