@@ -32,8 +32,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   let tokens = sesarToken;
 
   useEffect(() => {
-
-
     getInitialUrl().then(() => console.log('LINKED'));
     const subscription = Linking.addEventListener('url', handleOpenURL);
     console.log('Subscribing');
@@ -75,15 +73,16 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
         dispatch(setSesarToken(tokens));
       }
       if (tokens.access) {
-        const accessTokenParsed = JSON.parse(atob(tokens.access.split('.')[1]));
-        if (accessTokenParsed.exp < Math.floor(Date.now() / 1000)) tokens = await authenticateWithSesar(tokens);
-        toast.show('Sesar Authenticated!', {
+        // const accessTokenParsed = JSON.parse(atob(tokens.access.split('.')[1]));
+        tokens = await authenticateWithSesar(tokens);
+        const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
+        toast.show(sesarMessage, {
           duration: 3000,
-          type: 'success',
+          type: tokens.access ? 'success' : 'danger',
           placement: 'bottom',
-          textStyle: { fontSize: 20, fontStyle: 'italic' },
+          textStyle: {fontSize: 20, fontStyle: 'italic'},
         });
-        if (!selectedFeature.isOnMySesar && isEmpty(userCodes)) {
+        if (!selectedFeature.isOnMySesar) {
           const sesarCodesRes = await getAndSaveSesarCode(tokens);
           dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
         }
@@ -124,15 +123,15 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
       <View style={{justifyContent: 'flex-start', alignItems: 'center'}}>
         {!selectedFeature.isOnMySesar
           && (
-            <Text style={sampleStyles.mySesarUpdateDisclaimer}>To upload to your MYSESAR account and obtain an IGSN
+            <Text style={sampleStyles.mySesarUpdateDisclaimer}>To upload to your SESAR account and obtain an IGSN
               check below:</Text>
           )
         }
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <CheckBox
-            title={'Upload to MYSESAR'}
+            title={'Upload to SESAR'}
             checked={isIGSNChecked}
-            checkedTitle={selectedFeature.isOnMySesar && 'On MYSESAR and IGSN assigned'}
+            checkedTitle={selectedFeature.isOnMySesar && 'On SESAR and IGSN assigned'}
             onPress={handlePress}
             disabled={selectedFeature.isOnMySesar || !isInternetReachable}
           />
@@ -142,7 +141,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
             type={'ionicon'}
             color={'red'}
             size={10}
-            onPress={() => alert('Sesar Code Required')}
+            onPress={() => alert('SESAR Code Required')}
           />}
         </View>
       </View>
@@ -157,12 +156,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
         {selectedFeature.Sample_IGSN && selectedFeature.sesarUserCode
           ? (
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>Sesar User Code:  {selectedFeature.sesarUserCode}</Text>
+              <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User
+                Code: {selectedFeature.sesarUserCode}</Text>
             </View>
           ) : (
             <>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'}}>
-                <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>Sesar User Code:</Text>
+                <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User Code:</Text>
                 <Button
                   raised
                   title={selectedUserCode || 'Select User Code'}
@@ -232,7 +232,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   return (
     <React.Fragment>
       {__DEV__ && <Button
-        title='Delete Sesar values'
+        title="Delete SESAR values"
         type={'clear'}
         onPress={() => {
           dispatch(setInitialSesarState());

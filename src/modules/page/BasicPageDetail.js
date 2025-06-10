@@ -93,7 +93,7 @@ const BasicPageDetail = ({
 
   const confirmLeavePage = () => {
     const description = isIGSNChecked
-      ? 'Would you like to save your data before continuing? \n\n \This sample was not registered to Sesar. Please re-save sample to register to Sesar.'
+      ? 'Would you like to save your data before continuing? \n\n \This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
       : 'Would you like to save your data before continuing?';
     if (!isTemplate && formRef.current && formRef.current.dirty) {
       const formCurrent = formRef.current;
@@ -180,7 +180,7 @@ const BasicPageDetail = ({
           />
         ) : (
           <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-            You need to login to StraboSpot to upload to Sesar
+            You need to login to StraboSpot to upload to SESAR
           </Text>
         )}
       </>
