@@ -221,6 +221,7 @@ const useDownload = () => {
     if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     dispatch(setStatusMessageModalTitle(projectName));
     dispatch(clearedStatusMessages());
+    if (Platform.OS !== 'web') dispatch(setIsStatusMessagesModalVisible(true));
     dispatch(setLoadingStatus({view: 'modal', bool: true}));
     dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
     try {

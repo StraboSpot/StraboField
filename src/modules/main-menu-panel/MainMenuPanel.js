@@ -64,7 +64,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS:
         return (
           <ActiveProjectPanel
-            title={!isEmpty(project) && project.description ? project.description.project_name : 'Un-named'}
+            title={!isEmpty(project) && project.description ? project.description.project_name : 'Unnamed'}
           />
         );
       case MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT:

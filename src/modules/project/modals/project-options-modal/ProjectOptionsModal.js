@@ -20,6 +20,8 @@ import uiStyles from '../../../../shared/ui/ui.styles';
 import LottieAnimations from '../../../../utils/animations/LottieAnimations';
 import {setIsProgressModalVisible, setLoadingStatus} from '../../../home/home.slice';
 import overlayStyles from '../../../home/overlays/overlay.styles';
+import {MAIN_MENU_ITEMS} from '../../../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage} from '../../../main-menu-panel/mainMenuPanel.slice';
 import {BACKUP_TO_DEVICE, BACKUP_TO_SERVER, OVERWRITE} from '../../project.constants';
 import {setSelectedProject} from '../../projects.slice';
 import useProject from '../../useProject';
@@ -104,21 +106,14 @@ const ProjectOptionsDialogBox = ({
   };
 
   const handleOnPress = async (userAction) => {
-    if (userAction === BACKUP_TO_DEVICE) {
-      await saveProject();
-      console.log('Project Saved!');
-    }
-    else if (userAction === OVERWRITE) {
+    if (userAction === OVERWRITE) {
       closeModal();
       await switchProject(OVERWRITE);
       console.log('Project overwritten!');
     }
     else {
       closeModal();
-      setAction('');
-      setChecked(1);
-      dispatch(setIsProgressModalVisible(true));
-      // console.log('Project Overwritten or Uploaded!');
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT}));
     }
   };
 
@@ -174,27 +169,23 @@ const ProjectOptionsDialogBox = ({
         return (
           <View>
             <View style={uiStyles.sectionDivider}>
-              <Text style={overlayStyles.statusMessageText}>What do you want to do with
-                the current project ({currentProjectName})?</Text>
+              <Text style={overlayStyles.statusMessageText}>
+                What do you want to do with the current project ({currentProjectName})?
+              </Text>
             </View>
             <View style={{padding: 10}}>
-              {selectedProject.source !== 'new' && <Button
-                title={'Overwrite'}
-                type={'outline'}
-                containerStyle={{padding: 2.5}}
-                onPress={() => setAction(OVERWRITE)}
-              />}
+              {selectedProject.source !== 'new' && (
+                <Button
+                  title={'Overwrite'}
+                  containerStyle={{padding: 2.5}}
+                  onPress={() => setAction(OVERWRITE)}
+                />
+              )}
               <Button
-                title={'Save to Device'}
+                title={'Go To Upload & Backup Page'}
                 type={'outline'}
                 containerStyle={{padding: 2.5}}
-                onPress={() => setAction(BACKUP_TO_DEVICE)}
-              />
-              <Button
-                title={'Upload'}
-                type={'outline'}
-                containerStyle={{padding: 2.5}}
-                onPress={() => setAction(BACKUP_TO_SERVER)}
+                onPress={handleOnPress}
               />
             </View>
           </View>
@@ -271,13 +262,13 @@ const ProjectOptionsDialogBox = ({
           the local copy of the current project:
         </Text>
         <Text style={[overlayStyles.importantText, overlayStyles.contentText]}>
-          {currentProject
-          && !isEmpty(
-            currentProject.description) ? currentProject.description.project_name.toUpperCase() : 'UN-NAMED'}
+          {currentProject && !isEmpty(currentProject.description)
+            ? currentProject.description.project_name.toUpperCase()
+            : 'UNNAMED'}
         </Text>
-        <Text style={overlayStyles.contentText}>Including all datasets and Spots contained within this project. Make
-          sure you have already uploaded the project to the server or backed it up to the device if you wish to preserve
-          the data.
+        <Text style={overlayStyles.contentText}>
+          Including all datasets and Spots contained within this project. Make sure you have already uploaded
+          the project to the server or backed it up to the device if you wish to preserve the data.
         </Text>
       </View>
     );
@@ -286,13 +277,9 @@ const ProjectOptionsDialogBox = ({
   const renderSectionView = () => {
     switch (action) {
       case OVERWRITE:
-        return (
-          renderOverwriteView()
-        );
+        return renderOverwriteView();
       case BACKUP_TO_DEVICE:
-        return (
-          renderBackupView()
-        );
+        return renderBackupView();
       case BACKUP_TO_SERVER:
         return renderUploadView();
       default:
@@ -304,18 +291,18 @@ const ProjectOptionsDialogBox = ({
     return (
       <View>
         <View>
-          <Text style={overlayStyles.importantText}>Uploading {'\n'}{!isEmpty(
-            currentProject) && currentProject.description.project_name} {'\n'}to:</Text>
+          <Text style={overlayStyles.importantText}>
+            Uploading {'\n'}{!isEmpty(currentProject) && currentProject.description.project_name} {'\n'}to:
+          </Text>
           <Text style={overlayStyles.importantText}>
             {endpoint?.isSelected ? endpoint.endpoint : STRABO_APIS.DB}
           </Text>
         </View>
         <Spacer/>
         <Text>
-          <Text style={overlayStyles.importantText}> </Text>
           project properties and datasets will be uploaded and will
-          <Text style={overlayStyles.importantText}> OVERWRITE</Text> any data already on the server
-          for this project:
+          <Text style={overlayStyles.importantText}> OVERWRITE </Text>
+          any data already on the server for this project:
         </Text>
       </View>
     );
@@ -330,10 +317,13 @@ const ProjectOptionsDialogBox = ({
   // const displayedButtons = selectedProject.source === 'device' && Platform.OS === 'ios' ? radioButtonArr.slice(0,
   //   2) : radioButtonArr;
   const showExportChoice = selectedProject.source === 'device';
-  const header = selectedProject.source === 'device' ? 'Selected Device Project:' : selectedProject.source === 'server'
-    ? 'Selected Server Project:' : null;
-  const projectName = `${selectedProject.source === 'server' ? selectedProject.project.name : selectedProject.source === 'device'
-    ? selectedProject.project.fileName : 'New Project'}`;
+  const header = selectedProject.source === 'device' ? 'Selected Device Project:'
+    : selectedProject.source === 'server' ? 'Selected Server Project:'
+      : null;
+  const projectName = `${selectedProject.source === 'server' ? selectedProject.project.name
+    : selectedProject.source === 'device' ? selectedProject.project.fileName
+      : 'New Project'}`;
+
   return (
     <>
       <Overlay
@@ -347,12 +337,11 @@ const ProjectOptionsDialogBox = ({
           closeModal={onClose}
           title={(header ? header + '\n' : '') + projectName}
         />
-        {selectedProject.source === 'new'
-          && (
-            <Text style={overlayStyles.importantText}>Starting a new project will overwrite the current
-              project. Press Close if that is ok.
-            </Text>
-          )}
+        {selectedProject.source === 'new' && (
+          <Text style={overlayStyles.importantText}>
+            Starting a new project will overwrite the current project. Press Close if that is ok.
+          </Text>
+        )}
         {showExportChoice && radioButtonArr.map((l, i) => (
           <CheckBox
             key={i}
@@ -369,19 +358,23 @@ const ProjectOptionsDialogBox = ({
         <View>
           {renderSectionView()}
         </View>
-        {action !== '' && <View style={overlayStyles.buttonContainer}>
-          <Button
-            title={'Cancel'}
-            type={'clear'}
-            onPress={() => goBack()}
-          />
-          <Button
-            title={'Continue'}
-            type={'clear'}
-            onPress={() => handleOnPress(action)}
-          />
-        </View>}
+        {action !== '' && (
+          <View style={overlayStyles.buttonContainer}>
+            <Button
+              title={'Cancel'}
+              type={'clear'}
+              onPress={() => goBack()}
+            />
+            <Button
+              title={'Continue'}
+              type={'clear'}
+              onPress={() => handleOnPress(action)}
+            />
+          </View>
+        )}
       </Overlay>
+
+      {/* Progress Modal */}
       <Overlay
         supportedOrientations={['portrait', 'landscape']}
         isVisible={isProgressModalVisibleLocal}

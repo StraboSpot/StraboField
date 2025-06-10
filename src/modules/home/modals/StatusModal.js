@@ -13,7 +13,7 @@ import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../../main-menu-panel/mainMenuPanel.slice';
 import {setSelectedProject} from '../../project/projects.slice';
-import {setIsStatusMessagesModalVisible} from '../home.slice';
+import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../home.slice';
 import overlayStyles from '../overlays/overlay.styles';
 
 const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
@@ -32,7 +32,9 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
       console.log('FROM DEVICE', selectedProject.project);
       dispatch(setSelectedProject({source: '', project: ''}));
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setLoadingStatus({view: 'modal', bool: true}));
       const res = await loadProjectFromDevice(selectedProject.project.fileName);
+      dispatch(setLoadingStatus({view: 'modal', bool: false}));
       console.log('Done loading project', res);
     }
     else if (selectedProject.source === 'server') {

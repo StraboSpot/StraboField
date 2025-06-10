@@ -51,7 +51,7 @@ const OverlaysContainer = forwardRef(({
   //   // console.log(`Project ${backupFileName} has been exported!`);
   // };
 
-  // const openStraboSpotURL = () => openURL('https://www.strabospot.org/login');
+  const openStraboSpotURL = () => openURL('https://www.strabospot.org/login');
 
   return (
     <>
@@ -67,7 +67,7 @@ const OverlaysContainer = forwardRef(({
       <StatusModal
         // exportProject={exportProject}
         openMainMenuPanel={openMainMenuPanel}
-        // openUrl={openStraboSpotURL}
+        openUrl={openStraboSpotURL}
       />
       <WarningModal/>
       {/*------------------------*/}

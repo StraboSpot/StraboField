@@ -247,8 +247,9 @@ const useProject = () => {
           dispatch(setSelectedProject({project: '', source: ''}));
           dispatch(clearedStatusMessages());
           dispatch(setIsStatusMessagesModalVisible(true));
+          dispatch(setLoadingStatus({view: 'modal', bool: true}));
           const res = await loadProjectFromDevice(selectedProject.project.fileName);
-          dispatch(setLoadingStatus({view: 'home', bool: false}));
+          dispatch(setLoadingStatus({view: 'modal', bool: false}));
           console.log('Done loading project', res);
         }
         else if (selectedProject.source === 'server') {
@@ -260,7 +261,7 @@ const useProject = () => {
     catch (err) {
       dispatch(setIsStatusMessagesModalVisible(false));
       console.error('Error switching project in useProject', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      dispatch(setLoadingStatus({view: 'modal', bool: false}));
       dispatch(clearedStatusMessages());
       dispatch(addedStatusMessage(`There was an error loading the project. \n\nMessage:\n${err}`));
       dispatch(setIsErrorMessagesModalVisible(true));
