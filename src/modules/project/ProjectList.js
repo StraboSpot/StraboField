@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {AppState, FlatList, Platform, Text, View} from 'react-native';
+import {AppState, FlatList, Text, View} from 'react-native';
 
 import {Button, ListItem} from '@rn-vui/base';
 import moment from 'moment';
@@ -121,7 +121,6 @@ const ProjectList = ({source}) => {
 
   const loadSelectedProject = async (project) => {
     try {
-      if (Platform.OS !== 'web') dispatch(setIsStatusMessagesModalVisible(true));
       console.log('Selected Project:', project);
       setLoading(true);
       if (!isEmpty(currentProject)) dispatch(setSelectedProject({project: project, source: source}));
@@ -129,9 +128,12 @@ const ProjectList = ({source}) => {
         console.log('Getting project...');
         if (source === 'device') {
           dispatch(setIsProjectLoadSelectionModalVisible(false));
+          dispatch(setLoadingStatus({view: 'modal', bool: true}));
+          dispatch(setIsStatusMessagesModalVisible(true));
           const res = await loadProjectFromDevice(project.fileName);
           setLoading(false);
           dispatch(setStatusMessageModalTitle(res.project.description.project_name));
+          dispatch(setLoadingStatus({view: 'modal', bool: false}));
           console.log('Done loading project', res);
         }
         else await initializeDownload(project);

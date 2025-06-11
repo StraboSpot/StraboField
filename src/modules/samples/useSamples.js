@@ -142,9 +142,9 @@ const useSamples = () => {
     else throw Error('Something happened. Please try again later.');
   };
 
-  const refreshToken = async (refreshToken) => {
+  const refreshToken = async (refresh) => {
     try {
-      const newTokens = await refreshSesarToken(refreshToken);
+      const newTokens = await refreshSesarToken(refresh);
       console.log(newTokens);
       if (newTokens.error) {
         console.error('Token refresh failed:', newTokens.error);
