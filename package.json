@@ -25,7 +25,7 @@
     "deploy-beta": "bundle exec fastlane beta",
     "create-changelog": "changelog generate-changelog",
     "web": "webpack serve --mode development -d inline-source-map --config webpack.config.js --hot --color",
-    "web-deploy": "webpack --config webpack.config.js",
+    "web-deploy": "webpack --mode production --config webpack.config.js",
     "postinstall": "patch-package",
     "remove:packages": "rm -rf node_modules ios/Pods ios/Podfile.lock"
   },
