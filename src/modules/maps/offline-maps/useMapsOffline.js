@@ -251,11 +251,6 @@ const useMapsOffline = () => {
           startZipURL = tilehost + '/asynczip?layer=' + layer + '&extent=' + extentString + '&zoom=' + downloadZoom
             + '&username=' + username + '&id=' + id + '&access_token=' + accessToken;
         }
-        else if (downloadMap.source === 'Map Warper' || downloadMap.source === 'map_warper') {
-          layer = 'mapwarper';
-          id = downloadMap.id;
-          startZipURL = tilehost + '/asynczip?layer=' + layer + '&extent=' + extentString + '&zoom=' + downloadZoom + '&id=' + id;
-        }
         else if (downloadMap.source === 'strabospot_mymaps') {
           layer = 'strabomymaps';
           id = downloadMap.id;

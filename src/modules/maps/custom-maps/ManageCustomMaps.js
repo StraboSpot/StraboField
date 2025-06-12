@@ -47,7 +47,6 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   const mapTypeName = (source) => {
     let name;
     if (source === 'mapbox_styles') name = 'Mapbox Styles';
-    if (source === 'map_warper') name = 'Map Warper (Not Supported)';
     if (source === 'strabospot_mymaps') name = 'Strabo MyMaps';
     return name;
   };
@@ -81,9 +80,9 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   };
 
   const viewCustomMap = async (item) => {
-    let basemap = {};
+    let basemap = item;
     if (item.overlay) {
-      updateMap({...item, isViewable: true});
+      updateMap({...basemap, isViewable: true});
       if (DEFAULT_MAPS.every(map => currentBasemap.id !== map.id)) basemap = await setBasemap();
     }
     else basemap = await setBasemap(item.id);
