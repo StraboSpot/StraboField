@@ -73,7 +73,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
 
     return (
-      <View style={{maxHeight: 250}} key={'CustomMapsList'}>
+      <View key={'CustomMapsList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
           keyExtractor={item => item.id + 'CustomMap'}
@@ -92,7 +92,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       customMap => offlineMaps[customMap.id]);
 
     return (
-      <View style={{maxHeight: 250}} key={'OfflineCustomMapsList'}>
+      <View key={'OfflineCustomMapsList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
           keyExtractor={item => item.id + 'OfflineCustomMap'}
@@ -111,7 +111,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
 
     return (
-      <View style={{maxHeight: 250}} key={'CustomOverlaysList'}>
+      <View key={'CustomOverlaysList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
           keyExtractor={item => item.id + 'CustomOverlay'}
@@ -129,7 +129,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       customOverlay => offlineMaps[customOverlay.id]);
 
     return (
-      <View style={{maxHeight: 250}} key={'OfflineCustomOverlaysList'}>
+      <View key={'OfflineCustomOverlaysList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
           keyExtractor={item => item.id + 'OfflineCustomOverlay'}
@@ -221,8 +221,8 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   };
 
   const determineWhatCustomMapListToRender = () => {
-    if (isInternetReachable && isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
-    else if (!isInternetReachable && isConnected) {
+    if (!isInternetReachable && !isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
+    else if (isInternetReachable && isConnected) {
       return [
         renderCustomMapsList(),
         renderOfflineCustomMapsList(),
