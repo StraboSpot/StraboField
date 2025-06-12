@@ -35,12 +35,12 @@ else style.appendChild(document.createTextNode(IconsStyles));
 
 document.head.appendChild(style);
 
-if (module.hot) {
+if (__DEV__ && module.hot) {
   module.hot.accept();
 }
 
-AppRegistry.registerComponent('React Native Web', () => App);
-AppRegistry.runApplication('React Native Web', {
+AppRegistry.registerComponent('StraboFieldWeb', () => App);
+AppRegistry.runApplication('StraboFieldWeb', {
   initialProps: {},
   rootTag: document.getElementById('app-root'),
 });

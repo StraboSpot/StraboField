@@ -24,8 +24,8 @@
     "bump-major": "npm version major --no-git-tag-version && bundle exec fastlane bump",
     "deploy-beta": "bundle exec fastlane beta",
     "create-changelog": "changelog generate-changelog",
-    "web": "webpack serve --mode=development -d inline-source-map --config webpack.config.js --hot --color",
-    "web-deploy": "webpack --mode=production --config webpack.config.js",
+    "web": "webpack serve --mode development -d inline-source-map --config webpack.config.js --hot --color",
+    "web-deploy": "webpack --mode production --config webpack.config.js",
     "postinstall": "patch-package",
     "remove:packages": "rm -rf node_modules ios/Pods ios/Podfile.lock"
   },
@@ -143,6 +143,7 @@
     "react-native-devsettings": "^1.0.5",
     "react-test-renderer": "19.0.0",
     "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.14",
     "types": "^0.1.1",
     "typescript": "5.0.4",
     "url-loader": "^4.1.1",
