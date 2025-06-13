@@ -12,7 +12,7 @@ import {
   setIsWarningMessagesModalVisible,
 } from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';
-import {isEmpty} from '../shared/Helpers';
+import {isEmpty, hasSpace} from '../shared/Helpers';
 
 const useExport = () => {
   const dispatch = useDispatch();
@@ -187,6 +187,8 @@ const useExport = () => {
 
   const initializeBackup = async (fileName) => {
     try {
+      if (hasSpace(fileName)) fileName = fileName.replaceAll(' ', '_');
+
       dispatch(setBackupFileName(fileName));
       // dispatch(setIsBackupModalVisible(false));
       dispatch(clearedStatusMessages());

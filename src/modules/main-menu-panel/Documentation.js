@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Linking, Platform, View} from 'react-native';
+import {FlatList, Linking, Platform, SafeAreaView, View} from 'react-native';
 
 import {Button, Icon, ListItem, Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
@@ -75,6 +75,7 @@ const Documentation = () => {
       fullScreen
       overlayStyle={styles.overlayContainer}
     >
+      <SafeAreaView>
       <StandardModalHeaderComponent
         currentPage={currentPage}
         totalPages={totalPages}
@@ -99,6 +100,7 @@ const Documentation = () => {
           }}
         />
       )}
+      </SafeAreaView>
     </Overlay>
   );
 

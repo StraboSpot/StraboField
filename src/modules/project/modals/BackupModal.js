@@ -28,7 +28,7 @@ const BackupModal = ({closeModal, visible}) => {
     }
   }, [currentProject, visible]);
 
-  const fileName = backupFileName.replace(/\s/g, '');
+  const fileName = backupFileName.replace(/\s/g, '_');
 
   const handleClosePress = () => {
     setBackingUpStatus('');

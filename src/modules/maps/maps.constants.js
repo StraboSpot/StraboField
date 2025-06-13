@@ -95,13 +95,6 @@ export const MAP_PROVIDERS = {
     tilePath: '/{z}/{x}/{y}.png',
     url: ['https://tiles.strabospot.org/v5/'],
   },
-  map_warper: {
-    attributions: '© <a href="http://mapwarper.net/home/about">Map Warper</a>',
-    imageType: 'png',
-    mime: 'image/png',
-    tilePath: '{z}/{x}/{y}.png',
-    url: ['https://www.strabospot.org/mwproxy/'],
-  },
   strabospot_mapbox: {
     attributions: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.',
     imageType: 'png',
