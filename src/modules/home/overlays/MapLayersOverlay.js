@@ -221,8 +221,8 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   };
 
   const determineWhatCustomMapListToRender = () => {
-    if (!isInternetReachable && !isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
-    else if (isInternetReachable && isConnected) {
+    if (isInternetReachable && isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
+    else if (!isInternetReachable && isConnected) {
       return [
         renderCustomMapsList(),
         renderOfflineCustomMapsList(),
