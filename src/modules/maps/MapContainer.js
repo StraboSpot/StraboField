@@ -287,7 +287,7 @@ const MapContainer = forwardRef(({
         const currentZoom = mapRef.current.getZoom();
         mapRef.current.flyTo({center: center, zoom: currentZoom, maxDuration: 2500});
       }
-      else cameraRef.current.setCamera({centerCoordinate: center});
+      else cameraRef.current.setCamera({centerCoordinate: center, animationMode: 'easeTo', animationDuration: 2000});
     }
     else throw 'Error Getting Map Camera';
   };
