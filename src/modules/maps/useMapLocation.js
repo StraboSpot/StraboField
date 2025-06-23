@@ -26,12 +26,11 @@ const useMapLocation = () => {
       });
     }
 
-    const geolocationOptions = {timeout: 15000, maximumAge: 10000, enableHighAccuracy: true};
+    const geolocationOptions = {timeout: 15000, maximumAge: 10000, enableHighAccuracy: Platform.OS === 'ios'};
     return (
       new Promise((resolve, reject) => {
         Geolocation.getCurrentPosition(
           (position) => {
-            // setUserLocationCoords([position.coords.longitude, position.coords.latitude]);
             console.log('Got Current Location: [', position.coords.longitude, ', ', position.coords.latitude, ']');
             resolve(position.coords);
           },
