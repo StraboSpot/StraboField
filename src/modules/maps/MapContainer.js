@@ -282,14 +282,12 @@ const MapContainer = forwardRef(({
     if (cameraRef.current || Platform.OS === 'web') {
       console.log('%cFlying to location', 'color: red');
       const currentLocation = await getCurrentLocation();
+      const center = [currentLocation.longitude, currentLocation.latitude];
       if (Platform.OS === 'web') {
-        mapRef.current.flyTo(
-          {center: [currentLocation.longitude, currentLocation.latitude], zoom: ZOOM, maxDuration: 2500});
+        const currentZoom = mapRef.current.getZoom();
+        mapRef.current.flyTo({center: center, zoom: currentZoom, maxDuration: 2500});
       }
-      else {
-        const currentLocationAsPoint = turf.point([currentLocation.longitude, currentLocation.latitude]);
-        await zoomToSpotsNow([currentLocationAsPoint], mapRef.current, cameraRef.current);
-      }
+      else cameraRef.current.setCamera({centerCoordinate: center});
     }
     else throw 'Error Getting Map Camera';
   };
