@@ -106,10 +106,13 @@ const spotSlice = createSlice({
       state.spots = {...state.spots, [state.selectedSpot.properties.id]: state.selectedSpot};
     },
     editedSpotProperties(state, action) {
-      const {field, value} = action.payload;
-      state.selectedSpot.properties[field] = value;
-      state.selectedSpot.properties.modified_timestamp = Date.now();
-      state.spots = {...state.spots, [state.selectedSpot.properties.id]: state.selectedSpot};
+      const {field, value, spotId = state.selectedSpot.properties.id} = action.payload;
+      const spotToEdit = state.spots[spotId];
+      spotToEdit.properties[field] = value;
+      spotToEdit.properties.modified_timestamp = Date.now();
+      if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
+      if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
+      state.spots = {...state.spots, [spotId]: spotToEdit};
     },
     resetSpotState() {
       return initialSpotState;
@@ -131,10 +134,6 @@ const spotSlice = createSlice({
       state.recentViews = recentViewsArr;
       state.selectedAttributes = [];
     },
-    setSelectedSpotNotesTimestamp(state) {
-      state.selectedSpot.properties.notesTimestamp = Date();
-      state.spots = {...state.spots, [state.selectedSpot.properties.id]: state.selectedSpot};
-    },
   },
 });
 
@@ -154,7 +153,6 @@ export const {
   setIntersectedSpotsForTagging,
   setSelectedAttributes,
   setSelectedSpot,
-  setSelectedSpotNotesTimestamp,
 } = spotSlice.actions;
 
 export default spotSlice.reducer;
