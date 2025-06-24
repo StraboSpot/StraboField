@@ -49,7 +49,7 @@
     "@reduxjs/toolkit": "2.7.0",
     "@rn-vui/base": "5.1.3",
     "@rn-vui/themed": "5.1.3",
-    "@rnmapbox/maps": "10.1.38",
+    "@rnmapbox/maps": "10.1.39",
     "@sentry/cli": "2.41.1",
     "@sentry/react-native": "6.6.0",
     "@sentry/tracing": "7.120.3",

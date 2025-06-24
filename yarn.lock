@@ -3133,9 +3133,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.1.38":
-  version: 10.1.38
-  resolution: "@rnmapbox/maps@npm:10.1.38"
+"@rnmapbox/maps@npm:10.1.39":
+  version: 10.1.39
+  resolution: "@rnmapbox/maps@npm:10.1.39"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -3157,7 +3157,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/767ea41e1418d65b4a3cb252c7325c203d7440fec85659b449c3540378de207cf3e46b4cb043cce12347fac33659f26c92283a1f19bc80c217bb5c808dad4770
+  checksum: 10c0/3f4d78f90f43e1d6477ebcd543ee23d301ab7aed82c99902102837945063e6338ad09bfbaf5a402c939d97b5fa55201bb81ff64f738ce4bed6678a2cb213bca5
   languageName: node
   linkType: hard
 
@@ -14968,7 +14968,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:2.7.0"
     "@rn-vui/base": "npm:5.1.3"
     "@rn-vui/themed": "npm:5.1.3"
-    "@rnmapbox/maps": "npm:10.1.38"
+    "@rnmapbox/maps": "npm:10.1.39"
     "@sentry/cli": "npm:2.41.1"
     "@sentry/react-native": "npm:6.6.0"
     "@sentry/tracing": "npm:7.120.3"
