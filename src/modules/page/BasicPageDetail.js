@@ -288,21 +288,21 @@ const BasicPageDetail = ({
 
   const saveForm = async (formCurrent) => {
     try {
-      if (groupKey === 'pet') {
-        await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+      if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
+      else {
+        if (groupKey === 'pet') {
+          await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else if (groupKey === 'sed' && pageKey === 'bedding') {
+          await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else if (groupKey === 'sed') {
+          await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else await saveFeature(formCurrent);
+        closeDetailView();
+        console.log('Done');
       }
-      else if (groupKey === 'sed' && pageKey === 'bedding') {
-        await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-      }
-      else if (groupKey === 'sed') {
-        await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-      }
-      if (formCurrent?.values.isOnMySesar || isIGSNChecked) {
-        await updateIGSNAndShowModal(formCurrent);
-        console.log('IGSN Registered');
-      }
-      else await saveFeature(formCurrent);
-      console.log('Done');
     }
     catch (err) {
       console.error('ERROR saving form', err);
