@@ -1,8 +1,9 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {PAGE_KEYS} from './page.constants';
@@ -54,6 +55,7 @@ const BasicPageDetail = ({
   const {deleteFeatureTags} = useTags();
 
   const formRef = useRef(null);
+  const toast = useToast();
 
   const [initialValues, setInitialValues] = useState({});
 
@@ -191,7 +193,7 @@ const BasicPageDetail = ({
     console.log('Submitting form...', values);
     setInitialValues(values);
     resetForm({values});
-    console.log('Resetting form...');
+    console.log('Reset form...');
   };
 
   const renderFormFields = () => {
@@ -273,8 +275,9 @@ const BasicPageDetail = ({
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       editedPageData = editedPageData.filter(f => f.id !== editedFeatureData.id);
       editedPageData.push(editedFeatureData);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: pageKey, value: editedPageData}));
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
 
       if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
         await checkSampleName(editedFeatureData.sample_id_name);
@@ -301,10 +304,12 @@ const BasicPageDetail = ({
         }
         else await saveFeature(formCurrent);
         closeDetailView();
+        if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
         console.log('Done');
       }
     }
     catch (err) {
+      toast.show('Error Saving Changes', {type: 'danger'});
       console.error('ERROR saving form', err);
     }
   };

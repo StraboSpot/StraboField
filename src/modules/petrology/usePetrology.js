@@ -94,18 +94,19 @@ const usePetrology = () => {
       await formCurrent.submitForm();
       const editedFeatureData = showErrors(formCurrent, isLeavingPage);
       console.log('Saving', key, 'data to Spot ...');
+      const spotId = spot.properties.id;
       if (editedFeatureData.rock_type && (key === PAGE_KEYS.ROCK_TYPE_IGNEOUS
         || key === PAGE_KEYS.ROCK_TYPE_METAMORPHIC || key === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE)) {
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'pet', value: editedFeatureData}));
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: 'pet', value: editedFeatureData, spotId: spotId}));
       }
       else {
         let editedPetData = spot.properties.pet ? JSON.parse(JSON.stringify(spot.properties.pet)) : {};
         if (!editedPetData[key] || !Array.isArray(editedPetData[key])) editedPetData[key] = [];
         editedPetData[key] = editedPetData[key].filter(type => type.id !== editedFeatureData.id);
         editedPetData[key].push(editedFeatureData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: 'pet', value: editedPetData, spotId: spotId}));
       }
       // await formCurrent.resetForm();
     }

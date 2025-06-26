@@ -106,13 +106,16 @@ const spotSlice = createSlice({
       state.spots = {...state.spots, [state.selectedSpot.properties.id]: state.selectedSpot};
     },
     editedSpotProperties(state, action) {
-      const {field, value, spotId = state.selectedSpot.properties.id} = action.payload;
-      const spotToEdit = state.spots[spotId];
-      spotToEdit.properties[field] = value;
-      spotToEdit.properties.modified_timestamp = Date.now();
-      if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
-      if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
-      state.spots = {...state.spots, [spotId]: spotToEdit};
+      const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
+      if (spotId) {
+        const spotToEdit = state.spots[spotId];
+        spotToEdit.properties[field] = value;
+        spotToEdit.properties.modified_timestamp = Date.now();
+        if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
+        if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
+        state.spots = {...state.spots, [spotId]: spotToEdit};
+      }
+      else throw Error('Missing Spot Id');
     },
     resetSpotState() {
       return initialSpotState;

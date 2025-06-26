@@ -14,7 +14,8 @@ const noteStyle = StyleSheet.create({
     textAlign: 'center',
   },
   noteContainer: {
-    marginTop: 10,
+    borderStyle: 'solid',
+    borderTopWidth: .5,
   },
 });
 

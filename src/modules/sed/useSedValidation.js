@@ -47,10 +47,9 @@ const useSedValidation = () => {
     }
   };
 
-  const validateSedData = (spot, pageKey) => {
+  const validateSedData = (sed, spot, pageKey) => {
     let errorMessages = [];
     const isMappedInterval = isStratInterval(spot);
-    const sed = spot.properties.sed;
 
     // Validation checks for Bedding page
     const validateBeddingPage = () => {

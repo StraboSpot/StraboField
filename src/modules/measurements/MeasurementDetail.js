@@ -1,8 +1,9 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button, ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementItem from './MeasurementItem';
@@ -38,6 +39,7 @@ const MeasurementDetail = ({
   const {deleteMeasurements} = useMeasurements();
 
   const formRef = useRef(null);
+  const toast = useToast();
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
@@ -452,9 +454,11 @@ const MeasurementDetail = ({
         }
       });
       dispatch(setSelectedAttributes(editedSelectedMeasurements));
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy}));
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
       await formCurrent.resetForm();
+      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
     }
     catch (e) {

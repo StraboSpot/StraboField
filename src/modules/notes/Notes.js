@@ -5,7 +5,6 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
@@ -18,6 +17,7 @@ import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import Templates from '../templates/Templates';
+import noteStyle from './notes.styles';
 
 const Notes = ({zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -139,18 +139,16 @@ const Notes = ({zoomToCurrentLocation}) => {
         : (
           <>
             {!isShowTemplates && renderCancelSaveButtons()}
-            <View style={noteStyle.noteContainer}>
-              <Templates
-                isShowTemplates={isShowTemplates}
-                setIsShowTemplates={bool => setIsShowTemplates(bool)}
-                page={page}
-              />
-            </View>
+            <Templates
+              isShowTemplates={isShowTemplates}
+              setIsShowTemplates={bool => setIsShowTemplates(bool)}
+              page={page}
+            />
           </>
         )
       }
       {!isShowTemplates && (
-        <ScrollView>
+        <ScrollView style={noteStyle.noteContainer}>
           <NoteForm
             formRef={formRef}
             initialNotesValues={initialNotesValues}
@@ -163,7 +161,6 @@ const Notes = ({zoomToCurrentLocation}) => {
           )}
         </ScrollView>
       )}
-      <Text style={noteStyle.messageText}>Notes will save automatically if you navigate away.</Text>
     </View>
   );
 };
