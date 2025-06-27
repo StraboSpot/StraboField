@@ -149,12 +149,15 @@ const Compass = ({
     const adjustedTrend = heading < 0 ? trendAndPlunge.trend + magneticDeclination.current : trendAndPlunge.trend - magneticDeclination.current;
     // const declinationRadians = magneticDeclination * Math.PI / 180;
     // const adjustedHeading = heading + declinationRadians;
+    let dipDirection = strikeAndDip.strike + 90;
+    if (dipDirection >= 360) dipDirection = dipDirection - 360;
     setCompassData({
       magDecHeading: roundToDecimalPlaces(heading, 0),
       trueHeading: roundToDecimalPlaces(adjustedHeadingWithMagDecl, 0),
       strike: roundToDecimalPlaces(strikeAndDip.strike, 0),
       magDecStrike: roundToDecimalPlaces(adjustedStrike, 0),
       dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
+      dip_direction: roundToDecimalPlaces(dipDirection, 0),
       trend: roundToDecimalPlaces(trendAndPlunge.trend, 0),
       magDecTrend: roundToDecimalPlaces(adjustedTrend, 0),
       plunge: roundToDecimalPlaces(trendAndPlunge.plunge, 0),

@@ -5,6 +5,7 @@ import {MEASUREMENT_KEYS} from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import SliderBar from '../../shared/ui/SliderBar';
 import compassStyles from '../compass/compass.styles';
+import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 
 const AddManualMeasurements = ({formProps, measurementType}) => {
@@ -30,6 +31,8 @@ const AddManualMeasurements = ({formProps, measurementType}) => {
 
   const labelField = planarSurvey.find(f => f.name === labelKey);
 
+  const {onMyChange} = useCompassCalculations({formRefCurrent: formProps});
+
   useEffect(() => {
     console.log('UE AddManualMeasurements [sliderValue]', sliderValue);
     const sliderValueString = sliderValue <= 5 ? sliderValue.toString() : undefined;
@@ -43,9 +46,14 @@ const AddManualMeasurements = ({formProps, measurementType}) => {
     <>
       <Form {...{...formProps, formName: planarFormName, surveyFragment: [labelField]}}/>
       <>
-        {(measurementType === MEASUREMENT_KEYS.PLANAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR)
-          && <Form {...{...formProps, formName: planarFormName, surveyFragment: planarKeysFields}}/>
-        }
+        {(measurementType === MEASUREMENT_KEYS.PLANAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
+          <Form {...{
+            ...formProps,
+            formName: planarFormName,
+            surveyFragment: planarKeysFields,
+            onMyChange: onMyChange,
+          }}/>
+        )}
         {(measurementType === MEASUREMENT_KEYS.LINEAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
           <Form {...{
             ...formProps,
