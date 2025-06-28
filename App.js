@@ -76,8 +76,8 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <Toast>
         <Provider store={store}>
+          <Toast>
           <PersistGate loading={null} persistor={persistor}>
             {/*<Sentry.TouchEventBoundary>*/}
             <SystemBars/>
@@ -87,8 +87,8 @@ const App = () => {
             </NavigationContainer>
             {/*</Sentry.TouchEventBoundary>*/}
           </PersistGate>
+          </Toast>
         </Provider>
-      </Toast>
     </SafeAreaProvider>
   );
 };
