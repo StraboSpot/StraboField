@@ -8,11 +8,12 @@ import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/Helpers';
 import {MAP_MODES} from '../maps/maps.constants';
+import {setFreehandFeatureCoords} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/page.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
-import {clearedSelectedSpots} from '../spots/spots.slice';
+import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 
 const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
   const [dialogs, setDialogs] = useState(
@@ -90,6 +91,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         closeMainMenuPanel();
         break;
       case 'addTag':
+        dispatch(setIntersectedSpotsForTagging([]));
         // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
@@ -98,6 +100,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
         break;
       case 'addToReport':
+        dispatch(setIntersectedSpotsForTagging([]));
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('report');
         setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
@@ -105,9 +108,13 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
         break;
       case 'stereonet':
-        // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('stereonet');
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
+        break;
+      case 'selectSpots':
+        mapComponentRef.current?.clearSelectedSpots();
+        setSelectingMode('selectSpots');
         setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'mapMeasurement':
@@ -142,6 +149,12 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const endMeasurement = () => setMapMode(MAP_MODES.VIEW);
+
+  const onCancel = () => {
+    console.log('Cancel');
+    setMapMode(MAP_MODES.VIEW);
+    dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
+  };
 
   const onEndDrawPressed = async () => {
     try {
@@ -199,6 +212,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     endMeasurement: endMeasurement,
     selectingMode: selectingMode,
     mapMode: mapMode,
+    onCancel: onCancel,
     onEndDrawPressed: onEndDrawPressed,
     setDistance: setDistance,
     setMapModeToEdit: setMapModeToEdit,

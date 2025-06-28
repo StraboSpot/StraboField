@@ -15,12 +15,12 @@ const useDeviceOrientation = () => {
     const orientation = width > height ? Orientation.landscape : Orientation.portrait;
     RNOrientationDirector.lockTo(orientation);
     toast.show(
-      `Screen orientation LOCKED to  ${RNOrientationDirector.convertOrientationToHumanReadableString(orientation)}`);
+      `Screen orientation LOCKED to  ${RNOrientationDirector.convertOrientationToHumanReadableString(orientation)}`, {duration: 1000});
   };
 
   const unlockOrientation = () => {
     RNOrientationDirector.unlock();
-    toast.show('Screen orientation UNLOCKED');
+    toast.show('Screen orientation UNLOCKED', {duration: 1000});
   };
 
   return {
