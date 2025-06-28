@@ -9,16 +9,20 @@ import {MAP_MODES} from '../../maps/maps.constants';
 import useProject from '../../project/useProject';
 import EditCancelSaveButtons from '../buttons/EditCancelSaveButtons';
 import homeStyles from '../home.style';
+import {PRIMARY_TEXT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import {setFreehandFeatureCoords} from '../../maps/maps.slice';
 
 const DrawInfo = ({
                     clickHandler,
                     distance,
                     endMeasurement,
                     mapMode,
+                    onCancel,
                     onEndDrawPressed,
                     selectingMode,
                   }) => {
   const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
+  const freehandFeatureCoords = useSelector(state => state.map.freehandFeatureCoords);
 
   const {getSelectedDatasetFromId} = useProject();
 
@@ -58,14 +62,27 @@ const DrawInfo = ({
                   />
                 )
                 : (
-                  <Button
-                    buttonStyle={homeStyles.drawToolsButtons}
-                    containerStyle={{alignContent: 'center'}}
-                    onPress={onEndDrawPressed}
-                    title={selectingMode ? 'Set Area' : 'Save New Spot'}
-                    titleStyle={homeStyles.drawToolsTitle}
-                    type={'clear'}
-                  />
+                  <>
+                    <Button
+                      buttonStyle={homeStyles.drawToolsButtons}
+                      containerStyle={{alignContent: 'center'}}
+                      disabledStyle={{backgroundColor: 'grey'}}
+                      onPress={onEndDrawPressed}
+                      title={selectingMode ? 'Set Area' : 'Save New Spot'}
+                      titleStyle={homeStyles.drawToolsTitle}
+                      type={'clear'}
+                      disabled={isEmpty(freehandFeatureCoords)}
+                    />
+                    <Button
+                      buttonStyle={{...homeStyles.drawToolsButtons, backgroundColor: SECONDARY_BACKGROUND_COLOR}}
+                      containerStyle={{alignContent: 'center', paddingTop: 5}}
+                      onPress={onCancel}
+                      title={'Cancel'}
+                      titleStyle={{...homeStyles.drawToolsTitle, color: PRIMARY_TEXT_COLOR}}
+                      type={'clear'}
+                    />
+                  </>
+
                 )
           }
         </View>

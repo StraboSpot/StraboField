@@ -24,6 +24,7 @@ const HomeView = forwardRef(({
                                distance,
                                endMeasurement,
                                mapMode,
+                               onCancel,
                                onEndDrawPressed,
                                openMainMenuPanel,
                                openNotebookPanel,
@@ -57,6 +58,7 @@ const HomeView = forwardRef(({
         endMeasurement={endMeasurement}
         mapMode={mapMode}
         onEndDrawPressed={onEndDrawPressed}
+        onCancel={onCancel}
         openNotebookPanel={openNotebookPanel}
         selectingMode={selectingMode}
       />

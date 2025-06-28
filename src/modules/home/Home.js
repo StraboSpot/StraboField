@@ -27,6 +27,7 @@ const Home = forwardRef(({
     distance,
     endMeasurement,
     mapMode,
+    onCancel,
     onEndDrawPressed,
     selectingMode,
     setDistance,
@@ -45,6 +46,7 @@ const Home = forwardRef(({
           dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
+          onCancel={onCancel}
           mapMode={mapMode}
           onEndDrawPressed={onEndDrawPressed}
           openMainMenuPanel={openMainMenuPanel}
@@ -73,6 +75,7 @@ const Home = forwardRef(({
         distance={distance}
         endMeasurement={endMeasurement}
         mapMode={mapMode}
+        onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
         openMainMenuPanel={openMainMenuPanel}
         openNotebookPanel={openNotebookPanel}
