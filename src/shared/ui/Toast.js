@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {ToastProvider} from 'react-native-toast-notifications';
 
-const ToastPopup = ({children, placement}) => {
+const ToastPopup = ({children}) => {
   return (
     <ToastProvider
       placement={'center'}
@@ -32,6 +32,18 @@ const ToastPopup = ({children, placement}) => {
         noWifi: toast => (
           <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
             <Icon name={'wifi-off'} containerStyle={{paddingEnd: 10}}/>
+            <Text>{toast.message}</Text>
+          </View>
+        ),
+        lock: toast => (
+          <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
+            <Icon type={'material-community'} name={'lock'} containerStyle={{paddingEnd: 10}} size={35}/>
+            <Text>{toast.message}</Text>
+          </View>
+        ),
+        unlock: toast => (
+          <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
+            <Icon type={'material-community'} name={'lock-open'} containerStyle={{paddingEnd: 10}} size={35}/>
             <Text>{toast.message}</Text>
           </View>
         ),
