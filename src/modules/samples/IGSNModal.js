@@ -128,7 +128,7 @@ const IGNSModal = forwardRef(({
 
   const formatContentItems = (item) => {
     if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude') {
-      return item.value.toFixed(5);
+      return item.value;
     }
     if (item.sesarKey === 'collection_start_date') {
       return moment(item.value).format('MM-DD-YYYY (h:mm:ss a)');

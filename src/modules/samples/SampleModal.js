@@ -202,8 +202,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         let samples = 'samples';
         let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
-        newSample.longitude = pointSetAtCurrentLocation.geometry.coordinates[0].toFixed(6);
-        newSample.latitude = pointSetAtCurrentLocation.geometry.coordinates[1].toFixed(6);
         pointSetAtCurrentLocation.properties[samples] = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
         dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
@@ -217,9 +215,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       else {
         Keyboard.dismiss();
         dispatch(setModalVisible({modal: null}));
-        const location = await getCurrentLocation();
-        newSample.latitude = location.latitude;
-        newSample.longitude = location.longitude;
         const samples = spot.properties?.samples
           ? [...spot.properties.samples, newSample]
           : [newSample];

@@ -13,6 +13,7 @@ const useSamples = () => {
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
   const {name} = useSelector(state => state.user);
+  const selectedSpot= useSelector(state => state.spot.selectedSpot);
 
   const authenticateWithSesar = async (sesarTokens) => {
     const validSesarTokens = await getValidToken(sesarTokens);
@@ -158,6 +159,8 @@ const useSamples = () => {
   };
 
   const straboSesarMapping = (sampleValue) => {
+    const longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0] : 'No coordinates assigned';
+    const latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1] : 'No coordinates assigned';
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
       {label: 'User Code', sesarKey: 'user_code', value: sampleValue.sesarUserCode}, //required
@@ -169,8 +172,8 @@ const useSamples = () => {
       {label: 'Purpose:', sesarKey: 'purpose', value: sampleValue?.main_sampling_purpose},
       {label: 'Collection Date (Time):', sesarKey: 'collection_start_date', value: sampleValue?.collection_date},
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
-      {label: 'Latitude:', sesarKey: 'latitude', value: sampleValue?.latitude},
-      {label: 'Longitude:', sesarKey: 'longitude', value: sampleValue?.longitude},
+      {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
+      {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
       {label: 'Collector:', sesarKey: 'collector', value: name},
     ];
     return mappedObj;

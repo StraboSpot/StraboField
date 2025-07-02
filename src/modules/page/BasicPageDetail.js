@@ -212,7 +212,6 @@ const BasicPageDetail = ({
         >
           {formProps => (
             <>
-              {page.key === PAGE_KEYS.SAMPLES && <GeoFieldsInputs geomFormRef={formRef}/>}
               <Form {...{
                 ...formProps,
                 formName: formName,
