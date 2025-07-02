@@ -22,7 +22,7 @@ const DrawInfo = ({
                     selectingMode,
                   }) => {
   const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
-  const freehandFeatureCoords = useSelector(state => state.map.freehandFeatureCoords);
+  // const freehandFeatureCoords = useSelector(state => state.map.freehandFeatureCoords);
 
   const {getSelectedDatasetFromId} = useProject();
 
@@ -71,7 +71,7 @@ const DrawInfo = ({
                       title={selectingMode ? 'Set Area' : 'Save New Spot'}
                       titleStyle={homeStyles.drawToolsTitle}
                       type={'clear'}
-                      disabled={isEmpty(freehandFeatureCoords)}
+                      // disabled={isEmpty(freehandFeatureCoords)}
                     />
                     <Button
                       buttonStyle={{...homeStyles.drawToolsButtons, backgroundColor: SECONDARY_BACKGROUND_COLOR}}

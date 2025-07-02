@@ -16,8 +16,9 @@ const NamingConventions = () => {
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
     await formRef.current.submitForm();
-    console.log('Saving naming convention preferences to Project ...', formRef.current.values);
-    dispatch(updatedProject({field: 'preferences', value: formRef.current.values}));
+    const updatedValues = {...formRef.current.values, [name]: value};
+    console.log('Saving naming convention preferences to Project ...', updatedValues);
+    dispatch(updatedProject({field: 'preferences', value: updatedValues}));
   };
 
   return (

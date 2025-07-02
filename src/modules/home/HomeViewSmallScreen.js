@@ -28,6 +28,7 @@ const HomeViewSmallScreen = forwardRef(({
                                           distance,
                                           endMeasurement,
                                           mapMode,
+                                          onCancel,
                                           onEndDrawPressed,
                                           openMainMenuPanel,
                                           openNotebookPanel,
@@ -176,6 +177,7 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogClickHandler={dialogClickHandler}
                     dialogs={dialogs}
                     distance={distance}
+                    onCancel={onCancel}
                     endMeasurement={endMeasurement}
                     mapComponentRef={mapComponentRef}
                     mapMode={mapMode}

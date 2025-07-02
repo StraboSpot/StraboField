@@ -150,9 +150,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const endMeasurement = () => setMapMode(MAP_MODES.VIEW);
 
-  const onCancel = () => {
+  const onCancel = async () => {
     console.log('Cancel');
-    setMapMode(MAP_MODES.VIEW);
+    await cancelEdits();
     dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
   };
 
