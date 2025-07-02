@@ -32,11 +32,6 @@ const Overview = ({openMainMenuPanel}) => {
   const {showErrors, validateForm} = useForm();
   const {getPopulatedPagesKeys} = usePage();
 
-  useEffect(() => {
-    console.log('UE Overview []');
-    dispatch(setModalVisible({modal: null}));
-  }, []);
-
   const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
   const sections = visiblePagesKeys.reduce((acc, key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
