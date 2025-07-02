@@ -250,7 +250,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
              !isEmpty(sesarToken.access)
               && renderIGSNUserCodePicker()
             }
-            {isEmpty(sesarToken.access) && <Button
+            {!isEmpty(sesarToken.access) && <Button
               title='Reset SESAR Credentials'
               titleStyle={{fontSize: themes.SMALL_TEXT_SIZE}}
               type={'clear'}
