@@ -4,8 +4,8 @@ import {useToast} from 'react-native-toast-notifications';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 
 const useDeviceOrientation = () => {
-  const toast = useToast();
   const {width, height} = useWindowSize();
+  const toast = useToast();
 
   const toastOptions = {
     duration: 1000,

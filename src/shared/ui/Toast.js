@@ -2,9 +2,10 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {ToastProvider} from 'react-native-toast-notifications';
+import {ToastProvider, Toast} from 'react-native-toast-notifications';
+import styles from './ui.styles';
 
-const ToastPopup = ({children}) => {
+const ToastPopup = ({children, onToastRef}) => {
   return (
     <ToastProvider
       placement={'center'}
@@ -30,19 +31,19 @@ const ToastPopup = ({children}) => {
       }
       renderType={{
         noWifi: toast => (
-          <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={styles.toastContainer}>
             <Icon name={'wifi-off'} containerStyle={{paddingEnd: 10}}/>
-            <Text>{toast.message}</Text>
+            <Text >{toast.message}</Text>
           </View>
         ),
         lock: toast => (
-          <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={styles.toastContainer}>
             <Icon type={'material-community'} name={'lock'} containerStyle={{paddingEnd: 10}} size={35}/>
             <Text>{toast.message}</Text>
           </View>
         ),
         unlock: toast => (
-          <View style={{padding: 15, backgroundColor: 'white', flexDirection: 'row', alignItems: 'center'}}>
+          <View style={styles.toastContainer}>
             <Icon type={'material-community'} name={'lock-open'} containerStyle={{paddingEnd: 10}} size={35}/>
             <Text>{toast.message}</Text>
           </View>

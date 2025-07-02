@@ -79,6 +79,7 @@ const Modal = ({
       }}
       fullScreen={SMALL_SCREEN || isFullScreen}
       animationType={'slide'}
+      backdropStyle={{backgroundColor: 'transparent'}}
     >
       <ModalHeader
         buttonTitleLeft={buttonTitleLeft}

@@ -3,7 +3,7 @@ import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
-import Toast from 'react-native-toast-notifications';
+import Toast, {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, isEmpty, numToLetter} from '../../shared/Helpers';
@@ -27,6 +27,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {checkSampleName, getNewSpotName} = useSpots();
+  const toast = useToast();
   const {getCurrentLocation, setPointAtCurrentLocation} = useMapLocation();
 
   const initialNamePrefix = preferences.sample_prefix || '';
@@ -38,7 +39,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const [collectionDate, setCollectionDate] = useState(null);
 
   const formRef = useRef(null);
-  const toastRef = useRef();
+  const toastRef = useRef(null);
 
   const formName = ['general', 'samples'];
 
@@ -64,13 +65,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   useEffect(() => {
     console.log('UE SampleModal [spot]', spot);
-    getCurrentLocation()
-      .then((location) => {
-        const date = new Date().toISOString();
-        setCurrentLocation(location);
-        setCollectionDate(date);
-      });
-
     if (preferences.prepend_spot_name_sample_name) {
       const spotName = modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE || !spot ? getNewSpotName()
         : spot?.properties?.name;
@@ -210,6 +204,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
         dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
         dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toastRef.current?.show(toastMsg, toastOptions);
+        setIsLoading(false);
         await zoomToCurrentLocation();
       }
       else {
@@ -223,6 +221,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,
         };
         dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toast.show(toastMsg, toastOptions);
+        setIsLoading(false);
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       await currentForm.resetForm();
@@ -232,6 +234,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     catch (err) {
       console.error('Error saving Sample', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+      const toastMsg = `Error Saving Sample! \n${err}`;
+      const toastOptions = {duration: 2000, type: 'danger'};
+      if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
+      else toast.show(toastMsg, toastOptions);
     }
   };
 
@@ -248,10 +254,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
                 sample_type: 'individual_sample',
                 sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
                 inplaceness_of_sample: '5___definitely',
-                longitude: currentLocation.longitude,
-                latitude: currentLocation.latitude,
-                collection_time: collectionDate,
-                collection_date: collectionDate,
               }}
               onSubmit={values => console.log('Submitting form...', values)}
               enableReinitialize={true}>
@@ -277,7 +279,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       onPress={onPress}
     >
-
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
     </Modal>
