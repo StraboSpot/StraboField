@@ -114,6 +114,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
     setIsPickerVisible(false);
   };
 
+  const onReset = () => {
+    dispatch(setInitialSesarState());
+    console.log('Sesar credentials have beed reset')
+    toast.show('Sesar credentials have beed reset', {type: 'success'});
+    handleIGSNChecked(false);
+  }
+
   const onUserCodeSelect = async (userCode) => {
     dispatch(setSelectedUserCode(userCode));
   };
@@ -243,15 +250,12 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
              !isEmpty(sesarToken.access)
               && renderIGSNUserCodePicker()
             }
-            <Button
+            {isEmpty(sesarToken.access) && <Button
               title='Reset SESAR Credentials'
               titleStyle={{fontSize: themes.SMALL_TEXT_SIZE}}
               type={'clear'}
-              onPress={() => {
-                dispatch(setInitialSesarState());
-                handleIGSNChecked(false);
-              }}
-            />
+              onPress={onReset}
+            />}
           </View>
         }
       </View>
