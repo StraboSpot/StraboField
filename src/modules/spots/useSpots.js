@@ -71,15 +71,9 @@ const useSpots = () => {
         const spotSampleNames = spot.properties.samples?.map(sample => sample.sample_id_name);
         return spotSampleNames ? [...new Set([...acc, ...spotSampleNames])] : acc;
       }, []);
-      const foundDuplicateName = sampleNames.includes(name);
-      if (foundDuplicateName) {
-        const toastMsg = 'Warning! Sample Name has Already Been Used.';
-        const toastOptions = {duration: 3000, type: 'warning', placement: 'top'};
-        if (SMALL_SCREEN && toastRef) toastRef.current.show(toastMsg, toastOptions);
-        else toast.show(toastMsg, toastOptions);
-        if (Platform.OS === 'web') await sleep(3000);
-      }
+      return sampleNames.includes(name);
     }
+    else return;
   };
 
   // Show toast warning if duplicate Spot name used

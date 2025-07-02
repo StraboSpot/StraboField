@@ -4,11 +4,13 @@ import Geolocation from '@react-native-community/geolocation';
 import * as turf from '@turf/turf';
 import {useDispatch} from 'react-redux';
 
+import usePermissions from '../../services/usePermissions';
 import {useSpots} from '../spots';
 import {setSelectedSpot} from '../spots/spots.slice';
 
 const useMapLocation = () => {
   const {createRandomSpots, createSpot} = useSpots();
+  const {hasLocationPermission} = usePermissions();
   const dispatch = useDispatch();
 
   const generateRandomsSpotsAroundCurrentLocation = async (numRandomSpots) => {
@@ -19,22 +21,39 @@ const useMapLocation = () => {
 
   // Get the current location from the device and set it in the state
   const getCurrentLocation = async () => {
+    if (Platform.OS === 'android') {
+      const permissionGranted = await hasLocationPermission();
+      if (!permissionGranted) {
+        throw new Error('Location permission not granted');
+      }
+    }
+
     if (Platform.OS !== 'web') {
       Geolocation.setRNConfiguration({
         skipPermissionRequests: false,
-        locationProvider: Platform.OS === 'ios' ? null : 'playServices',
+        locationProvider: 'auto', //fallback to native provider if needed
+        // locationProvider: Platform.OS === 'ios' ? null : 'playServices',
       });
     }
 
-    const geolocationOptions = {timeout: 15000, maximumAge: 10000, enableHighAccuracy: Platform.OS === 'ios'};
+    const geolocationOptions = {
+      timeout: 15000,
+      maximumAge: 10000,
+      forceRequestLocation: true, //forces real-time fix
+      showLocationDialog: true,
+      enableHighAccuracy: Platform.OS === 'ios'
+    };
     return (
       new Promise((resolve, reject) => {
         Geolocation.getCurrentPosition(
           (position) => {
-            console.log('Got Current Location: [', position.coords.longitude, ', ', position.coords.latitude, ']');
+            console.log('Got location', position.coords);
             resolve(position.coords);
           },
-          error => reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error')),
+          (error) => {
+            console.error(error);
+            reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error'));
+          },
           geolocationOptions,
         );
       })
@@ -50,7 +69,7 @@ const useMapLocation = () => {
     const newSpot = await createSpot(feature);
     console.log('Created new Spot at current location:', newSpot);
     dispatch(setSelectedSpot(newSpot));
-    return newSpot;
+    return JSON.parse(JSON.stringify(newSpot));
   };
 
   return {
