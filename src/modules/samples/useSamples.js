@@ -67,10 +67,8 @@ const useSamples = () => {
     const xml = await getSesarUserCode(sesarTokens.access);
     let json = parseXML(xml);
 
-    if (json.results.valid.includes('yes')) {
-      console.log(json.results.valid);
-      return json;
-    }
+    if (json.results.valid.includes('yes')) return json;
+    else if (json.results.error) throw Error(json.results.error);
     else {
       const newTokens = await getValidToken(sesarTokens);
       return await getAndSaveSesarCode(newTokens);

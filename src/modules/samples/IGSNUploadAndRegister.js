@@ -90,7 +90,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
         // handleIGSNChecked(true);
         // if (isEmpty(selectedUserCode)) setIsPickerVisible(true);
       }
-      else return;
+      else if (tokens.errors.permissions) throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
     }
     catch (err) {
       console.error(err);
@@ -113,6 +113,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   const closePicker = () => {
     setIsPickerVisible(false);
   };
+
+  const onReset = () => {
+    dispatch(setInitialSesarState());
+    console.log('Sesar credentials have beed reset')
+    toast.show('Sesar credentials have beed reset', {type: 'success'});
+    handleIGSNChecked(false);
+  }
 
   const onUserCodeSelect = async (userCode) => {
     dispatch(setSelectedUserCode(userCode));
@@ -231,22 +238,25 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
 
   return (
     <React.Fragment>
-      {__DEV__ && <Button
-        title="Delete SESAR values"
-        type={'clear'}
-        onPress={() => {
-          dispatch(setInitialSesarState());
-          handleIGSNChecked(false);
-        }}
-      />}
       <View>
         {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
         {renderIGSNUploadCheckbox()}
-        {isEmpty(sesarToken.access) && isIGSNChecked && renderOrcidSignInButton()}
-        {
-          isIGSNChecked
-          && !isEmpty(sesarToken.access)
-          && renderIGSNUserCodePicker()
+
+        {isIGSNChecked &&
+          <View>
+            {isEmpty(sesarToken.access) && renderOrcidSignInButton()}
+
+            {
+             !isEmpty(sesarToken.access)
+              && renderIGSNUserCodePicker()
+            }
+            {isEmpty(sesarToken.access) && <Button
+              title='Reset SESAR Credentials'
+              titleStyle={{fontSize: themes.SMALL_TEXT_SIZE}}
+              type={'clear'}
+              onPress={onReset}
+            />}
+          </View>
         }
       </View>
     </React.Fragment>
