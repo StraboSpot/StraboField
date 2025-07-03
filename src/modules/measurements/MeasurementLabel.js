@@ -1,20 +1,31 @@
 import React from 'react';
 import {Text} from 'react-native';
 
+import {useSelector} from 'react-redux';
+
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
 import useMeasurements from './useMeasurements';
 import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 
 const MeasurementLabel = ({isDetail, item}) => {
+  const measurementConvention = useSelector(state => state.project.project?.description?.measurement_convention);
+
   const {getMeasurementLabel} = useMeasurements();
   const {getLabel} = useForm();
 
   const getMeasurementText = (measurement) => {
     let measurementText = '';
     if (measurement.type === 'planar_orientation' || measurement.type === 'tabular_orientation') {
-      measurementText += (isEmpty(measurement.strike) ? '?' : padWithLeadingZeros(measurement.strike, 3)) + '/'
-        + (isEmpty(measurement.dip) ? '?' : padWithLeadingZeros(measurement.dip, 2));
+      if (measurementConvention === 'dip_direction_dip') {
+        measurementText +=
+          (isEmpty(measurement.dip_direction) ? '?' : padWithLeadingZeros(measurement.dip_direction, 3)) + '/'
+          + (isEmpty(measurement.dip) ? '?' : padWithLeadingZeros(measurement.dip, 2));
+      }
+      else {
+        measurementText += (isEmpty(measurement.strike) ? '?' : padWithLeadingZeros(measurement.strike, 3)) + '/'
+          + (isEmpty(measurement.dip) ? '?' : padWithLeadingZeros(measurement.dip, 2));
+      }
     }
     if (measurement.type === 'linear_orientation') {
       measurementText += (isEmpty(measurement.plunge) ? '?' : padWithLeadingZeros(measurement.plunge, 2)) + '\u2192'

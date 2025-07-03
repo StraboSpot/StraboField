@@ -59,6 +59,13 @@
       "required": "false"
     },
     {
+      "type": "select_one wz3rs72",
+      "name": "measurement_convention",
+      "label": "Measurement Convention",
+      "required": "true",
+      "default": "strike_dip"
+    },
+    {
       "type": "text",
       "name": "instruments",
       "label": "Instruments Used",
@@ -127,17 +134,23 @@
     },
     {
       "type": "end_group"
+    }
+  ],
+  "choices": [
+    {
+      "list_name": "wz3rs72",
+      "name": "strike_dip",
+      "label": "Strike/Dip (Right Hand Rule)"
     },
     {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vBjsct9hFCpTHdUtPckoG7'"
+      "list_name": "wz3rs72",
+      "name": "dip_direction_dip",
+      "label": "Dip Direction/Dip"
     }
   ],
   "settings": [
     {
-      "id_string": "project_description",
-      "version": "vBjsct9hFCpTHdUtPckoG7"
+      "id_string": "project_description"
     }
   ]
 }
