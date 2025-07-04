@@ -200,7 +200,7 @@ const BasicPageDetail = ({
     const formName = getFormName();
     return (
       <View style={{flex: 1}}>
-        {page.key === PAGE_KEYS.SAMPLES && renderIGSNUpload()}
+        {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && renderIGSNUpload()}
         <Formik
           innerRef={formRef}
           onSubmit={onSubmitForm}

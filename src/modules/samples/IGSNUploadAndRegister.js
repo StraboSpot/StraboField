@@ -32,7 +32,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   let tokens = sesarToken;
 
   useEffect(() => {
-    getInitialUrl().then(() => console.log('LINKED'));
     const subscription = Linking.addEventListener('url', handleOpenURL);
     console.log('Subscribing');
     return () => {
@@ -46,13 +45,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
     isIGSNChecked && !isEmpty(sesarToken.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
-
-  const getInitialUrl = async () => {
-    const initialUrl = await Linking.getInitialURL();
-    if (initialUrl) {
-      handleOpenURL({url: initialUrl});
-    }
-  };
 
   const handleOpenURL = async ({url}) => {
     console.log('App resumed with URL:', url);

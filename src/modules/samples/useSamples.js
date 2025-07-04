@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import useServerRequests from '../../services/useServerRequests';
+import {isEmpty} from '../../shared/Helpers';
 import useForm from '../form/useForm';
 import {setSesarToken} from '../user/userProfile.slice';
 
@@ -36,7 +37,7 @@ const useSamples = () => {
            ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
            <longitude>${data.longitude}</longitude>
            <latitude>${data.latitude}</latitude>
-           <collection_start_date>${data.collection_start_date}</collection_start_date>
+           ${isEmpty(data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
            <purpose>${data.purpose}</purpose>
            <description>${data.description}</description>
            <material>${data.material}</material>
@@ -49,7 +50,9 @@ const useSamples = () => {
   const convertAndBuildSchema = (mappedArray, isUpdating) => {
     const jsonData = convertToJSON(mappedArray);
     console.log(jsonData);
-    const updatedJsonData = {...jsonData, collection_start_date: truncateDateISOString(jsonData.collection_start_date)};
+    const collectionDate = !isEmpty(jsonData.collection_start_date) ? truncateDateISOString(jsonData.collection_start_date)
+      : null;
+      const updatedJsonData = {...jsonData, collection_start_date: collectionDate};
     const xmlSchema = buildSesarXmlSchema(updatedJsonData, isUpdating);
     console.log('SESAR SCHEMA', xmlSchema);
     return xmlSchema;
@@ -135,10 +138,10 @@ const useSamples = () => {
       console.log(singleResObject);
       return singleResObject;
     }
-    else if (json.results.error || json.results.sample.error) {
-      throw Error(json.results.error || json.results.sample.error);
+    else {
+      console.log(json.results.sample[0]);
+      return json.results.sample[0];
     }
-    else throw Error('Something happened. Please try again later.');
   };
 
   const refreshToken = async (refresh) => {
