@@ -269,7 +269,7 @@ const useSed = () => {
       await formCurrent.submitForm();
       let editedFeatureData = showErrors(formCurrent, isLeavingPage);
       let editedSpot = JSON.parse(JSON.stringify(spot));
-      let editedSedData = editedSpot.properties.sed ? editedSpot.properties.sed : {};
+      let editedSedData = editedSpot.properties.sed ? JSON.parse(JSON.stringify(editedSpot.properties.sed)) : {};
       if (subKey) {
         if (!editedSedData[pageKey]) editedSedData[pageKey] = {};
         if (!editedSedData[pageKey][subKey]) editedSedData[pageKey][subKey] = [];
@@ -298,7 +298,7 @@ const useSed = () => {
       }
 
       // Validate more conditions for Sed
-      validateSedData(editedSpot, pageKey);
+      validateSedData(editedSedData, editedSpot, pageKey);
 
       // Update geometry if Interval
       if (isStratInterval(spot)) {
@@ -310,8 +310,9 @@ const useSed = () => {
       // Update Sed data
       else {
         // console.log('Saving', pageKey, 'data to Spot ...');
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+        const spotId = spot.properties.id;
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: 'sed', value: editedSedData, spotId: spotId}));
       }
 
       // Update strat section for map if matches edited strat section

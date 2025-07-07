@@ -36,6 +36,7 @@ const Form = ({
         label={field.label}
         key={field.name}
         setFieldValue={setFieldValue}
+        placeholder={field.hint}
       />
     );
   };

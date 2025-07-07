@@ -12,6 +12,7 @@ const ActionButtonsSmallScreen = ({
                                     dialogClickHandler,
                                     dialogs,
                                     distance,
+                                    onCancel,
                                     endMeasurement,
                                     mapComponentRef,
                                     mapMode,
@@ -32,6 +33,7 @@ const ActionButtonsSmallScreen = ({
         <DrawInfo
           clickHandler={clickHandler}
           distance={distance}
+          onCancel={onCancel}
           endMeasurement={endMeasurement}
           mapMode={mapMode}
           onEndDrawPressed={onEndDrawPressed}

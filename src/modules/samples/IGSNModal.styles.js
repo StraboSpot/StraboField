@@ -14,10 +14,12 @@ const IGSNModalStyles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 20,
     maxHeight: 400,
+    paddingHorizontal: 20,
   },
   errorMessageText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   fieldValueText: {
     fontWeight: '500',

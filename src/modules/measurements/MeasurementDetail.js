@@ -1,15 +1,16 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button, ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementItem from './MeasurementItem';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, roundToDecimalPlaces, toDegrees, toRadians} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -17,6 +18,7 @@ import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
+import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
@@ -38,6 +40,7 @@ const MeasurementDetail = ({
   const {deleteMeasurements} = useMeasurements();
 
   const formRef = useRef(null);
+  const toast = useToast();
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
@@ -47,6 +50,12 @@ const MeasurementDetail = ({
   const selectedAttitude = selectedAttributes?.length > 0 ? JSON.parse(JSON.stringify(selectedAttributes[0]))
     : isTemplate ? selectedAttitudes[0]
       : {};
+
+  const {onMyChange} = useCompassCalculations({
+    formRefCurrent: formRef.current,
+    selectedAttitude: selectedAttitude,
+    selectedMeasurement: selectedMeasurement,
+  });
 
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
@@ -97,23 +106,6 @@ const MeasurementDetail = ({
       : [COMPASS_TOGGLE_BUTTONS.LINEAR];
     dispatch(setCompassMeasurementTypes(types));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
-  };
-
-  const calcTrendPlunge = (value) => {
-    console.log('Calculating trend and plunge...');
-    const strike = selectedAttitude.strike;
-    const dip = selectedAttitude.dip;
-    const rake = value;
-    let trend;
-    const beta = toDegrees(Math.atan(Math.tan(toRadians(rake)) * Math.cos(toRadians(dip))));
-    if (rake <= 90) trend = strike + beta;
-    else {
-      trend = 180 + strike + beta;
-      if (trend >= 360) trend = trend - 360;
-    }
-    const plunge = toDegrees(Math.asin(Math.sin(toRadians(dip)) * Math.sin(toRadians(rake))));
-    formRef.current.setFieldValue('trend', roundToDecimalPlaces(trend, 0));
-    formRef.current.setFieldValue('plunge', roundToDecimalPlaces(plunge, 0));
   };
 
   const cancelFormAndGo = () => {
@@ -202,14 +194,6 @@ const MeasurementDetail = ({
       );
     }
     else addAssociatedMeasurement();
-  };
-
-  const onMyChange = async (name, value) => {
-    //console.log(name, 'changed to', value);
-    if (name === 'rake' && !isEmpty(value) && selectedMeasurement.type === 'linear_orientation'
-      && selectedAttitude.id !== selectedMeasurement.id && !isEmpty(selectedAttitude.strike)
-      && !isEmpty(selectedAttitude.dip) && value >= 0 && value <= 180) calcTrendPlunge(value);
-    await formRef.current.setFieldValue(name, value);
   };
 
   // Confirm switching the selected measurement
@@ -452,9 +436,11 @@ const MeasurementDetail = ({
         }
       });
       dispatch(setSelectedAttributes(editedSelectedMeasurements));
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy}));
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
       await formCurrent.resetForm();
+      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
     }
     catch (e) {

@@ -39,7 +39,6 @@ const OtherFeatureDetail = ({
   }, []);
 
   const cancelForm = async () => {
-    await formRef.current.resetForm();
     hideFeatureDetail();
   };
 
@@ -248,8 +247,9 @@ const OtherFeatureDetail = ({
     else feature.type = formValues.type;
     feature.description = formValues.description;
     otherFeatures.push(feature);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures}));
+    const spotId = spot.properties.id;
+    dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+    dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures, spotId: spotId}));
     return true;
   };
 

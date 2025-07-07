@@ -18,6 +18,7 @@ const RightSideButtons = ({
                             distance,
                             endMeasurement,
                             mapMode,
+                            onCancel,
                             onEndDrawPressed,
                             openNotebookPanel,
                             selectingMode,
@@ -60,6 +61,7 @@ const RightSideButtons = ({
             endMeasurement={endMeasurement}
             mapMode={mapMode}
             onEndDrawPressed={onEndDrawPressed}
+            onCancel={onCancel}
             selectingMode={selectingMode}
           />
         </View>

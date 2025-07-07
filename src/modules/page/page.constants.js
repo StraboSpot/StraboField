@@ -43,6 +43,7 @@ import IntervalOverview from '../sed/IntervalOverview';
 import IntervalPage from '../sed/IntervalPage';
 import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
+import SpotsRawDataView from '../spots/SpotsRawDataView';
 import {
   AddTagsToSpotsShortcutModal,
   FeatureTagsModal,
@@ -410,6 +411,7 @@ export const MODAL_KEYS = {
   OTHER: {
     ADD_INTERVAL: 'add_interval',
     ADD_SPOTS_TO_REPORTS: 'AddSpotsToReports',
+    ADD_SPOTS_TO_QAQC: 'AddSpotsToQAQC',
     ADD_TAGS_TO_SPOTS: 'AddTagsToSpots',
     DAILY_NOTES: 'daily_setup',
     FEATURE_TAGS: 'FeatureTags',
@@ -484,6 +486,10 @@ const OTHER_MODALS = [
     key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS,
     label: 'Add Spots To Reports',
     modal_component: ReportsListModal,
+  }, {
+    key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_QAQC,
+    label: 'Add Spots To QAQC',
+    modal_component: SpotsRawDataView,
   }, {
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
     label: 'Add Tags To Spots',

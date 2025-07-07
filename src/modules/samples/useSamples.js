@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import useServerRequests from '../../services/useServerRequests';
+import {isEmpty} from '../../shared/Helpers';
 import useForm from '../form/useForm';
 import {setSesarToken} from '../user/userProfile.slice';
 
@@ -13,6 +14,7 @@ const useSamples = () => {
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
   const {name} = useSelector(state => state.user);
+  const selectedSpot= useSelector(state => state.spot.selectedSpot);
 
   const authenticateWithSesar = async (sesarTokens) => {
     const validSesarTokens = await getValidToken(sesarTokens);
@@ -35,7 +37,7 @@ const useSamples = () => {
            ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
            <longitude>${data.longitude}</longitude>
            <latitude>${data.latitude}</latitude>
-           <collection_start_date>${data.collection_start_date}</collection_start_date>
+           ${isEmpty(data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
            <purpose>${data.purpose}</purpose>
            <description>${data.description}</description>
            <material>${data.material}</material>
@@ -48,7 +50,9 @@ const useSamples = () => {
   const convertAndBuildSchema = (mappedArray, isUpdating) => {
     const jsonData = convertToJSON(mappedArray);
     console.log(jsonData);
-    const updatedJsonData = {...jsonData, collection_start_date: truncateDateISOString(jsonData.collection_start_date)};
+    const collectionDate = !isEmpty(jsonData.collection_start_date) ? truncateDateISOString(jsonData.collection_start_date)
+      : null;
+      const updatedJsonData = {...jsonData, collection_start_date: collectionDate};
     const xmlSchema = buildSesarXmlSchema(updatedJsonData, isUpdating);
     console.log('SESAR SCHEMA', xmlSchema);
     return xmlSchema;
@@ -67,10 +71,8 @@ const useSamples = () => {
     const xml = await getSesarUserCode(sesarTokens.access);
     let json = parseXML(xml);
 
-    if (json.results.valid.includes('yes')) {
-      console.log(json.results.valid);
-      return json;
-    }
+    if (json.results.valid.includes('yes')) return json;
+    else if (json.results.error) throw Error(json.results.error);
     else {
       const newTokens = await getValidToken(sesarTokens);
       return await getAndSaveSesarCode(newTokens);
@@ -136,10 +138,10 @@ const useSamples = () => {
       console.log(singleResObject);
       return singleResObject;
     }
-    else if (json.results.error || json.results.sample.error) {
-      throw Error(json.results.error || json.results.sample.error);
+    else {
+      console.log(json.results.sample[0]);
+      return json.results.sample[0];
     }
-    else throw Error('Something happened. Please try again later.');
   };
 
   const refreshToken = async (refresh) => {
@@ -160,6 +162,8 @@ const useSamples = () => {
   };
 
   const straboSesarMapping = (sampleValue) => {
+    const longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0] : 'No coordinates assigned';
+    const latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1] : 'No coordinates assigned';
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
       {label: 'User Code', sesarKey: 'user_code', value: sampleValue.sesarUserCode}, //required
@@ -171,8 +175,8 @@ const useSamples = () => {
       {label: 'Purpose:', sesarKey: 'purpose', value: sampleValue?.main_sampling_purpose},
       {label: 'Collection Date (Time):', sesarKey: 'collection_start_date', value: sampleValue?.collection_date},
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
-      {label: 'Latitude:', sesarKey: 'latitude', value: sampleValue?.latitude},
-      {label: 'Longitude:', sesarKey: 'longitude', value: sampleValue?.longitude},
+      {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
+      {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
       {label: 'Collector:', sesarKey: 'collector', value: name},
     ];
     return mappedObj;

@@ -24,6 +24,14 @@ const usePermissions = () => {
           title: 'CAMERA',
           message: 'StraboSpot needs permission to use the camera take pictures',
         };
+      case PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION:
+        return {
+          title: 'Location Permission',
+          message: 'App needs access to your location',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        };
     }
   };
 
@@ -40,6 +48,11 @@ const usePermissions = () => {
     else granted = await requestPermission(permission);
     console.log('Permissions', granted);
     return granted;
+  };
+
+  const hasLocationPermission = async () => {
+    const granted = await requestPermission(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
   };
 
   const requestPermission = async (permission) => {
@@ -64,6 +77,7 @@ const usePermissions = () => {
 
   return {
     checkPermission: checkPermission,
+    hasLocationPermission: hasLocationPermission,
     requestPermission: requestPermission,
     requestPermissions: requestPermissions,
   };

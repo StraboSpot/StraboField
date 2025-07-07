@@ -28,15 +28,15 @@ if (Platform.OS !== 'web') {
     dist: RELEASE_NAME,
     autoSessionTracking: true,
     environment: __DEV__ ? 'development' : 'production',
-    // tracesSampleRate: 0.30,
-    // _experiments: {
-    //   profilesSampleRate: 0.50,
-    //   replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
-    //   replaysOnErrorSampleRate: 1.0,
-    // },
-    // integrations: [
-    //   Sentry.mobileReplayIntegration(),
-    // ],
+    tracesSampleRate: 0.30,
+    _experiments: {
+      profilesSampleRate: 0.50,
+      replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
+      replaysOnErrorSampleRate: 1.0,
+    },
+    integrations: [
+      Sentry.mobileReplayIntegration(),
+    ],
   });
 }
 else console.log('SENTRY NOT RUNNING');
@@ -76,8 +76,8 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <Toast>
         <Provider store={store}>
+          <Toast>
           <PersistGate loading={null} persistor={persistor}>
             {/*<Sentry.TouchEventBoundary>*/}
             <SystemBars/>
@@ -87,8 +87,8 @@ const App = () => {
             </NavigationContainer>
             {/*</Sentry.TouchEventBoundary>*/}
           </PersistGate>
+          </Toast>
         </Provider>
-      </Toast>
     </SafeAreaProvider>
   );
 };

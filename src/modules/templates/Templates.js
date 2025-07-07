@@ -359,7 +359,7 @@ const Templates = ({
   const renderTemplateToggle = () => {
     return (
       <View>
-        <ListItem containerStyle={{padding: 0, paddingLeft: 10, paddingRight: 10}}>
+        <ListItem containerStyle={{padding: 10}}>
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>
               {'Use Template(s)?'}

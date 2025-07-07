@@ -5,18 +5,19 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SaveButton from '../../shared/ui/SaveButton';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpotNotesTimestamp} from '../spots/spots.slice';
+import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import Templates from '../templates/Templates';
+import noteStyle from './notes.styles';
 
 const Notes = ({zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -40,20 +41,42 @@ const Notes = ({zoomToCurrentLocation}) => {
       const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
-    return () => leavePage();
+    return () => confirmLeavePage();
   }, [templates]);
 
-  const leavePage = () => {
-    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.NOTE) {
-      const formCurrent = formRef.current;
-      saveForm(formCurrent, false);
-      if (Platform.OS !== 'web') toast.show('Notes saved', {type: 'success'});
-    }
-    else if (Platform.OS !== 'web') toast.show('No changes.');
-
+  const cancelFormAndGo = () => {
+    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
-  const saveForm = async (currentForm, pageTransition) => {
+  const confirmLeavePage = () => {
+    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.NOTE) {
+      const formCurrent = formRef.current;
+      alert('Unsaved Changes',
+        'Would you like to save your data before continuing?',
+        [{
+          text: 'No',
+          style: 'cancel',
+        }, {
+          text: 'Yes',
+          onPress: () => saveFormAndGo(formCurrent),
+        }],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const renderCancelSaveButtons = () => {
+    return (
+      <View>
+        <SaveAndCancelButtons
+          cancel={() => cancelFormAndGo()}
+          save={() => saveFormAndGo()}
+        />
+      </View>
+    );
+  };
+
+  const saveForm = async (currentForm) => {
     try {
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       if (modalVisible === MODAL_KEYS.SHORTCUTS.NOTE) {
@@ -71,18 +94,28 @@ const Notes = ({zoomToCurrentLocation}) => {
       }
       else {
         await currentForm.submitForm();
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(setSelectedSpotNotesTimestamp());
-        dispatch(editedSpotProperties({field: 'notes', value: currentForm.values.note}));
+        const spotId = spot.properties.id;
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: 'notes', value: currentForm.values.note, spotId: spotId}));
         await currentForm.resetForm();
       }
-      if (pageTransition) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-      else if (zoomToCurrentLocation) await zoomToCurrentLocation();
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+      if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
     }
     catch (err) {
       console.log('Error submitting form', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+    }
+  };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
+    try {
+      await saveForm(currentForm);
+      if (zoomToCurrentLocation) await zoomToCurrentLocation();
+      else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
     }
   };
 
@@ -105,19 +138,17 @@ const Notes = ({zoomToCurrentLocation}) => {
         )
         : (
           <>
-            {!isShowTemplates && <ReturnToOverviewButton/>}
-            <View style={noteStyle.noteContainer}>
-              <Templates
-                isShowTemplates={isShowTemplates}
-                setIsShowTemplates={bool => setIsShowTemplates(bool)}
-                page={page}
-              />
-            </View>
+            {!isShowTemplates && renderCancelSaveButtons()}
+            <Templates
+              isShowTemplates={isShowTemplates}
+              setIsShowTemplates={bool => setIsShowTemplates(bool)}
+              page={page}
+            />
           </>
         )
       }
       {!isShowTemplates && (
-        <ScrollView>
+        <ScrollView style={noteStyle.noteContainer}>
           <NoteForm
             formRef={formRef}
             initialNotesValues={initialNotesValues}
@@ -125,12 +156,11 @@ const Notes = ({zoomToCurrentLocation}) => {
           {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
             <SaveButton
               title={'Save Note'}
-              onPress={() => saveForm(formRef.current, false)}
+              onPress={() => saveFormAndGo()}
             />
           )}
         </ScrollView>
       )}
-      <Text style={noteStyle.messageText}>Notes will save automatically if you navigate away.</Text>
     </View>
   );
 };

@@ -11,7 +11,8 @@
     {
       "type": "begin_group",
       "name": "group_image_data",
-      "label": "Image Data"
+      "label": "Image Data",
+      "required": "false"
     },
     {
       "type": "text",
@@ -30,8 +31,7 @@
       "name": "other_image_type",
       "label": "Other Image Type",
       "required": "true",
-      "relevant": "${image_type} = 'other_image_ty'",
-      "constraint": ". = ''"
+      "relevant": "${image_type} = 'other_image_ty'"
     },
     {
       "type": "text",
@@ -77,7 +77,8 @@
     {
       "type": "begin_group",
       "name": "group_camera_orientation",
-      "label": "Camera Orientation"
+      "label": "Camera Orientation",
+      "required": "false"
     },
     {
       "type": "integer",
@@ -107,55 +108,55 @@
     },
     {
       "type": "end_group"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'v9bw7EtaSvkjNvfdXJyCHt'"
     }
   ],
   "choices": [
     {
       "list_name": "cs3xd00",
       "name": "photo",
-      "label": "photo",
-      "order": "0"
+      "label": "photo"
     },
     {
       "list_name": "cs3xd00",
       "name": "sketch",
       "label": "sketch",
-      "order": "1"
+      "order": 1
+    },
+    {
+      "list_name": "cs3xd00",
+      "name": "screenshot",
+      "label": "screenshot",
+      "order": 2
     },
     {
       "list_name": "cs3xd00",
       "name": "thin_section",
       "label": "thin section",
-      "order": "2"
+      "order": 3
     },
     {
       "list_name": "cs3xd00",
       "name": "geological_cs",
       "label": "geological cross section",
-      "order": "3"
+      "order": 4
     },
     {
       "list_name": "cs3xd00",
       "name": "geophysical_cs",
       "label": "geophysical cross section",
-      "order": "4"
+      "order": 5
     },
     {
       "list_name": "cs3xd00",
       "name": "strat_section",
       "label": "stratigraphic section",
-      "order": "5"
+      "order": 6
     },
     {
       "list_name": "cs3xd00",
       "name": "other_image_ty",
       "label": "other",
-      "order": "6"
+      "order": 7
     },
     {
       "list_name": "vt86z05",
@@ -185,8 +186,7 @@
   ],
   "settings": [
     {
-      "id_string": "image_properties",
-      "version": "v9bw7EtaSvkjNvfdXJyCHt"
+      "id_string": "image_properties"
     }
   ]
 }

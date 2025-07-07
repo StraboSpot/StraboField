@@ -35,7 +35,7 @@ const IGNSModal = forwardRef(({
   const [isLoading, setIsLoading] = useState(false);
   const [checkSesarAuth, setCheckSesarAuth] = useState(true);
   const [errorView, setErrorView] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [modalPage, setModalPage] = useState(null);
@@ -67,31 +67,28 @@ const IGNSModal = forwardRef(({
 
   const registerSample = async () => {
     try {
-      let res;
+      // let res;
+      const formValues = formRef.current.values;
       console.log('Updated FormRef', formRef.current.values);
       setIsLoading(true);
-      if (formRef.current.values.isOnMySesar) {
-        setStatusMessage('Updating Sample...');
-        console.log('UPDATING SESAR');
-        res = await updateSampleIsSesar(formRef.current.values);
-        setIsUploaded(true);
+      const res = formValues.isOnMySesar ? await updateSampleIsSesar(formValues) : await uploadSample(formValues);
+      if (res.error && res.error.length > 0) {
+        console.log(res.error[0]);
+        setModalPage('error');
+        setErrorMessages(res.error);
+        setErrorView(true);
       }
       else {
-        setStatusMessage('Uploading Sample...');
-        res = await uploadSample(formRef.current.values);
         setIsUploaded(true);
+        setStatusMessage(res.status);
+        await formRef.current.setValues({...formRef.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
       }
-      setStatusMessage(res.status);
       setIsLoading(false);
-      await formRef.current.setValues({...formRef.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
     }
     catch (err) {
-      const errorMessage = err.toString().split(': ');
-      const reformattedErrorMessage = errorMessage[1].replace(/^_*(.)|_+(.)/g,
-        (s, c, d) => c ? c.toUpperCase() : ' ' + d.toUpperCase());
+      console.error(err);
       setIsLoading(false);
-      console.error(errorMessage);
-      setErrorMessage(reformattedErrorMessage);
+      setErrorMessages('Something went wrong.');
       setModalPage('error');
       setIsUploaded(false);
     }
@@ -116,11 +113,12 @@ const IGNSModal = forwardRef(({
     return (
       <View style={IGSNModalStyles.errorContainer}>
         <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
-        <Text style={IGSNModalStyles.errorMessageText}>{errorMessage}</Text>
+        {errorMessages.map((msg, index) => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
         <Button
           title={'Ok'}
           onPress={onModalCancel}
           buttonStyle={{backgroundColor: 'rgb(78, 114, 33)', paddingHorizontal: 50}}
+          containerStyle={{marginTop: 25}}
         />
       </View>
     );
@@ -128,7 +126,7 @@ const IGNSModal = forwardRef(({
 
   const formatContentItems = (item) => {
     if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude') {
-      return item.value.toFixed(5);
+      return item.value;
     }
     if (item.sesarKey === 'collection_start_date') {
       return moment(item.value).format('MM-DD-YYYY (h:mm:ss a)');

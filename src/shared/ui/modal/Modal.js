@@ -1,5 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
 
 import {Button, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -67,41 +66,20 @@ const Modal = ({
     }
   };
 
-  if (modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT
-    || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS || SMALL_SCREEN || isFullScreen) {
-    return (
-      <Overlay
-        supportedOrientations={['portrait', 'landscape']}
-        isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
-          || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
-          || SMALL_SCREEN || isFullScreen}
-        overlayStyle={SMALL_SCREEN || isFullScreen ? overlayStyles.overlayContainerFullScreen : {
-          ...overlayStyles.overlayContainer,
-          maxHeight: height * 0.80,
-          width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
-        }}
-        fullScreen={SMALL_SCREEN || isFullScreen}
-        animationType={'slide'}
-      >
-        <ModalHeader
-          buttonTitleLeft={buttonTitleLeft}
-          buttonTitleRight={buttonTitleRight}
-          cancel={cancel}
-          closeModal={closeModal}
-          title={title}
-        />
-        {children}
-        {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
-      </Overlay>
-    );
-  }
   return (
-    <View
-      style={{
+    <Overlay
+      supportedOrientations={['portrait', 'landscape']}
+      isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
+        || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
+        || SMALL_SCREEN || isFullScreen}
+      overlayStyle={SMALL_SCREEN || isFullScreen ? overlayStyles.overlayContainerFullScreen : {
         ...overlayStyles.overlayContainer,
-        ...overlayStyles.overlayPosition,
-        zIndex: 1000,
+        maxHeight: height * 0.80,
+        width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
       }}
+      fullScreen={SMALL_SCREEN || isFullScreen}
+      animationType={'slide'}
+      backdropStyle={{backgroundColor: 'transparent'}}
     >
       <ModalHeader
         buttonTitleLeft={buttonTitleLeft}
@@ -111,8 +89,8 @@ const Modal = ({
         title={title}
       />
       {children}
-      {!isEmpty(selectedSpot) && renderModalBottom()}
-    </View>
+      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+    </Overlay>
   );
 };
 

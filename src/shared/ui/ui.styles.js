@@ -157,6 +157,12 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
   },
+  toastContainer: {
+    alignItems: 'center',
+    backgroundColor: themes.GOLD,
+    flexDirection: 'row',
+    padding: 5,
+  },
   verifyButtonStyle: {
     borderRadius: 15,
     paddingLeft: 20,

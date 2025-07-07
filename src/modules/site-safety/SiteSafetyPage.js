@@ -1,24 +1,27 @@
-import React, {useRef} from 'react';
-import {FlatList, View} from 'react-native';
+import React, {useLayoutEffect, useRef} from 'react';
+import {FlatList, Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS, SECONDARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedSpotProperties, setSelectedSpotNotesTimestamp} from '../spots/spots.slice';
+import {editedSpotProperties} from '../spots/spots.slice';
 
 const SiteSafetyPage = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
+  const toast = useToast();
 
   const formRef = useRef(null);
   const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
@@ -33,13 +36,35 @@ const SiteSafetyPage = () => {
     };
   }
 
+  useLayoutEffect(() => {
+    console.log('ULE SiteSafetyPage []');
+    return () => confirmLeavePage();
+  }, []);
+
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
-  const saveFormAndGo = async () => {
+  const confirmLeavePage = () => {
+    if (formRef.current && formRef.current.dirty) {
+      const formCurrent = formRef.current;
+      alert('Unsaved Changes',
+        'Would you like to save your data before continuing?',
+        [{
+          text: 'No',
+          style: 'cancel',
+        }, {
+          text: 'Yes',
+          onPress: () => saveFormAndGo(formCurrent),
+        }],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
     try {
-      await saveForm(formRef.current);
+      await saveForm(currentForm);
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     catch (e) {
@@ -51,10 +76,11 @@ const SiteSafetyPage = () => {
     try {
       await currentForm.submitForm();
       const editedSiteSafetyFormData = showErrors(currentForm);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(setSelectedSpotNotesTimestamp());
-      dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData}));
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
       await currentForm.resetForm();
+      if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
     }
     catch (err) {
       console.log('Error submitting form', err);

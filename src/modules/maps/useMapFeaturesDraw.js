@@ -446,7 +446,7 @@ const useMapFeaturesDraw = ({
             : await mapRef.current.getCoordinateFromView([screenX, screenY]);
           featureCoordinates.push(geoCoordinates);
         }
-        let feature;
+        let feature = {};
         if (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON) {
           featureCoordinates.push(featureCoordinates[0]); // First and Last coordinates of polygon should match
           feature = turf.polygon([featureCoordinates]);
@@ -462,6 +462,7 @@ const useMapFeaturesDraw = ({
         }
         if (selectingMode === 'report') selectReports(feature);
         else if (selectingMode === 'stereonet') await getStereonetForFeature(feature);
+        else if (selectingMode === 'selectSpots') selectSpotsForQAQC(feature);
         else if (selectingMode === 'tag') selectSpotsForTagging(feature);
         else {
           feature.properties.symbology = getSymbology(feature);
@@ -496,6 +497,7 @@ const useMapFeaturesDraw = ({
       setDrawFeatures([]);
     }
     console.log('Draw ended.');
+    dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
     return Promise.resolve(newOrEditedSpot);
   };
 
@@ -640,6 +642,17 @@ const useMapFeaturesDraw = ({
         'No Spots selected.',
       );
     }
+  };
+
+  const selectSpotsForQAQC = (feature) => {
+    let selectedSpots = [];
+    selectedSpots = getLassoedSpots(spotsNotSelected, feature);
+    console.log('Selected Spots', selectedSpots);
+    if (selectedSpots.length > 0) {
+      dispatch(setIntersectedSpotsForTagging(selectedSpots));
+      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_SPOTS_TO_QAQC}));
+    }
+    else console.warn('No Spots selected.');
   };
 
   const selectSpotsForTagging = (feature) => {

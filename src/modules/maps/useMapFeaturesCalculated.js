@@ -81,8 +81,11 @@ const useMapFeaturesCalculated = (mapRef) => {
 
   // Get Spots within (points) or intersecting (line or polygon) the drawn polygon
   const getLassoedSpots = (features, drawnPolygon) => {
-    let selectedSpots;
+    let selectedSpots = [];
     try {
+      if (!drawnPolygon || !drawnPolygon.geometry || !drawnPolygon.geometry.coordinates?.length) {
+        return [];
+      }
       let selectedFeaturesIds = [];
       features.forEach((feature) => {
         if (feature.geometry.type !== 'GeometryCollection' && (turf.booleanWithin(feature, drawnPolygon)

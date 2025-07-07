@@ -1,12 +1,12 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Keyboard, Platform, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
-import Toast from 'react-native-toast-notifications';
+import Toast, {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, isEmpty, numToLetter} from '../../shared/Helpers';
+import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import Modal from '../../shared/ui/modal/Modal';
@@ -27,18 +27,20 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {checkSampleName, getNewSpotName} = useSpots();
+  const toast = useToast();
   const {getCurrentLocation, setPointAtCurrentLocation} = useMapLocation();
 
-  const initialNamePrefix = preferences.sample_prefix || '';
   const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
-  const [namePostfix, setNamePostfix] = useState(null);
-  const [startingNumber, setStartingNumber] = useState(null);
-  const [currentLocation, setCurrentLocation] = useState({});
   const [collectionDate, setCollectionDate] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [namePostfix, setNamePostfix] = useState(null);
+  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
+  const [startingNumber, setStartingNumber] = useState(null);
+  const initialNamePrefix = preferences.sample_prefix || '';
 
   const formRef = useRef(null);
-  const toastRef = useRef();
+  const toastRef = useRef(null);
 
   const formName = ['general', 'samples'];
 
@@ -64,13 +66,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   useEffect(() => {
     console.log('UE SampleModal [spot]', spot);
-    getCurrentLocation()
-      .then((location) => {
-        const date = new Date().toISOString();
-        setCurrentLocation(location);
-        setCollectionDate(date);
-      });
-
     if (preferences.prepend_spot_name_sample_name) {
       const spotName = modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE || !spot ? getNewSpotName()
         : spot?.properties?.name;
@@ -195,24 +190,31 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const saveForm = async (currentForm) => {
     try {
+      setIsLoading(true);
       let newSample = currentForm.values;
+      const date = new Date().toISOString();
+
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       newSample.id = getNewId();
+      newSample.collection_date = date;
+      newSample.collection_time = date;
+
       if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+        let samples = 'samples';
         let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
-        pointSetAtCurrentLocation = {
-          ...pointSetAtCurrentLocation,
-          properties: {
-            ...pointSetAtCurrentLocation.properties,
-            samples: [newSample],
-          },
-        };
+        pointSetAtCurrentLocation.properties[samples] = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
         dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
         dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toastRef.current?.show(toastMsg, toastOptions);
+        setIsLoading(false);
         await zoomToCurrentLocation();
       }
       else {
+        Keyboard.dismiss();
+        dispatch(setModalVisible({modal: null}));
         const samples = spot.properties?.samples
           ? [...spot.properties.samples, newSample]
           : [newSample];
@@ -223,15 +225,34 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,
         };
         dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toast.show(toastMsg, toastOptions);
+        setIsLoading(false);
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       await currentForm.resetForm();
 
-      if (newSample.sample_id_name) await checkSampleName(newSample.sample_id_name, toastRef);
+      if (newSample.sample_id_name) {
+        const foundDuplicateName = await checkSampleName(newSample.sample_id_name, toastRef);
+        if (foundDuplicateName) {
+          const toastMsg = 'Warning! Sample Name has Already Been Used.';
+          const toastOptions = {duration: 2000, type: 'warning'};
+          await sleep(2000);
+          if (SMALL_SCREEN && toastRef) toastRef.current?.show(toastMsg, toastOptions);
+          else toast.show(toastMsg, toastOptions);
+          if (Platform.OS === 'web') await sleep(3000);
+        }
+      }
     }
     catch (err) {
+      setIsLoading(false);
       console.error('Error saving Sample', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+      const toastMsg = `Error Saving Sample! \n${err}`;
+      const toastOptions = {duration: 2000, type: 'danger'};
+      if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
+      else toast.show(toastMsg, toastOptions);
     }
   };
 
@@ -248,10 +269,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
                 sample_type: 'individual_sample',
                 sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
                 inplaceness_of_sample: '5___definitely',
-                longitude: currentLocation.longitude,
-                latitude: currentLocation.latitude,
-                collection_time: collectionDate,
-                collection_date: collectionDate,
               }}
               onSubmit={values => console.log('Submitting form...', values)}
               enableReinitialize={true}>
@@ -263,10 +280,13 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
             </Formik>
           }
         />
-        {!choicesViewKey && <SaveButton
-          title={'Save Sample'}
-          onPress={() => saveForm(formRef.current)}
-        />}
+        {!choicesViewKey && (
+          <SaveButton
+            isLoading={isLoading}
+            onPress={() => saveForm(formRef.current)}
+            title={'Save Sample'}
+          />
+        )}
       </>
     );
   };
@@ -277,7 +297,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       onPress={onPress}
     >
-
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
     </Modal>
