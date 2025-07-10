@@ -43,7 +43,7 @@
     {
       "type": "begin_group",
       "name": "group_rv9mt72",
-      "label": "Image Basemap/Strat Section Spot Name"
+      "label": "Image Basemap/Strat Section\nSpot Name"
     },
     {
       "type": "text",
@@ -62,7 +62,7 @@
     {
       "type": "acknowledge",
       "name": "restart_num_each_nested_spot",
-      "label": "Restart Numbering at 1 for Each Image Basemap/Strat Section",
+      "label": "Restart at 1 for each Parent Spot",
       "required": "false"
     },
     {
@@ -106,7 +106,7 @@
     {
       "type": "acknowledge",
       "name": "restart_sample_num_each_spot",
-      "label": "Restart Numbering at 1 for Each Spot",
+      "label": "Restart at 1 for each Spot",
       "required": "false"
     },
     {
