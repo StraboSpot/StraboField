@@ -112,7 +112,7 @@
     {
       "type": "acknowledge",
       "name": "sample_postfix_letter",
-      "label": "Append Letter Instead of Number to End of Name, Restarting at 'a' for Each Spot",
+      "label": "Append Letter Instead of Number to End of Name, Restarting at 'a' for each Spot",
       "hint": "Add a lowercase letter to the end of each sample name. Increments for each sample within a single spot.",
       "required": "false"
     },
