@@ -19,6 +19,7 @@ import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
+import CompassDebugOverlay from '../compass/CompassDebug';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -269,7 +270,9 @@ const AddMeasurementModal = ({onPress}) => {
         closeModal={onCloseButton}
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
+        modalStyle={{position: 'absolute', left: 70}}
       >
+        {/*<CompassDebugOverlay />*/}
         <>
           {measurementTypeForForm && (
             <FlatList

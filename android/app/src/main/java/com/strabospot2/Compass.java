@@ -5,6 +5,7 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.hardware.GeomagneticField;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -65,7 +66,7 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 
     private float[] mGravity = new float[3];
     private float[] mGeomagnetic = new float[3];
-    private float azimuth = 0f;
+//    private float azimuth = 0f;
     float I[] = new float[9];
 
 
@@ -151,11 +152,36 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
             if (success) {
                 SensorManager.getOrientation(rotationMatrix, orientation);
 
-                azimuth = (float) Math.toDegrees(orientation[0]);
+                float azimuth = (float) Math.toDegrees(orientation[0]);
                 azimuth = (azimuth + 360) % 360;
                 azimuth = Math.round(azimuth);
 
-                sendAzimuthChangeEvent();
+                float declination = 0f;
+                float trueHeading = azimuth;
+
+                LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+                Location location = null;
+
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                if (location == null) {
+                                    location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                }
+
+                                if (location != null) {
+                                    GeomagneticField geoField = new GeomagneticField(
+                                            (float) location.getLatitude(),
+                                            (float) location.getLongitude(),
+                                            (float) location.getAltitude(),
+                                            System.currentTimeMillis()
+                                    );
+                                    declination = geoField.getDeclination();
+                                    trueHeading = (azimuth + declination + 360) % 360;
+                                }
+                            }
+
+                sendAzimuthChangeEvent(trueHeading, azimuth, declination);
+//                 sendAzimuthChangeEvent();
             }
 
 
@@ -169,16 +195,18 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
         WritableMap wm = Arguments.createMap();
 
         // Transposed Matrix
-        wm.putDouble("heading", azimuth);
-        wm.putDouble("M11", rotationMatrix[0]);
-        wm.putDouble("M12", rotationMatrix[3]);
-        wm.putDouble("M13", rotationMatrix[6]);
-        wm.putDouble("M21", rotationMatrix[1]);
-        wm.putDouble("M22", rotationMatrix[4]);
-        wm.putDouble("M23", rotationMatrix[7]);
-        wm.putDouble("M31", rotationMatrix[2]);
-        wm.putDouble("M32", rotationMatrix[5]);
-        wm.putDouble("M33", rotationMatrix[8]);
+        wm.putDouble("trueHeading", trueHeading);
+        wm.putDouble("magneticHeading", magneticHeading);
+        wm.putDouble("declination", declination);
+        wm.putDouble("m11", rotationMatrix[0]);
+        wm.putDouble("m12", rotationMatrix[3]);
+        wm.putDouble("m13", rotationMatrix[6]);
+        wm.putDouble("m21", rotationMatrix[1]);
+        wm.putDouble("m22", rotationMatrix[4]);
+        wm.putDouble("m23", rotationMatrix[7]);
+        wm.putDouble("m31", rotationMatrix[2]);
+        wm.putDouble("m32", rotationMatrix[5]);
+        wm.putDouble("m33", rotationMatrix[8]);
 
 //         wm.putDouble("newAzimuth", azimuth);
 //         wm.putDouble("M11", rotationMatrix[0]);

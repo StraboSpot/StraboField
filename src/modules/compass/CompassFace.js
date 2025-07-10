@@ -28,13 +28,15 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
   // Render the strike and dip symbol inside the compass
   const renderStrikeDipSymbol = () => {
     let spin;
+    const strike = compassData.strike || 0; // iOS already sets the strike with magnetic declination natively
     const strikeAdjusted = compassData?.magDecStrike || 0;
+    const platformStrike = Platform.OS === 'ios' ? strike : strikeAdjusted;
     let image = require('../../assets/images/compass/strike-dip-centered.png');
-    if (compassData.magDecStrike >= 0) {
+    if (platformStrike >= 0) {
       spin = strikeSpinValue.interpolate({
-        inputRange: [0, strikeAdjusted],
+        inputRange: [0, platformStrike],
         // inputRange: [0, 360], // Changed to get symbols to render while we figure out the android compass
-        outputRange: ['0deg', strikeAdjusted + 'deg'],
+        outputRange: ['0deg', platformStrike + 'deg'],
         // outputRange: ['0deg', 180 + 'deg'], // Changed to get symbols to render while we figure out the android compass
       });
 
@@ -45,7 +47,7 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
         strikeSpinValue,
         {
           duration: 100,
-          toValue: strikeAdjusted,
+          toValue: platformStrike,
           easing: Easing.linear(),
           useNativeDriver: Platform.OS !== 'web',
         },

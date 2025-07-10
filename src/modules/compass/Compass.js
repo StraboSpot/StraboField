@@ -25,7 +25,7 @@ const Compass = ({
   let magneticDeclination = useRef(0);
 
   const CompassEvents = new NativeEventEmitter(CompassModule);
-  const {startSensors, stopSensors, getDeviceRotation, stopCompass} = CompassModule;
+  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
 
   const dispatch = useDispatch();
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
@@ -36,7 +36,7 @@ const Compass = ({
   const {playCompassSound} = useCompassSound();
 
   const [compassData, setCompassData] = useState({
-    magDecHeading: 0,
+    magHeading: 0,
     trueHeading: 0,
     strike: 0,
     magDecStrike: 0,
@@ -133,18 +133,23 @@ const Compass = ({
   const getCartesianToSpherical = async (matrixRotationData) => {
     let ENU_Pole;
     let ENU_TP;
-    const heading = matrixRotationData.heading;
-    const adjustedHeadingWithMagDecl = heading > 0 ? heading + magneticDeclination.current : heading - magneticDeclination.current;
+    const {magneticHeading, trueHeading, declination, heading} = matrixRotationData
+    const matrix = matrixRotationData.matrix;
+    // const {heading, trueHeading, declination} = matrixRotationData
+    // const heading = matrixRotationData.heading;
+    // const adjustedHeadingWithMagDecl = trueHeading > 0 ? trueHeading + magneticDeclination.current : trueHeading - magneticDeclination.current;
+    // const trueHeadingFromPlatform= Platform.OS === 'ios' ? trueHeading : magneticHeading;
     if (Platform.OS === 'ios') {
-      ENU_Pole = await cartesianToSpherical(-matrixRotationData.M32, matrixRotationData.M31, matrixRotationData.M33);
-      ENU_TP = await cartesianToSpherical(-matrixRotationData.M22, matrixRotationData.M21, matrixRotationData.M23);
+      ENU_Pole = await cartesianToSpherical(-matrix.m32, matrix.m31, matrix.m33);
+      ENU_TP = await cartesianToSpherical(-matrix.m22, matrix.m21, matrix.m23);
     }
     else {
-      ENU_Pole = await cartesianToSpherical(matrixRotationData.M31, matrixRotationData.M32, matrixRotationData.M33);
-      ENU_TP = await cartesianToSpherical(matrixRotationData.M21, matrixRotationData.M22, matrixRotationData.M23);
+      ENU_Pole = await cartesianToSpherical(matrix.m31, matrix.m32, matrix.m33);
+      ENU_TP = await cartesianToSpherical(matrix.m21, matrix.m22, matrix.m23);
     }
     const strikeAndDip = await getStrikeAndDip(ENU_Pole);
     const trendAndPlunge = await getTrendAndPlunge(ENU_TP);
+
     const adjustedStrike = heading < 0 ? strikeAndDip.strike + magneticDeclination.current : strikeAndDip.strike - magneticDeclination.current;
     const adjustedTrend = heading < 0 ? trendAndPlunge.trend + magneticDeclination.current : trendAndPlunge.trend - magneticDeclination.current;
     // const declinationRadians = magneticDeclination * Math.PI / 180;
@@ -152,8 +157,9 @@ const Compass = ({
     let dipDirection = strikeAndDip.strike + 90;
     if (dipDirection >= 360) dipDirection = dipDirection - 360;
     setCompassData({
-      magDecHeading: roundToDecimalPlaces(heading, 0),
-      trueHeading: roundToDecimalPlaces(adjustedHeadingWithMagDecl, 0),
+      magHeading: roundToDecimalPlaces(magneticHeading, 0),
+      declination: declination,
+      trueHeading: roundToDecimalPlaces(trueHeading, 0),
       strike: roundToDecimalPlaces(strikeAndDip.strike, 0),
       magDecStrike: roundToDecimalPlaces(adjustedStrike, 0),
       dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
@@ -167,6 +173,7 @@ const Compass = ({
   const handleMatrixRotationData = async (res) => {
     try {
       let matrixData = res;
+      // console.log(matrixData);
       if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
       await getCartesianToSpherical(matrixData);
     }
@@ -183,27 +190,27 @@ const Compass = ({
       matrixArray.shift();
       // console.log('Matrix Array', matrixArray);
     }
-    const m11Avg = matrixArray.reduce((sum, obj) => sum + obj.M11 / matrixArray.length, 0);
-    const m12Avg = matrixArray.reduce((sum, obj) => sum + obj.M12 / matrixArray.length, 0);
-    const m13Avg = matrixArray.reduce((sum, obj) => sum + obj.M13 / matrixArray.length, 0);
-    const m21Avg = matrixArray.reduce((sum, obj) => sum + obj.M21 / matrixArray.length, 0);
-    const m22Avg = matrixArray.reduce((sum, obj) => sum + obj.M22 / matrixArray.length, 0);
-    const m23Avg = matrixArray.reduce((sum, obj) => sum + obj.M23 / matrixArray.length, 0);
-    const m31Avg = matrixArray.reduce((sum, obj) => sum + obj.M31 / matrixArray.length, 0);
-    const m32Avg = matrixArray.reduce((sum, obj) => sum + obj.M32 / matrixArray.length, 0);
-    const m33Avg = matrixArray.reduce((sum, obj) => sum + obj.M33 / matrixArray.length, 0);
+    const m11Avg = matrixArray.reduce((sum, obj) => sum + obj.m11 / matrixArray.length, 0);
+    const m12Avg = matrixArray.reduce((sum, obj) => sum + obj.m12 / matrixArray.length, 0);
+    const m13Avg = matrixArray.reduce((sum, obj) => sum + obj.m13 / matrixArray.length, 0);
+    const m21Avg = matrixArray.reduce((sum, obj) => sum + obj.m21 / matrixArray.length, 0);
+    const m22Avg = matrixArray.reduce((sum, obj) => sum + obj.m22 / matrixArray.length, 0);
+    const m23Avg = matrixArray.reduce((sum, obj) => sum + obj.m23 / matrixArray.length, 0);
+    const m31Avg = matrixArray.reduce((sum, obj) => sum + obj.m31 / matrixArray.length, 0);
+    const m32Avg = matrixArray.reduce((sum, obj) => sum + obj.m32 / matrixArray.length, 0);
+    const m33Avg = matrixArray.reduce((sum, obj) => sum + obj.m33 / matrixArray.length, 0);
     const headingAvg = matrixArray.reduce((sum, obj) => sum + obj.heading / matrixArray.length, 0);
 
     const newMatrixObject = {
-      M11: roundToDecimalPlaces(m11Avg, 3),
-      M12: roundToDecimalPlaces(m12Avg, 3),
-      M13: roundToDecimalPlaces(m13Avg, 3),
-      M21: roundToDecimalPlaces(m21Avg, 3),
-      M22: roundToDecimalPlaces(m22Avg, 3),
-      M23: roundToDecimalPlaces(m23Avg, 3),
-      M31: roundToDecimalPlaces(m31Avg, 3),
-      M32: roundToDecimalPlaces(m32Avg, 3),
-      M33: roundToDecimalPlaces(m33Avg, 3),
+      m11: roundToDecimalPlaces(m11Avg, 3),
+      m12: roundToDecimalPlaces(m12Avg, 3),
+      m13: roundToDecimalPlaces(m13Avg, 3),
+      m21: roundToDecimalPlaces(m21Avg, 3),
+      m22: roundToDecimalPlaces(m22Avg, 3),
+      m23: roundToDecimalPlaces(m23Avg, 3),
+      m31: roundToDecimalPlaces(m31Avg, 3),
+      m32: roundToDecimalPlaces(m32Avg, 3),
+      m33: roundToDecimalPlaces(m33Avg, 3),
       heading: roundToDecimalPlaces(headingAvg, 0),
     };
     return newMatrixObject;
@@ -296,44 +303,55 @@ const Compass = ({
   const planerType = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
   const linearType = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
 
-  const renderCompassMeasurementsText = () => {
-    if (planerType && linearType) {
-      return (
-        <View style={compassStyles.rawMeasurementsTextContainer}>
-          <View>
-            <Text style={compassStyles.compassDataText}>Strike: {compassData.strike || 0}</Text>
-            <Text style={compassStyles.compassDataText}>Trend: {compassData.trend || 0}</Text>
-          </View>
-          <View>
-            <Text style={compassStyles.compassDataText}>Dip: {compassData.dip || 0}</Text>
-            <Text style={compassStyles.compassDataText}>Plunge: {compassData.plunge || 0}</Text>
-          </View>
-        </View>
-      );
-    }
-    else if (planerType) {
-      return (
-        <View style={compassStyles.rawMeasurementsTextContainer}>
-          <Text style={compassStyles.compassDataText}>Strike: {compassData.strike || 0}</Text>
-          <Text style={compassStyles.compassDataText}>Dip: {compassData.dip || 0}</Text>
-        </View>
-      );
-    }
-    else if (linearType) {
-      return (
-        <View style={compassStyles.rawMeasurementsTextContainer}>
-          <Text style={compassStyles.compassDataText}>Trend: {compassData.trend || 0}</Text>
-          <Text style={compassStyles.compassDataText}>Plunge: {compassData.plunge || 0}</Text>
-        </View>
-      );
-    }
-  };
+  // const renderCompassMeasurementsText = () => {
+  //   if (planerType && linearType) {
+  //     return (
+  //       <View style={compassStyles.rawMeasurementsTextContainer}>
+  //         <View>
+  //           <Text style={compassStyles.compassDataText}>Strike: {compassData.strike || 0}</Text>
+  //           <Text style={compassStyles.compassDataText}>Trend: {compassData.trend || 0}</Text>
+  //         </View>
+  //         <View>
+  //           <Text style={compassStyles.compassDataText}>Dip: {compassData.dip || 0}</Text>
+  //           <Text style={compassStyles.compassDataText}>Plunge: {compassData.plunge || 0}</Text>
+  //         </View>
+  //       </View>
+  //     );
+  //   }
+  //   else if (planerType) {
+  //     return (
+  //       <View style={compassStyles.rawMeasurementsTextContainer}>
+  //         <Text style={compassStyles.compassDataText}>Strike: {compassData.strike || 0}</Text>
+  //         <Text style={compassStyles.compassDataText}>Dip: {compassData.dip || 0}</Text>
+  //       </View>
+  //     );
+  //   }
+  //   else if (linearType) {
+  //     return (
+  //       <View style={compassStyles.rawMeasurementsTextContainer}>
+  //         <Text style={compassStyles.compassDataText}>Trend: {compassData.trend || 0}</Text>
+  //         <Text style={compassStyles.compassDataText}>Plunge: {compassData.plunge || 0}</Text>
+  //       </View>
+  //     );
+  //   }
+  // };
 
   const subscribeToSensors = () => {
     try {
       CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
+      // CompassEvents.addListener('rotationMatrix', (data) => {
+      //   console.log("True heading:", data.trueHeading);
+      //   setCompassData({
+      //     magHeading: data.magneticHeading,
+      //     declination: data.declination,
+      //     trueHeading: data.trueHeading,
+      //   })
 
-      Platform.OS === 'ios' ? getDeviceRotation() : startSensors();
+      // });
+      // CompassEvents.addListener('headingUpdate', handleMatrixRotationData);
+
+      Platform.OS === 'ios' ? startCompass() : startSensors();
+      // Platform.OS === 'ios' ? startCompass() : startSensors();
       console.log('%cSUBSCRIBING to native compass data!', 'color: green');
     }
     catch (err) {
@@ -355,9 +373,12 @@ const Compass = ({
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
-        {/*<Text style={{textAlign: 'center', fontWeight: 'bold'}}>MDeclination: {magneticDeclination.current?.toFixed(2)}</Text>*/}
-        {/*<Text style={{textAlign: 'center', fontWeight: 'bold'}}>True Heading: {compassData.trueHeading}</Text>*/}
-        {/*<Text style={{textAlign: 'center', fontWeight: 'bold'}}>Mag Heading: {compassData.magHeading}</Text>*/}
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>MDeclination: {magneticDeclination.current?.toFixed(2)}</Text>
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>MDeclination Degree: {compassData.declination}</Text>
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>True Heading: {compassData.trueHeading}</Text>
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>Mag Heading: {compassData.magHeading}</Text>
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>Strike: {compassData.strike}</Text>
+        <Text style={{textAlign: 'center', fontWeight: 'bold'}}>MStrike: {compassData.magDecStrike}</Text>
         <CompassFace
           compassMeasurementTypes={compassMeasurementTypes}
           grabMeasurements={grabMeasurements}
