@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, Image, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -8,7 +8,7 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {imageStyles, useImages} from '../images';
+import {ImageThumbnail} from '../images';
 import {PAGE_KEYS} from '../page/page.constants';
 import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {SpotsListItem, useSpots} from '../spots';
@@ -16,7 +16,6 @@ import {SpotsListItem, useSpots} from '../spots';
 const Nesting = () => {
   console.log('Rendering Nesting');
 
-  const {getLocalImageURI} = useImages();
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {handleSpotSelected} = useSpots();
 
@@ -35,25 +34,13 @@ const Nesting = () => {
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
-  const renderImageBasemapThumbnail = (imageId) => {
-    return (
-      <View style={imageStyles.thumbnailContainer}>
-        <Image
-          source={{uri: getLocalImageURI(imageId)}}
-          style={imageStyles.thumbnail}
-          PlaceholderContent={<ActivityIndicator/>}
-        />
-      </View>
-    );
-  };
-
   const renderItem = (spot) => {
     if (spot && spot.properties) {
       if (spot.properties.image_basemap) {
         return (
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{alignSelf: 'center'}}>
-              {renderImageBasemapThumbnail(spot.properties.image_basemap)}
+              <ImageThumbnail imageId={spot.properties.image_basemap}/>
             </View>
             <View style={{flex: 1, alignSelf: 'center'}}>
               {renderName(spot)}
@@ -130,7 +117,7 @@ const Nesting = () => {
       >
         {imageBasemapKey !== 'undefined' && (
           <View style={{alignSelf: 'center'}}>
-            {renderImageBasemapThumbnail(imageBasemapKey)}
+            <ImageThumbnail imageId={imageBasemapKey}/>
           </View>
         )}
         <View style={{flex: 1}}>

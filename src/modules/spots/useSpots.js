@@ -249,19 +249,22 @@ const useSpots = () => {
 
   // Get parent Spot for image basemap
   const getImageBasemapBySpot = (spot) => {
-    const imageBasemapFound = getImageBasemaps().find(
+    const imageBasemapFound = getActiveImageBasemaps().find(
       imageBasemap => imageBasemap.id === spot.properties.image_basemap);
     return imageBasemapFound;
   };
 
-  const getImageBasemaps = () => {
+  const getActiveImageBasemaps = () => {
     return Object.values(getActiveSpotsObj()).reduce((acc, spot) => {
-      const imageBasemaps = spot.properties.images
-        && spot.properties.images.reduce((acc1, image) => {
-          return image.annotated ? [...acc1, image] : acc1;
-        }, []) || [];
+      const imageBasemaps = getImageBasemapsInSpot(spot);
       return [...acc, ...imageBasemaps];
     }, []);
+  };
+
+  const getImageBasemapsInSpot = (spot) => {
+    return spot.properties.images && spot.properties.images.reduce((acc, image) => {
+      return image.annotated ? [...acc, image] : acc;
+    }, []) || [];
   };
 
   // Get Interval Spots on a given Strat Section
@@ -306,8 +309,8 @@ const useSpots = () => {
     }
 
     let newSpotName = namePrefix;
-    if (newSpot && preferences.prepend_spot_name_nested_spot && (isOnImageBasemap(newSpot) || isOnStratSection(
-      newSpot))) {
+    if (newSpot && preferences.prepend_spot_name_nested_spot
+      && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
         const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
         newSpotName = parentSpot.properties.name + namePrefix;
@@ -322,8 +325,13 @@ const useSpots = () => {
     if (newSpot && preferences.restart_num_each_nested_spot
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
-        const spotsMappedOnGivenImageBasemap = getSpotsMappedOnGivenImageBasemap(newSpot.properties.image_basemap);
-        spotNumber = spotsMappedOnGivenImageBasemap.length + 1;
+        const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
+        const imageBasemaps  = getImageBasemapsInSpot(parentSpot);
+        const nestedImageBasemapSpots = imageBasemaps.reduce((acc, imageBasemap) => {
+          const spotsMappedOnGivenImageBasemap = getSpotsMappedOnGivenImageBasemap(imageBasemap.id);
+          return [...acc, ...spotsMappedOnGivenImageBasemap];
+        }, []) || [];
+        spotNumber = nestedImageBasemapSpots.length + 1;
       }
       else {
         const spotsMappedOnGivenStratSection = getSpotsMappedOnGivenStratSection(newSpot.properties.strat_section_id);
@@ -547,7 +555,7 @@ const useSpots = () => {
     getActiveSpotsObj: getActiveSpotsObj,
     getAllFeaturesFromSpot: getAllFeaturesFromSpot,
     getImageBasemapBySpot: getImageBasemapBySpot,
-    getImageBasemaps: getImageBasemaps,
+    getActiveImageBasemaps: getActiveImageBasemaps,
     getIntervalSpotsThisStratSection: getIntervalSpotsThisStratSection,
     getMappableSpots: getMappableSpots,
     getNewSpotName: getNewSpotName,

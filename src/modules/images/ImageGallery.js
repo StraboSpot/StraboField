@@ -1,13 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, SectionList, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {FlatList, SectionList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {Icon, Image} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
-import {imageStyles, useImages} from '.';
-import placeholderImage from '../../assets/images/noimage.jpg';
-import commonStyles from '../../shared/common.styles';
+import {imageStyles, ImageThumbnail} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -22,7 +19,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   // console.log('Rendering ImageGallery...');
 
   const navigate = useNavigation();
-  const {getImageThumbnailURIs} = useImages();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
 
   const dispatch = useDispatch();
@@ -30,40 +26,12 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
 
-  const [imageThumbnails, setImageThumbnails] = useState({});
-  const [isError, setIsError] = useState(false);
-  const [isImageLoadedObj, setIsImageLoadedObj] = useState({});
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
   let sortedSpotsWithImages = [];
-
-  useEffect(() => {
-    // console.log('UE ImageGallery []');
-    loadImageThumbnailURIs().catch(err => console.error(err));
-  }, []);
-
-  const loadImageThumbnailURIs = async () => {
-    try {
-      const spotsWithImages = getSpotsWithImages();
-      // console.log('Getting Image URI Thumbnails!');
-      let imageThumbnailURIsTemp = {};
-      await Promise.all(spotsWithImages.map(async (spot) => {
-        const gotImageThumbnailURIs = await getImageThumbnailURIs(spot.properties.images);
-        imageThumbnailURIsTemp = {...imageThumbnailURIsTemp, ...gotImageThumbnailURIs};
-      }));
-      setIsImageLoadedObj(Object.assign({}, ...Object.keys(imageThumbnailURIsTemp).map(key => ({[key]: false}))));
-      // console.log('Image URI Thumbnails are done!');
-      setImageThumbnails(imageThumbnailURIsTemp);
-      setIsError(false);
-    }
-    catch (err) {
-      console.error('Error getting image thumbnail URIs', err);
-      setIsError(true);
-    }
-  };
 
   const handleImagePressed = async (image) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -78,42 +46,23 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         keyExtractor={image => image.id}
         data={images}
         numColumns={3}
-        renderItem={({item, index}) => renderImage(item, index)}
+        renderItem={renderItem}
       />
     );
   };
 
-  const renderImage = (image, i) => {
+  const renderItem = ({item}) => {
     return (
-      <View style={imageStyles.thumbnailContainer}>
-        <Image
-          style={imageStyles.thumbnail}
-          onPress={() => handleImagePressed(image, i)}
-          source={imageThumbnails[image.id] ? {uri: imageThumbnails[image.id]} : placeholderImage}
-          PlaceholderContent={isEmpty(isImageLoadedObj) || !isImageLoadedObj[image.id] ? <ActivityIndicator/>
-            : <Image style={imageStyles.thumbnail} source={placeholderImage}/>}
-          placeholderStyle={commonStyles.imagePlaceholder}
-          onError={() => {
-            if (!isImageLoadedObj[image.id]) setIsImageLoadedObj(j => ({...j, [image.id]: true}));
-          }}
-          onLoadEnd={() => {
-            if (!isImageLoadedObj[image.id]) setIsImageLoadedObj(j => ({...j, [image.id]: true}));
-          }}
-        />
-      </View>
+      <ImageThumbnail
+        handleImagePressed={() => handleImagePressed(item)}
+        imageId={item.id}
+      />
     );
   };
 
   const renderNoImagesText = () => {
     return <ListEmptyText text={'No Images in Active Datasets'}/>;
   };
-
-  const renderError = () => (
-    <View style={{paddingTop: 75}}>
-      <Icon name={'alert-circle-outline'} type={'ionicon'} size={100}/>
-      <Text style={[commonStyles.noValueText, {paddingTop: 50}]}>Problem getting thumbnail images...</Text>
-    </View>
-  );
 
   const renderSectionHeader = ({spot}) => {
     return (
@@ -164,9 +113,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
-      {isEmpty(getSpotsWithImages()) ? renderNoImagesText()
-        : !isError ? renderSpotsWithImages()
-          : renderError()}
+      {isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages()}
     </>
   );
 };
