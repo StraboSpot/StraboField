@@ -14,6 +14,7 @@ const useDeviceOrientation = () => {
 
   const lockToPortrait = () => {
     RNOrientationDirector.lockTo(Orientation.portrait);
+    toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
   };
 
   const lockOrientation = () => {

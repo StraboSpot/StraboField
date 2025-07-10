@@ -21,6 +21,7 @@ import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -49,6 +50,7 @@ const AddMeasurementModal = ({onPress}) => {
 
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
   const toast = useToast();
 
   const formRef = useRef(null);
@@ -59,7 +61,11 @@ const AddMeasurementModal = ({onPress}) => {
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    return () => dispatch(setModalValues({}));
+    lockToPortrait();
+    return () => {
+      dispatch(setModalValues({}));
+      unlockOrientation();
+    }
   }, []);
 
   useLayoutEffect(() => {

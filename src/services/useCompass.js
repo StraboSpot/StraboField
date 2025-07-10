@@ -88,7 +88,7 @@ const useCompass = () => {
       longitude = locationData.longitude;
       latitude = locationData.latitude;
     }
-    const magneticDeclination = geomagnetism.model(new Date(2024, 11, 10)).point([latitude, longitude]);
+    const magneticDeclination = geomagnetism.model().point([latitude, longitude]);
     console.log('MagDeclination', magneticDeclination);
     return magneticDeclination.decl;
   };
