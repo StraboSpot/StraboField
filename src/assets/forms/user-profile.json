@@ -11,7 +11,7 @@
     {
       "type": "begin_group",
       "name": "group_op0kp09",
-      "label": "Profile",
+      "label": "Personal Info",
       "required": "false"
     },
     {
@@ -21,19 +21,10 @@
       "required": "false"
     },
     {
-      "type": "end_group"
-    },
-    {
-      "type": "begin_group",
-      "name": "group_ib8ke88",
-      "label": "Preferences"
-    },
-    {
-      "type": "select_one tw96f24",
-      "name": "measurement_convention",
-      "label": "Measurement Convention",
-      "required": "true",
-      "default": "strike_dip"
+      "type": "text",
+      "name": "email",
+      "label": "Email",
+      "required": "true"
     },
     {
       "type": "end_group"
@@ -52,23 +43,17 @@
     },
     {
       "type": "end_group"
-    }
-  ],
-  "choices": [
-    {
-      "list_name": "tw96f24",
-      "name": "strike_dip",
-      "label": "Strike/Dip (Right Hand Rule)"
     },
     {
-      "list_name": "tw96f24",
-      "name": "dip_direction_dip",
-      "label": "Dip Direction/Dip"
+      "type": "calculate",
+      "name": "__version__",
+      "calculation": "'vXMpRmfkTjx39qyjEm3uaq'"
     }
   ],
   "settings": [
     {
-      "id_string": "user_profile"
+      "id_string": "user_profile",
+      "version": "vXMpRmfkTjx39qyjEm3uaq"
     }
   ]
 }
