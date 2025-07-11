@@ -23,12 +23,7 @@ const userProfileSlice = createSlice({
   initialState: initialUserState,
   reducers: {
     setUserData(state, action) {
-      const {name, email, mapboxToken, encoded_login, image} = action.payload;
-      state.name = name;
-      state.email = email;
-      state.mapboxToken = mapboxToken;
-      state.encoded_login = encoded_login;
-      state.image = image;
+      Object.assign(state, {...state, ...action.payload});
     },
     login(state) {
       state.isAuthenticated = true;

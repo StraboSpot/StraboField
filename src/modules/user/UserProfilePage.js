@@ -172,9 +172,10 @@ const UserProfilePage = () => {
       await formRef.current.submitForm();
       let newValues = JSON.parse(JSON.stringify(formCurrent.values));
       if (hasErrors(formCurrent)) throw Error('Error in form.');
-      dispatch(setUserData(newValues));
+      const {email, encoded_login, isAuthenticated, sesar, ...userValuesToUpdate} = newValues;
+      dispatch(setUserData(userValuesToUpdate));
       if (isOnline.isInternetReachable) {
-        await uploadProfile(newValues);
+        await uploadProfile(userValuesToUpdate);
         toast.show('Profile uploaded successfully!', {type: 'success'});
         dispatch(setSidePanelVisible({bool: false}));
       }

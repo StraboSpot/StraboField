@@ -135,8 +135,7 @@ const useUpload = () => {
 
   const uploadProfile = async (userValues) => {
     try {
-      const profileData = {name: userValues.name, mapboxToken: userValues.mapboxToken};
-      await updateProfile(profileData);
+      await updateProfile(userValues);
     }
     catch (err) {
       console.error('Error uploading profile image', err);
