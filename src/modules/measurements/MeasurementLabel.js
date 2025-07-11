@@ -9,7 +9,7 @@ import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 
 const MeasurementLabel = ({isDetail, item}) => {
-  const measurementConvention = useSelector(state => state.project.project?.description?.measurement_convention);
+  const measurementConvention = useSelector(state => state.user?.measurement_convention);
 
   const {getMeasurementLabel} = useMeasurements();
   const {getLabel} = useForm();
@@ -18,8 +18,8 @@ const MeasurementLabel = ({isDetail, item}) => {
     let measurementText = '';
     if (measurement.type === 'planar_orientation' || measurement.type === 'tabular_orientation') {
       if (measurementConvention === 'dip_direction_dip') {
-        measurementText +=
-          (isEmpty(measurement.dip_direction) ? '?' : padWithLeadingZeros(measurement.dip_direction, 3)) + '/'
+        measurementText
+          += (isEmpty(measurement.dip_direction) ? '?' : padWithLeadingZeros(measurement.dip_direction, 3)) + '/'
           + (isEmpty(measurement.dip) ? '?' : padWithLeadingZeros(measurement.dip, 2));
       }
       else {
