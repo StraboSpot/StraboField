@@ -29,14 +29,12 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
   const renderStrikeDipSymbol = () => {
     let spin;
     const strike = compassData.strike || 0; // iOS already sets the strike with magnetic declination natively
-    const strikeAdjusted = compassData?.magDecStrike || 0;
-    const platformStrike = Platform.OS === 'ios' ? strike : strikeAdjusted;
     let image = require('../../assets/images/compass/strike-dip-centered.png');
-    if (platformStrike >= 0) {
+    if (strike >= 0) {
       spin = strikeSpinValue.interpolate({
-        inputRange: [0, platformStrike],
+        inputRange: [0, strike],
         // inputRange: [0, 360], // Changed to get symbols to render while we figure out the android compass
-        outputRange: ['0deg', platformStrike + 'deg'],
+        outputRange: ['0deg', strike + 'deg'],
         // outputRange: ['0deg', 180 + 'deg'], // Changed to get symbols to render while we figure out the android compass
       });
 
@@ -47,7 +45,7 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
         strikeSpinValue,
         {
           duration: 100,
-          toValue: platformStrike,
+          toValue: strike,
           easing: Easing.linear(),
           useNativeDriver: Platform.OS !== 'web',
         },
@@ -66,12 +64,12 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
 
   // Render the strike and dip symbol inside the compass
   const renderTrendSymbol = () => {
-    const trendAdjusted = compassData?.magDecTrend || 0;
+    const trend = compassData.trend;
     let image = require('../../assets/images/compass/trendLine.png');
     if (compassData.magDecTrend >= 0) {
       const spin = trendSpinValue.interpolate({
-        inputRange: [0, trendAdjusted],
-        outputRange: ['0deg', trendAdjusted + 'deg'],
+        inputRange: [0, trend],
+        outputRange: ['0deg', trend + 'deg'],
       });
 
       trendAndPlungeStyles.push({transform: [{rotate: spin}]});
@@ -80,7 +78,7 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
         trendSpinValue,
         {
           duration: 100,
-          toValue: trendAdjusted,
+          toValue: trend,
           easing: Easing.linear,
           useNativeDriver: Platform.OS !== 'web',
         },

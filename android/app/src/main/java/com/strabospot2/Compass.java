@@ -42,11 +42,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Compass extends ReactContextBaseJavaModule implements SensorEventListener {
+    private boolean sensorsRegistered = false;
     private static final String PERMISSION_LOCATION_ACCESS = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int PERMISSION_REQ_CODE = 100;
     private int listenerCount = 0;
     private final ReactApplicationContext context;
-//    private LocationRequest locationRequest;
+    //    private LocationRequest locationRequest;
 //    protected Location mCurrentLocation;
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -66,7 +67,7 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 
     private float[] mGravity = new float[3];
     private float[] mGeomagnetic = new float[3];
-//    private float azimuth = 0f;
+    //    private float azimuth = 0f;
     float I[] = new float[9];
 
 
@@ -74,7 +75,7 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
         super(context);
         this.context = context;
 
-        this.sensorManager = (SensorManager)context.getSystemService(context.SENSOR_SERVICE);
+        this.sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
         this.sensorAccelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         this.sensorMagneticField = this.sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -94,7 +95,8 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 //    private void requestRuntimePermissions() {
 //        if (ActivityCompat.checkSelfPermission(this.context, PERMISSION_LOCATION_ACCESS) == PackageManager.PERMISSION_GRANTED) {
 //            Toast.makeText(this.context, "Permission Granted", Toast.LENGTH_LONG).show();
-////            userLocation();
+
+    /// /            userLocation();
 //        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this.context, PERMISSION_LOCATION_ACCESS)) {
 //            AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
 //            builder.setMessage("This app requires LOCATION to get the users declination")
@@ -115,7 +117,6 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 //            ActivityCompat.requestPermissions(this, new String[]{PERMISSION_LOCATION_ACCESS}, PERMISSION_REQ_CODE);
 //        }
 //    }
-
     private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
 
         reactContext
@@ -125,13 +126,41 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 
     @ReactMethod
     public void startSensors() {
-        this.sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
-        this.sensorManager.registerListener(this, sensorMagneticField, SensorManager.SENSOR_DELAY_UI);
-        Log.d("MatrixDataModule", "Sensors started!" );
+        if (!sensorsRegistered) {
+            if (sensorAccelerometer != null) {
+                boolean accelOk = sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+                Log.d("Compass", "Accelerometer registered: " + accelOk);
+            } else {
+                Log.e("Compass", "Accelerometer not available!");
+            }
+
+            if (sensorMagneticField != null) {
+                boolean magOk = sensorManager.registerListener(this, sensorMagneticField, SensorManager.SENSOR_DELAY_UI);
+                Log.d("Compass", "MagneticField registered: " + magOk);
+            } else {
+                Log.e("Compass", "Magnetic field sensor not available!");
+            }
+
+            sensorsRegistered = true;
+        } else {
+            Log.d("Compass", "Sensors already registered.");
+        }
+    }
+
+    @ReactMethod
+    public void stopSensors() {
+        if (!sensorsRegistered) {
+            Log.d("Compass", "Sensors were not registered or already stopped.");
+            return;
+        }
+            sensorManager.unregisterListener(this);
+            sensorsRegistered = false;
+            Log.d("Compass", "All sensors unregistered.");
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        if (listenerCount <= 0) return;
         final float alpha = 0.97f;
 
         synchronized (this) {
@@ -162,23 +191,23 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
                 LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
                 Location location = null;
 
-                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                                if (location == null) {
-                                    location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                                }
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (location == null) {
+                        location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    }
 
-                                if (location != null) {
-                                    GeomagneticField geoField = new GeomagneticField(
-                                            (float) location.getLatitude(),
-                                            (float) location.getLongitude(),
-                                            (float) location.getAltitude(),
-                                            System.currentTimeMillis()
-                                    );
-                                    declination = geoField.getDeclination();
-                                    trueHeading = (azimuth + declination + 360) % 360;
-                                }
-                            }
+                    if (location != null) {
+                        GeomagneticField geoField = new GeomagneticField(
+                                (float) location.getLatitude(),
+                                (float) location.getLongitude(),
+                                (float) location.getAltitude(),
+                                System.currentTimeMillis()
+                        );
+                        declination = geoField.getDeclination();
+                        trueHeading = (azimuth + declination + 360) % 360;
+                    }
+                }
 
                 sendAzimuthChangeEvent(trueHeading, azimuth, declination);
 //                 sendAzimuthChangeEvent();
@@ -191,7 +220,7 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
         }
     }
 
-    private void sendAzimuthChangeEvent() {
+    private void sendAzimuthChangeEvent(float trueHeading, float magneticHeading, float declination) {
         WritableMap wm = Arguments.createMap();
 
         // Transposed Matrix
@@ -218,8 +247,7 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
 //         wm.putDouble("M31", rotationMatrix[6]);
 //         wm.putDouble("M32", rotationMatrix[7]);
 //         wm.putDouble("M33", rotationMatrix[8]);
-
-
+        System.out.println(wm);
         sendEvent(this.context, "rotationMatrix", wm);
     }
 
@@ -236,19 +264,23 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
     // Required for rn built in EventEmitter Calls.
     @ReactMethod
     public void addListener(String eventName) {
-        Log.d("Matrix Array", "Listener has been ADDED: " + eventName);
+        listenerCount++;
+        Log.d("Compass", "Listener added. Total: " + listenerCount);
+
+        if (listenerCount == 1) {
+            startSensors(); // Start only on first listener
+        }
     }
 
     @ReactMethod
     public void removeListeners(Integer count) {
-        Log.d("Matrix Array", "Listener has been REMOVED: " + count);
-    }
+        listenerCount -= count;
+        if (listenerCount < 0) listenerCount = 0;
+        Log.d("Compass", "Listeners removed. Remaining: " + listenerCount);
 
-    @ReactMethod
-    public void stopSensors() {
-        sensorManager.unregisterListener(this, sensorAccelerometer);
-        sensorManager.unregisterListener(this, sensorMagneticField);
-        Log.d("Compass", "All Sensors Stopped!!");
+        if (listenerCount == 0) {
+            stopSensors(); // Stop only when no listeners remain
+        }
     }
 
     @NonNull
