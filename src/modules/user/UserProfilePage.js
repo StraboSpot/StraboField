@@ -281,8 +281,8 @@ const UserProfilePage = () => {
   return (
     <>
       <SidePanelHeader
-        title={'My Strabo Spot'}
-        headerTitle={'Profile'}
+        title={'My StraboSpot'}
+        headerTitle={'Account'}
         backButton={() => {
           console.log('Is User Profile page dirty?', formRef.current.dirty);
           if (!formRef?.current?.dirty) dispatch(setSidePanelVisible({bool: false}));
@@ -310,6 +310,9 @@ const UserProfilePage = () => {
                   size={200}
                 />
               </View>
+              <View style={{alignItems: 'center', padding: 10}}>
+                <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
+              </View>
               <Formik
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
@@ -318,7 +321,6 @@ const UserProfilePage = () => {
                 initialValues={userData}
                 validateOnChange={true}
                 enableReinitialize={true}  // Update values if preferences change while form open
-                disabled={true}
               />
               {isOnline.isInternetReachable ? (
                 <View style={userStyles.saveButtonContainer}>

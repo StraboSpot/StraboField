@@ -7,9 +7,7 @@ const useUserProfile = () => {
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
 
   const getEmail = () => {
-    let email = '';
-    !customDatabaseEndpoint.isSelected && !isEmpty(userData.email) && truncateText(userData.email, 16);
-    return email;
+    return !customDatabaseEndpoint.isSelected && !isEmpty(userData.email) && truncateText(userData.email, 16);
   };
 
   const getInitials = () => {
