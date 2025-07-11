@@ -54,6 +54,7 @@ const AddMeasurementModal = ({onPress}) => {
   const toast = useToast();
 
   const formRef = useRef(null);
+  const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
   const groupKey = 'measurement';
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
@@ -70,6 +71,16 @@ const AddMeasurementModal = ({onPress}) => {
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
+
+    const prev = prevValuesRef.current;
+
+    if (
+      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes) &&
+      JSON.stringify(prev.templates) === JSON.stringify(templates)
+    ) return;
+
+    prevValuesRef.current = {compassMeasurementTypes, templates};
+
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     setSelectedTypeIndex(MEASUREMENT_TYPES.findIndex(t => t.key === typeObj.key));
 
