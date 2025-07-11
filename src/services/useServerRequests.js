@@ -45,7 +45,7 @@ const useServerRequests = () => {
     return request('DELETE', '/datasetSpots/' + datasetId, encoded_login);
   };
 
-  const deleteProfile = async (login) => {
+  const deleteAccount = async (login) => {
     try {
       const response = await fetch(
         baseUrl + STRABO_APIS.ACCOUNT,
@@ -599,7 +599,7 @@ const useServerRequests = () => {
     addDatasetToProject: addDatasetToProject,
     authenticateUser: authenticateUser,
     deleteAllSpotsInDataset: deleteAllSpotsInDataset,
-    deleteProfile: deleteProfile,
+    deleteAccount: deleteAccount,
     deleteProfileImage: deleteProfileImage,
     // deleteProject: deleteProject,
     downloadImage: downloadImage,

@@ -57,7 +57,7 @@ const UserProfilePage = () => {
   const {hasErrors, validateForm} = useForm();
   const {checkPermission} = usePermissions();
   const {clearUser} = useResetState();
-  const {authenticateUser, deleteProfile, deleteProfileImage} = useServerRequests();
+  const {authenticateUser, deleteAccount, deleteProfileImage} = useServerRequests();
   const {uploadProfile} = useUpload();
   const {resizeImageForUpload, uploadProfileImage} = useUploadImages();
 
@@ -70,7 +70,7 @@ const UserProfilePage = () => {
       if (isAuthenticated.valid === 'true') {
         const encodedLogin = Base64.encode(`${userData.email}:${deleteProfileInputValue}`);
         console.log(encodedLogin);
-        const res = await deleteProfile(encodedLogin);
+        const res = await deleteAccount(encodedLogin);
         console.log('ACCOUNT DELETED!', res);
         setDeleteProfileModalVisible(false);
         clearUser();
