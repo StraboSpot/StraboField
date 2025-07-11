@@ -71,10 +71,10 @@ const UserProfilePage = () => {
         const encodedLogin = Base64.encode(`${userData.email}:${deleteProfileInputValue}`);
         console.log(encodedLogin);
         const res = await deleteProfile(encodedLogin);
-        console.log('PROFILE DELETED!', res);
+        console.log('ACCOUNT DELETED!', res);
         setDeleteProfileModalVisible(false);
         clearUser();
-        toast.show('Profile Successfully Deleted!', {type: 'success', duration: 2000});
+        toast.show('Account Successfully Deleted!', {type: 'success', duration: 2000});
         setTimeout(() => navigation.navigate('SignIn'), 200);
       }
       else setErrorMessage('Wrong password');
@@ -92,13 +92,14 @@ const UserProfilePage = () => {
     const deleteModalText = (
       <View>
         <Text style={userStyles.deleteProfileText}>
-          Deleting your profile will<Text style={overlayStyles.importantText}> PERMANENTLY {'\n'} </Text>
-          remove any personal info and data saved for user{'\n'}{userData.email}{'\n'} from www.Strabospot.org!
+          Deleting your account will<Text style={overlayStyles.importantText}> PERMANENTLY </Text>
+          remove all data for user{'\n'}{userData.email}{'\n'}from StraboSpot!
         </Text>
         <Text style={userStyles.deleteProfileText}>Enter password to delete:</Text>
       </View>
     );
-    const offlineText = <Text style={userStyles.deleteProfileText}>Need to be online in order to delete profile.</Text>;
+    const offlineText = <Text style={userStyles.deleteProfileText}>You must be online in order to delete your
+      account.</Text>;
 
     return (
       <TextInputModal
@@ -333,17 +334,19 @@ const UserProfilePage = () => {
                     loadingProps={userStyles.loadingSpinnerProps}
                   />
                   {Platform.OS !== 'web' && (
-                    <Button
-                      onPress={onDownloadUserProfile}
-                      type={'clear'}
-                      title={'Download Profile'}
-                      loading={isDownloading}
-                      loadingProps={userStyles.loadingSpinnerProps}
-                    />
+                    <View style={commonStyles.buttonContainer}>
+                      <Button
+                        onPress={onDownloadUserProfile}
+                        type={'clear'}
+                        title={'Download Profile'}
+                        loading={isDownloading}
+                        loadingProps={userStyles.loadingSpinnerProps}
+                      />
+                    </View>
                   )}
                   <View style={commonStyles.buttonContainer}>
                     <Button
-                      title={'DELETE PROFILE'}
+                      title={'Delete Account'}
                       type={'clear'}
                       onPress={() => setDeleteProfileModalVisible(true)}
                       containerStyle={userStyles.deleteProfileButtonContainer}
