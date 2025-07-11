@@ -22,6 +22,7 @@ import compassStyles from '../compass/compass.styles';
 import CompassDebugOverlay from '../compass/CompassDebug';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -50,9 +51,11 @@ const AddMeasurementModal = ({onPress}) => {
 
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
   const toast = useToast();
 
   const formRef = useRef(null);
+  const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
   const groupKey = 'measurement';
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
@@ -60,11 +63,25 @@ const AddMeasurementModal = ({onPress}) => {
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    return () => dispatch(setModalValues({}));
+    lockToPortrait();
+    return () => {
+      dispatch(setModalValues({}));
+      unlockOrientation();
+    }
   }, []);
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
+
+    const prev = prevValuesRef.current;
+
+    if (
+      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes) &&
+      JSON.stringify(prev.templates) === JSON.stringify(templates)
+    ) return;
+
+    prevValuesRef.current = {compassMeasurementTypes, templates};
+
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     setSelectedTypeIndex(MEASUREMENT_TYPES.findIndex(t => t.key === typeObj.key));
 

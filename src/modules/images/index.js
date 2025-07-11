@@ -4,6 +4,7 @@ export {default as ImageInfo} from './ImageInfo';
 export {default as ImageModal} from './ImageModal';
 export {default as ImagePropertiesModal} from './ImagePropertiesModal';
 export {default as ImageSlider} from './ImageSlider';
+export {default as ImageThumbnail} from './ImageThumbnail';
 export {default as ImagesInSpot} from './ImagesInSpot';
 export {default as ImagesList} from './ImagesList';
 export {default as ImagesOverview} from './ImagesOverview';
