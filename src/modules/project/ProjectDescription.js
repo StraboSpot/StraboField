@@ -33,7 +33,7 @@ const ProjectDescription = () => {
   const handleBackPressed = async () => {
     if (isDirty) {
       await saveForm();
-      toast.show('Changes Saved!', 'success');
+      toast.show('Changes Saved!', {type: 'success'});
     }
     dispatch(setSidePanelVisible({bool: false}));
   };
