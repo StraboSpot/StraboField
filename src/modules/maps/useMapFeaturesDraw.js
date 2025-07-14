@@ -56,6 +56,7 @@ const useMapFeaturesDraw = ({
   const datasets = useSelector(state => state.project.datasets);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const freehandFeatureCoords = useSelector(state => state.map.freehandFeatureCoords);
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -89,9 +90,9 @@ const useMapFeaturesDraw = ({
 
   useEffect(() => {
     // console.log(
-    //   'UE useMapFeaturesDraw [spots, datasets, currentBasemap, currentImageBasemap, stratSection, featureTypesOff]');
+    //   'UE useMapFeaturesDraw [spots, datasets, currentBasemap, currentImageBasemap, stratSection, featureTypesOff, geometryTypesOff]');
     setDisplayedSpots((isEmpty(selectedSpot) ? [] : [{...selectedSpot}]));
-  }, [spots, datasets, currentBasemap, currentImageBasemap, featureTypesOff, stratSection]);
+  }, [spots, datasets, currentBasemap, currentImageBasemap, featureTypesOff, geometryTypesOff, stratSection]);
 
   useEffect(() => {
     // console.log('UE useMapFeaturesDraw [selectedSpot, activeDatasetsIds]');

@@ -13,9 +13,14 @@ const FeaturesLayers = ({spotsNotSelected, spotsSelected}) => {
   console.log('Getting Spots Not Selected as Features...');
   const spotsNotSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsNotSelected)));
   const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);
+  const featuresNotSelectedUniq = featuresNotSelected.reduce((acc, f) =>
+    acc.map(f1 => f1.properties.id).includes(f.properties.id) ? acc : [...acc, f], []);
+
   console.log('Getting Spots Selected as Features...');
   const spotsSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsSelected)));
   const featuresSelected = getSpotsAsFeatures(spotsSelectedWithSymbology);
+  const featuresSelectedUniq = featuresSelected.reduce((acc, f) =>
+    acc.map(f1 => f1.properties.id).includes(f.properties.id) ? acc : [...acc, f], []);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
@@ -25,7 +30,8 @@ const FeaturesLayers = ({spotsNotSelected, spotsSelected}) => {
   return (
     <>
       {/* Halos Around Point Features Layers */}
-      <FeatureHalosLayers spotsNotSelected={spotsNotSelectedWithSymbology} spotsSelected={spotsSelectedWithSymbology}/>
+      {/* Use unique features so multiple halos are not stacked on top of each other */}
+      <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
 
       {/* Not Selected Features Layer */}
       <FeaturesNotSelectedLayers features={features}/>

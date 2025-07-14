@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {FlatList, Switch, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem, Overlay} from '@rn-vui/base';
@@ -11,6 +11,7 @@ import * as themes from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {
   setFeatureTypesOff,
+  setGeometryTypesOff,
   setIsShowOnly1stMeas,
   setIsShowSpotLabelsOn,
   setTagTypeForColor,
@@ -21,10 +22,14 @@ import useMeasurements from '../../measurements/useMeasurements';
 const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
   const dispatch = useDispatch();
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
   const isShowSpotLabelsOn = useSelector(state => state.map.isShowSpotLabelsOn);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
+
+  const [isFeatureTypesExpanded, setFeatureTypesExpanded] = useState(true);
+  const [isGeometryTypesExpanded, setGeometryTypesExpanded] = useState(true);
 
   const {getMeasurementLabel} = useMeasurements();
 
@@ -33,6 +38,19 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
   const handleShowOnly1stMeas = () => dispatch(setIsShowOnly1stMeas(!isShowOnly1stMeas));
 
   const handleShowSpotLabelsOn = () => dispatch(setIsShowSpotLabelsOn(!isShowSpotLabelsOn));
+
+  const renderGeometryTypesList = ({item, index}) => {
+    return (
+      <ListItem containerStyle={commonStyles.listItemFormField} key={item}>
+        <>
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>    {getSymbolTitle(item)}</ListItem.Title>
+          </ListItem.Content>
+          <Switch onValueChange={() => toggleGeometryTypesOff(item)} value={!geometryTypesOff.includes(item)}/>
+        </>
+      </ListItem>
+    );
+  };
 
   const renderSymbolsList = ({item, index}) => {
     return (
@@ -45,6 +63,14 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
         </>
       </ListItem>
     );
+  };
+
+  const toggleGeometryTypesOff = (geometryType) => {
+    let geometryTypesOffCopy = [...geometryTypesOff];
+    const i = geometryTypesOffCopy.indexOf(geometryType);
+    if (i === -1) geometryTypesOffCopy.push(geometryType);
+    else geometryTypesOffCopy.splice(i, 1);
+    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
   };
 
   const toggleFeatureTypesOff = (featureType) => {
@@ -74,20 +100,46 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
       </View>
       {!isEmpty(mapSymbols) && (
         <>
-          <ListItem key={'feature_types'} containerStyle={commonStyles.listItem}>
-            <ListItem.Content>
-              <ListItem.Title style={commonStyles.listItemTitle}>Feature Types</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
-          <FlatListItemSeparator/>
-          <FlatList
-            keyExtractor={item => item}
-            data={mapSymbols}
-            renderItem={renderSymbolsList}
-            ItemSeparatorComponent={FlatListItemSeparator}
-          />
+          <ListItem.Accordion
+            key={'feature_types'}
+            containerStyle={commonStyles.listItem}
+            content={
+              <ListItem.Content>
+                <ListItem.Title style={commonStyles.listItemTitle}>Feature Types</ListItem.Title>
+              </ListItem.Content>
+            }
+            isExpanded={isFeatureTypesExpanded}
+            onPress={() => setFeatureTypesExpanded(!isFeatureTypesExpanded)}
+          >
+            <FlatListItemSeparator/>
+            <FlatList
+              keyExtractor={item => item}
+              data={mapSymbols}
+              renderItem={renderSymbolsList}
+              ItemSeparatorComponent={FlatListItemSeparator}
+            />
+          </ListItem.Accordion>
         </>
       )}
+      <ListItem.Accordion
+        key={'geometry_types'}
+        containerStyle={commonStyles.listItem}
+        content={
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>Geometry Types</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={isGeometryTypesExpanded}
+        onPress={() => setGeometryTypesExpanded(!isGeometryTypesExpanded)}
+      >
+        <FlatListItemSeparator/>
+        <FlatList
+          keyExtractor={item => item}
+          data={['points', 'lines', 'polygons']}
+          renderItem={renderGeometryTypesList}
+          ItemSeparatorComponent={FlatListItemSeparator}
+        />
+      </ListItem.Accordion>
       <FlatListItemSeparator/>
       <ListItem key={'spotLabels'} containerStyle={commonStyles.listItemFormField}>
         <>

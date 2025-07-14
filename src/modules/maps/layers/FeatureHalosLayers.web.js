@@ -5,16 +5,16 @@ import {Layer, Source} from 'react-map-gl';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const FeatureHalosLayers = ({spotsNotSelected, spotsSelected}) => {
+const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
   const {getPaintSymbology} = useMapSymbology();
 
   return (
     <>
       {/* Halo Around Selected Point Feature Layer */}
       <Source
-        id={'pointSpotsSelectedSource'}
+        id={'pointFeaturesSelectedSource'}
         type={'geojson'}
-        data={turf.featureCollection(spotsSelected)}
+        data={turf.featureCollection(featuresSelected)}
       >
         <Layer
           type={'circle'}
@@ -28,7 +28,7 @@ const FeatureHalosLayers = ({spotsNotSelected, spotsSelected}) => {
       <Source
         id={'pointSourceColorHalo'}
         type={'geojson'}
-        data={turf.featureCollection(spotsNotSelected)}
+        data={turf.featureCollection(featuresNotSelected)}
       >
         <Layer
           type={'circle'}

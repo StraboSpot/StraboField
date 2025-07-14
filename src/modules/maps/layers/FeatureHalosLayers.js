@@ -5,15 +5,15 @@ import * as turf from '@turf/turf';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const FeatureHalosLayers = ({spotsNotSelected, spotsSelected}) => {
+const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
   const {getMapSymbology} = useMapSymbology();
 
   return (
     <>
       {/* Halo Around Selected Point Feature Layer */}
       <MapboxGL.ShapeSource
-        id={'pointSpotsSelectedSource'}
-        shape={turf.featureCollection(spotsSelected)}
+        id={'pointFeaturesSelectedSource'}
+        shape={turf.featureCollection(featuresSelected)}
       >
         <MapboxGL.CircleLayer
           id={'pointLayerSelectedHalo'}
@@ -26,7 +26,7 @@ const FeatureHalosLayers = ({spotsNotSelected, spotsSelected}) => {
       {/* Colored Halo Around Points Layer */}
       <MapboxGL.ShapeSource
         id={'pointSourceColorHalo'}
-        shape={turf.featureCollection(spotsNotSelected)}
+        shape={turf.featureCollection(featuresNotSelected)}
       >
         <MapboxGL.CircleLayer
           id={'pointLayerColorHalo'}

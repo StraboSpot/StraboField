@@ -9,6 +9,7 @@ const initialMapsState = {
   customMaps: {},
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
+  geometryTypesOff: [],
   isMapMoved: true,
   isShowOnly1stMeas: false,
   isShowSpotLabelsOn: true,
@@ -69,11 +70,15 @@ const mapsSlice = createSlice({
       state.currentImageBasemap = action.payload;
     },
     setFeatureTypesOff(state, action) {
-      // console.log('Map Symbols Displayed', action.payload);
+      // console.log('Map Feature Types Off', action.payload);
       state.featureTypesOff = action.payload;
     },
     setFreehandFeatureCoords(state, action) {
       state.freehandFeatureCoords = action.payload;
+    },
+    setGeometryTypesOff(state, action) {
+      console.log('Map Geometry Types Off', action.payload);
+      state.geometryTypesOff = action.payload;
     },
     setIsMapMoved(state, action) {
       state.isMapMoved = action.payload;
@@ -130,6 +135,7 @@ export const {
   setCurrentImageBasemap,
   setFeatureTypesOff,
   setFreehandFeatureCoords,
+  setGeometryTypesOff,
   setIsMapMoved,
   setIsShowOnly1stMeas,
   setIsShowSpotLabelsOn,

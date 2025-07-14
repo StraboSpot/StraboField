@@ -18,6 +18,7 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const stratSection = useSelector(state => state.map.stratSection);
 
   const toggleMapSymbolsOverlay = () => {
@@ -33,7 +34,7 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
         onPress={() => toggleDialog('mapActionsMenuVisible')}
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
       />
-      {isEmpty(featureTypesOff)
+      {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff)
         ? (
           <IconButton
             source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')

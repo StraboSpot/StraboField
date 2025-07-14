@@ -10,15 +10,28 @@ const useMapFeatures = () => {
   const {getMappableSpots} = useSpots();
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const featureTypesOff = useSelector(state => state.map.featureTypesOff);
+  const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const filterFeatures = (mappedFeatures) => {
+    let filteredFeatures = JSON.parse(JSON.stringify(mappedFeatures));
+    if (!isEmpty(filteredFeatures) && !isEmpty(featureTypesOff)) {
+      filteredFeatures = filterByFeatureType(filteredFeatures);
+    }
+    if (!isEmpty(filteredFeatures) && !isEmpty(geometryTypesOff)) {
+      filteredFeatures = filterByGeometryType(filteredFeatures);
+    }
+    // console.log('Mapped Features after fitlering:', filteredFeatures);
+    return filteredFeatures;
+  };
+
   // Filter Spots currently visible on the map by feature type (i.e. toggled on in the Map Symbols Overlay)
   const filterByFeatureType = (mappedFeatures) => {
-    console.log('Filtering Features...');
-    console.log('Feature Types Off', featureTypesOff);
+    // console.log('Filtering Features by Feature Type...');
+    // console.log('Feature Types Off', featureTypesOff);
 
     const filteredFeatures = mappedFeatures.filter((spot) => {
 
@@ -39,7 +52,27 @@ const useMapFeatures = () => {
       return isEmpty(nonPointFeaturesToHide) && !pointFeatureToHide && !featuresWithNoOrientationToHide;
     });
 
-    console.log('Filtered Mapped Features', filteredFeatures);
+    // console.log('Features after filtering by feature type', filteredFeatures);
+    return filteredFeatures;
+  };
+
+  // Filter Spots currently visible on the map by geometry type (i.e. toggled on in the Map Symbols Overlay)
+  const filterByGeometryType = (mappedFeatures) => {
+    // console.log('Filtering Features by Geometry Type...');
+    // console.log('Geometry Types Off', geometryTypesOff);
+
+    const filteredFeatures = mappedFeatures.filter((spot) => {
+      return (spot.geometry.type
+        && ((spot.geometry.type === 'Point' || spot.geometry.type === 'MultiPoint')
+          && !geometryTypesOff.includes('points'))
+        || ((spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
+          && !geometryTypesOff.includes('lines'))
+        || ((spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon')
+          && !geometryTypesOff.includes('polygons'))
+      );
+    });
+
+    // console.log('Features after filtering by geometry type', filteredFeatures);
     return filteredFeatures;
   };
 
@@ -114,7 +147,7 @@ const useMapFeatures = () => {
       else mappedFeatures.push(JSON.parse(JSON.stringify(spot)));
     });
     console.log('Mapped Features:', mappedFeatures);
-    return isEmpty(featureTypesOff) || isEmpty(mappedFeatures) ? mappedFeatures : filterByFeatureType(mappedFeatures);
+    return filterFeatures(mappedFeatures);
   };
 
   // Gather and set the feature types that are present in the mapped Spots
@@ -138,6 +171,7 @@ const useMapFeatures = () => {
   };
 
   return {
+    filterFeatures: filterFeatures,
     getAllMappedSpots: getAllMappedSpots,
     getDisplayedSpots: getDisplayedSpots,
     getSpotsAsFeatures: getSpotsAsFeatures,
