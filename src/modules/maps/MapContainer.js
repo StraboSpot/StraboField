@@ -283,11 +283,25 @@ const MapContainer = forwardRef(({
       console.log('%cFlying to location', 'color: red');
       const currentLocation = await getCurrentLocation();
       const center = [currentLocation.longitude, currentLocation.latitude];
+      const currentZoom = await mapRef.current?.getZoom() || ZOOM;
+      const newZoom = Math.max(currentZoom, ZOOM);
       if (Platform.OS === 'web') {
-        const currentZoom = mapRef.current.getZoom();
-        mapRef.current.flyTo({center: center, zoom: currentZoom, maxDuration: 2500});
+        mapRef.current.flyTo({
+          animate: true,
+          center: center,
+          essential: true,
+          maxDuration: 2000,
+          zoom: newZoom,
+        });
       }
-      else cameraRef.current.setCamera({centerCoordinate: center, animationMode: 'easeTo', animationDuration: 2000});
+      else {
+        cameraRef.current.setCamera({
+          animationDuration: 2000,
+          animationMode: 'easeTo',
+          centerCoordinate: center,
+          zoomLevel: newZoom,
+        });
+      }
     }
     else throw 'Error Getting Map Camera';
   };
