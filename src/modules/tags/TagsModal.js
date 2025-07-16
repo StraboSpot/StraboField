@@ -197,10 +197,7 @@ const TagsModal = ({
 
   return (
     <>
-      <View style={{
-        padding: 20,
-        maxHeight: height * 0.8,
-      }}>
+      <View style={{flex: 1, padding: 20, maxHeight: height * 0.8}}>
         <View style={modalStyle.textContainer}>
           <AddButton
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
@@ -213,8 +210,9 @@ const TagsModal = ({
             : <Text style={modalStyle.textStyle}>No {label}</Text>}
         </View>
         {renderSpotTagsList()}
-        {(!isEmpty(tags) && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS
-          && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
+        {(!isEmpty(tags)
+          && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+          && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
           <SaveButton
             buttonStyle={{backgroundColor: 'red'}}
             title={`Save ${label}`}
