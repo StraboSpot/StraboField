@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers} from './index';
+import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
 import useMapSymbology from '../symbology/useMapSymbology';
 import useMapFeatures from '../useMapFeatures';
 
@@ -32,6 +32,8 @@ const FeaturesLayers = ({spotsNotSelected, spotsSelected}) => {
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
       <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+
+      <SampleLayers features={features}/>
 
       {/* Not Selected Features Layer */}
       <FeaturesNotSelectedLayers features={features}/>

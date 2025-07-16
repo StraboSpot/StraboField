@@ -13,6 +13,7 @@ import {
   setFeatureTypesOff,
   setGeometryTypesOff,
   setIsShowOnly1stMeas,
+  setIsShowSamplesOn,
   setIsShowSpotLabelsOn,
   setTagTypeForColor,
 } from '../../maps/maps.slice';
@@ -24,6 +25,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
+  const isShowSamplesOn = useSelector(state => state.map.isShowSamplesOn);
   const isShowSpotLabelsOn = useSelector(state => state.map.isShowSpotLabelsOn);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
@@ -36,6 +38,8 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
   const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
 
   const handleShowOnly1stMeas = () => dispatch(setIsShowOnly1stMeas(!isShowOnly1stMeas));
+
+  const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
 
   const handleShowSpotLabelsOn = () => dispatch(setIsShowSpotLabelsOn(!isShowSpotLabelsOn));
 
@@ -177,6 +181,15 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
           textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
         />
       )}
+      <FlatListItemSeparator/>
+      <ListItem key={'samples'} containerStyle={commonStyles.listItemFormField}>
+        <>
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>Show Samples</ListItem.Title>
+          </ListItem.Content>
+          <Switch onValueChange={handleShowSamplesOn} value={isShowSamplesOn}/>
+        </>
+      </ListItem>
     </Overlay>
   );
 };

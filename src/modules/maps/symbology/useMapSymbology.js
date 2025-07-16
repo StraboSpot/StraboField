@@ -504,6 +504,13 @@ const useMapSymbology = () => {
       lineColor: 'black',
       lineWidth: 3,
     },
+    sample: {
+      textIgnorePlacement: true,  // Need to be able to stack symbols at same location
+      iconImage: 'starburst',
+      iconAllowOverlap: true,     // Need to be able to stack symbols at same location
+      iconIgnorePlacement: true,  // Need to be able to stack symbols at same location
+      iconSize: 0.2,
+    },
     xAxisTickMarkLabels: {
       textField: ['get', 'label'],
       textAnchor: 'bottom-left',

@@ -30,4 +30,6 @@ export const MAP_SYMBOLS = {
   // 'fold_hinge': require('../../assets/symbols/fold_axis.png'),
   // 'intersection': require('../../assets/symbols/intersection.png'),
   'lineation_general': require('../../../assets/symbols/lineation_general.png'),
+
+  'starburst': require('../../../assets/symbols/starburst.png'),
 };

@@ -12,6 +12,7 @@ const initialMapsState = {
   geometryTypesOff: [],
   isMapMoved: true,
   isShowOnly1stMeas: false,
+  isShowSamplesOn: false,
   isShowSpotLabelsOn: true,
   mapSymbols: [],
   selectedCustomMapToEdit: {},
@@ -86,6 +87,9 @@ const mapsSlice = createSlice({
     setIsShowOnly1stMeas(state, action) {
       state.isShowOnly1stMeas = action.payload;
     },
+    setIsShowSamplesOn(state, action) {
+      state.isShowSamplesOn = action.payload;
+    },
     setIsShowSpotLabelsOn(state, action) {
       state.isShowSpotLabelsOn = action.payload;
     },
@@ -138,6 +142,7 @@ export const {
   setGeometryTypesOff,
   setIsMapMoved,
   setIsShowOnly1stMeas,
+  setIsShowSamplesOn,
   setIsShowSpotLabelsOn,
   setMapSymbols,
   setSpotsInMapExtentIds,

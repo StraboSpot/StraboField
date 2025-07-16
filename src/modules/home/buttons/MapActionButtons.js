@@ -19,7 +19,11 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
+  const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
+  const isShowSamplesOn = useSelector(state => state.map.isShowSamplesOn);
+  const isShowSpotLabelsOn = useSelector(state => state.map.isShowSpotLabelsOn);
   const stratSection = useSelector(state => state.map.stratSection);
+  const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
   const toggleMapSymbolsOverlay = () => {
     if (!dialogs.mapSymbolsMenuVisible) updateFeatureTypes();
@@ -34,23 +38,22 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
         onPress={() => toggleDialog('mapActionsMenuVisible')}
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
       />
-      {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff)
-        ? (
-          <IconButton
-            source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')
-              : require('../../../assets/icons/SymbolsButton.png')}
-            onPress={toggleMapSymbolsOverlay}
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-          />
-        ) : (
-          <IconButton
-            source={SMALL_SCREEN ? require('../../../assets/icons/Symbols_pressed.png')
-              : require('../../../assets/icons/SymbolsButton_pressed.png')}
-            onPress={toggleMapSymbolsOverlay}
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-          />
-        )
-      }
+      {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff) && !isShowSamplesOn && !isShowOnly1stMeas
+      && isEmpty(tagTypeForColor) && isShowSpotLabelsOn ? (
+        <IconButton
+          source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')
+            : require('../../../assets/icons/SymbolsButton.png')}
+          onPress={toggleMapSymbolsOverlay}
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        />
+      ) : (
+        <IconButton
+          source={SMALL_SCREEN ? require('../../../assets/icons/Symbols_pressed.png')
+            : require('../../../assets/icons/SymbolsButton_pressed.png')}
+          onPress={toggleMapSymbolsOverlay}
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        />
+      )}
       {!currentImageBasemap && !stratSection && (
         <IconButton
           source={SMALL_SCREEN ? require('../../../assets/icons/Layers.png')
@@ -73,7 +76,7 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
       />
       <MapLayersOverlay
         visible={dialogs.baseMapMenuVisible}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight:(height - 40) * 0.80}]}
+        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         mapComponentRef={mapComponentRef}
         onPress={(name) => {
           setBasemap(name);

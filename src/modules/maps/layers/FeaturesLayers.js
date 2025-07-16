@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 
-import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers} from './index';
+import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from '../symbology/mapSymbology.constants';
 import useMapSymbology from '../symbology/useMapSymbology';
@@ -37,6 +37,8 @@ const FeaturesLayers = ({isStratStyleLoaded, spotsNotSelected, spotsSelected}) =
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
       <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+
+      <SampleLayers features={features}/>
 
       <MapboxGL.Images
         images={symbols}

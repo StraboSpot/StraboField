@@ -10,3 +10,4 @@ export {default as ImageBasemapLayer} from './ImageBasemapLayer';
 export {default as MacrostratMarkerLayer} from './MacrostratMarkerLayer';
 export {default as MapLayers} from './MapLayers';
 export {default as MeasureLayers} from './MeasureLayers';
+export {default as SampleLayers} from './SampleLayers';
