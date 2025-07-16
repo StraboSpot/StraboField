@@ -28,7 +28,9 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {checkSampleName, getNewSpotName} = useSpots();
   const toast = useToast();
-  const {getCurrentLocation, setPointAtCurrentLocation} = useMapLocation();
+  const {setPointAtCurrentLocation} = useMapLocation();
+
+  const initialNamePrefix = preferences.sample_prefix || '';
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [collectionDate, setCollectionDate] = useState(null);
@@ -37,7 +39,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const [namePostfix, setNamePostfix] = useState(null);
   const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
   const [startingNumber, setStartingNumber] = useState(null);
-  const initialNamePrefix = preferences.sample_prefix || '';
 
   const formRef = useRef(null);
   const toastRef = useRef(null);
