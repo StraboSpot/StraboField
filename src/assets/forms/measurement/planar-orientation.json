@@ -27,6 +27,7 @@
       "type": "integer",
       "name": "dip_direction",
       "label": "Azimuth Dip Direction",
+      "hint": "Bulk convert strikes to dip directions from Home Menu -> Miscellaneous.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
       "constraint_message": "Value must be a whole number between 0-360."

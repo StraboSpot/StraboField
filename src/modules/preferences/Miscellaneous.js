@@ -3,6 +3,7 @@ import {Switch, Text} from 'react-native';
 
 import {Button, Input, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SpotDataModelModal from './SpotDataModelModal';
@@ -16,11 +17,13 @@ import StandardModal from '../../shared/ui/StandardModal';
 import {setLoadingStatus} from '../home/home.slice';
 import overlayStyles from '../home/overlays/overlay.styles';
 import useMapLocation from '../maps/useMapLocation';
-import {setTestingMode} from '../project/projects.slice';
+import {setTestingMode, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const Miscellaneous = () => {
   const dispatch = useDispatch();
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const spots = useSelector(state => state.spot.spots);
   const {endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
   const [isErrorMessage, setIsErrorMessage] = useState(false);
@@ -29,13 +32,14 @@ const Miscellaneous = () => {
   const [numRandomSpots, setNumRandomSpots] = useState(100);
   const [password, setPassword] = useState('');
 
+  const toast = useToast();
   const {generateRandomsSpotsAroundCurrentLocation} = useMapLocation();
 
   const formRef = useRef('null');
 
+  const errorMessage = 'Wrong Password!';
   const initialValues = {database_endpoint: endpoint};
   const testingModePassword = 'Strab0R0cks';
-  const errorMessage = 'Wrong Password!';
 
   useEffect(() => {
     console.log('UE Miscellaneous [password]', password);
@@ -45,6 +49,48 @@ const Miscellaneous = () => {
   const closeModal = () => {
     setIsTestingModalVisible(false);
     setIsErrorMessage(false);
+  };
+
+  const convertStrikeDipDirection = () => {
+    if (isEmpty(spots)) toast.show('No Spots Found.', {placement: 'top'});
+    else {
+      const spotsEdited = [];
+      let spotsEditedIds = [];
+      Object.values(spots).forEach((s) => {
+        if (s.properties.orientation_data) {
+          let editedMeasurements = JSON.parse(JSON.stringify(s.properties.orientation_data));
+          Object.values(editedMeasurements).forEach((m) => {
+            if (!isEmpty(m.strike) && isEmpty(m.dip_direction)) {
+              const dipDirection = (m.strike + 90) % 360;
+              console.log('Strike', m.strike, '-> Dip Direction', dipDirection);
+              m.dip_direction = dipDirection;
+              spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
+            }
+            else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
+              const strike = (m.dipDirection - 90) % 360;
+              console.log('Dip direction', m.dip_direction, '-> Strike', strike);
+              m.strike = strike;
+              spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
+            }
+          });
+          if (spotsEditedIds.includes(s.properties.id.toString())) {
+            const updatedSpot = JSON.parse(JSON.stringify(s));
+            updatedSpot.properties.orientation_data = editedMeasurements;
+            spotsEdited.push(updatedSpot);
+          }
+        }
+      });
+      if (!isEmpty(spotsEdited)) {
+        // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
+        //   return spotsEditedIds.includes(s.properties.id.toString()) ? [...acc, s] : acc;
+        // }, []));
+        // console.log('Spots to update', spotsEdited);
+        dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
+        dispatch(editedOrCreatedSpots(spotsEdited));
+        toast.show('Finished conversions. Spots updated', {placement: 'top', type: 'success'});
+      }
+      else toast.show('No conversions needed. No Spots updated.', {placement: 'top'});
+    }
   };
 
   const onTestingSwitchChange = (value) => {
@@ -65,6 +111,24 @@ const Miscellaneous = () => {
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
     else alert('Error Generating Random Spots', 'The number of Spots must be an integer.');
+  };
+
+  const renderBulkUpdatesSection = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Bulk Updates'}/>
+        <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+          Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
+          updated.
+        </Text>
+        <Button
+          title={'Convert Strike <-> Dip Direction'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
+          onPress={convertStrikeDipDirection}
+        />
+      </>
+    );
   };
 
   const renderCustomEndpoint = () => (
@@ -172,6 +236,7 @@ const Miscellaneous = () => {
         </>
       </Formik>
       {renderSpotDataModelSection()}
+      {renderBulkUpdatesSection()}
     </>
   );
 };

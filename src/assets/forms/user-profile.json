@@ -32,6 +32,7 @@
       "type": "select_one tw96f24",
       "name": "measurement_convention",
       "label": "Measurement Convention",
+      "hint": "Bulk convert strikes to dip directions from Home Menu -> Miscellaneous.",
       "required": "true",
       "default": "strike_dip"
     },
