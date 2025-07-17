@@ -286,7 +286,6 @@ const AddMeasurementModal = ({onPress}) => {
         closeModal={onCloseButton}
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
-        modalStyle={{position: 'absolute', left: 70}}
       >
         <>
           {measurementTypeForForm && (
