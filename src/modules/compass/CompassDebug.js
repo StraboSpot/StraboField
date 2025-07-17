@@ -17,11 +17,11 @@ const CompassDebug = ({compassData, matrixRotation}) => {
   }, []);
 
   const Row = ({children}) => (
-    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2}]}>{children}</View>
+    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
   );
 
   const Col = ({children, flex = 1}) => (
-    <View style={{flex, alignItems: 'center', padding: 4}}>{children}</View>
+    <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
   );
 
   const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
@@ -50,7 +50,7 @@ const CompassDebug = ({compassData, matrixRotation}) => {
           if (idx % 3 === 0) rows.push([]);
           rows[rows.length - 1].push(
             <Col key={key}>
-              <Text style={compassStyles.compassDataText}>
+              <Text>
                 {key.toUpperCase()}:{'\n'}{roundToDecimalPlaces(matrixRotation?.[key], 3)}
               </Text>
             </Col>,
@@ -66,6 +66,7 @@ const CompassDebug = ({compassData, matrixRotation}) => {
   const renderCompassMeasurementsText = () => {
     const strike = formatDeg(compassData?.strike);
     const dip = formatDeg(compassData?.dip);
+    const dipDirection = formatDeg(compassData?.dip_direction);
     const trend = formatDeg(compassData?.trend);
     const plunge = formatDeg(compassData?.plunge);
 
@@ -73,17 +74,18 @@ const CompassDebug = ({compassData, matrixRotation}) => {
     const hasLinear = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
 
     return (
-      <View style={[compassStyles.rawMeasurementsTextContainer, {marginTop: 12}]}>
+      <View style={compassStyles.rawMeasurementsTextContainer}>
         {hasPlanar && (
           <View>
-            <Text style={compassStyles.compassDataText}>Strike: {strike}</Text>
-            <Text style={compassStyles.compassDataText}>Dip: {dip}</Text>
+            <Text>Strike: {strike}</Text>
+            <Text>Dip: {dip}</Text>
+            <Text>Dip Direction: {dipDirection}</Text>
           </View>
         )}
         {hasLinear && (
           <View>
-            <Text style={compassStyles.compassDataText}>Trend: {trend}</Text>
-            <Text style={compassStyles.compassDataText}>Plunge: {plunge}</Text>
+            <Text>Trend: {trend}</Text>
+            <Text>Plunge: {plunge}</Text>
           </View>
         )}
       </View>

@@ -45,11 +45,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // top: 20,
   },
-  compassDataText: {
-    // borderWidth: 1,
-    padding: 5,
-    textAlign: 'center',
-  },
   compassImage: {
     height: 175,
     justifyContent: 'center',
@@ -74,10 +69,12 @@ const styles = StyleSheet.create({
     backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
   },
   rawMeasurementsTextContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     borderTopWidth: 0,
     borderWidth: 1,
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
   },
   sliderContainer: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
