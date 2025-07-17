@@ -3,9 +3,10 @@ import {useSelector} from 'react-redux';
 
 import useMapCoords from '../modules/maps/useMapCoords';
 import useMapLocation from '../modules/maps/useMapLocation';
-import {isEmpty} from '../shared/Helpers';
+import {isEmpty, roundToDecimalPlaces} from '../shared/Helpers';
 
 const useCompass = () => {
+  let matrixArray = [];
 
   const {getCurrentLocation} = useMapLocation();
   const {getCentroidOfSelectedSpot} = useMapCoords();
@@ -40,6 +41,38 @@ const useCompass = () => {
     }
 
     return {rho: rho, phi: phi, theta: theta};
+  };
+
+  const matrixAverage = async (matrixData) => {
+    matrixArray.push(matrixData);
+
+    if (matrixArray.length > 5) {
+      matrixArray.shift();
+    }
+    const m11Avg = matrixArray.reduce((sum, obj) => sum + obj.m11 / matrixArray.length, 0);
+    const m12Avg = matrixArray.reduce((sum, obj) => sum + obj.m12 / matrixArray.length, 0);
+    const m13Avg = matrixArray.reduce((sum, obj) => sum + obj.m13 / matrixArray.length, 0);
+    const m21Avg = matrixArray.reduce((sum, obj) => sum + obj.m21 / matrixArray.length, 0);
+    const m22Avg = matrixArray.reduce((sum, obj) => sum + obj.m22 / matrixArray.length, 0);
+    const m23Avg = matrixArray.reduce((sum, obj) => sum + obj.m23 / matrixArray.length, 0);
+    const m31Avg = matrixArray.reduce((sum, obj) => sum + obj.m31 / matrixArray.length, 0);
+    const m32Avg = matrixArray.reduce((sum, obj) => sum + obj.m32 / matrixArray.length, 0);
+    const m33Avg = matrixArray.reduce((sum, obj) => sum + obj.m33 / matrixArray.length, 0);
+    // const trueHeadingAvg = matrixArray.reduce((sum, obj) => sum + obj.trueHeading / matrixArray.length, 0);
+
+    const newMatrixObject = {
+      m11: roundToDecimalPlaces(m11Avg, 3),
+      m12: roundToDecimalPlaces(m12Avg, 3),
+      m13: roundToDecimalPlaces(m13Avg, 3),
+      m21: roundToDecimalPlaces(m21Avg, 3),
+      m22: roundToDecimalPlaces(m22Avg, 3),
+      m23: roundToDecimalPlaces(m23Avg, 3),
+      m31: roundToDecimalPlaces(m31Avg, 3),
+      m32: roundToDecimalPlaces(m32Avg, 3),
+      m33: roundToDecimalPlaces(m33Avg, 3),
+      magneticHeading: roundToDecimalPlaces(matrixData.magneticHeading, 0),
+    };
+    return newMatrixObject;
   };
 
   const getHeading = (yaw) => {
@@ -99,6 +132,7 @@ const useCompass = () => {
 
   return {
     cartesianToSpherical: cartesianToSpherical,
+    matrixAverage: matrixAverage,
     getHeading: getHeading,
     getStrikeAndDip: getStrikeAndDip,
     getTrendAndPlunge: getTrendAndPlunge,

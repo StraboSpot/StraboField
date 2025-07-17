@@ -18,26 +18,27 @@ const styles = StyleSheet.create({
   },
   compassDataCol2: {
     borderWidth: 1,
-    flex: 2,
+    flex: 1,
   },
   compassDataCol3: {
-    flex: 3,
+    flex: 1,
   },
   compassDataDirectionTextContainer: {
-    flex: 3,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    flex: 1,
+
+    // flexDirection: 'row',
+    // justifyContent: 'space-evenly',
     marginHorizontal: 'auto',
-    paddingBottom: 10,
-    paddingLeft: 10,
+    // paddingBottom: 10,
+    // paddingLeft: 10,
   },
   compassDataGridContainer: {
-    borderWidth: 1,
-    flex: 3,
-    marginHorizontal: 'auto',
-
+    flex: 1,
+    // marginHorizontal: 'auto',
+    marginVertical: '15',
   },
   compassDataGridRow: {
+    alignItems: 'center',
     flexDirection: 'row',
   },
   compassDataModalPosition: {
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
   compassDataText: {
     // borderWidth: 1,
     padding: 5,
-    // textAlign: 'center',
+    textAlign: 'center',
   },
   compassImage: {
     height: 175,
@@ -63,13 +64,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     textAlign: 'center',
   },
-  // matrixDataButtonContainer: {
-    // backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
-    // bottom: 10,
-    // position: 'absolute',
-    // right: 10,
-    // width: 75,
-  // },
+  matrixDataButtonContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 5,
+  },
   rawMeasurementDataContainer: {
     backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
   },
@@ -93,6 +93,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     height: '65%',
     width: '100%',
+  },
+  switchText: {
+    marginRight: 15,
   },
   trendLine: {
     alignSelf: 'center',
