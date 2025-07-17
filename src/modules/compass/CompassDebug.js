@@ -40,7 +40,7 @@ const CompassDebug = ({compassData, matrixRotation}) => {
 
       <View style={{marginTop: 12, marginBottom: 6}}>
         <Text style={[overlayStyles.titleText, {fontSize: 16, textAlign: 'center'}]}>
-          Rotation Matrix ({Platform.OS === 'ios' ? 'NED' : 'ENU'})
+          Rotation Matrix ({Platform.OS === 'ios' ? 'NWU' : 'ENU'})
         </Text>
       </View>
 
