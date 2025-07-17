@@ -73,11 +73,11 @@ const Modal = ({
       isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
         || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
         || SMALL_SCREEN || isFullScreen}
-      overlayStyle={[SMALL_SCREEN || isFullScreen ? overlayStyles.overlayContainerFullScreen : {
+      overlayStyle={SMALL_SCREEN || isFullScreen ? overlayStyles.overlayContainerFullScreen : {
         ...overlayStyles.overlayContainer,
         maxHeight: height * 0.80,
         width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
-      }, modalStyle]}
+      }}
       fullScreen={SMALL_SCREEN || isFullScreen}
       animationType={'slide'}
       backdropStyle={{backgroundColor: 'transparent'}}

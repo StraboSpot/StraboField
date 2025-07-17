@@ -109,8 +109,7 @@ const styles = StyleSheet.create({
   // Extra Specific Modal Styles
   titleText: {
     color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT,
+    fontSize: themes.MEDIUM_TEXT_SIZE,
     paddingBottom: 10,
     textAlign: 'center',
   },
