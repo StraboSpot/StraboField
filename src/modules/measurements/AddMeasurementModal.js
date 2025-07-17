@@ -53,6 +53,11 @@ const AddMeasurementModal = ({onPress}) => {
   const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
   const toast = useToast();
 
+  const toastOptions = {
+    duration: 1000,
+    placement: 'top',
+  };
+
   const formRef = useRef(null);
   const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
@@ -62,7 +67,8 @@ const AddMeasurementModal = ({onPress}) => {
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    lockToPortrait();
+    !SMALL_SCREEN && lockToPortrait();
+    toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
     return () => {
       dispatch(setModalValues({}));
       unlockOrientation();
