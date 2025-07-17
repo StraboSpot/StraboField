@@ -5,15 +5,13 @@ const useCompassCalculations = ({formRefCurrent, selectedAttitude, selectedMeasu
 
   const calcDipDir = (strike) => {
     console.log('Calculating dip direction...');
-    let dipDirection = strike + 90;
-    if (dipDirection >= 360) dipDirection = dipDirection - 360;
+    let dipDirection = (strike + 90) % 360;
     formRefCurrent.setFieldValue('dip_direction', roundToDecimalPlaces(dipDirection, 0));
   };
 
   const calcStrike = (dipDirection) => {
     console.log('Calculating strike...');
-    let strike = dipDirection - 90;
-    if (strike < 0) strike = 360 + strike;
+    let strike = (dipDirection - 90) % 360;
     formRefCurrent.setFieldValue('strike', roundToDecimalPlaces(strike, 0));
   };
 
