@@ -10,9 +10,9 @@ const About = () => {
       <View style={styles.container}>
         <Text style={styles.versionText}>Version: {VERSION_NUMBER}</Text>
         <ScrollView style={styles.descriptionContainer} contentContainerStyle={styles.content}>
-          <Text style={styles.heading}>📌 About StraboSpot2</Text>
+          <Text style={styles.heading}>📌 About StraboField</Text>
           <Text style={styles.paragraph}>
-            <Text style={styles.bold}>StraboSpot2</Text> is a powerful tool for collecting and organizing geologic field data. It allows users to create and manage spatial “Spots” — points, lines, or polygons that store geologic observations.
+            <Text style={styles.bold}>StraboField</Text> is a powerful tool for collecting and organizing geologic field data. It allows users to create and manage spatial “Spots” — points, lines, or polygons that store geologic observations.
             {'\n\n'}
             Spots can be:
             {'\n'}• GPS-referenced using your device
@@ -24,7 +24,7 @@ const About = () => {
 
           <Text style={styles.heading}>🔗 Integration & Sharing</Text>
           <Text style={styles.paragraph}>
-            StraboSpot2 works seamlessly with the open-source <Text style={styles.bold}>StraboSpot.org</Text> platform, supported by the <Text style={styles.bold}>National Science Foundation</Text>. You can:
+            StraboField works seamlessly with the open-source <Text style={styles.bold}>StraboSpot.org</Text> platform, supported by the <Text style={styles.bold}>National Science Foundation</Text>. You can:
             {'\n\n'}• Upload your field data to your online account
             {'\n'}• Export everything locally to your device’s file system
           </Text>

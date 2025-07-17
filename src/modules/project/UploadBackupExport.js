@@ -77,7 +77,7 @@ const UploadBackAndExport = () => {
           && (
             <View style={{padding: 10}}>
               <Text style={{...overlayStyles.statusMessageText}}>After backing up,
-                to further preserve your data please copy your project backups out of the StraboSpot2/ProjectBackups
+                to further preserve your data please copy your project backups out of the  StraboSpot2/ProjectBackups
                 folder to a
                 different folder in the iOS app Files/On My IPad! If online, you can find detailed instructions
                 <Text style={{color: BLUE}} onPress={openMovingProjectBackupsURL}> here</Text>.
