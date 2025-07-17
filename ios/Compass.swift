@@ -33,20 +33,17 @@
         CMMotionManager.availableAttitudeReferenceFrames().contains(.xMagneticNorthZVertical)
       else { return }
 
-      let queue = OperationQueue.main
-      let orientation = UIDevice.current.orientation
-
       motionTrue.deviceMotionUpdateInterval = 0.2
       motionMagnetic.deviceMotionUpdateInterval = 0.2
 
-      motionTrue.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: queue) { data, _ in
+      motionTrue.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) { data, _ in
         guard let data = data else { return }
         self.trueMatrixArray.append(data.attitude.rotationMatrix)
         if self.trueMatrixArray.count > 5 { self.trueMatrixArray.removeFirst() }
         self.emitHeadingIfReady()
       }
 
-      motionMagnetic.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: queue) { data, _ in
+      motionMagnetic.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: .main) { data, _ in
         guard let data = data else { return }
         self.magneticMatrixArray.append(data.attitude.rotationMatrix)
         if self.magneticMatrixArray.count > 5 { self.magneticMatrixArray.removeFirst() }
@@ -75,15 +72,12 @@
 
       let trueHeading = headingFromMatrix(avgTrue, orientation: orientation)
       let magneticHeading = headingFromMatrix(avgMag, orientation: orientation)
-      let declination = (trueHeading - magneticHeading).normalizeAngle()
-      print("True matrix m11: \(avgTrue.m11), Magnetic matrix m11: \(avgMag.m11)")
 
       sendEvent(
         withName: "rotationMatrix",
         body: [
           "trueHeading": trueHeading.rounded(toPlaces: 1),
           "magneticHeading": magneticHeading.rounded(toPlaces: 1),
-          "declination": declination.rounded(toPlaces: 1),
           "matrix": [
             "m11": avgTrue.m11, "m12": avgTrue.m12, "m13": avgTrue.m13,
             "m21": avgTrue.m21, "m22": avgTrue.m22, "m23": avgTrue.m23,
