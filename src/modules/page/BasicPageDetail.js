@@ -86,6 +86,7 @@ const BasicPageDetail = ({
 
   useEffect(() => {
     console.log('UE BasicPageDetail [selectedFeature]', selectedFeature);
+    setInitialValues(selectedFeature);
     if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
   }, [selectedFeature]);
 
