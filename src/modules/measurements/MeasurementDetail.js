@@ -142,6 +142,10 @@ const MeasurementDetail = ({
         [{
           text: 'No',
           style: 'cancel',
+          onPress: () => {
+            dispatch(setSelectedAttributes([]));
+            console.log('Cancel Pressed', selectedAttributes);
+          },
         }, {
           text: 'Yes',
           onPress: async () => {
