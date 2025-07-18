@@ -102,94 +102,100 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
       <View style={[overlayStyles.titleContainer]}>
         <Text style={[overlayStyles.titleText]}>Map Symbols</Text>
       </View>
-      {!isEmpty(mapSymbols) && (
-        <>
-          <ListItem.Accordion
-            key={'feature_types'}
-            containerStyle={commonStyles.listItem}
-            content={
-              <ListItem.Content>
-                <ListItem.Title style={commonStyles.listItemTitle}>Feature Types</ListItem.Title>
-              </ListItem.Content>
-            }
-            isExpanded={isFeatureTypesExpanded}
-            onPress={() => setFeatureTypesExpanded(!isFeatureTypesExpanded)}
-          >
+      <FlatList
+        ListHeaderComponent={
+          <>
+            {!isEmpty(mapSymbols) && (
+              <>
+                <ListItem.Accordion
+                  key={'feature_types'}
+                  containerStyle={commonStyles.listItem}
+                  content={
+                    <ListItem.Content>
+                      <ListItem.Title style={commonStyles.listItemTitle}>Feature Types</ListItem.Title>
+                    </ListItem.Content>
+                  }
+                  isExpanded={isFeatureTypesExpanded}
+                  onPress={() => setFeatureTypesExpanded(!isFeatureTypesExpanded)}
+                >
+                  <FlatListItemSeparator/>
+                  <FlatList
+                    keyExtractor={item => item}
+                    data={mapSymbols}
+                    renderItem={renderSymbolsList}
+                    ItemSeparatorComponent={FlatListItemSeparator}
+                  />
+                </ListItem.Accordion>
+              </>
+            )}
+            <ListItem.Accordion
+              key={'geometry_types'}
+              containerStyle={commonStyles.listItem}
+              content={
+                <ListItem.Content>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Geometry Types</ListItem.Title>
+                </ListItem.Content>
+              }
+              isExpanded={isGeometryTypesExpanded}
+              onPress={() => setGeometryTypesExpanded(!isGeometryTypesExpanded)}
+            >
+              <FlatListItemSeparator/>
+              <FlatList
+                keyExtractor={item => item}
+                data={['points', 'lines', 'polygons']}
+                renderItem={renderGeometryTypesList}
+                ItemSeparatorComponent={FlatListItemSeparator}
+              />
+            </ListItem.Accordion>
             <FlatListItemSeparator/>
-            <FlatList
-              keyExtractor={item => item}
-              data={mapSymbols}
-              renderItem={renderSymbolsList}
-              ItemSeparatorComponent={FlatListItemSeparator}
-            />
-          </ListItem.Accordion>
-        </>
-      )}
-      <ListItem.Accordion
-        key={'geometry_types'}
-        containerStyle={commonStyles.listItem}
-        content={
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Geometry Types</ListItem.Title>
-          </ListItem.Content>
+            <ListItem key={'spotLabels'} containerStyle={commonStyles.listItemFormField}>
+              <>
+                <ListItem.Content>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Labels</ListItem.Title>
+                </ListItem.Content>
+                <Switch onValueChange={handleShowSpotLabelsOn} value={isShowSpotLabelsOn}/>
+              </>
+            </ListItem>
+            <FlatListItemSeparator/>
+            <ListItem key={'Only1stMeas'} containerStyle={commonStyles.listItemFormField}>
+              <>
+                <ListItem.Content>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Only 1st Measurements</ListItem.Title>
+                </ListItem.Content>
+                <Switch onValueChange={handleShowOnly1stMeas} value={isShowOnly1stMeas}/>
+              </>
+            </ListItem>
+            <FlatListItemSeparator/>
+            <ListItem key={'tag_color'} containerStyle={commonStyles.listItemFormField}>
+              <>
+                <ListItem.Content>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Tag Colors</ListItem.Title>
+                </ListItem.Content>
+                <Switch onValueChange={toggleShowTagColor} value={tagTypeForColor !== undefined}/>
+              </>
+            </ListItem>
+            {tagTypeForColor && (
+              <ButtonGroup
+                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
+                selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
+                buttons={['Geologic Unit', 'Conceptual']}
+                containerStyle={styles.measurementDetailSwitches}
+                selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
+                textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
+              />
+            )}
+            <FlatListItemSeparator/>
+            <ListItem key={'samples'} containerStyle={commonStyles.listItemFormField}>
+              <>
+                <ListItem.Content>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Show Samples</ListItem.Title>
+                </ListItem.Content>
+                <Switch onValueChange={handleShowSamplesOn} value={isShowSamplesOn}/>
+              </>
+            </ListItem>
+          </>
         }
-        isExpanded={isGeometryTypesExpanded}
-        onPress={() => setGeometryTypesExpanded(!isGeometryTypesExpanded)}
-      >
-        <FlatListItemSeparator/>
-        <FlatList
-          keyExtractor={item => item}
-          data={['points', 'lines', 'polygons']}
-          renderItem={renderGeometryTypesList}
-          ItemSeparatorComponent={FlatListItemSeparator}
-        />
-      </ListItem.Accordion>
-      <FlatListItemSeparator/>
-      <ListItem key={'spotLabels'} containerStyle={commonStyles.listItemFormField}>
-        <>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Labels</ListItem.Title>
-          </ListItem.Content>
-          <Switch onValueChange={handleShowSpotLabelsOn} value={isShowSpotLabelsOn}/>
-        </>
-      </ListItem>
-      <FlatListItemSeparator/>
-      <ListItem key={'Only1stMeas'} containerStyle={commonStyles.listItemFormField}>
-        <>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Only 1st Measurements</ListItem.Title>
-          </ListItem.Content>
-          <Switch onValueChange={handleShowOnly1stMeas} value={isShowOnly1stMeas}/>
-        </>
-      </ListItem>
-      <FlatListItemSeparator/>
-      <ListItem key={'tag_color'} containerStyle={commonStyles.listItemFormField}>
-        <>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Tag Colors</ListItem.Title>
-          </ListItem.Content>
-          <Switch onValueChange={toggleShowTagColor} value={tagTypeForColor !== undefined}/>
-        </>
-      </ListItem>
-      {tagTypeForColor && (
-        <ButtonGroup
-          onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
-          selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
-          buttons={['Geologic Unit', 'Conceptual']}
-          containerStyle={styles.measurementDetailSwitches}
-          selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
-          textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
-        />
-      )}
-      <FlatListItemSeparator/>
-      <ListItem key={'samples'} containerStyle={commonStyles.listItemFormField}>
-        <>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Show Samples</ListItem.Title>
-          </ListItem.Content>
-          <Switch onValueChange={handleShowSamplesOn} value={isShowSamplesOn}/>
-        </>
-      </ListItem>
+      />
     </Overlay>
   );
 };
