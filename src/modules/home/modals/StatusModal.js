@@ -96,17 +96,6 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
           {/*    onPress={exportProject}*/}
           {/*  />*/}
           {/*)}*/}
-          {isInternetReachable && <Button
-            titleStyle={overlayStyles.urlText}
-            icon={{
-              name: 'globe-outline',
-              type: 'ionicon',
-              size: 15,
-              color: BLUE,
-            }}
-            title={'Visit account at StraboSpot.org'}
-            type={'clear'}
-            onPress={openUrl}/>}
         </View>
         }
       </View>

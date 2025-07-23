@@ -13,10 +13,12 @@ import useDevice from '../../../../services/useDevice';
 import useExport from '../../../../services/useExport';
 import commonStyles from '../../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../../shared/Helpers';
+import {SMALL_SCREEN} from '../../../../shared/styles.constants';
 import modalStyle from '../../../../shared/ui/modal/modal.style';
 import ModalHeader from '../../../../shared/ui/modal/ModalHeader';
 import Spacer from '../../../../shared/ui/Spacer';
 import uiStyles from '../../../../shared/ui/ui.styles';
+import {useWindowSize} from '../../../../shared/ui/useWindowSize';
 import LottieAnimations from '../../../../utils/animations/LottieAnimations';
 import {setIsProgressModalVisible, setLoadingStatus} from '../../../home/home.slice';
 import overlayStyles from '../../../home/overlays/overlay.styles';
@@ -52,6 +54,8 @@ const ProjectOptionsDialogBox = ({
   const toast = useToast();
   const {deleteFromDevice} = useDevice();
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
+
+  const {height} = useWindowSize();
 
   useEffect(() => {
     console.log('Images Included:', includeImages);
@@ -103,6 +107,16 @@ const ProjectOptionsDialogBox = ({
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       toast.show('EXPORT FAILED!\n' + err);
     }
+  };
+
+  const getResponsiveOverlayStyle = () => {
+    if (SMALL_SCREEN) {
+      return overlayStyles.overlayContainerFullScreen;
+    }
+    return {
+      ...overlayStyles.overlayContainer,
+      maxHeight: height * 0.5,
+    };
   };
 
   const handleOnPress = async (userAction) => {
@@ -329,9 +343,10 @@ const ProjectOptionsDialogBox = ({
       <Overlay
         supportedOrientations={['portrait', 'landscape']}
         animationType={'slide'}
-        overlayStyle={overlayStyles.overlayContainer}
+        overlayStyle={getResponsiveOverlayStyle()}
         backdropStyle={overlayStyles.backdropStyles}
         isVisible={visible}
+        fullScreen={SMALL_SCREEN}
       >
         <ModalHeader
           closeModal={onClose}
@@ -378,7 +393,8 @@ const ProjectOptionsDialogBox = ({
       <Overlay
         supportedOrientations={['portrait', 'landscape']}
         isVisible={isProgressModalVisibleLocal}
-        overlayStyle={overlayStyles.overlayContainer}
+        overlayStyle={getResponsiveOverlayStyle()}
+        fullScreen={SMALL_SCREEN}
       >
         <Text style={modalStyle.modalTitle}>{'Deleting...'}</Text>
         <View style={overlayStyles.overlayContent}>

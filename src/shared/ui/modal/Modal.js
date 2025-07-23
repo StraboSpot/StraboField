@@ -25,11 +25,22 @@ const Modal = ({
                  modalStyle,
                }) => {
 
-  const {height, width} = useWindowSize();
+  const {height} = useWindowSize();
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  const getResponsiveOverlayStyle = () => {
+    if (SMALL_SCREEN) {
+      return overlayStyles.overlayContainerFullScreen;
+    }
+    return {
+      ...overlayStyles.overlayContainer,
+      maxHeight: height * 0.7,
+      flex: 1,
+    };
+  };
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -73,14 +84,10 @@ const Modal = ({
       isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
         || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
         || SMALL_SCREEN || isFullScreen}
-      overlayStyle={SMALL_SCREEN || isFullScreen ? overlayStyles.overlayContainerFullScreen : {
-        ...overlayStyles.overlayContainer,
-        maxHeight: height * 0.80,
-        width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
-      }}
-      fullScreen={SMALL_SCREEN || isFullScreen}
+      overlayStyle={getResponsiveOverlayStyle()}
+      fullScreen={SMALL_SCREEN}
       animationType={'slide'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+      backdropStyle={overlayStyles.backdropStyles}
     >
       <ModalHeader
         buttonTitleLeft={buttonTitleLeft}

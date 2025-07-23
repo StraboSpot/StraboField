@@ -197,7 +197,7 @@ const TagsModal = ({
 
   return (
     <>
-      <View style={{flex: 1, padding: 20, maxHeight: height * 0.8}}>
+      <View style={{flex: 1}}>
         <View style={modalStyle.textContainer}>
           <AddButton
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
