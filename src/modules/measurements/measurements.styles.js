@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
 
@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   measurementDetailSwitches: {
     borderColor: themes.PRIMARY_ACCENT_COLOR,
     borderRadius: 10,
-    height: 40,
+    height: Platform.OS === 'web' ? 30 : 40,
   },
   measurementsContentContainer: {
     flex: 1,

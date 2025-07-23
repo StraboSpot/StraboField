@@ -197,12 +197,12 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
             </ListItem>
             {tagTypeForColor && (
               <ButtonGroup
-                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
-                selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
                 buttons={['Geologic Unit', 'Conceptual']}
                 containerStyle={styles.measurementDetailSwitches}
+                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
-                textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
+                selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
+                textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
               />
             )}
 
