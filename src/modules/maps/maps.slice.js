@@ -10,10 +10,10 @@ const initialMapsState = {
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
+  labelTypeOn: 'dip',
   isMapMoved: true,
   isShowOnly1stMeas: false,
   isShowSamplesOn: false,
-  isShowSpotLabelsOn: true,
   mapSymbols: [],
   selectedCustomMapToEdit: {},
   spotsInMapExtentIds: [],
@@ -90,8 +90,8 @@ const mapsSlice = createSlice({
     setIsShowSamplesOn(state, action) {
       state.isShowSamplesOn = action.payload;
     },
-    setIsShowSpotLabelsOn(state, action) {
-      state.isShowSpotLabelsOn = action.payload;
+    setLabelTypeOn(state, action) {
+      state.labelTypeOn = action.payload;
     },
     setMapSymbols(state, action) {
       // console.log('Set Map Symbols', action.payload);
@@ -143,7 +143,7 @@ export const {
   setIsMapMoved,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,
-  setIsShowSpotLabelsOn,
+  setLabelTypeOn,
   setMapSymbols,
   setSpotsInMapExtentIds,
   setStratSection,

@@ -6,8 +6,10 @@ const {width, height} = Dimensions.get(platform);
 //See https://facebook.github.io/react-native/docs/colors
 export const LIGHTGREY = '#f7f7f7'; //(lightgrey)
 export const MEDIUMGREY = 'darkgray'; //(#d3d3d3)
+export const MEDIUMGREY_FADED = '#d3d3d3E6'; // 90% opacity
 export const DARKGREY = 'dimgray';
 export const BLUE = 'dodgerblue'; // (#1e90ff)
+export const BLUE_FADED = '#1e90ff66';  // Blue at 40% opacity
 export const GREEN = 'green';
 export const RED = 'red';
 export const WHITE = '#ffffff';
@@ -21,6 +23,7 @@ export const SECONDARY_BACKGROUND_COLOR = WHITE;
 export const PRIMARY_TEXT_COLOR = BLACK;
 
 export const PRIMARY_ACCENT_COLOR = BLUE;
+export const PRIMARY_ACCENT_COLOR_FADED = BLUE_FADED;
 
 export const POSITIVE_COLOR = GREEN;
 export const NEGATIVE_COLOR = RED;

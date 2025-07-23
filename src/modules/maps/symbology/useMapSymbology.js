@@ -8,7 +8,7 @@ const useMapSymbology = () => {
   const {getTagsAtSpot} = useTags();
   const {getStratIntervalFill} = useStratSectionSymbology();
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
-  const isShowSpotLabelsOn = useSelector(state => state.map.isShowSpotLabelsOn);
+  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
 
   const linePatterns = {
     solid: [1, 0],
@@ -118,6 +118,35 @@ const useMapSymbology = () => {
         ],
       ],
     ];
+  };
+
+  // Get the label
+  const getLabel = () => {
+    if (labelTypeOn === 'name') return ['get', 'name'];
+    else if (labelTypeOn === 'dip') {
+      return [
+        'case', ['has', 'orientation'],
+        ['case',
+          ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
+          ['case',
+            ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
+            '',
+          ],
+        ],
+        '',
+      ];
+    }
+    else return '';
+
+    // Does not work on iOS - iOS doesn't build if there is more than 1 condition and a fallback in a case expression
+    /*return ['case', ['has', 'orientation'],
+     ['case',
+     ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
+     ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
+     ['get', 'name'],
+     ],
+     ['get', 'name'],
+     ];*/
   };
 
   // Get the label offset, which is further to the right if the symbol rotation is between 60-120 or 240-300
@@ -282,31 +311,6 @@ const useMapSymbology = () => {
     }), {});
   };
 
-  // Get the label for the point symbol, either dip, plunge or failing both, the Spot name
-  const getPointLabel = () => {
-    return [
-      'case', ['has', 'orientation'],
-      ['case',
-        ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
-        ['case',
-          ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
-          ['get', 'name'],
-        ],
-      ],
-      ['get', 'name'],
-    ];
-
-    // Does not work on iOS - iOS doesn't build if there is more than 1 condition and a fallback in a case expression
-    /*return ['case', ['has', 'orientation'],
-     ['case',
-     ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
-     ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
-     ['get', 'name'],
-     ],
-     ['get', 'name'],
-     ];*/
-  };
-
   const getPointSymbology = (feature) => {
     return {
       'circleColor': getTagColor(feature) || 'transparent',
@@ -391,7 +395,7 @@ const useMapSymbology = () => {
   const mapStyles = {
     point: {
       textIgnorePlacement: true,  // Need to be able to stack symbols at same location
-      textField: isShowSpotLabelsOn ? getPointLabel() : '',
+      textField: getLabel(),
       textAnchor: 'left',
       textOffset: getLabelOffset(),
       iconImage: getIconImage(),
@@ -406,7 +410,7 @@ const useMapSymbology = () => {
       circleColor: ['get', 'circleColor', ['get', 'symbology']],
     },
     lineLabel: {
-      textField: isShowSpotLabelsOn ? ['get', 'name'] : '',
+      textField: getLabel(),
       symbolPlacement: 'line',
       textAnchor: 'bottom',
     },
@@ -432,7 +436,7 @@ const useMapSymbology = () => {
       lineDasharray: linePatterns.dotDashed,
     },
     polygonLabel: {
-      textField: isShowSpotLabelsOn ? ['get', 'name'] : '',
+      textField: getLabel(),
     },
     polygon: {
       fillColor: ['get', 'fillColor', ['get', 'symbology']],
