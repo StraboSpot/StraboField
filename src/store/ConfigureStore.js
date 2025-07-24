@@ -147,10 +147,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const defaultMiddlewareOptions = {
   immutableCheck: false,
-  serializableCheck: {
-    ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    warnAfter: 60,
-  },
+  serializableCheck: false,
+  // serializableCheck: {
+  //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+  //   warnAfter: 60,
+  // },
 };
 
 const store = configureStore({
