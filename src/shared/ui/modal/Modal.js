@@ -22,23 +22,21 @@ const Modal = ({
                  isFullScreen,
                  onPress,
                  title,
-                 modalStyle,
                }) => {
 
-  const {height} = useWindowSize();
+  const {height, width} = useWindowSize();
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const getResponsiveOverlayStyle = () => {
-    if (SMALL_SCREEN) {
-      return overlayStyles.overlayContainerFullScreen;
-    }
+    if (SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
-      maxHeight: height * 0.7,
       flex: 1,
+      maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
+      width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
     };
   };
 
