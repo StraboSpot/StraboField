@@ -60,7 +60,7 @@
     {
       "type": "text",
       "name": "unit_id",
-      "label": "Unit ID",
+      "label": "Tephra Name",
       "required": "false"
     }
   ],

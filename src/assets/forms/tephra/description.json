@@ -84,38 +84,38 @@
     },
     {
       "list_name": "ou9ax73",
-      "name": "soil",
-      "label": "soil",
-      "order": 1
-    },
-    {
-      "list_name": "ou9ax73",
-      "name": "peat",
-      "label": "peat",
-      "order": 2
-    },
-    {
-      "list_name": "ou9ax73",
       "name": "pyroclastic_density_current",
       "label": "pyroclastic density current",
-      "order": 3
+      "order": 1
     },
     {
       "list_name": "ou9ax73",
       "name": "pyroclastic_surge",
       "label": "pyroclastic surge",
-      "order": 4
+      "order": 2
     },
     {
       "list_name": "ou9ax73",
       "name": "pyroclastic_flow",
       "label": "pyroclastic flow",
-      "order": 5
+      "order": 3
     },
     {
       "list_name": "ou9ax73",
       "name": "sediment",
       "label": "sediment",
+      "order": 4
+    },
+    {
+      "list_name": "ou9ax73",
+      "name": "soil",
+      "label": "soil",
+      "order": 5
+    },
+    {
+      "list_name": "ou9ax73",
+      "name": "peat",
+      "label": "peat",
       "order": 6
     },
     {
@@ -144,92 +144,95 @@
     },
     {
       "list_name": "ou9ax73",
+      "name": "mass_wasting",
+      "label": "mass wasting",
+      "order": 11
+    },
+    {
+      "list_name": "ou9ax73",
       "name": "debris_flow",
       "label": "debris flow",
-      "order": 11
+      "order": 12
     },
     {
       "list_name": "ou9ax73",
       "name": "lahar",
       "label": "lahar",
-      "order": 12
+      "order": 13
     },
     {
       "list_name": "ou9ax73",
       "name": "landslide",
       "label": "landslide",
-      "order": 13
+      "order": 14
     },
     {
       "list_name": "ou9ax73",
       "name": "hyperconcentrated_flow",
       "label": "hyperconcentrated flow",
-      "order": 14
+      "order": 15
     },
     {
       "list_name": "ou9ax73",
       "name": "debris_avalanche",
       "label": "debris avalanche",
-      "order": 15
+      "order": 16
     },
     {
       "list_name": "ou9ax73",
       "name": "lava",
       "label": "lava",
-      "order": 16
+      "order": 17
     },
     {
       "list_name": "ou9ax73",
       "name": "intrusion",
       "label": "intrusion",
-      "order": 17
-    },
-    {
-      "list_name": "ou9ax73",
-      "name": "country_rock",
-      "label": "country rock",
       "order": 18
     },
     {
       "list_name": "ou9ax73",
       "name": "ice",
       "label": "ice",
-      "order": 19
+      "order": 20
     },
     {
       "list_name": "ou9ax73",
       "name": "snow",
       "label": "snow",
-      "order": 20
+      "order": 21
     },
     {
       "list_name": "ou9ax73",
       "name": "dirty_snow",
-      "label": "dirty snow"
+      "label": "dirty snow",
+      "order": 22
     },
     {
       "list_name": "ou9ax73",
       "name": "package",
-      "label": "mixed package"
+      "label": "undifferentiated or undescribed",
+      "order": 23
     },
     {
       "list_name": "ou9ax73",
       "name": "other",
-      "label": "other"
+      "label": "other",
+      "order": 24
     },
     {
       "list_name": "ay7bp40",
-      "name": "mm",
+      "name": "millimeters",
       "label": "mm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "cm",
+      "name": "centimeters",
       "label": "cm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "m",
+      "name": "meters",
       "label": "m"
     },
     {
@@ -434,43 +437,43 @@
     },
     {
       "list_name": "gg1yf28",
-      "name": "not_graded",
-      "label": "not graded"
+      "name": "none_or_massive",
+      "label": "None or massive"
     },
     {
       "list_name": "gg1yf28",
       "name": "normal",
-      "label": "normal",
+      "label": "Normal",
       "order": 1
     },
     {
       "list_name": "gg1yf28",
       "name": "reverse",
-      "label": "reverse",
+      "label": "Reverse",
       "order": 2
     },
     {
       "list_name": "gg1yf28",
-      "name": "reverse_normal",
-      "label": "reverse bottom / normal top",
+      "name": "normal_top_reverse_bottom",
+      "label": "Normal top, reverse bottom",
       "order": 3
     },
     {
       "list_name": "gg1yf28",
-      "name": "normal_reverse",
-      "label": "normal bottom / reverse top",
+      "name": "reverse_top_normal_bottom",
+      "label": "Reverse top, normal bottom",
       "order": 4
     },
     {
       "list_name": "gg1yf28",
       "name": "complex",
-      "label": "complex",
+      "label": "Complex",
       "order": 5
     },
     {
       "list_name": "gg1yf28",
       "name": "density_grading",
-      "label": "density grading",
+      "label": "Density grading",
       "order": 6
     }
   ]
