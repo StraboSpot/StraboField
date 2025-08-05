@@ -115,7 +115,7 @@ const ProjectOptionsDialogBox = ({
     }
     return {
       ...overlayStyles.overlayContainer,
-      maxHeight: height * 0.5,
+      // maxHeight: height * 0.7,
     };
   };
 
@@ -160,7 +160,7 @@ const ProjectOptionsDialogBox = ({
     if (Platform.OS === 'ios') {
       return (
         <View>
-          <Text>All project data, images, and offline maps will be EXPORTED as a .ZIP file to the Distribution folder in
+          <Text style={{textAlign: 'center'}}>All project data, images, and offline maps will be EXPORTED as a .ZIP file to the Distribution folder in
             the My Files App &gt; StraboSpot2 &gt; ProjectBackups &gt; Distribution.</Text>
         </View>
       );
@@ -169,7 +169,7 @@ const ProjectOptionsDialogBox = ({
       return (
         <View>
           <Text style={overlayStyles.statusMessageText}>
-            <Text> All project data, images, and offline maps will be EXPORTED as a .ZIP file to the Downloads folder in
+            <Text style={{textAlign: 'center'}}> All project data, images, and offline maps will be EXPORTED as a .ZIP file to the Downloads folder in
               the My Files App.</Text>
           </Text>
         </View>
@@ -211,7 +211,7 @@ const ProjectOptionsDialogBox = ({
           <View>
             {renderExportMessage()}
             <View style={overlayStyles.overlayContent}>
-              <Text>Project will be exported as: {exportFileName}</Text>
+              <Text style={{textAlign: 'center'}}>Project will be exported as: <Text style={{fontWeight: 'bold'}}>{exportFileName}</Text></Text>
             </View>
             <View>
               <Button
