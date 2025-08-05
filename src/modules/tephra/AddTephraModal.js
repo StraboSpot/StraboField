@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
-import {Tab} from '@rn-vui/base';
+import {Button, Icon, Tab} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -14,7 +14,6 @@ import {
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
 import Modal from '../../shared/ui/modal/Modal';
-import SaveAndCloseModalButtons from '../../shared/ui/SaveAndCloseModalButtons';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -26,10 +25,11 @@ const AddTephraModal = ({onPress}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] = useState(0);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
 
   const formRef = useRef(null);
-  const {showErrors, validateForm} = useForm();
+  const {validateForm} = useForm();
 
   const pageKey = PAGE_KEYS.TEPHRA;
 
@@ -72,30 +72,53 @@ const AddTephraModal = ({onPress}) => {
                 initialValues={{}}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={false}
+                validateOnChange={true}
               >
-                {formProps => (
-                  <View style={{flex: 1}}>
-                    <Form {...{formName: formName, ...formProps}}/>
-                  </View>
-                )}
+                {(formProps) => {
+                  return (
+                    <View style={{flex: 1}}>
+                      <Form {...{formName: formName, ...formProps}}/>
+                    </View>
+                  );
+                }}
               </Formik>
             </View>
           }
         />
-        {!choicesViewKey && <SaveAndCloseModalButtons saveAction={saveTephra}/>}
+        {!choicesViewKey && (
+          <Button
+            title={'Save'}
+            containerStyle={{height: 40, borderRadius: 10, marginTop: 10, marginBottom: 10}}
+            onPress={saveTephra}
+            textStyle={{color: PRIMARY_ACCENT_COLOR}}
+          />
+        )}
       </Modal>
     );
   };
 
   const saveTephra = async () => {
     try {
-      await formRef.current.submitForm();
-      const editedTephraLayerData = showErrors(formRef.current);
+      const errors = await formRef.current.validateForm(); // Runs validation
+      const isValid = Object.keys(errors).length === 0;
+
+      if (!isValid) {
+        console.log('Validation errors found:', errors);
+        await formRef.current.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {}),
+          true,
+        );
+
+        return; // Don't proceed with saving
+      }
+      const values = formRef.current.values;
       console.log('Saving tephra data to Spot ...');
       let editedTephraLayersData = spot.properties.tephra ? JSON.parse(
         JSON.stringify(spot.properties.tephra)) : [];
-      editedTephraLayersData.push({...editedTephraLayerData, id: getNewUUID()});
+      editedTephraLayersData.push({...values, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedTephraLayersData}));
     }
