@@ -6,6 +6,7 @@ import DraggableFlatList, {ShadowDecorator} from 'react-native-draggable-flatlis
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TEPHRA_SUBPAGES} from './tephra.constants';
+import tephraStyles from './tephra.styles';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
@@ -67,8 +68,7 @@ const TephraPage = ({page}) => {
           selectedIndex={selectedTypeIndex}
           onPress={i => setSelectedTypeIndex(i)}
           buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
-          containerStyle={{height: 40, borderRadius: 10}}
-          buttonStyle={{padding: 5}}
+          containerStyle={tephraStyles.buttonGroupContainer}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
@@ -83,14 +83,15 @@ const TephraPage = ({page}) => {
 
   const renderAttributesMain = () => {
     return (
-      <View style={{flex: 1, justifyContent: 'flex-start'}}>
+      <View style={tephraStyles.mainAttributesContainer}>
         <ReturnToOverviewButton/>
         <SectionDividerWithRightButton
           dividerText={page.label}
           onPress={addAttribute}
         />
+        <View style={tephraStyles.draggableListContainer}>
         {data.length > 1 && (
-          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, paddingLeft: 10}}>Top</Text>
+          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
         )}
         <DraggableFlatList
           keyExtractor={item => item.id}
@@ -113,7 +114,7 @@ const TephraPage = ({page}) => {
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
         />
         {data.length > 1 && (
-          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, paddingLeft: 10}}>Bottom</Text>
+          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Bottom</Text>
         )}
         {isReorderingActive && (
           <Button
@@ -123,6 +124,7 @@ const TephraPage = ({page}) => {
             titleStyle={commonStyles.standardButtonText}
           />
         )}
+        </View>
       </View>
     );
   };
