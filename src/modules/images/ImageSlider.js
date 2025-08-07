@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {imageSliderStyles, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import IconButton from '../../shared/ui/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
@@ -19,10 +18,11 @@ const ImageSlider = ({route, navigation}) => {
   const dispatch = useDispatch();
   const spots = useSelector(state => state.spot.spots);
 
-  const {getImageScreenSizedURI, getLocalImageURI} = useImages();
+  const {doesImageExistOnDevice, getImageScreenSizedURI, getLocalImageURI} = useImages();
 
   const [imageIndex, setImageIndex] = useState(undefined);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageURI, setImageURI] = useState(undefined);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   const imagesObj = useMemo(() => {
     const sortedSpotsWithImages = route.params.sortedSpotsWithImages;
@@ -34,12 +34,6 @@ const ImageSlider = ({route, navigation}) => {
     }, []);
   }, [route.params.sortedSpotsWithImages]);
 
-  if (isEmpty(imageIndex)) {
-    const startImageId = route.params.selectedImage.id;
-    const startIndex = imagesObj.map(i => i.imageId).indexOf(startImageId);
-    setImageIndex(startIndex);
-  }
-
   const getSpotFromId = () => {
     console.log('getSpotFromId getCurrentIndex', imageIndex);
     const spot = spots[imagesObj[imageIndex].spotId];
@@ -48,19 +42,47 @@ const ImageSlider = ({route, navigation}) => {
   };
 
   const onPressNext = () => {
-    setIsImageLoaded(false);
-    setImageIndex(i => i === imagesObj.length - 1 ? 0 : i + 1);
+    updateImage(imageIndex === imagesObj.length - 1 ? 0 : imageIndex + 1);
   };
 
   const onPressPrevious = () => {
-    setIsImageLoaded(false);
-    setImageIndex(i => i === 0 ? imagesObj.length - 1 : i - 1);
+    updateImage(imageIndex === 0 ? imagesObj.length - 1 : imageIndex - 1);
   };
 
-  if (!isEmpty(imageIndex)) {
-    const imageId = imagesObj[imageIndex].imageId;
+  const setSource = async (imageId) => {
+    try {
+      if (Platform.OS === 'web') setImageURI(getImageScreenSizedURI(imageId));
+      else {
+        const res = await doesImageExistOnDevice(imageId);
+        if (res) setImageURI(getLocalImageURI(imageId));
+        else {
+          setImageURI(undefined);
+          setIsImageLoading(false);
+        }
+      }
+    }
+    catch (e) {
+      setImageURI(undefined);
+      setIsImageLoading(false);
+    }
+  };
+
+  const updateImage = (i) => {
+    setIsImageLoading(true);
+    setImageIndex(i);
+    const imageId = imagesObj[i].imageId;
+    setSource(imageId);
+  };
+
+  if (isEmpty(imageIndex)) {
+    const startImageId = route.params.selectedImage.id;
+    const startIndex = imagesObj.map(i => i.imageId).indexOf(startImageId);
+    setImageIndex(startIndex);
+    setSource(startImageId);
+  }
+  else {
     return (
-      <View style={{backgroundColor: 'black'}}>
+      <View>
         <View style={imageSliderStyles.buttonsContainer}>
           <IconButton
             style={imageStyles.imageInfoButtons}
@@ -74,14 +96,19 @@ const ImageSlider = ({route, navigation}) => {
           />
         </View>
         <Image
-          source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(imageId)} : {uri: getLocalImageURI(imageId)}}
-          style={Platform.OS === 'web' ? {width: width, height: height} : {width: '100%', height: '100%'}}
+          source={imageURI && {uri: imageURI}}
+          containerStyle={[imageStyles.thumbnailImageContainer, Platform.OS === 'web' ? {width: width, height: height}
+            : {width: '100%', height: '100%'}]}
           resizeMode={'contain'}
-          PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
+          PlaceholderContent={isImageLoading ? <ActivityIndicator/>
             : <Image style={imageStyles.thumbnail} source={placeholderImage}/>}
-          placeholderStyle={commonStyles.imagePlaceholder}
-          onError={() => setIsImageLoaded(true)}
-          onLoadEnd={() => setIsImageLoaded(true)}
+          placeholderStyle={imageStyles.placeholderImage}
+          onError={() => {
+            if (imageURI) setIsImageLoading(false);
+          }}
+          onLoadEnd={() => {
+            if (imageURI) setIsImageLoading(false);
+          }}
         />
         <View style={imageSliderStyles.navButtonsContainer}>
           <Button

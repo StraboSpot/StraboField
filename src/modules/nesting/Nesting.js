@@ -8,24 +8,31 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {ImageThumbnail} from '../images';
+import {ImageCard, useImages, useImageThumbnails} from '../images';
 import {PAGE_KEYS} from '../page/page.constants';
 import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {
   console.log('Rendering Nesting');
+  const [childrenGenerations, setChildrenGenerations] = useState(null);
+  const [images, setImages] = useState([]);
+  const [parentGenerations, setParentGenerations] = useState(null);
 
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {handleSpotSelected} = useSpots();
+  const {getImageByImageId} = useImages();
+  const {
+    areImageThumbnailsLoading,
+    imageThumbnailURIs,
+    setAreImageThumbnailsLoading,
+    setImageThumbnailURIs,
+  } = useImageThumbnails({images});
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
-
-  const [childrenGenerations, setChildrenGenerations] = useState(null);
-  const [parentGenerations, setParentGenerations] = useState(null);
 
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
 
@@ -34,13 +41,28 @@ const Nesting = () => {
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
+  const renderImage = async (image, index) => {
+    return (
+      <ImageCard
+        areImageThumbnailsLoading={areImageThumbnailsLoading}
+        image={image}
+        imageThumbnailURIs={imageThumbnailURIs}
+        index={index}
+        isThumbnailOnly
+        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
+        setImageThumbnailURIs={setImageThumbnailURIs}
+      />
+    );
+  };
+
   const renderItem = (spot) => {
     if (spot && spot.properties) {
       if (spot.properties.image_basemap) {
+        const image = getImageByImageId(spot.properties.image_basemap);
         return (
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{alignSelf: 'center'}}>
-              <ImageThumbnail imageId={spot.properties.image_basemap}/>
+              {renderImage(image, 0)}
             </View>
             <View style={{flex: 1, alignSelf: 'center'}}>
               {renderName(spot)}
@@ -102,6 +124,7 @@ const Nesting = () => {
 
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
     console.log('renderGroup', type, i, group, b);
+    const image = getImageByImageId(imageBasemapKey);
     return (
       <View
         style={{
@@ -117,7 +140,7 @@ const Nesting = () => {
       >
         {imageBasemapKey !== 'undefined' && (
           <View style={{alignSelf: 'center'}}>
-            <ImageThumbnail imageId={imageBasemapKey}/>
+            {renderImage(image, b)}
           </View>
         )}
         <View style={{flex: 1}}>
@@ -145,8 +168,23 @@ const Nesting = () => {
     if (!isEmpty(selectedSpot)) {
       console.log('Updating Nest for Selected Spot ...');
       console.log('Selected Spot:', selectedSpot);
-      setParentGenerations(getParentGenerationsSpots(selectedSpot, 10));
-      setChildrenGenerations(getChildrenGenerationsSpots(selectedSpot, 10));
+      const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
+      setParentGenerations(parentSpots);
+      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
+      setChildrenGenerations(childrenSpots);
+
+      // Get All Images (Image Basemaps) Used in Nest
+      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
+      console.log(allSpotsInNest);
+      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
+        const imageBasemapId = spot.properties?.image_basemap;
+        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
+          const image = getImageByImageId(spot.properties.image_basemap);
+          return isEmpty(image) ? acc : [...acc, image];
+        }
+        else return acc;
+      }, []);
+      setImages(allImagesInNest);
     }
   };
 

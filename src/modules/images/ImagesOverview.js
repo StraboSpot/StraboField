@@ -1,5 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,11 +21,7 @@ const ImagesOverview = () => {
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
 
-  return (
-    <View style={{alignItems: 'center', flex: 1}}>
-      <ImagesInSpot saveImages={saveImagesToSpot}/>
-    </View>
-  );
+  return <ImagesInSpot saveImages={saveImagesToSpot}/>;
 };
 
 export default ImagesOverview;

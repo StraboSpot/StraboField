@@ -1,4 +1,5 @@
 export {default as AddImageButtons} from './AddImageButtons';
+export {default as ImageCard} from './ImageCard';
 export {default as ImageGallery} from './ImageGallery';
 export {default as ImageInfo} from './ImageInfo';
 export {default as ImageModal} from './ImageModal';
@@ -9,6 +10,8 @@ export {default as ImagesInSpot} from './ImagesInSpot';
 export {default as ImagesList} from './ImagesList';
 export {default as ImagesOverview} from './ImagesOverview';
 export {default as ImagesViewPage} from './ImagesPage';
+export {default as PlaceholderImageIcon} from './PlaceholderImageIcon';
 export {default as imageSliderStyles} from './imageSlider.styles';
 export {default as imageStyles} from './image.styles';
+export {default as useImageThumbnails} from './useImageThumbnails';
 export {default as useImages} from './useImages';

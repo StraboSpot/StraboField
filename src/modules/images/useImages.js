@@ -164,6 +164,12 @@ const useImages = () => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
+  const getImageByImageId = (imageId) => {
+    const images = getAllImages();
+    const image = images.find(i => i.id.toString() === imageId.toString());
+    return image;
+  };
+
   const getImageHeightAndWidth = (imageURI) => {
     return new Promise((resolve, reject) => {
       Image.getSize(imageURI, (imageWidth, imageHeight) => {
@@ -433,6 +439,7 @@ const useImages = () => {
     getAllImages: getAllImages,
     getAllImagesIds: getAllImagesIds,
     getImageBasemap: getImageBasemap,
+    getImageByImageId: getImageByImageId,
     getImageHeightAndWidth: getImageHeightAndWidth,
     getImageScreenSizedURI: getImageScreenSizedURI,
     getImageThumbnailURI: getImageThumbnailURI,

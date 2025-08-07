@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImagesList, useImages} from './index';
+import {ImagesList, useImages} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -33,7 +33,8 @@ const ImagesInSpot = ({saveImages}) => {
       deleteImage={deleteImage}
       images={images}
       saveImages={saveImages}
-      saveUpdatedImage={saveUpdatedImage}/>
+      saveUpdatedImage={saveUpdatedImage}
+    />
   );
 };
 
