@@ -1,11 +1,16 @@
 ---
 name: Testing Checklist
 about: 'Use this checklist to test new versions of StraboField '
-title: "[User Name]"
+title: User Testing Testing
 labels: testing
 assignees: ''
 
 ---
+
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - StraboSpot Version [e.g. 1.84]
 
 ## Application Testing
   Testing the app is an important task to ensure the usability, functionality and design. Application testing should be preformed for new versioning before and after deployment to the App store (Apple) or Play Store (Google). If one or more checks fail then an issue must be started with specific descriptions of the failure and the steps taken to arrive at the failure. 
@@ -28,10 +33,7 @@ If you have any questions or suggestions, please contact us at strabospot@gmail.
 ***
 ### Device [est. 3 min]
 _**Follow the instructions below and report any issues, bugs, or unexpected actions while using StraboField. Use any and all devices you have available (apple, android, phone, tablet). **_
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - StraboSpot Version [e.g. 1.84]
+
 
 #### Device Testing
 - [ ] Uninstall StraboField on your device
