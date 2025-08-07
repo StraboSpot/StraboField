@@ -1,7 +1,7 @@
 ---
 name: Testing Checklist
 about: 'Use this checklist to test new versions of StraboField '
-title: ''
+title: "[User Name]"
 labels: testing
 assignees: ''
 
