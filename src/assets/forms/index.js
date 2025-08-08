@@ -8,7 +8,6 @@ import imageProperties from './image-properties.json';
 import linearOrientation from './measurement/linear-orientation.json';
 import planarOrientation from './measurement/planar-orientation.json';
 import tabularZoneOrientation from './measurement/tabular-zone-orientation.json';
-import namingConventions from './naming-conventions.json';
 import rockTypeAlterationOreDeprecated from './pet/deprecated/rock-type-alteration-ore.json';
 import rockTypeIgneousDeprecated from './pet/deprecated/rock-type-igneous.json';
 import rockTypeMetamorphicDeprecated from './pet/deprecated/rock-type-metamorphic.json';
@@ -20,6 +19,7 @@ import rockTypePlutonic from './pet/rock-type-igneous-plutonic.json';
 import rockTypeVolcanic from './pet/rock-type-igneous-volcanic.json';
 import rockTypeMetamorphic from './pet/rock-type-metamorphic.json';
 import projectDescription from './project-description.json';
+import projectSettings from './project-settings.json';
 import report from './report.json';
 import sample from './sample.json';
 import addInterval from './sed/add-interval.json';
@@ -128,8 +128,8 @@ const forms = {
     igneous: rockTypeIgneousDeprecated,
     metamorphic: rockTypeMetamorphicDeprecated,
   },
-  preferences: {
-    naming_conventions: namingConventions,
+  settings: {
+    project_settings: projectSettings,
   },
   project: {
     tags: tags,

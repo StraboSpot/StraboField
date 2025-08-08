@@ -233,7 +233,7 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
     catch (err) {

@@ -11,7 +11,7 @@ import {isEmpty, truncateText} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import Spacer from '../../../shared/ui/Spacer';
 import ImportProjectFromZip from '../../project/ImportProjectFromZip';
-import NewProject from '../../project/NewProjectForm';
+import NewProjectForm from '../../project/NewProjectForm';
 import projectStyles from '../../project/project.styles';
 import ProjectList from '../../project/ProjectList';
 import ProjectTypesButtons from '../../project/ProjectTypesButtons';
@@ -209,7 +209,7 @@ const InitialProjectLoadModal = ({closeModal, openMainMenuPanel, visible}) => {
           titleStyle={commonStyles.standardButtonText}
         />
         <View style={{height: 400}}>
-          <NewProject onPress={closeModal} openMainMenuPanel={openMainMenuPanel}/>
+          <NewProjectForm onPress={closeModal} openMainMenuPanel={openMainMenuPanel}/>
         </View>
       </>
     );

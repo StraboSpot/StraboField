@@ -1,20 +1,17 @@
 import React, {useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import userStyles from './user.styles';
 import {logout} from './userProfile.slice';
-import UserProfileAvatar from './UserProfileAvatar';
-import useUserProfile from './useUserProfile';
 import useResetState from '../../services/useResetState';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import StandardModal from '../../shared/ui/StandardModal';
 import overlayStyles from '../home/overlays/overlay.styles';
-import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
 
 const UserProfile = () => {
   const dispatch = useDispatch();
@@ -23,31 +20,12 @@ const UserProfile = () => {
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const {clearUser} = useResetState();
-  const {getEmail, getName} = useUserProfile();
 
   const openUploadAndBackupPage = () => {
     setIsLogoutModalVisible(false);
     setTimeout(() => {          // Added timeOut cause state of modal wasn't changing fast enough
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
     }, 200);
-  };
-
-  const renderProfile = () => {
-    return (
-      <View>
-        <ListItem
-          onPress={() => dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.USER_PROFILE, bool: true}))}
-          disabled={isEmpty(userData.name)}
-        >
-          <UserProfileAvatar size={70}/>
-          <ListItem.Content>
-            <ListItem.Title style={userStyles.avatarLabelName}>{getName()}</ListItem.Title>
-            <ListItem.Subtitle style={userStyles.avatarLabelEmail}>{getEmail()}</ListItem.Subtitle>
-          </ListItem.Content>
-          {!isEmpty(userData.name) && <ListItem.Chevron/>}
-        </ListItem>
-      </View>
-    );
   };
 
   const renderLogInOrOutButton = () => {
@@ -105,15 +83,10 @@ const UserProfile = () => {
   };
 
   return (
-    <View>
-      {renderProfile()}
-      {Platform.OS !== 'web' && (
-        <>
-          {renderLogInOrOutButton()}
-          {renderLogoutModal()}
-        </>
-      )}
-    </View>
+    <>
+      {renderLogInOrOutButton()}
+      {renderLogoutModal()}
+    </>
   );
 };
 

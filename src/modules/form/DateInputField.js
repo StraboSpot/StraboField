@@ -12,12 +12,13 @@ import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisibl
 
 const DateInputField = ({
                           field: {name, onBlur, onChange, value},
-                          form: {errors, touched, setFieldValue, values},
+                          form: {errors, values},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
                           onMyChange,
+                          setFieldValue,
                         }) => {
   const [isDatePickerModalVisible, setIsDatePickerModalVisible] = useState(false);
   const [date, setDate] = useState(Date.parse(value) ? new Date(value) : new Date());
@@ -32,7 +33,7 @@ const DateInputField = ({
       },
     );
     return () => subscription.remove();
-    }, [colorScheme]);
+  }, [colorScheme]);
 
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')

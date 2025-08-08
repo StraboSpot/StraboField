@@ -32,7 +32,7 @@ import RockIgneousPage from '../petrology/RockIgneousPage';
 import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
-import DailyNotesModal from '../project/description/DailyNotesModal';
+import DailyNotesModal from '../project/daily-notes/DailyNotesModal';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';

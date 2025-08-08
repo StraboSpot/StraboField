@@ -26,7 +26,7 @@ import {
   setStatusMessageModalTitle,
 } from '../home/home.slice';
 
-const ProjectList = ({source}) => {
+const ProjectList = ({doRefresh, onProjectPress, source}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const endPoint = useSelector(state => state.connections.databaseEndpoint);
@@ -62,7 +62,7 @@ const ProjectList = ({source}) => {
       setIsProjectOptionsModalVisible(false);
       console.log('Project Options Modal Visible (in return)', isProjectOptionsModalVisible);
     };
-  }, []);
+  }, [doRefresh]);
 
   const handleStateChange = async (state) => {
     state === 'active'
@@ -97,7 +97,7 @@ const ProjectList = ({source}) => {
     }
   };
 
-  const reloadingList = async (isDeleted) => {
+  const reloadList = async (isDeleted) => {
     if (isDeleted) {
       if (source === 'server') setProjectsArr(await getAllServerProjects());
       else if (source === 'device') {
@@ -156,7 +156,7 @@ const ProjectList = ({source}) => {
         visible={isProjectOptionsModalVisible}
         closeModal={() => setIsProjectOptionsModalVisible(false)}
         open={() => setIsProjectOptionsModalVisible(true)}
-        projectDeleted={value => reloadingList(value)}
+        projectDeleted={value => reloadList(value)}
       />
     );
   };
@@ -199,7 +199,7 @@ const ProjectList = ({source}) => {
       return (
         <View style={{flex: 1}}>
           <View style={{paddingBottom: 0}}>
-            <SectionDivider dividerText={source === 'device' ? 'Saved Projects' : 'Projects to Import'}/>
+            <SectionDivider dividerText={source === 'device' ? 'Local Copies of Projects' : 'Projects on Server'}/>
           </View>
           <FlatList
             keyExtractor={item => item.id.toString()}
@@ -209,14 +209,14 @@ const ProjectList = ({source}) => {
             ListEmptyComponent={
               <View>
                 {source === 'server' ? (
-                    <Button
-                      title={'Retry'}
-                      onPress={() => getAllProjects()}
-                      buttonStyle={{width: 80, alignSelf: 'center'}}
-                    />
-                  )
-                  : <ListEmptyText text={'No Projects Available'}/>
-                }
+                  <Button
+                    title={'Retry'}
+                    onPress={() => getAllProjects()}
+                    buttonStyle={{width: 80, alignSelf: 'center'}}
+                  />
+                ) : (
+                  <ListEmptyText text={'No Projects Available'}/>
+                )}
                 {isError && renderErrorMessage()}
               </View>
             }/>

@@ -45,11 +45,12 @@ const Form = ({
     return (
       <Field
         component={DateInputField}
-        name={field.name}
-        label={field.label}
-        key={field.name}
         isShowTimeOnly={isShowTimeOnly}
+        key={field.name}
+        label={field.label}
+        name={field.name}
         onMyChange={onMyChange}
+        setFieldValue={setFieldValue}
       />
     );
   };

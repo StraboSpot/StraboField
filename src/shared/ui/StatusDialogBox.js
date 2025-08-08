@@ -14,14 +14,18 @@ const StatusDialogBox = ({
                            closeTitle,
                            confirmText,
                            confirmTitleStyle,
+                           isVisible,
                            onConfirmPress,
                            onTouchOutside,
                            overlayTitleText,
                            showCancelButton,
                            showConfirmButton,
+                           showMiddleButton,
                            title,
+                           middleButtonTitle,
                            titleContainer,
-                           isVisible,
+                           middleButtonPress,
+                           isConfirmDisabled,
                          }) => {
   const scrollView = useRef();
 
@@ -61,16 +65,26 @@ const StatusDialogBox = ({
         {(showCancelButton || false) && (
           <Button
             title={closeTitle || 'Close'}
-            type={'clear'}
+            type={'outline'}
             onPress={closeModal}
+            containerStyle={{padding: 5}}
+          />
+        )}
+        {(showMiddleButton || false) && (
+          <Button
+            title={middleButtonTitle || 'Close'}
+            type={'outline'}
+            onPress={middleButtonPress}
+            containerStyle={{padding: 5}}
           />
         )}
         {showConfirmButton && (
           <Button
+            disabled={isConfirmDisabled}
             title={confirmText || 'Ok'}
             titleStyle={confirmTitleStyle}
-            type={'clear'}
             onPress={onConfirmPress}
+            containerStyle={{padding: 5}}
           />
         )}
       </View>

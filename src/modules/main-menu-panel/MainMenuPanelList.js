@@ -18,18 +18,15 @@ const MainMenuPanelList = ({activeProject}) => {
 
     const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: item}));
 
-    if (item !== MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT && item !== MAIN_MENU_ITEMS.MANAGE.STRABOMICRO_PROJECTS
+    if (item !== MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP && item !== MAIN_MENU_ITEMS.MANAGE_PROJECT.STRABOMICRO_PROJECTS
       && item !== MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS
-      || ((item === MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT || item === MAIN_MENU_ITEMS.MANAGE.STRABOMICRO_PROJECTS
+      || ((item === MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP || item === MAIN_MENU_ITEMS.MANAGE_PROJECT.STRABOMICRO_PROJECTS
         || item === MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS) && Platform.OS !== 'web')) {
       return (
         <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
           <ListItem.Content>
             {<ListItem.Title style={commonStyles.listItemTitle}>
-              {item === MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS
-                ? MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS + ` (${activeProject})`
-                : item
-              }
+              {item}
             </ListItem.Title>}
           </ListItem.Content>
         </ListItem>
@@ -37,7 +34,9 @@ const MainMenuPanelList = ({activeProject}) => {
     }
   };
 
-  const renderMenuSectionHeader = ({section: {title}}) => <SectionDivider dividerText={toTitleCase(title)}/>;
+  const renderMenuSectionHeader = ({section: {title}}) => {
+    return <SectionDivider dividerText={title.split('_').join(' ')}/>;
+  };
 
   return (
     <SectionList

@@ -22,9 +22,9 @@ const mainMenuSlice = createSlice({
       state.selectedButtonIndex = action.payload.index;
     },
     setSidePanelVisible(state, action) {
-      state.isSidePanelVisible = action.payload.bool;
-      state.sidePanelView = action.payload.view;
-      state.tag = action.payload.tag;
+      if (action.payload.hasOwnProperty('bool')) state.isSidePanelVisible = action.payload.bool;
+      if (action.payload.hasOwnProperty('view')) state.sidePanelView = action.payload.view;
+      if (action.payload.hasOwnProperty('tag')) state.tag = action.payload.tag;
     },
     setSortedView(state, action) {
       state.sortedView = action.payload.view;

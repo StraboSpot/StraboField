@@ -57,16 +57,16 @@ const NewProjectForm = ({
     );
   };
 
-  const renderProjectOptionsModal = () => {
-    return (
-      <ProjectOptionsDialogBox
-        currentProject={currentProject}
-        visible={isProjectOptionsModalVisible}
-        closeModal={() => setIsProjectOptionsModalVisible(false)}
-        open={() => setIsProjectOptionsModalVisible(true)}
-      />
-    );
-  };
+  // const renderProjectOptionsModal = () => {
+  //   return (
+  //     <ProjectOptionsDialogBox
+  //       currentProject={currentProject}
+  //       visible={isProjectOptionsModalVisible}
+  //       closeModal={() => setIsProjectOptionsModalVisible(false)}
+  //       open={() => setIsProjectOptionsModalVisible(true)}
+  //     />
+  //   );
+  // };
 
   const saveForm = async () => {
     try {
@@ -76,7 +76,7 @@ const NewProjectForm = ({
       await initializeNewProject(formValues);
       console.log('New Project created', formValues.project_name);
       if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
       openMainMenuPanel();
       return Promise.resolve();
     }
@@ -94,7 +94,7 @@ const NewProjectForm = ({
         type={'clear'}
         onPress={() => saveForm()}
       />
-      {renderProjectOptionsModal()}
+      {/*{renderProjectOptionsModal()}*/}
     </>
   );
 };

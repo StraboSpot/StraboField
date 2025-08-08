@@ -42,21 +42,19 @@ const DailyNotesSection = () => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1, flexDirection: 'column'}}>
       <SectionDividerWithRightButton
         dividerText={'Daily Notes'}
         onPress={addDailyNote}
       />
-      <View style={{flex: 1}}>
-        <FlatList
-          data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
-          keyExtractor={item => item.date}
-          renderItem={({item}) => renderDailyNotesListItem(item)}
-          ListEmptyComponent={
-            <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
-          }
-        />
-      </View>
+      <FlatList
+        data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
+        keyExtractor={item => item.date}
+        renderItem={({item}) => renderDailyNotesListItem(item)}
+        ListEmptyComponent={
+          <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
+        }
+      />
     </View>
   );
 };

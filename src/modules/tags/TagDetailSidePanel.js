@@ -22,9 +22,9 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
   const [isColorPickerModalVisible, setIsColorPickerModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
-  const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.ATTRIBUTES.GEOLOGIC_UNITS
-    : MAIN_MENU_ITEMS.ATTRIBUTES.TAGS;
-  const colorLabel = label === MAIN_MENU_ITEMS.ATTRIBUTES.GEOLOGIC_UNITS ? 'Unit' : label.slice(0, -1);
+  const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
+    : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
+  const colorLabel = label === MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS ? 'Unit' : label.slice(0, -1);
 
   const closeDetailModal = () => setIsDetailModalVisible(false);
 

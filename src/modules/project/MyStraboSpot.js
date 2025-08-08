@@ -1,35 +1,51 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
-import ActiveProjectList from './ActiveProjectList';
+import DeleteProjectPage from './DeleteProjectPage';
 import ImportProjectFromZip from './ImportProjectFromZip';
+import {SaveProjectModal, UploadModal, UploadProgressModal} from './modals';
 import NewProjectForm from './NewProjectForm';
+import OpenProjectPage from './OpenProjectPage';
 import ProjectList from './ProjectList';
+import {setSelectedProject} from './projects.slice';
 import ProjectTypesButtons from './ProjectTypesButtons';
 import {APP_DIRECTORIES} from '../../services/directories.constants';
 import useDevice from '../../services/useDevice';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {BLUE} from '../../shared/styles.constants';
 import Spacer from '../../shared/ui/Spacer';
-import {setLoadingStatus} from '../home/home.slice';
-import UserProfile from '../user/UserProfile';
+import {
+  addedStatusMessage,
+  clearedStatusMessages,
+  setIsErrorMessagesModalVisible,
+  setLoadingStatus,
+} from '../home/home.slice';
+import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 
 const MyStraboSpot = ({openMainMenuPanel}) => {
+  const dispatch = useDispatch();
+  const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
+
   const [importComplete] = useState(false);
   const [importedProject, setImportedProject] = useState({});
+  const [isSaveProjectModalVisible, setIsSaveProjectModalVisible] = useState(false);
+  const [isProgressModalVisible, setIsProgressModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
   const [showSection, setShowSection] = useState('none');
 
-  const dispatch = useDispatch();
-  const {doesDeviceBackupDirExist, getExternalProjectData, openURL, makeDirectory} = useDevice();
+  const {doesDeviceBackupDirExist, getExternalProjectData, makeDirectory} = useDevice();
 
   useEffect(() => {
     console.log('UE MyStraboSpot []');
     if (Platform.OS !== 'web') checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
   }, []);
+
+
+  const checkAndroidDownloadDir = async () => {
+    const exists = await doesDeviceBackupDirExist(undefined, true);
+    if (!exists) await makeDirectory(APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID);
+  };
 
   const checkBackupDir = async () => {
     try {
@@ -43,9 +59,16 @@ const MyStraboSpot = ({openMainMenuPanel}) => {
     }
   };
 
-  const checkAndroidDownloadDir = async () => {
-    const exists = await doesDeviceBackupDirExist(undefined, true);
-    if (!exists) await makeDirectory(APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID);
+  const checkForActiveDatasets = () => {
+    if (activeDatasets.length > 0) {
+      dispatch(setSelectedProject({source: '', project: ''}));
+      setIsSaveProjectModalVisible(true);
+    }
+    else {
+      dispatch(clearedStatusMessages());
+      dispatch(addedStatusMessage('There are no active datasets selected.'));
+      dispatch(setIsErrorMessagesModalVisible(true));
+    }
   };
 
   const getExportedProject = async () => {
@@ -69,51 +92,47 @@ const MyStraboSpot = ({openMainMenuPanel}) => {
     switch (showSection) {
       case 'none':
         return (
-          <View style={{padding: 10}}>
-            <UserProfile/>
+          <>
             {Platform.OS !== 'web' && (
               <>
                 <Spacer/>
                 <ProjectTypesButtons
-                  onLoadProjectsFromServer={() => setShowSection('serverProjects')}
-                  onLoadProjectsFromDevice={() => setShowSection('deviceProjects')}
-                  onLoadProjectsFromDownloadsFolder={() => getExportedProject()}
-                  onStartNewProject={() => setShowSection('new')}
+                  onDeleteProject={() => {
+                    setShowSection('deleteProject');
+                    dispatch(setSidePanelVisible({bool: true, view: null}));
+                  }}
+                  onLoadProjectsFromServer={() => {
+                    setShowSection('serverProjects');
+                    dispatch(setSidePanelVisible({bool: true, view: null}));
+                  }}
+                  onLoadProjectsFromDevice={() => {
+                    setShowSection('deviceProjects');
+                    dispatch(setSidePanelVisible({bool: true, view: null}));
+                  }}
+                  onLoadProjectsFromDownloadsFolder={() => {
+                    getExportedProject();
+                    dispatch(setSidePanelVisible({bool: true, view: null}));
+                  }}
+                  onSaveCurrentProject={checkForActiveDatasets}
+                  onStartNewProject={() => {
+                    setShowSection('new');
+                    dispatch(setSidePanelVisible({bool: true, view: null}));
+                  }}
                 />
               </>
             )}
-          </View>
+          </>
         );
       case 'serverProjects':
         return (
           <View style={{flex: 1}}>
             <ProjectList source={'server'}/>
-            <ActiveProjectList/>
           </View>
         );
+      case 'deleteProject':
+        return <DeleteProjectPage/>;
       case 'deviceProjects':
-        return (
-          <View style={{flex: 1}}>
-            <ProjectList source={'device'}/>
-            <View style={{marginBottom: 20}}>
-              <ActiveProjectList/>
-              {Platform.OS === 'ios' && <Button
-                title={'View/Edit Files on Device'}
-                type={'outline'}
-                containerStyle={commonStyles.buttonPadding}
-                buttonStyle={commonStyles.standardButton}
-                titleStyle={commonStyles.standardButtonText}
-                onPress={() => openURL('ProjectBackups')}
-                iconContainerStyle={{paddingRight: 10}}
-                icon={{
-                  name: 'file-tray-full-outline',
-                  type: 'ionicon',
-                  color: BLUE,
-                }}
-              />}
-            </View>
-          </View>
-        );
+        return <OpenProjectPage/>;
       case 'importData':
         return (
           <ImportProjectFromZip
@@ -136,23 +155,28 @@ const MyStraboSpot = ({openMainMenuPanel}) => {
 
   return (
     <>
-      <View style={{alignItems: 'flex-start'}}>
-        {showSection !== 'none' && (
-          <Button
-            title={'Back to My StraboSpot'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
-            onPress={() => setShowSection('none')}
-            icon={{
-              name: 'chevron-back-outline',
-              type: 'ionicon',
-              size: 20,
-              color: BLUE,
-            }}
-          />
-        )}
-      </View>
-      {renderSectionView()}
+      <FlatList
+        ListHeaderComponent={
+          <>
+            {renderSectionView()}
+          </>
+        }
+      />
+
+      {/*  Modals */}
+      {isSaveProjectModalVisible && (
+        <SaveProjectModal
+          visible={isSaveProjectModalVisible}
+          closeModal={() => setIsSaveProjectModalVisible(false)}
+        />
+      )}
+      <UploadModal
+        visible={isUploadModalVisible}
+        closeModal={() => setIsUploadModalVisible(false)}
+      />
+      <UploadProgressModal
+        isProgressModalVisible={isProgressModalVisible}
+      />
     </>
   );
 };

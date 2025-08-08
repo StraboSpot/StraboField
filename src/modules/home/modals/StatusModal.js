@@ -31,7 +31,7 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
     if (selectedProject.source === 'device') {
       console.log('FROM DEVICE', selectedProject.project);
       dispatch(setSelectedProject({source: '', project: ''}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       const res = await loadProjectFromDevice(selectedProject.project.fileName);
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
@@ -40,13 +40,13 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
     else if (selectedProject.source === 'server') {
       console.log('FROM SERVER', selectedProject.project);
       dispatch(setSelectedProject({source: '', project: ''}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
       await initializeDownload(selectedProject.project);
     }
     else {
       dispatch(setIsStatusMessagesModalVisible(false));
       openMainMenuPanel();
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
     }
   };
 

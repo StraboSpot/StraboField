@@ -10,8 +10,24 @@
     },
     {
       "type": "begin_group",
+      "name": "group_ei8vf77",
+      "label": "Privacy Setting",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "public",
+      "label": "Make Project Public?",
+      "required": "false",
+      "hint": "Public datasets are accessible at StraboSpot.org/search.  Privacy settings are reversible and update when project is uploaded."
+    },
+    {
+      "type": "end_group"
+    },
+    {
+      "type": "begin_group",
       "name": "group_kb59y17",
-      "label": "Spot Name",
+      "label": "Spot Name Defaults",
       "required": "false"
     },
     {
@@ -43,7 +59,8 @@
     {
       "type": "begin_group",
       "name": "group_rv9mt72",
-      "label": "Image Basemap/Strat Section\nSpot Name"
+      "label": "Image Basemap/Strat Section Spot Name Defaults",
+      "required": "false"
     },
     {
       "type": "text",
@@ -71,7 +88,7 @@
     {
       "type": "begin_group",
       "name": "group_vy88v94",
-      "label": "Sample Name",
+      "label": "Sample Name Defaults",
       "required": "false"
     },
     {

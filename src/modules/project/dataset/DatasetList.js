@@ -12,14 +12,14 @@ const DatasetList = ({setDatasetToView}) => {
   const datasets = useSelector(state => state.project.datasets) || {};
 
   return (
-    // <View style={{flex: 1, backgroundColor: 'red'}}>
+    <View>
       <FlatList
         keyExtractor={item => item.id}
         data={Object.values(datasets)}
         renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
         ItemSeparatorComponent={FlatListItemSeparator}
       />
-    // </View>
+     </View>
   );
 };
 

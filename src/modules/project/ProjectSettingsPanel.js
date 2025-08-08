@@ -3,15 +3,18 @@ import React, {useRef} from 'react';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Form, useForm} from '../../form';
-import {updatedProject} from '../../project/projects.slice';
+import {Form, useForm} from '../form';
+import {updatedProject} from './projects.slice';
 
-const NamingConventions = () => {
+const ProjectSettingsPanel = () => {
   const dispatch = useDispatch();
-  const formName = ['preferences', 'naming_conventions'];
-  const {validateForm} = useForm();
-  const formRef = useRef(null);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
+
+  const {validateForm} = useForm();
+
+  const formRef = useRef(null);
+
+  const formName = ['settings', 'project_settings'];
 
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
@@ -35,4 +38,4 @@ const NamingConventions = () => {
   );
 };
 
-export default NamingConventions;
+export default ProjectSettingsPanel;

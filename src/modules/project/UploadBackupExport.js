@@ -50,8 +50,10 @@ const UploadBackAndExport = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <View>
-        {user.encoded_login ? <Button
-            title={isOnline.isConnected ? 'Upload project to StraboSpot' : 'Need to be connected to server'}
+        {user.encoded_login ? (
+          <Button
+            containerStyle={commonStyles.standardButtonContainer}
+            title={isOnline.isConnected ? 'Upload to Server' : 'Need to be connected to server'}
             buttonStyle={commonStyles.standardButton}
             titleStyle={commonStyles.standardButtonText}
             onPress={() => {
@@ -60,15 +62,23 @@ const UploadBackAndExport = () => {
             }}
             disabled={!isOnline.isConnected}
           />
-          : (
-            <View style={uiStyles.spacer}>
-              <Text style={overlayStyles.importantText}>If you are attempting to upload the project,
-                check to see if you are logged in
-              </Text>
-            </View>
-          )}
+        ) : (
+          <View style={uiStyles.spacer}>
+            <Text style={overlayStyles.importantText}>If you are attempting to upload the project,
+              check to see if you are logged in
+            </Text>
+          </View>
+        )}
         <Button
-          title={'Backup project to device'}
+          title={'Save Local Copy'}
+          containerStyle={commonStyles.standardButtonContainer}
+          buttonStyle={commonStyles.standardButton}
+          titleStyle={commonStyles.standardButtonText}
+          onPress={checkForActiveDatasets}
+        />
+        <Button
+          title={'Export to Zip'}
+          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
           onPress={() => checkForActiveDatasets()}
@@ -77,7 +87,7 @@ const UploadBackAndExport = () => {
           && (
             <View style={{padding: 10}}>
               <Text style={{...overlayStyles.statusMessageText}}>After backing up,
-                to further preserve your data please copy your project backups out of the  StraboSpot2/ProjectBackups
+                to further preserve your data please copy your project backups out of the StraboSpot2/ProjectBackups
                 folder to a
                 different folder in the iOS app Files/On My IPad! If online, you can find detailed instructions
                 <Text style={{color: BLUE}} onPress={openMovingProjectBackupsURL}> here</Text>.
@@ -92,36 +102,32 @@ const UploadBackAndExport = () => {
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
-        <SectionDivider dividerText={'upload and backup'}/>
-        <Spacer/>
         {renderUploadAndBackupButtons()}
       </View>
 
-      {Platform.OS === 'ios'
-        && (
-          <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-            <View style={{padding: 10, alignItems: 'center'}}>
-              <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
-                Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
-              </Text>
-            </View>
-            <Button
-              title={'View/Edit Files on Device'}
-              type={'outline'}
-              containerStyle={commonStyles.buttonPadding}
-              buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
-              onPress={() => openURL('ProjectBackups')}
-              iconContainerStyle={{paddingRight: 10}}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-            />
+      {Platform.OS === 'ios' && (
+        <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
+          <View style={{padding: 10, alignItems: 'center'}}>
+            <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
+              Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
+            </Text>
           </View>
-        )
-      }
+          <Button
+            title={'View/Edit Files on Device'}
+            type={'outline'}
+            containerStyle={commonStyles.buttonPadding}
+            buttonStyle={commonStyles.standardButton}
+            titleStyle={commonStyles.standardButtonText}
+            onPress={() => openURL('ProjectBackups')}
+            iconContainerStyle={{paddingRight: 10}}
+            icon={{
+              name: 'file-tray-full-outline',
+              type: 'ionicon',
+              color: BLUE,
+            }}
+          />
+        </View>
+      )}
       <BackupModal
         visible={isBackupModalVisible}
         closeModal={() => setIsBackupModalVisible(false)}

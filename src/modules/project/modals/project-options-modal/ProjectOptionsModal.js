@@ -127,7 +127,7 @@ const ProjectOptionsDialogBox = ({
     }
     else {
       closeModal();
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
     }
   };
 

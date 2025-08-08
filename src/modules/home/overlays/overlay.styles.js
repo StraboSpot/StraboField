@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-end',
     paddingTop: 10,
   },
   buttonText: {
