@@ -18,25 +18,15 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: themes.PRIMARY_TEXT_COLOR,
-    flex: 3,
-    fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
+    fontSize: themes.SPOT_NAME_SIZE,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   mainMenuHeaderContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     flexDirection: 'row',
-    height: 70,
-    justifyContent: 'center',
-  },
-  mainMenuHeaderTextContainer: {
-    alignItems: 'center',
-    flex: 4,
-    flexDirection: 'row',
+    maxHeight: 70,
+    padding: 10,
   },
   mainMenuIconContainer: {
-    alignItems: 'flex-start',
-    flex: 1,
     justifyContent: 'center',
   },
   settingsDrawer: {
@@ -45,6 +35,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 300,
     zIndex: 0,
+  },
+  subheaderText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    fontWeight: 'bold',
   },
 });
 

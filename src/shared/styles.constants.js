@@ -40,6 +40,7 @@ export const PRIMARY_HEADER_TEXT_SIZE = Platform.OS === 'web' ? 14 : 20;
 export const SMALL_TEXT_SIZE = Platform.OS === 'web' ? 10 : 14;
 export const MEDIUM_TEXT_SIZE = Platform.OS === 'web' ? 12 : 16;
 export const LARGE_TEXT_SIZE = Platform.OS === 'web' ? 18 : 22;
+export const HOME_MENU_HEADER2_SIZE = Platform.OS === 'web' ? 16 : 26;
 export const SPOT_NAME_SIZE = Platform.OS === 'web' ? 20 : 30;
 
 // MODALS AND OVERLAYS
