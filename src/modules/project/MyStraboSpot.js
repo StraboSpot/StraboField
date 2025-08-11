@@ -93,34 +93,30 @@ const MyStraboSpot = ({openMainMenuPanel}) => {
       case 'none':
         return (
           <>
-            {Platform.OS !== 'web' && (
-              <>
-                <Spacer/>
-                <ProjectTypesButtons
-                  onDeleteProject={() => {
-                    setShowSection('deleteProject');
-                    dispatch(setSidePanelVisible({bool: true, view: null}));
-                  }}
-                  onLoadProjectsFromServer={() => {
-                    setShowSection('serverProjects');
-                    dispatch(setSidePanelVisible({bool: true, view: null}));
-                  }}
-                  onLoadProjectsFromDevice={() => {
-                    setShowSection('deviceProjects');
-                    dispatch(setSidePanelVisible({bool: true, view: null}));
-                  }}
-                  onLoadProjectsFromDownloadsFolder={() => {
-                    getExportedProject();
-                    dispatch(setSidePanelVisible({bool: true, view: null}));
-                  }}
-                  onSaveCurrentProject={checkForActiveDatasets}
-                  onStartNewProject={() => {
-                    setShowSection('new');
-                    dispatch(setSidePanelVisible({bool: true, view: null}));
-                  }}
-                />
-              </>
-            )}
+            <Spacer/>
+            <ProjectTypesButtons
+              onDeleteProject={() => {
+                setShowSection('deleteProject');
+                dispatch(setSidePanelVisible({bool: true, view: null}));
+              }}
+              onLoadProjectsFromServer={() => {
+                setShowSection('serverProjects');
+                dispatch(setSidePanelVisible({bool: true, view: null}));
+              }}
+              onLoadProjectsFromDevice={() => {
+                setShowSection('deviceProjects');
+                dispatch(setSidePanelVisible({bool: true, view: null}));
+              }}
+              onLoadProjectsFromDownloadsFolder={() => {
+                getExportedProject();
+                dispatch(setSidePanelVisible({bool: true, view: null}));
+              }}
+              onSaveCurrentProject={checkForActiveDatasets}
+              onStartNewProject={() => {
+                setShowSection('new');
+                dispatch(setSidePanelVisible({bool: true, view: null}));
+              }}
+            />
           </>
         );
       case 'serverProjects':

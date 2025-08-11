@@ -7,7 +7,6 @@ import {useDispatch} from 'react-redux';
 import {MAIN_MENU_DATA, MAIN_MENU_ITEMS} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import commonStyles from '../../shared/common.styles';
-import {toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
@@ -18,10 +17,11 @@ const MainMenuPanelList = ({activeProject}) => {
 
     const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: item}));
 
-    if (item !== MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP && item !== MAIN_MENU_ITEMS.MANAGE_PROJECT.STRABOMICRO_PROJECTS
-      && item !== MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS
-      || ((item === MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP || item === MAIN_MENU_ITEMS.MANAGE_PROJECT.STRABOMICRO_PROJECTS
-        || item === MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS) && Platform.OS !== 'web')) {
+    if (item !== MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP && item !== MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOFIELD_PROJECTS
+      && item !== MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOMICRO_PROJECTS && item !== MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS
+      || ((item === MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP || item === MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOFIELD_PROJECTS
+          || item === MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOMICRO_PROJECTS || item === MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS)
+        && Platform.OS !== 'web')) {
       return (
         <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
           <ListItem.Content>
