@@ -18,12 +18,12 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.SPOT_NAME_SIZE,
+    fontSize: themes.LARGE_TEXT_SIZE,
     fontWeight: 'bold',
   },
   mainMenuHeaderContainer: {
     flexDirection: 'row',
-    maxHeight: 70,
+    height: 80,
     padding: 10,
   },
   mainMenuIconContainer: {
