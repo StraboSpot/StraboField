@@ -43,10 +43,13 @@ export const MAIN_MENU_DATA = Object.entries(MAIN_MENU_ITEMS).map(([key, value])
 
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',
+  DELETE_PROJECT: 'Delete Project',
+  DOWNLOAD_PROJECT: 'Download Project',
+  IMPORT_PROJECT: 'Import Project',
   MANAGE_CUSTOM_MAP: 'manageCustomMap',
-  PROJECT_DESCRIPTION: 'project daily-notes',
-  TAG_DETAIL: 'tag detail',
-  TAG_ADD_REMOVE_SPOTS: 'add remove tag spots',
+  NEW_PROJECT: 'New Project',
+  OPEN_PROJECT: 'Open Project',
   TAG_ADD_REMOVE_FEATURES: 'add remove tag features',
-  USER_PROFILE: 'userProfile',
+  TAG_ADD_REMOVE_SPOTS: 'add remove tag spots',
+  TAG_DETAIL: 'tag detail',
 };

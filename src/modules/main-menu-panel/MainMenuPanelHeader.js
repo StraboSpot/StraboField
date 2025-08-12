@@ -15,27 +15,33 @@ const MainMenuPanelHeader = () => {
   const dispatch = useDispatch();
 
   const settingsPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
+  const isSideMenuVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
+
+  console.log('settingsPageVisible', settingsPageVisible);
+  console.log('isSideMenuVisible', isSideMenuVisible);
 
   console.log('here', Object.values(MAIN_MENU_ITEMS.MY_STRABOSPOT));
   console.log('here2', !Object.values(MAIN_MENU_ITEMS.MY_STRABOSPOT).includes(settingsPageVisible));
 
-  const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.MY_STRABOSPOT).includes(settingsPageVisible) &&
-    !Object.values(MAIN_MENU_ITEMS.SETTINGS).includes(settingsPageVisible);
+  const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.MY_STRABOSPOT).includes(settingsPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.SETTINGS).includes(settingsPageVisible);
 
   return (
     <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: settingsPageVisible ? 0 : 10}]}>
       {settingsPageVisible ? (
-        <View style={mainMenuPanelStyles.mainMenuIconContainer}>
-          <Icon
-            name={'arrow-back'}
-            type={'ionicon'}
-            color={'black'}
-            iconStyle={mainMenuPanelStyles.buttons}
-            onPress={() => dispatch(setMenuSelectionPage({name: null}))}
-            size={30}
-          />
-        </View>
+        !isSideMenuVisible && (
+          <View style={mainMenuPanelStyles.mainMenuIconContainer}>
+            <Icon
+              name={'arrow-back'}
+              type={'ionicon'}
+              color={'black'}
+              iconStyle={mainMenuPanelStyles.buttons}
+              onPress={() => dispatch(setMenuSelectionPage({name: null}))}
+              size={30}
+            />
+          </View>
+        )
       ) : (
         <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingHorizontal: 5, paddingVertical: 0}]}>
           <AvatarWrapper

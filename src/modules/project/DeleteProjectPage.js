@@ -8,13 +8,17 @@ import ProjectList from './ProjectList';
 import useDevice from '../../services/useDevice';
 import commonStyles from '../../shared/common.styles';
 import {BLUE} from '../../shared/styles.constants';
+import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
+import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import {useDispatch} from 'react-redux';
 
 // Open project on device in StraboSpot app directory
 const DeleteProjectPage = () => {
+  const dispatch = useDispatch();
 
+  const [doReloadPage, setDoReloadPage] = useState(false);
   const [isDeleteProjectModalVisible, setIsDeleteProjectModalVisible] = useState(false);
   const [projectToDeleteFilename, setProjectToDeleteFilename] = useState(null);
-  const [doReloadPage, setDoReloadPage] = useState(false);
 
   const {openURL} = useDevice();
 
@@ -43,6 +47,11 @@ const DeleteProjectPage = () => {
   return (
     <>
       <View style={{flex: 1}}>
+        <SidePanelHeader
+          backButton={() => dispatch(setSidePanelVisible({bool: false}))}
+          title={'My StraboField Projects'}
+          headerTitle={'Delete Project'}
+        />
         <ProjectList doRefresh={doReloadPage} onProjectPress={confirmDeleteProject} source={source}/>
         <View style={{marginBottom: 20}}>
           {Platform.OS === 'ios' && (

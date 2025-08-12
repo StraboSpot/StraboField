@@ -18,7 +18,6 @@ const ProjectTypesButtons = ({
                                onLoadProjectsFromDevice,
                                onLoadProjectsFromDownloadsFolder,
                                onLoadProjectsFromServer,
-                               onSaveCurrentProject,
                                onStartNewProject,
                              }) => {
   const isOnline = useSelector(state => state.connections.isOnline);

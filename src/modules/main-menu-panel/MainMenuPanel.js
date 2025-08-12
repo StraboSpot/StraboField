@@ -25,16 +25,20 @@ import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import DailyNotesSection from '../project/daily-notes/DailyNotesSection';
 import DatasetDetail from '../project/dataset/DatasetDetail';
 import DatasetsPanel from '../project/DatasetsPanel';
-import MyStraboSpot from '../project/MyStraboSpot';
+import DeleteProjectPage from '../project/DeleteProjectPage';
+import DownloadProjectPage from '../project/DownloadProjectPage';
+import ImportProjectFromZip from '../project/ImportProjectFromZip';
+import NewProjectForm from '../project/NewProjectForm';
+import OpenProjectPage from '../project/OpenProjectPage';
 import ProjectDescription from '../project/ProjectDescription';
 import ProjectSettingsPanel from '../project/ProjectSettingsPanel';
+import StraboFieldProjects from '../project/StraboFieldProjects';
 import UploadBackupAndExport from '../project/UploadBackupExport';
 import {ReportsMenu} from '../reports';
 import SamplesMenuItem from '../samples/SamplesMenuItem';
 import {SpotsList} from '../spots';
 import {AddRemoveTagFeatures, AddRemoveTagSpots, TagDetailSidePanel, Tags} from '../tags';
 import AccountPanel from '../user/AccountPanel';
-import UserProfilePage from '../user/UserProfilePage';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
@@ -120,7 +124,7 @@ const MainMenuPanel = forwardRef(({
 
       // My StraboSpot
       case MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOFIELD_PROJECTS:
-        return <MyStraboSpot openMainMenuPanel={openMainMenuPanel}/>;
+        return <StraboFieldProjects openMainMenuPanel={openMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOMICRO_PROJECTS:
         return <MicroProjectsList/>;
       case MAIN_MENU_ITEMS.MY_STRABOSPOT.ACCOUNT:
@@ -151,18 +155,24 @@ const MainMenuPanel = forwardRef(({
     switch (sidePanelView) {
       case SIDE_PANEL_VIEWS.DATASET_DETAIL:
         return <DatasetDetail dataset={datasetToView}/>;
+      case SIDE_PANEL_VIEWS.DELETE_PROJECT:
+        return <DeleteProjectPage/>;
+      case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
+        return <DownloadProjectPage/>;
+      case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
+        return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
-      case SIDE_PANEL_VIEWS.PROJECT_DESCRIPTION:
-        return <ProjectDescription/>;
-      case SIDE_PANEL_VIEWS.TAG_DETAIL:
-        return <TagDetailSidePanel openNotebookPanel={openNotebookPanel}/>;
-      case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
-        return <AddRemoveTagSpots updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+      case SIDE_PANEL_VIEWS.NEW_PROJECT:
+        return <NewProjectForm/>;
+      case SIDE_PANEL_VIEWS.OPEN_PROJECT:
+        return <OpenProjectPage/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
-      case SIDE_PANEL_VIEWS.USER_PROFILE:
-        return <UserProfilePage/>;
+      case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
+        return <AddRemoveTagSpots updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+      case SIDE_PANEL_VIEWS.TAG_DETAIL:
+        return <TagDetailSidePanel openNotebookPanel={openNotebookPanel}/>;
     }
   };
 

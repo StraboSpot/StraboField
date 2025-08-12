@@ -26,7 +26,7 @@ const OpenProjectPage = () => {
   const {loadProjectFromDevice} = useImport();
   const {openURL} = useDevice();
 
-  const source = 'device';
+  const source = 'server';
 
   const closeBackupModal = () => setIsSaveProjectModalVisible(false);
 
@@ -67,7 +67,7 @@ const OpenProjectPage = () => {
         <SidePanelHeader
           backButton={() => dispatch(setSidePanelVisible({bool: false}))}
           title={'My StraboField Projects'}
-          headerTitle={'Open Local Copy'}
+          headerTitle={'Download Project'}
         />
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>
         <View style={{marginBottom: 20}}>

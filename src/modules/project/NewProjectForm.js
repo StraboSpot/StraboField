@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -12,7 +12,8 @@ import {isEmpty} from '../../shared/Helpers';
 import {Form, useForm} from '../form';
 import {setIsProjectLoadSelectionModalVisible} from '../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
+import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
 const NewProjectForm = ({
                           openMainMenuPanel,
@@ -87,7 +88,12 @@ const NewProjectForm = ({
   };
 
   return (
-    <>
+    <View style={{flex: 1}}>
+      <SidePanelHeader
+        backButton={() => dispatch(setSidePanelVisible({bool: false}))}
+        headerTitle={'New Project Description'}
+        title={'StraboField Projects'}
+      />
       <FlatList ListHeaderComponent={renderFormFields()}/>
       <Button
         title={'Save New Project'}
@@ -95,7 +101,7 @@ const NewProjectForm = ({
         onPress={() => saveForm()}
       />
       {/*{renderProjectOptionsModal()}*/}
-    </>
+    </View>
   );
 };
 
