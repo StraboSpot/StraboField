@@ -17,8 +17,9 @@ const MainMenuPanelHeader = () => {
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
 
-  const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.MY_STRABOSPOT).includes(mainMenuPageVisible)
-    && !Object.values(MAIN_MENU_ITEMS.SETTINGS).includes(mainMenuPageVisible);
+  const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.ACCOUNT).includes(mainMenuPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.INPUT_OPTIONS).includes(mainMenuPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.HElP).includes(mainMenuPageVisible);
 
   return (
     <View
@@ -71,7 +72,7 @@ const MainMenuPanelHeader = () => {
           <Icon
             color={BLACK}
             name={'swap-horizontal'}
-            onPress={() => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOFIELD_PROJECTS}))}
+            onPress={() => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS}))}
             size={25}
             type={'ionicon'}
           />

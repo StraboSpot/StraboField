@@ -86,7 +86,7 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
         />
         <DatasetList setDatasetToView={setDatasetToView}/>
         <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
-          <Text style={commonStyles.standardDescriptionText}>*New Spots will be added to the starred dataset.</Text>
+          <Text style={commonStyles.standardDescriptionText}>*Starred dataset will be set as the target dataset for new Spots.</Text>
         </View>
       </View>
 

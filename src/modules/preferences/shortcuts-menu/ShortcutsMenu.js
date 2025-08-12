@@ -4,10 +4,10 @@ import {FlatList, Platform, Switch, Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import shortcutMenuStyles from './shortcutsMenu.styles';
 import commonStyles from '../../../shared/common.styles';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import {setShortcutSwitchPositions} from '../../home/home.slice';
 import {MODAL_KEYS, SHORTCUT_MODALS} from '../../page/page.constants';
 
@@ -41,10 +41,8 @@ const ShortcutMenu = () => {
   };
 
   return (
-    <>
-      <View style={shortcutMenuStyles.textContainer}>
-        <Text style={shortcutMenuStyles.textStyle}>Shortcuts will create a NEW spot</Text>
-      </View>
+    <View style={{flex: 1, flexDirection: 'column'}}>
+      <SectionDivider dividerText={'Shortcuts'}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>All</ListItem.Title>
@@ -54,13 +52,18 @@ const ShortcutMenu = () => {
           value={shortcutSwitchPositions.all}
         />
       </ListItem>
-      <FlatList
-        keyExtractor={item => item.key}
-        data={SHORTCUT_MODALS}
-        renderItem={({item}) => renderShortcutListItem(item)}
-        ItemSeparatorComponent={FlatListItemSeparator}
-      />
-    </>
+      <View>
+        <FlatList
+          keyExtractor={item => item.key}
+          data={SHORTCUT_MODALS}
+          renderItem={({item}) => renderShortcutListItem(item)}
+          ItemSeparatorComponent={FlatListItemSeparator}
+        />
+      </View>
+      <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
+        <Text style={commonStyles.standardDescriptionText}>*Shortcuts will create a NEW spot</Text>
+      </View>
+    </View>
   );
 };
 

@@ -1,5 +1,4 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {FlatList, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';

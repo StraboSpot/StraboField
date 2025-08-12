@@ -25,22 +25,6 @@
     },
     {
       "type": "begin_group",
-      "name": "group_ib8ke88",
-      "label": "Preferences"
-    },
-    {
-      "type": "select_one tw96f24",
-      "name": "measurement_convention",
-      "label": "Measurement Convention",
-      "hint": "Bulk convert strikes to dip directions from Home Menu -> Miscellaneous.",
-      "required": "true",
-      "default": "strike_dip"
-    },
-    {
-      "type": "end_group"
-    },
-    {
-      "type": "begin_group",
       "name": "group_pj19e83",
       "label": "Access Tokens",
       "required": "false"
@@ -53,18 +37,6 @@
     },
     {
       "type": "end_group"
-    }
-  ],
-  "choices": [
-    {
-      "list_name": "tw96f24",
-      "name": "strike_dip",
-      "label": "Strike/Dip (Right Hand Rule)"
-    },
-    {
-      "list_name": "tw96f24",
-      "name": "dip_direction_dip",
-      "label": "Dip Direction/Dip"
     }
   ],
   "settings": [

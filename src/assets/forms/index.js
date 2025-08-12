@@ -8,6 +8,7 @@ import imageProperties from './image-properties.json';
 import linearOrientation from './measurement/linear-orientation.json';
 import planarOrientation from './measurement/planar-orientation.json';
 import tabularZoneOrientation from './measurement/tabular-zone-orientation.json';
+import namingConventions from './naming-conventions.json';
 import rockTypeAlterationOreDeprecated from './pet/deprecated/rock-type-alteration-ore.json';
 import rockTypeIgneousDeprecated from './pet/deprecated/rock-type-igneous.json';
 import rockTypeMetamorphicDeprecated from './pet/deprecated/rock-type-metamorphic.json';
@@ -54,6 +55,7 @@ import other from './three-d-structures/other.json';
 import tensor from './three-d-structures/tensor.json';
 import trace from './trace.json';
 import userProfile from './user-profile.json';
+import userConventions from './user-conventions.json';
 
 const getMeasurementSurveyForBulkInput = (form) => {
   const fieldsToExclude = ['label', 'strike', 'dip_direction', 'dip', 'trend', 'plunge', 'rake', 'rake_calculated'];
@@ -88,12 +90,13 @@ const forms = {
     geography: geography,
     images: imageProperties,
     project_description: projectDescription,
+    reports: report,
     samples: sample,
     site_safety: siteSafety,
     surface_feature: surfaceFeature,
     trace: trace,
+    user_conventions: userConventions,
     user_profile: userProfile,
-    reports: report,
   },
   measurement: {
     linear_orientation: linearOrientation,
@@ -130,6 +133,7 @@ const forms = {
   },
   settings: {
     project_settings: projectSettings,
+    naming_conventions: namingConventions,
   },
   project: {
     tags: tags,

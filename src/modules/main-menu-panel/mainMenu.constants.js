@@ -3,9 +3,15 @@ export const MAIN_MENU_TITLE = 'StraboField';
 export const MAIN_MENU_ITEMS = {
   MANAGE_PROJECT: {
     DATASETS: 'Datasets ',
-    BACKUP: 'Backup Options',
-    DESCRIPTION: 'Project Description',
-    SETTINGS: 'Project Settings',
+    BACKUP: 'Backup',
+    DESCRIPTION: 'Metadata',
+    SETTINGS: 'Privacy',
+  },
+  CUSTOMIZE_AND_PRESET: {
+    NAMING_CONVENTIONS: 'Naming Conventions',
+    CUSTOM_FEATURE_TYPES: 'Custom Feature Types',
+    // TEMPLATES: 'Templates',
+    // FORMS_PAGES: 'Forms/Pages',
   },
   PROJECT_DATA: {
     SPOTS: 'Spots',
@@ -13,25 +19,27 @@ export const MAIN_MENU_ITEMS = {
     SAMPLES: 'Samples',
     TAGS: 'Tags',
     GEOLOGIC_UNITS: 'Geologic Units',
-    STRAT_SECTIONS: 'Strat Sections',
+    STRAT_SECTIONS: 'Stratigraphic Sections',
     REPORTS: 'Reports',
     DAILY_NOTES: 'Daily Notes',
-    CUSTOM_PRESETS: 'Custom Presets',
   },
   MAPS: {
     CUSTOM: 'Custom Maps',
     IMAGE_BASEMAPS: 'Image Basemaps',
     MANAGE_OFFLINE_MAPS: 'Offline Maps',
   },
-  MY_STRABOSPOT: {
+  ACCOUNT: {
+    PROFILE: 'Profile',
     STRABOFIELD_PROJECTS: 'StraboField Projects',
     STRABOMICRO_PROJECTS: 'StraboMicro Projects',
-    ACCOUNT: 'Account',
+    USER_CONVENTIONS: 'User Conventions',
   },
-  SETTINGS: {
-    MAP_BUTTON_OPTIONS: 'Map Button Options',
-    APP_SETTINGS: 'App Settings',
-    ABOUT: 'About Strabo',
+  INPUT_OPTIONS: {
+    ADDING_NEW_SPOTS: 'Adding New Spots',
+    ADVANCED_OPTIONS: 'Advanced Options',
+  },
+  HElP: {
+    ABOUT: 'About StraboField',
     DOCUMENTATION: 'Documentation',
     ISSUES: 'Issues & Requests',
   },

@@ -1,10 +1,12 @@
 import React, {useRef} from 'react';
+import {Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
+import commonStyles from '../../shared/common.styles';
 
 const ProjectSettingsPanel = () => {
   const dispatch = useDispatch();
@@ -20,21 +22,34 @@ const ProjectSettingsPanel = () => {
     await formRef.current.setFieldValue(name, value);
     await formRef.current.submitForm();
     const updatedValues = {...formRef.current.values, [name]: value};
-    console.log('Saving naming convention preferences to Project ...', updatedValues);
+    console.log('Saving privacy preferences to Project ...', updatedValues);
     dispatch(updatedProject({field: 'preferences', value: updatedValues}));
   };
 
   return (
-    <Formik
-      innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: formName, values: values})}
-      initialValues={preferences}
-      validateOnChange={false}
-      enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
-    >
-      {formProps => <Form {...{...formProps, formName: formName, onMyChange: onMyChange, setFieldValue: onMyChange}}/>}
-    </Formik>
+    <View>
+      <Formik
+        innerRef={formRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
+        initialValues={preferences}
+        validateOnChange={false}
+        enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
+      >
+        {formProps => <Form {...{
+          ...formProps,
+          formName: formName,
+          onMyChange: onMyChange,
+          setFieldValue: onMyChange,
+        }}/>}
+      </Formik>
+      <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
+        <Text style={commonStyles.standardDescriptionText}>
+          *Public datasets are accessible at StraboSpot.org/search. Privacy settings are reversible and update when
+          project is uploaded.
+        </Text>
+      </View>
+    </View>
   );
 };
 

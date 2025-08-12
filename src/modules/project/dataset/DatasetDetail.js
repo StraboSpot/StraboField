@@ -105,7 +105,7 @@ const DatasetDetail = ({dataset}) => {
         />
         {isDisabled(dataset.id) && (
           <Text style={[overlayStyles.importantText, {paddingHorizontal: 30}]}>
-            *{dataset.name} can not be deleted while still set as the selected (starred) dataset.
+            *{dataset.name} can not be deleted while still set as the target (starred) dataset.
           </Text>
         )}
       </View>

@@ -1,0 +1,124 @@
+{
+  "survey": [
+    {
+      "type": "start",
+      "name": "start"
+    },
+    {
+      "type": "end",
+      "name": "end"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_kb59y17",
+      "label": "Spot Name",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "spot_prefix",
+      "label": "Prefix",
+      "hint": "Label prefix based on location or other.",
+      "required": "false"
+    },
+    {
+      "type": "integer",
+      "name": "starting_number_for_spot",
+      "label": "Starting Number",
+      "hint": "Number to append to the end of every spot name. Increments automatically.",
+      "required": "false",
+      "constraint": ". >= 0",
+      "constraint_message": "Must start with 0 or greater"
+    },
+    {
+      "type": "acknowledge",
+      "name": "warn_on_dupe_spot_name",
+      "label": "Warn on Duplicate Spot Name",
+      "hint": "Give a warning if a spot name is duplicated.",
+      "required": "false"
+    },
+    {
+      "type": "end_group"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_rv9mt72",
+      "label": "Image Basemap/Strat Section Spot Name",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "nested_spot_prefix",
+      "label": "Alternate Prefix",
+      "hint": "Use an alternate label prefix for Spots on an Image Basemap or Strat Section.",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "prepend_spot_name_nested_spot",
+      "label": "Prepend Parent Spot Name",
+      "hint": "Add the parent spot name to beginning of every nested spot name.",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "restart_num_each_nested_spot",
+      "label": "Restart at 1 for each Parent Spot",
+      "required": "false"
+    },
+    {
+      "type": "end_group"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_vy88v94",
+      "label": "Sample Name",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "sample_prefix",
+      "label": "Prefix",
+      "hint": "Short label based on location or IGSN prefix (exactly 3 characters) or something else associated with the user.",
+      "required": "false"
+    },
+    {
+      "type": "integer",
+      "name": "starting_sample_number",
+      "label": "Starting Number",
+      "hint": "Number to append to the end of every sample name. Use exactly 6 numbers if creating an IGSN code. Increments automatically.",
+      "required": "false",
+      "constraint_message": "Must start with 0 or greater"
+    },
+    {
+      "type": "acknowledge",
+      "name": "prepend_spot_name_sample_name",
+      "label": "Prepend Spot Name",
+      "hint": "Add the spot name to beginning of every sample name.",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "warn_on_dupe_sample_name",
+      "label": "Warn on Duplicate Sample Name",
+      "hint": "Give a warning if a sample name is duplicated.",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "restart_sample_num_each_spot",
+      "label": "Restart at 1 for each Spot",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "sample_postfix_letter",
+      "label": "Append Letter Instead of Number to End of Name, Restarting at 'a' for each Spot",
+      "hint": "Add a lowercase letter to the end of each sample name. Increments for each sample within a single spot.",
+      "required": "false"
+    },
+    {
+      "type": "end_group"
+    }
+  ]
+}

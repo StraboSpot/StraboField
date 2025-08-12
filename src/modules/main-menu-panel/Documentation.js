@@ -1,9 +1,8 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Linking, Platform, SafeAreaView, View} from 'react-native';
+import {FlatList, Platform, SafeAreaView, View} from 'react-native';
 
-import {Button, Icon, ListItem, Overlay} from '@rn-vui/base';
+import {Button, ListItem, Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
-import {useSelector} from 'react-redux';
 
 import styles from './documentation.styles';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
@@ -16,16 +15,16 @@ import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import OpenUrlLink from '../../shared/ui/OpenUrlLink';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import SpotDataModelModal from '../preferences/SpotDataModelModal';
 
 const Documentation = () => {
   const ref = useRef(null);
 
-  const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
-
-  const [visible, setVisible] = useState(false);
-  const [doc, setDoc] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [doc, setDoc] = useState('');
+  const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+  const [visible, setVisible] = useState(false);
 
   const files = [
     {
@@ -76,30 +75,30 @@ const Documentation = () => {
       overlayStyle={styles.overlayContainer}
     >
       <SafeAreaView>
-      <StandardModalHeaderComponent
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onClose={() => setVisible(false)}
-        onJumpToPage={page => ref.current.setPage(page)}
-      />
-      {!isEmpty(doc) && (
-        <Pdf
-          ref={ref}
-          source={doc.file}
-          style={styles.pdf}
-          onLoadComplete={(numberOfPages, filePath) => {
-            setTotalPages(numberOfPages);
-          }}
-          onError={(error) => {
-            console.log(error);
-          }}
-          onPressLink={openLink}
-          onPageChanged={(page, numberOfPages) => {
-            setCurrentPage(page);
-            console.log(`Number of pages: ${page}/${numberOfPages}`);
-          }}
+        <StandardModalHeaderComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onClose={() => setVisible(false)}
+          onJumpToPage={page => ref.current.setPage(page)}
         />
-      )}
+        {!isEmpty(doc) && (
+          <Pdf
+            ref={ref}
+            source={doc.file}
+            style={styles.pdf}
+            onLoadComplete={(numberOfPages, filePath) => {
+              setTotalPages(numberOfPages);
+            }}
+            onError={(error) => {
+              console.log(error);
+            }}
+            onPressLink={openLink}
+            onPageChanged={(page, numberOfPages) => {
+              setCurrentPage(page);
+              console.log(`Number of pages: ${page}/${numberOfPages}`);
+            }}
+          />
+        )}
       </SafeAreaView>
     </Overlay>
   );
@@ -145,9 +144,27 @@ const Documentation = () => {
     );
   };
 
+  const renderSpotDataModelSection = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Spot Data Model'}/>
+        <Button
+          title={'Show Data Model'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
+          onPress={() => setIsSpotDataModelModalVisible(true)}
+        />
+        {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
+      </>
+    );
+  };
 
   return (
     <View style={styles.container}>
+      {renderSpotDataModelSection()}
+      <View>
+        <SectionDivider dividerText={'Manual'}/>
+      </View>
       <OpenUrlLink
         buttonStyle={styles.button}
         title={'Strabo Spot Help'}
@@ -156,9 +173,6 @@ const Documentation = () => {
         icon={'globe-outline'}
         color={WHITE}
       />
-      <View>
-        <SectionDivider dividerText={'Helpful Docs'}/>
-      </View>
       {renderFAQItems()}
       {viewPDF()}
     </View>

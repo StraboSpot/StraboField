@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
+import {useDispatch} from 'react-redux';
 
 import {DeleteProjectModal} from './modals';
 import ProjectList from './ProjectList';
 import useDevice from '../../services/useDevice';
 import commonStyles from '../../shared/common.styles';
 import {BLUE} from '../../shared/styles.constants';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {useDispatch} from 'react-redux';
+import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
 // Open project on device in StraboSpot app directory
 const DeleteProjectPage = () => {

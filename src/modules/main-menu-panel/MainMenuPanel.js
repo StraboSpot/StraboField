@@ -28,6 +28,7 @@ import DatasetsPanel from '../project/DatasetsPanel';
 import DeleteProjectPage from '../project/DeleteProjectPage';
 import DownloadProjectPage from '../project/DownloadProjectPage';
 import ImportProjectFromZip from '../project/ImportProjectFromZip';
+import NamingConventions from '../project/NamingConventions';
 import NewProjectForm from '../project/NewProjectForm';
 import OpenProjectPage from '../project/OpenProjectPage';
 import ProjectDescription from '../project/ProjectDescription';
@@ -38,7 +39,8 @@ import {ReportsMenu} from '../reports';
 import SamplesMenuItem from '../samples/SamplesMenuItem';
 import {SpotsList} from '../spots';
 import {AddRemoveTagFeatures, AddRemoveTagSpots, TagDetailSidePanel, Tags} from '../tags';
-import AccountPanel from '../user/AccountPanel';
+import UserConventions from '../user/UserConventions';
+import UserProfile from '../user/UserProfile';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
@@ -76,6 +78,12 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
         return <ProjectSettingsPanel/>;
 
+      // Customize & Preset
+      case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:
+        return <NamingConventions/>;
+      case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.CUSTOM_FEATURE_TYPES:
+        return <CustomFeatureTypes/>;
+
       //  Project Data
       case MAIN_MENU_ITEMS.PROJECT_DATA.SPOTS:
         return (
@@ -106,8 +114,6 @@ const MainMenuPanel = forwardRef(({
         return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
         return <DailyNotesSection/>;
-      case MAIN_MENU_ITEMS.PROJECT_DATA.CUSTOM_PRESETS:
-        return <CustomFeatureTypes/>;
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
@@ -122,25 +128,30 @@ const MainMenuPanel = forwardRef(({
           />
         );
 
-      // My StraboSpot
-      case MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOFIELD_PROJECTS:
+      // Account
+      case MAIN_MENU_ITEMS.ACCOUNT.PROFILE:
+        return <UserProfile/>;
+      case MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS:
         return <StraboFieldProjects openMainMenuPanel={openMainMenuPanel}/>;
-      case MAIN_MENU_ITEMS.MY_STRABOSPOT.STRABOMICRO_PROJECTS:
+      case MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS:
         return <MicroProjectsList/>;
-      case MAIN_MENU_ITEMS.MY_STRABOSPOT.ACCOUNT:
-        return <AccountPanel/>;
+      case MAIN_MENU_ITEMS.ACCOUNT.USER_CONVENTIONS:
+        return <UserConventions/>;
 
-      // App Settings, Documentation, Help
-      case MAIN_MENU_ITEMS.SETTINGS.MAP_BUTTON_OPTIONS:
+      // App Settings
+      case MAIN_MENU_ITEMS.INPUT_OPTIONS.ADDING_NEW_SPOTS:
         return <ShortcutMenu/>;
-      case MAIN_MENU_ITEMS.SETTINGS.APP_SETTINGS:
+      case MAIN_MENU_ITEMS.INPUT_OPTIONS.ADVANCED_OPTIONS:
         return <Miscellaneous/>;
-      case MAIN_MENU_ITEMS.SETTINGS.ABOUT:
+
+      // Help
+      case MAIN_MENU_ITEMS.HElP.ABOUT:
         return <About/>;
-      case MAIN_MENU_ITEMS.SETTINGS.DOCUMENTATION:
+      case MAIN_MENU_ITEMS.HElP.DOCUMENTATION:
         return <Documentation/>;
-      case MAIN_MENU_ITEMS.SETTINGS.ISSUES:
+      case MAIN_MENU_ITEMS.HElP.ISSUES:
         return <IssuesAndReqests/>;
+
       default:
         return (
           <MainMenuPanelList
