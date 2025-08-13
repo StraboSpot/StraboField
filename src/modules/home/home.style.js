@@ -113,11 +113,11 @@ const homeStyles = StyleSheet.create({
     zIndex: -1,
   },
   mapboxAttributionPosition: {
-    bottom: Platform.OS === 'ios' ? -15 : 7,
+    bottom: Platform.OS === 'ios' ? 0 : 7,
     right: 10,
   },
   mapboxLogoPosition: {
-    bottom: Platform.OS === 'ios' ? -15 : 7,
+    bottom: Platform.OS === 'ios' ? 0 : 7,
     left: 10,
   },
   modal: {
