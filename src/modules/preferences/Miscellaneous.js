@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Switch, Text} from 'react-native';
+import {Text} from 'react-native';
 
 import {Button, Input, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -123,10 +124,7 @@ const Miscellaneous = () => {
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>Use Testing Mode?</ListItem.Title>
         </ListItem.Content>
-        <Switch
-          value={isTestingMode}
-          onValueChange={onTestingSwitchChange}
-        />
+        <SwitchWrapper onValueChange={onTestingSwitchChange} value={isTestingMode}/>
       </ListItem>
     </>
   );

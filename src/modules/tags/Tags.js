@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Switch, View} from 'react-native';
+import {View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import AddButton from '../../shared/ui/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
@@ -72,7 +73,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
         </ListItem.Content>
-        <Switch onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
+        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
       </ListItem>
       <TagsList type={type} selectedIndex={selectedIndex}/>
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}

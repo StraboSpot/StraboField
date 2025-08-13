@@ -8,7 +8,7 @@ import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
-import SwitchWrapper from '../../../shared/ui/Switch';
+import {SwitchWrapper} from '../../../shared/ui/';
 import useProject from '../useProject';
 import DatasetSelectedModal from './DatasetSelectedModal';
 import {setIsProjectLoadComplete} from '../../home/home.slice';
@@ -58,11 +58,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         onPress={() => viewDataset(dataset.id, dataset.name)}
         pad={10}
       >
-        <SwitchWrapper
-          onValueChange={onSwitch}
-          value={isActive}
-          disabled={isDisabled(dataset.id)}
-        />
+        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
 
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{truncateText(dataset.name, 18)}</ListItem.Title>

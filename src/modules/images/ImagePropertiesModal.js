@@ -1,9 +1,10 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Switch, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 
 import {imageStyles} from '.';
+import {SwitchWrapper} from '../../shared/ui';
 import Modal from '../../shared/ui/modal/Modal';
 import {Form, useForm} from '../form';
 
@@ -60,7 +61,7 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
         ListFooterComponent={
           <View style={imageStyles.switch}>
             <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
-            <Switch onValueChange={setIsAnnotated} value={isAnnotated}/>
+            <SwitchWrapper onValueChange={setIsAnnotated} value={isAnnotated}/>
           </View>
         }
       />

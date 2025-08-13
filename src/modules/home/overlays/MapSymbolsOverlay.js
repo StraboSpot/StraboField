@@ -8,8 +8,8 @@ import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui/';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import SwitchWrapper from '../../../shared/ui/Switch';
 import {
   setFeatureTypesOff,
   setGeometryTypesOff,

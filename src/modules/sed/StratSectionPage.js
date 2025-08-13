@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Switch, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
@@ -11,6 +11,7 @@ import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -115,10 +116,7 @@ const StratSectionPage = ({page}) => {
               Add a Stratigraphic Section at this Spot?
             </ListItem.Title>
           </ListItem.Content>
-          <Switch
-            value={!isEmpty(stratSection)}
-            onValueChange={() => toggleStratSection(spot)}
-          />
+          <SwitchWrapper onValueChange={() => toggleStratSection(spot)} value={!isEmpty(stratSection)}/>
         </ListItem>
       </View>
     );

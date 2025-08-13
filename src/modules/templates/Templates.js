@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Switch, Text, TextInput, View} from 'react-native';
+import {FlatList, Text, TextInput, View} from 'react-native';
 
 import {Button, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -365,10 +366,7 @@ const Templates = ({
               {'Use Template(s)?'}
             </ListItem.Title>
           </ListItem.Content>
-          <Switch
-            onValueChange={toggleUseTemplateSwitch}
-            value={isTemplateInUse}
-          />
+          <SwitchWrapper onValueChange={toggleUseTemplateSwitch} value={isTemplateInUse}/>
         </ListItem>
         {isTemplateInUse && renderTemplatesSelected()}
       </View>

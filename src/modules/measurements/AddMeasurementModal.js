@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -13,6 +13,7 @@ import {MEASUREMENT_KEYS, MEASUREMENT_TYPES} from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 import Modal from '../../shared/ui/modal/Modal';
 import SaveButton from '../../shared/ui/SaveButton';
 import SliderBar from '../../shared/ui/SliderBar';
@@ -220,10 +221,7 @@ const AddMeasurementModal = ({onPress}) => {
               <>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', padding: 5}}>
                   <Text style={{}}>Compass</Text>
-                  <Switch
-                    value={isManualMeasurement}
-                    onValueChange={value => setIsManualMeasurement(value)}
-                  />
+                  <SwitchWrapper onValueChange={value => setIsManualMeasurement(value)} value={isManualMeasurement}/>
                   <Text style={{}}>Manual</Text>
                 </View>
               </>

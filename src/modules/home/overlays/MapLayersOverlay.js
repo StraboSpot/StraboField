@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Switch, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {Icon, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -8,6 +8,7 @@ import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';
@@ -204,11 +205,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
         {!isInternetReachable
           && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles)</ListItem.Subtitle>}
       </ListItem.Content>
-      <Switch
-        style={{marginRight: 10}}
-        value={customMap.isViewable}
-        onValueChange={val => setCustomMapSwitchValue(val, customMap)}
-      />
+      <SwitchWrapper onValueChange={val => setCustomMapSwitchValue(val, customMap)} value={customMap.isViewable}/>
     </ListItem>
   );
 

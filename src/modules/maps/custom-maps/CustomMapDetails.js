@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button, Icon, Input, ListItem, Overlay} from '@rn-vui/base';
 import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
@@ -10,6 +10,7 @@ import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
@@ -24,7 +25,6 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
 import useMapCoords from '../useMapCoords';
-
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 // const {State: TextInputState} = TextInput;
@@ -218,8 +218,8 @@ const CustomMapDetails = () => {
     catch (err) {
       console.error('Error getting bbox coords', err);
       dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n' +
-        'Please pan to the map manually.'));
+      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n'
+        + 'Please pan to the map manually.'));
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };
@@ -288,9 +288,9 @@ const CustomMapDetails = () => {
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>Display as overlay</ListItem.Title>
           </ListItem.Content>
-          <Switch
-            value={editableCustomMapData?.overlay}
+          <SwitchWrapper
             onValueChange={val => setEditableCustomMapData(e => ({...e, overlay: val}))}
+            value={editableCustomMapData?.overlay}
           />
         </ListItem>
         {editableCustomMapData?.overlay && (

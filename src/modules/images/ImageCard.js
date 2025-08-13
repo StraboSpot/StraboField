@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Switch, Text, TextInput, View} from 'react-native';
+import {Text, TextInput, View} from 'react-native';
 
 import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -8,6 +8,7 @@ import {imageStyles, ImageThumbnail, useImages} from '.';
 import useDevice from '../../services/useDevice';
 import {isEmpty, truncateText} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -52,7 +53,6 @@ const ImageCard = ({
   };
 
   const handleImagePressed = async () => {
-   console.log('handle')
     if (imageThumbnailURIs?.[image.id]) {
       if (openImage) openImage(image);
       else {
@@ -100,7 +100,7 @@ const ImageCard = ({
 
       {!isThumbnailOnly && (
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
-          <Switch
+          <SwitchWrapper
             disabled={getIsSwtichDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
             value={image.annotated}

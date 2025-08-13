@@ -1,11 +1,12 @@
 import React from 'react';
-import {Platform, Pressable, ScrollView, Switch, Text, View} from 'react-native';
+import {Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
+import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import overlayStyles from '../../home/overlays/overlay.styles';
@@ -53,10 +54,7 @@ const MorePagesMenu = ({
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>{page.label}</ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
-            <Switch
-              onValueChange={() => togglePageSwitch(page.key)}
-              value={notebookPagesOn.includes(page.key)}
-            />
+            <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>
           </View>
         </ListItem.Content>
       </ListItem>

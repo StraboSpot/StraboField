@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Pressable, SectionList, Switch, Text, View} from 'react-native';
+import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import usePage from './usePage';
 import {isEmpty} from '../../shared/Helpers';
+import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
@@ -207,10 +208,7 @@ const Overview = ({openMainMenuPanel}) => {
             {(spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
                 || spot.geometry.type === 'GeometryCollection')
               && <Text style={notebookStyles.traceSurfaceFeatureToggleText}>This is a surface feature</Text>}
-            <Switch
-              onValueChange={toggleTraceSurfaceFeature}
-              value={isTraceSurfaceFeatureEnabled}
-            />
+            <SwitchWrapper onValueChange={toggleTraceSurfaceFeature} value={isTraceSurfaceFeatureEnabled}/>
           </View>
           <View>
             <Button

@@ -1,10 +1,11 @@
 import React from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
+import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../../shared/ui/SectionDivider';
@@ -31,7 +32,7 @@ const ShortcutMenu = () => {
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>{toggleButton.label}</ListItem.Title>
           </ListItem.Content>
-          <Switch
+          <SwitchWrapper
             onValueChange={() => toggleSwitch(toggleButton.key)}
             value={shortcutSwitchPositions[toggleButton.key]}
           />
@@ -47,10 +48,7 @@ const ShortcutMenu = () => {
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>All</ListItem.Title>
         </ListItem.Content>
-        <Switch
-          onValueChange={() => toggleSwitch('all')}
-          value={shortcutSwitchPositions.all}
-        />
+        <SwitchWrapper onValueChange={() => toggleSwitch('all')} value={shortcutSwitchPositions.all}/>
       </ListItem>
       <View>
         <FlatList

@@ -1,10 +1,11 @@
 import React from 'react';
-import {Switch, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-import {formStyles} from './index';
-import * as themes from '../../shared/styles.constants';
+import {formStyles} from '.';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 
 const AcknowledgeInput = ({
                             label,
@@ -15,12 +16,9 @@ const AcknowledgeInput = ({
                             value,
                           }) => {
   return (
-    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start'}}>
-      <View>
-        <Switch
-          value={value}
-          onValueChange={bool => setFieldValue(name, bool)}
-        />
+    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', width: '100%'}}>
+      <View style={{justifyContent: 'center'}}>
+        <SwitchWrapper value={value} onValueChange={bool => setFieldValue(name, bool)}/>
       </View>
       <View style={[formStyles.fieldLabelContainer, {flex: 1, paddingLeft: 5}]}>
         <Text style={formStyles.fieldLabel}>{label}</Text>
@@ -28,7 +26,7 @@ const AcknowledgeInput = ({
           <Icon
             name={'information-circle-outline'}
             type={'ionicon'}
-            color={themes.PRIMARY_ACCENT_COLOR}
+            color={PRIMARY_ACCENT_COLOR}
             onPress={() => onShowFieldInfo(label, placeholder)}
           />
         )}
