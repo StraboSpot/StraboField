@@ -10,7 +10,6 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
-import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {ImageGallery} from '../images';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
@@ -51,7 +50,6 @@ const MainMenuPanel = forwardRef(({
   console.log('Rendering MainMenuPanel...');
 
   const isSidePanelVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
-  const project = useSelector(state => state.project.project);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
@@ -153,12 +151,7 @@ const MainMenuPanel = forwardRef(({
         return <IssuesAndReqests/>;
 
       default:
-        return (
-          <MainMenuPanelList
-            activeProject={!isEmpty(project) && project.description ? project.description.project_name
-              : 'No Active Project'}
-          />
-        );
+        return <MainMenuPanelList/>;
     }
   };
 
