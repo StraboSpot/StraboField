@@ -67,12 +67,14 @@ const AddMeasurementModal = ({onPress}) => {
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    !SMALL_SCREEN && lockToPortrait();
-    toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
+    if (!SMALL_SCREEN && Platform.OS !== 'web') {
+      lockToPortrait();
+      toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
+    }
     return () => {
       dispatch(setModalValues({}));
-      unlockOrientation();
-    }
+      if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
+    };
   }, []);
 
   useLayoutEffect(() => {
