@@ -24,6 +24,16 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
       />
     );
   }
+  else if (Platform.OS === 'ios') {
+    return (
+      <Switch
+        disabled={disabled}
+        onValueChange={onValueChange}
+        trackColor={{false: MEDIUMGREY, true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
+        value={value}
+      />
+    );
+  }
   else {
     return (
       <Switch
