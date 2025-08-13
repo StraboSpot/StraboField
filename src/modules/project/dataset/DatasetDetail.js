@@ -278,7 +278,7 @@ const DatasetDetail = ({dataset}) => {
   return (
     <>
       <SidePanelHeader
-        title={datasetName === dataset.name ? 'Active Project' : 'Active Project (Save Changes)'}
+        title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
         headerTitle={'Dataset Detail'}
         backButton={handleBackPressed}
       />

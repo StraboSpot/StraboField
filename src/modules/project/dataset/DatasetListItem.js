@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Platform, Switch, View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -8,6 +8,7 @@ import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
+import SwitchWrapper from '../../../shared/ui/Switch';
 import useProject from '../useProject';
 import DatasetSelectedModal from './DatasetSelectedModal';
 import {setIsProjectLoadComplete} from '../../home/home.slice';
@@ -57,7 +58,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         onPress={() => viewDataset(dataset.id, dataset.name)}
         pad={10}
       >
-        <Switch
+        <SwitchWrapper
           onValueChange={onSwitch}
           value={isActive}
           disabled={isDisabled(dataset.id)}
