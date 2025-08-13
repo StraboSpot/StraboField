@@ -1,7 +1,5 @@
 import React, {forwardRef} from 'react';
-import {Animated} from 'react-native';
-
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Animated, View} from 'react-native';
 
 import {LeftSideButtons, RightSideButtons} from './buttons';
 import DeviceInfo from './DeviceInfo';
@@ -36,7 +34,7 @@ const HomeView = forwardRef(({
   console.log('Rendering HomeView...');
 
   return (
-    <SafeAreaView style={uiStyles.safeAreaView}>
+    <View style={uiStyles.container}>
       <MapContainer
         mapMode={mapMode}
         onEndDrawPressed={onEndDrawPressed}
@@ -82,7 +80,7 @@ const HomeView = forwardRef(({
           zoomToSpots={mapComponentRef.current?.zoomToSpots}
         />
       </Animated.View>
-    </SafeAreaView>
+    </View>
   );
 });
 
