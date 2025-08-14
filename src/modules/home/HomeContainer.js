@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {Animated, Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
@@ -12,7 +12,6 @@ import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';
 import useDevice from '../../services/useDevice';
-import uiStyles from '../../shared/ui/ui.styles';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
@@ -70,39 +69,39 @@ const HomeContainer = ({navigation, route}) => {
   }, [projectLoadComplete]);
 
   return (
-    <SafeAreaView style={uiStyles.container}>
-    <Animated.View style={[homeStyles.container, animateTextInputs]}>
-      <Home
-        animateLeftSide={animateLeftSide}
-        animateNotebookDrawer={animateNotebookDrawer}
-        animateRightSide={animateRightSide}
-        closeMainMenuPanel={closeMainMenuPanel}
-        closeNotebookPanel={closeNotebookPanel}
-        openMainMenuPanel={openMainMenuPanel}
-        openNotebookPanel={openNotebookPanel}
-        openSpotInNotebook={openSpotInNotebook}
-        ref={mapComponentRef}
-        zoomToCurrentLocation={zoomToCurrentLocation}
-      />
-      <OverlaysContainer
-        closeNotebookPanel={closeNotebookPanel}
-        openMainMenuPanel={openMainMenuPanel}
-        openNotebookPanel={openNotebookPanel}
-        openSpotInNotebook={openSpotInNotebook}
-        ref={mapComponentRef}
-        zoomToCurrentLocation={zoomToCurrentLocation}
-      />
-      <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
-        <MainMenuPanel
+    <SafeAreaProvider>
+      <Animated.View style={[homeStyles.container, animateTextInputs]}>
+        <Home
+          animateLeftSide={animateLeftSide}
+          animateNotebookDrawer={animateNotebookDrawer}
+          animateRightSide={animateRightSide}
           closeMainMenuPanel={closeMainMenuPanel}
+          closeNotebookPanel={closeNotebookPanel}
           openMainMenuPanel={openMainMenuPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
           ref={mapComponentRef}
+          zoomToCurrentLocation={zoomToCurrentLocation}
         />
+        <OverlaysContainer
+          closeNotebookPanel={closeNotebookPanel}
+          openMainMenuPanel={openMainMenuPanel}
+          openNotebookPanel={openNotebookPanel}
+          openSpotInNotebook={openSpotInNotebook}
+          ref={mapComponentRef}
+          zoomToCurrentLocation={zoomToCurrentLocation}
+        />
+        <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
+          <MainMenuPanel
+            closeMainMenuPanel={closeMainMenuPanel}
+            openMainMenuPanel={openMainMenuPanel}
+            openNotebookPanel={openNotebookPanel}
+            openSpotInNotebook={openSpotInNotebook}
+            ref={mapComponentRef}
+          />
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

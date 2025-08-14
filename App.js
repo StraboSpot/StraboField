@@ -4,7 +4,7 @@ import {Platform} from 'react-native';
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
@@ -13,7 +13,8 @@ import ConnectionStatus from './src/services/ConnectionStatus';
 import SystemBars from './src/services/SystemBars';
 import {RELEASE_NAME} from './src/shared/app.constants';
 import Toast from './src/shared/ui/Toast';
-import {store, persistor} from './src/store/ConfigureStore';
+import uiStyles from './src/shared/ui/ui.styles';
+import {persistor, store} from './src/store/ConfigureStore';
 import config from './src/utils/config';
 
 let didInit = false;
@@ -76,19 +77,21 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
+      <SafeAreaView style={uiStyles.container}>
         <Provider store={store}>
           <Toast>
-          <PersistGate loading={null} persistor={persistor}>
-            {/*<Sentry.TouchEventBoundary>*/}
-            <SystemBars/>
-            <ConnectionStatus/>
-            <NavigationContainer linking={linking}>
-              <Routes/>
-            </NavigationContainer>
-            {/*</Sentry.TouchEventBoundary>*/}
-          </PersistGate>
+            <PersistGate loading={null} persistor={persistor}>
+              {/*<Sentry.TouchEventBoundary>*/}
+              <SystemBars/>
+              <ConnectionStatus/>
+              <NavigationContainer linking={linking}>
+                <Routes/>
+              </NavigationContainer>
+              {/*</Sentry.TouchEventBoundary>*/}
+            </PersistGate>
           </Toast>
         </Provider>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 };

@@ -74,7 +74,6 @@ const HomeViewSmallScreen = forwardRef(({
       <Header
         backgroundColor={themes.SECONDARY_BACKGROUND_COLOR}
         barStyle={'dark-content'}
-        containerStyle={{marginVertical: -10}}
         centerContainerStyle={{justifyContent: 'center'}}
         leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
           <Icon
@@ -115,7 +114,7 @@ const HomeViewSmallScreen = forwardRef(({
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
             tabBarItemStyle: {padding: 0},
             tabBarLabelStyle: {fontSize: themes.PRIMARY_HEADER_TEXT_SIZE, color: themes.PRIMARY_TEXT_COLOR},
-            tabBarStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
+            tabBarStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR, marginTop: -10},
           }}
         >
           <Tab.Screen

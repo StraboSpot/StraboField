@@ -34,7 +34,7 @@ const HomeView = forwardRef(({
   console.log('Rendering HomeView...');
 
   return (
-    <View style={uiStyles.container}>
+    <>
       <MapContainer
         mapMode={mapMode}
         onEndDrawPressed={onEndDrawPressed}
@@ -80,7 +80,7 @@ const HomeView = forwardRef(({
           zoomToSpots={mapComponentRef.current?.zoomToSpots}
         />
       </Animated.View>
-    </View>
+    </>
   );
 });
 
