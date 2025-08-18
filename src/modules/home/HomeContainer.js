@@ -2,7 +2,6 @@ import React, {useEffect, useRef} from 'react';
 import {Animated, Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
@@ -69,39 +68,37 @@ const HomeContainer = ({navigation, route}) => {
   }, [projectLoadComplete]);
 
   return (
-    <SafeAreaProvider>
-      <Animated.View style={[homeStyles.container, animateTextInputs]}>
-        <Home
-          animateLeftSide={animateLeftSide}
-          animateNotebookDrawer={animateNotebookDrawer}
-          animateRightSide={animateRightSide}
+    <Animated.View style={[homeStyles.container, animateTextInputs]}>
+      <Home
+        animateLeftSide={animateLeftSide}
+        animateNotebookDrawer={animateNotebookDrawer}
+        animateRightSide={animateRightSide}
+        closeMainMenuPanel={closeMainMenuPanel}
+        closeNotebookPanel={closeNotebookPanel}
+        openMainMenuPanel={openMainMenuPanel}
+        openNotebookPanel={openNotebookPanel}
+        openSpotInNotebook={openSpotInNotebook}
+        ref={mapComponentRef}
+        zoomToCurrentLocation={zoomToCurrentLocation}
+      />
+      <OverlaysContainer
+        closeNotebookPanel={closeNotebookPanel}
+        openMainMenuPanel={openMainMenuPanel}
+        openNotebookPanel={openNotebookPanel}
+        openSpotInNotebook={openSpotInNotebook}
+        ref={mapComponentRef}
+        zoomToCurrentLocation={zoomToCurrentLocation}
+      />
+      <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
+        <MainMenuPanel
           closeMainMenuPanel={closeMainMenuPanel}
-          closeNotebookPanel={closeNotebookPanel}
           openMainMenuPanel={openMainMenuPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
           ref={mapComponentRef}
-          zoomToCurrentLocation={zoomToCurrentLocation}
         />
-        <OverlaysContainer
-          closeNotebookPanel={closeNotebookPanel}
-          openMainMenuPanel={openMainMenuPanel}
-          openNotebookPanel={openNotebookPanel}
-          openSpotInNotebook={openSpotInNotebook}
-          ref={mapComponentRef}
-          zoomToCurrentLocation={zoomToCurrentLocation}
-        />
-        <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
-          <MainMenuPanel
-            closeMainMenuPanel={closeMainMenuPanel}
-            openMainMenuPanel={openMainMenuPanel}
-            openNotebookPanel={openNotebookPanel}
-            openSpotInNotebook={openSpotInNotebook}
-            ref={mapComponentRef}
-          />
-        </Animated.View>
       </Animated.View>
-    </SafeAreaProvider>
+    </Animated.View>
   );
 };
 

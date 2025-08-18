@@ -75,6 +75,7 @@ const HomeViewSmallScreen = forwardRef(({
         backgroundColor={themes.SECONDARY_BACKGROUND_COLOR}
         barStyle={'dark-content'}
         centerContainerStyle={{justifyContent: 'center'}}
+        edges={'top'}
         leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
           <Icon
             color={themes.PRIMARY_TEXT_COLOR}

@@ -1,9 +1,8 @@
 import React, {forwardRef} from 'react';
-import {Animated, View} from 'react-native';
+import {Animated} from 'react-native';
 
 import {LeftSideButtons, RightSideButtons} from './buttons';
 import DeviceInfo from './DeviceInfo';
-import uiStyles from '../../shared/ui/ui.styles';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import notebookStyles from '../notebook-panel/notebook.styles';
