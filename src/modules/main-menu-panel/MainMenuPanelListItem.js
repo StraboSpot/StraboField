@@ -14,9 +14,9 @@ import useProject from '../project/useProject';
 const MainMenuPanelListItem = ({title}) => {
   const dispatch = useDispatch();
 
-  const {getSelectedDatasetFromId} = useProject();
+  const {getTargetDatasetFromId} = useProject();
 
-  const targetDatasetName = getSelectedDatasetFromId().name;
+  const targetDatasetName = getTargetDatasetFromId().name;
 
   const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
 

@@ -22,7 +22,7 @@ import useProject from '../useProject';
 const DatasetDetail = ({dataset}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset} = useProject();
@@ -55,12 +55,11 @@ const DatasetDetail = ({dataset}) => {
         .then(backToProjectPanel)
         .catch(err => console.log('Error deleting dataset', err));
     }
-    else console.error('Selected dataset or id is undefined!');
+    else console.error('Target dataset or id is undefined!');
   };
 
   const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id)
-      || (selectedDatasetId && selectedDatasetId === id);
+    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
   const renderDeleteConfirmationModal = () => {

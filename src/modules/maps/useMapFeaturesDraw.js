@@ -45,7 +45,7 @@ const useMapFeaturesDraw = ({
     identifyClosestVertexOnSpotPress,
   } = useMapFeaturesCalculated(mapRef);
   const {getSymbology} = useMapSymbology();
-  const {getSelectedDatasetFromId} = useProject();
+  const {getTargetDatasetFromId} = useProject();
   const {createSpot} = useSpots();
   const {getStereonet} = useStereonet();
 
@@ -623,8 +623,8 @@ const useMapFeaturesDraw = ({
     }
     if (!isEmpty(spotsEdited)) {
       const spotIds = spotsEdited.map(s => s.properties.id);
-      const selectedDataset = getSelectedDatasetFromId();
-      dispatch(addedNewSpotIdsToDataset({datasetId: selectedDataset.id, spotIds: spotIds}));
+      const targetDataset = getTargetDatasetFromId();
+      dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
       dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
       dispatch(editedOrCreatedSpots(spotsEdited));
     }

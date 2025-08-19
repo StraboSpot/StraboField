@@ -19,13 +19,13 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-  const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {makeDatasetCurrent, setSwitchValue} = useProject();
 
   const [isMakeDatasetCurrentModalVisible, setMakeIsDatasetCurrentModalVisible] = useState(false);
 
-  const checked = selectedDatasetId && selectedDatasetId === dataset.id;
+  const checked = targetDatasetId && targetDatasetId === dataset.id;
   const spotsCount = dataset.spotIds?.length || 0;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
@@ -39,8 +39,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const isActive = activeDatasetsIds.includes(dataset.id);
 
   const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id)
-      || (selectedDatasetId && selectedDatasetId === id);
+    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
   const onSwitch = async (val) => {

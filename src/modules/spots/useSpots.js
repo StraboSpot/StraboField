@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, setSelectedSpot} from './spots.slice';
 import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/Helpers';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
@@ -24,7 +23,7 @@ import useProject from '../project/useProject';
 import {useTags} from '../tags';
 
 const useSpots = () => {
-  const {getActiveDatasets, getSelectedDatasetFromId} = useProject();
+  const {getActiveDatasets, getTargetDatasetFromId} = useProject();
   const {addSpotsToTags} = useTags();
 
   const dispatch = useDispatch();
@@ -139,8 +138,8 @@ const useSpots = () => {
     });
     console.log('Creating', numRandomSpots, 'new random Spots near current location.');
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpots[0].properties.id]));
-    const selectedDataset = getSelectedDatasetFromId();
-    dispatch(addedNewSpotIdsToDataset({datasetId: selectedDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
+    const targetDataset = getTargetDatasetFromId();
+    dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
     dispatch(editedOrCreatedSpots(newSpots));
     console.log('Finished creating new random Spot. All Spots: ', spots);
   };
@@ -187,8 +186,8 @@ const useSpots = () => {
     }
     console.log('Creating new Spot:', newSpot);
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpot.properties.id]));
-    const selectedDataset = getSelectedDatasetFromId();
-    dispatch(addedNewSpotIdToDataset({datasetId: selectedDataset.id, spotId: newSpot.properties.id}));
+    const targetDataset = getTargetDatasetFromId();
+    dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newSpot.properties.id}));
     dispatch(editedOrCreatedSpot(newSpot));
     console.log('Finished creating new Spot. All Spots: ', spots);
     return newSpot;

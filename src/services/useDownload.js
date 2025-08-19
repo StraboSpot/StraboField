@@ -27,7 +27,7 @@ import {
   addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
-  setSelectedDataset,
+  setTargetDataset,
 } from '../modules/project/projects.slice';
 import {addedSpotsFromServer} from '../modules/spots/spots.slice';
 import {setUserData} from '../modules/user/userProfile.slice';
@@ -58,7 +58,7 @@ const useDownload = () => {
       const datasets = res?.datasets || [];
       if (datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setSelectedDataset(datasets[0].id));
+        dispatch(setTargetDataset(datasets[0].id));
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));

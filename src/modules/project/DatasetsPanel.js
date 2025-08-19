@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import DatasetList from './dataset/DatasetList';
-import {setActiveDatasets, setSelectedDataset} from './projects.slice';
+import {setActiveDatasets, setTargetDataset} from './projects.slice';
 import useProject from './useProject';
 import useDownload from '../../services/useDownload';
 import commonStyles from '../../shared/common.styles';
@@ -25,16 +25,16 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const datasets = useSelector(state => state.project.datasets);
   const project = useSelector(state => state.project.project);
-  const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   useEffect(() => {
     console.log('UE ActiveProjectPanel [datasets]', datasets);
     if (Object.values(datasets).length > 0 && !isEmpty(Object.values(datasets)[0])) {
       if (activeDatasetsIds.length === 0) {
         dispatch(setActiveDatasets({bool: true, dataset: Object.values(datasets)[0].id}));
-        dispatch(setSelectedDataset(Object.values(datasets)[0].id));
+        dispatch(setTargetDataset(Object.values(datasets)[0].id));
       }
-      else if (!selectedDatasetId) dispatch(setSelectedDataset(activeDatasetsIds[0]));
+      else if (!targetDatasetId) dispatch(setTargetDataset(activeDatasetsIds[0]));
     }
   }, [datasets]);
 

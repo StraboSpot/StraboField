@@ -19,7 +19,7 @@ const DatasetSelectedModal = ({closeModal, dataset}) => {
       dialogTitleStyle={{backgroundColor: 'green'}}
       visible={true}
       footerButtonsVisible={true}
-      dialogTitle={'Select Dataset?'}
+      dialogTitle={'Set as Target Dataset?'}
       rightButtonText={'Yes'}
       leftButtonText={'No'}
       onPress={handleSetCurrentDatasetPressed}

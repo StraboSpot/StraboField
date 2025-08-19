@@ -5,7 +5,7 @@ import {getNewId, isEmpty, isEqual} from '../../shared/Helpers';
 
 const initialProjectState = {
   activeDatasetsIds: [],
-  selectedDatasetId: undefined,
+  targetDatasetId: undefined,
   project: {},
   datasets: {},
   deviceBackUpDirectoryExists: false,
@@ -55,19 +55,6 @@ const projectSlice = createSlice({
         [datasetId]: {...state.datasets[datasetId], modified_timestamp: datasetTimestamp, images: imagesInDataset},
       };
     },
-    addedProject(state, action) {
-      if (!action.payload.id) action.payload.id = getNewId();
-      if (!action.payload.description) action.payload.description = {};
-      if (!action.payload.description.project_name) action.payload.description.project_name = 'Unnamed';
-      if (!action.payload.other_features) action.payload.other_features = DEFAULT_GEOLOGIC_TYPES;
-      if (!action.payload.relationship_types) action.payload.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
-      if (!action.payload.templates) action.payload.templates = {};
-      if (!action.payload.useContinuousTagging) action.payload.useContinuousTagging = false;
-      state.project = action.payload;
-    },
-    addedProjectDescription(state, action) {
-      state.project = action.payload;
-    },
     addedNewSpotIdToDataset(state, action) {
       const {datasetId, spotId} = action.payload;
       const timestamp = Date.now();
@@ -83,6 +70,19 @@ const projectSlice = createSlice({
       const dataset = {...state.datasets[datasetId], modified_timestamp: timestamp, spotIds: spotIdsInDataset};
       state.datasets = {...state.datasets, [datasetId]: dataset};
       state.project.modified_timestamp = timestamp;
+    },
+    addedProject(state, action) {
+      if (!action.payload.id) action.payload.id = getNewId();
+      if (!action.payload.description) action.payload.description = {};
+      if (!action.payload.description.project_name) action.payload.description.project_name = 'Unnamed';
+      if (!action.payload.other_features) action.payload.other_features = DEFAULT_GEOLOGIC_TYPES;
+      if (!action.payload.relationship_types) action.payload.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
+      if (!action.payload.templates) action.payload.templates = {};
+      if (!action.payload.useContinuousTagging) action.payload.useContinuousTagging = false;
+      state.project = action.payload;
+    },
+    addedProjectDescription(state, action) {
+      state.project = action.payload;
     },
     addedTagToSelectedSpot(state, action) {
       state.addTagToSelectedSpot = action.payload;
@@ -100,7 +100,7 @@ const projectSlice = createSlice({
     clearedDatasets(state) {
       state.datasets = {};
       state.activeDatasetsIds = [];
-      state.selectedDatasetId = undefined;
+      state.targetDatasetId = undefined;
     },
     clearedProject(state) {
       state.project = {};
@@ -110,6 +110,27 @@ const projectSlice = createSlice({
       state.datasets = datasetsList;
       state.activeDatasetsIds = state.activeDatasetsIds.filter(activeDatasetId => activeDatasetId !== action.payload);
       state.project.modified_timestamp = Date.now();
+    },
+    deletedSpotIdFromDataset(state, action) {
+      const {datasetId, spotId} = action.payload;
+      const timestamp = Date.now();
+      const dataset = state.datasets[datasetId];
+      const updatedSpotIds = dataset.spotIds.filter(id => id !== spotId);
+      const updatedDataset = {...dataset, modified_timestamp: timestamp, spotIds: updatedSpotIds};
+      state.datasets = {...state.datasets, [datasetId]: updatedDataset};
+      state.project.modified_timestamp = timestamp;
+    },
+    deletedSpotIdFromDatasets(state, action) {
+      const spotId = action.payload;
+      const timestamp = Date.now();
+      const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
+        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
+        const updatedDatatset = isEqual(dataset.spotIds, remainingSpotIds) ? dataset
+          : {...dataset, modified_timestamp: timestamp, spotIds: remainingSpotIds};
+        return {...acc, [datasetId]: updatedDatatset};
+      }, {});
+      state.datasets = updatedDatasets;
+      state.project.modified_timestamp = timestamp;
     },
     deletedSpotIdFromReports(state, action) {
       const spotId = action.payload;
@@ -146,27 +167,6 @@ const projectSlice = createSlice({
         state.project.modified_timestamp = Date.now();
         state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag.id) || {};
       }
-    },
-    deletedSpotIdFromDataset(state, action) {
-      const {datasetId, spotId} = action.payload;
-      const timestamp = Date.now();
-      const dataset = state.datasets[datasetId];
-      const updatedSpotIds = dataset.spotIds.filter(id => id !== spotId);
-      const updatedDataset = {...dataset, modified_timestamp: timestamp, spotIds: updatedSpotIds};
-      state.datasets = {...state.datasets, [datasetId]: updatedDataset};
-      state.project.modified_timestamp = timestamp;
-    },
-    deletedSpotIdFromDatasets(state, action) {
-      const spotId = action.payload;
-      const timestamp = Date.now();
-      const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
-        const updatedDatatset = isEqual(dataset.spotIds, remainingSpotIds) ? dataset
-          : {...dataset, modified_timestamp: timestamp, spotIds: remainingSpotIds};
-        return {...acc, [datasetId]: updatedDatatset};
-      }, {});
-      state.datasets = updatedDatasets;
-      state.project.modified_timestamp = timestamp;
     },
     deletedTagIdFromReports(state, action) {
       const tagId = action.payload;
@@ -207,9 +207,6 @@ const projectSlice = createSlice({
     resetProjectState() {
       return initialProjectState;
     },
-    setIsImageTransferring(state, action) {
-      state.isImageTransferring = action.payload;
-    },
     setActiveDatasets(state, action) {
       const {bool, dataset} = action.payload;
       if (bool) state.activeDatasetsIds = [...new Set([...state.activeDatasetsIds, dataset])];
@@ -230,8 +227,11 @@ const projectSlice = createSlice({
     setBackupFileName(state, action) {
       state.backupFileName = action.payload;
     },
-    setSelectedDataset(state, action) {
-      state.selectedDatasetId = action.payload;
+    setIsImageTransferring(state, action) {
+      state.isImageTransferring = action.payload;
+    },
+    setMultipleFeaturesTaggingEnabled(state, action) {
+      state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
     setSelectedProject(state, action) {
       const {project, source} = action.payload;
@@ -241,11 +241,11 @@ const projectSlice = createSlice({
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
+    setTargetDataset(state, action) {
+      state.targetDatasetId = action.payload;
+    },
     setTestingMode(state, action) {
       state.isTestingMode = action.payload;
-    },
-    setMultipleFeaturesTaggingEnabled(state, action) {
-      state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
     setUseContinuousTagging(state, action) {
       state.project.useContinuousTagging = action.payload;
@@ -302,11 +302,11 @@ export const {
   addedCustomFeatureTypes,
   addedDataset,
   addedDatasets,
-  addedProject,
-  addedProjectDescription,
   addedNeededImagesToDataset,
   addedNewSpotIdToDataset,
   addedNewSpotIdsToDataset,
+  addedProject,
+  addedProjectDescription,
   addedTagToSelectedSpot,
   addedTemplates,
   clearedDatasets,
@@ -321,15 +321,15 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   resetProjectState,
-  setIsImageTransferring,
   setActiveDatasets,
   setActiveTemplates,
   setBackupFileName,
-  setSelectedDataset,
+  setIsImageTransferring,
+  setMultipleFeaturesTaggingEnabled,
   setSelectedProject,
   setSelectedTag,
+  setTargetDataset,
   setTestingMode,
-  setMultipleFeaturesTaggingEnabled,
   setUseContinuousTagging,
   setUseTemplate,
   updatedDatasetProperties,

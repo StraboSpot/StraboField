@@ -14,8 +14,8 @@ import {
   addedDatasets,
   addedProject,
   setActiveDatasets,
-  setSelectedDataset,
   setSelectedProject,
+  setTargetDataset,
 } from '../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../modules/spots/spots.slice';
 import {isEmpty} from '../shared/Helpers';
@@ -165,7 +165,7 @@ const useImport = () => {
       dispatch(addedDatasets(projectDb.datasets));
       if (Object.values(projectDb.datasets).length > 0 && !isEmpty(Object.values(projectDb.datasets)[0])) {
         dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
-        dispatch(setSelectedDataset(Object.values(projectDb.datasets)[0].id));
+        dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
       }
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage(`${selectedProject}\nProject loaded.`));

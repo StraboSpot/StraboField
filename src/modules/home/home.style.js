@@ -146,16 +146,6 @@ const homeStyles = StyleSheet.create({
     textShadowColor: 'black',
     textShadowRadius: 10,
   },
-  selectedDatasetContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-    borderRadius: 10,
-    elevation: 2,
-    padding: 15,
-    shadowColor: 'black',
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    width: 160,
-  },
   shortcutButtons: {
     position: 'absolute',
     right: 10,
@@ -180,6 +170,16 @@ const homeStyles = StyleSheet.create({
     top: 10,
     width: '100%',
     zIndex: -1,
+  },
+  targetDatasetContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderRadius: 10,
+    elevation: 2,
+    padding: 15,
+    shadowColor: 'black',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    width: 160,
   },
   toastContainer: {
     alignItems: 'center',
