@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImages} from '.';
 import useDevice from '../../services/useDevice';
-import {isEmpty, truncateText} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
@@ -83,7 +83,7 @@ const ImageCard = ({
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
         {isEditing ? (
           <TextInput
             autoFocus
@@ -93,11 +93,11 @@ const ImageCard = ({
             onSubmitEditing={handleEndEditing}  // Needed for web
             placeholder={placeholderTitle}
             style={[imageStyles.cardTitle, {flex: 1}, Platform.OS === 'web' && {
+              display: 'inline-block',
+              maxWidth: 87,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              display: 'inline-block',
-              maxWidth: 87,
             }]}
             value={title}
           />
@@ -107,11 +107,11 @@ const ImageCard = ({
               style={[
                 imageStyles.cardTitle,
                 Platform.OS === 'web' && {
+                  display: 'inline-block',
+                  maxWidth: 87,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  display: 'inline-block',
-                  maxWidth: 87,
                 },
               ]}
               numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
