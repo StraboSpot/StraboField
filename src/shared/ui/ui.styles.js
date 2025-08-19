@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   container: {
+    backgroundColor: themes.BLACK,
     flex: 1,
     overflow: 'hidden',
   },
