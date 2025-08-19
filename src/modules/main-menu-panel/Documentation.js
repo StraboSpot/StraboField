@@ -139,26 +139,6 @@ const Documentation = () => {
           }}
         />
       )}
-      <StandardModalHeaderComponent
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onClose={() => setVisible(false)}
-        onJumpToPage={page => ref.current.setPage(page)}
-      />
-      {!isEmpty(doc) && (
-        <Pdf
-          ref={ref}
-          source={doc.file}
-          style={styles.pdf}
-          onLoadComplete={(numberOfPages, filePath) => setTotalPages(numberOfPages)}
-          onError={error => console.log(error)}
-          onPressLink={openLink}
-          onPageChanged={(page, numberOfPages) => {
-            setCurrentPage(page);
-            console.log(`Number of pages: ${page}/${numberOfPages}`);
-          }}
-        />
-      )}
     </Overlay>
   );
 
