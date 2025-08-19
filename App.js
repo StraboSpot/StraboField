@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform} from 'react-native';
+import {Platform, StatusBar} from 'react-native';
 
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
@@ -10,8 +10,8 @@ import {PersistGate} from 'redux-persist/integration/react';
 
 import Routes from './src/routes/Routes';
 import ConnectionStatus from './src/services/ConnectionStatus';
-import SystemBars from './src/services/SystemBars';
 import {RELEASE_NAME} from './src/shared/app.constants';
+import {SMALL_SCREEN} from './src/shared/styles.constants';
 import Toast from './src/shared/ui/Toast';
 import uiStyles from './src/shared/ui/ui.styles';
 import {persistor, store} from './src/store/ConfigureStore';
@@ -82,7 +82,7 @@ const App = () => {
           <Toast>
             <PersistGate loading={null} persistor={persistor}>
               {/*<Sentry.TouchEventBoundary>*/}
-              <SystemBars/>
+              {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
               <NavigationContainer linking={linking}>
                 <Routes/>

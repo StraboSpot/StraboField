@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   container: {
-    backgroundColor: themes.BLACK,
+    backgroundColor: Platform.OS === 'ios' ? themes.BLACK : themes.WHITE,
     flex: 1,
     overflow: 'hidden',
   },
