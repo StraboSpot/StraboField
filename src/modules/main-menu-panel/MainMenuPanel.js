@@ -1,5 +1,5 @@
 import React, {forwardRef, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -10,7 +10,6 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {ImageGallery} from '../images';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
@@ -181,9 +180,9 @@ const MainMenuPanel = forwardRef(({
   };
 
   return (
-    <SafeAreaView style={[mainMenuPanelStyles.container, SMALL_SCREEN ? {paddingTop: 30} : {}]}>
+    <View style={mainMenuPanelStyles.container}>
       {isSidePanelVisible && sidePanelView ? renderSidePanelContent() : renderMainMenuContent()}
-    </SafeAreaView>
+    </View>
   );
 });
 

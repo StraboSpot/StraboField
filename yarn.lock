@@ -13639,16 +13639,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-system-navigation-bar@npm:2.6.4":
-  version: 2.6.4
-  resolution: "react-native-system-navigation-bar@npm:2.6.4"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/77f8a179b3606a9a232c0ed11786a8c7422d41f926bed31ee1e234b5beed43cb588eab557522046a628d30c66f77c395a9aef7ede74b31a2fe411bb39cef041b
-  languageName: node
-  linkType: hard
-
 "react-native-tab-view@npm:4.0.5":
   version: 4.0.5
   resolution: "react-native-tab-view@npm:4.0.5"
@@ -15036,7 +15026,6 @@ __metadata:
     react-native-screens: "npm:4.10.0"
     react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
-    react-native-system-navigation-bar: "npm:2.6.4"
     react-native-tab-view: "npm:4.0.5"
     react-native-toast-notifications: "npm:3.4.0"
     react-native-vector-icons: "npm:10.2.0"

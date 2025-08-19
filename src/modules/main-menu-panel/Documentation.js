@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Platform, SafeAreaView, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import {Button, ListItem, Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
@@ -67,57 +67,7 @@ const Documentation = () => {
     }
   };
 
-  const viewPDF = () => (
-    <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      isVisible={visible}
-      fullScreen
-      overlayStyle={styles.overlayContainer}
-    >
-      <SafeAreaView>
-        <StandardModalHeaderComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onClose={() => setVisible(false)}
-          onJumpToPage={page => ref.current.setPage(page)}
-        />
-        {!isEmpty(doc) && (
-          <Pdf
-            ref={ref}
-            source={doc.file}
-            style={styles.pdf}
-            onLoadComplete={(numberOfPages, filePath) => {
-              setTotalPages(numberOfPages);
-            }}
-            onError={(error) => {
-              console.log(error);
-            }}
-            onPressLink={openLink}
-            onPageChanged={(page, numberOfPages) => {
-              setCurrentPage(page);
-              console.log(`Number of pages: ${page}/${numberOfPages}`);
-            }}
-          />
-        )}
-      </SafeAreaView>
-    </Overlay>
-  );
-
-  const renderFAQListItem = item => (
-    <ListItem
-      onPress={() => handlePress(item)}
-      containerStyle={mainMenuPanelStyles.documentListItem}
-    >
-      <ListItem.Content style={commonStyles.listItemContent}>
-        <ListItem.Title style={commonStyles.listItemTitle}>
-          {item.name}
-        </ListItem.Title>
-      </ListItem.Content>
-      <ListItem.Chevron size={20}/>
-    </ListItem>
-  );
-
-  const renderFAQItems = () => {
+  const renderFAQList = () => {
     let filteredDocs = [];
     files.forEach((file) => {
       if (Platform.OS === 'ios' && file.platform.includes('ios')) {
@@ -143,6 +93,74 @@ const Documentation = () => {
       </View>
     );
   };
+
+  const renderFAQListItem = item => (
+    <ListItem
+      onPress={() => handlePress(item)}
+      containerStyle={mainMenuPanelStyles.documentListItem}
+    >
+      <ListItem.Content style={commonStyles.listItemContent}>
+        <ListItem.Title style={commonStyles.listItemTitle}>
+          {item.name}
+        </ListItem.Title>
+      </ListItem.Content>
+      <ListItem.Chevron size={20}/>
+    </ListItem>
+  );
+
+  const renderPDF = () => (
+    <Overlay
+      supportedOrientations={['portrait', 'landscape']}
+      isVisible={visible}
+      fullScreen
+      overlayStyle={styles.overlayContainer}
+    >
+      <StandardModalHeaderComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onClose={() => setVisible(false)}
+        onJumpToPage={page => ref.current.setPage(page)}
+      />
+      {!isEmpty(doc) && (
+        <Pdf
+          ref={ref}
+          source={doc.file}
+          style={styles.pdf}
+          onLoadComplete={(numberOfPages, filePath) => {
+            setTotalPages(numberOfPages);
+          }}
+          onError={(error) => {
+            console.log(error);
+          }}
+          onPressLink={openLink}
+          onPageChanged={(page, numberOfPages) => {
+            setCurrentPage(page);
+            console.log(`Number of pages: ${page}/${numberOfPages}`);
+          }}
+        />
+      )}
+      <StandardModalHeaderComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onClose={() => setVisible(false)}
+        onJumpToPage={page => ref.current.setPage(page)}
+      />
+      {!isEmpty(doc) && (
+        <Pdf
+          ref={ref}
+          source={doc.file}
+          style={styles.pdf}
+          onLoadComplete={(numberOfPages, filePath) => setTotalPages(numberOfPages)}
+          onError={error => console.log(error)}
+          onPressLink={openLink}
+          onPageChanged={(page, numberOfPages) => {
+            setCurrentPage(page);
+            console.log(`Number of pages: ${page}/${numberOfPages}`);
+          }}
+        />
+      )}
+    </Overlay>
+  );
 
   const renderSpotDataModelSection = () => {
     return (
@@ -173,8 +191,11 @@ const Documentation = () => {
         icon={'globe-outline'}
         color={WHITE}
       />
-      {renderFAQItems()}
-      {viewPDF()}
+      <View>
+        <SectionDivider dividerText={'Helpful Docs'}/>
+      </View>
+      {renderFAQList()}
+      {renderPDF()}
     </View>
   );
 };

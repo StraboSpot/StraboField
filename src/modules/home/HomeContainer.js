@@ -2,7 +2,6 @@ import React, {useEffect, useRef} from 'react';
 import {Animated, Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
@@ -12,7 +11,6 @@ import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';
 import useDevice from '../../services/useDevice';
-import uiStyles from '../../shared/ui/ui.styles';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
@@ -70,7 +68,6 @@ const HomeContainer = ({navigation, route}) => {
   }, [projectLoadComplete]);
 
   return (
-    <SafeAreaView style={uiStyles.container}>
     <Animated.View style={[homeStyles.container, animateTextInputs]}>
       <Home
         animateLeftSide={animateLeftSide}
@@ -102,7 +99,6 @@ const HomeContainer = ({navigation, route}) => {
         />
       </Animated.View>
     </Animated.View>
-    </SafeAreaView>
   );
 };
 

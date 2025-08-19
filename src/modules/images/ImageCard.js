@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Text, TextInput, View, TouchableOpacity, Platform} from 'react-native';
 
 import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImages} from '.';
 import useDevice from '../../services/useDevice';
-import {isEmpty, truncateText} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -28,18 +28,23 @@ const ImageCard = ({
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const placeholderTitle = `Untitled ${index + 1}`;
+
   const [title, setTitle] = useState(
-    image.title && typeof image.title === 'string' && image.title.trim !== '' ? image.title.toString() : undefined);
+    image.title && typeof image.title === 'string' && image.title.trim() !== ''
+      ? image.title.toString()
+      : placeholderTitle,
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const {downloadImageAndSave} = useDevice();
   const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
 
-  const placeholderTitle = 'Untitled ' + (index + 1);
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
 
-  const getIsSwtichDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
-
-  const handleEditImageName = async (value) => {
+  const handleEditImageName = (value) => {
     if (value && value !== '') setTitle(value);
     else setTitle(undefined);
   };
@@ -50,6 +55,7 @@ const ImageCard = ({
       dispatch(editedSpotImage(updatedImage));
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     }
+    setIsEditing(false);
   };
 
   const handleImagePressed = async () => {
@@ -78,15 +84,45 @@ const ImageCard = ({
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>
-      <TextInput
-        blurOnSubmit={true}                  // Needed for web
-        onChangeText={handleEditImageName}
-        onEndEditing={handleEndEditing}
-        onSubmitEditing={handleEndEditing}   // Needed for web
-        placeholder={placeholderTitle}
-        style={imageStyles.cardTitle}
-        value={truncateText(title, isThumbnailOnly ? 8 : 16)}
-      />
+      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+        {isEditing ? (
+          <TextInput
+            autoFocus
+            blurOnSubmit                        // Needed for web
+            onChangeText={handleEditImageName}
+            onEndEditing={handleEndEditing}
+            onSubmitEditing={handleEndEditing}  // Needed for web
+            placeholder={placeholderTitle}
+            style={[imageStyles.cardTitle, {flex: 1}, Platform.OS === 'web' && {
+              display: 'inline-block',
+              maxWidth: 87,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }]}
+            value={title}
+          />
+        ) : (
+          <TouchableOpacity style={{flex: 1, alignItems: 'center'}} onPress={() => setIsEditing(true)}>
+            <Text
+              style={[
+                imageStyles.cardTitle,
+                Platform.OS === 'web' && {
+                  display: 'inline-block',
+                  maxWidth: 87,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                },
+              ]}
+              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
+              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
+            >
+              {title || placeholderTitle}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       <View style={imageStyles.cardImageContainer}>
         <ImageThumbnail
@@ -101,7 +137,7 @@ const ImageCard = ({
       {!isThumbnailOnly && (
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
           <SwitchWrapper
-            disabled={getIsSwtichDisabled()}
+            disabled={getIsSwitchDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
             value={image.annotated}
           />
