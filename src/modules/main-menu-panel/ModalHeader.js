@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, FlatList, Modal} from 'react-native';
-import styles from './documentation.styles';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {FlatList, Text, TouchableOpacity, View} from 'react-native';
+
 import {Button, Overlay} from '@rn-vui/base';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import styles from './documentation.styles';
 
 const ModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -24,12 +26,12 @@ const ModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
           Page {currentPage} of {totalPages}
         </Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color="#333"/>
+          <Ionicons name={'close'} size={24} color={'#333'}/>
         </TouchableOpacity>
       </View>
       <Overlay
         visible={pickerVisible}
-        animationType="fade"
+        animationType={'fade'}
         overlayStyle={styles.pickerContainer}
       >
         <View style={styles.pickerOverlay}>
