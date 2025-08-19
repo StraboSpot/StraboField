@@ -15,8 +15,9 @@ import uiStyles from '../../shared/ui/ui.styles';
 import overlayStyles from '../home/overlays/overlay.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import LogOut from '../user/LogOut';
 
-const StraboFieldProjects = ({openMainMenuPanel}) => {
+const StraboFieldProjects = () => {
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
@@ -171,6 +172,7 @@ const StraboFieldProjects = ({openMainMenuPanel}) => {
           </View>
         }
       />
+      {Platform.OS !== 'web' && <LogOut/>}
 
       {/*  Modals */}
       {isSaveProjectModalVisible && (
