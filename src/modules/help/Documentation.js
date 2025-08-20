@@ -5,8 +5,8 @@ import {Button, ListItem, Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 
 import styles from './documentation.styles';
-import mainMenuPanelStyles from './mainMenuPanel.styles';
-import StandardModalHeaderComponent from './ModalHeader';
+import DocumentationModalHeader from './DocumentationModalHeader';
+import SpotDataModelModal from './SpotDataModelModal';
 import {STRABO_APIS} from '../../services/urls.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, openUrl} from '../../shared/Helpers';
@@ -15,7 +15,7 @@ import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import OpenUrlLink from '../../shared/ui/OpenUrlLink';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import SpotDataModelModal from '../preferences/SpotDataModelModal';
+import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
 const Documentation = () => {
   const ref = useRef(null);
@@ -115,7 +115,7 @@ const Documentation = () => {
       fullScreen
       overlayStyle={styles.overlayContainer}
     >
-      <StandardModalHeaderComponent
+      <DocumentationModalHeader
         currentPage={currentPage}
         totalPages={totalPages}
         onClose={() => setVisible(false)}

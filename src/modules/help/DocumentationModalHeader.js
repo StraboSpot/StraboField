@@ -6,7 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import styles from './documentation.styles';
 
-const ModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
+const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   const [pickerVisible, setPickerVisible] = useState(false);
 
   const handleSelectPage = (page) => {
@@ -57,4 +57,4 @@ const ModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   );
 };
 
-export default ModalHeader;
+export default DocumentationModalHeader;

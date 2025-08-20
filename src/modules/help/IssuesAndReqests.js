@@ -3,8 +3,8 @@ import {View, Text} from 'react-native';
 
 import styles from './issuesAndRequest.styles';
 import {SUPPORT_PATHS} from '../../services/urls.constants';
-import OpenUrlLink from '../../shared/ui/OpenUrlLink';
 import {WHITE} from '../../shared/styles.constants';
+import OpenUrlLink from '../../shared/ui/OpenUrlLink';
 
 const IssuesAndRequests = () => {
   return (

@@ -3,14 +3,14 @@ import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import About from './About';
-import Documentation from './Documentation';
-import IssuesAndReqests from './IssuesAndReqests';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
 import DailyNotesPage from '../daily-notes/DailyNotesPage';
+import About from '../help/About';
+import Documentation from '../help/Documentation';
+import IssuesAndReqests from '../help/IssuesAndReqests';
 import {ImageGallery} from '../images';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
