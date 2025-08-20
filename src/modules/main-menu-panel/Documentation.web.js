@@ -10,15 +10,13 @@ import {BLUE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 
 const Documentation = () => {
-  const isOnline = useSelector(
-    state => state.connections.isOnline.isInternetReachable,
-  );
+  const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
   const helpUrl = STRABO_APIS.STRABO + '/help';
 
   const viewOnlineHelp = async (path) => {
-      const canOpen = await Linking.canOpenURL(path);
-      canOpen ? (await Linking.openURL(path))
+    const canOpen = await Linking.canOpenURL(path);
+    canOpen ? (await Linking.openURL(path))
       : alert('Unable to open URL');
   };
 
