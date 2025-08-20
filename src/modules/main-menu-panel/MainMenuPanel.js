@@ -30,7 +30,7 @@ import NamingConventions from '../project/NamingConventions';
 import NewProjectForm from '../project/NewProjectForm';
 import OpenProjectPage from '../project/OpenProjectPage';
 import ProjectDescription from '../project/ProjectDescription';
-import ProjectSettingsPanel from '../project/ProjectSettingsPanel';
+import ProjectPrivacyPage from '../project/ProjectPrivacyPage';
 import StraboFieldProjects from '../project/StraboFieldProjects';
 import UploadBackupAndExport from '../project/UploadBackupExport';
 import {ReportsMenu} from '../reports';
@@ -73,7 +73,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
         return <ProjectDescription setDatasetToView={setDatasetToView}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
-        return <ProjectSettingsPanel/>;
+        return <ProjectPrivacyPage/>;
 
       // Customize & Preset
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:

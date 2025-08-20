@@ -8,7 +8,7 @@ import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
 
-const ProjectSettingsPanel = () => {
+const ProjectPrivacyPage = () => {
   const dispatch = useDispatch();
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
@@ -53,4 +53,4 @@ const ProjectSettingsPanel = () => {
   );
 };
 
-export default ProjectSettingsPanel;
+export default ProjectPrivacyPage;
