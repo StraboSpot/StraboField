@@ -19,7 +19,7 @@ const MainMenuPanelHeader = () => {
 
   const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.ACCOUNT).includes(mainMenuPageVisible)
     && !Object.values(MAIN_MENU_ITEMS.INPUT_OPTIONS).includes(mainMenuPageVisible)
-    && !Object.values(MAIN_MENU_ITEMS.HElP).includes(mainMenuPageVisible);
+    && !Object.values(MAIN_MENU_ITEMS.HELP).includes(mainMenuPageVisible);
 
   return (
     <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>

@@ -38,7 +38,7 @@ export const MAIN_MENU_ITEMS = {
     ADDING_NEW_SPOTS: 'Adding New Spots',
     ADVANCED_OPTIONS: 'Advanced Options',
   },
-  HElP: {
+  HELP: {
     ABOUT: 'About StraboField',
     DOCUMENTATION: 'Documentation',
     ISSUES: 'Issues & Requests',

@@ -142,11 +142,11 @@ const MainMenuPanel = forwardRef(({
         return <Miscellaneous/>;
 
       // Help
-      case MAIN_MENU_ITEMS.HElP.ABOUT:
+      case MAIN_MENU_ITEMS.HELP.ABOUT:
         return <About/>;
-      case MAIN_MENU_ITEMS.HElP.DOCUMENTATION:
+      case MAIN_MENU_ITEMS.HELP.DOCUMENTATION:
         return <Documentation/>;
-      case MAIN_MENU_ITEMS.HElP.ISSUES:
+      case MAIN_MENU_ITEMS.HELP.ISSUES:
         return <IssuesAndReqests/>;
 
       default:
