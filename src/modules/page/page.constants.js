@@ -1,5 +1,6 @@
 import BasicOverviewList from './BasicOverviewList';
 import Overview from './Overview';
+import DailyNotesModal from '../daily-notes/DailyNotesModal';
 import DataOverview from '../external-data/DataOverview';
 import ExternalData from '../external-data/ExternalData';
 import AddFabricModal from '../fabrics/AddFabricModal';
@@ -32,7 +33,6 @@ import RockIgneousPage from '../petrology/RockIgneousPage';
 import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
-import DailyNotesModal from '../project/daily-notes/DailyNotesModal';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
