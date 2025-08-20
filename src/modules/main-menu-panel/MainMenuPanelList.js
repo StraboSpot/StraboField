@@ -1,15 +1,24 @@
 import React from 'react';
-import {SectionList} from 'react-native';
+import {Platform, SectionList} from 'react-native';
 
-import {MAIN_MENU_DATA} from './mainMenu.constants';
+import {useSelector} from 'react-redux';
+
+import {MAIN_MENU_DATA, MAIN_MENU_DATA_NO_PROJECT, MAIN_MENU_DATA_WEB} from './mainMenu.constants';
 import MainMenuPanelListItem from './MainMenuPanelListItem';
 import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const MainMenuPanelList = () => {
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const renderItem = ({item}) => <MainMenuPanelListItem title={item}/>;
+
+  const getMainMenuData = () => {
+    if (Platform.OS === 'web') return MAIN_MENU_DATA_WEB;
+    if (!projectName) return MAIN_MENU_DATA_NO_PROJECT;
+    else return MAIN_MENU_DATA;
+  };
 
   const renderMenuSectionHeader = ({section: {title}}) => {
     return (
@@ -20,7 +29,7 @@ const MainMenuPanelList = () => {
   return (
     <SectionList
       keyExtractor={(item, index) => item + index}
-      sections={MAIN_MENU_DATA}
+      sections={getMainMenuData()}
       renderItem={renderItem}
       renderSectionHeader={renderMenuSectionHeader}
       ItemSeparatorComponent={FlatListItemSeparator}

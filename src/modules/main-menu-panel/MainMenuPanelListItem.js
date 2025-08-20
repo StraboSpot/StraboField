@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Text} from 'react-native';
+import {Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
@@ -30,17 +30,11 @@ const MainMenuPanelListItem = ({title}) => {
     );
   };
 
-  if (title !== MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP && title !== MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS
-    && title !== MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS && title !== MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS
-    || ((title === MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP || title === MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS
-        || title === MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS || title === MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS)
-      && Platform.OS !== 'web')) {
-    return (
-      <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
-        <ListItem.Content>{getTitle()}</ListItem.Content>
-      </ListItem>
-    );
-  }
+  return (
+    <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
+      <ListItem.Content>{getTitle()}</ListItem.Content>
+    </ListItem>
+  );
 };
 
 export default MainMenuPanelListItem;

@@ -49,6 +49,23 @@ export const MAIN_MENU_DATA = Object.entries(MAIN_MENU_ITEMS).map(([key, value])
   return {title: key, data: Object.values(value)};
 });
 
+const listItemsToHideOnWeb = [
+  MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP,
+  MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS,
+  MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS,
+  MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS];
+export const MAIN_MENU_DATA_WEB = Object.entries(MAIN_MENU_ITEMS).map(([key, value]) => {
+  return {
+    title: key,
+    data: Object.values(value).reduce((acc, val) => listItemsToHideOnWeb.includes(val) ? acc : [...acc, val], []),
+  };
+});
+
+const sectionsToHideIfNoProject = ['MANAGE_PROJECT', 'CUSTOMIZE_AND_PRESET', 'PROJECT_DATA', 'MAPS'];
+export const MAIN_MENU_DATA_NO_PROJECT = Object.entries(MAIN_MENU_ITEMS).reduce((acc, [key, value]) => {
+  return sectionsToHideIfNoProject.includes(key) ? acc : [...acc, {title: key, data: Object.values(value)}];
+}, []);
+
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',
   DELETE_PROJECT: 'Delete Project',
