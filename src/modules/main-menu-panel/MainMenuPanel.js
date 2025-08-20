@@ -10,6 +10,7 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
+import DailyNotesPage from '../daily-notes/DailyNotesPage';
 import {ImageGallery} from '../images';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
@@ -20,7 +21,6 @@ import MicroProjectsList from '../micro/MicroProjectsList';
 import Miscellaneous from '../preferences/Miscellaneous';
 import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
-import DailyNotesSection from '../project/daily-notes/DailyNotesSection';
 import DatasetDetail from '../project/dataset/DatasetDetail';
 import DatasetsPanel from '../project/DatasetsPanel';
 import DeleteProjectPage from '../project/DeleteProjectPage';
@@ -110,7 +110,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
         return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
-        return <DailyNotesSection/>;
+        return <DailyNotesPage/>;
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:

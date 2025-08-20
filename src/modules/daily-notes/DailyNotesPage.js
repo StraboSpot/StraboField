@@ -5,13 +5,13 @@ import {ListItem} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
-import commonStyles from '../../../shared/common.styles';
-import ListEmptyText from '../../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
-import {MODAL_KEYS} from '../../page/page.constants';
+import commonStyles from '../../shared/common.styles';
+import ListEmptyText from '../../shared/ui/ListEmptyText';
+import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
+import {setModalValues, setModalVisible} from '../home/home.slice';
+import {MODAL_KEYS} from '../page/page.constants';
 
-const DailyNotesSection = () => {
+const DailyNotesPage = () => {
   const dispatch = useDispatch();
 
   const dailyNotes = useSelector(state => state.project.project?.description?.daily_setup) || [];
@@ -59,4 +59,4 @@ const DailyNotesSection = () => {
   );
 };
 
-export default DailyNotesSection;
+export default DailyNotesPage;

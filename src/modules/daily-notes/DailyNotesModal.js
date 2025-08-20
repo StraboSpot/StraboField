@@ -5,16 +5,16 @@ import {Button, Icon, ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/Helpers';
-import alert from '../../../shared/ui/alert';
-import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import Modal from '../../../shared/ui/modal/Modal';
-import SaveAndCancelButtons from '../../../shared/ui/SaveAndCancelButtons';
-import {DateInputField, TextInputField} from '../../form';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
-import {updatedProject} from '../projects.slice';
+import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
+import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
+import Modal from '../../shared/ui/modal/Modal';
+import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import {DateInputField, TextInputField} from '../form';
+import {setModalValues, setModalVisible} from '../home/home.slice';
+import overlayStyles from '../home/overlays/overlay.styles';
+import {updatedProject} from '../project/projects.slice';
 
 const DailyNotesModal = () => {
   const dispatch = useDispatch();
