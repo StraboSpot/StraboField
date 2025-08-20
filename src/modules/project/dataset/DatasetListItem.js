@@ -10,7 +10,7 @@ import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
 import useProject from '../useProject';
-import DatasetSelectedModal from './DatasetSelectedModal';
+import TargetDatasetModal from './TargetDatasetModal';
 import {setIsProjectLoadComplete} from '../../home/home.slice';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
@@ -80,7 +80,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
       {/* Modal */}
       {isMakeDatasetCurrentModalVisible && !isProjectLoadSelectionModalVisible && (
-        <DatasetSelectedModal
+        <TargetDatasetModal
           closeModal={() => setMakeIsDatasetCurrentModalVisible(false)}
           dataset={dataset}
         />

@@ -3,17 +3,17 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import DatasetList from './dataset/DatasetList';
-import {setActiveDatasets, setTargetDataset} from './projects.slice';
-import useProject from './useProject';
-import useDownload from '../../services/useDownload';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import TextInputModal from '../../shared/ui/TextInputModal';
-import {WarningModal} from '../home/modals';
+import DatasetList from './DatasetList';
+import useDownload from '../../../services/useDownload';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/Helpers';
+import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
+import TextInputModal from '../../../shared/ui/TextInputModal';
+import {WarningModal} from '../../home/modals';
+import {setActiveDatasets, setTargetDataset} from '../projects.slice';
+import useProject from '../useProject';
 
-const ActiveProjectPanel = ({setDatasetToView}) => {
+const DatasetsPage = ({setDatasetToView}) => {
   const {initializeDownload} = useDownload();
   const {addDataset} = useProject();
 
@@ -28,7 +28,7 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   useEffect(() => {
-    console.log('UE ActiveProjectPanel [datasets]', datasets);
+    console.log('UE DatasetsPage [datasets]', datasets);
     if (Object.values(datasets).length > 0 && !isEmpty(Object.values(datasets)[0])) {
       if (activeDatasetsIds.length === 0) {
         dispatch(setActiveDatasets({bool: true, dataset: Object.values(datasets)[0].id}));
@@ -97,4 +97,4 @@ const ActiveProjectPanel = ({setDatasetToView}) => {
   );
 };
 
-export default ActiveProjectPanel;
+export default DatasetsPage;

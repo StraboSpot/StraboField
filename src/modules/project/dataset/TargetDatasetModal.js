@@ -5,7 +5,7 @@ import StandardModal from '../../../shared/ui/StandardModal';
 import overlayStyles from '../../home/overlays/overlay.styles';
 import useProject from '../useProject';
 
-const DatasetSelectedModal = ({closeModal, dataset}) => {
+const TargetDatasetModal = ({closeModal, dataset}) => {
 
   const {makeDatasetCurrent} = useProject();
 
@@ -35,4 +35,4 @@ const DatasetSelectedModal = ({closeModal, dataset}) => {
   );
 };
 
-export default DatasetSelectedModal;
+export default TargetDatasetModal;

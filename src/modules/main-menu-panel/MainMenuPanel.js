@@ -22,8 +22,8 @@ import Miscellaneous from '../preferences/Miscellaneous';
 import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import DatasetDetail from '../project/dataset/DatasetDetail';
-import DatasetsPanel from '../project/DatasetsPanel';
-import DeleteProjectPage from '../project/DeleteProjectPage';
+import DatasetsPage from '../project/dataset/DatasetsPage';
+import DeleteLocalProjectPage from '../project/delete/DeleteLocalProjectPage';
 import DownloadProjectPage from '../project/DownloadProjectPage';
 import ImportProjectFromZip from '../project/ImportProjectFromZip';
 import NamingConventions from '../project/NamingConventions';
@@ -67,7 +67,7 @@ const MainMenuPanel = forwardRef(({
     switch (mainMenuPageVisible) {
       // Manage Project
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS:
-        return <DatasetsPanel setDatasetToView={setDatasetToView}/>;
+        return <DatasetsPage setDatasetToView={setDatasetToView}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP:
         return <UploadBackupAndExport closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
