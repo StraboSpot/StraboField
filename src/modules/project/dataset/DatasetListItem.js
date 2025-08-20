@@ -33,7 +33,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
   const viewDataset = () => {
     setDatasetToView(dataset);
-    dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.DATASET_DETAIL, bool: true}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DATASET_DETAIL}));
   };
 
   const isActive = activeDatasetsIds.includes(dataset.id);

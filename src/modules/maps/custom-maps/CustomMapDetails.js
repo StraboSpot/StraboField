@@ -124,7 +124,7 @@ const CustomMapDetails = () => {
 
   const handlePress = () => {
     setIsLoadingModalVisible(false);
-    dispatch(setSidePanelVisible({view: null, bool: false}));
+    dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
   };
 

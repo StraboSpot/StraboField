@@ -59,7 +59,7 @@ const TagsList = ({type, selectedIndex}) => {
       <ListItem
         containerStyle={commonStyles.listItem}
         onPress={() => {
-          dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.TAG_DETAIL, bool: true}));
+          dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
           dispatch(setSelectedTag(tag));
         }}
       >

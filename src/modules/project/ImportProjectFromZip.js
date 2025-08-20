@@ -50,7 +50,7 @@ const ImportProjectFromZip = () => {
           <Button
             title={'Go to saved projects'}
             // onPress={() => loadProject()}
-            onPress={() => dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.OPEN_PROJECT, bool: true}))}
+            onPress={() => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}))}
             type={'clear'}
             containerStyle={{alignItems: 'flex-start'}}
             titleStyle={commonStyles.standardButtonText}
@@ -79,7 +79,7 @@ const ImportProjectFromZip = () => {
       dispatch(setStatusMessageModalTitle('Project Imported'));
       setIsLoading(false);
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
-      dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.OPEN_PROJECT, bool: true}));
+      dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}));
     }
     catch (err) {
       console.error('Error Writing Project Data', err);

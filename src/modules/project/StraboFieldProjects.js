@@ -36,7 +36,6 @@ const StraboFieldProjects = () => {
     if (Platform.OS !== 'web') checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
   }, []);
 
-
   const checkAndroidDownloadDir = async () => {
     const exists = await doesDeviceBackupDirExist(undefined, true);
     if (!exists) await makeDirectory(APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID);
@@ -54,28 +53,26 @@ const StraboFieldProjects = () => {
     }
   };
 
-  const openMovingProjectBackupsURL = async () => {
-    const url = 'https://strabospot.org/files/helpFiles/Moving_Project_Backups_Out_of%20StraboSpot2.pdf';
-    const canOpen = await Linking.canOpenURL(url);
-    canOpen ? await Linking.openURL(url) : alert('Need to be online');
+  const onDeleteLocalCopy = () => {
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_LOCAL_PROJECT_COPY}));
   };
 
   const onStartNewProject = () => {
     dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.NEW_PROJECT, bool: true}));
   };
   const onLoadProjectsFromServer = () => {
-    dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT, bool: true}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT}));
   };
 
   const onLoadProjectsFromDevice = () => {
-    dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.OPEN_PROJECT, bool: true}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}));
   };
 
   const onLoadProjectsFromDownloadsFolder = () => {
-    dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.IMPORT_PROJECT, bool: true}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.IMPORT_PROJECT}));
   };
 
-  const onDeleteProject = () => dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.DELETE_PROJECT, bool: true}));
+  const onStartNewProject = () => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.NEW_PROJECT}));
 
   return (
     <>
