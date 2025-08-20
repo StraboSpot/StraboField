@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Platform, Pressable, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,51 +22,51 @@ const MainMenuPanelHeader = () => {
     && !Object.values(MAIN_MENU_ITEMS.HElP).includes(mainMenuPageVisible);
 
   return (
-    <View
-      style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>
-      {mainMenuPageVisible ? (
-        !isSideMenuVisible && (
-          <View style={mainMenuPanelStyles.mainMenuIconContainer}>
-            <Icon
-              iconStyle={mainMenuPanelStyles.buttons}
-              name={'arrow-back'}
-              onPress={() => dispatch(setMenuSelectionPage({name: null}))}
+    <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>
+      <Pressable style={{flex: 1, flexDirection: 'row'}} onPress={() => dispatch(setMenuSelectionPage({name: null}))}>
+        {mainMenuPageVisible ? (
+          !isSideMenuVisible && (
+            <View style={mainMenuPanelStyles.mainMenuIconContainer}>
+              <Icon
+                iconStyle={mainMenuPanelStyles.buttons}
+                name={'arrow-back'}
+                size={30}
+                type={'ionicon'}
+              />
+            </View>
+          )
+        ) : (
+          <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingHorizontal: 5, paddingVertical: 0}]}>
+            <AvatarWrapper
+              rounded
               size={30}
-              type={'ionicon'}
+              source={require('../../assets/icons/strabospot.png')}
             />
           </View>
-        )
-      ) : (
-        <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingHorizontal: 5, paddingVertical: 0}]}>
-          <AvatarWrapper
-            rounded
-            size={30}
-            source={require('../../assets/icons/strabospot.png')}
-          />
-        </View>
-      )}
-      <View style={{flex: 1, justifyContent: 'center'}}>
-        {mainMenuPageVisible ? (
-          <>
-            {doShowSubheader ? (
-              <>
-                <Text style={mainMenuPanelStyles.headerText}>{mainMenuPageVisible || MAIN_MENU_TITLE}</Text>
-                <Text style={mainMenuPanelStyles.subheaderText}>
-                  Project: {truncateText(projectName, 22) || 'Open a Project'}
-                </Text>
-              </>
-            ) : (
-              <Text style={mainMenuPanelStyles.headerText}>
-                {mainMenuPageVisible || MAIN_MENU_TITLE}
-              </Text>
-            )}
-          </>
-        ) : (
-          <Text style={mainMenuPanelStyles.headerText}>
-            {truncateText(projectName, 35) || 'Open a Project'}
-          </Text>
         )}
-      </View>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          {mainMenuPageVisible ? (
+            <>
+              {doShowSubheader ? (
+                <>
+                  <Text style={mainMenuPanelStyles.headerText}>{mainMenuPageVisible || MAIN_MENU_TITLE}</Text>
+                  <Text style={mainMenuPanelStyles.subheaderText}>
+                    Project: {truncateText(projectName, 22) || 'No Project Selected'}
+                  </Text>
+                </>
+              ) : (
+                <Text style={mainMenuPanelStyles.headerText}>
+                  {mainMenuPageVisible || MAIN_MENU_TITLE}
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text style={mainMenuPanelStyles.headerText}>
+              {truncateText(projectName, 35) || 'No Project Selected'}
+            </Text>
+          )}
+        </View>
+      </Pressable>
       {!mainMenuPageVisible && Platform.OS !== 'web' && (
         <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingLeft: 5}]}>
           <Icon
