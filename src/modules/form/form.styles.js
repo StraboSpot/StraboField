@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
     fontSize: themes.SMALL_TEXT_SIZE,
   },
   fullWidthButtonContainer: {
-    alignItems: 'center',
     padding: 10,
     paddingBottom: 2.5,
     paddingTop: 2.5,

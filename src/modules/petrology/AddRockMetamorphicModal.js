@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
@@ -60,20 +60,23 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
           height: '100%',
         }]}
         type={'outline'}
-        title={() => faciesButtonText(faciesProps.faciesKey)}
         onPress={() => addFacies(faciesProps.faciesKey)}
-      />
+      >
+        {faciesButtonText(faciesProps.faciesKey)}
+      </Button>
     );
   };
 
   const renderFaciesModal = () => {
-    const faciesModalWidth = width > 520 ? 500 : '90%';
+    const faciesModalWidth = width > 520 ? 700 : '90%';
     return (
       <Overlay
+        fullScreen={SMALL_SCREEN}
         supportedOrientations={['portrait', 'landscape']}
         overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : [overlayStyles.overlayContainer, overlayStyles.overlayPosition, {
           width: faciesModalWidth,
           left: 20,
+          height: '50%'
         }]}
         isVisible={true}
       >
@@ -82,11 +85,20 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
           title={'Facies'}
           closeModal={() => setIsFaciesModalVisible(false)}
         />
-        <View style={{flex: 1}}>
-
-          <View style={{flex: 5, flexDirection: 'row', paddingRight: 5}}>
-            <View style={{width: 20, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={[formStyles.formButtonTitle, {transform: [{rotate: '-90deg'}], width: 60}]}>Pressure</Text>
+        <View style={{ flex: 1, padding: 10 }}>
+          <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', overflow: 'visible' }}>
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            {/* Pressure axis */}
+            <View style={{ width: 60, alignItems: 'center', justifyContent: 'center' }}>
+              <Text
+                style={{
+                  transform: [{ rotate: '-90deg' }],
+                  textAlign: 'center',
+                  fontSize: 14,
+                }}
+              >
+                Pressure
+              </Text>
             </View>
             <View style={{
               flex: 1,
@@ -130,10 +142,11 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
               </View>
             </View>
           </View>
+          </ScrollView>
           <View style={{height: 30, alignItems: 'center', justifyContent: 'center'}}>
             <Text style={formStyles.formButtonTitle}>Temperature</Text>
           </View>
-          <View style={{flexDirection: 'row', height: 80, paddingBottom: 10}}>
+          <View style={{flexDirection: 'row', height: 40, paddingBottom: 0}}>
             <View style={{width: '50%'}}>
               <FaciesButton faciesKey={'ultra_high_pre'}/>
             </View>
