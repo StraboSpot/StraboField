@@ -19,7 +19,7 @@ import {
 } from '../modules/home/home.slice';
 import {useImages} from '../modules/images';
 import {MAIN_MENU_ITEMS} from '../modules/main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage} from '../modules/main-menu-panel/mainMenuPanel.slice';
+import {setMenuSelectionPage, setSidePanelVisible} from '../modules/main-menu-panel/mainMenuPanel.slice';
 import {MAP_PROVIDERS} from '../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {
@@ -233,6 +233,7 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
+      dispatch(setSidePanelVisible({bool: false}));
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }

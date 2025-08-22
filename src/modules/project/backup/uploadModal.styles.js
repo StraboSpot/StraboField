@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 import {DARKGREY} from '../../../shared/styles.constants';
 
-const projectModalStyle = StyleSheet.create({
+const uploadModalStyles = StyleSheet.create({
   gridItem: {
     // borderWidth: 1,
     alignItems: 'center',
@@ -33,4 +33,4 @@ const projectModalStyle = StyleSheet.create({
   },
 });
 
-export default projectModalStyle;
+export default uploadModalStyles;

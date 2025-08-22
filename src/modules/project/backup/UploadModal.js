@@ -6,29 +6,24 @@ import KeepAwake from 'react-native-keep-awake';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
-import projectModalsStyles from './projectModals.styles';
+import uploadModalStyles from './uploadModal.styles';
 import {updatedProjectTransferProgress} from '../../../services/connections.slice';
 import {STRABO_APIS} from '../../../services/urls.constants';
 import useUpload from '../../../services/useUpload';
 import useUploadImages from '../../../services/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
+import Modal from '../../../shared/ui/modal/Modal';
 import Spacer from '../../../shared/ui/Spacer';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {
-  clearedStatusMessages,
-  setIsProgressModalVisible,
-} from '../../home/home.slice';
+import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import overlayStyles from '../../home/overlays/overlay.styles';
-import MenuModal from '../MenuModal';
 import {setIsImageTransferring} from '../projects.slice';
 
-
-const UploadModal = ({closeModal, visible}) => {
-
+const UploadModal = ({closeModal}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
-  const endPoint = useSelector(state => state.connections.databaseEndpoint);
+  const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
@@ -162,40 +157,32 @@ const UploadModal = ({closeModal, visible}) => {
       <View>
         <Text style={overlayStyles.importantText}>Uploading to:</Text>
         <Text style={overlayStyles.importantText}>
-          {endPoint.isSelected ? endPoint.endpoint : STRABO_APIS.DB}
+          {endpoint.isSelected ? endpoint.endpoint : STRABO_APIS.DB}
         </Text>
       </View>
       <Spacer/>
-      <Text>
-        <Text style={overlayStyles.importantText}>{!isEmpty(
-          currentProject) && currentProject.description?.project_name} </Text>
-        project properties and datasets will be uploaded and will
+      <Text style={overlayStyles.contentText}>
+        <Text>
+          {!isEmpty(currentProject) && currentProject.description?.project_name + '\n\n'}
+        </Text>
+        properties and datasets will be uploaded and will
         <Text style={overlayStyles.importantText}> OVERWRITE</Text> any data already on the server
         for this project:
       </Text>
       <View style={overlayStyles.buttonContainer}>
+        {__DEV__ && (
+          <Button
+            title={'Images Only (Dev Mode)'}
+            type={'outline'}
+            titleStyle={overlayStyles.buttonText}
+            onPress={uploadImagesOnly}
+          />
+        )}
         <Button
-          title={'UPLOAD FULL'}
-          type={'clear'}
-          titleStyle={overlayStyles.buttonText}
+          title={'Upload'}
           onPress={() => initiateUpload()}
         />
-        <Button
-          title={'CANCEL'}
-          type={'clear'}
-          titleStyle={overlayStyles.buttonText}
-          onPress={handleClosePress}
-        />
       </View>
-      {__DEV__ && (
-        <Button
-          title={'IMAGES ONLY'}
-          type={'clear'}
-          titleStyle={overlayStyles.buttonText}
-          onPress={uploadImagesOnly}
-        />
-      )
-      }
     </View>
   );
 
@@ -222,14 +209,14 @@ const UploadModal = ({closeModal, visible}) => {
   const renderImageUploadStatusText = () => {
     if (uploadState === 'complete') {
       return (
-        <View style={projectModalsStyles.imageTotalUploadContainer}>
+        <View style={uploadModalStyles.imageTotalUploadContainer}>
           <Text>Images uploaded successfully: {imageUploadStatus.success || 0}</Text>
         </View>
       );
     }
     else if (uploadState === 'error') {
       return (
-        <View style={projectModalsStyles.imageTotalUploadContainer}>
+        <View style={uploadModalStyles.imageTotalUploadContainer}>
           <Text>Images uploaded successfully: {imageUploadStatus.success || 0}</Text>
           <Text>Images Failed: {imageUploadStatus.failed || 0}</Text>
         </View>
@@ -240,23 +227,23 @@ const UploadModal = ({closeModal, visible}) => {
   const renderUploadProgress = () => {
     return (
       <View style={{minHeight: 150}}>
-        <View style={projectModalsStyles.messageContainer}>
-          <Text style={projectModalsStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
+        <View style={uploadModalStyles.messageContainer}>
+          <Text style={uploadModalStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
         </View>
-        <View style={[projectModalsStyles.statusContainer]}>
-          <View style={projectModalsStyles.gridItem}>
+        <View style={[uploadModalStyles.statusContainer]}>
+          <View style={uploadModalStyles.gridItem}>
             <View style={{flex: 1}}>
               <Text>Project: </Text>
             </View>
             {projectUploadSuccess ? renderUploadCompleteAnimation() : renderUploadAnimation()}
           </View>
-          <View style={projectModalsStyles.gridItem}>
+          <View style={uploadModalStyles.gridItem}>
             <View style={{flex: 1}}>
               <Text>Datasets: </Text>
             </View>
             {projectUploadSuccess ? datasetUploadSuccess ? renderUploadCompleteAnimation() : renderUploadAnimation() : null}
           </View>
-          <View style={projectModalsStyles.gridItem}>
+          <View style={uploadModalStyles.gridItem}>
             <View style={{flex: 1}}>
               <Text>Images:</Text>
             </View>
@@ -269,9 +256,9 @@ const UploadModal = ({closeModal, visible}) => {
   };
 
   return (
-    <MenuModal
-      modalTitle={modalTitle}
-      visible={visible}
+    <Modal
+      title={modalTitle}
+      closeModal={closeModal}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()
@@ -291,7 +278,7 @@ const UploadModal = ({closeModal, visible}) => {
           )
         }
       </View>
-    </MenuModal>
+    </Modal>
   );
 };
 

@@ -20,19 +20,20 @@ import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
 import Miscellaneous from '../preferences/Miscellaneous';
 import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
+import BackupProjectPage from '../project/backup/BackupProjectPage';
+import ExportOtherSavedProjectPage from '../project/backup/ExportOtherSavedProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import DatasetDetail from '../project/datasets/DatasetDetail';
 import DatasetsPage from '../project/datasets/DatasetsPage';
-import DeleteLocalProjectPage from '../project/delete/DeleteLocalProjectPage';
-import DownloadProjectPage from '../project/DownloadProjectPage';
-import ImportProjectFromZip from '../project/ImportProjectFromZip';
+import DeleteOtherSavedProjectPage from '../project/delete/DeleteOtherSavedProjectPage';
+import DownloadProjectPage from '../project/load/DownloadProjectPage';
+import ImportProjectFromZip from '../project/load/ImportProjectFromZip';
+import NewProjectPage from '../project/load/NewProjectPage';
+import OpenProjectPage from '../project/load/OpenProjectPage';
 import NamingConventions from '../project/NamingConventions';
-import NewProjectForm from '../project/NewProjectForm';
-import OpenProjectPage from '../project/OpenProjectPage';
 import ProjectDescription from '../project/ProjectDescription';
 import ProjectPrivacyPage from '../project/ProjectPrivacyPage';
 import StraboFieldProjects from '../project/StraboFieldProjects';
-import UploadBackupAndExport from '../project/UploadBackupExport';
 import {ReportsMenu} from '../reports';
 import SamplesMenuItem from '../samples/SamplesMenuItem';
 import {SpotsList} from '../spots';
@@ -69,7 +70,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS:
         return <DatasetsPage setDatasetToView={setDatasetToView}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP:
-        return <UploadBackupAndExport closeMainMenuPanel={closeMainMenuPanel}/>;
+        return <BackupProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
         return <ProjectDescription setDatasetToView={setDatasetToView}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
@@ -158,16 +159,18 @@ const MainMenuPanel = forwardRef(({
     switch (sidePanelView) {
       case SIDE_PANEL_VIEWS.DATASET_DETAIL:
         return <DatasetDetail dataset={datasetToView}/>;
-      case SIDE_PANEL_VIEWS.DELETE_PROJECT:
-        return <DeleteProjectPage/>;
+      case SIDE_PANEL_VIEWS.DELETE_LOCAL_PROJECT_COPY:
+        return <DeleteOtherSavedProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
         return <DownloadProjectPage/>;
+      case SIDE_PANEL_VIEWS.EXPORT_OTHER_SAVED_PROJECT:
+        return <ExportOtherSavedProjectPage/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
         return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
-        return <NewProjectForm/>;
+        return <NewProjectPage/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
         return <OpenProjectPage/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:

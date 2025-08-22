@@ -1,0 +1,79 @@
+import React, {useRef} from 'react';
+import {FlatList, View} from 'react-native';
+
+import {Button} from '@rn-vui/base';
+import {Formik} from 'formik';
+import {useDispatch, useSelector} from 'react-redux';
+
+import commonStyles from '../../../shared/common.styles';
+import {Form, useForm} from '../../form';
+import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
+import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import useProject from '../useProject';
+
+const NewProjectForm = ({openMainMenuPanel}) => {
+  const dispatch = useDispatch();
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+
+  const {showErrors, validateForm} = useForm();
+  const {initializeNewProject} = useProject();
+
+  const formRef = useRef(null);
+
+  const initialValues = {
+    start_date: new Date().toISOString(),
+    gps_datum: 'WGS84 (Default)',
+    magnetic_declination: 0,
+  };
+
+  const renderFormFields = () => {
+    const formName = ['general', 'project_description'];
+    console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
+    return (
+      <Formik
+        innerRef={formRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
+        component={formProps => Form({...formProps, formName: formName})}
+        initialValues={initialValues}
+        initialStatus={{formName: formName}}
+        enableReinitialize={false}
+      />
+    );
+  };
+
+  const saveForm = async () => {
+    try {
+      await formRef.current.submitForm();
+      const formValues = showErrors(formRef.current);
+      console.log('Saving form...');
+      await initializeNewProject(formValues);
+      console.log('New Project created', formValues.project_name);
+      if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+      dispatch(setSidePanelVisible({bool: false}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+      if (openMainMenuPanel) openMainMenuPanel();
+      return Promise.resolve();
+    }
+    catch (e) {
+      console.log('Error submitting form', e);
+      return Promise.reject();
+    }
+  };
+
+  return (
+    <View style={{flex: 1}}>
+      <FlatList ListHeaderComponent={renderFormFields}/>
+      <Button
+        buttonStyle={commonStyles.standardButton}
+        containerStyle={commonStyles.standardButtonContainer}
+        onPress={saveForm}
+        title={'Save New Project'}
+        titleStyle={commonStyles.standardButtonText}
+      />
+    </View>
+  );
+};
+
+export default NewProjectForm;

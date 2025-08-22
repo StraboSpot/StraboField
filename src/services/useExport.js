@@ -16,7 +16,6 @@ import {isEmpty, hasSpace} from '../shared/Helpers';
 
 const useExport = () => {
   const dispatch = useDispatch();
-  const backupFileName = useSelector(state => state.project.backupFileName);
   const mapNamesDb = useSelector(state => state.offlineMap.offlineMaps);
   const otherMapsDb = useSelector(state => state.map.customMaps);
   const projectDb = useSelector(state => state.project);
@@ -69,16 +68,16 @@ const useExport = () => {
   const gatherDataForBackup = async (filename) => {
     try {
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Exporting Project Data...'));
+      dispatch(addedStatusMessage('Saving Project Data...'));
       console.log(dataForExport);
       await exportData(APP_DIRECTORIES.BACKUP_DIR + filename, dataForExport, 'data.json');
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Finished Exporting Project Data'));
+      dispatch(addedStatusMessage('Finished Saving Project Data'));
     }
     catch (err) {
-      console.error('Error Exporting Data!', err);
+      console.error('Error Saving Data!', err);
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Exporting Project Data.' + err));
+      dispatch(addedStatusMessage('Error Saving Project Data.' + err));
     }
   };
 
@@ -87,7 +86,8 @@ const useExport = () => {
       const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
       console.log('data:', data);
       await doesDeviceDirectoryExist(deviceDir + fileName + '/images');
-      dispatch(addedStatusMessage((isBeingExported ? 'Exporting' : 'Backing up') + ' Images...'));
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('Looking for Images...'));
       if (data.spotsDb) {
         console.groupCollapsed('Found Spots. Gathering Images...');
         await Promise.all(
@@ -132,7 +132,7 @@ const useExport = () => {
     catch (err) {
       console.error('Error Backing Up Images!', err);
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Exporting Images!' + err));
+      dispatch(addedStatusMessage('Error Backing Up Images!' + err));
     }
   };
 
@@ -142,7 +142,7 @@ const useExport = () => {
       const mapCount = Object.values(maps).length;
       const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Exporting Offline Maps...'));
+      dispatch(addedStatusMessage('Looking for Offline Maps...'));
       if (!isEmpty(maps)) {
         console.log('Maps exist.', maps);
         await doesDeviceDirectoryExist(deviceDir + fileName + '/maps');
@@ -152,13 +152,13 @@ const useExport = () => {
       }
       else {
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('No offline maps to export.'));
+        dispatch(addedStatusMessage('No offline maps to back up.'));
       }
     }
     catch (err) {
-      console.error('Error Exporting Offline Maps.');
+      console.error('Error Backing Up Offline Maps.');
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Exporting Offline Maps!' + err));
+      dispatch(addedStatusMessage('Error Exporting Backing Up Maps!' + err));
     }
   };
 
@@ -167,21 +167,21 @@ const useExport = () => {
       console.log(configDb);
       const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Exporting Custom Maps...'));
+      dispatch(addedStatusMessage('Looking for Custom Maps...'));
       if (!isEmpty(configDb.other_maps)) {
         await exportData(deviceDir + exportedFileName, configDb.other_maps, 'other_maps.json');
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('Finished Exporting Custom Maps.'));
+        dispatch(addedStatusMessage('Finished Backing Up Custom Maps.'));
       }
       else {
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('No custom maps to export.'));
+        dispatch(addedStatusMessage('No custom maps to back up.'));
       }
     }
     catch (err) {
       console.error('Error Exporting Other Maps', err);
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Exporting Custom Maps!' + err));
+      dispatch(addedStatusMessage('Error Backing Up Custom Maps!' + err));
     }
   };
 
@@ -192,7 +192,7 @@ const useExport = () => {
       dispatch(setBackupFileName(fileName));
       // dispatch(setIsBackupModalVisible(false));
       dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Backing up Project to Device...'));
+      dispatch(addedStatusMessage('Saving Project to Device...'));
 
       const hasBackupDir = await doesDeviceBackupDirExist();
       console.log('Has Backup Dir?: ', hasBackupDir);
@@ -203,7 +203,7 @@ const useExport = () => {
       }
     }
     catch (err) {
-      console.error('Error Backing Up Project!: ', err);
+      console.error('Error Saving Project!: ', err);
     }
   };
 
@@ -277,6 +277,7 @@ const useExport = () => {
       console.log('Folder', deleteTempFolder);
       console.log(`zip completed at ${path}`);
       console.log('All Done Exporting');
+      dispatch(clearedStatusMessages());
     }
     catch (e) {
       const warningMessage = 'Error Exporting\n' + e;

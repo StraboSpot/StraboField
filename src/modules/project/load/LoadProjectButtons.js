@@ -1,29 +1,25 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Linking, Platform, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {UploadModal} from './modals';
-import useDevice from '../../services/useDevice.web';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
-import {BLUE} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import uiStyles from '../../shared/ui/ui.styles';
-import overlayStyles from '../home/overlays/overlay.styles';
+import useDevice from '../../../services/useDevice';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/Helpers';
+import {BLUE} from '../../../shared/styles.constants';
+import alert from '../../../shared/ui/alert';
+import uiStyles from '../../../shared/ui/ui.styles';
+import overlayStyles from '../../home/overlays/overlay.styles';
 
-const ProjectTypesButtons = ({
-                               onDeleteProject,
-                               onLoadProjectsFromDevice,
-                               onLoadProjectsFromDownloadsFolder,
-                               onLoadProjectsFromServer,
-                               onStartNewProject,
-                             }) => {
+const LoadProjectButtons = ({
+                              onLoadProjectsFromDevice,
+                              onLoadProjectsFromDownloadsFolder,
+                              onLoadProjectsFromServer,
+                              onStartNewProject,
+                            }) => {
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
-
-  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
   const {openURL} = useDevice();
 
@@ -40,39 +36,22 @@ const ProjectTypesButtons = ({
     <>
       <View>
         <Button
-          title={'Start a New Project'}
+          title={'New'}
           containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
           onPress={onStartNewProject}
         />
         <Button
-          title={'Open Local Copy'}
+          title={'Open'}
           containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
           onPress={onLoadProjectsFromDevice}
         />
-        {Platform.OS === 'ios'
-          && (
-            <View style={{padding: 10}}>
-              <Text style={{...overlayStyles.statusMessageText}}>After backing up,
-                to further preserve your data please copy your project backups out of the StraboSpot2/ProjectBackups
-                folder to a
-                different folder in the iOS app Files/On My IPad! If online, you can find detailed instructions
-                <Text style={{color: BLUE}} onPress={openMovingProjectBackupsURL}> here</Text>.
-              </Text>
-            </View>
-          )
-        }
-        {isEmpty(user.name) && (
-          <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
-            Please Log In.
-          </Text>
-        )}
         {!isEmpty(user.name) && isOnline.isConnected && (
           <Button
-            title={'Download Project'}
+            title={'Download'}
             containerStyle={commonStyles.standardButtonContainer}
             buttonStyle={commonStyles.standardButton}
             titleStyle={commonStyles.standardButtonText}
@@ -85,7 +64,7 @@ const ProjectTypesButtons = ({
           </Text>
         )}
         <Button
-          title={'Import Project from Zip'}
+          title={'Import'}
           containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
@@ -115,27 +94,13 @@ const ProjectTypesButtons = ({
           </View>
         )}
         {Platform.OS === 'android' && (
-          <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
-            *The imported project should only be a .zip file in the {importLocation} folder.
+          <Text style={overlayStyles.statusMessageText}>
+            *The imported project must be a .zip file in the {importLocation} folder.
           </Text>
         )}
-        <Button
-          title={'Delete Local Copy'}
-          containerStyle={commonStyles.standardButtonContainer}
-          buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
-          onPress={onDeleteProject}
-        />
       </View>
-
-      {/* Modals */}
-      <UploadModal
-        visible={isUploadModalVisible}
-        closeModal={() => setIsUploadModalVisible(false)}
-      />
-
     </>
   );
 };
 
-export default ProjectTypesButtons;
+export default LoadProjectButtons;

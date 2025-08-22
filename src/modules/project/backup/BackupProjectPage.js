@@ -4,35 +4,41 @@ import {Linking, Platform, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setSelectedProject} from './projects.slice';
-import useDevice from '../../services/useDevice';
-import commonStyles from '../../shared/common.styles';
-import {BLUE} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import Spacer from '../../shared/ui/Spacer';
-import uiStyles from '../../shared/ui/ui.styles';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
-import overlayStyles from '../home/overlays/overlay.styles';
-import {BackupModal, UploadModal, UploadProgressModal} from '../project/modals/index';
+import useDevice from '../../../services/useDevice';
+import commonStyles from '../../../shared/common.styles';
+import {BLUE, WARNING_COLOR} from '../../../shared/styles.constants';
+import alert from '../../../shared/ui/alert';
+import uiStyles from '../../../shared/ui/ui.styles';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import overlayStyles from '../../home/overlays/overlay.styles';
+import {setSelectedProject} from '../projects.slice';
+import SaveAndExportModal from './SaveAndExportModal';
+import UploadModal from './UploadModal';
+import UploadProgressModal from './UploadProgressModal';
 
-const UploadBackAndExport = () => {
-  console.log('UploadBackAndExport Render');
+const BackupProjectPage = () => {
+  console.log('Rendering BackupProjectPage...');
 
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
-  const [isBackupModalVisible, setIsBackupModalVisible] = useState(false);
-  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+  const [backupAction, setBackupAction] = useState(undefined);
   const [isProgressModalVisible, setIsProgressModalVisible] = useState(false);
+  const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
+
   const {openURL} = useDevice();
 
-  const checkForActiveDatasets = () => {
+  const saveProject = () => checkForActiveDatasets('save');
+
+  const exportProject = () => checkForActiveDatasets('export');
+
+  const checkForActiveDatasets = (backupActionToSet) => {
     if (activeDatasets.length > 0) {
-      dispatch(setSelectedProject({source: '', project: ''}));
-      setIsBackupModalVisible(true);
+      setIsSaveAndExportModalVisible(true);
+      setBackupAction(backupActionToSet);
     }
     else {
       dispatch(clearedStatusMessages());
@@ -50,51 +56,48 @@ const UploadBackAndExport = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <View>
-        {user.encoded_login ? (
+        {user.encoded_login && isOnline.isConnected ? (
           <Button
             containerStyle={commonStyles.standardButtonContainer}
-            title={isOnline.isConnected ? 'Upload to Server' : 'Need to be connected to server'}
+            title={'Upload'}
             buttonStyle={commonStyles.standardButton}
             titleStyle={commonStyles.standardButtonText}
             onPress={() => {
               dispatch(setSelectedProject({source: '', project: ''}));
               setIsUploadModalVisible(true);
             }}
-            disabled={!isOnline.isConnected}
           />
         ) : (
           <View style={uiStyles.spacer}>
-            <Text style={overlayStyles.importantText}>If you are attempting to upload the project,
-              check to see if you are logged in
-            </Text>
+            <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
           </View>
         )}
         <Button
-          title={'Save Local Copy'}
+          title={'Save'}
           containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
-          onPress={checkForActiveDatasets}
+          onPress={saveProject}
         />
         <Button
-          title={'Export to Zip'}
+          title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
           containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
-          onPress={() => checkForActiveDatasets()}
+          onPress={exportProject}
         />
-        {Platform.OS === 'ios'
-          && (
-            <View style={{padding: 10}}>
-              <Text style={{...overlayStyles.statusMessageText}}>After backing up,
-                to further preserve your data please copy your project backups out of the StraboSpot2/ProjectBackups
-                folder to a
-                different folder in the iOS app Files/On My IPad! If online, you can find detailed instructions
-                <Text style={{color: BLUE}} onPress={openMovingProjectBackupsURL}> here</Text>.
-              </Text>
-            </View>
-          )
-        }
+        {Platform.OS === 'ios' && (
+          <View style={{padding: 10}}>
+            <Text style={overlayStyles.titleText}>
+              <Text style={{color: WARNING_COLOR}}>iOS WARNING{'\n'}</Text>
+              After backing up, to further preserve your data, copy your Saved Project out of the
+              StraboField/ProjectBackups folder and/or your Zipped Project out of the StraboField/Distribution
+              folder to a different folder in the iOS app Files/On My IPad! If online, you can find detailed
+              instructions
+              <Text style={{color: BLUE}} onPress={openMovingProjectBackupsURL}> here</Text>.
+            </Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -128,22 +131,20 @@ const UploadBackAndExport = () => {
           />
         </View>
       )}
-      <BackupModal
-        visible={isBackupModalVisible}
-        closeModal={() => setIsBackupModalVisible(false)}
-      />
-      <UploadModal
-        visible={isUploadModalVisible}
-        closeModal={() => setIsUploadModalVisible(false)}
-      />
+
+      {/* Modals */}
+      {isSaveAndExportModalVisible && (
+        <SaveAndExportModal
+          closeModal={() => setIsSaveAndExportModalVisible(false)}
+          backupAction={backupAction}
+        />
+      )}
+      {isUploadModalVisible && <UploadModal closeModal={() => setIsUploadModalVisible(false)}/>}
       <UploadProgressModal
         isProgressModalVisible={isProgressModalVisible}
       />
-      {/*<Divider sectionText={'export'}/>*/}
-      {/*{renderExportButtons()}*/}
-      {/*<Divider sectionText={'restore project from backup'}/>*/}
     </View>
   );
 };
 
-export default UploadBackAndExport;
+export default BackupProjectPage;

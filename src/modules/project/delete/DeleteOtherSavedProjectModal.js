@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import projectOptionsModalStyle from './project-options-modal/projectOptionsModal.style';
+import projectOptionsModalStyle from './projectOptionsModal.style';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
 import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import overlayStyles from '../../home/overlays/overlay.styles';
 
-const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
+const DeleteOtherSavedProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
 
   const DELETE_STATUS = {
     IN_PROGRESS: 'in_progress',
@@ -75,4 +75,4 @@ const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPag
   );
 };
 
-export default DeleteProjectModal;
+export default DeleteOtherSavedProjectModal;
