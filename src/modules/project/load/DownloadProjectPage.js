@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDevice from '../../../services/useDevice';
@@ -14,8 +14,10 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Download Project
-const DownloadProjectPage = () => {
+const DownloadProjectPage = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();
+
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToOpen, setProjectToOpen] = useState(null);
@@ -29,22 +31,26 @@ const DownloadProjectPage = () => {
 
   const confirmOpenProject = (project) => {
     setProjectToOpen(project);
-    setIsConfirmOverwriteModalVisible(true);
+    if (isProjectLoadSelectionModalVisible) downloadProject(project);
+    else setIsConfirmOverwriteModalVisible(true);
   };
 
   const downloadProject = async () => {
     closeConfirmOverwriteModal();
-    initializeDownload(projectToOpen);
+    await initializeDownload(projectToOpen);
+    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   return (
     <>
       <View style={{flex: 1}}>
-        <SidePanelHeader
-          backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-          title={'My StraboField Projects'}
-          headerTitle={'Download Project'}
-        />
+        {!isProjectLoadSelectionModalVisible && (
+          <SidePanelHeader
+            backButton={() => dispatch(setSidePanelVisible({bool: false}))}
+            title={'My StraboField Projects'}
+            headerTitle={'Download Project'}
+          />
+        )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>
         <View style={{marginBottom: 20}}>
           {Platform.OS === 'ios' && (

@@ -40,10 +40,8 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
 
   useEffect(() => {
     console.log('UE MyStraboSpot []');
-    if (Platform.OS !== 'web') {
-      checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
-      getZippedProject();
-    }
+    checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
+    getZippedProject();
   }, []);
 
   const checkAndroidDownloadDir = async () => {

@@ -69,7 +69,7 @@ const StraboFieldProjects = () => {
           </>
         }
       />
-      {Platform.OS !== 'web' && <LogOut/>}
+      <LogOut/>
     </>
   );
 };

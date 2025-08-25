@@ -12,6 +12,8 @@ import StandardModal from '../../shared/ui/StandardModal';
 import overlayStyles from '../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
+import Modal from '../../shared/ui/modal/Modal';
+import uiStyles from '../../shared/ui/ui.styles';
 
 const LogOut = () => {
   const dispatch = useDispatch();
@@ -21,7 +23,7 @@ const LogOut = () => {
 
   const {clearUser} = useResetState();
 
-  const openUploadAndBackupPage = () => {
+  const goToBackupPage = () => {
     setIsLogoutModalVisible(false);
     setTimeout(() => {          // Added timeOut cause state of modal wasn't changing fast enough
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
@@ -53,39 +55,38 @@ const LogOut = () => {
 
   const renderLogoutModal = () => {
     return (
-      <StandardModal
-        visible={isLogoutModalVisible}
-        dialogTitle={'Log Out?'}
+      <Modal
+        closeModal={() => setIsLogoutModalVisible(false)}
+        title={'Log Out?'}
       >
-        <Text style={overlayStyles.statusMessageText}>
-          Logging out will
-          <Text style={overlayStyles.importantText}> ERASE </Text>
-          local data. Please make sure you saved changes to the server or device.
-        </Text>
-        <View style={overlayStyles.buttonContainer}>
-          <Button
-            title={'Backup'}
-            type={'clear'}
-            onPress={() => openUploadAndBackupPage()}/>
-          <Button
-            title={'Logout'}
-            titleStyle={overlayStyles.importantText}
-            onPress={clearUser}
-            type={'clear'}
-          />
+        <View>
+          <View style={uiStyles.sectionDivider}>
+            <Text style={overlayStyles.importantText}>
+              Please make sure to backup your project before logging out.
+            </Text>
+          </View>
+          <View style={{padding: 10}}>
+            <Button
+              title={'Logout'}
+              containerStyle={{padding: 2.5}}
+              onPress={clearUser}
+            />
+            <Button
+              title={'Go to Backup Page'}
+              type={'outline'}
+              containerStyle={{padding: 2.5}}
+              onPress={goToBackupPage}
+            />
+          </View>
         </View>
-        <Button
-          title={'Cancel'}
-          onPress={() => setIsLogoutModalVisible(false)} type={'clear'}
-          containerStyle={overlayStyles.buttonContainer}/>
-      </StandardModal>
+      </Modal>
     );
   };
 
   return (
     <>
       {renderLogInOrOutButton()}
-      {renderLogoutModal()}
+      {isLogoutModalVisible && renderLogoutModal()}
     </>
   );
 };

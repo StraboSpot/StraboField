@@ -119,7 +119,7 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
         return (
           <>
             {renderBackButton()}
-            <DownloadProjectPage/>
+            <DownloadProjectPage openMainMenuPanel={openMainMenuPanel}/>
           </>
         );
       case 'deviceProjects':
