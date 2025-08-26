@@ -9,7 +9,6 @@ import {
 
 import {Icon, Overlay} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
-import {useDispatch} from 'react-redux';
 
 import externalDataStyles from './externalData.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
@@ -67,8 +66,8 @@ function TablesData({
         <View style={externalDataStyles.modalContent}>
           <View style={externalDataStyles.modalHeader}>
             <Text style={externalDataStyles.modalTitle}>{loading ? 'Loading Table...' : tableName}</Text>
-            <Pressable onPress={closeTable} style={({pressed}) => pressed && 'rgb(210, 230, 255)'}>
-              <Icon name="close" type="ionicon" size={30} color="#333"/>
+            <Pressable onPress={closeTable} >
+              <Icon name={'close'} type={'ionicon'} size={30} color={'#333'}/>
             </Pressable>
           </View>
 
@@ -141,7 +140,6 @@ function TablesData({
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
       />
-      )
       {renderTable()}
     </View>
   );
