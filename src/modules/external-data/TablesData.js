@@ -52,8 +52,6 @@ function TablesData({
   };
 
   const renderTable = async () => {
-    if (!isTableVisible || isEmpty(selectedTable)) return null;
-
     const {cellWidths, tableDataTrimmed} = await getTableData();
     const tableName = toTitleCase(selectedTable?.name.replace(/[_-]/g, ' '));
     return (
