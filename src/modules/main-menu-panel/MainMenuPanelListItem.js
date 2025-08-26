@@ -2,21 +2,22 @@ import React from 'react';
 import {Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {MAIN_MENU_ITEMS} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {isEmpty, truncateText} from '../../shared/Helpers';
 import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import useProject from '../project/useProject';
 
 const MainMenuPanelListItem = ({title}) => {
   const dispatch = useDispatch();
+  const currentProjectId = useSelector(state => state.project.project?.id);
 
   const {getTargetDatasetFromId} = useProject();
 
-  const targetDatasetName = getTargetDatasetFromId().name;
+  const targetDatasetName = isEmpty(currentProjectId) ? '' : getTargetDatasetFromId().name;
 
   const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
 

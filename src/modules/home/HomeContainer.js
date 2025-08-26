@@ -5,18 +5,20 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
-import {setIsProjectLoadComplete} from './home.slice';
+import {setIsProjectLoadComplete, setIsProjectLoadSelectionModalVisible} from './home.slice';
 import homeStyles from './home.style';
 import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';
 import useDevice from '../../services/useDevice';
+import {isEmpty} from '../../shared/Helpers';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
 const HomeContainer = ({navigation, route}) => {
   console.log('Rendering HomeContainer...');
   const dispatch = useDispatch();
+  const currentProjectId = useSelector(state => state.project.project?.id);
 
   const mapComponentRef = useRef(null);
 
@@ -38,8 +40,10 @@ const HomeContainer = ({navigation, route}) => {
   const {openSpotInNotebook, zoomToCurrentLocation} = useHomeContainer({mapComponentRef, openNotebookPanel});
 
   useEffect(() => {
-    Platform.OS !== 'web' && createProjectDirectories().catch(
-      err => console.error('Error creating app directories', err));
+    if (Platform.OS !== 'web') {
+      createProjectDirectories().catch(err => console.error('Error creating app directories', err));
+      if (isEmpty(currentProjectId)) dispatch(setIsProjectLoadSelectionModalVisible(true));
+    }
   }, []);
 
   useEffect(() => {

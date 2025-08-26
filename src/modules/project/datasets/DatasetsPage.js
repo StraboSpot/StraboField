@@ -54,7 +54,7 @@ const DatasetsPage = ({setDatasetToView}) => {
       <TextInputModal
         visible={isAddDatasetModalVisible}
         dialogTitle={'Add a Dataset'}
-        onPress={() => onAddDataset()}
+        onPress={onAddDataset}
         closeModal={() => setIsAddDatasetModalVisible(false)}
         value={datasetName}
         onChangeText={text => setDatasetName(text)}
