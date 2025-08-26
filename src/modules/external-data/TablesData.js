@@ -1,12 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, ScrollView, Text, View} from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 
-import {Button, Icon, ListItem, Overlay} from '@rn-vui/base';
+import {Icon, Overlay} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
+import {useDispatch} from 'react-redux';
 
 import externalDataStyles from './externalData.styles';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
@@ -16,22 +22,23 @@ function TablesData({
                       initializeDelete,
                       spot,
                     }) {
+
   const [isTableVisible, setIsTableVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState({});
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // console.log('UE TablesData [selectedTable]', selectedTable);
-    !isEmpty(selectedTable) && isTableVisible && setLoading(false);
-  }, [selectedTable]);
-
-  useEffect(() => {
     // console.log('UE TablesData [isTableVisible]', isTableVisible);
     !isTableVisible && setSelectedTable({});
   }, [isTableVisible]);
 
-  const renderTable = () => {
+  const closeTable = () => {
+    setTableData([]);
+    setIsTableVisible(false);
+  };
+
+  const getTableData = async () => {
     const numCols = tableData?.[0]?.length;
     const tableDataTrimmed = tableData.reduce((acc, r) => r.length === numCols ? [...acc, r] : acc, []);
     let cellMaxWidths = Array(numCols).fill(0);
@@ -41,29 +48,47 @@ function TablesData({
       });
     });
     const cellWidths = cellMaxWidths.map(w => Math.min(w * 20, 150));
+
+    return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed};
+  };
+
+  const renderTable = async () => {
+    if (!isTableVisible || isEmpty(selectedTable)) return null;
+
+    const {cellWidths, tableDataTrimmed} = await getTableData();
+    const tableName = toTitleCase(selectedTable?.name.replace(/[_-]/g, ' '));
     return (
       <Overlay
-        animationType={'slide'}
-        overlayStyle={externalDataStyles.overlayContainer}
         isVisible={isTableVisible}
+        onBackdropPress={() => setIsTableVisible(false)}
+        overlayStyle={loading ? externalDataStyles.loadingContainer : externalDataStyles.overlayContainer}
         supportedOrientations={['portrait', 'landscape']}
       >
-        <View style={externalDataStyles.centeredView}>
-          <View style={externalDataStyles.buttonClose}>
-            <Button
-              onPress={() => setIsTableVisible(!isTableVisible)}
-              type={'clear'}
-              icon={{name: 'close', type: 'ionicon', size: 40}}
-            />
+        <View style={externalDataStyles.modalContent}>
+          <View style={externalDataStyles.modalHeader}>
+            <Text style={externalDataStyles.modalTitle}>{loading ? 'Loading Table...' : tableName}</Text>
+            <Pressable onPress={closeTable} style={({pressed}) => pressed && 'rgb(210, 230, 255)'}>
+              <Icon name="close" type="ionicon" size={30} color="#333"/>
+            </Pressable>
           </View>
-          <Text style={externalDataStyles.modalText}>{selectedTable.name}</Text>
-          <ScrollView>
-            <ScrollView style={{overflow: 'scroll'}} horizontal={true}>
-              <Table borderStyle={{borderWidth: 1}}>
-                <Rows data={tableDataTrimmed} widthArr={cellWidths} textStyle={{textAlign: 'center', margin: 5}}/>
-              </Table>
+
+          {loading ? (
+            <Loading isLoading={loading} style={{backgroundColor: 'transparent'}}/>
+          ) : (
+            <ScrollView horizontal>
+              <View>
+                <ScrollView>
+                  <Table borderStyle={{borderWidth: 1, borderColor: '#ccc'}}>
+                    <Rows
+                      data={tableDataTrimmed}
+                      widthArr={cellWidths}
+                      textStyle={externalDataStyles.cellText}
+                    />
+                  </Table>
+                </ScrollView>
+              </View>
             </ScrollView>
-          </ScrollView>
+          )}
         </View>
       </Overlay>
     );
@@ -71,57 +96,53 @@ function TablesData({
 
   const renderTableListItem = (table) => {
     return (
-      <ListItem
-        key={table.id}
-        onPress={() => selectTable(table)}
-        containerStyle={commonStyles.listItem}
-      >
-        <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-          <ListItem.Title style={commonStyles.listItemTitle}>
-            {table.name}
-          </ListItem.Title>
-          {editable && (
-            <Button
-              buttonStyle={externalDataStyles.iconButton}
-              onPress={() => initializeDelete('csv', table)}
-              type={'clear'}
-              icon={
-                <Icon
-                  name={'trash'}
-                  type={'font-awesome'}
-                  size={20}
-                  color={'darkgrey'}
-                  containerStyle={externalDataStyles.iconContainer}
-                />
-              }
+      <View>
+        <Pressable
+          style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
+          onPress={() => selectTable(table)} loading={loading}
+        >
+          <Text>{table.name}</Text>
+          <Pressable
+            onPress={() => initializeDelete('csv', table)}
+            style={({pressed}) => [{backgroundColor: pressed ? '#b4b6b8' : 'transparent'}]}
+          >
+            <Icon
+              name={'trash'}
+              type={'font-awesome'}
+              size={25}
+              color={'darkgrey'}
+              containerStyle={externalDataStyles.iconContainer}
             />
-          )}
-        </ListItem.Content>
-      </ListItem>
+          </Pressable>
+        </Pressable>
+      </View>
     );
   };
 
   const selectTable = (table) => {
-    setLoading(true);
     setSelectedTable(table);
-    setTableData(table.data);
-    setIsTableVisible(true);
+    setTableData([]); // clear old
+    setIsTableVisible(true); // open immediately
+    setLoading(true);
+
+    setTimeout(() => {
+      setTableData(table.data || []);
+      setLoading(false);
+    }, [0]);
   };
 
   return (
     <View style={{flex: 1}}>
-      {loading ? <Loading style={externalDataStyles.loadingSpinner}/>
-        : (
-          <FlatList
-            listKey={'tables'}
-            keyExtractor={item => item.id}
-            data={spot.properties?.data?.tables}
-            renderItem={({item}) => renderTableListItem(item)}
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
-          />
-        )}
-      {!loading && renderTable()}
+      <FlatList
+        listKey={'tables'}
+        keyExtractor={item => item.id}
+        data={spot.properties?.data?.tables}
+        renderItem={({item}) => renderTableListItem(item)}
+        ItemSeparatorComponent={FlatListItemSeparator}
+        ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
+      />
+      )
+      {renderTable()}
     </View>
   );
 }
