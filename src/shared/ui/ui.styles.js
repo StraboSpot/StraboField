@@ -45,6 +45,11 @@ const styles = StyleSheet.create({
   connectionStatusContainer: {
     padding: 5,
   },
+  container: {
+    backgroundColor: Platform.OS === 'ios' ? themes.BLACK : themes.WHITE,
+    flex: 1,
+    overflow: 'hidden',
+  },
   customEndpointContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -103,11 +108,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  safeAreaView: {
-    backgroundColor: themes.BLACK,
-    flex: 1,
-    overflow: 'hidden',
   },
   saveAndDeleteButtonContainer: {
     alignItems: 'center',

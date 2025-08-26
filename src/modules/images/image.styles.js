@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUM_TEXT_SIZE} from '../../shared/styles.constants';
+import {MEDIUM_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const imageStyles = StyleSheet.create({
   buttonContainer: {
@@ -14,20 +14,31 @@ const imageStyles = StyleSheet.create({
     flexDirection: 'row',
   },
   cardContainer: {
-    margin: 5,
+    borderBottomColor: themes.LIST_BORDER_COLOR,
+    borderWidth: 1,
+    margin: 2,
     padding: 0,
   },
   cardImageContainer: {
-    alignSelf: 'center',
-    height: 150,
-    padding: 5,
-    width: 150,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    margin: 0,
+    padding: 0,
   },
   cardTitle: {
+    flex: 1,
     fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     paddingVertical: 5,
     textAlign: 'center',
+  },
+  cardTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  cardTitleEditingButton: {
+    alignItems: 'center',
+    flex: 1,
   },
   closeButtonContainer: {
     position: 'absolute',
@@ -44,20 +55,19 @@ const imageStyles = StyleSheet.create({
   icon: {
     paddingRight: 10,
   },
-  imageContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-    borderBottomColor: themes.LIST_BORDER_COLOR,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 5,
-  },
   imageInfoButtons: {
     marginTop: 20,
   },
-  notebookImage: {
-    height: 100,
-    width: 145,
+  imagesListContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 2.5,
+  },
+  placeholderImage: {
+    alignSelf: 'center',
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    flex: 1,
   },
   rightsideIcons: {
     bottom: 50,
@@ -74,9 +84,8 @@ const imageStyles = StyleSheet.create({
     height: 90,
     width: 90,
   },
-  thumbnailContainer: {
-    margin: 5,
-    width: 90,
+  thumbnailImageContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
   },
 });
 

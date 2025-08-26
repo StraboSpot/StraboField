@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
-import {FlatList, SectionList, View} from 'react-native';
+import {SectionList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 
-import {imageStyles, ImageThumbnail} from '.';
+import {ImagesList, imageStyles} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import uiStyles from '../../shared/ui/ui.styles';
@@ -16,7 +17,7 @@ import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-  // console.log('Rendering ImageGallery...');
+  console.log('Rendering ImageGallery...');
 
   const navigate = useNavigation();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
@@ -33,7 +34,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   let sortedSpotsWithImages = [];
 
-  const handleImagePressed = async (image) => {
+  const openImage = async (image) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     console.log('Opening image', image.id, '...');
     navigate.navigate('ImageSlider', {selectedImage: image, sortedSpotsWithImages: sortedSpotsWithImages});
@@ -41,23 +42,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderImagesInSpot = (images) => {
-    return (
-      <FlatList
-        keyExtractor={image => image.id}
-        data={images}
-        numColumns={3}
-        renderItem={renderItem}
-      />
-    );
-  };
-
-  const renderItem = ({item}) => {
-    return (
-      <ImageThumbnail
-        handleImagePressed={() => handleImagePressed(item)}
-        imageId={item.id}
-      />
-    );
+    return <ImagesList images={images} isThumbnailOnly openImage={openImage}/>;
   };
 
   const renderNoImagesText = () => {
@@ -77,7 +62,13 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderSpotsWithImages = () => {
-    sortedSpotsWithImages = spotsSorted.filter(spot => !isEmpty(spot.properties.images));
+    const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
+    sortedSpotsWithImages = spotsWithImages.map((spot) => {
+      const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
+        .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+          .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
+      return {...spot, properties: {...spot.properties, images: sortedImages}};
+    });
     if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
     let count = 0;
     const spotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
@@ -98,6 +89,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
         <View style={imageStyles.galleryImageContainer}>
           <SectionDivider dividerText={count + (count === 1 ? ' Image' : ' Images') + ' in active Spots'}/>
+          <LittleSpacer/>
           <SectionList
             keyExtractor={(item, index) => item + index}
             sections={spotsAsSections}
@@ -111,11 +103,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     );
   };
 
-  return (
-    <>
-      {isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages()}
-    </>
-  );
+  return isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages();
 };
 
 export default ImageGallery;

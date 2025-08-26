@@ -334,7 +334,7 @@ const BasicPageDetail = ({
             cancel={cancelForm}
             save={saveButtonOnPress}
             getIsDisabled={isInternetReachable && isIGSNChecked
-              && isEmpty(sesar.selectedUserCode) && !selectedFeature.isOnMySesar}
+              && isEmpty(sesar?.selectedUserCode) && !selectedFeature?.isOnMySesar}
           />
           <FlatList
             ListHeaderComponent={page?.key === PAGE_KEYS.NOTES ? renderNotesField() : renderFormFields()}

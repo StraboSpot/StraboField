@@ -16,8 +16,7 @@ export const useSafeDocumentPicker = () => {
 
     setIsPicking(true);
     try {
-      const [{name, uri}] = await pick(options);
-      return {name, uri};
+      return await pick(options);
     }
     catch (error) {
       dispatch(setLoadingStatus({bool: false, view: 'home'}));

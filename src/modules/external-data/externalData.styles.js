@@ -3,37 +3,63 @@ import {StyleSheet} from 'react-native';
 import * as themes from '../../shared/styles.constants';
 
 const externalDataStyles = StyleSheet.create({
-  button: {
-    borderRadius: 20,
-    elevation: 2,
-    padding: 10,
-    width: 300,
-  },
-  buttonClose: {
-    alignItems: 'flex-end',
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  centeredView: {
-    flex: 1,
-  },
-  iconButton: {
-    padding: 0,
+  cellText: {
+    fontWeight: 'bold',
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+    textAlign: 'center',
   },
   iconContainer: {
     paddingLeft: 10,
     paddingRight: 10,
+  },
+  listItem: {
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 8,
+    marginVertical: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  loadingContainer: {
+    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    borderRadius: 15,
+    maxHeight: '20%',
+    maxWidth: '20%',
   },
   loadingSpinner: {
     backgroundColor: 'transparent',
     position: 'absolute',
     top: 50,
   },
+  modalContent: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   modalText: {
     fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
     marginBottom: 15,
     textAlign: 'center',
+  },
+  modalTitle: {
+    color: '#222',
+    flexShrink: 1,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   modalView: {
     backgroundColor: 'white',
@@ -42,14 +68,11 @@ const externalDataStyles = StyleSheet.create({
     padding: 35,
   },
   overlayContainer: {
-    borderRadius: 20,
-    height: '90%',
-    width: '90%',
-  },
-  textStyle: {
-    color: 'black',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    borderRadius: 15,
+    maxHeight: '90%',
+    maxWidth: '90%',
+    padding: 16,
   },
 });
 

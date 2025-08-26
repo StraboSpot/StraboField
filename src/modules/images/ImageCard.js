@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
-import {ActivityIndicator, Switch, Text, TextInput, View} from 'react-native';
+import {Switch, Text, TextInput, View, TouchableOpacity, Platform} from 'react-native';
 
-import {Button, Card, Icon, Image} from '@rn-vui/base';
+import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, useImages} from './';
-import placeholderImage from '../../assets/images/noimage.jpg';
-import commonStyles from '../../shared/common.styles';
+import {imageStyles, ImageThumbnail, useImages} from '.';
+import useDevice from '../../services/useDevice';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -14,28 +13,37 @@ import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
 
 const ImageCard = ({
+                     areImageThumbnailsLoading,
                      image,
-                     imageThumbnails,
+                     imageThumbnailURIs,
                      index,
-                     isImageLoadedObj,
-                     isOnReport,
+                     isThumbnailOnly,
+                     openImage,
+                     setAreImageThumbnailsLoading,
+                     setImageThumbnailURIs,
                      setImageToView,
-                     setIsImageLoadedObj,
                      setIsImageModalVisible,
                    }) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [title, setTitle] = useState(image.title && image.title !== '' ? image.title.toString() : undefined);
+  const placeholderTitle = `Untitled ${index + 1}`;
 
-  const {getImageBasemap, setAnnotation} = useImages();
+  const [title, setTitle] = useState(
+    image.title && typeof image.title === 'string' && image.title.trim() !== ''
+      ? image.title.toString()
+      : placeholderTitle,
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const {downloadImageAndSave} = useDevice();
+  const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
 
-  const placeholderTitle = 'Untitled ' + (index + 1);
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
 
-  const getIsSwtichDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
-
-  const handleEditImageName = async (value) => {
+  const handleEditImageName = (value) => {
     if (value && value !== '') setTitle(value);
     else setTitle(undefined);
   };
@@ -46,47 +54,89 @@ const ImageCard = ({
       dispatch(editedSpotImage(updatedImage));
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     }
+    setIsEditing(false);
   };
 
-  const viewImage = (imageToView) => {
-    setImageToView(imageToView);
-    setIsImageModalVisible(true);
+  const handleImagePressed = async () => {
+    if (imageThumbnailURIs?.[image.id]) {
+      if (openImage) openImage(image);
+      else {
+        setImageToView(image);
+        setIsImageModalVisible(true);
+      }
+    }
+    else {
+      setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: true});
+      const res = await downloadImageAndSave(image.id);
+      if (res) {
+        console.log('Got Image');
+        const uriObj = await getImageThumbnailURIs([image]);
+        setImageThumbnailURIs({...imageThumbnailURIs, ...uriObj});
+      }
+      setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: false});
+    }
+  };
+
+  const handleImageFinishedLoading = () => {
+    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
   };
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>
-      {!isOnReport && (
-        <TextInput
-          blurOnSubmit={true}                  // Needed for web
-          onSubmitEditing={handleEndEditing}   // Needed for web
-          onEndEditing={handleEndEditing}
-          onChangeText={handleEditImageName}
-          style={imageStyles.cardTitle}
-          value={title}
-          placeholder={placeholderTitle}
+      <View style={imageStyles.cardTitleContainer}>
+        {isEditing ? (
+          <TextInput
+            autoFocus
+            blurOnSubmit                        // Needed for web
+            onChangeText={handleEditImageName}
+            onEndEditing={handleEndEditing}
+            onSubmitEditing={handleEndEditing}  // Needed for web
+            placeholder={placeholderTitle}
+            style={[imageStyles.cardTitle, Platform.OS === 'web' && {
+              display: 'inline-block',
+              maxWidth: 87,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }]}
+            value={title}
+          />
+        ) : (
+          <TouchableOpacity style={imageStyles.cardTitleEditingButton} onPress={() => setIsEditing(true)}>
+            <Text
+              style={[
+                imageStyles.cardTitle,
+                Platform.OS === 'web' && {
+                  display: 'inline-block',
+                  maxWidth: 87,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                },
+              ]}
+              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
+              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
+            >
+              {title || placeholderTitle}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={imageStyles.cardImageContainer}>
+        <ImageThumbnail
+          imageThumbnailURI={imageThumbnailURIs?.[image.id]}
+          isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
+          isThumbnailOnly={isThumbnailOnly}
+          onFinishedLoading={handleImageFinishedLoading}
+          onImagePressed={handleImagePressed}
         />
-      )}
+      </View>
 
-      <Card.Image
-        resizeMode={'cover'}
-        containerStyle={imageStyles.cardImageContainer}
-        source={imageThumbnails[image.id] ? {uri: imageThumbnails[image.id]} : placeholderImage}
-        onPress={() => viewImage(image)}
-        PlaceholderContent={isEmpty(isImageLoadedObj) || !isImageLoadedObj[image.id] ? <ActivityIndicator/>
-          : <Image style={imageStyles.thumbnail} source={placeholderImage}/>}
-        placeholderStyle={commonStyles.imagePlaceholder}
-        onError={() => {
-          if (!isImageLoadedObj[image.id]) setIsImageLoadedObj(i => ({...i, [image.id]: true}));
-        }}
-        onLoadEnd={() => {
-          if (!isImageLoadedObj[image.id]) setIsImageLoadedObj(i => ({...i, [image.id]: true}));
-        }}
-      />
-
-      {!isOnReport && (
+      {!isThumbnailOnly && (
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
           <Switch
-            disabled={getIsSwtichDisabled()}
+            disabled={getIsSwitchDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
             value={image.annotated}
           />
