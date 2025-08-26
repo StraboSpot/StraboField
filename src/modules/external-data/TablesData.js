@@ -140,7 +140,7 @@ function TablesData({
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
       />
-      {renderTable()}
+      {isTableVisible && renderTable()}
     </View>
   );
 }
