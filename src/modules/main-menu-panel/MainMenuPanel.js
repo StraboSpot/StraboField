@@ -137,9 +137,9 @@ const MainMenuPanel = forwardRef(({
         return <UserConventions/>;
 
       // App Settings
-      case MAIN_MENU_ITEMS.INPUT_OPTIONS.ADDING_NEW_SPOTS:
+      case MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS:
         return <ShortcutMenu/>;
-      case MAIN_MENU_ITEMS.INPUT_OPTIONS.ADVANCED_OPTIONS:
+      case MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS:
         return <Miscellaneous/>;
 
       // Help

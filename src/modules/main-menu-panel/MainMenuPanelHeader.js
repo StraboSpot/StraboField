@@ -18,7 +18,7 @@ const MainMenuPanelHeader = () => {
   const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.ACCOUNT).includes(mainMenuPageVisible)
-    && !Object.values(MAIN_MENU_ITEMS.INPUT_OPTIONS).includes(mainMenuPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.APP_SETTINGS).includes(mainMenuPageVisible)
     && !Object.values(MAIN_MENU_ITEMS.HELP).includes(mainMenuPageVisible);
 
   return (

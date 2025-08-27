@@ -34,7 +34,7 @@ export const MAIN_MENU_ITEMS = {
     STRABOMICRO_PROJECTS: 'StraboMicro Projects',
     USER_CONVENTIONS: 'User Conventions',
   },
-  INPUT_OPTIONS: {
+  APP_SETTINGS: {
     ADDING_NEW_SPOTS: 'Adding New Spots',
     ADVANCED_OPTIONS: 'Advanced Options',
   },
