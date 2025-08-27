@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {Button, Icon, Overlay} from '@rn-vui/base';
+import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import DownloadProjectPage from './DownloadProjectPage';
@@ -11,13 +11,13 @@ import NewProjectForm from './NewProjectForm';
 import useResetState from '../../../services/useResetState';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
-import {PRIMARY_BACKGROUND_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
+import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
 import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
+import Modal from '../../../shared/ui/modal/Modal';
 
 const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   console.log('Rendering InitialProjectLoadModal...');
@@ -172,20 +172,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   };
 
   return (
-    <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      animationType={'slide'}
-      isVisible={visible}
-      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : overlayStyles.overlayContainer}
-      backdropStyle={overlayStyles.backdropStyles}
-      fullScreen={SMALL_SCREEN}
-    >
-      <View style={overlayStyles.titleContainer}>
-        <Text style={overlayStyles.titleText}>{statusMessageModalTitle}</Text>
-      </View>
+    <Modal title={statusMessageModalTitle}>
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}
-    </Overlay>
+    </Modal>
   );
 };
 

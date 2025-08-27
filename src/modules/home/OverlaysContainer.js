@@ -29,10 +29,7 @@ const OverlaysContainer = forwardRef(({
   return (
     <>
       {isProjectLoadSelectionModalVisible && Platform.OS !== 'web' && (
-        <InitialProjectLoadModal
-          openMainMenuPanel={openMainMenuPanel}
-          visible={isProjectLoadSelectionModalVisible}
-        />
+        <InitialProjectLoadModal openMainMenuPanel={openMainMenuPanel}/>
       )}
       <ErrorModal/>
       <StatusModal

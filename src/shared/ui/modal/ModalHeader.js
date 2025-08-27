@@ -17,6 +17,7 @@ const ModalHeader = ({
                        title,
                      }) => {
   const dispatch = useDispatch();
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
   const modalInfo = MODALS.find(p => p.key === modalVisible);
@@ -26,21 +27,23 @@ const ModalHeader = ({
   return (
     <View style={modalStyle.modalTop}>
       <View style={modalStyle.modalHeaderContainer}>
-        <View style={modalStyle.modalHeaderButtonsContainer}>
-          <Button
-            titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
-            title={buttonTitleLeft}
-            type={'clear'}
-            onPress={cancel}
-            buttonStyle={{padding: 0}}
-          />
-          <Button
-            titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
-            title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
-            type={'clear'}
-            onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
-          />
-        </View>
+        {!isProjectLoadSelectionModalVisible && (
+          <View style={modalStyle.modalHeaderButtonsContainer}>
+            <Button
+              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+              title={buttonTitleLeft}
+              type={'clear'}
+              onPress={cancel}
+              buttonStyle={{padding: 0}}
+            />
+            <Button
+              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
+              type={'clear'}
+              onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
+            />
+          </View>
+        )}
         <Text style={modalStyle.modalTitle}>{title || getTitle()}</Text>
       </View>
     </View>
