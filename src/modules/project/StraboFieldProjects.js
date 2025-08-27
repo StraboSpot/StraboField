@@ -1,19 +1,27 @@
 import React from 'react';
-import {FlatList, Platform} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import LoadProjectButtons from './load/LoadProjectButtons';
+import useDevice from '../../services/useDevice';
 import commonStyles from '../../shared/common.styles';
+import {BLUE} from '../../shared/styles.constants';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import Spacer from '../../shared/ui/Spacer';
+import uiStyles from '../../shared/ui/ui.styles';
+import overlayStyles from '../home/overlays/overlay.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import LogOut from '../user/LogOut';
 
 const StraboFieldProjects = () => {
   const dispatch = useDispatch();
+  const {openURL} = useDevice();
+
+  const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
+    : 'Downloads/StraboSpot2/Backups';
 
   const onDeleteLocalCopy = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_LOCAL_PROJECT_COPY}));
@@ -66,6 +74,34 @@ const StraboFieldProjects = () => {
               titleStyle={commonStyles.standardButtonText}
               onPress={onExportOtherSavedProject}
             />
+            {Platform.OS === 'ios' && (
+              <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
+                <View style={{padding: 10, alignItems: 'center'}}>
+                  <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
+                    Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
+                  </Text>
+                </View>
+                <Button
+                  title={'View/Edit Files on Device'}
+                  type={'outline'}
+                  containerStyle={commonStyles.buttonPadding}
+                  buttonStyle={commonStyles.standardButton}
+                  titleStyle={commonStyles.standardButtonText}
+                  onPress={() => openURL('ProjectBackups')}
+                  iconContainerStyle={{paddingRight: 10}}
+                  icon={{
+                    name: 'file-tray-full-outline',
+                    type: 'ionicon',
+                    color: BLUE,
+                  }}
+                />
+              </View>
+            )}
+            {Platform.OS === 'android' && (
+              <Text style={overlayStyles.statusMessageText}>
+                *The imported project must be a .zip file in the {importLocationText} folder.
+              </Text>
+            )}
           </>
         }
       />

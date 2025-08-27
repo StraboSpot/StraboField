@@ -75,24 +75,6 @@ const OpenProjectPage = () => {
           />
         )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>
-        <View style={{marginBottom: 20}}>
-          {Platform.OS === 'ios' && (
-            <Button
-              title={'View/Edit Files on Device'}
-              type={'outline'}
-              containerStyle={commonStyles.buttonPadding}
-              buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
-              onPress={() => openURL('ProjectBackups')}
-              iconContainerStyle={{paddingRight: 10}}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-            />
-          )}
-        </View>
       </View>
 
       {/* Modal */}

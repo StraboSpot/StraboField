@@ -21,11 +21,6 @@ const LoadProjectButtons = ({
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
-  const {openURL} = useDevice();
-
-  const importLocation = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
-    : 'Downloads/StraboSpot2/Backups';
-
   const openMovingProjectBackupsURL = async () => {
     const url = 'https://strabospot.org/files/helpFiles/Moving_Project_Backups_Out_of%20StraboSpot2.pdf';
     const canOpen = await Linking.canOpenURL(url);
@@ -70,34 +65,6 @@ const LoadProjectButtons = ({
           titleStyle={commonStyles.standardButtonText}
           onPress={onLoadProjectsFromDownloadsFolder}
         />
-        {Platform.OS === 'ios' && (
-          <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-            <View style={{padding: 10, alignItems: 'center'}}>
-              <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
-                Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
-              </Text>
-            </View>
-            <Button
-              title={'View/Edit Files on Device'}
-              type={'outline'}
-              containerStyle={commonStyles.buttonPadding}
-              buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
-              onPress={() => openURL('ProjectBackups')}
-              iconContainerStyle={{paddingRight: 10}}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-            />
-          </View>
-        )}
-        {Platform.OS === 'android' && (
-          <Text style={overlayStyles.statusMessageText}>
-            *The imported project must be a .zip file in the {importLocation} folder.
-          </Text>
-        )}
       </View>
     </>
   );

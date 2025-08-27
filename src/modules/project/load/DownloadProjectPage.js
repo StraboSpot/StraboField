@@ -1,14 +1,10 @@
 import React, {useState} from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import useDevice from '../../../services/useDevice';
 import useDownload from '../../../services/useDownload';
-import commonStyles from '../../../shared/common.styles';
-import {BLUE} from '../../../shared/styles.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
@@ -22,7 +18,6 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToOpen, setProjectToOpen] = useState(null);
 
-  const {openURL} = useDevice();
   const {initializeDownload} = useDownload();
 
   const source = 'server';
@@ -52,24 +47,6 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
           />
         )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>
-        <View style={{marginBottom: 20}}>
-          {Platform.OS === 'ios' && (
-            <Button
-              title={'View/Edit Files on Device'}
-              type={'outline'}
-              containerStyle={commonStyles.buttonPadding}
-              buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
-              onPress={() => openURL('ProjectBackups')}
-              iconContainerStyle={{paddingRight: 10}}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-            />
-          )}
-        </View>
       </View>
 
       {/* Modal */}
