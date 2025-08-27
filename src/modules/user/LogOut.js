@@ -8,12 +8,11 @@ import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import StandardModal from '../../shared/ui/StandardModal';
+import Modal from '../../shared/ui/modal/Modal';
+import uiStyles from '../../shared/ui/ui.styles';
 import overlayStyles from '../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
-import Modal from '../../shared/ui/modal/Modal';
-import uiStyles from '../../shared/ui/ui.styles';
 
 const LogOut = () => {
   const dispatch = useDispatch();
@@ -67,7 +66,7 @@ const LogOut = () => {
           </View>
           <View style={{padding: 10}}>
             <Button
-              title={'Logout'}
+              title={'Log Out'}
               containerStyle={{padding: 2.5}}
               onPress={clearUser}
             />

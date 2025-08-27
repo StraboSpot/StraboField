@@ -99,7 +99,8 @@ const AddImageOverlayModal = ({
         buttonTitleLeft={'Cancel'}
         buttonTitleRight={'Save'}
         cancel={() => closeModal()}
-        closeModal={() => saveImageOverlay(overlayFormRef?.current?.values)}>
+        closeModal={() => saveImageOverlay(overlayFormRef?.current?.values)}
+      >
         <Formik
           initialValues={image || {}}
           onSubmit={() => console.log('Submitting form...')}

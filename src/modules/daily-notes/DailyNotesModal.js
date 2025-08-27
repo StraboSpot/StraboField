@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import { View} from 'react-native';
+import {View} from 'react-native';
 
 import {Button, Icon, ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
@@ -64,9 +64,7 @@ const DailyNotesModal = () => {
 
   const renderDailyNotesModal = () => {
     return (
-      <Modal
-        buttonTitleRight={''}
-      >
+      <Modal buttonTitleRight={''}>
         <SaveAndCancelButtons
           cancel={() => close()}
           save={() => saveNote(formRef?.current?.values)}
