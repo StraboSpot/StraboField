@@ -3,11 +3,12 @@ import {createSlice} from '@reduxjs/toolkit';
 import {SORTED_VIEWS} from '../spots/spots.constants';
 
 const initialMainMenuState = {
-  sortedView: SORTED_VIEWS.CHRONOLOGICAL,
-  selectedButtonIndex: 0,
-  mainMenuPageVisible: null,
   isSidePanelVisible: false,
+  mainMenuPageVisible: null,
+  sectionsCollapsed: [],
+  selectedButtonIndex: 0,
   sidePanelView: null,
+  sortedView: SORTED_VIEWS.CHRONOLOGICAL,
 };
 
 // createSlice combines reducers, actions, and constants
@@ -17,6 +18,13 @@ const mainMenuSlice = createSlice({
   reducers: {
     setMenuSelectionPage(state, action) {
       state.mainMenuPageVisible = action.payload.name;
+    },
+    setSectionsCollapsed(state, action) {
+      const title = action.payload;
+      if (state.sectionsCollapsed.includes(title)) {
+        state.sectionsCollapsed = state.sectionsCollapsed.filter(i => i !== title);
+      }
+      else state.sectionsCollapsed = [...state.sectionsCollapsed, title];
     },
     setSelectedButtonIndex(state, action) {
       state.selectedButtonIndex = action.payload.index;
@@ -34,6 +42,7 @@ const mainMenuSlice = createSlice({
 
 export const {
   setMenuSelectionPage,
+  setSectionsCollapsed,
   setSelectedButtonIndex,
   setSidePanelVisible,
   setSortedView,
