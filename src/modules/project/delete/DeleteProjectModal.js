@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import projectOptionsModalStyle from './projectOptionsModal.style';
+import deleteProjectModalStyle from './deleteProjectModalStyle';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
 import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import overlayStyles from '../../home/overlays/overlay.styles';
 
-const DeleteOtherSavedProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
+const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
 
   const DELETE_STATUS = {
     IN_PROGRESS: 'in_progress',
@@ -48,17 +48,17 @@ const DeleteOtherSavedProjectModal = ({closeModal, projectToDeleteFilename, setD
       onConfirmPress={handleConfirmPress}
       showCancelButton={deleteProjectStatus === DELETE_STATUS.PENDING}
       showConfirmButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
-      title={'Delete Local Copy'}
+      title={'Delete Locally Saved Project'}
     >
       <View style={overlayStyles.overlayContent}>
         {deleteProjectStatus === DELETE_STATUS.PENDING ? (
           <Text style={overlayStyles.contentText}>
-            Are you sure you want to delete {'\n'} the following local copy? {'\n\n' + projectToDeleteFilename}
+            Are you sure you want to delete {'\n'} the following locally saved project? {'\n\n' + projectToDeleteFilename}
             {'\n'}{'\n'}*Uploaded copy on server will remain.
           </Text>
         ) : (
           <>
-            <Text style={projectOptionsModalStyle.contentText}>
+            <Text style={deleteProjectModalStyle.contentText}>
               {deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'Deleting ' + projectToDeleteFilename
                 : deleteProjectStatus === DELETE_STATUS.SUCCESS ? projectToDeleteFilename + ' has been deleted'
                   : 'Error deleting ' + projectToDeleteFilename}
@@ -75,4 +75,4 @@ const DeleteOtherSavedProjectModal = ({closeModal, projectToDeleteFilename, setD
   );
 };
 
-export default DeleteOtherSavedProjectModal;
+export default DeleteProjectModal;

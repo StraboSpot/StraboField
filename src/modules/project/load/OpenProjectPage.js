@@ -71,7 +71,7 @@ const OpenProjectPage = () => {
           <SidePanelHeader
             backButton={() => dispatch(setSidePanelVisible({bool: false}))}
             title={'My StraboField Projects'}
-            headerTitle={'Open Local Copy'}
+            headerTitle={'Open Locally Saved Project'}
           />
         )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>

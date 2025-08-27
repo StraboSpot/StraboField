@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 import * as themes from '../../../shared/styles.constants';
 
-const projectOptionsModalStyle = StyleSheet.create({
+const deleteProjectModalStyle = StyleSheet.create({
   backupViewInputHeaderText: {
     fontSize: 12,
     padding: 5,
@@ -34,4 +34,4 @@ const projectOptionsModalStyle = StyleSheet.create({
   },
 });
 
-export default projectOptionsModalStyle;
+export default deleteProjectModalStyle;

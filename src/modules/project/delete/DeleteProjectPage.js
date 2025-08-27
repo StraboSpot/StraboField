@@ -1,31 +1,38 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
+import DeleteProjectModal from './DeleteProjectModal';
 import useDevice from '../../../services/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {BLUE} from '../../../shared/styles.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
-import SaveAndExportModal from './SaveAndExportModal';
 
-// Export a saved project on device in StraboSpot app directory
-const ExportOtherSavedProjectPage = () => {
+// Delete a project on device in StraboSpot app directory
+const DeleteProjectPage = () => {
   const dispatch = useDispatch();
 
-  const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
-  const [projectToExportFilename, setProjectToExportFilename] = useState(null);
+  const [doReloadPage, setDoReloadPage] = useState(false);
+  const [isDeleteProjectModalVisible, setIsDeleteProjectModalVisible] = useState(false);
+  const [projectToDeleteFilename, setProjectToDeleteFilename] = useState(null);
+
+  useEffect(() => {
+    //  Need to reload page after saved project deleted
+  }, [doReloadPage]);
 
   const {openURL} = useDevice();
 
   const source = 'device';
 
-  const onSelectedProjectForExport = (project) => {
-    setProjectToExportFilename(project.fileName);
-    setIsSaveAndExportModalVisible(true);
+  const closeDeleteProjectModal = () => setIsDeleteProjectModalVisible(false);
+
+  const confirmDeleteProject = (project) => {
+    setProjectToDeleteFilename(project.fileName);
+    setIsDeleteProjectModalVisible(true);
   };
 
   return (
@@ -34,9 +41,9 @@ const ExportOtherSavedProjectPage = () => {
         <SidePanelHeader
           backButton={() => dispatch(setSidePanelVisible({bool: false}))}
           title={'My StraboField Projects'}
-          headerTitle={'Export Other Saved Project'}
+          headerTitle={'Delete Locally Saved Project'}
         />
-        <ProjectList onProjectPress={onSelectedProjectForExport} source={source}/>
+        <ProjectList doRefresh={doReloadPage} onProjectPress={confirmDeleteProject} source={source}/>
         <View style={{marginBottom: 20}}>
           {Platform.OS === 'ios' && (
             <Button
@@ -58,15 +65,15 @@ const ExportOtherSavedProjectPage = () => {
       </View>
 
       {/* Modal */}
-      {isSaveAndExportModalVisible && (
-        <SaveAndExportModal
-          backupAction={'export'}
-          closeModal={() => setIsSaveAndExportModalVisible(false)}
-          selectedFilename={projectToExportFilename}
+      {isDeleteProjectModalVisible && (
+        <DeleteProjectModal
+          closeModal={closeDeleteProjectModal}
+          projectToDeleteFilename={projectToDeleteFilename}
+          setDoReloadPage={setDoReloadPage}
         />
       )}
     </>
   );
 };
 
-export default ExportOtherSavedProjectPage;
+export default DeleteProjectPage;

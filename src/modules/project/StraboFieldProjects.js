@@ -24,11 +24,11 @@ const StraboFieldProjects = () => {
     : 'Downloads/StraboSpot2/Backups';
 
   const onDeleteLocalCopy = () => {
-    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_LOCAL_PROJECT_COPY}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_PROJECT}));
   };
 
   const onExportOtherSavedProject = () => {
-    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.EXPORT_OTHER_SAVED_PROJECT}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.EXPORT_PROJECT}));
   };
 
   const onLoadProjectsFromServer = () => {
@@ -59,7 +59,7 @@ const StraboFieldProjects = () => {
             />
             <Spacer/>
             <Spacer/>
-            <SectionDivider dividerText={'Other Saved Local Projects'}/>
+            <SectionDivider dividerText={'Local Projects on Device'}/>
             <Button
               title={'Delete'}
               containerStyle={commonStyles.standardButtonContainer}

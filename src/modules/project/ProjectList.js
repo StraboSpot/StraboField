@@ -14,7 +14,6 @@ import * as themes from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
-import SectionDivider from '../../shared/ui/SectionDivider';
 
 const ProjectList = ({doRefresh, onProjectPress, source}) => {
   const dispatch = useDispatch();
@@ -113,10 +112,6 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
     if (!isEmpty(userData)) {
       return (
         <View style={{flex: 1}}>
-          <View style={{paddingBottom: 0}}>
-            <SectionDivider
-              dividerText={source === 'device' ? 'Local Copies of Projects' : 'Projects on StraboSpot Server'}/>
-          </View>
           <FlatList
             keyExtractor={item => item.id.toString()}
             data={projectsArr.projects}

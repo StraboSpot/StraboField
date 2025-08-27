@@ -21,11 +21,11 @@ import MicroProjectsList from '../micro/MicroProjectsList';
 import Miscellaneous from '../preferences/Miscellaneous';
 import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import BackupProjectPage from '../project/backup/BackupProjectPage';
-import ExportOtherSavedProjectPage from '../project/backup/ExportOtherSavedProjectPage';
+import ExportProjectPage from '../project/backup/ExportProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import DatasetDetail from '../project/datasets/DatasetDetail';
 import DatasetsPage from '../project/datasets/DatasetsPage';
-import DeleteOtherSavedProjectPage from '../project/delete/DeleteOtherSavedProjectPage';
+import DeleteProjectPage from '../project/delete/DeleteProjectPage';
 import DownloadProjectPage from '../project/load/DownloadProjectPage';
 import ImportProjectFromZip from '../project/load/ImportProjectFromZip';
 import NewProjectPage from '../project/load/NewProjectPage';
@@ -159,12 +159,12 @@ const MainMenuPanel = forwardRef(({
     switch (sidePanelView) {
       case SIDE_PANEL_VIEWS.DATASET_DETAIL:
         return <DatasetDetail dataset={datasetToView}/>;
-      case SIDE_PANEL_VIEWS.DELETE_LOCAL_PROJECT_COPY:
-        return <DeleteOtherSavedProjectPage/>;
+      case SIDE_PANEL_VIEWS.DELETE_PROJECT:
+        return <DeleteProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
         return <DownloadProjectPage/>;
-      case SIDE_PANEL_VIEWS.EXPORT_OTHER_SAVED_PROJECT:
-        return <ExportOtherSavedProjectPage/>;
+      case SIDE_PANEL_VIEWS.EXPORT_PROJECT:
+        return <ExportProjectPage/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
         return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:

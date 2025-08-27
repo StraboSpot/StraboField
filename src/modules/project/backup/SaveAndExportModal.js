@@ -114,24 +114,27 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   );
 
   const renderExportMessage = () => {
-    if (Platform.OS === 'ios') {
-      return (
-        <Text style={overlayStyles.contentText}>
-          All project data, images, and offline maps will be Saved as a .zip file to the Distribution folder
-          in the My Files App &gt; StraboField &gt; ProjectBackups &gt; Distribution. You must
-          <Text style={{color: WARNING_COLOR}}> MOVE THE .ZIP FILE OUT OF THE STRABOFIELD FOLDER </Text>
-          if you wish to export your project.
-        </Text>
-      );
-    }
-    else {
-      return (
-        <Text style={overlayStyles.contentText}>
-          All project data, images, and offline maps will be EXPORTED as a .zip file to the Downloads folder
-          in the My Files App.
-        </Text>
-      );
-    }
+    return (
+      <Text style={overlayStyles.contentText}>
+        {Platform.OS === 'ios' ? (
+          'All project data, images, and offline maps will be saved as a .zip file to the Distribution folder in '
+          + 'the My Files App\\StraboField\\ProjectBackups\\Distribution.\n\nYou may want to export '
+          + 'your zipped project by moving it out of the StraboField Folder using the iOS Files app.\n\n'
+          + 'Zipped project will be saved as:'
+        ) : (
+          'All project data, images, and offline maps will be EXPORTED as a .zip file to the Downloads folder '
+          + 'in the Android My Files app.\n\nZipped project will be exported as:'
+        )}
+      </Text>
+    );
+  };
+
+  const renderSaveMessage = () => {
+    return (
+      <Text style={overlayStyles.contentText}>
+        All datasets will be saved locally, along with any images and custom maps.
+      </Text>
+    );
   };
 
   const validateFileName = (filenameChanged) => {
@@ -144,23 +147,11 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   return (
-    <Modal
-      closeModal={closeModal}
-      title={modalTitle}
-    >
+    <Modal closeModal={closeModal} title={modalTitle}>
       {backingUpStatus === '' ? (
           <View>
             <View style={overlayStyles.overlayContent}>
-              {backupAction === 'save' ? (
-                <Text style={overlayStyles.contentText}>
-                  All datasets will be saved, along with any images and custom maps.
-                </Text>
-              ) : (
-                <View>
-                  {renderExportMessage()}
-                  <Text style={overlayStyles.contentText}>Project will be exported as:</Text>
-                </View>
-              )}
+              {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
               <TextInput
                 value={backupAction === 'save' ? fileName : exportFileName}
                 onChangeText={validateFileName}

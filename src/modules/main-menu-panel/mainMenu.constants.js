@@ -68,9 +68,9 @@ export const MAIN_MENU_DATA_NO_PROJECT = Object.entries(MAIN_MENU_ITEMS).reduce(
 
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',
-  DELETE_LOCAL_PROJECT_COPY: 'Delete Local Copy',
+  DELETE_PROJECT: 'Delete Locally Saved Project',
   DOWNLOAD_PROJECT: 'Download Project',
-  EXPORT_OTHER_SAVED_PROJECT: 'Export Other Saved Project',
+  EXPORT_PROJECT: 'Export Locally Saved Project',
   IMPORT_PROJECT: 'Import Project',
   MANAGE_CUSTOM_MAP: 'manageCustomMap',
   NEW_PROJECT: 'New Project',
