@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import Modal from '../../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
 import uiStyles from '../../../shared/ui/ui.styles';
 import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -21,7 +21,7 @@ const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
   };
 
   return (
-    <Modal
+    <OverlayWrapper
       closeModal={closeModal}
       title={'Open Project'}
     >
@@ -45,7 +45,7 @@ const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
           />
         </View>
       </View>
-    </Modal>
+    </OverlayWrapper>
   );
 };
 

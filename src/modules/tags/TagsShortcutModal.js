@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {TagsModal} from './index';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 
 const TagsShortcutModal = ({
                              onPress,
@@ -10,9 +10,9 @@ const TagsShortcutModal = ({
 
   const renderTagsShortcutModal = () => {
     return (
-      <Modal onPress={onPress}>
+      <OverlayWrapper onPress={onPress}>
         <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

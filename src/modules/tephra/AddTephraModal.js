@@ -13,7 +13,7 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -42,7 +42,7 @@ const AddTephraModal = ({onPress}) => {
     const subpages = TEPHRA_SUBPAGES;
     const formName = [pageKey, Object.values(subpages)[tabIndex]];
     return (
-      <Modal
+      <OverlayWrapper
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
         onPress={onPress}
@@ -93,7 +93,7 @@ const AddTephraModal = ({onPress}) => {
             textStyle={{color: PRIMARY_ACCENT_COLOR}}
           />
         )}
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

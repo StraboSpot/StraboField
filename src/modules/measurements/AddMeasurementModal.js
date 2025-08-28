@@ -14,7 +14,7 @@ import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
@@ -288,7 +288,7 @@ const AddMeasurementModal = ({onPress}) => {
     const formName = [groupKey, measurementTypeForForm];
     const saveTitle = 'Save ' + typeObj.save_title + (relevantTemplates.length > 1 ? 's' : '');
     return (
-      <Modal
+      <OverlayWrapper
         closeModal={onCloseButton}
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
@@ -318,7 +318,7 @@ const AddMeasurementModal = ({onPress}) => {
             <SaveButton title={saveTitle} onPress={saveMeasurement}/>
           )}
         </>
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

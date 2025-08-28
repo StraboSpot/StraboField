@@ -12,7 +12,7 @@ import {AddFold, FoldGeometryChoices} from './fold-geometry';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -118,7 +118,7 @@ const AddThreeDStructureModal = ({onPress}) => {
   const renderNotebookThreeDStructureModalContent = () => {
     const formName = [groupKey, types[selectedTypeIndex]];
     return (
-      <Modal
+      <OverlayWrapper
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
         onPress={onPress}
@@ -144,7 +144,7 @@ const AddThreeDStructureModal = ({onPress}) => {
           }
         />
         {!choicesViewKey && <SaveButton title={'Save 3D Structure'} onPress={save3DStructure}/>}
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

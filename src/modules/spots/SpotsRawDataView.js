@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import {setIntersectedSpotsForTagging} from './spots.slice';
 import {setModalVisible} from '../home/home.slice';
 
@@ -52,7 +52,7 @@ const SpotsRawDataView = () => {
   };
 
   return (
-    <Modal
+    <OverlayWrapper
       isFullScreen
       closeModal={closeModal}
     >
@@ -69,7 +69,7 @@ const SpotsRawDataView = () => {
         />
       </ScrollView>
       <Toast ref={toast}/>
-    </Modal>
+    </OverlayWrapper>
   );
 };
 

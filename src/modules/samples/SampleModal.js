@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
@@ -293,14 +293,14 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   };
 
   return (
-    <Modal
+    <OverlayWrapper
       closeModal={onCloseModalPressed}
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       onPress={onPress}
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
-    </Modal>
+    </OverlayWrapper>
   );
 };
 

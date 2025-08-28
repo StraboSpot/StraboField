@@ -11,7 +11,7 @@ import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -119,7 +119,7 @@ const AddMineralModal = ({onPress}) => {
 
   const renderAddMineralModalContent = () => {
     return (
-      <Modal
+      <OverlayWrapper
         closeModal={onCloseModalPressed}
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
@@ -131,7 +131,7 @@ const AddMineralModal = ({onPress}) => {
           />
         )}
         {!isShowTemplates && renderAddMineral()}
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

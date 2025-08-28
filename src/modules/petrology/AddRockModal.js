@@ -14,7 +14,7 @@ import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -127,7 +127,7 @@ const AddRockModal = ({modalKey, onPress}) => {
 
   const renderAddRockModalContent = () => {
     return (
-      <Modal
+      <OverlayWrapper
         closeModal={onCloseModalPressed}
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
@@ -151,7 +151,7 @@ const AddRockModal = ({modalKey, onPress}) => {
           />
         )}
         {!isShowTemplates && renderAddRock()}
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

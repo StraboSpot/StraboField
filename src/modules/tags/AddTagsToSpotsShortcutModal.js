@@ -1,15 +1,15 @@
 import React from 'react';
 
 import {TagsModal} from './index';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 
 const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
 
   const renderAddTagsToSpotsShortcutModal = () => {
     return (
-      <Modal>
+      <OverlayWrapper>
         <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

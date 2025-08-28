@@ -13,7 +13,7 @@ import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import {useWindowSize} from '../useWindowSize';
 
-const Modal = ({
+const OverlayWrapper = ({
                  buttonTitleLeft,
                  buttonTitleRight,
                  cancel,
@@ -34,8 +34,8 @@ const Modal = ({
     if (SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
-      flex: 1,
-      maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
+      // flex: 1,
+      // maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
       width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
     };
   };
@@ -100,4 +100,4 @@ const Modal = ({
   );
 };
 
-export default Modal;
+export default OverlayWrapper;

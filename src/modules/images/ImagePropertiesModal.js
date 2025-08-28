@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 
 import {imageStyles} from '.';
 import {SwitchWrapper} from '../../shared/ui';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToView}) => {
@@ -49,7 +49,7 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
   };
 
   return (
-    <Modal
+    <OverlayWrapper
       buttonTitleLeft={'Cancel'}
       buttonTitleRight={'Save'}
       cancel={closeModal}
@@ -65,7 +65,7 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
           </View>
         }
       />
-    </Modal>
+    </OverlayWrapper>
   );
 };
 

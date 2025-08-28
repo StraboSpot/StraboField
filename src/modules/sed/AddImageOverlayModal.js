@@ -9,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import Modal from '../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
 import {NumberInputField, SelectInputField, useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -94,7 +94,7 @@ const AddImageOverlayModal = ({
 
   const renderAddImageOverlayModal = () => {
     return (
-      <Modal
+      <OverlayWrapper
         title={'Add Image Overlay'}
         buttonTitleLeft={'Cancel'}
         buttonTitleRight={'Save'}
@@ -218,7 +218,7 @@ const AddImageOverlayModal = ({
             onPress={deleteImageOverlayConfirm}
           />
         )}
-      </Modal>
+      </OverlayWrapper>
     );
   };
 

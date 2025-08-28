@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
-import Modal from '../../../shared/ui/modal/Modal';
+import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import overlayStyles from '../../home/overlays/overlay.styles';
@@ -147,7 +147,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   return (
-    <Modal closeModal={closeModal} title={modalTitle}>
+    <OverlayWrapper closeModal={closeModal} title={modalTitle}>
       {backingUpStatus === '' ? (
           <View>
             <View style={overlayStyles.overlayContent}>
@@ -175,6 +175,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
         : renderBackingUpView()
       }
     </Modal>
+    </OverlayWrapper>
   );
 };
 
