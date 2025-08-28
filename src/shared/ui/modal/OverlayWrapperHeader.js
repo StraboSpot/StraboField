@@ -9,7 +9,7 @@ import {setModalVisible} from '../../../modules/home/home.slice';
 import {MODALS} from '../../../modules/page/page.constants';
 import * as themes from '../../styles.constants';
 
-const ModalHeader = ({
+const OverlayWrapperHeader = ({
                        buttonTitleLeft,
                        buttonTitleRight,
                        cancel,
@@ -50,4 +50,4 @@ const ModalHeader = ({
   );
 };
 
-export default ModalHeader;
+export default OverlayWrapperHeader;
