@@ -7,7 +7,7 @@ import {useToast} from 'react-native-toast-notifications';
 
 import useDevice from '../../services/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
-import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import {BLACK, POSITIVE_COLOR, WARNING_COLOR, WHITE} from '../../shared/styles.constants';
 import overlayStyles from '../home/overlays/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
@@ -40,7 +40,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
     <Overlay
       supportedOrientations={['portrait', 'landscape']}
       isVisible={visible}
-      overlayStyle={{height: '100%', width: '100%'}}
+      overlayStyle={{height: '100%', width: '100%', backgroundColor: WHITE}}
     >
       <View style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
         {wasExported ? (
