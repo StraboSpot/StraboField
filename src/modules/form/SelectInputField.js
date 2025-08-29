@@ -121,7 +121,7 @@ const SelectInputField = ({
     return (
       <>
         {renderFieldLabel()}
-        <View style={formStyles.fieldValue}>
+        <View style={[formStyles.fieldValue, {paddingBottom: 0}]}>
           <MultiSelect
             hideSubmitButton={true}
             hideTags={false}
@@ -136,7 +136,6 @@ const SelectInputField = ({
             textInputProps={{editable: false}}
             selectText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
             searchInputPlaceholderText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
-            searchInputStyle={formStyles.dropdownSelectionListHeader}
             fontSize={themes.PRIMARY_TEXT_SIZE}
             selectedItemTextColor={themes.PRIMARY_TEXT_COLOR}
             selectedItemIconColor={themes.PRIMARY_TEXT_COLOR}
@@ -144,8 +143,10 @@ const SelectInputField = ({
             itemTextColor={themes.PRIMARY_TEXT_COLOR}
             styleDropdownMenu={formStyles.dropdownContainer}
             styleDropdownMenuSubsection={formStyles.dropdownSelectedContainer}
-            styleSelectorContainer={formStyles.selectorContainer}
+            styleIndicator={formStyles.dropdownIndicator}
+            styleInputGroup={formStyles.dropdownInputGroup}
             tagBorderColor={themes.PRIMARY_TEXT_COLOR}
+            tagContainerStyle={formStyles.dropdownTagContainer}
             tagTextColor={themes.PRIMARY_TEXT_COLOR}
           />
         </View>

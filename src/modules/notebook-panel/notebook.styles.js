@@ -5,7 +5,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 
 const notebookStyles = StyleSheet.create({
   centerContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     flex: 1,
   },
   dialogBoxPosition: {

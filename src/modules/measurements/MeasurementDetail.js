@@ -305,7 +305,6 @@ const MeasurementDetail = ({
       selectedAttributes, '\nSelected Individual Measurement:', selectedMeasurement);
     return (
       <View>
-        <SectionDivider dividerText={'Feature Type'}/>
         <View style={{flex: 1}}>
           <Formik
             innerRef={formRef}
