@@ -23,7 +23,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   const {getSesarToken, getOrcidToken} = useServerRequests();
 
   const dispatch = useDispatch();
-  const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user.sesar);
+  const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
 
   // const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
@@ -42,7 +42,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
 
   useEffect(() => {
     console.log('In 1st UE in IGSNUploadAndRegister page');
-    isIGSNChecked && !isEmpty(sesarToken.access) && getSesarTokenAndCodes()
+    isIGSNChecked && !isEmpty(sesarToken?.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
 
@@ -236,13 +236,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
 
         {isIGSNChecked &&
           <View>
-            {isEmpty(sesarToken.access) && renderOrcidSignInButton()}
+            {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
 
             {
-             !isEmpty(sesarToken.access)
+             !isEmpty(sesarToken?.access)
               && renderIGSNUserCodePicker()
             }
-            {!isEmpty(sesarToken.access) && <Button
+            {!isEmpty(sesarToken?.access) && <Button
               title='Reset SESAR Credentials'
               titleStyle={{fontSize: themes.SMALL_TEXT_SIZE}}
               type={'clear'}

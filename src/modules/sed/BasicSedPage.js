@@ -6,10 +6,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {INTERPRETATIONS_SUBPAGES, LITHOLOGY_SUBPAGES, STRUCTURE_SUBPAGES} from './sed.constants';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
+import TruncatedText from '../../shared/ui/TruncatedText';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -67,11 +68,11 @@ const BasicSedPage = ({page}) => {
           <ButtonGroup
             selectedIndex={selectedTypeIndex}
             onPress={i => setSelectedTypeIndex(i)}
-            buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
+            buttons={Object.values(subpages).map(
+              v => ({element: () => <TruncatedText title={toTitleCase(v.replace(/_/g, ' '))}/>}))}
             containerStyle={{height: 40, borderRadius: 10}}
             buttonStyle={{padding: 5}}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-            textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}
           />
           <BasicPageDetail
             closeDetailView={() => setIsDetailView(false)}

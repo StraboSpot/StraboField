@@ -56,7 +56,7 @@ const UrlData = ({
   const renderUrlListItem = (urlItem, i) => {
     return (
       <ListItem containerStyle={commonStyles.listItem}>
-        <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <ListItem.Title
             style={[commonStyles.listItemTitle, {color: BLUE}]}
             onPress={() => openURL(urlItem)}>
@@ -87,7 +87,7 @@ const UrlData = ({
                   <Icon
                     name={'trash'}
                     type={'font-awesome'}
-                    size={20}
+                    size={25}
                     color={'darkgrey'}
                     containerStyle={externalDataStyles.iconContainer}
                   />

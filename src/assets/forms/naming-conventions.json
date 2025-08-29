@@ -43,7 +43,7 @@
     {
       "type": "begin_group",
       "name": "group_rv9mt72",
-      "label": "Image Basemap/Strat Section Spot Name",
+      "label": "Image Basemap / Strat Section\nSpot Name",
       "required": "false"
     },
     {

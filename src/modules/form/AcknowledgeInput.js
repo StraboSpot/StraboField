@@ -21,7 +21,7 @@ const AcknowledgeInput = ({
         <SwitchWrapper value={value} onValueChange={bool => setFieldValue(name, bool)}/>
       </View>
       <View style={[formStyles.fieldLabelContainer, {flex: 1, paddingLeft: 5}]}>
-        <Text style={formStyles.fieldLabel}>{label}</Text>
+        <Text style={[formStyles.fieldLabel, {fontWeight: 'normal'}]}>{label}</Text>
         {placeholder && (
           <Icon
             name={'information-circle-outline'}
