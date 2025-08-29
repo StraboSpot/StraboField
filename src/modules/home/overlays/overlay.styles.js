@@ -58,9 +58,10 @@ const styles = StyleSheet.create({
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 2,
+    maxHeight: '80%',
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    width: 300,
+    width: 300
   },
   overlayContainerFullScreen: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
