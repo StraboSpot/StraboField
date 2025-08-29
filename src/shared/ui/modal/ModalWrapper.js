@@ -13,16 +13,17 @@ import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import {useWindowSize} from '../useWindowSize';
 
-const OverlayWrapper = ({
-                 buttonTitleLeft,
-                 buttonTitleRight,
-                 cancel,
-                 children,
-                 closeModal,
-                 isFullScreen,
-                 onPress,
-                 title,
-               }) => {
+const ModalWrapper = ({
+                        buttonTitleLeft,
+                        buttonTitleRight,
+                        cancel,
+                        children,
+                        closeModal,
+                        isFullScreen,
+                        onPress,
+                        overlayStyleOverride,
+                        title,
+                      }) => {
 
   const {height, width} = useWindowSize();
 
@@ -34,6 +35,7 @@ const OverlayWrapper = ({
     if (SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
+      ...overlayStyleOverride,
       // flex: 1,
       // maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
       width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,

@@ -292,6 +292,7 @@ const AddMeasurementModal = ({onPress}) => {
         closeModal={onCloseButton}
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         onPress={onPress}
+        overlayStyleOverride={{height: '80%'}}
       >
         <>
           {measurementTypeForForm && (
