@@ -149,9 +149,9 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   return (
     <OverlayWrapper closeModal={closeModal} title={modalTitle}>
       {backingUpStatus === '' ? (
-        <View style={{ padding: 16 }}>
+        <View style={{padding: 16}}>
           {/* Instruction Text */}
-          <Text style={{ fontSize: 16, marginBottom: 12, color: '#444' }}>
+          <Text style={{fontSize: 16, marginBottom: 12, color: '#444'}}>
             {backupAction === 'save' ? (
               'All datasets will be saved locally, along with any images and custom maps.'
             ) : (
@@ -162,7 +162,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
           </Text>
 
           {/* File Name Input */}
-          <Text style={{ fontWeight: '600', marginBottom: 6 }}>File Name</Text>
+          <Text style={{fontWeight: '600', marginBottom: 6}}>File Name</Text>
           <TextInput
             value={backupAction === 'save' ? fileName : exportFileName}
             onChangeText={validateFileName}
@@ -179,20 +179,20 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
             ]}
           />
           {isFileNameError && (
-            <Text style={{ color: 'red', marginBottom: 8, fontSize: 13 }}>
+            <Text style={{color: 'red', marginBottom: 8, fontSize: 13}}>
               File Name Error! Only letters, numbers, dashes, or underscores allowed.
             </Text>
           )}
-          <Text style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>
+          <Text style={{fontSize: 12, color: '#666', marginBottom: 16}}>
             *File names cannot contain spaces or special characters. Do not include a file extension.
           </Text>
 
           {/* Action Buttons */}
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+          <View style={{flexDirection: 'row', justifyContent: 'flex-end', gap: 10}}>
             <Button
               title='Cancel'
               type='clear'
-              titleStyle={{ color: '#888' }}
+              titleStyle={{color: '#888'}}
               onPress={handleClosePress}
             />
             <Button
@@ -202,7 +202,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
                 borderRadius: 8,
                 backgroundColor: '#007AFF',
               }}
-              titleStyle={{ fontWeight: '600', fontSize: 16 }}
+              titleStyle={{fontWeight: '600', fontSize: 16}}
               disabled={backupFileName.trim() === '' || isFileNameError}
               onPress={backupAction === 'save' ? initiateBackup : exportProject}
               title={getButtonTitle()}
@@ -210,17 +210,17 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
           </View>
         </View>
       ) : (
-        <View style={{ padding: 20, alignItems: 'center' }}>
+        <View style={{padding: 20, alignItems: 'center'}}>
           <LottieAnimations
             type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
             show
             doesLoop={backingUpStatus === 'inProgress'}
           />
-          <Text style={{ marginTop: 12, textAlign: 'center', color: '#444' }}>
+          <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
             {statusMessages.join('\n')}
           </Text>
           {backingUpStatus === 'complete' && (
-            <View style={{ marginTop: 16 }}>
+            <View style={{marginTop: 16}}>
               <Button
                 title='OK'
                 type='solid'
@@ -233,11 +233,9 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
                 }}
               />
             </View>
-          </View>
-        )
-        : renderBackingUpView()
-      }
-    </Modal>
+          )}
+        </View>
+      )}
     </OverlayWrapper>
 
     // <Modal closeModal={closeModal} title={modalTitle}>
