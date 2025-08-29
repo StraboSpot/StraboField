@@ -169,20 +169,26 @@ const UploadModal = ({closeModal}) => {
         <Text style={overlayStyles.importantText}> OVERWRITE</Text> any data already on the server
         for this project:
       </Text>
+      <Spacer/>
       <View style={overlayStyles.buttonContainer}>
-        {__DEV__ && (
-          <Button
-            title={'Images Only (Dev Mode)'}
-            type={'outline'}
-            titleStyle={overlayStyles.buttonText}
-            onPress={uploadImagesOnly}
-          />
-        )}
+        <Button
+          title='Cancel'
+          type='outline'
+          titleStyle={overlayStyles.buttonText }
+          onPress={handleClosePress}
+        />
         <Button
           title={'Upload'}
           onPress={() => initiateUpload()}
         />
       </View>
+      {__DEV__ && (
+        <Button
+          title={'Upload Images Only (Dev Mode)'}
+          type={'clear'}
+          onPress={uploadImagesOnly}
+        />
+      )}
     </View>
   );
 

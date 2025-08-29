@@ -149,33 +149,124 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   return (
     <OverlayWrapper closeModal={closeModal} title={modalTitle}>
       {backingUpStatus === '' ? (
-          <View>
-            <View style={overlayStyles.overlayContent}>
-              {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
-              <TextInput
-                value={backupAction === 'save' ? fileName : exportFileName}
-                onChangeText={validateFileName}
-                style={[overlayStyles.inputContainer, {width: '100%'}]}
-              />
-            </View>
-            {isFileNameError && <Text style={overlayStyles.importantText}>File Name Error!</Text>}
-            <Text style={overlayStyles.statusMessageText}>
-              *File names may not contain spaces or special characters, other than a dash or underscore.
-              Do not use a file extension.
+        <View style={{ padding: 16 }}>
+          {/* Instruction Text */}
+          <Text style={{ fontSize: 16, marginBottom: 12, color: '#444' }}>
+            {backupAction === 'save' ? (
+              'All datasets will be saved locally, along with any images and custom maps.'
+            ) : (
+              Platform.OS === 'ios'
+                ? 'Your project will be saved as a .zip in the Distribution folder.\n\nMove it out of StraboField using the iOS Files app.\n\nZipped project will be saved as:'
+                : 'Your project will be exported as a .zip into the Downloads folder on Android.\n\nZipped project will be exported as:'
+            )}
+          </Text>
+
+          {/* File Name Input */}
+          <Text style={{ fontWeight: '600', marginBottom: 6 }}>File Name</Text>
+          <TextInput
+            value={backupAction === 'save' ? fileName : exportFileName}
+            onChangeText={validateFileName}
+            style={[
+              {
+                borderWidth: 1,
+                borderColor: isFileNameError ? 'red' : '#ccc',
+                borderRadius: 8,
+                padding: 10,
+                marginBottom: 8,
+                fontSize: 15,
+                backgroundColor: '#fafafa',
+              },
+            ]}
+          />
+          {isFileNameError && (
+            <Text style={{ color: 'red', marginBottom: 8, fontSize: 13 }}>
+              File Name Error! Only letters, numbers, dashes, or underscores allowed.
             </Text>
-            <View style={overlayStyles.buttonContainer}>
+          )}
+          <Text style={{ fontSize: 12, color: '#666', marginBottom: 16 }}>
+            *File names cannot contain spaces or special characters. Do not include a file extension.
+          </Text>
+
+          {/* Action Buttons */}
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+            <Button
+              title='Cancel'
+              type='clear'
+              titleStyle={{ color: '#888' }}
+              onPress={handleClosePress}
+            />
+            <Button
+              buttonStyle={{
+                paddingVertical: 12,
+                paddingHorizontal: 24,
+                borderRadius: 8,
+                backgroundColor: '#007AFF',
+              }}
+              titleStyle={{ fontWeight: '600', fontSize: 16 }}
+              disabled={backupFileName.trim() === '' || isFileNameError}
+              onPress={backupAction === 'save' ? initiateBackup : exportProject}
+              title={getButtonTitle()}
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <LottieAnimations
+            type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
+            show
+            doesLoop={backingUpStatus === 'inProgress'}
+          />
+          <Text style={{ marginTop: 12, textAlign: 'center', color: '#444' }}>
+            {statusMessages.join('\n')}
+          </Text>
+          {backingUpStatus === 'complete' && (
+            <View style={{ marginTop: 16 }}>
               <Button
-                disabled={backupFileName.trim() === '' || isFileNameError}
-                onPress={backupAction === 'save' ? initiateBackup : exportProject}
-                title={getButtonTitle()}
+                title='OK'
+                type='solid'
+                onPress={handleClosePress}
+                buttonStyle={{
+                  backgroundColor: '#28a745',
+                  borderRadius: 8,
+                  paddingHorizontal: 24,
+                  paddingVertical: 10,
+                }}
               />
             </View>
-          </View>
-        )
-        : renderBackingUpView()
-      }
-    </Modal>
+          )}
+        </View>
+      )}
     </OverlayWrapper>
+
+    // <Modal closeModal={closeModal} title={modalTitle}>
+    //   {backingUpStatus === '' ? (
+    //       <View>
+    //         <View style={overlayStyles.overlayContent}>
+    //           {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
+    //           <TextInput
+    //             value={backupAction === 'save' ? fileName : exportFileName}
+    //             onChangeText={validateFileName}
+    //             style={[overlayStyles.inputContainer, {width: '100%'}]}
+    //           />
+    //           {isFileNameError && <Text style={overlayStyles.importantText}>File Name Error!</Text>}
+    //           <Text style={overlayStyles.statusMessageText}>
+    //             *File names may not contain spaces or special characters, other than a dash or underscore.
+    //             Do not use a file extension.
+    //           </Text>
+    //         </View>
+    //         <View style={overlayStyles.buttonContainer}>
+    //           <Button
+    //             buttonStyle={{padding: 10}}
+    //             disabled={backupFileName.trim() === '' || isFileNameError}
+    //             onPress={backupAction === 'save' ? initiateBackup : exportProject}
+    //             title={getButtonTitle()}
+    //           />
+    //         </View>
+    //       </View>
+    //     )
+    //     : renderBackingUpView()
+    //   }
+    // </OverlayWrapper>
   );
 };
 
