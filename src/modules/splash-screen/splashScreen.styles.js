@@ -26,7 +26,7 @@ const splashScreenStyles = StyleSheet.create({
   },
   loadingSplashScreenText: {
     fontSize: themes.LARGE_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
     padding: 50,
   },
   title: {

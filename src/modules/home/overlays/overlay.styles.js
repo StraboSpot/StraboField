@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   importantText: {
     color: 'red',
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   inputContainer: {
