@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {ReportsList} from '.';
 import AddButton from '../../shared/ui/AddButton';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 
@@ -19,14 +19,14 @@ const ReportsListModal = () => {
   };
 
   return (
-    <OverlayWrapper>
+    <ModalWrapper>
       <AddButton
         onPress={addReport}
         title={'Create New Report'}
         type={'outline'}
       />
       <ReportsList isCheckedList/>
-    </OverlayWrapper>
+    </ModalWrapper>
   );
 };
 

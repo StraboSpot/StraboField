@@ -8,7 +8,7 @@ import JSONTree from 'react-native-json-tree';
 import forms from '../../assets/forms';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 
 const SpotDataModelModal = ({close}) => {
 
@@ -105,7 +105,7 @@ const SpotDataModelModal = ({close}) => {
   };
 
   return (
-    <OverlayWrapper closeModal={close} isFullScreen title={'Spot Data Model Object'}>
+    <ModalWrapper closeModal={close} isFullScreen title={'Spot Data Model Object'}>
       <ScrollView>
         <Button
           title={'Copy JSON to Clipboard'}
@@ -115,7 +115,7 @@ const SpotDataModelModal = ({close}) => {
         />
         <JSONTree data={spotDataModel} hideRoot/>
       </ScrollView>
-    </OverlayWrapper>
+    </ModalWrapper>
   );
 };
 

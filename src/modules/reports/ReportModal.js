@@ -7,7 +7,7 @@ import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from 
 import {isEmpty} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {WarningModal} from '../home/modals';
 import overlayStyles from '../home/overlays/overlay.styles';
@@ -42,7 +42,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
 
-      <OverlayWrapper
+      <ModalWrapper
         title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
@@ -100,7 +100,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
             : <Text>Are you sure you want to delete this report?</Text>}
         </WarningModal>
 
-      </OverlayWrapper>
+      </ModalWrapper>
     </>
   );
 };

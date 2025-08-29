@@ -3,7 +3,7 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/Helpers';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import {TagsModal} from '../tags';
 
 const TagsNotebookModal = ({
@@ -15,9 +15,9 @@ const TagsNotebookModal = ({
 
   const renderTagsModalContent = () => {
     return (
-      <OverlayWrapper onPress={onPress} closeModal={closeModal}>
+      <ModalWrapper onPress={onPress} closeModal={closeModal}>
         <TagsModal isFeatureLevelTagging={isFeatureLevelTagging}/>
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

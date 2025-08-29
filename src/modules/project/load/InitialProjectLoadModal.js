@@ -17,7 +17,7 @@ import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
 import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
-import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 
 const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   console.log('Rendering InitialProjectLoadModal...');
@@ -172,10 +172,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   };
 
   return (
-    <OverlayWrapper title={statusMessageModalTitle}>
+    <ModalWrapper title={statusMessageModalTitle}>
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}
-    </OverlayWrapper>
+    </ModalWrapper>
   );
 };
 

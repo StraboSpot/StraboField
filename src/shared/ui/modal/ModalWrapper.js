@@ -3,7 +3,7 @@ import React from 'react';
 import {Button, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import OverlayWrapperHeader from './OverlayWrapperHeader';
+import ModalWrapperHeader from './ModalWrapperHeader';
 import compassStyles from '../../../modules/compass/compass.styles';
 import overlayStyles from '../../../modules/home/overlays/overlay.styles';
 import {MODAL_KEYS, NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
@@ -89,7 +89,7 @@ const ModalWrapper = ({
       animationType={'slide'}
       backdropStyle={overlayStyles.backdropStyles}
     >
-      <OverlayWrapperHeader
+      <ModalWrapperHeader
         buttonTitleLeft={buttonTitleLeft}
         buttonTitleRight={buttonTitleRight}
         cancel={cancel}
@@ -102,4 +102,4 @@ const ModalWrapper = ({
   );
 };
 
-export default OverlayWrapper;
+export default ModalWrapper;

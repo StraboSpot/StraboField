@@ -5,7 +5,7 @@ import {Button, Overlay} from '@rn-vui/base';
 
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import OverlayWrapperHeader from '../../shared/ui/modal/OverlayWrapperHeader';
+import ModalWrapperHeader from '../../shared/ui/modal/ModalWrapperHeader';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
 import overlayStyles from '../home/overlays/overlay.styles';
@@ -80,7 +80,7 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
         }]}
         isVisible={true}
       >
-        <OverlayWrapperHeader
+        <ModalWrapperHeader
           buttonTitleRight={'Done'}
           title={'Facies'}
           closeModal={() => setIsFaciesModalVisible(false)}
