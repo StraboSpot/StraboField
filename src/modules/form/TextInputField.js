@@ -28,14 +28,9 @@ const TextInputField = ({
 
   const onFocusEffect = useCallback(() => {
     if (Platform.OS === 'ios') {
-      KeyboardManager.setEnable(true);
+      KeyboardManager.setToolbarDoneBarButtonItemText('Close Keyboard');
+      KeyboardManager.setEnableAutoToolbar(true);
     }
-    return () => {
-      if (Platform.OS === 'ios') {
-        console.log('BasicPageDetail onFocusEffect');
-        KeyboardManager.setEnable(false);
-      }
-    };
   }, []);
 
   useFocusEffect(onFocusEffect);

@@ -21,19 +21,19 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
     setImageThumbnailURIs,
   } = useImageThumbnails({images});
 
-  const onFocusEffect = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      KeyboardManager.setEnable(true);
-    }
-    return () => {
-      if (Platform.OS === 'ios') {
-        console.log('BasicPageDetail onFocusEffect');
-        KeyboardManager.setEnable(false);
-      }
-    };
-  }, []);
-
-  useFocusEffect(onFocusEffect);
+  // const onFocusEffect = useCallback(() => {
+  //   if (Platform.OS === 'ios') {
+  //     KeyboardManager.setEnable(true);
+  //   }
+  //   return () => {
+  //     if (Platform.OS === 'ios') {
+  //       console.log('BasicPageDetail onFocusEffect');
+  //       KeyboardManager.setEnable(false);
+  //     }
+  //   };
+  // }, []);
+  //
+  // useFocusEffect(onFocusEffect);
 
   const renderError = () => (
     <View style={{paddingTop: 75}}>

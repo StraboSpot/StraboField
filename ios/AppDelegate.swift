@@ -15,8 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    IQKeyboardManager.shared.enable = true
-    IQKeyboardManager.shared.toolbarDoneBarButtonItemText = "Close Keyboard"
 
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
