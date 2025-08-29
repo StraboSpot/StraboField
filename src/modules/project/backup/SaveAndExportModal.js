@@ -174,7 +174,6 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
         )
         : renderBackingUpView()
       }
-    </Modal>
     </OverlayWrapper>
   );
 };
