@@ -233,9 +233,11 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
                 }}
               />
             </View>
-          )}
-        </View>
-      )}
+          </View>
+        )
+        : renderBackingUpView()
+      }
+    </Modal>
     </OverlayWrapper>
 
     // <Modal closeModal={closeModal} title={modalTitle}>

@@ -9,16 +9,14 @@ import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
-import useProject from '../useProject';
-import TargetDatasetModal from './TargetDatasetModal';
 import {setIsProjectLoadComplete} from '../../home/home.slice';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {makeDatasetCurrent, setSwitchValue} = useProject();
@@ -45,7 +43,6 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const onSwitch = async (val) => {
     const value = await setSwitchValue(val, dataset);
     console.log('Value has been switched', value);
-    val && setMakeIsDatasetCurrentModalVisible(true);
     dispatch(setIsProjectLoadComplete(true));
   };
 
@@ -77,14 +74,6 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
         <ListItem.Chevron/>
       </ListItem>
-
-      {/* Modal */}
-      {isMakeDatasetCurrentModalVisible && !isProjectLoadSelectionModalVisible && (
-        <TargetDatasetModal
-          closeModal={() => setMakeIsDatasetCurrentModalVisible(false)}
-          dataset={dataset}
-        />
-      )}
     </View>
   );
 };

@@ -35,10 +35,11 @@ const MainButtons = ({
     <View
       style={mainKeys.length === 1 ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonsContainer}>
       {mainKeys.map((k) => {
+        const isSingle = mainKeys.length === 1;
         return (
           <Button
             key={k}
-            containerStyle={mainKeys.length === 1 ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
+            containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
             buttonStyle={[formStyles.formButtonLarge, {
               backgroundColor: formProps?.values[k] ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
             }]}

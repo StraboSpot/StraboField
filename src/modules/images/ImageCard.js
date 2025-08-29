@@ -84,7 +84,7 @@ const ImageCard = ({
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>
-      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+      <View style={imageStyles.cardTitleContainer}>
         {isEditing ? (
           <TextInput
             autoFocus
@@ -93,7 +93,7 @@ const ImageCard = ({
             onEndEditing={handleEndEditing}
             onSubmitEditing={handleEndEditing}  // Needed for web
             placeholder={placeholderTitle}
-            style={[imageStyles.cardTitle, {flex: 1}, Platform.OS === 'web' && {
+            style={[imageStyles.cardTitle, Platform.OS === 'web' && {
               display: 'inline-block',
               maxWidth: 87,
               overflow: 'hidden',
@@ -103,7 +103,7 @@ const ImageCard = ({
             value={title}
           />
         ) : (
-          <TouchableOpacity style={{flex: 1, alignItems: 'center'}} onPress={() => setIsEditing(true)}>
+          <TouchableOpacity style={imageStyles.cardTitleEditingButton} onPress={() => setIsEditing(true)}>
             <Text
               style={[
                 imageStyles.cardTitle,

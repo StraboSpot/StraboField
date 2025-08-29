@@ -26,10 +26,19 @@ const imageStyles = StyleSheet.create({
     padding: 0,
   },
   cardTitle: {
+    flex: 1,
     fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     paddingVertical: 5,
     textAlign: 'center',
+  },
+  cardTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  cardTitleEditingButton: {
+    alignItems: 'center',
+    flex: 1,
   },
   closeButtonContainer: {
     position: 'absolute',

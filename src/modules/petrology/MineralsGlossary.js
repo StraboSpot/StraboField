@@ -82,7 +82,7 @@ const MineralsGlossary = ({addMineral}) => {
   };
 
   return (
-    <View style={{paddingLeft: 10, paddingRight: 10}}>
+    <View style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
       <FlatList ListHeaderComponent={
         isEmpty(activeMineralInfo) ? renderMineralList() : renderMineralInfo()
       }/>
