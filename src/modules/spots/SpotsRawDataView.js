@@ -55,6 +55,7 @@ const SpotsRawDataView = () => {
     <OverlayWrapper
       isFullScreen
       closeModal={closeModal}
+      overlayStylesOverride={{width: '90%', height: '80%'}}
     >
       <ScrollView>
         <Button

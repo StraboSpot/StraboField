@@ -55,6 +55,8 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
       cancel={closeModal}
       closeModal={saveFormAndGo}
       title={'Image Properties'}
+      overlayStylesOverride={{height: '90%'}}
+
     >
       <FlatList
         ListHeaderComponent={renderFormFields()}

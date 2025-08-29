@@ -46,6 +46,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
+        overlayStylesOverride={{width: '80%'}}
       >
         <FlatList
           bounces={false}

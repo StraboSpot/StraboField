@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 10,
     justifyContent: 'flex-end',
     paddingTop: 10,
   },
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
   overlayContent: {
     alignItems: 'center',
     marginTop: 5,
+    // backgroundColor: 'green',
   },
   overlayMapMenuPosition: {
     bottom: SMALL_SCREEN ? 80 : 100,
