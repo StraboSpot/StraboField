@@ -35,6 +35,7 @@ module.exports = {
     'operator-linebreak': ['error', 'before'],
     'quote-props': ['error', 'consistent'],
     'quotes': ['error', 'single'],
+    'react/jsx-sort-props': 'error',
 
     // StraboSpot2 Override Import rules
     'import/order': ['error', {
