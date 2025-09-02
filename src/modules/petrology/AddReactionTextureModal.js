@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -61,7 +61,7 @@ const AddReactionTextureModal = ({onPress}) => {
 
   const renderAddReactionTextureModalContent = () => {
     return (
-      <OverlayWrapper
+      <ModalWrapper
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
         onPress={onPress}
@@ -85,7 +85,7 @@ const AddReactionTextureModal = ({onPress}) => {
           }
         />
         {!choicesViewKey && <SaveButton title={'Save Reaction Texture'} onPress={saveReactionTexture}/>}
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

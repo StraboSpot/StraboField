@@ -8,7 +8,7 @@ import {formStyles, useForm} from '.';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN, WARNING_COLOR} from '../../shared/styles.constants';
-import OverlayWrapperHeader from '../../shared/ui/modal/OverlayWrapperHeader';
+import ModalWrapperHeader from '../../shared/ui/modal/ModalWrapperHeader';
 import SliderBar from '../../shared/ui/SliderBar';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import Compass from '../compass/Compass';
@@ -71,13 +71,13 @@ const MeasurementModal = ({
       overlayStyle={
         SMALL_SCREEN
           ? overlayStyles.overlayContainerFullScreen
-          : [{...overlayStyles.overlayContainer, maxHeight: height * 0.80}, overlayStyles.overlayPosition]
+          : [{...overlayStyles.overlayContainer, height: 0.60}, overlayStyles.overlayPosition]
       }
       supportedOrientations={['portrait', 'landscape']}
       isVisible={true}
       fullScreen={SMALL_SCREEN}
     >
-      <OverlayWrapperHeader
+      <ModalWrapperHeader
         buttonTitleRight={'Done'}
         title={measurementsGroupLabel}
         closeModal={() => setIsMeasurementModalVisible(false)}

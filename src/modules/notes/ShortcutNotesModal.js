@@ -1,15 +1,15 @@
 import React from 'react';
 
 import Notes from './Notes';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 
 const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
 
   const renderNotesShortcutModal = () => {
     return (
-      <OverlayWrapper onPress={onPress}>
+      <ModalWrapper onPress={onPress}>
         <Notes zoomToCurrentLocation={zoomToCurrentLocation}/>
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

@@ -5,8 +5,10 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
+import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
+import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SaveButton from '../../shared/ui/SaveButton';
 import uiStyles from '../../shared/ui/ui.styles';
@@ -17,7 +19,6 @@ import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import Templates from '../templates/Templates';
-import noteStyle from './notes.styles';
 
 const Notes = ({zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -147,6 +148,7 @@ const Notes = ({zoomToCurrentLocation}) => {
           </>
         )
       }
+      <FlatListItemSeparator/>
       {!isShowTemplates && (
         <ScrollView style={noteStyle.noteContainer}>
           <NoteForm

@@ -13,7 +13,7 @@ import useUpload from '../../../services/useUpload';
 import useUploadImages from '../../../services/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
-import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 import Spacer from '../../../shared/ui/Spacer';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
@@ -262,7 +262,7 @@ const UploadModal = ({closeModal}) => {
   };
 
   return (
-    <OverlayWrapper
+    <ModalWrapper
       title={modalTitle}
       closeModal={closeModal}
     >
@@ -284,7 +284,7 @@ const UploadModal = ({closeModal}) => {
           )
         }
       </View>
-    </OverlayWrapper>
+    </ModalWrapper>
   );
 };
 

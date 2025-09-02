@@ -8,7 +8,7 @@ import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
 import overlayStyles from '../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
@@ -54,7 +54,7 @@ const LogOut = () => {
 
   const renderLogoutModal = () => {
     return (
-      <OverlayWrapper
+      <ModalWrapper
         closeModal={() => setIsLogoutModalVisible(false)}
         title={'Log Out?'}
       >
@@ -78,7 +78,7 @@ const LogOut = () => {
             />
           </View>
         </View>
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

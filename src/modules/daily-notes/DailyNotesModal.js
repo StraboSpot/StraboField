@@ -9,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import {DateInputField, TextInputField} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -64,7 +64,7 @@ const DailyNotesModal = () => {
 
   const renderDailyNotesModal = () => {
     return (
-      <OverlayWrapper buttonTitleRight={''}>
+      <ModalWrapper buttonTitleRight={''}>
         <SaveAndCancelButtons
           cancel={() => close()}
           save={() => saveNote(formRef?.current?.values)}
@@ -120,7 +120,7 @@ const DailyNotesModal = () => {
             </View>
           )}
         </Formik>
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

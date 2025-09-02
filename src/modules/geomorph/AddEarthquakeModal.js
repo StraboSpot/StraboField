@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID} from '../../shared/Helpers';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import OverlayWrapper from '../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import SaveButton from '../../shared/ui/SaveButton';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
@@ -149,7 +149,7 @@ const AddEarthquakeModal = ({onPress}) => {
 
   const renderNotebookEarthquakeModal = () => {
     return (
-      <OverlayWrapper
+      <ModalWrapper
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
         onPress={onPress}
@@ -175,7 +175,7 @@ const AddEarthquakeModal = ({onPress}) => {
           }
         />
         {!choicesViewKey && <SaveButton title={'Save Earthquake'} onPress={saveEarthquake}/>}
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

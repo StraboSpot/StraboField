@@ -10,7 +10,7 @@ import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
-import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 import {Form, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
@@ -222,7 +222,7 @@ const AddIntervalModal = () => {
 
   const renderAddIntervalModal = () => {
     return (
-      <OverlayWrapper
+      <ModalWrapper
         title={'Add Interval'}
         buttonTitleLeft={'Cancel'}
         buttonTitleRight={'Save'}
@@ -233,7 +233,7 @@ const AddIntervalModal = () => {
           ListHeaderComponent={renderAddIntervalNameField()}
           ListFooterComponent={renderAddIntervalFormFields()}
         />
-      </OverlayWrapper>
+      </ModalWrapper>
     );
   };
 

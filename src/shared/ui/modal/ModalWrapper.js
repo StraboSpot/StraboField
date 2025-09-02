@@ -3,7 +3,7 @@ import React from 'react';
 import {Button, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import OverlayWrapperHeader from './OverlayWrapperHeader';
+import ModalWrapperHeader from './ModalWrapperHeader';
 import compassStyles from '../../../modules/compass/compass.styles';
 import overlayStyles from '../../../modules/home/overlays/overlay.styles';
 import {MODAL_KEYS, NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
@@ -13,17 +13,17 @@ import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import {useWindowSize} from '../useWindowSize';
 
-const OverlayWrapper = ({
-                          buttonTitleLeft,
-                          buttonTitleRight,
-                          cancel,
-                          children,
-                          closeModal,
-                          isFullScreen,
-                          onPress,
-                          overlayStylesOverride,
-                          title,
-                        }) => {
+const ModalWrapper = ({
+                        buttonTitleLeft,
+                        buttonTitleRight,
+                        cancel,
+                        children,
+                        closeModal,
+                        isFullScreen,
+                        onPress,
+                        overlayStyleOverride,
+                        title,
+                      }) => {
 
   const {height, width} = useWindowSize();
 
@@ -35,7 +35,10 @@ const OverlayWrapper = ({
     if (SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
-      ...overlayStylesOverride,
+      ...overlayStyleOverride,
+      // flex: 1,
+      // maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
+      width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
     };
   };
 
@@ -86,7 +89,7 @@ const OverlayWrapper = ({
       animationType={'slide'}
       backdropStyle={overlayStyles.backdropStyles}
     >
-      <OverlayWrapperHeader
+      <ModalWrapperHeader
         buttonTitleLeft={buttonTitleLeft}
         buttonTitleRight={buttonTitleRight}
         cancel={cancel}
@@ -99,4 +102,4 @@ const OverlayWrapper = ({
   );
 };
 
-export default OverlayWrapper;
+export default ModalWrapper;

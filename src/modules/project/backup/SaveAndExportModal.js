@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
-import OverlayWrapper from '../../../shared/ui/modal/OverlayWrapper';
+import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import overlayStyles from '../../home/overlays/overlay.styles';
@@ -147,7 +147,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   return (
-    <OverlayWrapper closeModal={closeModal} title={modalTitle}>
+    <ModalWrapper closeModal={closeModal} title={modalTitle}>
       {backingUpStatus === '' ? (
         <View style={{padding: 16}}>
           {/* Instruction Text */}
@@ -233,40 +233,11 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
                 }}
               />
             </View>
-          )}
-        </View>
-      )}
-    </OverlayWrapper>
-
-    // <Modal closeModal={closeModal} title={modalTitle}>
-    //   {backingUpStatus === '' ? (
-    //       <View>
-    //         <View style={overlayStyles.overlayContent}>
-    //           {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
-    //           <TextInput
-    //             value={backupAction === 'save' ? fileName : exportFileName}
-    //             onChangeText={validateFileName}
-    //             style={[overlayStyles.inputContainer, {width: '100%'}]}
-    //           />
-    //           {isFileNameError && <Text style={overlayStyles.importantText}>File Name Error!</Text>}
-    //           <Text style={overlayStyles.statusMessageText}>
-    //             *File names may not contain spaces or special characters, other than a dash or underscore.
-    //             Do not use a file extension.
-    //           </Text>
-    //         </View>
-    //         <View style={overlayStyles.buttonContainer}>
-    //           <Button
-    //             buttonStyle={{padding: 10}}
-    //             disabled={backupFileName.trim() === '' || isFileNameError}
-    //             onPress={backupAction === 'save' ? initiateBackup : exportProject}
-    //             title={getButtonTitle()}
-    //           />
-    //         </View>
-    //       </View>
-    //     )
-    //     : renderBackingUpView()
-    //   }
-    // </OverlayWrapper>
+          </View>
+        )
+        : renderBackingUpView()
+      }
+    </ModalWrapper>
   );
 };
 

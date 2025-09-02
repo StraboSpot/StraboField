@@ -8,7 +8,6 @@ import AcknowledgeInput from './AcknowledgeInput';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
@@ -171,7 +170,6 @@ const Form = ({
       keyExtractor={(item, index) => index.toString()}
       data={Object.values(survey.filter(item => isRelevant(item, values)))}
       renderItem={({item}) => renderField(item)}
-      ItemSeparatorComponent={FlatListItemSeparator}
     />
   );
 };
