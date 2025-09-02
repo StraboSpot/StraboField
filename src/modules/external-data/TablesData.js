@@ -1,17 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import {FlatList, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {Icon, Overlay} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
 
 import externalDataStyles from './externalData.styles';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
@@ -64,7 +58,7 @@ function TablesData({
         <View style={externalDataStyles.modalContent}>
           <View style={externalDataStyles.modalHeader}>
             <Text style={externalDataStyles.modalTitle}>{loading ? 'Loading Table...' : tableName}</Text>
-            <Pressable onPress={closeTable} >
+            <Pressable onPress={closeTable}>
               <Icon color={'#333'} name={'close'} size={30} type={'ionicon'}/>
             </Pressable>
           </View>
@@ -96,7 +90,8 @@ function TablesData({
       <View>
         <Pressable
           loading={loading}
-          onPress={() => selectTable(table)} style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
+          onPress={() => selectTable(table)}
+          style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
         >
           <Text>{table.name}</Text>
           <Pressable

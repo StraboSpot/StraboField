@@ -82,7 +82,9 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
         // handleIGSNChecked(true);
         // if (isEmpty(selectedUserCode)) setIsPickerVisible(true);
       }
-      else if (tokens.errors.permissions) throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
+      else if (tokens.errors.permissions) {
+        throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
+      }
     }
     catch (err) {
       console.error(err);
@@ -239,7 +241,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
             {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
 
             {
-             !isEmpty(sesarToken?.access)
+              !isEmpty(sesarToken?.access)
               && renderIGSNUserCodePicker()
             }
             {!isEmpty(sesarToken?.access) && <Button

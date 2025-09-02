@@ -69,12 +69,12 @@ const FormSlider = ({
               : choicesList.map(c => c.label)}
           maximumValue={hasNoneChoice ? choicesList.length : choicesList.length - 1}
           minimumValue={0}
+          onSlidingComplete={value => onSlideComplete(value)}
           rotateLabels={hasRotatedLabels}
           step={1}
           thumbTintColor={(!sliderValue || sliderValue === 5) && 'lightgrey'}
-          onSlidingComplete={value => onSlideComplete(value)}
-          // value={choicesList.map(c => c.name).indexOf(formProps?.values[fieldKey])}
           value={handleSliderValue()}
+          // value={choicesList.map(c => c.name).indexOf(formProps?.values[fieldKey])}
         />
         {showSliderValue && (
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>

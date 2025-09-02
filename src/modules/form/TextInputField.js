@@ -1,10 +1,5 @@
 import React, {useCallback} from 'react';
-import {
-  Platform,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {Platform, Text, TextInput, View} from 'react-native';
 
 import {useFocusEffect} from '@react-navigation/native';
 import {Icon} from '@rn-vui/base';

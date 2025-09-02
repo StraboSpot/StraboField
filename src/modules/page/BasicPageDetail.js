@@ -95,7 +95,7 @@ const BasicPageDetail = ({
 
   const confirmLeavePage = () => {
     const description = isIGSNChecked
-      ? 'Would you like to save your data before continuing? \n\n \This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
+      ? 'Would you like to save your data before continuing? \n\n This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
       : 'Would you like to save your data before continuing?';
     if (!isTemplate && formRef.current && formRef.current.dirty) {
       const formCurrent = formRef.current;

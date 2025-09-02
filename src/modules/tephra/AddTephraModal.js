@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
-import {Button, Icon, Tab} from '@rn-vui/base';
+import {Button, Tab} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 

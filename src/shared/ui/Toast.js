@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {ToastProvider, Toast} from 'react-native-toast-notifications';
+import {ToastProvider} from 'react-native-toast-notifications';
 
 import styles from './ui.styles';
 
@@ -18,7 +18,7 @@ const ToastPopup = ({children, onToastRef}) => {
         noWifi: toast => (
           <View style={styles.toastContainer}>
             <Icon containerStyle={{paddingEnd: 10}} name={'wifi-off'}/>
-            <Text >{toast.message}</Text>
+            <Text>{toast.message}</Text>
           </View>
         ),
         lock: toast => (

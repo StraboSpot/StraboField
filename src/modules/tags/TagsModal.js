@@ -13,7 +13,6 @@ import SaveButton from '../../shared/ui/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyle from '../../shared/ui/modal/modal.style';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -28,7 +27,6 @@ const TagsModal = ({
                      isFeatureLevelTagging,
                      zoomToCurrentLocation,
                    }) => {
-  const {height} = useWindowSize();
   const toast = useToast();
   const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
   const {setPointAtCurrentLocation} = useMapLocation();

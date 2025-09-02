@@ -268,7 +268,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
                   mode={'dropdown'}
                   onValueChange={value => updatePicker(value)}
                   prompt={'Select a zoom level'}
-                selectedValue={downloadZoom}
+                  selectedValue={downloadZoom}
                 >
                   {zoomLevels.map((zoom) => {
                     return (

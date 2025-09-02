@@ -18,7 +18,6 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
   const formName = [groupKey, pageKey];
 
   const survey = getSurvey(formName);
-  const choices = getChoices(formName);
 
   const mainFormKeys = ['report_privacy', 'report_type', 'subject', 'notes'];
   const mainFormKeysFields = mainFormKeys.map(k => survey.find(f => f.name === k));

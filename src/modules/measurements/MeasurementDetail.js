@@ -15,7 +15,6 @@ import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import useCompassCalculations from '../compass/useCompassCalculations';

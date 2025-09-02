@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View, TouchableOpacity, Platform} from 'react-native';
+import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';

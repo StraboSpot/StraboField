@@ -24,10 +24,10 @@ const ImageBasemapLayer = () => {
         url={getImageScreenSizedURI(currentImageBasemap.id)}
       >
         <Layer
-          id={'imageBasemapLayer'}
-          type={'raster'}
-          paint={{'raster-opacity': 1}}
           // beforeId={'pointLayerColorHalo'}
+          id={'imageBasemapLayer'}
+          paint={{'raster-opacity': 1}}
+          type={'raster'}
         />
       </Source>
     );

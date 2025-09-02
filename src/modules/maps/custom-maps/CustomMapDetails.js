@@ -24,7 +24,6 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
-import useMapCoords from '../useMapCoords';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 // const {State: TextInputState} = TextInput;
@@ -32,12 +31,12 @@ const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 const CustomMapDetails = () => {
   let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
-  const {getMyMapsBboxCoords} = useMapCoords();
+  // const {getMyMapsBboxCoords} = useMapCoords();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  const isOnline = useSelector(state => state.connections.isOnline);
+  // const isOnline = useSelector(state => state.connections.isOnline);
 
   const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});

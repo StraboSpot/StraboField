@@ -7,7 +7,6 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
-import {WARNING_COLOR} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';

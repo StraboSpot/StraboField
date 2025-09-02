@@ -1,14 +1,10 @@
 import React, {useState} from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import useDevice from '../../../services/useDevice';
 import useImport from '../../../services/useImport';
-import commonStyles from '../../../shared/common.styles';
-import {BLUE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import {
   setIsProjectLoadSelectionModalVisible,
@@ -30,7 +26,6 @@ const OpenProjectPage = () => {
   const [projectToOpen, setProjectToOpen] = useState(null);
 
   const {loadProjectFromDevice} = useImport();
-  const {openURL} = useDevice();
 
   const source = 'device';
 

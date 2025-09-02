@@ -1,11 +1,9 @@
-import React, {useCallback, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {FlatList, Text, View} from 'react-native';
 
-import {useFocusEffect} from '@react-navigation/native';
 import {Icon} from '@rn-vui/base';
-import KeyboardManager from 'react-native-keyboard-manager';
 
-import {ImageModal, imageStyles, ImageCard, useImageThumbnails} from '.';
+import {ImageCard, ImageModal, imageStyles, useImageThumbnails} from '.';
 import commonStyles from '../../shared/common.styles';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 

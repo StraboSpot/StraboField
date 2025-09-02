@@ -7,7 +7,6 @@ import JSONTree from 'react-native-json-tree';
 import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setIntersectedSpotsForTagging} from './spots.slice';
 import commonStyles from '../../shared/common.styles';
 import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
@@ -29,22 +28,22 @@ const SpotsRawDataView = () => {
     buildObject();
   }, [selectedSpots]);
 
- const buildObject = () => {
-   const filteredDataJson = {
-     Project: {
-       project,
-     },
-     Spots: {selectedSpots},
-   };
-   console.log(filteredDataJson);
-   setDataJson(filteredDataJson);
- };
+  const buildObject = () => {
+    const filteredDataJson = {
+      Project: {
+        project,
+      },
+      Spots: {selectedSpots},
+    };
+    console.log(filteredDataJson);
+    setDataJson(filteredDataJson);
+  };
 
- const closeModal = () => {
+  const closeModal = () => {
 
-   // dispatch(setIntersectedSpotsForTagging([]));
-   dispatch(setModalVisible({modal: null}));
- };
+    // dispatch(setIntersectedSpotsForTagging([]));
+    dispatch(setModalVisible({modal: null}));
+  };
 
   const onClipboardPress = () => {
     Clipboard.setString(JSON.stringify(selectedSpots));

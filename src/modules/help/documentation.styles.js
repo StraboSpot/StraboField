@@ -1,7 +1,7 @@
 import {Dimensions, StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {BLUE, MEDIUM_TEXT_SIZE, PRIMARY_BACKGROUND_COLOR, WHITE} from '../../shared/styles.constants';
+import {BLUE, MEDIUM_TEXT_SIZE, WHITE} from '../../shared/styles.constants';
 
 const documentationStyles = StyleSheet.create({
   activityIndicatorStyle: {

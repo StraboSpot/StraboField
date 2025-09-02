@@ -9,10 +9,7 @@ import SortingButtons from './SortingButtons';
 import {SORT_ORDER, SORTED_VIEWS} from './spots.constants';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import {
-  DARKGREY,
-  PRIMARY_BACKGROUND_COLOR,
-} from '../../shared/styles.constants';
+import {DARKGREY, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import PickerOverlay from '../../shared/ui/PickerOverlay';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 

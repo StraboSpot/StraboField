@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN, WARNING_COLOR} from '../../shared/styles.constants';
 import ModalWrapperHeader from '../../shared/ui/modal/ModalWrapperHeader';
 import SliderBar from '../../shared/ui/SliderBar';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
 import Compass from '../compass/Compass';
 import compassStyles from '../compass/compass.styles';
 import ManualMeasurement from '../compass/ManualMeasurement';
@@ -23,8 +22,6 @@ const MeasurementModal = ({
                             measurementsGroupLabel,
                             setIsMeasurementModalVisible,
                           }) => {
-  const {height} = useWindowSize();
-
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
 
   const [isManualMeasurement, setIsManualMeasurement] = useState(Platform.OS !== 'ios');

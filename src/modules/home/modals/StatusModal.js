@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import useImport from '../../../services/useImport';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE} from '../../../shared/styles.constants';
 import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -16,9 +15,8 @@ import {setSelectedProject} from '../../project/projects.slice';
 import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../home.slice';
 import overlayStyles from '../overlays/overlay.styles';
 
-const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
+const StatusModal = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const isModalLoading = useSelector(state => state.home.loading.modal);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
   const selectedProject = useSelector(state => state.project.selectedProject) || {};
@@ -53,7 +51,7 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
   return (
     <StatusDialogBox
       closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      isVisible={visible || isStatusMessagesModalVisible}
+      isVisible={isStatusMessagesModalVisible}
       onConfirmPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
       showConfirmButton={!isModalLoading && selectedProject.source === ''}
       title={'Status'}
@@ -86,16 +84,7 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
                 type={'clear'}
               />
             )}
-
           </View>
-          {/*{statusMessages.includes('Complete!') && (*/}
-          {/*  <Button*/}
-          {/*    title={'Export Project?'}*/}
-          {/*    containerStyle={{padding: 10}}*/}
-          {/*    type={'clear'}*/}
-          {/*    onPress={exportProject}*/}
-          {/*  />*/}
-          {/*)}*/}
         </View>
         }
       </View>

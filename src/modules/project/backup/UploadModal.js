@@ -269,11 +269,11 @@ const UploadModal = ({closeModal}) => {
         {(uploadState === 'complete' || uploadState === 'error')
           && (
             <Button
-              title={'OK'}
-              type={'clear'}
-              titleStyle={overlayStyles.buttonText}
               // disabled={uploadState !== 'complete'}
               onPress={handleClosePress}
+              title={'OK'}
+              titleStyle={overlayStyles.buttonText}
+              type={'clear'}
             />
           )
         }
