@@ -87,11 +87,11 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
     const modifiedTimeAndDate = moment.unix(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
     return (
       <ListItem
-        key={item.id}
-        onPress={() => onProjectPress(item)}
         containerStyle={commonStyles.listItem}
         disabled={!isOnline.isConnected && source !== 'device'}
         disabledStyle={{backgroundColor: 'lightgrey'}}
+        key={item.id}
+        onPress={() => onProjectPress(item)}
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>
@@ -113,24 +113,24 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
       return (
         <View style={{flex: 1}}>
           <FlatList
-            keyExtractor={item => item.id.toString()}
-            data={projectsArr.projects}
-            renderItem={({item}) => renderProjectItem(item)}
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={
               <View>
                 {source === 'server' ? (
                   <Button
-                    title={'Retry'}
-                    onPress={() => getAllProjects()}
                     buttonStyle={{width: 80, alignSelf: 'center'}}
+                    onPress={() => getAllProjects()}
+                    title={'Retry'}
                   />
                 ) : (
                   <ListEmptyText text={'No Projects Available'}/>
                 )}
                 {isError && renderErrorMessage()}
               </View>
-            }/>
+            }
+            data={projectsArr.projects}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderProjectItem(item)}/>
         </View>
       );
     }

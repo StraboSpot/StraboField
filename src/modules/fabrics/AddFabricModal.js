@@ -68,39 +68,39 @@ const AddFabricModal = ({onPress}) => {
     return (
       <>
         <ButtonGroup
-          selectedIndex={selectedTypeIndex}
-          onPress={onFabricTypePress}
+          buttonStyle={{padding: 5}}
           buttons={Object.values(FABRIC_TYPES)}
           containerStyle={{height: 40, borderRadius: 10}}
-          buttonStyle={{padding: 5}}
+          onPress={onFabricTypePress}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          selectedIndex={selectedTypeIndex}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         {types[selectedTypeIndex] === 'fault_rock' && (
           <FaultRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
         {types[selectedTypeIndex] === 'igneous_rock' && (
           <IgneousRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
         {types[selectedTypeIndex] === 'metamorphic_rock' && (
           <MetamRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
       </>
@@ -111,18 +111,17 @@ const AddFabricModal = ({onPress}) => {
     const formName = [groupKey, types[selectedTypeIndex]];
     return (
       <ModalWrapper
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <>
           <FlatList
-            bounces={false}
             ListHeaderComponent={
               <View style={{flex: 1}}>
                 <Formik
-                  innerRef={formRef}
                   initialValues={{}}
+                  innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={false}
@@ -135,9 +134,10 @@ const AddFabricModal = ({onPress}) => {
                 </Formik>
               </View>
             }
+            bounces={false}
           />
         </>
-        {!choicesViewKey && <SaveButton title={'Save Fabric'} onPress={saveFabric}/>}
+        {!choicesViewKey && <SaveButton onPress={saveFabric} title={'Save Fabric'}/>}
       </ModalWrapper>
     );
   };

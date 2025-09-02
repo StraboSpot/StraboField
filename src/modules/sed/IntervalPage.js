@@ -75,13 +75,13 @@ const IntervalPage = ({page}) => {
         save={() => saveInterval(intervalRef.current)}
       />
       <Formik
-        innerRef={intervalRef}
-        onSubmit={() => console.log('Submitting form...')}
-        onReset={() => console.log('Resetting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        initialValues={{...interval, character}}
-        validateOnChange={false}
         enableReinitialize={true}
+        initialValues={{...interval, character}}
+        innerRef={intervalRef}
+        onReset={() => console.log('Resetting form...')}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={false}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>

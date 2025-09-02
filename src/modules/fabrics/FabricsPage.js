@@ -64,15 +64,15 @@ const FabricsPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={fabricsGrouped}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        renderItem={({item}) => <FabricListItem fabric={item} editFabric={editFabric}/>}
+        renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={fabricsGrouped}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };

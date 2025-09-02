@@ -41,14 +41,14 @@ const UrlData = ({
   const renderURLEditModal = () => {
     return (
       <TextInputModal
-        multiline={true}
-        keyboardType={'url'}
-        dialogTitle={'Edit Url'}
-        visible={isEditModalVisible}
-        onPress={onSaveEdits}
         closeModal={() => setIsEditModalVisible(false)}
-        value={urlToEdit.url}
+        dialogTitle={'Edit Url'}
+        keyboardType={'url'}
+        multiline={true}
         onChangeText={text => setUrlToEdit({...urlToEdit, url: text})}
+        onPress={onSaveEdits}
+        value={urlToEdit.url}
+        visible={isEditModalVisible}
       />
     );
   };
@@ -58,40 +58,40 @@ const UrlData = ({
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <ListItem.Title
-            style={[commonStyles.listItemTitle, {color: BLUE}]}
-            onPress={() => openURL(urlItem)}>
+            onPress={() => openURL(urlItem)}
+            style={[commonStyles.listItemTitle, {color: BLUE}]}>
             {truncateText(urlItem, 33)}
           </ListItem.Title>
 
           <View style={{flexDirection: 'row'}}>
             <Button
               buttonStyle={externalDataStyles.iconButton}
-              type={'clear'}
-              onPress={() => editUrl(urlItem, i)}
               icon={
                 <Icon
-                  name={'edit'}
-                  type={'material'}
-                  size={20}
                   color={'darkgrey'}
                   containerStyle={externalDataStyles.iconContainer}
+                  name={'edit'}
+                  size={20}
+                  type={'material'}
                 />
               }
+              onPress={() => editUrl(urlItem, i)}
+              type={'clear'}
             />
             {editable && (
               <Button
                 buttonStyle={externalDataStyles.iconButton}
-                type={'clear'}
-                onPress={() => initializeDelete('url', urlItem)}
                 icon={
                   <Icon
-                    name={'trash'}
-                    type={'font-awesome'}
-                    size={25}
                     color={'darkgrey'}
                     containerStyle={externalDataStyles.iconContainer}
+                    name={'trash'}
+                    size={25}
+                    type={'font-awesome'}
                   />
                 }
+                onPress={() => initializeDelete('url', urlItem)}
+                type={'clear'}
               />
             )}
           </View>
@@ -117,12 +117,12 @@ const UrlData = ({
   return (
     <View style={{flex: 1}}>
       <FlatList
-        listKey={'urls'}
-        keyExtractor={index => index}
-        data={spot.properties?.data?.urls}
-        renderItem={({item, index}) => renderUrlListItem(item, index)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No URLs saved'}/>}
+        data={spot.properties?.data?.urls}
+        keyExtractor={index => index}
+        listKey={'urls'}
+        renderItem={({item, index}) => renderUrlListItem(item, index)}
       />
       {renderURLEditModal()}
     </View>

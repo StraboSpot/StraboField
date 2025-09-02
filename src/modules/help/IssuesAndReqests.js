@@ -15,19 +15,19 @@ const IssuesAndRequests = () => {
         You can report issues directly on GitHub (preferred method) or email our team.
       </Text>
       <OpenUrlLink
-        title={'Open GitHub Issues'}
-        titleStyle={styles.buttonText}
-        icon={'logo-github'}
         buttonStyle={styles.button}
         color={WHITE}
+        icon={'logo-github'}
+        title={'Open GitHub Issues'}
+        titleStyle={styles.buttonText}
         url={SUPPORT_PATHS.GITHUB}
       />
       <OpenUrlLink
-        title={'Email Support'}
-        titleStyle={styles.buttonText}
-        icon={'mail-outline'}
         buttonStyle={styles.button}
         color={WHITE}
+        icon={'mail-outline'}
+        title={'Email Support'}
+        titleStyle={styles.buttonText}
         url={SUPPORT_PATHS.EMAIL}
       />
     </View>

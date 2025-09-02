@@ -43,8 +43,8 @@ const AddTephraModal = ({onPress}) => {
     const formName = [pageKey, Object.values(subpages)[tabIndex]];
     return (
       <ModalWrapper
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <Tab
@@ -64,12 +64,11 @@ const AddTephraModal = ({onPress}) => {
           ))}
         </Tab>
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={true}
@@ -84,13 +83,14 @@ const AddTephraModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
         {!choicesViewKey && (
           <Button
-            title={'Save'}
             containerStyle={{height: 40, borderRadius: 10, marginTop: 10, marginBottom: 10}}
             onPress={saveTephra}
             textStyle={{color: PRIMARY_ACCENT_COLOR}}
+            title={'Save'}
           />
         )}
       </ModalWrapper>

@@ -62,17 +62,16 @@ const AddReactionTextureModal = ({onPress}) => {
   const renderAddReactionTextureModalContent = () => {
     return (
       <ModalWrapper
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{id: getNewId()}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
               >
                 {formProps => (
@@ -83,8 +82,9 @@ const AddReactionTextureModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
-        {!choicesViewKey && <SaveButton title={'Save Reaction Texture'} onPress={saveReactionTexture}/>}
+        {!choicesViewKey && <SaveButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
       </ModalWrapper>
     );
   };
@@ -102,10 +102,10 @@ const AddReactionTextureModal = ({onPress}) => {
         </View>
         <ChoiceButtons
           choiceFieldKey={basedOnKey}
-          survey={survey}
           choices={choices}
           formProps={formProps}
           onPress={choice => onMultiChoiceSelected(basedOnKey, choice)}
+          survey={survey}
         />
         {!isEmpty(formRef.current?.values[basedOnKey]) && formRef.current?.values[basedOnKey].includes('other') && (
           <>

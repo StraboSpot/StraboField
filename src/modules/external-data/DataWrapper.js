@@ -30,10 +30,10 @@ function DataWrapper({
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
     return (
       <DeleteConformationDialogBox
-        title={`${itemToDelete.type.toUpperCase()} to delete`}
-        isVisible={isDeleteConfirmModalVisible}
-        deleteOverlay={() => deleteSelection()}
         cancel={() => setIsDeleteConfirmModalVisible(false)}
+        deleteOverlay={() => deleteSelection()}
+        isVisible={isDeleteConfirmModalVisible}
+        title={`${itemToDelete.type.toUpperCase()} to delete`}
       >
         <Text>Are you sure you want to delete</Text>
         <Text>{title}?</Text>
@@ -45,16 +45,16 @@ function DataWrapper({
     <View style={{flex: 1}}>
       {urlData && (
         <UrlData
-          spot={spot}
           editable={editable}
           initializeDelete={(type, item) => initializeDelete(type, item)}
+          spot={spot}
         />
       )}
       {!urlData && (
         <TablesData
-          spot={spot}
           editable={editable}
           initializeDelete={(type, item) => initializeDelete(type, item)}
+          spot={spot}
         />
       )}
       {!isEmpty(itemToDelete) && renderDeleteConformation()}

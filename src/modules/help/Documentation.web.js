@@ -24,18 +24,18 @@ const Documentation = () => {
     <View style={styles.bottomButton}>
       {isOnline && (
         <Button
-          title={'StraboSpot Help Center'}
-          type={'clear'}
-          onPress={() => viewOnlineHelp(helpUrl)}
           icon={
             <Icon
-              name={'globe-outline'}
-              type={'ionicon'}
-              iconStyle={{paddingRight: 10}}
-              size={20}
               color={BLUE}
+              iconStyle={{paddingRight: 10}}
+              name={'globe-outline'}
+              size={20}
+              type={'ionicon'}
             />
           }
+          onPress={() => viewOnlineHelp(helpUrl)}
+          title={'StraboSpot Help Center'}
+          type={'clear'}
         />
       )}
     </View>

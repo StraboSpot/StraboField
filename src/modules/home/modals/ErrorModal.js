@@ -18,11 +18,11 @@ const ErrorModal = ({closeModal, children, isVisible}) => {
 
   return (
     <StatusDialogBox
-      title={'Error!'}
+      closeModal={closeModal || closeErrorModal}
       isVisible={isVisible || isErrorMessagesModalVisible}
       overlayTitleText={overlayStyles.titleTextError}
-      closeModal={closeModal || closeErrorModal}
       showCancelButton={!(Platform.OS === 'web' && statusMessages.includes('Error loading project!'))}
+      title={'Error!'}
     >
       <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
     </StatusDialogBox>

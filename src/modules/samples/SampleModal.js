@@ -139,10 +139,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     return (
       <>
         <MainButtons
-          mainKeys={sampleTypeKey}
           formName={formName}
-          setChoicesViewKey={setChoicesViewKey}
           formProps={formProps}
+          mainKeys={sampleTypeKey}
+          setChoicesViewKey={setChoicesViewKey}
         />
         <Form
           {...{
@@ -152,13 +152,18 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           }}
         />
         <FormSlider
+          choices={choices}
           fieldKey={inplacenessKey}
           formProps={formProps}
-          survey={survey}
-          choices={choices}
           labels={['In Place', 'Float']}
+          survey={survey}
         />
         <ButtonGroup
+          buttonStyle={{padding: 5}}
+          buttons={['Oriented', 'Unoriented']}
+          containerStyle={{height: 40, borderRadius: 10}}
+          onPress={onOrientedButtonPress}
+          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           selectedIndex={
             formRef.current?.values[orientedKey] === 'yes'
               ? 0
@@ -166,11 +171,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
                 ? 1
                 : undefined
           }
-          onPress={onOrientedButtonPress}
-          buttons={['Oriented', 'Unoriented']}
-          containerStyle={{height: 40, borderRadius: 10}}
-          buttonStyle={{padding: 5}}
-          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         <Form
@@ -261,18 +261,17 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     return (
       <>
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <Formik
-              innerRef={formRef}
+              enableReinitialize={true}
               initialValues={{
                 material_type: 'intact_rock',
                 sample_type: 'individual_sample',
                 sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
                 inplaceness_of_sample: '5___definitely',
               }}
-              onSubmit={values => console.log('Submitting form...', values)}
-              enableReinitialize={true}>
+              innerRef={formRef}
+              onSubmit={values => console.log('Submitting form...', values)}>
               {formProps => (
                 <View style={{flex: 1}}>
                   {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
@@ -280,6 +279,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
               )}
             </Formik>
           }
+          bounces={false}
         />
         {!choicesViewKey && (
           <SaveButton
@@ -294,8 +294,8 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   return (
     <ModalWrapper
-      closeModal={onCloseModalPressed}
       buttonTitleRight={choicesViewKey ? 'Done' : null}
+      closeModal={onCloseModalPressed}
       onPress={onPress}
     >
       {renderSampleMainContent()}

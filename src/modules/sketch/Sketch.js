@@ -46,43 +46,27 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
     <View style={styles.container}>
       <View style={{flex: 1, flexDirection: 'row'}}>
         <RNSketchCanvas
-          containerStyle={{backgroundColor: 'transparent', flex: 1}}
           canvasStyle={{
             backgroundColor: 'transparent',
             flex: 1,
             borderWidth: 2,
             borderColor: 'grey',
           }}
+          clearComponent={<View style={{...styles.functionButton, backgroundColor: 'red'}}>
+            <Text style={{color: 'white'}}>Clear</Text></View>}
+          closeComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Close</Text></View>}
+          containerStyle={{backgroundColor: 'transparent', flex: 1}}
+          defaultStrokeIndex={0}
+          defaultStrokeWidth={1}
+          eraseComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Eraser</Text></View>}
           localSourceImage={{
             filename: getLocalImageURI(image.id).replace('file://', ''),
             mode: 'AspectFit',
           }}
-          defaultStrokeIndex={0}
-          defaultStrokeWidth={1}
+          maxStrokeWidth={10}
+          minStrokeWidth={1}
           onClosePressed={() => setIsSketchModalVisible(false)}
           onSketchSaved={saveSketch}
-          closeComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Close</Text></View>}
-          undoComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Undo</Text></View>}
-          clearComponent={<View style={{...styles.functionButton, backgroundColor: 'red'}}>
-            <Text style={{color: 'white'}}>Clear</Text></View>}
-          eraseComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Eraser</Text></View>}
-          strokeComponent={color => <View style={[{backgroundColor: color}, styles.strokeColorButton]}/>}
-          strokeSelectedComponent={(color, index, changed) => {
-            return <View style={[{backgroundColor: color, borderWidth: 2}, styles.strokeColorButton]}/>;
-          }}
-          strokeWidthStep={1}
-          minStrokeWidth={1}
-          maxStrokeWidth={10}
-          strokeWidthComponent={(w) => {
-            return (
-              <View style={styles.strokeWidthButton}>
-                <View style={{
-                  backgroundColor: 'white', marginHorizontal: 2.5,
-                  width: Math.sqrt(w / 3) * 10, height: Math.sqrt(w / 3) * 10, borderRadius: Math.sqrt(w / 3) * 10 / 2,
-                }}/>
-              </View>
-            );
-          }}
           saveComponent={
             <View style={styles.functionButton}>
               <Text style={{color: 'white'}}>Save</Text>
@@ -96,6 +80,22 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
               imageType: 'jpg',
             };
           }}
+          strokeComponent={color => <View style={[{backgroundColor: color}, styles.strokeColorButton]}/>}
+          strokeSelectedComponent={(color, index, changed) => {
+            return <View style={[{backgroundColor: color, borderWidth: 2}, styles.strokeColorButton]}/>;
+          }}
+          strokeWidthComponent={(w) => {
+            return (
+              <View style={styles.strokeWidthButton}>
+                <View style={{
+                  backgroundColor: 'white', marginHorizontal: 2.5,
+                  width: Math.sqrt(w / 3) * 10, height: Math.sqrt(w / 3) * 10, borderRadius: Math.sqrt(w / 3) * 10 / 2,
+                }}/>
+              </View>
+            );
+          }}
+          strokeWidthStep={1}
+          undoComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Undo</Text></View>}
         />
       </View>
     </View>

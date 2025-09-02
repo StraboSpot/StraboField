@@ -101,14 +101,13 @@ const AddRockModal = ({modalKey, onPress}) => {
       <>
         {!areMultipleTemplates && (
           <FlatList
-            bounces={false}
             ListHeaderComponent={
               <View style={{flex: 1}}>
                 <Formik
-                  innerRef={formRef}
-                  initialValues={initialValues}
-                  onSubmit={values => console.log('Submitting form...', values)}
                   enableReinitialize={true}
+                  initialValues={initialValues}
+                  innerRef={formRef}
+                  onSubmit={values => console.log('Submitting form...', values)}
                 >
                   {formProps => (
                     <View style={{flex: 1}}>
@@ -118,9 +117,10 @@ const AddRockModal = ({modalKey, onPress}) => {
                 </Formik>
               </View>
             }
+            bounces={false}
           />
         )}
-        {!choicesViewKey && <SaveButton title={saveRockTitle} onPress={saveRock}/>}
+        {!choicesViewKey && <SaveButton onPress={saveRock} title={saveRockTitle}/>}
       </>
     );
   };
@@ -128,26 +128,26 @@ const AddRockModal = ({modalKey, onPress}) => {
   const renderAddRockModalContent = () => {
     return (
       <ModalWrapper
-        closeModal={onCloseModalPressed}
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
+        closeModal={onCloseModalPressed}
         onPress={onPress}
       >
         {Object.values(IGNEOUS_ROCK_CLASSES).includes(rockKey) && !choicesViewKey && !isShowTemplates && (
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={onIgneousRockTypePress}
+            buttonStyle={{padding: 5}}
             buttons={Object.values(IGNEOUS_ROCK_CLASSES).map(v => toTitleCase(v))}
             containerStyle={{height: 40, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={onIgneousRockTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
             textStyle={{color: PRIMARY_TEXT_COLOR}}
           />
         )}
         {!choicesViewKey && (
           <Templates
             isShowTemplates={isShowTemplates}
-            setIsShowTemplates={bool => setIsShowTemplates(bool)}
             rockKey={rockKey}
+            setIsShowTemplates={bool => setIsShowTemplates(bool)}
           />
         )}
         {!isShowTemplates && renderAddRock()}

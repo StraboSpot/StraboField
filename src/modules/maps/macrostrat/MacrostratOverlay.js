@@ -148,9 +148,9 @@ const MacrostratOverlay = ({
           <Card
             containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen] : [macrostratOverlayStyles.container]}>
             <Button
-              title={'Close'}
               containerStyle={{alignItems: 'flex-end'}}
               onPress={closeModal}
+              title={'Close'}
               type={'clear'}
             />
             <Card.Title>{isEmpty(dataObject.name) ? 'Unnamed' : dataObject.name}</Card.Title>

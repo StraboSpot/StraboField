@@ -23,7 +23,7 @@ const MainMenuPanelHeader = () => {
 
   return (
     <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>
-      <Pressable style={{flex: 1, flexDirection: 'row'}} onPress={() => dispatch(setMenuSelectionPage({name: null}))}>
+      <Pressable onPress={() => dispatch(setMenuSelectionPage({name: null}))} style={{flex: 1, flexDirection: 'row'}}>
         {mainMenuPageVisible ? (
           !isSideMenuVisible && (
             <View style={mainMenuPanelStyles.mainMenuIconContainer}>

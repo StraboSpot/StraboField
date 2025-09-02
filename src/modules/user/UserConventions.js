@@ -98,10 +98,10 @@ const UserProfile = () => {
       <>
         <SectionDivider dividerText={'Convert Measurements'}/>
         <Button
+          onPress={convertStrikeDipDirection}
           title={'Convert Strike <-> Dip Direction'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={convertStrikeDipDirection}
         />
         <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
           *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
@@ -134,18 +134,18 @@ const UserProfile = () => {
 
   return (
     <>
-      <View style={{flex: 1}} pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'}>
+      <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
               <Formik
+                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                enableReinitialize={true}  // Update values if preferences change while form open
+                initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values =>     validateForm({formName: formName, values: values})}
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
-                initialValues={userData}
                 validateOnChange={true}
-                enableReinitialize={true}  // Update values if preferences change while form open
               />
               {renderBulkUpdatesSection()}
               {isOnline.isInternetReachable ? (
@@ -153,11 +153,11 @@ const UserProfile = () => {
                   {Platform.OS !== 'web' && (
                     <View style={commonStyles.buttonContainer}>
                       <Button
-                        onPress={onDownloadUserProfile}
-                        type={'clear'}
-                        title={'Download User Conventions'}
                         loading={isDownloading}
                         loadingProps={userStyles.loadingSpinnerProps}
+                        onPress={onDownloadUserProfile}
+                        title={'Download User Conventions'}
+                        type={'clear'}
                       />
                     </View>
                   )}

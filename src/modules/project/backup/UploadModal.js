@@ -123,9 +123,9 @@ const UploadModal = ({closeModal}) => {
     return (
       <View style={{padding: 10}}>
         <LottieAnimations
-          type={'error'}
-          show={uploadState === 'error'}
           doesLoop={false}
+          show={uploadState === 'error'}
+          type={'error'}
         />
         <Text style={{textAlign: 'center'}}>{errorMessage}</Text>
       </View>
@@ -135,9 +135,9 @@ const UploadModal = ({closeModal}) => {
   const renderUploadAnimation = () => {
     return (
       <LottieAnimations
-        type={'uploadingCloud'}
-        doesLoop={true}
         animationStyle={{height: 50, width: 50}}
+        doesLoop={true}
+        type={'uploadingCloud'}
       />
     );
   };
@@ -145,9 +145,9 @@ const UploadModal = ({closeModal}) => {
   const renderUploadCompleteAnimation = () => {
     return (
       <LottieAnimations
-        type={'complete'}
-        doesLoop={false}
         animationStyle={{height: 50, width: 50}}
+        doesLoop={false}
+        type={'complete'}
       />
     );
   };
@@ -172,15 +172,15 @@ const UploadModal = ({closeModal}) => {
       <View style={overlayStyles.buttonContainer}>
         {__DEV__ && (
           <Button
-            title={'Images Only (Dev Mode)'}
-            type={'outline'}
-            titleStyle={overlayStyles.buttonText}
             onPress={uploadImagesOnly}
+            title={'Images Only (Dev Mode)'}
+            titleStyle={overlayStyles.buttonText}
+            type={'outline'}
           />
         )}
         <Button
-          title={'Upload'}
           onPress={() => initiateUpload()}
+          title={'Upload'}
         />
       </View>
     </View>
@@ -196,10 +196,10 @@ const UploadModal = ({closeModal}) => {
         </View>
         <Text style={{textAlign: 'center', paddingBottom: 5}}>Uploading images</Text>
         <ProgressBar
+          borderRadius={20}
+          height={15}
           progress={projectTransferProgress}
           width={250}
-          height={15}
-          borderRadius={20}
         />
         <Text style={{textAlign: 'center'}}>{`${(projectTransferProgress * 100).toFixed(0)}%`}</Text>
       </View>
@@ -257,8 +257,8 @@ const UploadModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      title={modalTitle}
       closeModal={closeModal}
+      title={modalTitle}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()

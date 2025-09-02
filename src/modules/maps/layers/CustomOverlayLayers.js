@@ -11,7 +11,7 @@ const CustomOverlayLayers = ({basemap}) => {
   return (
     Object.values(customMaps).map((customMap) => {
       return customMap.overlay && customMap.isViewable && (
-        <CustomOverlayLayer basemap={basemap} key={customMap.id} customMap={customMap}/>
+        <CustomOverlayLayer basemap={basemap} customMap={customMap} key={customMap.id}/>
       );
     })
   );

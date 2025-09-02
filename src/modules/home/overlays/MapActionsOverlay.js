@@ -72,22 +72,22 @@ const MapActionsOverlay = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'slide'}
       backdropStyle={{backgroundColor: 'transparent'}}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
       overlayStyle={[overlayStyles.overlayContainer, overlayStyle]}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={[overlayStyles.titleContainer]}>
         <Text style={[overlayStyles.titleText]}>Map Actions</Text>
       </View>
       <FlatList
-        key={'mapActions'}
-        data={actions}
-        contentContainerStyle={{alignItems: 'center'}}
-        renderItem={({item}) => mapActionItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
+        contentContainerStyle={{alignItems: 'center'}}
+        data={actions}
+        key={'mapActions'}
+        renderItem={({item}) => mapActionItem(item)}
       />
     </Overlay>
   );

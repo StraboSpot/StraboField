@@ -43,19 +43,19 @@ const StatusDialogBox = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'fade'}
-      isVisible={isVisible}
       fullScreen={SMALL_SCREEN}
+      isVisible={isVisible}
       onBackdropPress={onTouchOutside}
       overlayStyle={getResponsiveOverlayStyle()}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={[overlayStyles.titleContainer, titleContainer]}>
         <Text style={[overlayStyles.titleText, overlayTitleText]}>{title}</Text>
       </View>
       <ScrollView
-        ref={scrollView}
         onContentSizeChange={() => scrollView.current.scrollToEnd({animated: true})}
+        ref={scrollView}
       >
         <View style={overlayStyles.overlayContent}>
           {children}
@@ -64,27 +64,27 @@ const StatusDialogBox = ({
       <View style={overlayStyles.buttonContainer}>
         {(showCancelButton || false) && (
           <Button
+            containerStyle={{padding: 5}}
+            onPress={closeModal}
             title={closeTitle || 'Close'}
             type={'outline'}
-            onPress={closeModal}
-            containerStyle={{padding: 5}}
           />
         )}
         {(showMiddleButton || false) && (
           <Button
+            containerStyle={{padding: 5}}
+            onPress={middleButtonPress}
             title={middleButtonTitle || 'Close'}
             type={'outline'}
-            onPress={middleButtonPress}
-            containerStyle={{padding: 5}}
           />
         )}
         {showConfirmButton && (
           <Button
+            containerStyle={{padding: 5}}
             disabled={isConfirmDisabled}
+            onPress={onConfirmPress}
             title={confirmText || 'Ok'}
             titleStyle={confirmTitleStyle}
-            onPress={onConfirmPress}
-            containerStyle={{padding: 5}}
           />
         )}
       </View>

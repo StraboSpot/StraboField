@@ -32,13 +32,13 @@ const NewProjectForm = ({openMainMenuPanel}) => {
     console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
     return (
       <Formik
+        component={formProps => Form({...formProps, formName: formName})}
+        enableReinitialize={false}
+        initialStatus={{formName: formName}}
+        initialValues={initialValues}
         innerRef={formRef}
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
-        component={formProps => Form({...formProps, formName: formName})}
-        initialValues={initialValues}
-        initialStatus={{formName: formName}}
-        enableReinitialize={false}
       />
     );
   };

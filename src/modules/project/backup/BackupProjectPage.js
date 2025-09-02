@@ -51,14 +51,14 @@ const BackupProjectPage = () => {
       <View>
         {user.encoded_login && isOnline.isConnected ? (
           <Button
-            containerStyle={commonStyles.standardButtonContainer}
-            title={'Upload'}
             buttonStyle={commonStyles.standardButton}
-            titleStyle={commonStyles.standardButtonText}
+            containerStyle={commonStyles.standardButtonContainer}
             onPress={() => {
               dispatch(setSelectedProject({source: '', project: ''}));
               setIsUploadModalVisible(true);
             }}
+            title={'Upload'}
+            titleStyle={commonStyles.standardButtonText}
           />
         ) : (
           <View style={uiStyles.spacer}>
@@ -66,18 +66,18 @@ const BackupProjectPage = () => {
           </View>
         )}
         <Button
-          title={'Save'}
-          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={saveProject}
+          title={'Save'}
+          titleStyle={commonStyles.standardButtonText}
         />
         <Button
-          title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
-          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={exportProject}
+          title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
+          titleStyle={commonStyles.standardButtonText}
         />
       </View>
     );
@@ -97,18 +97,18 @@ const BackupProjectPage = () => {
             </Text>
           </View>
           <Button
-            title={'View/Edit Files on Device'}
-            type={'outline'}
-            containerStyle={commonStyles.buttonPadding}
             buttonStyle={commonStyles.standardButton}
-            titleStyle={commonStyles.standardButtonText}
-            onPress={() => openURL('ProjectBackups')}
-            iconContainerStyle={{paddingRight: 10}}
+            containerStyle={commonStyles.buttonPadding}
             icon={{
               name: 'file-tray-full-outline',
               type: 'ionicon',
               color: BLUE,
             }}
+            iconContainerStyle={{paddingRight: 10}}
+            onPress={() => openURL('ProjectBackups')}
+            title={'View/Edit Files on Device'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
           />
         </View>
       )}
@@ -116,8 +116,8 @@ const BackupProjectPage = () => {
       {/* Modals */}
       {isSaveAndExportModalVisible && (
         <SaveAndExportModal
-          closeModal={() => setIsSaveAndExportModalVisible(false)}
           backupAction={backupAction}
+          closeModal={() => setIsSaveAndExportModalVisible(false)}
         />
       )}
       {isUploadModalVisible && <UploadModal closeModal={() => setIsUploadModalVisible(false)}/>}

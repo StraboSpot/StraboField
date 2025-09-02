@@ -13,14 +13,14 @@ const PlaceholderImageIcon = () => {
   if (isInternetReachable && isConnected) {
     return (
       <Icon
-        name={'download'}
-        type={'material-community'}
         color={PRIMARY_ACCENT_COLOR}
+        name={'download'}
         size={35}
+        type={'material-community'}
       />
     );
   }
-  else return <Image style={imageStyles.thumbnail} source={placeholderImage}/>;
+  else return <Image source={placeholderImage} style={imageStyles.thumbnail}/>;
 };
 
 export default PlaceholderImageIcon;

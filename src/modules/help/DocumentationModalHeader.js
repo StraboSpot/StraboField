@@ -26,13 +26,13 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
           Page {currentPage} of {totalPages}
         </Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons name={'close'} size={24} color={'#333'}/>
+          <Ionicons color={'#333'} name={'close'} size={24}/>
         </TouchableOpacity>
       </View>
       <Overlay
-        visible={pickerVisible}
         animationType={'fade'}
         overlayStyle={styles.pickerContainer}
+        visible={pickerVisible}
       >
         <View style={styles.pickerOverlay}>
           <FlatList
@@ -45,11 +45,11 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
             )}
           />
           <Button
-            title={'Cancel'}
-            type={'clear'}
+            containerStyle={styles.pickerCancelButtonContainer}
             onPress={() => setPickerVisible(false)}
             style={styles.cancelButton}
-            containerStyle={styles.pickerCancelButtonContainer}
+            title={'Cancel'}
+            type={'clear'}
           />
         </View>
       </Overlay>

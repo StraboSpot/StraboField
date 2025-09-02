@@ -113,23 +113,23 @@ const TagsModal = ({
           && modalVisible !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS && (
             <Formik
               initialValues={{}}
-              validate={fieldValues => setSearchText(fieldValues.searchText)}
-              onSubmit={values => console.log('Submitting form...', values)}
               innerRef={formRef}
+              onSubmit={values => console.log('Submitting form...', values)}
+              validate={fieldValues => setSearchText(fieldValues.searchText)}
             >
               {() => (
                 <ListItem containerStyle={commonStyles.listItemFormField}>
                   <ListItem.Content>
                     <Field
+                      choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                        tagType => ({label: getTagLabel(tagType), value: tagType}))}
                       component={formProps => (
                         SelectInputField(
                           {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                       )}
-                      name={'searchText'}
                       key={'searchText'}
                       label={'Tag Type'}
-                      choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                        tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                      name={'searchText'}
                       single={true}
                     />
                   </ListItem.Content>
@@ -138,15 +138,15 @@ const TagsModal = ({
             </Formik>
           )}
         <FlatList
-          keyExtractor={item => item.id.toString()}
-          data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
-          renderItem={({item}) => renderTagItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={
             <ListEmptyText
               text={!isEmpty(tags) && isEmpty(getRelevantTags()) ? 'There are no tags with this type.' : ''}
             />
           }
+          data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => renderTagItem(item)}
         />
       </>
     );
@@ -200,9 +200,9 @@ const TagsModal = ({
       <View style={{flex: 1}}>
         <View style={modalStyle.textContainer}>
           <AddButton
+            onPress={addTag}
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
             type={'outline'}
-            onPress={addTag}
           />
         </View>
         <View style={modalStyle.textContainer}>
@@ -215,9 +215,9 @@ const TagsModal = ({
           && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
           <SaveButton
             buttonStyle={{backgroundColor: 'red'}}
-            title={`Save ${label}`}
-            onPress={save}
             disabled={isEmpty(checkedTagsTemp)}
+            onPress={save}
+            title={`Save ${label}`}
           />
         )}
       </View>

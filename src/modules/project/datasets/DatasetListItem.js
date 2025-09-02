@@ -27,7 +27,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const spotsCount = dataset.spotIds?.length || 0;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
-  const imagesIcon = <Icon name={'alert-circle-outline'} type={'ionicon'} color={WARNING_COLOR} size={12}/>;
+  const imagesIcon = <Icon color={WARNING_COLOR} name={'alert-circle-outline'} size={12} type={'ionicon'}/>;
 
   const viewDataset = () => {
     setDatasetToView(dataset);
@@ -49,8 +49,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   return (
     <View>
       <ListItem
-        key={dataset.id}
         containerStyle={{paddingHorizontal: 10, paddingVertical: 5}}
+        key={dataset.id}
         onPress={() => viewDataset(dataset.id, dataset.name)}
         pad={10}
       >
@@ -64,12 +64,12 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         </ListItem.Content>
 
         <Icon
-          name={checked ? 'star' : 'star-outline'}
-          type={'ionicon'}
           color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive ? themes.MEDIUMGREY : themes.SECONDARY_BACKGROUND_COLOR}
-          onPress={() => makeDatasetCurrent(dataset.id)}
           disabled={!isActive}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
+          name={checked ? 'star' : 'star-outline'}
+          onPress={() => makeDatasetCurrent(dataset.id)}
+          type={'ionicon'}
         />
 
         <ListItem.Chevron/>

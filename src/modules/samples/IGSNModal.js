@@ -115,10 +115,10 @@ const IGNSModal = forwardRef(({
         <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
         {errorMessages.map((msg, index) => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
         <Button
-          title={'Ok'}
-          onPress={onModalCancel}
           buttonStyle={{backgroundColor: 'rgb(78, 114, 33)', paddingHorizontal: 50}}
           containerStyle={{marginTop: 25}}
+          onPress={onModalCancel}
+          title={'Ok'}
         />
       </View>
     );
@@ -173,10 +173,10 @@ const IGNSModal = forwardRef(({
           </ScrollView>
         )}
         <Button
+          buttonStyle={{backgroundColor: 'black', padding: 10}}
+          containerStyle={{padding: 10}}
           onPress={!isUploaded ? registerSample : handleConfirmOnPress}
           title={!isUploaded ? 'Register' : 'OK'}
-          containerStyle={{padding: 10}}
-          buttonStyle={{backgroundColor: 'black', padding: 10}}
         />
       </>
     );
@@ -184,20 +184,20 @@ const IGNSModal = forwardRef(({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
+      animationType={'fade'}
       overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {
         ...overlayStyles.overlayContainer,
         maxHeight: height * 0.80, width: 500,
       }}
-      animationType={'fade'}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={IGSNModalStyles.container}>
         {!isUploaded && <Button
-          title={'X'}
-          type={'clear'}
-          titleStyle={{color: 'black'}}
           containerStyle={{alignItems: 'flex-end', width: '100%'}}
           onPress={onModalCancel}
+          title={'X'}
+          titleStyle={{color: 'black'}}
+          type={'clear'}
         />}
         <View style={IGSNModalStyles.sesarImageContainer}>
           <Image

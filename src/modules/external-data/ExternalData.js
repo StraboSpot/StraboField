@@ -60,34 +60,34 @@ const ExternalData = () => {
       <SectionDivider dividerText={'Links To Web Resources'}/>
       <View style={{flex: 1}}>
         <ButtonGroup
-          onPress={i => i === 0 ? setProtocol('http://') : setProtocol('https://')}
-          selectedIndex={protocol === 'http://' ? 0 : 1}
           buttons={['http://', 'https://']}
           containerStyle={{borderRadius: 10}}
+          onPress={i => i === 0 ? setProtocol('http://') : setProtocol('https://')}
           selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
+          selectedIndex={protocol === 'http://' ? 0 : 1}
           textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
         />
         <ListItem containerStyle={commonStyles.listItem}>
           <ListItem.Content style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
             <View>
               <TextInput
-                multiline={true}
                 editable={false}
+                multiline={true}
                 style={formStyles.fieldValue}
                 value={protocol || ''}
               />
             </View>
             <View>
               <TextInput
-                onFocus={() => setError(false)}
                 autoCapitalize={'none'}
+                keyboardType={'url'}
                 multiline={true}
+                onChangeText={text => setUrl(text)}
+                onFocus={() => setError(false)}
                 placeholder={'Example -> www.usgs.gov'}
                 placeholderTextColor={themes.MEDIUMGREY}
                 style={formStyles.fieldValue}
-                onChangeText={text => setUrl(text)}
                 textContentType={'URL'}
-                keyboardType={'url'}
                 value={url || ''}
               />
             </View>
@@ -96,16 +96,16 @@ const ExternalData = () => {
         {error && <Text style={formStyles.fieldError}>Not a valid url</Text>}
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
           <Button
+            containerStyle={commonStyles.standardButtonContainer}
+            disabled={url === ''}
+            onPress={() => saveUrl()}
             title={'Add Link'}
             titleStyle={{fontSize: themes.PRIMARY_TEXT_SIZE}}
             type={'clear'}
-            disabled={url === ''}
-            containerStyle={commonStyles.standardButtonContainer}
-            onPress={() => saveUrl()}
           />
         </View>
         <View style={{flex: 1}}>
-          <DataWrapper spot={spot} editable={true} urlData={true}/>
+          <DataWrapper editable={true} spot={spot} urlData={true}/>
         </View>
       </View>
       <View style={{flex: 1}}>
@@ -114,28 +114,28 @@ const ExternalData = () => {
           {Platform.OS === 'web'
             && (
               <input
-                style={{display: 'none'}}
-                id={'selectedCSV'}
-                ref={inputRef}
-                type={'file'}
-                name={'.csv'}
                 accept={'.csv'}
+                id={'selectedCSV'}
+                name={'.csv'}
                 onChange={handleFileChange}
                 onClick={() => console.log('Canceled')}
+                ref={inputRef}
+                style={{display: 'none'}}
+                type={'file'}
               />
             )}
           <Button
-            title={'Attach table from a .CSV file'}
-            type={'outline'}
-            icon={{name: 'attach-outline', type: 'ionicon'}}
-            containerStyle={commonStyles.buttonPadding}
             buttonStyle={commonStyles.standardButton}
-            titleStyle={commonStyles.standardButtonText}
+            containerStyle={commonStyles.buttonPadding}
+            icon={{name: 'attach-outline', type: 'ionicon'}}
             onPress={importCSVFile}
+            title={'Attach table from a .CSV file'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
           />
         </View>
         <View style={{flex: 1}}>
-          <DataWrapper spot={spot} editable={true} urlData={false}/>
+          <DataWrapper editable={true} spot={spot} urlData={false}/>
         </View>
       </View>
     </View>

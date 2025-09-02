@@ -14,16 +14,16 @@ const ReturnToOverviewButton = () => {
   return (
     <View style={styles.navButtonsContainer}>
       <Button
+        containerStyle={styles.backButton}
         icon={{
           name: 'arrow-back',
           size: 20,
           color: 'black',
         }}
-        containerStyle={styles.backButton}
-        titleStyle={styles.buttonText}
-        title={'Return to Overview'}
-        type={'clear'}
         onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+        title={'Return to Overview'}
+        titleStyle={styles.buttonText}
+        type={'clear'}
       />
     </View>
   );

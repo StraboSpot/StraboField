@@ -12,7 +12,6 @@ import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import {Form, useForm} from '../form';
-import GeoFieldsInputs from '../geography/GeoFieldInputs';
 import NoteForm from '../notes/NoteForm';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -176,10 +175,10 @@ const BasicPageDetail = ({
       <>
         {!isEmpty(encoded_login) ? (
           <IGSNUploadAndRegister
-            selectedFeature={selectedFeature}
-            page={page}
             handleIGSNChecked={handleIGSNChecked}
             isIGSNChecked={isIGSNChecked}
+            page={page}
+            selectedFeature={selectedFeature}
           />
         ) : (
           <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
@@ -203,13 +202,13 @@ const BasicPageDetail = ({
       <View style={{flex: 1}}>
         {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && renderIGSNUpload()}
         <Formik
-          innerRef={formRef}
-          onSubmit={onSubmitForm}
-          onReset={() => console.log('Resetting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          initialValues={initialValues}
-          initialStatus={{formName: formName}}
           enableReinitialize={true}
+          initialStatus={{formName: formName}}
+          initialValues={initialValues}
+          innerRef={formRef}
+          onReset={() => console.log('Resetting form...')}
+          onSubmit={onSubmitForm}
+          validate={values => validateForm({formName: formName, values: values})}
         >
           {formProps => (
             <>
@@ -230,10 +229,10 @@ const BasicPageDetail = ({
           )}
         </Formik>
         <Button
-          titleStyle={{color: themes.RED}}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          type={'clear'}
           onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+          titleStyle={{color: themes.RED}}
+          type={'clear'}
         />
       </View>
     );
@@ -247,10 +246,10 @@ const BasicPageDetail = ({
           initialNotesValues={selectedFeature}
         />
         <Button
-          titleStyle={{color: themes.RED}}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          type={'clear'}
           onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+          titleStyle={{color: themes.RED}}
+          type={'clear'}
         />
       </View>
     );
@@ -332,9 +331,9 @@ const BasicPageDetail = ({
         <>
           <SaveAndCancelButtons
             cancel={cancelForm}
+            getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
+              && !selectedFeature?.isOnMySesar}
             save={saveButtonOnPress}
-            getIsDisabled={isInternetReachable && isIGSNChecked
-              && isEmpty(sesar?.selectedUserCode) && !selectedFeature?.isOnMySesar}
           />
           <FlatList
             ListHeaderComponent={page?.key === PAGE_KEYS.NOTES ? renderNotesField() : renderFormFields()}
@@ -349,9 +348,9 @@ const BasicPageDetail = ({
         />
       )}
       <DeleteOverlay
-        isVisible={isDeleteOverlayVisible}
         closeModal={() => setIsDeleteOverlayVisible(false)}
         deleteSample={deleteFeature}
+        isVisible={isDeleteOverlayVisible}
       />
     </>
   );

@@ -56,12 +56,12 @@ const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements })
   const renderStrikeDipSymbol = () => {
     return (
       <Animated.Image
+        resizeMode='contain'
         source={require('../../assets/images/compass/strike-dip-centered.png')}
         style={[
           compassStyles.strikeAndDipLine,
           { position: 'absolute', transform: [{ rotate: strikeSpin }] },
         ]}
-        resizeMode='contain'
       />
     );
   };
@@ -69,12 +69,12 @@ const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements })
   const renderTrendSymbol = () => {
     return (
       <Animated.Image
+        resizeMode='contain'
         source={require('../../assets/images/compass/trendLine.png')}
         style={[
           compassStyles.trendLine,
           { position: 'absolute', transform: [{ rotate: trendSpin }] },
         ]}
-        resizeMode='contain'
       />
     );
   };

@@ -32,15 +32,15 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
       <Overlay
-        supportedOrientations={['portrait', 'landscape']}
         overlayStyle={overlayStyles.overlayContainer}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <View style={{alignItems: 'flex-end'}}>
           <Button
+            buttonStyle={{padding: 0}}
+            icon={{name: 'close', type: 'ionicon', size: 20}}
             onPress={() => setChoicesViewKey(null)}
             type={'clear'}
-            icon={{name: 'close', type: 'ionicon', size: 20}}
-            buttonStyle={{padding: 0}}
           />
         </View>
         <Form {...{
@@ -54,8 +54,8 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
 
   return (
     <Formik
-      innerRef={formRef}
       initialValues={initialValues}
+      innerRef={formRef}
       onSubmit={values => console.log('Submitting form...', values)}
       validate={values => validateForm({formName: formName, values: values})}
       validateOnChange={false}

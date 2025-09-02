@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    width: 300
+    width: 300,
   },
   overlayContainerFullScreen: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,

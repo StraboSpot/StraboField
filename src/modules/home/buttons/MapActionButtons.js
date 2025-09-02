@@ -29,55 +29,55 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
   return (
     <>
       <IconButton
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        onPress={() => toggleDialog('mapActionsMenuVisible')}
         source={SMALL_SCREEN ? require('../../../assets/icons/MapActions.png')
           : require('../../../assets/icons/MapActionsButton.png')}
-        onPress={() => toggleDialog('mapActionsMenuVisible')}
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
       />
       {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff) ? (
         <IconButton
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+          onPress={toggleMapSymbolsOverlay}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')
             : require('../../../assets/icons/SymbolsButton.png')}
-          onPress={toggleMapSymbolsOverlay}
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         />
       ) : (
         <IconButton
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+          onPress={toggleMapSymbolsOverlay}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols_pressed.png')
             : require('../../../assets/icons/SymbolsButton_pressed.png')}
-          onPress={toggleMapSymbolsOverlay}
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         />
       )}
       {!currentImageBasemap && !stratSection && (
         <IconButton
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+          onPress={() => toggleDialog('baseMapMenuVisible')}
           source={SMALL_SCREEN ? require('../../../assets/icons/Layers.png')
             : require('../../../assets/icons/LayersButton.png')}
-          onPress={() => toggleDialog('baseMapMenuVisible')}
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         />
       )}
       <MapActionsOverlay
-        visible={dialogs.mapActionsMenuVisible}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         onPress={name => dialogClickHandler('mapActionsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapActionsMenuVisible')}
+        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
+        visible={dialogs.mapActionsMenuVisible}
       />
       <MapSymbolsOverlay
-        visible={dialogs.mapSymbolsMenuVisible}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         onPress={name => dialogClickHandler('mapSymbolsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapSymbolsMenuVisible')}
+        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
+        visible={dialogs.mapSymbolsMenuVisible}
       />
       <MapLayersOverlay
-        visible={dialogs.baseMapMenuVisible}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         mapComponentRef={mapComponentRef}
         onPress={(name) => {
           setBasemap(name);
           toggleDialog('baseMapMenuVisible');
         }}
         onTouchOutside={() => toggleDialog('baseMapMenuVisible')}
+        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
+        visible={dialogs.baseMapMenuVisible}
       />
     </>
   );

@@ -96,18 +96,18 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   const renderBackingUpView = () => (
     <View>
       <LottieAnimations
-        type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
-        show={backingUpStatus === 'inProgress'}
         doesLoop={backingUpStatus === 'inProgress'}
+        show={backingUpStatus === 'inProgress'}
+        type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
       />
       <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
       <View style={overlayStyles.buttonContainer}>
         <Button
-          title={'OK'}
-          type={'clear'}
-          titleStyle={overlayStyles.buttonText}
           disabled={backingUpStatus !== 'complete'}
           onPress={handleClosePress}
+          title={'OK'}
+          titleStyle={overlayStyles.buttonText}
+          type={'clear'}
         />
       </View>
     </View>
@@ -153,9 +153,9 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
             <View style={overlayStyles.overlayContent}>
               {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
               <TextInput
-                value={backupAction === 'save' ? fileName : exportFileName}
                 onChangeText={validateFileName}
                 style={[overlayStyles.inputContainer, {width: '100%'}]}
+                value={backupAction === 'save' ? fileName : exportFileName}
               />
             </View>
             {isFileNameError && <Text style={overlayStyles.importantText}>File Name Error!</Text>}

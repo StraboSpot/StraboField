@@ -7,9 +7,9 @@ import JSONTree from 'react-native-json-tree';
 import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {setIntersectedSpotsForTagging} from './spots.slice';
 import commonStyles from '../../shared/common.styles';
 import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
-import {setIntersectedSpotsForTagging} from './spots.slice';
 import {setModalVisible} from '../home/home.slice';
 
 
@@ -34,8 +34,8 @@ const SpotsRawDataView = () => {
      Project: {
        project,
      },
-     Spots: {selectedSpots}
-   }
+     Spots: {selectedSpots},
+   };
    console.log(filteredDataJson);
    setDataJson(filteredDataJson);
  };
@@ -43,7 +43,7 @@ const SpotsRawDataView = () => {
  const closeModal = () => {
 
    // dispatch(setIntersectedSpotsForTagging([]));
-   dispatch(setModalVisible({modal: null}))
+   dispatch(setModalVisible({modal: null}));
  };
 
   const onClipboardPress = () => {
@@ -53,15 +53,15 @@ const SpotsRawDataView = () => {
 
   return (
     <ModalWrapper
-      isFullScreen
       closeModal={closeModal}
+      isFullScreen
     >
       <ScrollView>
         <Button
+          onPress={onClipboardPress}
           title={'Copy JSON to Clipboard'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={onClipboardPress}
         />
         <JSONTree
           data={dataJson}

@@ -20,10 +20,10 @@ const ProgressModal = ({
                        }) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      isVisible={isProgressModalVisible}
       animationType={'fade'}
+      isVisible={isProgressModalVisible}
       overlayStyle={overlayStyles.overlayContainer}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>{dialogTitle}</Text>
@@ -44,9 +44,9 @@ const ProgressModal = ({
         <Button
           disabled={disabled}
           onPress={onPressComplete}
-          type={'clear'}
           title={buttonText || 'OK'}
           titleStyle={overlayStyles.buttonText}
+          type={'clear'}
         />
       )}
     </Overlay>

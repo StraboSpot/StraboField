@@ -16,9 +16,9 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
         shape={turf.featureCollection(featuresSelected)}
       >
         <MapboxGL.CircleLayer
+          filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerSelectedHalo'}
           minZoomLevel={1}
-          filter={['==', ['geometry-type'], 'Point']}
           style={getMapSymbology().pointSelected}
         />
       </MapboxGL.ShapeSource>
@@ -29,9 +29,9 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
         shape={turf.featureCollection(featuresNotSelected)}
       >
         <MapboxGL.CircleLayer
+          filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerColorHalo'}
           minZoomLevel={1}
-          filter={['==', ['geometry-type'], 'Point']}
           style={getMapSymbology().pointColorHalo}
         />
       </MapboxGL.ShapeSource>

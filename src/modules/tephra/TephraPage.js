@@ -65,11 +65,11 @@ const TephraPage = ({page}) => {
     return (
       <>
         <ButtonGroup
-          selectedIndex={selectedTypeIndex}
-          onPress={i => setSelectedTypeIndex(i)}
           buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
           containerStyle={tephraStyles.buttonGroupContainer}
+          onPress={i => setSelectedTypeIndex(i)}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          selectedIndex={selectedTypeIndex}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         <BasicPageDetail
@@ -94,24 +94,24 @@ const TephraPage = ({page}) => {
           <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
         )}
         <DraggableFlatList
-          keyExtractor={item => item.id}
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
           data={data}
+          keyExtractor={item => item.id}
           onDragBegin={() => setIsReorderingActive(true)}
           onDragEnd={({data}) => setData(data)}
           renderItem={({item, getIndex, drag}) => (
             <ShadowDecorator>
               <BasicListItem
                 drag={Platform.OS === 'web' ? undefined : drag}
-                item={item}
-                index={getIndex()}
-                page={page}
                 editItem={editAttribute}
+                index={getIndex()}
                 isReorderingActive={isReorderingActive}
+                item={item}
+                page={page}
               />
             </ShadowDecorator>
           )}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
         />
         {data.length > 1 && (
           <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Bottom</Text>
@@ -119,9 +119,9 @@ const TephraPage = ({page}) => {
         {isReorderingActive && (
           <Button
             onPress={updateOrder}
-            type={'clear'}
             title={'Done Reordering ' + page.label}
             titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
         )}
         </View>

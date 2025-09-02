@@ -57,15 +57,15 @@ const AddRemoveTagFeatures = () => {
     <>
       <SidePanelHeader
         backButton={() => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}))}
-        title={`${selectedTag.name}`}
         headerTitle={!isEmpty(selectedTag) && `Add/Remove ${selectedTag.name}`}
+        title={`${selectedTag.name}`}
       />
       <View style={{...commonStyles.buttonContainer, flex: 1}}>
         <FlatList
-          data={getAllFeaturesFromSpot()}
-          renderItem={({item}) => renderSpotFeatureItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Features in Active Datasets'}/>}
+          data={getAllFeaturesFromSpot()}
+          renderItem={({item}) => renderSpotFeatureItem(item)}
         />
       </View>
     </>

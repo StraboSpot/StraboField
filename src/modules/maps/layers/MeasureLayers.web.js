@@ -11,21 +11,21 @@ const MeasureLayers = ({measureFeatures}) => {
 
   return (
     <Source
+      data={turf.featureCollection(measureFeatures)}
       id={'mapMeasure'}
       type={'geojson'}
-      data={turf.featureCollection(measureFeatures)}
     >
       <Layer
-        type={'circle'}
-        id={'measureLayerPoints'}
         filter={['==', ['geometry-type'], 'Point']}
+        id={'measureLayerPoints'}
         paint={getPaintSymbology().pointMeasure}
+        type={'circle'}
       />
       <Layer
-        type={'line'}
-        id={'measureLayerLines'}
         filter={['==', ['geometry-type'], 'LineString']}
+        id={'measureLayerLines'}
         paint={getPaintSymbology().lineMeasure}
+        type={'line'}
       />
     </Source>
   );

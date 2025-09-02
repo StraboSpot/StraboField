@@ -16,15 +16,15 @@ const IconButton = ({
 
   return (
     <Pressable
-      onPress={onPress}
-      onLongPress={onLongPress}
       delayLongPress={1000}
+      onLongPress={onLongPress}
+      onPress={onPress}
       style={style}
     >
       <Image
         containerStyle={containerStyle}
-        style={[uiStyles.imageIcon, imageStyle]}
         source={source}
+        style={[uiStyles.imageIcon, imageStyle]}
       />
     </Pressable>
   );

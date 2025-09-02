@@ -9,7 +9,7 @@ const About = () => {
     <>
       <View style={styles.container}>
         <Text style={styles.versionText}>Version: {VERSION_NUMBER}</Text>
-        <ScrollView style={styles.descriptionContainer} contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} style={styles.descriptionContainer}>
           <Text style={styles.heading}>📌 About StraboField</Text>
           <Text style={styles.paragraph}>
             <Text style={styles.bold}>StraboField</Text> is a powerful tool for collecting and organizing geologic field data. It allows users to create and manage spatial “Spots” — points, lines, or polygons that store geologic observations.

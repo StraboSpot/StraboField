@@ -18,9 +18,9 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
           && FOLD_ICONS[key].PRESSED[formProps?.values[key]]
           && (
             <IconButton
+              imageStyle={{margin: -5}}
               key={key}
               source={FOLD_ICONS[key].PRESSED[formProps?.values[key]]}
-              imageStyle={{margin: -5}}
             />
           );
         if (iconSource) foldGeometryData.push(iconSource);
@@ -31,13 +31,14 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
 
   const FoldGeometryEditButton = () => (
     <Button
-      containerStyle={{paddingTop: 0}}
       buttonStyle={[formStyles.formButtonSmall, {
         height: 49,
         width: 49,
         backgroundColor: SECONDARY_BACKGROUND_COLOR,
         padding: 0,
       }]}
+      containerStyle={{paddingTop: 0}}
+      onPress={() => setChoicesViewKey('fold_geometry')}
       title={'Edit\nGeometry'}
       titleProps={{
         style: [formStyles.formButtonTitle, {fontSize: 10, textAlign: 'center'}],
@@ -45,7 +46,6 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
         textAlign: 'center',
       }}
       type={'outline'}
-      onPress={() => setChoicesViewKey('fold_geometry')}
     />
   );
 

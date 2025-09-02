@@ -14,10 +14,10 @@ const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
 
   return (
     <IconButton
+      onPress={toggleNotebookPanel}
       source={isNotebookPanelVisible
         ? require('../../../assets/icons/NotebookViewButton_pressed.png')
         : require('../../../assets/icons/NotebookViewButton.png')}
-      onPress={toggleNotebookPanel}
     />
   );
 };

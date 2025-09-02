@@ -86,21 +86,21 @@ const MineralsPage = ({page}) => {
   const renderCopyDataSelectBox = () => {
     return (
       <Formik
+        initialValues={{}}
         innerRef={preFormRef}
         validate={fieldValues => copyMineralData(fieldValues.spot_id_for_pet_copy)}
         validateOnChange={true}
-        initialValues={{}}
       >
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field
+              choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
               component={formProps => (
                 SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
               )}
-              name={'spot_id_for_pet_copy'}
               key={'spot_id_for_pet_copy'}
               label={'Copy ' + page.label + ' Data From:'}
-              choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+              name={'spot_id_for_pet_copy'}
               single={true}
             />
           </ListItem.Content>
@@ -120,11 +120,11 @@ const MineralsPage = ({page}) => {
           onPress={addMineral}
         />
         <FlatList
-          data={mineralDataSorted}
-          renderItem={({item}) => <BasicListItem page={page} item={item} editItem={editMineral}/>}
-          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
+          data={mineralDataSorted}
+          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+          renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
         />
       </>
     );
@@ -134,9 +134,9 @@ const MineralsPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
         page={page}
         selectedFeature={selectedMineral}
-        groupKey={'pet'}
       />
     );
   };

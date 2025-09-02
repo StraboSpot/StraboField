@@ -1,17 +1,24 @@
+const path = require('path');
+
 module.exports = {
   env: {
     'browser': true,
     'es2021': true,
     'react-native/react-native': true,
   },
-  plugins : ['react', 'react-native'],
+  plugins: ['react', 'react-native'],
   extends: ['@react-native', 'plugin:import/recommended'],
+  parser: '@babel/eslint-parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
     ecmaVersion: 'latest',
+    requireConfigFile: false,
     sourceType: 'module',
+    babelOptions: {
+      configFile: path.resolve(__dirname, './babel.config.js'),
+    },
   },
   root: true,
   rules: {
@@ -37,8 +44,9 @@ module.exports = {
       'newlines-between': 'always',
       'alphabetize': {order: 'asc', caseInsensitive: true},
     }],
+
     // StraboSpot2 Sort StyleSheets
-    'react-native/sort-styles': ['error', 'asc', { 'ignoreClassNames': false, 'ignoreStyleProperties': false }],
+    'react-native/sort-styles': ['error', 'asc', {'ignoreClassNames': false, 'ignoreStyleProperties': false}],
 
     // StraboSpot2 Override React rules
     'react/jsx-filename-extension': [1, {extensions: ['.js', '.jsx']}], // allow .js files to contain JSX code

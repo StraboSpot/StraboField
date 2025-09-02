@@ -11,27 +11,27 @@ const DrawLayers = ({drawFeatures}) => {
 
   return (
     <Source
+      data={turf.featureCollection(drawFeatures)}
       id={'drawFeatures'}
       type={'geojson'}
-      data={turf.featureCollection(drawFeatures)}
     >
       <Layer
-        type={'circle'}
-        id={'pointLayerDraw'}
         filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerDraw'}
         paint={getPaintSymbology().pointDraw}
+        type={'circle'}
       />
       <Layer
-        type={'line'}
-        id={'lineLayerDraw'}
         filter={['==', ['geometry-type'], 'LineString']}
+        id={'lineLayerDraw'}
         paint={getPaintSymbology().lineDraw}
+        type={'line'}
       />
       <Layer
-        type={'fill'}
-        id={'polygonLayerDraw'}
         filter={['==', ['geometry-type'], 'Polygon']}
+        id={'polygonLayerDraw'}
         paint={getPaintSymbology().polygonDraw}
+        type={'fill'}
       />
     </Source>
   );

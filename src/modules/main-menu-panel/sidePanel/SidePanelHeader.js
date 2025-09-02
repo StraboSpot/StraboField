@@ -16,16 +16,16 @@ const SidePanelHeader = ({
       <Button
         icon={
           <Icon
-            name={'arrow-back'}
-            type={'ionicon'}
             iconStyle={projectStyles.buttons}
+            name={'arrow-back'}
             size={20}
+            type={'ionicon'}
           />
         }
-        title={title}
-        type={'clear'}
-        titleStyle={projectStyles.buttonText}
         onPress={backButton}
+        title={title}
+        titleStyle={projectStyles.buttonText}
+        type={'clear'}
       />
       <View style={projectStyles.headerTextContainer}>
         <Text style={projectStyles.headerText}>{headerTitle}</Text>

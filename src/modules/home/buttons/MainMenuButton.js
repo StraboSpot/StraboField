@@ -14,10 +14,10 @@ const MainMenuButton = ({closeMainMenuPanel, openMainMenuPanel}) => {
 
   return (
     <IconButton
+      onPress={toggleHomeDrawer}
       source={isMainMenuPanelVisible
         ? require('../../../assets/icons/HomeButton_pressed.png')
         : require('../../../assets/icons/HomeButton.png')}
-      onPress={toggleHomeDrawer}
     />
   );
 };

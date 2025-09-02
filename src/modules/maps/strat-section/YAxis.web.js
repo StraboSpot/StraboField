@@ -13,33 +13,33 @@ const YAxis = ({spotsDisplayed}) => {
     <>
       {/* Y Axis Line */}
       <Source
+        data={getYAxis()}
         id={'yAxisSource'}
         type={'geojson'}
-        data={getYAxis()}
       >
         <Layer
-          type={'line'}
           id={'yAxisLayer'}
           minZoomLevel={1}
+          type={'line'}
         />
       </Source>
 
       {/* Y Axis Tick Marks */}
       <Source
+        data={getYAxisTickMarks()}
         id={'yAxisTickMarksSource'}
         type={'geojson'}
-        data={getYAxisTickMarks()}
       >
         <Layer
-          type={'line'}
           id={'yAxisTickMarksLayer'}
           minZoomLevel={1}
+          type={'line'}
         />
         <Layer
-          type={'symbol'}
           id={'yAxisTickMarksLabelLayer'}
-          minZoomLevel={1}
           layout={getLayoutSymbology().yAxisTickMarkLabels}
+          minZoomLevel={1}
+          type={'symbol'}
         />
       </Source>
     </>

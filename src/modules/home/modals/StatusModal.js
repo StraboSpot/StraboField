@@ -52,18 +52,18 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
 
   return (
     <StatusDialogBox
-      title={'Status'}
-      isVisible={visible || isStatusMessagesModalVisible}
       closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      showConfirmButton={!isModalLoading && selectedProject.source === ''}
+      isVisible={visible || isStatusMessagesModalVisible}
       onConfirmPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      showConfirmButton={!isModalLoading && selectedProject.source === ''}
+      title={'Status'}
     >
       <View>
         {isModalLoading && (
           <LottieAnimations
-            type={'loadingFile'}
-            show={isModalLoading}
             doesLoop={isModalLoading}
+            show={isModalLoading}
+            type={'loadingFile'}
           />
         )}
         <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
@@ -73,17 +73,17 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
           )}
           <View style={{flexDirection: 'row'}}>
             <Button
-              title={!isEmpty(selectedProject.source) && selectedProject.source !== '' && 'Continue'}
-              type={'clear'}
               containerStyle={{padding: 10}}
               onPress={() => getProjectFromSource(selectedProject)}
+              title={!isEmpty(selectedProject.source) && selectedProject.source !== '' && 'Continue'}
+              type={'clear'}
             />
             {!isEmpty(selectedProject.source) && selectedProject.source !== '' && (
               <Button
-                title={'Cancel'}
                 containerStyle={{padding: 10}}
-                type={'clear'}
                 onPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
+                title={'Cancel'}
+                type={'clear'}
               />
             )}
 

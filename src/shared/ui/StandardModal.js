@@ -18,11 +18,11 @@ const StandardModal = ({
                        }) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'fade'}
       isVisible={visible}
-      overlayStyle={overlayStyles.overlayContainer}
       onBackdropPress={onTouchOutside}
+      overlayStyle={overlayStyles.overlayContainer}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>{dialogTitle}</Text>
@@ -33,16 +33,16 @@ const StandardModal = ({
       {footerButtonsVisible && (
         <View style={overlayStyles.buttonContainer}>
           <Button
-            title={rightButtonText || 'OK'}
-            type={'clear'}
-            titleStyle={overlayStyles.buttonText}
             onPress={onPress}
+            title={rightButtonText || 'OK'}
+            titleStyle={overlayStyles.buttonText}
+            type={'clear'}
           />
           <Button
+            onPress={closeModal}
             title={leftButtonText || 'Cancel'}
             titleStyle={overlayStyles.buttonText}
             type={'clear'}
-            onPress={closeModal}
           />
         </View>
       )}

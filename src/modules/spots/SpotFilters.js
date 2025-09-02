@@ -146,12 +146,12 @@ const SpotFilters = ({
         />
       </View>
       <PickerOverlay
-        data={Object.values(SORT_ORDER)}
-        value={sortOrder}
-        isPickerVisible={isPickerVisible}
         closePicker={closePicker}
-        onSelect={item => updateSort(item)}
+        data={Object.values(SORT_ORDER)}
         dividerText={'Sort'}
+        isPickerVisible={isPickerVisible}
+        onSelect={item => updateSort(item)}
+        value={sortOrder}
       />
     </>
   );

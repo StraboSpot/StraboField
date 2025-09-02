@@ -70,11 +70,11 @@ const DailyNotesModal = () => {
           save={() => saveNote(formRef?.current?.values)}
         />
         <Formik
-          initialValues={initialValues}
-          onSubmit={() => console.log('Submitting form...')}
-          innerRef={formRef}
-          validateOnChange={true}
           enableReinitialize={true}
+          initialValues={initialValues}
+          innerRef={formRef}
+          onSubmit={() => console.log('Submitting form...')}
+          validateOnChange={true}
         >
           {() => (
             <View>
@@ -82,11 +82,11 @@ const DailyNotesModal = () => {
                 <ListItem.Content>
                   <Field
                     component={DateInputField}
-                    name={'date'}
-                    label={'Date'}
-                    key={'date'}
-                    isShowTime={true}
                     isDisplayOnly={true}
+                    isShowTime={true}
+                    key={'date'}
+                    label={'Date'}
+                    name={'date'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -94,28 +94,28 @@ const DailyNotesModal = () => {
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
-                    component={TextInputField}
-                    name={'notes'}
-                    label={'Notes'}
-                    key={'notes'}
                     appearance={'multiline'}
+                    component={TextInputField}
+                    key={'notes'}
+                    label={'Notes'}
+                    name={'notes'}
                   />
                 </ListItem.Content>
               </ListItem>
               <Button
+                icon={
+                  <Icon
+                    color={'red'}
+                    iconStyle={{paddingRight: 10}}
+                    name={'trash'}
+                    size={20}
+                    type={'font-awesome'}
+                  />
+                }
+                onPress={() => deleteNoteConfirm()}
                 title={'Delete Note'}
                 titleStyle={overlayStyles.importantText}
                 type={'clear'}
-                onPress={() => deleteNoteConfirm()}
-                icon={
-                  <Icon
-                    iconStyle={{paddingRight: 10}}
-                    name={'trash'}
-                    type={'font-awesome'}
-                    size={20}
-                    color={'red'}
-                  />
-                }
               />
             </View>
           )}

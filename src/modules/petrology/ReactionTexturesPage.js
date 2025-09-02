@@ -66,9 +66,9 @@ const ReactionTexturesPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
         page={page}
         selectedFeature={selectedReaction}
-        groupKey={'pet'}
       />
     );
   };
@@ -92,13 +92,13 @@ const ReactionTexturesPage = ({page}) => {
           onPress={addReaction}
         />
         <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
           data={spot.properties.pet && spot.properties.pet[page.key]
             && spot.properties.pet[page.key].slice().sort(
               (a, b) => (a[page.key] || 'Unknown').localeCompare((b[page.key] || 'Unknown')))}
-          renderItem={({item}) => <BasicListItem page={page} item={item} editItem={editReaction}/>}
           keyExtractor={item => item.id.toString()}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
+          renderItem={({item}) => <BasicListItem editItem={editReaction} item={item} page={page}/>}
         />
       </View>
     );

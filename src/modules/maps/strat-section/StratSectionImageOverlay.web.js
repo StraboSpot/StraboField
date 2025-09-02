@@ -7,14 +7,13 @@ const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
 
   return (
     <Source
+      coordinates={coordQuad}
       id={'imageOverlay' + id}
       type={'image'}
-      coordinates={coordQuad}
       url={url}
     >
       <Layer
         // beforeId={'pointLayerColoHalo'}
-        type={'raster'}
         id={'imageOverlayLayer' + id}
         paint={{
           'raster-opacity': imageOpacity && parseFloat(imageOpacity.toString())
@@ -22,6 +21,7 @@ const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
             ? parseFloat(imageOpacity.toString()) : 1,
         }}
         slot={'top'}
+        type={'raster'}
       />
     </Source>
   );

@@ -30,17 +30,17 @@ const ModalWrapperHeader = ({
         {!isProjectLoadSelectionModalVisible && (
           <View style={modalStyle.modalHeaderButtonsContainer}>
             <Button
-              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
-              title={buttonTitleLeft}
-              type={'clear'}
-              onPress={cancel}
               buttonStyle={{padding: 0}}
+              onPress={cancel}
+              title={buttonTitleLeft}
+              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+              type={'clear'}
             />
             <Button
-              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
-              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
-              type={'clear'}
               onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
+              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
+              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+              type={'clear'}
             />
           </View>
         )}

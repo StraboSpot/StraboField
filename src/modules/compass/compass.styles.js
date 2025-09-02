@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
   },
   rawMeasurementsTextContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'flex-start',
     borderTopWidth: 0,
     borderWidth: 1,
+    flex: 1,
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   sliderContainer: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,

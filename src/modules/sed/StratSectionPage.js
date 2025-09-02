@@ -73,11 +73,11 @@ const StratSectionPage = ({page}) => {
           onPress={() => setSelectedImage({})}
         />
         <FlatList
-          keyExtractor={item => item.id}
-          data={stratSection.images}
-          renderItem={({item, index}) => renderImageItem(item, index)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Image Overlays'}/>}
+          data={stratSection.images}
+          keyExtractor={item => item.id}
+          renderItem={({item, index}) => renderImageItem(item, index)}
         />
       </View>
     );
@@ -93,13 +93,13 @@ const StratSectionPage = ({page}) => {
           save={saveStratSection}
         />
         <Formik
-          innerRef={stratSectionRef}
-          onSubmit={() => console.log('Submitting form...')}
-          onReset={() => console.log('Resetting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          initialValues={stratSection}
-          validateOnChange={false}
           enableReinitialize={true}
+          initialValues={stratSection}
+          innerRef={stratSectionRef}
+          onReset={() => console.log('Resetting form...')}
+          onSubmit={() => console.log('Submitting form...')}
+          validate={values => validateForm({formName: formName, values: values})}
+          validateOnChange={false}
         >
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>

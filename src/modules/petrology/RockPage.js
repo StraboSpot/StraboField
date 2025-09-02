@@ -171,22 +171,22 @@ const RockPage = ({page}) => {
     const label = 'Copy ' + page.label + ' Data From:';
     return (
       <Formik
+        initialValues={{}}
         innerRef={preFormRef}
+        onSubmit={values => console.log('Submitting form...', values)}
         validate={fieldValues => copyPetData(fieldValues.spot_id_for_pet_copy)}
         validateOnChange={true}
-        initialValues={{}}
-        onSubmit={values => console.log('Submitting form...', values)}
       >
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field
+              choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
               component={formProps => (
                 SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
               )}
-              name={'spot_id_for_pet_copy'}
               key={'spot_id_for_pet_copy'}
               label={label}
-              choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
+              name={'spot_id_for_pet_copy'}
               single={true}
             />
           </ListItem.Content>
@@ -227,21 +227,21 @@ const RockPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={rocksGrouped}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
         renderItem={({item, index}) => (
           <BasicListItem
+            editItem={itemToEdit => editRock(itemToEdit, index)}
             item={item}
             page={page}
-            editItem={itemToEdit => editRock(itemToEdit, index)}
           />
         )}
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={rocksGrouped}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };
@@ -250,9 +250,9 @@ const RockPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        groupKey={groupKey}
         page={page}
         selectedFeature={selectedRock}
-        groupKey={groupKey}
       />
     );
   };

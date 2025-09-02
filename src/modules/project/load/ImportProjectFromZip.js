@@ -90,11 +90,11 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
         </View>
         <View style={{alignItems: 'center'}}>
           <Button
-            title={'Go to saved projects'}
-            onPress={goToSavedProjects}
-            type={'clear'}
             containerStyle={{alignItems: 'flex-start'}}
+            onPress={goToSavedProjects}
+            title={'Go to saved projects'}
             titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
         </View>
       </View>
@@ -171,10 +171,10 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
             {importedProject.name}
           </Text>
           <Button
-            title={'Unzip and Save'}
-            type={'clear'}
             containerStyle={{marginTop: 20}}
             onPress={() => verifyFileExistence('data')}
+            title={'Unzip and Save'}
+            type={'clear'}
           />
         </View>
       )}

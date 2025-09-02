@@ -33,18 +33,18 @@ const LogOut = () => {
     return (
       <View>
         <Button
+          buttonStyle={commonStyles.standardButton}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={() => isEmpty(userData.name) ? dispatch(logout()) : setIsLogoutModalVisible(true)}
           title={isEmpty(userData.name) ? 'Log In' : 'Log out'}
-          containerStyle={commonStyles.standardButtonContainer}
-          buttonStyle={commonStyles.standardButton}
           titleStyle={commonStyles.standardButtonText}
         />
         {isEmpty(userData.name) && (
           <Button
+            buttonStyle={commonStyles.standardButton}
+            containerStyle={commonStyles.standardButtonContainer}
             onPress={clearUser}
             title={isEmpty(userData.name) && 'Clear and Return to Log In'}
-            containerStyle={commonStyles.standardButtonContainer}
-            buttonStyle={commonStyles.standardButton}
             titleStyle={commonStyles.standardButtonText}
           />
         )}
@@ -66,15 +66,15 @@ const LogOut = () => {
           </View>
           <View style={{padding: 10}}>
             <Button
-              title={'Log Out'}
               containerStyle={{padding: 2.5}}
               onPress={clearUser}
+              title={'Log Out'}
             />
             <Button
-              title={'Go to Backup Page'}
-              type={'outline'}
               containerStyle={{padding: 2.5}}
               onPress={goToBackupPage}
+              title={'Go to Backup Page'}
+              type={'outline'}
             />
           </View>
         </View>

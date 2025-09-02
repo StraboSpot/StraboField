@@ -50,9 +50,9 @@ const MeasurementItem = ({
             style={selectedIds.includes(item.id) ? commonStyles.listItemTitleInverse
               : commonStyles.listItemTitle}
           >
-            <MeasurementLabel item={item} isDetail={isDetail}/>
+            <MeasurementLabel isDetail={isDetail} item={item}/>
           </ListItem.Title>
-          <FeatureTagsList spotId={spot.properties.id} featureId={item.id}/>
+          <FeatureTagsList featureId={item.id} spotId={spot.properties.id}/>
         </ListItem.Content>
         <ListItem.Chevron/>
       </ListItem>

@@ -63,18 +63,18 @@ const FormSlider = ({
       </ListItem>
       <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR, padding: 10, paddingTop: 0}}>
         <SliderBar
-          onSlidingComplete={value => onSlideComplete(value)}
-          // value={choicesList.map(c => c.name).indexOf(formProps?.values[fieldKey])}
-          value={handleSliderValue()}
-          step={1}
-          minimumValue={0}
-          maximumValue={hasNoneChoice ? choicesList.length : choicesList.length - 1}
+          isHideLabels={isHideLabels}
           labels={labels ? labels
             : hasNoneChoice ? [...choicesList.map(c => c.label), 'N/R']
               : choicesList.map(c => c.label)}
+          maximumValue={hasNoneChoice ? choicesList.length : choicesList.length - 1}
+          minimumValue={0}
           rotateLabels={hasRotatedLabels}
-          isHideLabels={isHideLabels}
+          step={1}
           thumbTintColor={(!sliderValue || sliderValue === 5) && 'lightgrey'}
+          onSlidingComplete={value => onSlideComplete(value)}
+          // value={choicesList.map(c => c.name).indexOf(formProps?.values[fieldKey])}
+          value={handleSliderValue()}
         />
         {showSliderValue && (
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>

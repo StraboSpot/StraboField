@@ -65,7 +65,7 @@ function TablesData({
           <View style={externalDataStyles.modalHeader}>
             <Text style={externalDataStyles.modalTitle}>{loading ? 'Loading Table...' : tableName}</Text>
             <Pressable onPress={closeTable} >
-              <Icon name={'close'} type={'ionicon'} size={30} color={'#333'}/>
+              <Icon color={'#333'} name={'close'} size={30} type={'ionicon'}/>
             </Pressable>
           </View>
 
@@ -78,8 +78,8 @@ function TablesData({
                   <Table borderStyle={{borderWidth: 1, borderColor: '#ccc'}}>
                     <Rows
                       data={tableDataTrimmed}
-                      widthArr={cellWidths}
                       textStyle={externalDataStyles.cellText}
+                      widthArr={cellWidths}
                     />
                   </Table>
                 </ScrollView>
@@ -95,8 +95,8 @@ function TablesData({
     return (
       <View>
         <Pressable
-          style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
-          onPress={() => selectTable(table)} loading={loading}
+          loading={loading}
+          onPress={() => selectTable(table)} style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
         >
           <Text>{table.name}</Text>
           <Pressable
@@ -104,11 +104,11 @@ function TablesData({
             style={({pressed}) => [{backgroundColor: pressed ? '#b4b6b8' : 'transparent'}]}
           >
             <Icon
-              name={'trash'}
-              type={'font-awesome'}
-              size={25}
               color={'darkgrey'}
               containerStyle={externalDataStyles.iconContainer}
+              name={'trash'}
+              size={25}
+              type={'font-awesome'}
             />
           </Pressable>
         </Pressable>
@@ -131,12 +131,12 @@ function TablesData({
   return (
     <View style={{flex: 1}}>
       <FlatList
-        listKey={'tables'}
-        keyExtractor={item => item.id}
-        data={spot.properties?.data?.tables}
-        renderItem={({item}) => renderTableListItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
+        data={spot.properties?.data?.tables}
+        keyExtractor={item => item.id}
+        listKey={'tables'}
+        renderItem={({item}) => renderTableListItem(item)}
       />
       {isTableVisible && renderTable()}
     </View>

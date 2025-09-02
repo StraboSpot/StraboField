@@ -34,11 +34,11 @@ const StratSectionBackground = ({spotsDisplayed}) => {
       const url = getLocalImageURI(image.id);
       return (
         <StratSectionImageOverlay
-          key={'imageOverlay' + oI.id}
-          id={oI.id}
           coordQuad={coordQuad}
-          url={url}
+          id={oI.id}
           imageOpacity={oI.image_opacity}
+          key={'imageOverlay' + oI.id}
+          url={url}
         />
       );
     });

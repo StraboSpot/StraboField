@@ -42,14 +42,14 @@ const LeftSideButtons = ({
 
         {currentImageBasemap && (
           <IconButton
-            source={require('../../../assets/icons/Close.png')}
             onPress={() => clickHandler('closeImageBasemap')}
+            source={require('../../../assets/icons/Close.png')}
           />
         )}
         {stratSection && (
           <IconButton
-            source={require('../../../assets/icons/Close.png')}
             onPress={() => clickHandler('closeStratSection')}
+            source={require('../../../assets/icons/Close.png')}
           />
         )}
       </Animated.View>

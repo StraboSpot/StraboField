@@ -40,20 +40,20 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
         />
         <View style={{flex: 1}}>
           <FlatList
-            keyExtractor={spot => spot.properties.id.toString()}
+            ItemSeparatorComponent={FlatListItemSeparator}
+            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' found'}/>}
             data={isReverseSort ? [...spotsSorted].reverse() : spotsSorted}
+            keyExtractor={spot => spot.properties.id.toString()}
             renderItem={({item}) => (
               <SpotsListItem
                 doShowTags={true}
-                isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
                 isCheckedList={isCheckedList}
+                isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
                 onChecked={onChecked}
                 onPress={onPress}
                 spot={item}
               />
             )}
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' found'}/>}
           />
         </View>
       </View>

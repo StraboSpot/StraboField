@@ -68,18 +68,18 @@ const EarthquakesPage = ({page}) => {
           onPress={addAttribute}
         />
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={attributes}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              item={item}
-              index={index}
-              page={page}
-              editItem={itemToEdit => editAttribute(itemToEdit, index)}
-            />
-          )}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+          data={attributes}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item, index}) => (
+            <BasicListItem
+              editItem={itemToEdit => editAttribute(itemToEdit, index)}
+              index={index}
+              item={item}
+              page={page}
+            />
+          )}
         />
       </View>
     );

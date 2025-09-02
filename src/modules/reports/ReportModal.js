@@ -43,12 +43,11 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     <>
 
       <ModalWrapper
-        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
+        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <>
               <ReportForm initialValues={initialValues} ref={formRef}/>
@@ -72,29 +71,30 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
               />
             </>
           }
+          bounces={false}
         />
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{width: 40}}/>
-          <SaveButton title={'Save Report'} onPress={handleSavePressed}/>
+          <SaveButton onPress={handleSavePressed} title={'Save Report'}/>
           <Icon
-            name={'trash'}
-            type={'ionicon'}
             color={RED}
-            onPress={handleDeletePressed}
             containerStyle={{padding: 10, alignSelf: 'flex-end'}}
+            name={'trash'}
+            onPress={handleDeletePressed}
+            type={'ionicon'}
           />
         </View>
 
         <WarningModal
-          title={'Delete Report?'}
-          isVisible={isDeleteReportModalVisible}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           closeModal={() => setIsDeleteReportModalVisible(false)}
-          showCancelButton={true}
-          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           confirmText={'DELETE'}
           confirmTitleStyle={overlayStyles.importantText}
+          isVisible={isDeleteReportModalVisible}
           onConfirmPress={deleteReport}
+          showCancelButton={true}
+          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          title={'Delete Report?'}
         >
           {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
             : <Text>Are you sure you want to delete this report?</Text>}

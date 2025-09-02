@@ -50,12 +50,12 @@ const SamplesList = ({onPress, page, openModal}) => {
   return (
     <>
       <FlatList
-        keyExtractor={item => item.id}
-        data={samples.slice().sort(
-          (a, b) => (a.sample_id_name || 'Unknown').localeCompare((b.sample_id_name || 'Unknown')))}
-        renderItem={({item}) => renderSamplesListItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Samples'}/>}
+        data={samples.slice().sort(
+          (a, b) => (a.sample_id_name || 'Unknown').localeCompare((b.sample_id_name || 'Unknown')))}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => renderSamplesListItem(item)}
       />
     </>
   );

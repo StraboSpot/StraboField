@@ -132,8 +132,8 @@ const Notes = ({zoomToCurrentLocation}) => {
             )}
             <Templates
               isShowTemplates={isShowTemplates}
-              setIsShowTemplates={bool => setIsShowTemplates(bool)}
               page={page}
+              setIsShowTemplates={bool => setIsShowTemplates(bool)}
             />
           </>
         )
@@ -142,8 +142,8 @@ const Notes = ({zoomToCurrentLocation}) => {
             {!isShowTemplates && renderCancelSaveButtons()}
             <Templates
               isShowTemplates={isShowTemplates}
-              setIsShowTemplates={bool => setIsShowTemplates(bool)}
               page={page}
+              setIsShowTemplates={bool => setIsShowTemplates(bool)}
             />
           </>
         )
@@ -157,8 +157,8 @@ const Notes = ({zoomToCurrentLocation}) => {
           />
           {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
             <SaveButton
-              title={'Save Note'}
               onPress={() => saveFormAndGo()}
+              title={'Save Note'}
             />
           )}
         </ScrollView>

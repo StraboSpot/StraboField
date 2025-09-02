@@ -18,14 +18,14 @@ const ImageBasemapLayer = () => {
   if (currentImageBasemap && !isEmpty(coordQuad)) {
     return (
       <Source
+        coordinates={coordQuad}
         id={'currentImageBasemap'}
         type={'image'}
-        coordinates={coordQuad}
         url={getImageScreenSizedURI(currentImageBasemap.id)}
       >
         <Layer
-          type={'raster'}
           id={'imageBasemapLayer'}
+          type={'raster'}
           paint={{'raster-opacity': 1}}
           // beforeId={'pointLayerColorHalo'}
         />

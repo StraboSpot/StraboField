@@ -7,8 +7,8 @@ const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
 
   return (
     <MapboxGL.ImageSource
-      id={'imageOverlay' + id}
       coordinates={coordQuad}
+      id={'imageOverlay' + id}
       url={url}
     >
       <MapboxGL.RasterLayer

@@ -165,18 +165,18 @@ const UserProfile = () => {
 
     return (
       <TextInputModal
-        topPosition={10}
-        dialogTitle={'DANGER!'}
-        overlayTitleText={overlayStyles.importantText}
         buttonText={'DELETE'}
-        overlayButtonText={overlayStyles.importantText}
-        visible={isDeleteProfileModalVisible}
-        onPress={onDeleteProfile}
         closeModal={() => setDeleteProfileModalVisible(false)}
-        textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
-        onChangeText={text => handleOnChange(text)}
+        dialogTitle={'DANGER!'}
         errorMessage={errorMessage}
+        onChangeText={text => handleOnChange(text)}
+        onPress={onDeleteProfile}
         onSubmitEditing={onDeleteProfile}
+        overlayButtonText={overlayStyles.importantText}
+        overlayTitleText={overlayStyles.importantText}
+        textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
+        topPosition={10}
+        visible={isDeleteProfileModalVisible}
       />
     );
   };
@@ -184,49 +184,49 @@ const UserProfile = () => {
   const renderProfileImageModal = () => {
     return (
       <Overlay
-        supportedOrientations={['portrait', 'landscape']}
-        overlayStyle={userStyles.imageSelectionModal}
         isVisible={isImageDialogVisible}
+        overlayStyle={userStyles.imageSelectionModal}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <View style={{alignItems: 'flex-end'}}>
           <Icon
             name={'close-outline'}
-            type={'ionicon'}
             onPress={closeProfileImageModal}
+            type={'ionicon'}
           />
         </View>
         <View style={{alignItems: 'center'}}>
           <UserProfileAvatar size={'xlarge'} tempUserProfileImageURI={tempUserProfileImage?.uri}/>
         </View>
         <Button
-          containerStyle={commonStyles.buttonContainer}
           buttonStyle={{borderRadius: 10}}
+          containerStyle={commonStyles.buttonContainer}
+          onPress={() => pickImageSource('gallery')}
           title={'Gallery'}
           type={'outline'}
-          onPress={() => pickImageSource('gallery')}
         />
         <Button
-          containerStyle={commonStyles.buttonContainer}
           buttonStyle={{borderRadius: 10}}
+          containerStyle={commonStyles.buttonContainer}
+          onPress={() => pickImageSource('camera')}
           title={'Camera'}
           type={'outline'}
-          onPress={() => pickImageSource('camera')}
         />
         <Button
-          containerStyle={commonStyles.buttonContainer}
           buttonStyle={{borderRadius: 10}}
+          containerStyle={commonStyles.buttonContainer}
+          loading={isDeletingProfileImage}
+          onPress={removeProfileImage}
           title={'Remove Profile Image'}
           type={'outline'}
-          onPress={removeProfileImage}
-          loading={isDeletingProfileImage}
         />
         <Button
+          buttonStyle={{borderRadius: 10}}
           containerStyle={commonStyles.buttonContainer}
           disabled={isEmpty(tempUserProfileImage)}
-          buttonStyle={{borderRadius: 10}}
-          title={'Upload New Profile Image'}
-          onPress={saveImage}
           loading={isUploadingProfileImage}
+          onPress={saveImage}
+          title={'Upload New Profile Image'}
         />
       </Overlay>
     );
@@ -279,7 +279,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <View style={{flex: 1}} pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'}>
+      <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
@@ -295,34 +295,34 @@ const UserProfile = () => {
                 <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
               </View>
               <Formik
+                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                enableReinitialize={true}  // Update values if preferences change while form open
+                initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values =>     validateForm({formName: formName, values: values})}
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
-                initialValues={userData}
                 validateOnChange={true}
-                enableReinitialize={true}  // Update values if preferences change while form open
               />
               {isOnline.isInternetReachable ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
                     <View style={commonStyles.buttonContainer}>
                       <Button
-                        onPress={onDownloadUserProfile}
-                        type={'clear'}
-                        title={'Download User Profile'}
                         loading={isDownloading}
                         loadingProps={userStyles.loadingSpinnerProps}
+                        onPress={onDownloadUserProfile}
+                        title={'Download User Profile'}
+                        type={'clear'}
                       />
                     </View>
                   )}
                   <View style={commonStyles.buttonContainer}>
                     <Button
-                      title={'Delete Account'}
-                      type={'clear'}
-                      onPress={() => setDeleteProfileModalVisible(true)}
                       containerStyle={userStyles.deleteProfileButtonContainer}
+                      onPress={() => setDeleteProfileModalVisible(true)}
+                      title={'Delete Account'}
                       titleStyle={userStyles.deleteProfileButtonText}
+                      type={'clear'}
                     />
                   </View>
                 </View>

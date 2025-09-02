@@ -18,11 +18,11 @@ const TagsAtSpotList = ({openMainMenuPanel, page}) => {
 
   return (
     <FlatList
-      keyExtractor={item => item.id.toString()}
-      data={data}
-      renderItem={({item}) => renderTag(item)}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={listEmptyText}/>}
+      data={data}
+      keyExtractor={item => item.id.toString()}
+      renderItem={({item}) => renderTag(item)}
     />
   );
 };

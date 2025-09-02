@@ -65,10 +65,10 @@ const DatasetDetail = ({dataset}) => {
   const renderDeleteConfirmationModal = () => {
     return (
       <DeleteConformationDialogBox
-        title={'Confirm Delete!'}
-        isVisible={isDeleteConfirmModalVisible}
         cancel={() => setIsDeleteConfirmModalVisible(false)}
         deleteOverlay={initializeDeleteDataset}
+        isVisible={isDeleteConfirmModalVisible}
+        title={'Confirm Delete!'}
       >
         <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
           {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
@@ -87,20 +87,20 @@ const DatasetDetail = ({dataset}) => {
     return (
       <View style={{paddingBottom: 10}}>
         <Button
+          disabled={isDisabled(dataset.id)}
+          icon={
+            <Icon
+              color={isDisabled(dataset.id) ? MEDIUMGREY : RED}
+              iconStyle={{paddingRight: 10}}
+              name={'trash'}
+              size={20}
+              type={'font-awesome'}
+            />
+          }
+          onPress={handleDeletePressed}
           title={'Delete Dataset'}
           titleStyle={overlayStyles.importantText}
           type={'clear'}
-          disabled={isDisabled(dataset.id)}
-          onPress={handleDeletePressed}
-          icon={
-            <Icon
-              iconStyle={{paddingRight: 10}}
-              name={'trash'}
-              type={'font-awesome'}
-              size={20}
-              color={isDisabled(dataset.id) ? MEDIUMGREY : RED}
-            />
-          }
         />
         {isDisabled(dataset.id) && (
           <Text style={[overlayStyles.importantText, {paddingHorizontal: 30}]}>
@@ -127,17 +127,17 @@ const DatasetDetail = ({dataset}) => {
                 <Text style={formStyles.fieldLabel}>{'Images'}</Text>
               </View>
               <TextInput
+                editable={false}
                 style={formStyles.fieldValue}
                 value={imagesCount.toString()}
-                editable={false}
               />
             </View>
             {Platform.OS !== 'web' && imagesNeededCount === 0 && (
               <Icon
-                name={'checkmark-outline'}
-                type={'ionicon'}
-                size={30}
                 color={POSITIVE_COLOR}
+                name={'checkmark-outline'}
+                size={30}
+                type={'ionicon'}
               />
             )}
           </ListItem.Content>
@@ -153,18 +153,18 @@ const DatasetDetail = ({dataset}) => {
                   <Text style={formStyles.fieldLabel}>{'Images Needed to Download'}</Text>
                 </View>
                 <TextInput
+                  editable={false}
                   style={formStyles.fieldValue}
                   value={imagesNeededCount.toString()}
-                  editable={false}
                 />
               </View>
               {imagesNeededCount > 0 && (
                 <Icon
-                  name={'download-circle-outline'}
-                  type={'material-community'}
-                  size={30}
                   color={WARNING_COLOR}
+                  name={'download-circle-outline'}
                   onPress={downloadImages}
+                  size={30}
+                  type={'material-community'}
                 />
               )}
             </ListItem.Content>
@@ -184,10 +184,10 @@ const DatasetDetail = ({dataset}) => {
               <ListItem.Content>
                 <Field
                   component={NumberInputField}
-                  name={'id'}
-                  label={'ID'}
-                  key={'id'}
                   editable={false}
+                  key={'id'}
+                  label={'ID'}
+                  name={'id'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -196,11 +196,11 @@ const DatasetDetail = ({dataset}) => {
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'date'}
-                  label={'Date Created'}
+                  isDisplayOnly={true}
+                  isShowTime={true}
                   key={'date'}
-                  isDisplayOnly={true}
-                  isShowTime={true}
+                  label={'Date Created'}
+                  name={'date'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -209,11 +209,11 @@ const DatasetDetail = ({dataset}) => {
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  key={'modified_timestamp'}
                   isDisplayOnly={true}
                   isShowTime={true}
+                  key={'modified_timestamp'}
+                  label={'Date Last Modified'}
+                  name={'modified_timestamp'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -258,9 +258,9 @@ const DatasetDetail = ({dataset}) => {
             <Text style={formStyles.fieldLabel}>{'Spots'}</Text>
           </View>
           <TextInput
+            editable={false}
             style={formStyles.fieldValue}
             value={spotsCount.toString()}
-            editable={false}
           />
         </ListItem.Content>
       </ListItem>
@@ -277,9 +277,9 @@ const DatasetDetail = ({dataset}) => {
   return (
     <>
       <SidePanelHeader
-        title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
-        headerTitle={'Dataset Detail'}
         backButton={handleBackPressed}
+        headerTitle={'Dataset Detail'}
+        title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
       />
 
       {renderNameField()}

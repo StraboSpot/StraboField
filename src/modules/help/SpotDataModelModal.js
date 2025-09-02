@@ -108,10 +108,10 @@ const SpotDataModelModal = ({close}) => {
     <ModalWrapper closeModal={close} isFullScreen title={'Spot Data Model Object'}>
       <ScrollView>
         <Button
+          onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}
           title={'Copy JSON to Clipboard'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}
         />
         <JSONTree data={spotDataModel} hideRoot/>
       </ScrollView>

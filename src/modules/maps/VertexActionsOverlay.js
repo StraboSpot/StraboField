@@ -64,18 +64,18 @@ const VertexActionsOverlay = ({
               ((vertexActionValues.vertexSelected && button !== 'Add Vertex')
                 || (!vertexActionValues.vertexSelected && button !== 'Delete Vertex')) && (
                 <Button
+                  buttonStyle={overlayStyles.buttonText}
                   icon={
                     <IconButton
-                      style={{paddingRight: 15}}
-                      source={buttonIcon(button)}
                       onPress={() => handleActionPressed(button)}
+                      source={buttonIcon(button)}
+                      style={{paddingRight: 15}}
                     />
                   }
-                  title={button}
-                  buttonStyle={overlayStyles.buttonText}
-                  type={'clear'}
-                  onPress={() => handleActionPressed(button)}
                   key={button}
+                  onPress={() => handleActionPressed(button)}
+                  title={button}
+                  type={'clear'}
                 />
               )
             );

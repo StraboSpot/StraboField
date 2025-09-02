@@ -68,62 +68,62 @@ const MeasurementModal = ({
 
   return (
     <Overlay
+      fullScreen={SMALL_SCREEN}
+      isVisible={true}
       overlayStyle={
         SMALL_SCREEN
           ? overlayStyles.overlayContainerFullScreen
           : [{...overlayStyles.overlayContainer, height: 0.60}, overlayStyles.overlayPosition]
       }
       supportedOrientations={['portrait', 'landscape']}
-      isVisible={true}
-      fullScreen={SMALL_SCREEN}
     >
       <ModalWrapperHeader
         buttonTitleRight={'Done'}
-        title={measurementsGroupLabel}
         closeModal={() => setIsMeasurementModalVisible(false)}
+        title={measurementsGroupLabel}
       />
       {Platform.OS === 'ios' && (
         <Button
           buttonStyle={formStyles.formButtonSmall}
-          titleProps={formStyles.formButtonTitle}
-          title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
-          type={'clear'}
           onPress={() => setIsManualMeasurement(!isManualMeasurement)}
+          title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
+          titleProps={formStyles.formButtonTitle}
+          type={'clear'}
         />
       )}
       {isManualMeasurement ? (
         <ManualMeasurement
           addAttributeMeasurement={addAttributeMeasurement}
-          setAttributeMeasurements={setMeasurements}
           measurementTypes={compassMeasurementTypes}
+          setAttributeMeasurements={setMeasurements}
           setSliderValue={setSliderValue}
           sliderValue={sliderValue}
         />
       ) : (
         <>
           <Compass
-            setAttributeMeasurements={setMeasurements}
             closeCompass={() => setIsMeasurementModalVisible(false)}
+            setAttributeMeasurements={setMeasurements}
             sliderValue={sliderValue}
           />
           <View style={compassStyles.sliderContainer}>
             <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
             <SliderBar
-              onSlidingComplete={setSliderValue}
-              value={sliderValue}
-              step={1}
+              labels={['Low', '', '', '', 'High', 'N/R']}
               maximumValue={6}
               minimumValue={1}
-              labels={['Low', '', '', '', 'High', 'N/R']}
+              onSlidingComplete={setSliderValue}
+              step={1}
+              value={sliderValue}
             />
           </View>
         </>
       )}
       <Button
-        titleStyle={{color: WARNING_COLOR}}
-        title={'Clear Measurement'}
-        type={'clear'}
         onPress={() => setMeasurements({})}
+        title={'Clear Measurement'}
+        titleStyle={{color: WARNING_COLOR}}
+        type={'clear'}
       />
     </Overlay>
   );

@@ -133,12 +133,12 @@ const Templates = ({
   const renderFormFields = () => {
     return (
       <FlatList
-        listKey={'form' + measurementKey}
         ListHeaderComponent={
           <View style={{flex: 1}}>
             {templateKey === measurementKey ? renderMeasurementsForm() : renderNonMeasurementsForm()}
           </View>
         }
+        listKey={'form' + measurementKey}
       />
     );
   };
@@ -150,9 +150,9 @@ const Templates = ({
     return (
       <MeasurementDetail
         closeDetailView={() => setIsShowForm(false)}
-        selectedAttitudes={[values]}
-        saveTemplate={saveTemplate}
         deleteTemplate={deleteTemplateConfirm}
+        saveTemplate={saveTemplate}
+        selectedAttitudes={[values]}
       />
     );
   };
@@ -164,11 +164,11 @@ const Templates = ({
     return (
       <BasicPageDetail
         closeDetailView={() => setIsShowForm(false)}
-        selectedFeature={selectedTemplate.values}
-        page={page}
-        groupKey={groupKey}
-        saveTemplate={saveTemplate}
         deleteTemplate={deleteTemplateConfirm}
+        groupKey={groupKey}
+        page={page}
+        saveTemplate={saveTemplate}
+        selectedFeature={selectedTemplate.values}
       />
     );
   };
@@ -178,8 +178,8 @@ const Templates = ({
     return (
       <View>
         <ListItem
-          onPress={() => setAsTemplate(template)}
           containerStyle={isActive ? commonStyles.listItemInverse : commonStyles.listItem}
+          onPress={() => setAsTemplate(template)}
         >
           <ListItem.Content>
             <ListItem.Title style={isActive ? commonStyles.listItemTitleInverse : commonStyles.listItemTitle}>
@@ -187,10 +187,10 @@ const Templates = ({
             </ListItem.Title>
           </ListItem.Content>
           <Button
-            titleStyle={isActive ? commonStyles.standardButtonTextInverse : commonStyles.standardButtonText}
-            title={'Edit'}
-            type={'save'}
             onPress={() => editTemplate(template)}
+            title={'Edit'}
+            titleStyle={isActive ? commonStyles.standardButtonTextInverse : commonStyles.standardButtonText}
+            type={'save'}
           />
         </ListItem>
       </View>
@@ -214,32 +214,32 @@ const Templates = ({
     return (
       <>
         <FlatList
-          listKey={JSON.stringify(relevantTemplates)}
-          data={relevantTemplates}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderTemplateListItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'There are no templates defined yet.'}/>}
+          data={relevantTemplates}
+          keyExtractor={item => item.id.toString()}
+          listKey={JSON.stringify(relevantTemplates)}
+          renderItem={({item}) => renderTemplateListItem(item)}
         />
         <Button
-          titleStyle={commonStyles.standardButtonText}
-          title={'Done'}
-          type={'clear'}
           onPress={closeTemplates}
+          title={'Done'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
         />
         {!isEmpty(relevantTemplates) && (
           <Button
-            titleStyle={commonStyles.standardButtonText}
-            title={'Clear Selected Template'}
-            type={'clear'}
             onPress={clearTemplate}
+            title={'Clear Selected Template'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
         )}
         <Button
-          titleStyle={commonStyles.standardButtonText}
-          title={'Define New ' + label + ' Template'}
-          type={'clear'}
           onPress={createNewTemplate}
+          title={'Define New ' + label + ' Template'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
         />
       </>
     );
@@ -250,17 +250,17 @@ const Templates = ({
       <>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Button
-            titleStyle={commonStyles.standardButtonText}
-            title={'Cancel'}
-            type={'clear'}
             onPress={() => setIsShowNameInput(false)}
+            title={'Cancel'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
           <Button
-            titleStyle={commonStyles.standardButtonText}
-            title={'Continue'}
-            type={'clear'}
             disabled={isEmpty(name)}
             onPress={() => continueToTemplateForm()}
+            title={'Continue'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
         </View>
         <View style={[commonStyles.listItemFormField, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}>
@@ -268,10 +268,10 @@ const Templates = ({
             <Text style={formStyles.fieldLabel}>{'Template Name'}</Text>
           </View>
           <TextInput
-            style={formStyles.fieldValue}
-            onChangeText={value => setName(value)}
-            value={name || ''}
             autoFocus={isEmpty(name)}
+            onChangeText={value => setName(value)}
+            style={formStyles.fieldValue}
+            value={name || ''}
           />
         </View>
       </>
@@ -319,13 +319,13 @@ const Templates = ({
         {isEmpty(activeTemplates) ? (
           <ListItem containerStyle={{padding: 0, width: '100%', justifyContent: 'center'}}>
             <Button
-              titleStyle={commonStyles.standardButtonText}
-              title={title}
-              type={'clear'}
               onPress={() => {
                 setIsShowTemplates(true);
                 setTemplateType(type);
               }}
+              title={title}
+              titleStyle={commonStyles.standardButtonText}
+              type={'clear'}
             />
           </ListItem>
         ) : (
@@ -341,13 +341,13 @@ const Templates = ({
                   </ListItem.Title>
                 </ListItem.Content>
                 <Button
-                  titleStyle={commonStyles.standardButtonText}
-                  title={'Change'}
-                  type={'clear'}
                   onPress={() => {
                     setIsShowTemplates(true);
                     setTemplateType(type);
                   }}
+                  title={'Change'}
+                  titleStyle={commonStyles.standardButtonText}
+                  type={'clear'}
                 />
               </ListItem>
             }

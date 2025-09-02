@@ -24,28 +24,28 @@ const MineralsGlossary = ({addMineral}) => {
       <View>
         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
           <Button
-            titleStyle={styles.buttonText}
-            title={'Cancel'}
-            type={'clear'}
             onPress={() => setActiveMineralInfo({})}
+            title={'Cancel'}
+            titleStyle={styles.buttonText}
+            type={'clear'}
           />
           <Button
-            titleStyle={styles.buttonText}
-            title={'Add Mineral'}
-            type={'clear'}
             onPress={() => addMineral(activeMineralInfo)}
+            title={'Add Mineral'}
+            titleStyle={styles.buttonText}
+            type={'clear'}
           />
         </View>
         {Object.entries(activeMineralInfo).map(([field, value]) => {
           if (field === 'mindat.org link') {
             return (
               <Button
+                containerStyle={{padding: 10}}
+                icon={{name: 'globe-outline', type: 'ionicon', color: themes.PRIMARY_ACCENT_COLOR}}
                 key={activeMineralInfo.Name + 'MindatLink'}
+                onPress={() => Linking.openURL(value)}
                 title={'Click here for more mineral information on ' + activeMineralInfo.Label + ' from Mindat.org'}
                 type={'clear'}
-                icon={{name: 'globe-outline', type: 'ionicon', color: themes.PRIMARY_ACCENT_COLOR}}
-                containerStyle={{padding: 10}}
-                onPress={() => Linking.openURL(value)}
               />
             );
           }
@@ -66,13 +66,13 @@ const MineralsGlossary = ({addMineral}) => {
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly'}}>
         {glossaryChunked.map(glossaryChunk => (
-          <View style={{flex: 1}} key={JSON.stringify(glossaryChunk)}>
+          <View key={JSON.stringify(glossaryChunk)} style={{flex: 1}}>
             {glossaryChunk.map(mineralInfo => (
               <Button
                 key={mineralInfo.Name}
+                onPress={() => setActiveMineralInfo(mineralInfo)}
                 title={mineralInfo.Label}
                 type={'clear'}
-                onPress={() => setActiveMineralInfo(mineralInfo)}
               />
             ))}
           </View>

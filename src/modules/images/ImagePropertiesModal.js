@@ -21,12 +21,12 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
     console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
     return (
       <Formik
+        component={formProps => Form({formName: formName, ...formProps})}
+        initialStatus={{formName: formName}}
+        initialValues={image}
         innerRef={formRef}
         onSubmit={() => console.log('Submitting form...')}
         validate={values => validateForm({formName: formName, values: values})}
-        component={formProps => Form({formName: formName, ...formProps})}
-        initialValues={image}
-        initialStatus={{formName: formName}}
       />
     );
   };
@@ -57,13 +57,13 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
       title={'Image Properties'}
     >
       <FlatList
-        ListHeaderComponent={renderFormFields()}
         ListFooterComponent={
           <View style={imageStyles.switch}>
             <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
             <SwitchWrapper onValueChange={setIsAnnotated} value={isAnnotated}/>
           </View>
         }
+        ListHeaderComponent={renderFormFields()}
       />
     </ModalWrapper>
   );

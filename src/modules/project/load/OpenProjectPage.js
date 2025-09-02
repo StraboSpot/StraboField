@@ -70,8 +70,8 @@ const OpenProjectPage = () => {
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
             backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-            title={'My StraboField Projects'}
             headerTitle={'Open Locally Saved Project'}
+            title={'My StraboField Projects'}
           />
         )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>

@@ -18,16 +18,16 @@ const AcknowledgeInput = ({
   return (
     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', width: '100%'}}>
       <View style={{justifyContent: 'center'}}>
-        <SwitchWrapper value={value} onValueChange={bool => setFieldValue(name, bool)}/>
+        <SwitchWrapper onValueChange={bool => setFieldValue(name, bool)} value={value}/>
       </View>
       <View style={[formStyles.fieldLabelContainer, {flex: 1, paddingLeft: 5}]}>
         <Text style={[formStyles.fieldLabel, {fontWeight: 'normal'}]}>{label}</Text>
         {placeholder && (
           <Icon
-            name={'information-circle-outline'}
-            type={'ionicon'}
             color={PRIMARY_ACCENT_COLOR}
+            name={'information-circle-outline'}
             onPress={() => onShowFieldInfo(label, placeholder)}
+            type={'ionicon'}
           />
         )}
       </View>

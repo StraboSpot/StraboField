@@ -76,8 +76,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
           return [...acc, (
             <IconButton
               key={sm.key}
-              source={modalVisible === sm.key ? sm.icon_pressed_src : sm.icon_src}
               onPress={() => toggleShortcutModal(sm.key)}
+              source={modalVisible === sm.key ? sm.icon_pressed_src : sm.icon_src}
             />
           )];
         }

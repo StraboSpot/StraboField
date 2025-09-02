@@ -25,11 +25,11 @@ const PickerOverlay = ({ closePicker, data, dividerText, isPickerVisible, onSele
       supportedOrientations={['portrait', 'landscape']}
     >
       <Button
-        title={'X'}
-        type={'clear'}
-        titleStyle={{color: 'black'}}
         containerStyle={{alignItems: 'flex-end'}}
         onPress={closePicker}
+        title={'X'}
+        titleStyle={{color: 'black'}}
+        type={'clear'}
       />
       <SectionDivider dividerText={dividerText}/>
       <FlatList

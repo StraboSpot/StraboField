@@ -37,7 +37,7 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
 
   const renderError = () => (
     <View style={{paddingTop: 75}}>
-      <Icon name={'alert-circle-outline'} type={'ionicon'} size={100}/>
+      <Icon name={'alert-circle-outline'} size={100} type={'ionicon'}/>
       <Text style={[commonStyles.noValueText, {paddingTop: 50}]}>Problem getting thumbnail images...</Text>
     </View>
   );
@@ -46,15 +46,15 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
     return (
       <React.Fragment key={image.id}>
         <ImageCard
+          areImageThumbnailsLoading={areImageThumbnailsLoading}
           image={image}
           imageThumbnailURIs={imageThumbnailURIs}
           index={index}
-          areImageThumbnailsLoading={areImageThumbnailsLoading}
           isThumbnailOnly={isThumbnailOnly}
           openImage={openImage}
+          setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
           setImageToView={setImageToView}
-          setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setIsImageModalVisible={setIsImageModalVisible}
         />
       </React.Fragment>
@@ -67,7 +67,6 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
         .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
     return (
       <FlatList
-        data={sortedImages}
         ListEmptyComponent={<ListEmptyText text={'No Images'}/>}
         ListHeaderComponent={
           <View
@@ -76,6 +75,7 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
             {sortedImages.map((image, index) => renderImageCard(image, index))}
           </View>
         }
+        data={sortedImages}
       />
     );
   };

@@ -35,20 +35,20 @@ const OpenUrlLink = ({
       {isOnline && (
         <Button
           buttonStyle={buttonStyle}
+          icon={
+            <Icon
+              color={color || BLUE}
+              iconStyle={{paddingHorizontal: 10}}
+              name={icon}
+              size={20}
+              type={'ionicon'}
+            />
+          }
+          onPress={openLink}
+          raised
           title={title}
           titleStyle={titleStyle}
           type={'clear'}
-          onPress={openLink}
-          raised
-          icon={
-            <Icon
-              name={icon}
-              type={'ionicon'}
-              iconStyle={{paddingHorizontal: 10}}
-              size={20}
-              color={color || BLUE}
-            />
-          }
         />
       )}
     </>

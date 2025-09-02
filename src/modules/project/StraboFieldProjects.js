@@ -61,18 +61,18 @@ const StraboFieldProjects = () => {
             <Spacer/>
             <SectionDivider dividerText={'Local Projects on Device'}/>
             <Button
-              title={'Delete'}
-              containerStyle={commonStyles.standardButtonContainer}
               buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
+              containerStyle={commonStyles.standardButtonContainer}
               onPress={onDeleteLocalCopy}
+              title={'Delete'}
+              titleStyle={commonStyles.standardButtonText}
             />
             <Button
-              title={Platform.OS === 'ios' ? 'Zip' : 'Export to Zip'}
-              containerStyle={commonStyles.standardButtonContainer}
               buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
+              containerStyle={commonStyles.standardButtonContainer}
               onPress={onExportOtherSavedProject}
+              title={Platform.OS === 'ios' ? 'Zip' : 'Export to Zip'}
+              titleStyle={commonStyles.standardButtonText}
             />
             {Platform.OS === 'ios' && (
               <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
@@ -82,18 +82,18 @@ const StraboFieldProjects = () => {
                   </Text>
                 </View>
                 <Button
-                  title={'View/Edit Files on Device'}
-                  type={'outline'}
-                  containerStyle={commonStyles.buttonPadding}
                   buttonStyle={commonStyles.standardButton}
-                  titleStyle={commonStyles.standardButtonText}
-                  onPress={() => openURL('ProjectBackups')}
-                  iconContainerStyle={{paddingRight: 10}}
+                  containerStyle={commonStyles.buttonPadding}
                   icon={{
                     name: 'file-tray-full-outline',
                     type: 'ionicon',
                     color: BLUE,
                   }}
+                  iconContainerStyle={{paddingRight: 10}}
+                  onPress={() => openURL('ProjectBackups')}
+                  title={'View/Edit Files on Device'}
+                  titleStyle={commonStyles.standardButtonText}
+                  type={'outline'}
                 />
               </View>
             )}
