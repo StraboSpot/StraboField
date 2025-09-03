@@ -37,7 +37,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   };
 
   return (
-    <>
+    <View style={{flex: 1}}>
       <View style={{flex: 1}}>
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
@@ -56,7 +56,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
           loadProject={downloadProject}
         />
       )}
-    </>
+    </View>
   );
 };
 

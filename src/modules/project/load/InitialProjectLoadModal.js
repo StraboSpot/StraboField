@@ -11,7 +11,6 @@ import NewProjectForm from './NewProjectForm';
 import useResetState from '../../../services/useResetState';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
-import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
@@ -19,7 +18,7 @@ import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
 import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
 
-const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
+const InitialProjectLoadModal = ({openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');
 
   const dispatch = useDispatch();
@@ -59,13 +58,11 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
 
   const renderLoadProjectButtons = () => {
     return (
-      <View>
-        <LoadProjectButtons
-          onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
-          onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
-          onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
-          onStartNewProject={() => handleOnPress('project')}/>
-      </View>
+      <LoadProjectButtons
+        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
+        onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
+        onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
+        onStartNewProject={() => handleOnPress('project')}/>
     );
   };
 
@@ -133,9 +130,7 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
         return (
           <>
             {renderBackButton()}
-            <View style={{backgroundColor: PRIMARY_BACKGROUND_COLOR, flex: 1}}>
-              <NewProjectForm openMainMenuPanel={openMainMenuPanel}/>
-            </View>
+            <NewProjectForm openMainMenuPanel={openMainMenuPanel}/>
           </>
         );
       case 'importData':
@@ -172,7 +167,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   };
 
   return (
-    <ModalWrapper title={statusMessageModalTitle}>
+    <ModalWrapper
+      overlayStyleOverride={{justifyContent: 'center', height: '80%'}}
+      title={statusMessageModalTitle}
+    >
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}
     </ModalWrapper>
