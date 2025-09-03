@@ -41,11 +41,11 @@ const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebo
       {isEmpty(selectedSpot) ? <ListEmptyText text={'No Selected Spot'}/>
         : <SpotsListItem onPress={openSpotInNotebook} spot={selectedSpot}/>}
       <Picker
+        itemStyle={{color: themes.BLACK}}
         onValueChange={setPickerKey}
         ref={pickerRef}
         selectedValue={pickerKey}
         style={styles.sectionDividerText}
-        itemStyle={{color: themes.BLACK}}
       >
         <Picker.Item label={pickerLabels[pickerKeys.SPOTS]} value={pickerKeys.SPOTS}/>
         <Picker.Item label={pickerLabels[pickerKeys.IMAGES]} value={pickerKeys.IMAGES}/>
@@ -56,8 +56,8 @@ const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebo
       {pickerKey === pickerKeys.IMAGES && <ImageGallery openSpotInNotebook={openSpotInNotebook}/>}
       {pickerKey === pickerKeys.SAMPLES && (
         <SamplesMenuItem
-          openSpotInNotebook={openSpotInNotebookFromNavigator}
           openNotebookPanel={openNotebookPanel}
+          openSpotInNotebook={openSpotInNotebookFromNavigator}
         />
       )}
       {pickerKey === pickerKeys.REPORTS && <ReportsList openSpotInNotebook={openSpotInNotebook}/>}

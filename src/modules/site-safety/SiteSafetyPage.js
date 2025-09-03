@@ -102,13 +102,13 @@ const SiteSafetyPage = () => {
   const renderSiteSafetyForm = () => {
     return (
       <Formik
-        innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        onReset={() => console.log('Resetting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        initialValues={initialValues}
         enableReinitialize={true}
         initialStatus={{formName: formName}}
+        initialValues={initialValues}
+        innerRef={formRef}
+        onReset={() => console.log('Resetting form...')}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>

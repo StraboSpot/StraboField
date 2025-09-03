@@ -15,21 +15,21 @@ const DrawLayers = ({drawFeatures}) => {
       shape={turf.featureCollection(drawFeatures)}
     >
       <MapboxGL.CircleLayer
+        filter={['==', ['geometry-type'], 'Point']}
         id={'pointLayerDraw'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Point']}
         style={getMapSymbology().pointDraw}
       />
       <MapboxGL.LineLayer
+        filter={['==', ['geometry-type'], 'LineString']}
         id={'lineLayerDraw'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'LineString']}
         style={getMapSymbology().lineDraw}
       />
       <MapboxGL.FillLayer
+        filter={['==', ['geometry-type'], 'Polygon']}
         id={'polygonLayerDraw'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Polygon']}
         style={getMapSymbology().polygonDraw}
       />
     </MapboxGL.ShapeSource>

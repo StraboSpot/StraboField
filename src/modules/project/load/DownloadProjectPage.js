@@ -42,8 +42,8 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
             backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-            title={'My StraboField Projects'}
             headerTitle={'Download Project'}
+            title={'My StraboField Projects'}
           />
         )}
         <ProjectList onProjectPress={confirmOpenProject} source={source}/>

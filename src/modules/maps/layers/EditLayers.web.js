@@ -11,15 +11,15 @@ const EditLayers = ({editFeatureVertex}) => {
 
   return (
     <Source
+      data={turf.featureCollection(editFeatureVertex)}
       id={'editFeatureVertex'}
       type={'geojson'}
-      data={turf.featureCollection(editFeatureVertex)}
     >
       <Layer
-        type={'circle'}
-        id={'pointLayerEdit'}
         filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerEdit'}
         paint={getPaintSymbology().pointEdit}
+        type={'circle'}
       />
     </Source>
   );

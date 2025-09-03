@@ -41,14 +41,14 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
   const renderDeleteImageModal = () => {
     return (
       <WarningModal
-        title={'Delete Image?'}
-        isVisible={isImageDeleteModalVisible}
         closeModal={() => setIsImageDeleteModalVisible(false)}
         confirmText={'Delete'}
-        showConfirmButton
-        showCancelButton
         confirmTitleStyle={overlayStyles.importantText}
+        isVisible={isImageDeleteModalVisible}
         onConfirmPress={onDeleteImage}
+        showCancelButton
+        showConfirmButton
+        title={'Delete Image?'}
       >
         <Text>Are you sure you want to delete image:{'\n'}</Text>
         <Text>{image.title || image.id}</Text>
@@ -60,45 +60,45 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
     <>
       <View style={{backgroundColor: 'black', justifyContent: 'center', alignContent: 'center'}}>
         <Image
-          source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
-            : {uri: getLocalImageURI(image.id)}}
-          style={Platform.OS === 'web' ? {width: width, height: height}
-            : {width: '100%', height: '100%'}}
-          resizeMode={'contain'}
           PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
-            : <Image style={imageStyles.thumbnail} source={placeholderImage}/>}
-          placeholderStyle={commonStyles.imagePlaceholder}
+            : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
           onError={() => {
             if (!isImageLoaded) setIsImageLoaded(true);
           }}
           onLoadEnd={() => {
             if (!isImageLoaded) setIsImageLoaded(true);
           }}
+          placeholderStyle={commonStyles.imagePlaceholder}
+          resizeMode={'contain'}
+          source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
+            : {uri: getLocalImageURI(image.id)}}
+          style={Platform.OS === 'web' ? {width: width, height: height}
+            : {width: '100%', height: '100%'}}
         />
         <View style={imageStyles.closeButtonContainer}>
           <IconButton
-            source={require('../../assets/icons/Close.png')}
             onPress={() => setIsImageModalVisible(false)}
+            source={require('../../assets/icons/Close.png')}
             style={imageStyles.closeButtonStyle}
           />
         </View>
         <View style={imageStyles.rightsideIcons}>
           <IconButton
-            style={imageStyles.imageInfoButtons}
-            source={require('../../assets/icons/ImagePropertiesButton.png')}
             onPress={() => setIsImagePropertiesModalVisible(true)}
+            source={require('../../assets/icons/ImagePropertiesButton.png')}
+            style={imageStyles.imageInfoButtons}
           />
           {Platform.OS !== 'web' && (
             <IconButton
-              style={imageStyles.imageInfoButtons}
-              source={require('../../assets/icons/ImageSketchButton.png')}
               onPress={openInSketch}
+              source={require('../../assets/icons/ImageSketchButton.png')}
+              style={imageStyles.imageInfoButtons}
             />
           )}
           <IconButton
-            style={imageStyles.imageInfoButtons}
-            source={require('../../assets/icons/DeleteButton.png')}
             onPress={() => handleDeleteImageOnPress()}
+            source={require('../../assets/icons/DeleteButton.png')}
+            style={imageStyles.imageInfoButtons}
           />
         </View>
       </View>

@@ -49,15 +49,15 @@ const CustomEndpoint = ({
         {/*{isSelected && (*/}
         <View style={uiStyles.customEndpointVerifyInputContainer}>
           <Input
+            autoCapitalize={'none'}
             containerStyle={signInStyles.customEndpointInputContainer}
+            defaultValue={endpoint}
             inputContainerStyle={{borderBottomWidth: 0}}
             inputStyle={signInStyles.customEndpointInput}
-            onChangeText={value => handleEndpointTextValues(value)}
             label={'Enter endpoint IP address'}
-            placeholder={'http://192.168.xxx/db'}
             labelStyle={{fontSize: 10}}
-            defaultValue={endpoint}
-            autoCapitalize={'none'}
+            onChangeText={value => handleEndpointTextValues(value)}
+            placeholder={'http://192.168.xxx/db'}
             returnKeyType={'send'}
           />
           <Text style={[commonStyles.noValueText, {paddingTop: 0, fontStyle: 'italic'}, textStyles]}>

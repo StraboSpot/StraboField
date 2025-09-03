@@ -48,12 +48,12 @@ const DailyNotesPage = () => {
         onPress={addDailyNote}
       />
       <FlatList
-        data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
-        keyExtractor={item => item.date}
-        renderItem={({item}) => renderDailyNotesListItem(item)}
         ListEmptyComponent={
           <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
         }
+        data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
+        keyExtractor={item => item.date}
+        renderItem={({item}) => renderDailyNotesListItem(item)}
       />
     </View>
   );

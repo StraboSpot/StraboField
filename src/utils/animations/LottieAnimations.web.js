@@ -12,19 +12,19 @@ const LottieAnimation = ({doesLoop, show, error}) => {
       {show ? <ActivityIndicator size={75}/>
         : !error ? (
           <Icon
-            reverse
-            name={'check-circle-outline'}
-            type={'material-community'}
             color={'#517fa4'}
+            name={'check-circle-outline'}
+            reverse
             size={35}
+            type={'material-community'}
           />
         ) : (
           <Icon
-            reverse
-            name={'alert-circle-outline'}
-            type={'material-community'}
             color={'#930808'}
+            name={'alert-circle-outline'}
+            reverse
             size={35}
+            type={'material-community'}
           />
         )
       }

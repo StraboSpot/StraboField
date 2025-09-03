@@ -53,14 +53,14 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
   const FaciesButton = (faciesProps) => {
     return (
       <Button
-        containerStyle={{padding: 2.5}}
         buttonStyle={[formStyles.formButtonLarge, {
           backgroundColor: formProps?.values?.facies?.includes(faciesProps.faciesKey)
             ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
           height: '100%',
         }]}
-        type={'outline'}
+        containerStyle={{padding: 2.5}}
         onPress={() => addFacies(faciesProps.faciesKey)}
+        type={'outline'}
       >
         {faciesButtonText(faciesProps.faciesKey)}
       </Button>
@@ -72,18 +72,18 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     return (
       <Overlay
         fullScreen={SMALL_SCREEN}
-        supportedOrientations={['portrait', 'landscape']}
+        isVisible={true}
         overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : [overlayStyles.overlayContainer, overlayStyles.overlayPosition, {
           width: faciesModalWidth,
           left: 20,
-          height: '50%'
+          height: '50%',
         }]}
-        isVisible={true}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <ModalWrapperHeader
           buttonTitleRight={'Done'}
-          title={'Facies'}
           closeModal={() => setIsFaciesModalVisible(false)}
+          title={'Facies'}
         />
         <View style={{ flex: 1, padding: 10 }}>
           <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', overflow: 'visible' }}>

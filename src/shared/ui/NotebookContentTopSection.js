@@ -42,19 +42,19 @@ const NotebookContentTopSection = ({returnToOverviewAction}) => {
         />
         {isMultipleFeaturesTaggingEnabled ? (
           <ButtonRounded
+            buttonStyle={[imageStyles.buttonContainer, {padding: 5}]}
+            onPress={selectTagsForFeatures}
             title={'Select Tags'}
             titleStyle={commonStyles.standardDescriptionText}
-            buttonStyle={[imageStyles.buttonContainer, {padding: 5}]}
             type={'outline'}
-            onPress={selectTagsForFeatures}
           />
         ) : (
           <ButtonRounded
+            buttonStyle={[imageStyles.buttonContainer, {padding: 5}]}
+            onPress={selectFeaturesToTag}
             title={'Tag/Untag Features(s)'}
             titleStyle={commonStyles.standardDescriptionText}
-            buttonStyle={[imageStyles.buttonContainer, {padding: 5}]}
             type={'outline'}
-            onPress={selectFeaturesToTag}
           />
         )}
       </View>

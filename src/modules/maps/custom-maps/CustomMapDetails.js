@@ -24,7 +24,6 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
-import useMapCoords from '../useMapCoords';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 // const {State: TextInputState} = TextInput;
@@ -32,12 +31,12 @@ const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 const CustomMapDetails = () => {
   let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
-  const {getMyMapsBboxCoords} = useMapCoords();
+  // const {getMyMapsBboxCoords} = useMapCoords();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  const isOnline = useSelector(state => state.connections.isOnline);
+  // const isOnline = useSelector(state => state.connections.isOnline);
 
   const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
@@ -129,8 +128,8 @@ const CustomMapDetails = () => {
   };
 
   const renderCustomMapName = (item) => {
-    const radioSelected = <Icon name={'radiobox-marked'} type={'material-community'} color={BLUE}/>;
-    const radioUnselected = <Icon name={'radiobox-blank'} type={'material-community'} color={DARKGREY}/>;
+    const radioSelected = <Icon color={BLUE} name={'radiobox-marked'} type={'material-community'}/>;
+    const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
     return (
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
@@ -139,8 +138,8 @@ const CustomMapDetails = () => {
         <ListItem.CheckBox
           checked={item.source === editableCustomMapData?.source}
           checkedIcon={radioSelected}
-          uncheckedIcon={radioUnselected}
           onPress={() => setEditableCustomMapData(e => ({...e, source: item.source}))}
+          uncheckedIcon={radioUnselected}
         />
       </ListItem>
     );
@@ -197,10 +196,10 @@ const CustomMapDetails = () => {
         </Text>
       </View>
       <FlatList
-        keyExtractor={item => item.source}
-        data={CUSTOM_MAP_TYPES}
-        renderItem={({item, index}) => renderCustomMapName(item, index)}
         ItemSeparatorComponent={FlatListItemSeparator}
+        data={CUSTOM_MAP_TYPES}
+        keyExtractor={item => item.source}
+        renderItem={({item, index}) => renderCustomMapName(item, index)}
       />
       {editableCustomMapData?.source === ''
         && <Text style={customMapStyles.requiredMessage}>Map type is required</Text>}
@@ -231,7 +230,7 @@ const CustomMapDetails = () => {
           <Row data={['', 'Longitude', 'Latitude']} flexArr={[1, 2, 2]} style={customMapStyles.bboxTableHead}
                textStyle={customMapStyles.bboxText}/>
           <TableWrapper style={{flexDirection: 'row'}}>
-            <Col data={['SW', 'NE']} style={customMapStyles.bboxColumnContainer} heightArr={[25, 25]}
+            <Col data={['SW', 'NE']} heightArr={[25, 25]} style={customMapStyles.bboxColumnContainer}
                  textStyle={customMapStyles.bboxText}/>
             <Rows data={bboxCoords} flexArr={[2, 2]} style={customMapStyles.bboxRowContainer}
                   textStyle={customMapStyles.bboxText}/>
@@ -263,13 +262,13 @@ const CustomMapDetails = () => {
       <>
         <SectionDivider dividerText={'Custom Map Title'}/>
         <Input
-          inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
           containerStyle={{paddingHorizontal: 0}}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
-          value={editableCustomMapData?.title || ''}
           errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
           errorStyle={customMapStyles.requiredMessage}
+          inputContainerStyle={{borderBottomWidth: 0}}
+          inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
+          value={editableCustomMapData?.title || ''}
         />
       </>
     );
@@ -301,13 +300,13 @@ const CustomMapDetails = () => {
             </ListItem.Content>
             <View style={{flex: 2}}>
               <SliderBar
-                value={opacity}
-                onValueChange={val => setEditableCustomMapData(e => ({...e, opacity: val}))}
+                labels={['5%', '50%', '100%']}
                 maximumValue={1}
                 minimumValue={0.05}
-                step={0.05}
+                onValueChange={val => setEditableCustomMapData(e => ({...e, opacity: val}))}
                 rotateLabels
-                labels={['5%', '50%', '100%']}
+                step={0.05}
+                value={opacity}
               />
             </View>
           </ListItem>
@@ -323,8 +322,8 @@ const CustomMapDetails = () => {
           dispatch(setSidePanelVisible({bool: false}));
           dispatch(selectedCustomMapToEdit({}));
         }}
-        title={'Custom Maps'}
         headerTitle={!isEmpty(customMapToEdit) ? 'Edit Map' : 'Add Map'}
+        title={'Custom Maps'}
       />
     );
   };
@@ -341,27 +340,27 @@ const CustomMapDetails = () => {
           || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
           <Button
-            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
             containerStyle={commonStyles.standardButtonContainer}
-            type={'clear'}
             disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
                 editableCustomMapData.id)
               || editableCustomMapData.source === 'map_warper')}
             onPress={() => saveMap()}
+            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            type={'clear'}
           />
           <Button
+            containerStyle={commonStyles.standardButtonContainer}
+            onPress={() => confirmDeleteMap()}
             title={'Delete Map'}
             titleStyle={{color: WARNING_COLOR}}
-            containerStyle={commonStyles.standardButtonContainer}
             type={'clear'}
-            onPress={() => confirmDeleteMap()}
           />
         </View>
       </View>
       <Overlay
-        supportedOrientations={['portrait', 'landscape']}
         isVisible={isLoadingModalVisible}
         overlayStyle={[overlayStyles.overlayContainer, customMapStyles.loadingMapModalContainer]}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <View style={{flex: 1}}>
           <View style={[overlayStyles.titleContainer, customMapStyles.loadingMapModalTitleContainer]}>
@@ -373,10 +372,10 @@ const CustomMapDetails = () => {
           </View>
           <View style={customMapStyles.loadingMapButtonContainer}>
             <Button
+              disabled={isLoading}
+              onPress={handlePress}
               title={'Ok'}
               type={'clear'}
-              onPress={handlePress}
-              disabled={isLoading}
             />
           </View>
           <View style={{flex: 1}}>

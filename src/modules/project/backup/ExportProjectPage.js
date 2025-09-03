@@ -33,25 +33,25 @@ const ExportProjectPage = () => {
       <View style={{flex: 1}}>
         <SidePanelHeader
           backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-          title={'My StraboField Projects'}
           headerTitle={'Export Locally Saved Project'}
+          title={'My StraboField Projects'}
         />
         <ProjectList onProjectPress={onSelectedProjectForExport} source={source}/>
         <View style={{marginBottom: 20}}>
           {Platform.OS === 'ios' && (
             <Button
-              title={'View/Edit Files on Device'}
-              type={'outline'}
-              containerStyle={commonStyles.buttonPadding}
               buttonStyle={commonStyles.standardButton}
-              titleStyle={commonStyles.standardButtonText}
-              onPress={() => openURL('ProjectBackups')}
-              iconContainerStyle={{paddingRight: 10}}
+              containerStyle={commonStyles.buttonPadding}
               icon={{
                 name: 'file-tray-full-outline',
                 type: 'ionicon',
                 color: BLUE,
               }}
+              iconContainerStyle={{paddingRight: 10}}
+              onPress={() => openURL('ProjectBackups')}
+              title={'View/Edit Files on Device'}
+              titleStyle={commonStyles.standardButtonText}
+              type={'outline'}
             />
           )}
         </View>

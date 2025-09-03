@@ -21,9 +21,9 @@ const FaultRockFabric = ({choices, formName, formProps, setChoicesViewKey, surve
       <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
       <LittleSpacer/>
       <MainButtons
-        mainKeys={mainButtonsKeys}
         formName={formName}
         formProps={formProps}
+        mainKeys={mainButtonsKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
       <LittleSpacer/>

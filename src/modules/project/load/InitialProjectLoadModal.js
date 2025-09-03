@@ -59,9 +59,9 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
   const renderLoadProjectButtons = () => {
     return (
       <LoadProjectButtons
-        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
         onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
         onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
+        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
         onStartNewProject={() => handleOnPress('project')}/>
     );
   };
@@ -156,10 +156,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
           <Text style={userStyles.initialProjectLoadProfileHeaderText}>Hello, {displayName}!</Text>
           {user.email && <Text>Signed in as {truncateText(user.email, 15)}</Text>}
           <Button
-            title={user.name ? `Not ${user.name}?` : 'Log in?'}
-            type={'clear'}
-            titleStyle={{...commonStyles.standardButtonText, fontSize: 10}}
             onPress={clearUser}
+            title={user.name ? `Not ${user.name}?` : 'Log in?'}
+            titleStyle={{...commonStyles.standardButtonText, fontSize: 10}}
+            type={'clear'}
           />
         </View>
       </View>

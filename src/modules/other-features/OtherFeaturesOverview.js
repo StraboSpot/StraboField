@@ -16,22 +16,22 @@ const OtherFeaturesOverview = ({page}) => {
   const renderFeature = (feature) => {
     return (
       <OtherFeatureItem
-        feature={feature}
         editFeature={() => {
           dispatch(setNotebookPageVisible(page.key));
           dispatch(setSelectedAttributes([feature]));
         }}
+        feature={feature}
       />
     );
   };
 
   return (
     <FlatList
-      keyExtractor={(item, index) => index.toString()}
-      data={featuresData}
-      renderItem={({item}) => renderFeature(item)}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={'No Other Features'}/>}
+      data={featuresData}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({item}) => renderFeature(item)}
     />
   );
 };

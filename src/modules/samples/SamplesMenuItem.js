@@ -67,13 +67,13 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={{flex: 1}}>
           <SectionDivider dividerText={count + (count === 1 ? ' Sample' : ' Samples') + ' in active Spots'}/>
           <SectionList
-            keyExtractor={(item, index) => item + index}
-            sections={dataSectioned}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            renderItem={({item, i, section}) => renderSample(item, section.spot)}
-            stickySectionHeadersEnabled={true}
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
+            keyExtractor={(item, index) => item + index}
+            renderItem={({item, i, section}) => renderSample(item, section.spot)}
+            renderSectionHeader={({section}) => renderSectionHeader(section)}
+            sections={dataSectioned}
+            stickySectionHeadersEnabled={true}
           />
         </View>
       </View>
@@ -84,8 +84,8 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return (
       <View style={uiStyles.sectionHeaderBackground}>
         <SectionDividerWithRightButton
-          dividerText={title}
           buttonTitle={'View In Spot'}
+          dividerText={title}
           onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
         />
       </View>

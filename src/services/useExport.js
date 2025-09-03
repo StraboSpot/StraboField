@@ -12,7 +12,7 @@ import {
   setIsWarningMessagesModalVisible,
 } from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';
-import {isEmpty, hasSpace} from '../shared/Helpers';
+import {hasSpace, isEmpty} from '../shared/Helpers';
 
 const useExport = () => {
   const dispatch = useDispatch();

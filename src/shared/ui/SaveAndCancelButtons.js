@@ -11,19 +11,19 @@ const SaveAndCancelButtons = ({cancel, save, getIsDisabled}) => {
       <View style={styles.leftContainer}>
         {cancel && (
           <Button
-            titleStyle={styles.buttonText}
-            title={'Cancel'}
-            type={'clear'}
             onPress={cancel}
+            title={'Cancel'}
+            titleStyle={styles.buttonText}
+            type={'clear'}
           />
         )}
         {save && (
           <Button
-            titleStyle={styles.buttonText}
-            title={'Save'}
-            type={'clear'}
-            onPress={save}
             disabled={getIsDisabled}
+            onPress={save}
+            title={'Save'}
+            titleStyle={styles.buttonText}
+            type={'clear'}
           />
         )}
       </View>

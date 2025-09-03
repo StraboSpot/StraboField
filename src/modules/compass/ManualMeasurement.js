@@ -27,10 +27,10 @@ const ManualMeasurement = ({
 
   return (
     <Formik
-      initialValues={{}}
-      onSubmit={values => console.log('Submitting form...', values)}
-      innerRef={manualFormRef}
       enableReinitialize={true}
+      initialValues={{}}
+      innerRef={manualFormRef}
+      onSubmit={values => console.log('Submitting form...', values)}
     >
       {formProps => (
         <View>
@@ -40,9 +40,9 @@ const ManualMeasurement = ({
                 <ListItem.Content>
                   <Field
                     component={NumberInputField}
-                    name={'strike'}
-                    label={'Strike'}
                     key={'strike'}
+                    label={'Strike'}
+                    name={'strike'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -51,9 +51,9 @@ const ManualMeasurement = ({
                 <ListItem.Content>
                   <Field
                     component={NumberInputField}
-                    name={'dip_direction'}
-                    label={'Azimuthal Dip Direction'}
                     key={'dip_direction'}
+                    label={'Azimuthal Dip Direction'}
+                    name={'dip_direction'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -62,9 +62,9 @@ const ManualMeasurement = ({
                 <ListItem.Content>
                   <Field
                     component={NumberInputField}
-                    name={'dip'}
-                    label={'Dip'}
                     key={'dip'}
+                    label={'Dip'}
+                    name={'dip'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -77,9 +77,9 @@ const ManualMeasurement = ({
                 <ListItem.Content>
                   <Field
                     component={NumberInputField}
-                    name={'trend'}
-                    label={'Trend'}
                     key={'trend'}
+                    label={'Trend'}
+                    name={'trend'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -88,9 +88,9 @@ const ManualMeasurement = ({
                 <ListItem.Content>
                   <Field
                     component={NumberInputField}
-                    name={'plunge'}
-                    label={'Plunge'}
                     key={'plunge'}
+                    label={'Plunge'}
+                    name={'plunge'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -103,16 +103,16 @@ const ManualMeasurement = ({
                 <View style={compassStyles.sliderContainer}>
                   <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
                   <SliderBar
-                    onSlidingComplete={setSliderValue}
-                    value={sliderValue}
-                    step={1}
+                    labels={['Low', '', '', '', 'High', 'N/R']}
                     maximumValue={6}
                     minimumValue={1}
-                    labels={['Low', '', '', '', 'High', 'N/R']}
+                    onSlidingComplete={setSliderValue}
+                    step={1}
+                    value={sliderValue}
                   />
                   <SaveButton
-                    title={'Add to Attribute'}
                     onPress={() => addAttributeMeasurement(formProps.values)}
+                    title={'Add to Attribute'}
                   />
                 </View>
               </>

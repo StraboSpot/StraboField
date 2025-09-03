@@ -5,7 +5,6 @@ import {useSelector} from 'react-redux';
 
 import Dialog from './Dialog';
 import {ErrorModal, InitialProjectLoadModal, StatusModal, WarningModal} from './modals';
-import useDevice from '../../services/useDevice';
 import LoadingSpinner from '../../shared/ui/Loading';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 
@@ -22,20 +21,13 @@ const OverlaysContainer = forwardRef(({
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
-  const {openURL} = useDevice();
-
-  const openStraboSpotURL = () => openURL('https://www.strabospot.org/login');
-
   return (
     <>
       {isProjectLoadSelectionModalVisible && Platform.OS !== 'web' && (
         <InitialProjectLoadModal openMainMenuPanel={openMainMenuPanel}/>
       )}
       <ErrorModal/>
-      <StatusModal
-        openMainMenuPanel={openMainMenuPanel}
-        openUrl={openStraboSpotURL}
-      />
+      <StatusModal openMainMenuPanel={openMainMenuPanel}/>
       <WarningModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>

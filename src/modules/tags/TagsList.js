@@ -98,11 +98,11 @@ const TagsList = ({type, selectedIndex}) => {
 
     return (
       <FlatList
-        keyExtractor={item => item.id.toString()}
-        data={tagsInMapExtent}
-        renderItem={({item}) => renderTag(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={`No Spots with ${label.toLowerCase()} in current map extent`}/>}
+        data={tagsInMapExtent}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({item}) => renderTag(item)}
       />
     );
   };
@@ -120,15 +120,15 @@ const TagsList = ({type, selectedIndex}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={dataSectioned}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
         renderItem={({item}) => renderTag(item)}
         renderSectionFooter={({section: {data, title}}) => {
           return data.length === 0 && <ListEmptyText text={'No ' + title}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={dataSectioned}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };

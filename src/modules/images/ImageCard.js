@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View, TouchableOpacity, Platform} from 'react-native';
+import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -103,8 +103,10 @@ const ImageCard = ({
             value={title}
           />
         ) : (
-          <TouchableOpacity style={imageStyles.cardTitleEditingButton} onPress={() => setIsEditing(true)}>
+          <TouchableOpacity onPress={() => setIsEditing(true)} style={imageStyles.cardTitleEditingButton}>
             <Text
+              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
+              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
               style={[
                 imageStyles.cardTitle,
                 Platform.OS === 'web' && {
@@ -115,8 +117,6 @@ const ImageCard = ({
                   whiteSpace: 'nowrap',
                 },
               ]}
-              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
-              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
             >
               {title || placeholderTitle}
             </Text>
@@ -148,10 +148,10 @@ const ImageCard = ({
             disabled={!image.annotated}
             icon={
               <Icon
-                type={'ionicon'}
-                size={20}
-                name={'map-outline'}
                 color={image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY}
+                name={'map-outline'}
+                size={20}
+                type={'ionicon'}
               />
             }
             onPress={() => getImageBasemap(image)}

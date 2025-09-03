@@ -33,15 +33,15 @@ const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
         </View>
         <View style={{padding: 10}}>
           <Button
-            title={'Overwrite'}
             containerStyle={{padding: 2.5}}
             onPress={loadProject}
+            title={'Overwrite'}
           />
           <Button
-            title={'Go to Backup Page'}
-            type={'outline'}
             containerStyle={{padding: 2.5}}
             onPress={goToBackupPage}
+            title={'Go to Backup Page'}
+            type={'outline'}
           />
         </View>
       </View>

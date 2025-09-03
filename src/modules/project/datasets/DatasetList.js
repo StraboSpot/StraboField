@@ -14,10 +14,10 @@ const DatasetList = ({setDatasetToView}) => {
   return (
     <View>
       <FlatList
-        keyExtractor={item => item.id}
-        data={Object.values(datasets)}
-        renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
         ItemSeparatorComponent={FlatListItemSeparator}
+        data={Object.values(datasets)}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
       />
      </View>
   );

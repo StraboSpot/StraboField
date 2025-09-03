@@ -162,20 +162,20 @@ const MeasurementsPage = ({page}) => {
         <View style={styles.measurementsSectionDividerButtonContainer}>
           {multiSelectMode && sectionType === multiSelectMode && (
             <Button
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              title={'Cancel'}
-              type={'clear'}
-              onPress={() => onSelectingCancel()}
               disabled={isMultipleFeaturesTaggingEnabled}
+              onPress={() => onSelectingCancel()}
+              title={'Cancel'}
+              titleStyle={styles.measurementsSectionDividerButtonText}
+              type={'clear'}
             />
           )}
           {multiSelectMode && selectedFeaturesTemp.length >= 1 && sectionType === multiSelectMode && (
             <Button
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              title={'Identify Selected'}
-              type={'clear'}
-              onPress={() => onSelectingEnd()}
               disabled={isMultipleFeaturesTaggingEnabled}
+              onPress={() => onSelectingEnd()}
+              title={'Identify Selected'}
+              titleStyle={styles.measurementsSectionDividerButtonText}
+              type={'clear'}
             />
           )}
           {!multiSelectMode && (
@@ -183,32 +183,32 @@ const MeasurementsPage = ({page}) => {
               <>
                 <Button
                   disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  title={'Identify All'}
-                  type={'clear'}
                   onPress={() => onIdentifyAll(sectionType, data)}
+                  title={'Identify All'}
+                  titleStyle={styles.measurementsSectionDividerButtonText}
+                  type={'clear'}
                 />
                 <Button
                   disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  title={'Select'}
-                  type={'clear'}
                   onPress={() => onSelectingStart(sectionType)}
+                  title={'Select'}
+                  titleStyle={styles.measurementsSectionDividerButtonText}
+                  type={'clear'}
                 />
               </>
               {!modalVisible && (
                 <Button
+                  disabled={isMultipleFeaturesTaggingEnabled}
                   icon={
                     <Icon
+                      color={PRIMARY_ACCENT_COLOR}
                       name={'add'}
                       size={20}
                       style={{paddingHorizontal: 5}}
-                      color={PRIMARY_ACCENT_COLOR}
                     />
                   }
-                  type={'clear'}
                   onPress={() => addMeasurement(sectionType)}
-                  disabled={isMultipleFeaturesTaggingEnabled}
+                  type={'clear'}
                 />
               )}
             </View>
@@ -229,21 +229,21 @@ const MeasurementsPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={sections}
-        renderSectionHeader={({section}) => renderSectionHeader(section)}
         renderItem={({item, i, section}) => (
           <MeasurementItem
             item={item}
-            selectedIds={getIdsOfSelected()}
             onPress={() => onMeasurementPressed(item, section.title)}
+            selectedIds={getIdsOfSelected()}
           />
         )}
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
+        renderSectionHeader={({section}) => renderSectionHeader(section)}
+        sections={sections}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };
@@ -265,10 +265,10 @@ const MeasurementsPage = ({page}) => {
         {selectedFeaturesTemp.length >= 1 && (
           <View>
             <Button
-              titleStyle={{color: WARNING_COLOR}}
-              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
-              type={'clear'}
               onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
+              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
+              titleStyle={{color: WARNING_COLOR}}
+              type={'clear'}
             />
           </View>
         )}

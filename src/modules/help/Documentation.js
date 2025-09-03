@@ -85,10 +85,10 @@ const Documentation = () => {
     return (
       <View style={{maxHeight: '80%'}}>
         <FlatList
-          keyExtractor={item => item.id}
-          data={filteredDocs}
-          renderItem={({item}) => renderFAQListItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
+          data={filteredDocs}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => renderFAQListItem(item)}
         />
       </View>
     );
@@ -96,8 +96,8 @@ const Documentation = () => {
 
   const renderFAQListItem = item => (
     <ListItem
-      onPress={() => handlePress(item)}
       containerStyle={mainMenuPanelStyles.documentListItem}
+      onPress={() => handlePress(item)}
     >
       <ListItem.Content style={commonStyles.listItemContent}>
         <ListItem.Title style={commonStyles.listItemTitle}>
@@ -110,33 +110,33 @@ const Documentation = () => {
 
   const renderPDF = () => (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      isVisible={visible}
       fullScreen
+      isVisible={visible}
       overlayStyle={styles.overlayContainer}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <DocumentationModalHeader
         currentPage={currentPage}
-        totalPages={totalPages}
         onClose={() => setVisible(false)}
         onJumpToPage={page => ref.current.setPage(page)}
+        totalPages={totalPages}
       />
       {!isEmpty(doc) && (
         <Pdf
-          ref={ref}
-          source={doc.file}
-          style={styles.pdf}
-          onLoadComplete={(numberOfPages, filePath) => {
-            setTotalPages(numberOfPages);
-          }}
           onError={(error) => {
             console.log(error);
           }}
-          onPressLink={openLink}
+          onLoadComplete={(numberOfPages, filePath) => {
+            setTotalPages(numberOfPages);
+          }}
           onPageChanged={(page, numberOfPages) => {
             setCurrentPage(page);
             console.log(`Number of pages: ${page}/${numberOfPages}`);
           }}
+          onPressLink={openLink}
+          ref={ref}
+          source={doc.file}
+          style={styles.pdf}
         />
       )}
     </Overlay>
@@ -147,10 +147,10 @@ const Documentation = () => {
       <>
         <SectionDivider dividerText={'Spot Data Model'}/>
         <Button
+          onPress={() => setIsSpotDataModelModalVisible(true)}
           title={'Show Data Model'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={() => setIsSpotDataModelModalVisible(true)}
         />
         {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
       </>
@@ -165,11 +165,11 @@ const Documentation = () => {
       </View>
       <OpenUrlLink
         buttonStyle={styles.button}
+        color={WHITE}
+        icon={'globe-outline'}
         title={'Strabo Spot Help'}
         titleStyle={styles.buttonText}
         url={STRABO_APIS.STRABO + '/help'}
-        icon={'globe-outline'}
-        color={WHITE}
       />
       <View>
         <SectionDivider dividerText={'Helpful Docs'}/>

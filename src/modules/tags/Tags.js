@@ -48,12 +48,12 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
       {!isEmpty(tags) && (
         <>
           <ButtonGroup
-            selectedIndex={selectedIndex}
-            onPress={index => setSelectedIndex(index)}
+            buttonStyle={{padding: 5}}
             buttons={getButtonTitle()}
             containerStyle={{height: 50}}
-            buttonStyle={{padding: 5}}
+            onPress={index => setSelectedIndex(index)}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedIndex}
             textStyle={{fontSize: 12}}
           />
           {selectedIndex === 1 && (
@@ -75,7 +75,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
         </ListItem.Content>
         <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
       </ListItem>
-      <TagsList type={type} selectedIndex={selectedIndex}/>
+      <TagsList selectedIndex={selectedIndex} type={type}/>
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
     </View>
   );

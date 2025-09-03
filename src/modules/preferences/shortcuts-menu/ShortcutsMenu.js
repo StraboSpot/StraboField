@@ -52,10 +52,10 @@ const ShortcutMenu = () => {
       </ListItem>
       <View>
         <FlatList
-          keyExtractor={item => item.key}
-          data={SHORTCUT_MODALS}
-          renderItem={({item}) => renderShortcutListItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
+          data={SHORTCUT_MODALS}
+          keyExtractor={item => item.key}
+          renderItem={({item}) => renderShortcutListItem(item)}
         />
       </View>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>

@@ -10,14 +10,14 @@ const CoveredIntervalsXLines = ({spotsDisplayed}) => {
 
   return (
     <Source
+      data={turf.featureCollection(getIntervalsWithX())}
       id={'coveredIntervalLines'}
       type={'geojson'}
-      data={turf.featureCollection(getIntervalsWithX())}
     >
       <Layer
-        type={'line'}
         id={'coveredIntervalLinesLayer'}
         minZoomLevel={1}
+        type={'line'}
       />
     </Source>
   );

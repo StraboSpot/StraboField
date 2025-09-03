@@ -57,10 +57,10 @@ const BasicListItem = ({
   return (
     <ListItem
       containerStyle={commonStyles.listItem}
-      key={item.id}
-      onPress={() => !isReorderingActive && editItem(item)}
-      onLongPress={drag}
       delayLongPress={500}
+      key={item.id}
+      onLongPress={drag}
+      onPress={() => !isReorderingActive && editItem(item)}
     >
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>{getTitle()}</ListItem.Title>

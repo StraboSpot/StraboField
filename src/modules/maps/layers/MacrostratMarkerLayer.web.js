@@ -18,13 +18,13 @@ const MacrostratMarkerLayer = ({location}) => {
 
   return (
     <Marker
-      longitude={setCoords()[0]}
-      latitude={setCoords()[1]}
       angle={'bottom'}
+      latitude={setCoords()[1]}
+      longitude={setCoords()[0]}
     >
       <Icon
-        size={30}
         name={'map-marker'}
+        size={30}
         type={'material-community'}
       />
     </Marker>

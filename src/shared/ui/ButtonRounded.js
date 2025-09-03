@@ -15,13 +15,13 @@ const ButtonRounded = ({
                        }) => {
   return (
     <Button
-      icon={icon}
-      title={title}
-      containerStyle={[uiStyles.saveAndDeleteButtonContainer, containerStyle]}
       buttonStyle={[uiStyles.saveAndDeleteButtonStyles, buttonStyle]}
-      titleStyle={titleStyle}
-      onPress={onPress}
+      containerStyle={[uiStyles.saveAndDeleteButtonContainer, containerStyle]}
       disabled={disabled}
+      icon={icon}
+      onPress={onPress}
+      title={title}
+      titleStyle={titleStyle}
     />
   );
 };

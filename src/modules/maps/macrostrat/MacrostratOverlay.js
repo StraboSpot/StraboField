@@ -148,9 +148,9 @@ const MacrostratOverlay = ({
           <Card
             containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen] : [macrostratOverlayStyles.container]}>
             <Button
-              title={'Close'}
               containerStyle={{alignItems: 'flex-end'}}
               onPress={closeModal}
+              title={'Close'}
               type={'clear'}
             />
             <Card.Title>{isEmpty(dataObject.name) ? 'Unnamed' : dataObject.name}</Card.Title>
@@ -163,10 +163,10 @@ const MacrostratOverlay = ({
             {renderContent()}
             <View style={{alignItems: 'center', justifyContent: 'flex-end'}}>
               <Button
-                type={'clear'}
-                title={showMore ? 'Hide Description' : 'Show Description'}
                 // containerStyle={commonStyles.buttonContainer}
                 onPress={handleShowMore}
+                title={showMore ? 'Hide Description' : 'Show Description'}
+                type={'clear'}
               />
               {renderDescription()}
 

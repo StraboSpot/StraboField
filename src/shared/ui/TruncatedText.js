@@ -5,8 +5,8 @@ import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE} from '../styles.constants';
 
 const TruncatedText = ({title}) => (
   <Text
-    numberOfLines={1}
     ellipsizeMode={'tail'}
+    numberOfLines={1}
     style={{textAlign: 'center', color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}
   >
     {title}

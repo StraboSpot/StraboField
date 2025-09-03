@@ -1,10 +1,5 @@
 import React, {useCallback} from 'react';
-import {
-  Platform,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {Platform, Text, TextInput, View} from 'react-native';
 
 import {useFocusEffect} from '@react-navigation/native';
 import {Icon} from '@rn-vui/base';
@@ -42,27 +37,27 @@ const TextInputField = ({
           <Text style={formStyles.fieldLabel}>{label}</Text>
           {placeholder && (
             <Icon
-              name={'information-circle-outline'}
-              type={'ionicon'}
               color={themes.PRIMARY_ACCENT_COLOR}
+              name={'information-circle-outline'}
               onPress={() => onShowFieldInfo(label, placeholder)}
+              type={'ionicon'}
             />
           )}
         </View>
       )}
       <TextInput
-        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        autoCapitalize={autoCapitalize}
+        autoFocus={autoFocus}
+        editable={editable}
+        multiline={appearance === 'multiline' || appearance === 'full'}
         onBlur={onBlur(name)}
+        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        placeholder={placeholder}
+        placeholderTextColor={themes.MEDIUMGREY}
         style={appearance === 'multiline' ? {...formStyles.fieldValue, ...formStyles.fieldValueMultiline}
           : appearance === 'full' ? {...formStyles.fieldValue, ...formStyles.fieldValueFull}
             : formStyles.fieldValue}
         value={value || ''}
-        placeholder={placeholder}
-        placeholderTextColor={themes.MEDIUMGREY}
-        multiline={appearance === 'multiline' || appearance === 'full'}
-        autoFocus={autoFocus}
-        autoCapitalize={autoCapitalize}
-        editable={editable}
       />
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>

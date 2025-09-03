@@ -125,18 +125,18 @@ const BeddingPage = ({page}) => {
           onPress={addAttribute}
         />
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={bedding.beds}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              item={item}
-              index={index}
-              page={page}
-              editItem={itemToEdit => editAttribute(itemToEdit, index)}
-            />
-          )}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Beds'}/>}
+          data={bedding.beds}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item, index}) => (
+            <BasicListItem
+              editItem={itemToEdit => editAttribute(itemToEdit, index)}
+              index={index}
+              item={item}
+              page={page}
+            />
+          )}
         />
       </View>
     );
@@ -158,13 +158,13 @@ const BeddingPage = ({page}) => {
           save={() => saveBeddingShared(beddingSharedRef.current)}
         />
         <Formik
-          innerRef={beddingSharedRef}
-          onSubmit={() => console.log('Submitting form...')}
-          onReset={() => console.log('Resetting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          initialValues={bedding}
-          validateOnChange={false}
           enableReinitialize={true}
+          initialValues={bedding}
+          innerRef={beddingSharedRef}
+          onReset={() => console.log('Resetting form...')}
+          onSubmit={() => console.log('Submitting form...')}
+          validate={values => validateForm({formName: formName, values: values})}
+          validateOnChange={false}
         >
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>

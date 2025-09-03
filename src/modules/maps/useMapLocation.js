@@ -41,7 +41,7 @@ const useMapLocation = () => {
       maximumAge: 10000,
       forceRequestLocation: true, //forces real-time fix
       showLocationDialog: true,
-      enableHighAccuracy: Platform.OS === 'ios'
+      enableHighAccuracy: Platform.OS === 'ios',
     };
     return (
       new Promise((resolve, reject) => {

@@ -97,13 +97,13 @@ const Overview = ({openMainMenuPanel}) => {
           ListHeaderComponent={
             <View>
               <Formik
+                component={formProps => Form({formName: formName, ...formProps})}
+                enableReinitialize={true}
+                initialStatus={{formName: formName}}
+                initialValues={initialValues}
                 innerRef={formRef}
                 onSubmit={onSubmitForm}
                 validate={values => validateForm({formName: formName, values: values})}
-                component={formProps => Form({formName: formName, ...formProps})}
-                initialValues={initialValues}
-                initialStatus={{formName: formName}}
-                enableReinitialize={true}
               />
             </View>
           }
@@ -114,7 +114,7 @@ const Overview = ({openMainMenuPanel}) => {
 
   const renderSectionHeader = (page) => {
     return (
-      <Pressable style={uiStyles.sectionHeaderBackground} onPress={() => openPage(page)}>
+      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={page.label}/>
       </Pressable>
     );
@@ -123,12 +123,12 @@ const Overview = ({openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <SectionList
-        keyExtractor={(item, index) => item + index}
-        sections={sections}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        renderItem={({item}) => item}
-        stickySectionHeadersEnabled={true}
         ItemSeparatorComponent={FlatListItemSeparator}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({item}) => item}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={sections}
+        stickySectionHeadersEnabled={true}
       />
     );
   };
@@ -212,11 +212,12 @@ const Overview = ({openMainMenuPanel}) => {
           </View>
           <View>
             <Button
-              title={'Edit'}
-              type={'clear'}
               disabled={!isTraceSurfaceFeatureEnabled}
               disabledTitleStyle={notebookStyles.traceSurfaceFeatureDisabledText}
-              onPress={() => setIsTraceSurfaceFeatureEdit(true)}/>
+              onPress={() => setIsTraceSurfaceFeatureEdit(true)}
+              title={'Edit'}
+              type={'clear'}
+            />
           </View>
         </View>
       )}

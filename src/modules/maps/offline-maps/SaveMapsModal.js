@@ -234,23 +234,23 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'slide'}
-      isVisible={isOfflineMapModalVisible}
       backdropStyle={overlayStyles.backdropStyles}
-      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer]}
+      isVisible={isOfflineMapModalVisible}
       onBackdropPress={() => {
         setShowMainMenu(true);
         setShowComplete(false);
       }}
+      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer]}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <Icon
-        name={'close-outline'}
-        type={'ionicon'}
-        size={20}
         color={'darkgrey'}
-        onPress={() => dispatch(setIsOfflineMapsModalVisible(false))}
         containerStyle={overlayStyles.closeButton}
+        name={'close-outline'}
+        onPress={() => dispatch(setIsOfflineMapsModalVisible(false))}
+        size={20}
+        type={'ionicon'}
       />
       <View style={overlayStyles.titleContainer}>
         <Text style={[overlayStyles.titleText]}>{currentMapName}</Text>
@@ -264,19 +264,19 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
                   Select max zoom level to download:
                 </Text>
                 <Picker
+                  itemStyle={{color: themes.BLACK}}
                   mode={'dropdown'}
-                  prompt={'Select a zoom level'}
                   onValueChange={value => updatePicker(value)}
+                  prompt={'Select a zoom level'}
                   selectedValue={downloadZoom}
-                itemStyle={{color: themes.BLACK}}
                 >
                   {zoomLevels.map((zoom) => {
                     return (
                       <Picker.Item
-                        style={{width: 100}}
                         key={zoom}
-                        value={zoom}
                         label={zoom.toString()}
+                        style={{width: 100}}
+                        value={zoom}
                       />
                     );
                   })}
@@ -287,7 +287,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
               <View style={overlayStyles.overlayContent}>
                 {isLoadingWave
                   ? (
-                    <ActivityIndicator size={'large'} color={themes.BLACK}/>
+                    <ActivityIndicator color={themes.BLACK} size={'large'}/>
                   ) : (
                     <View>
                       <ProgressBar progress={percentDone} width={200}/>
@@ -332,12 +332,12 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
             {showMainMenu && (
               <View>
                 {isLoadingCircle
-                  ? <ActivityIndicator size={'large'} color={themes.BLACK}/>
+                  ? <ActivityIndicator color={themes.BLACK} size={'large'}/>
                   : (
                     <Button
                       onPress={() => saveMap()}
-                      type={'clear'}
                       title={`Download ${tileCount} Tiles`}
+                      type={'clear'}
                     />
                   )}
                 {isSelected && (

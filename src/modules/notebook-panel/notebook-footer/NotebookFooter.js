@@ -36,22 +36,22 @@ const NotebookFooter = ({openPage}) => {
         {notebookPagesValidOn.map(key => (
           <IconButton
             key={key}
-            source={getPageIcon(key)}
             onPress={() => openPage(key)}
+            source={getPageIcon(key)}
           />
         ))}
         <Button
-          containerStyle={{alignSelf: 'center'}}
           buttonStyle={{padding: 15}}
-          title={'MORE'}
-          type={'clear'}
-          titleStyle={footerStyle.morePagesButton}
+          containerStyle={{alignSelf: 'center'}}
           onPress={() => setIsMorePagesMenuVisible(true)}
+          title={'MORE'}
+          titleStyle={footerStyle.morePagesButton}
+          type={'clear'}
         />
       </View>
       <MorePagesMenu
-        visible={isMorePagesMenuVisible}
         closeMorePagesMenu={() => setIsMorePagesMenuVisible(false)}
+        visible={isMorePagesMenuVisible}
       />
     </>
   );

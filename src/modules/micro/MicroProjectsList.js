@@ -135,11 +135,11 @@ const MicroProjectsList = () => {
     const modifiedTimeAndDate = moment.unix(item.modifiedtimestamp / 1000).format('MMM Do YYYY, h:mm a');
     return (
       <ListItem
-        key={item.id}
-        onPress={() => checkForMicroProject(item, i)}
         containerStyle={commonStyles.listItem}
         disabled={!isConnected && !projectsExistsArr[i]}
         disabledStyle={{backgroundColor: LIGHTGREY}}
+        key={item.id}
+        onPress={() => checkForMicroProject(item, i)}
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{item.name}</ListItem.Title>
@@ -149,18 +149,18 @@ const MicroProjectsList = () => {
         </ListItem.Content>
         {isConnected && isInternetReachable && projectsUpdateAvailableArr[i] ? (
             <Icon
-              name={'sync'}
-              type={'material-community'}
-              size={20}
               color={MEDIUMGREY}
+              name={'sync'}
+              size={20}
+              type={'material-community'}
             />
           )
           : projectsExistsArr[i] ? <ListItem.Chevron/> : (
             <Icon
-              name={'download-circle-outline'}
-              type={'material-community'}
-              size={20}
               color={MEDIUMGREY}
+              name={'download-circle-outline'}
+              size={20}
+              type={'material-community'}
             />
           )}
       </ListItem>
@@ -172,11 +172,11 @@ const MicroProjectsList = () => {
       return (
         <View style={{flex: 1}}>
           <FlatList
-            keyExtractor={item => item.id.toString()}
-            data={projectsArr.projects}
-            renderItem={({item, index}) => renderMicroProjectItem(item, index)}
             ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={errorMessage}/>}/>
+            ListEmptyComponent={<ListEmptyText text={errorMessage}/>}
+            data={projectsArr.projects}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item, index}) => renderMicroProjectItem(item, index)}/>
         </View>
       );
     }
@@ -195,7 +195,7 @@ const MicroProjectsList = () => {
         showComplete={showComplete}
         showLoadingBar={showLoadingBar}
       />
-      <MicroProjectPDFOverlay doc={doc} visible={visible} setVisible={setVisible}/>
+      <MicroProjectPDFOverlay doc={doc} setVisible={setVisible} visible={visible}/>
     </View>
   );
 };

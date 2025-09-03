@@ -9,7 +9,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
-import {setIntersectedSpotsForTagging} from './spots.slice';
 import {setModalVisible} from '../home/home.slice';
 
 
@@ -29,22 +28,22 @@ const SpotsRawDataView = () => {
     buildObject();
   }, [selectedSpots]);
 
- const buildObject = () => {
-   const filteredDataJson = {
-     Project: {
-       project,
-     },
-     Spots: {selectedSpots}
-   }
-   console.log(filteredDataJson);
-   setDataJson(filteredDataJson);
- };
+  const buildObject = () => {
+    const filteredDataJson = {
+      Project: {
+        project,
+      },
+      Spots: {selectedSpots},
+    };
+    console.log(filteredDataJson);
+    setDataJson(filteredDataJson);
+  };
 
- const closeModal = () => {
+  const closeModal = () => {
 
-   // dispatch(setIntersectedSpotsForTagging([]));
-   dispatch(setModalVisible({modal: null}))
- };
+    // dispatch(setIntersectedSpotsForTagging([]));
+    dispatch(setModalVisible({modal: null}));
+  };
 
   const onClipboardPress = () => {
     Clipboard.setString(JSON.stringify(selectedSpots));
@@ -53,16 +52,16 @@ const SpotsRawDataView = () => {
 
   return (
     <ModalWrapper
-      isFullScreen
       closeModal={closeModal}
+      isFullScreen
       overlayStylesOverride={{width: '90%', height: '80%'}}
     >
       <ScrollView>
         <Button
+          onPress={onClipboardPress}
           title={'Copy JSON to Clipboard'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={onClipboardPress}
         />
         <JSONTree
           data={dataJson}

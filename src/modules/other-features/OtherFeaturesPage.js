@@ -47,7 +47,7 @@ const OtherFeaturesPage = () => {
 
   const renderFeature = (feature) => {
     return (
-      <OtherFeatureItem feature={feature} editFeature={() => editFeature(feature)}/>
+      <OtherFeatureItem editFeature={() => editFeature(feature)} feature={feature}/>
     );
   };
 
@@ -63,11 +63,11 @@ const OtherFeaturesPage = () => {
             />
           )}
           <FlatList
-            data={spot.properties.other_features}
-            renderItem={item => renderFeature(item.item)}
-            keyExtractor={item => item.id.toString()}
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
+            data={spot.properties.other_features}
+            keyExtractor={item => item.id.toString()}
+            renderItem={item => renderFeature(item.item)}
           />
         </View>
       )}
@@ -75,8 +75,8 @@ const OtherFeaturesPage = () => {
         <OtherFeatureDetail
           featureTypes={otherFeatures}
           hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
-          selectedFeature={selectedFeature}
           renderFeature={feature => renderFeature(feature)}
+          selectedFeature={selectedFeature}
         />
       )}
     </>

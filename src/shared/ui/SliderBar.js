@@ -20,17 +20,17 @@ const SliderBar = ({
   return (
     <>
       <Slider
-        value={value}
-        onValueChange={onValueChange}
-        onSlidingComplete={onSlidingComplete}
-        minimumValue={minimumValue}
-        maximumValue={maximumValue}
-        style={uiStyles.slider}
-        step={step || 1}
-        minimumTrackTintColor={themes.MEDIUMGREY}
         maximumTrackTintColor={themes.MEDIUMGREY}
-        thumbTintColor={thumbTintColor || themes.DARKGREY}
+        maximumValue={maximumValue}
+        minimumTrackTintColor={themes.MEDIUMGREY}
+        minimumValue={minimumValue}
+        onSlidingComplete={onSlidingComplete}
+        onValueChange={onValueChange}
+        step={step || 1}
+        style={uiStyles.slider}
         thumbStyle={{height: 20, width: 20}}
+        thumbTintColor={thumbTintColor || themes.DARKGREY}
+        value={value}
       />
       {!isHideLabels && (
         <View style={[uiStyles.sliderTextContainer, rotateLabels && {paddingTop: 10, paddingBottom: 10}]}>

@@ -32,7 +32,6 @@ const MainMenuPanelList = () => {
   const renderMenuSectionHeader = ({section: {title}}) => {
     return (
       <ListItem.Accordion
-        key={'section_header'}
         containerStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, padding: 0, paddingRight: 10}}
         content={
           <ListItem.Content>
@@ -40,6 +39,7 @@ const MainMenuPanelList = () => {
           </ListItem.Content>
         }
         isExpanded={!sectionsCollapsed.includes(title)}
+        key={'section_header'}
         onPress={() => onPressSectionAccordion(title)}
       />
     );
@@ -47,11 +47,11 @@ const MainMenuPanelList = () => {
 
   return (
     <SectionList
+      ItemSeparatorComponent={FlatListItemSeparator}
       keyExtractor={(item, index) => item + index}
-      sections={getMainMenuData()}
       renderItem={renderItem}
       renderSectionHeader={renderMenuSectionHeader}
-      ItemSeparatorComponent={FlatListItemSeparator}
+      sections={getMainMenuData()}
       stickySectionHeadersEnabled={true}
     />
   );

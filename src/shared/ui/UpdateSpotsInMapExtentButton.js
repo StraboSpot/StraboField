@@ -21,20 +21,20 @@ const UpdateSpotsInMapExtentButton = ({title, updateSpotsInMapExtent}) => {
   return (
     <Button
       containerStyle={{padding: 5, paddingTop: 0}}
-      title={title}
-      titleStyle={commonStyles.standardButtonText}
+      disabled={!isMapMoved}
       icon={
         <Icon
-          name={'sync-outline'}
-          type={'ionicon'}
-          size={20}
           color={isMapMoved ? themes.PRIMARY_ACCENT_COLOR : themes.MEDIUMGREY}
           containerStyle={{paddingRight: 5}}
+          name={'sync-outline'}
+          size={20}
+          type={'ionicon'}
         />
       }
-      type={'outline'}
       onPress={onPress}
-      disabled={!isMapMoved}
+      title={title}
+      titleStyle={commonStyles.standardButtonText}
+      type={'outline'}
     />
   );
 };

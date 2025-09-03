@@ -53,8 +53,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return (
       <View style={uiStyles.sectionHeaderBackground}>
         <SectionDividerWithRightButton
-          dividerText={spot.properties.name}
           buttonTitle={'View In Spot'}
+          dividerText={spot.properties.name}
           onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
         />
       </View>
@@ -91,11 +91,11 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           <SectionDivider dividerText={count + (count === 1 ? ' Image' : ' Images') + ' in active Spots'}/>
           <LittleSpacer/>
           <SectionList
-            keyExtractor={(item, index) => item + index}
-            sections={spotsAsSections}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            renderItem={({item}) => renderImagesInSpot(item)}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
+            keyExtractor={(item, index) => item + index}
+            renderItem={({item}) => renderImagesInSpot(item)}
+            renderSectionHeader={({section}) => renderSectionHeader(section)}
+            sections={spotsAsSections}
             stickySectionHeadersEnabled={true}
           />
         </View>

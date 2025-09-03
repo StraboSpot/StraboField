@@ -111,11 +111,11 @@ const OtherFeatureDetail = ({
     return (
       <View style={{flex: 1}}>
         <Formik
+          enableReinitialize={true}
           initialValues={initialFeatureValues}
+          innerRef={formRef}
           onSubmit={values => console.log('Submitting form...', values)}
           validate={validateFeature}
-          innerRef={formRef}
-          enableReinitialize={true}
         >
           {() => (
             <View>
@@ -123,9 +123,9 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <Field
                     component={TextInputField}
-                    name={'label'}
-                    label={'Label'}
                     key={'label'}
+                    label={'Label'}
+                    name={'label'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -134,9 +134,9 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <Field
                     component={TextInputField}
-                    name={'name'}
-                    label={'Name'}
                     key={'name'}
+                    label={'Name'}
+                    name={'name'}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -144,13 +144,13 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
+                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
                     component={formProps => (
                       SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                     )}
-                    name={'type'}
                     key={'type'}
                     label={'Feature Type'}
-                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                    name={'type'}
                     single={true}
                   />
                 </ListItem.Content>
@@ -164,10 +164,10 @@ const OtherFeatureDetail = ({
                         <Text style={formStyles.fieldLabel}>{'Other Feature Type'}</Text>
                       </View>
                       <TextInput
-                        style={formStyles.fieldValue}
+                        onChangeText={newType => setOtherType(newType)}
                         placeholder={'Type of feature ...'}
                         placeholderTextColor={themes.MEDIUMGREY}
-                        onChangeText={newType => setOtherType(newType)}
+                        style={formStyles.fieldValue}
                         value={otherType || ''}
                       />
                     </ListItem.Content>
@@ -178,19 +178,19 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
-                    component={TextInputField}
-                    name={'description'}
-                    label={'Feature Description'}
-                    key={'description'}
                     appearance={'multiline'}
+                    component={TextInputField}
+                    key={'description'}
+                    label={'Feature Description'}
+                    name={'description'}
                   />
                 </ListItem.Content>
               </ListItem>
               <Button
-                titleStyle={{color: WARNING_COLOR}}
-                title={'Delete Feature'}
-                type={'clear'}
                 onPress={() => deleteFeatureConfirm()}
+                title={'Delete Feature'}
+                titleStyle={{color: WARNING_COLOR}}
+                type={'clear'}
               />
             </View>
           )}

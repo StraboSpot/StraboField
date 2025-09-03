@@ -25,9 +25,9 @@ const SampleLayers = ({features}) => {
         >
           <MapboxGL.SymbolLayer
             aboveLayerID={'pointLayerColorHalo'}
+            filter={['==', ['geometry-type'], 'Point']}
             id={'pointLayerSampleSymbols'}
             minZoomLevel={1}
-            filter={['==', ['geometry-type'], 'Point']}
             style={getMapSymbology().sample}
           />
         </MapboxGL.ShapeSource>

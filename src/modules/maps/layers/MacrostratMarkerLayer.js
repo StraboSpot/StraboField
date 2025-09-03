@@ -18,11 +18,11 @@ const MacrostratMarkerLayer = ({location}) => {
   };
 
   return (
-    <PointAnnotation id={'marker'} coordinate={setCoords()}>
+    <PointAnnotation coordinate={setCoords()} id={'marker'}>
       <View style={{backgroundColor: 'transparent', padding: 5}}>
         <Icon
-          size={35}
           name={'map-marker'}
+          size={35}
           type={'material-community'}
         />
       </View>

@@ -13,33 +13,33 @@ const XAxis = ({n = 1}) => {
     <>
       {/* X Axis Line*/}
       <Source
+        data={getXAxis()}
         id={'xAxisSource' + n}
         type={'geojson'}
-        data={getXAxis()}
       >
         <Layer
-          type={'line'}
           id={'xAxisLayer' + n}
           minZoomLevel={1}
+          type={'line'}
         />
       </Source>
 
       {/* X Axis Tick Marks */}
       <Source
+        data={getXAxisTickMarks()}
         id={'xAxisTickMarksSource' + n}
         type={'geojson'}
-        data={getXAxisTickMarks()}
       >
         <Layer
-          type={'line'}
           id={'xAxisTickMarksLayer' + n}
           minZoomLevel={1}
+          type={'line'}
         />
         <Layer
-          type={'symbol'}
           id={'xAxisTickMarksLabelLayer' + n}
-          minZoomLevel={1}
           layout={getLayoutSymbology().xAxisTickMarkLabels}
+          minZoomLevel={1}
+          type={'symbol'}
         />
       </Source>
     </>

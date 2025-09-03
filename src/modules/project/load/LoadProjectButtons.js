@@ -21,27 +21,27 @@ const LoadProjectButtons = ({
     <>
       <View>
         <Button
-          title={'New'}
-          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={onStartNewProject}
+          title={'New'}
+          titleStyle={commonStyles.standardButtonText}
         />
         {!isEmpty(user.name) && isOnline.isConnected && (
           <Button
-            title={'Download'}
-            containerStyle={commonStyles.standardButtonContainer}
             buttonStyle={commonStyles.standardButton}
-            titleStyle={commonStyles.standardButtonText}
+            containerStyle={commonStyles.standardButtonContainer}
             onPress={onLoadProjectsFromServer}
+            title={'Download'}
+            titleStyle={commonStyles.standardButtonText}
           />
         )}
         <Button
-          title={'Open'}
-          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={onLoadProjectsFromDevice}
+          title={'Open'}
+          titleStyle={commonStyles.standardButtonText}
         />
         {!isEmpty(user.name) && !isOnline.isConnected && (
           <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
@@ -49,11 +49,11 @@ const LoadProjectButtons = ({
           </Text>
         )}
         <Button
-          title={'Import'}
-          containerStyle={commonStyles.standardButtonContainer}
           buttonStyle={commonStyles.standardButton}
-          titleStyle={commonStyles.standardButtonText}
+          containerStyle={commonStyles.standardButtonContainer}
           onPress={onLoadProjectsFromDownloadsFolder}
+          title={'Import'}
+          titleStyle={commonStyles.standardButtonText}
         />
       </View>
     </>

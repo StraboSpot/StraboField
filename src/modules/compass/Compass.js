@@ -223,9 +223,9 @@ const Compass = ({
   return (
     <View style={{flex: 1}}>
       <CompassFace
+        compassData={compassData}
         compassMeasurementTypes={compassMeasurementTypes}
         grabMeasurements={grabMeasurements}
-        compassData={compassData}
       />
       <View style={compassStyles.matrixDataButtonContainer}>
         <View style={compassStyles.matrixDataButtonContainer}>

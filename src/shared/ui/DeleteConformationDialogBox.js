@@ -14,11 +14,11 @@ const DeleteConformationDialogBox = ({
                                      }) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'fade'}
+      backdropStyle={{backgroundColor: 'transparent'}}
       isVisible={isVisible}
       overlayStyle={overlayStyles.overlayContainer}
-      backdropStyle={{backgroundColor: 'transparent'}}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={[overlayStyles.titleText, overlayStyles.importantText]}>{title}</Text>
@@ -28,16 +28,16 @@ const DeleteConformationDialogBox = ({
       </View>
       <View style={overlayStyles.buttonContainer}>
         <Button
+          onPress={deleteOverlay}
           title={'Delete'}
           titleStyle={overlayStyles.buttonText}
           type={'clear'}
-          onPress={deleteOverlay}
         />
         <Button
+          onPress={cancel}
           title={'Cancel'}
           titleStyle={overlayStyles.buttonText}
           type={'Cancel'}
-          onPress={cancel}
         />
       </View>
     </Overlay>

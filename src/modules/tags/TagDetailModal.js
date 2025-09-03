@@ -104,12 +104,12 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
+      animationType={'slide'}
+      fullScreen={SMALL_SCREEN}
       isVisible
       overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen
         : {...overlayStyles.overlayContainer, maxHeight: height * 0.80}}
-      fullScreen={SMALL_SCREEN}
-      animationType={'slide'}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <>
         {renderCancelSaveButtons()}
@@ -118,21 +118,21 @@ const TagDetailModal = ({closeModal}) => {
             <>
               <View style={{flex: 1}}>
                 <Formik
+                  component={formProps => Form({formName: formName, ...formProps})}
+                  enableReinitialize={true}
+                  initialStatus={{formName: formName}}
+                  initialValues={initialValues}
                   innerRef={formRef}
                   onSubmit={() => console.log('Submitting form...')}
                   validate={values => validateForm({formName: formName, values: values})}
-                  component={formProps => Form({formName: formName, ...formProps})}
-                  initialValues={initialValues}
-                  initialStatus={{formName: formName}}
-                  enableReinitialize={true}
                 />
               </View>
               {isEmpty(modalVisible) && (
                 <Button
-                  titleStyle={{color: themes.RED}}
-                  title={'Delete Tag'}
-                  type={'clear'}
                   onPress={() => confirmDeleteTag()}
+                  title={'Delete Tag'}
+                  titleStyle={{color: themes.RED}}
+                  type={'clear'}
                 />
               )}
             </>

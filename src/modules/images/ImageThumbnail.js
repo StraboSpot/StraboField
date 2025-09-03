@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Platform} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 

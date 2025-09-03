@@ -7,8 +7,8 @@ import {ImageInfo} from '.';
 const ImageModal = ({deleteImage, image, saveImages, saveUpdatedImage, setImageToView, setIsImageModalVisible}) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       fullScreen
+      supportedOrientations={['portrait', 'landscape']}
     >
       <ImageInfo
         deleteImage={deleteImage}

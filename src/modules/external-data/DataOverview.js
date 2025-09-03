@@ -10,8 +10,8 @@ const DataOverview = () => {
   const spot = useSelector(state => state.spot.selectedSpot);
   return (
     <>
-      {!isEmpty(spot.properties?.data?.urls) && <UrlData spot={spot} editable={false}/>}
-      {!isEmpty(spot.properties?.data?.tables) && <TablesData spot={spot} editable={false}/>}
+      {!isEmpty(spot.properties?.data?.urls) && <UrlData editable={false} spot={spot}/>}
+      {!isEmpty(spot.properties?.data?.tables) && <TablesData editable={false} spot={spot}/>}
     </>
   );
 };

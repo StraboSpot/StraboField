@@ -123,9 +123,9 @@ const UploadModal = ({closeModal}) => {
     return (
       <View style={{padding: 10}}>
         <LottieAnimations
-          type={'error'}
-          show={uploadState === 'error'}
           doesLoop={false}
+          show={uploadState === 'error'}
+          type={'error'}
         />
         <Text style={{textAlign: 'center'}}>{errorMessage}</Text>
       </View>
@@ -135,9 +135,9 @@ const UploadModal = ({closeModal}) => {
   const renderUploadAnimation = () => {
     return (
       <LottieAnimations
-        type={'uploadingCloud'}
-        doesLoop={true}
         animationStyle={{height: 50, width: 50}}
+        doesLoop={true}
+        type={'uploadingCloud'}
       />
     );
   };
@@ -145,9 +145,9 @@ const UploadModal = ({closeModal}) => {
   const renderUploadCompleteAnimation = () => {
     return (
       <LottieAnimations
-        type={'complete'}
-        doesLoop={false}
         animationStyle={{height: 50, width: 50}}
+        doesLoop={false}
+        type={'complete'}
       />
     );
   };
@@ -178,8 +178,8 @@ const UploadModal = ({closeModal}) => {
           onPress={handleClosePress}
         />
         <Button
-          title={'Upload'}
           onPress={() => initiateUpload()}
+          title={'Upload'}
         />
       </View>
       {__DEV__ && (
@@ -202,10 +202,10 @@ const UploadModal = ({closeModal}) => {
         </View>
         <Text style={{textAlign: 'center', paddingBottom: 5}}>Uploading images</Text>
         <ProgressBar
+          borderRadius={20}
+          height={15}
           progress={projectTransferProgress}
           width={250}
-          height={15}
-          borderRadius={20}
         />
         <Text style={{textAlign: 'center'}}>{`${(projectTransferProgress * 100).toFixed(0)}%`}</Text>
       </View>
@@ -263,8 +263,8 @@ const UploadModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      title={modalTitle}
       closeModal={closeModal}
+      title={modalTitle}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()
@@ -275,11 +275,11 @@ const UploadModal = ({closeModal}) => {
         {(uploadState === 'complete' || uploadState === 'error')
           && (
             <Button
-              title={'OK'}
-              type={'clear'}
-              titleStyle={overlayStyles.buttonText}
               // disabled={uploadState !== 'complete'}
               onPress={handleClosePress}
+              title={'OK'}
+              titleStyle={overlayStyles.buttonText}
+              type={'clear'}
             />
           )
         }

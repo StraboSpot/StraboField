@@ -28,11 +28,11 @@ const FeatureTagsAtSpotList = ({openMainMenuPanel, page}) => {
 
   return (
     <FlatList
-      keyExtractor={item => item.id.toString()}
-      data={getFeatureTagsAtSpot()}
-      renderItem={({item}) => renderTag(item)}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={listEmptyText}/>}
+      data={getFeatureTagsAtSpot()}
+      keyExtractor={item => item.id.toString()}
+      renderItem={({item}) => renderTag(item)}
     />
   );
 };

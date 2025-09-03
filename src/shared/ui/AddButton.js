@@ -11,18 +11,18 @@ const AddButton = ({
                    }) => {
   return (
     <Button
-      onPress={onPress}
-      containerStyle={commonStyles.buttonPadding}
       buttonStyle={commonStyles.standardButton}
-      titleStyle={commonStyles.standardButtonText}
-      type={type}
+      containerStyle={commonStyles.buttonPadding}
       icon={{
         name: 'add',
         type: 'ionicon',
         size: 35,
         color: commonStyles.iconColor.color,
       }}
+      onPress={onPress}
       title={title}
+      titleStyle={commonStyles.standardButtonText}
+      type={type}
     />
   );
 };

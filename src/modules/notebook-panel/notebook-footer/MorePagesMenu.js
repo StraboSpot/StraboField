@@ -45,8 +45,8 @@ const MorePagesMenu = ({
       >
         <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <Pressable
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}
-            onPress={() => switchPage(page.key)}>
+            onPress={() => switchPage(page.key)}
+            style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
             <AvatarWrapper
               size={20}
               source={page.icon_src}
@@ -63,10 +63,10 @@ const MorePagesMenu = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      overlayStyle={footerStyles.morePagesDialog}
       isVisible={visible}
       onBackdropPress={closeMorePagesMenu}
+      overlayStyle={footerStyles.morePagesDialog}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>More Pages</Text>

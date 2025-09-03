@@ -17,14 +17,14 @@ const AuthStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name={'SignIn'}
         component={SignIn}
+        name={'SignIn'}
         options={navigationOptions}
         // initialParams={{setIsSignedIn}}
       />
       <Stack.Screen
-        name={'SignUp'}
         component={SignUp}
+        name={'SignUp'}
         options={navigationOptions}
       />
     </Stack.Navigator>

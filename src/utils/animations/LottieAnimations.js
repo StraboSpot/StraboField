@@ -11,10 +11,10 @@ const LottieAnimation = ({animationStyle, type, doesLoop}) => {
 
   return (
     <LottieView
-      style={[{width: 100, height: 100, alignSelf: 'center'}, animationStyle]}
-      source={getAnimationType(type)}
       autoPlay
       loop={doesLoop}
+      source={getAnimationType(type)}
+      style={[{width: 100, height: 100, alignSelf: 'center'}, animationStyle]}
     />
   );
 };

@@ -11,10 +11,10 @@ const DeleteOverlay = ({closeModal, deleteSample, isVisible}) => {
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       isVisible={isVisible}
-      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {...overlayStyles.overlayContainer, height: '30%'}}
       onBackdropPress={closeModal}
+      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {...overlayStyles.overlayContainer, height: '30%'}}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'yellow'}}>
         <Text style={overlayStyles.titleText}>WARNING!</Text>
@@ -26,14 +26,14 @@ const DeleteOverlay = ({closeModal, deleteSample, isVisible}) => {
       </View>
       <View style={overlayStyles.buttonContainer}>
         <Button
-          title={'Cancel'}
           onPress={closeModal}
+          title={'Cancel'}
         />
         <Button
-          title={'Delete'}
-          titleStyle={{color: 'white', fontWeight: '700'}}
           buttonStyle={{backgroundColor: 'red'}}
           onPress={deleteSample}
+          title={'Delete'}
+          titleStyle={{color: 'white', fontWeight: '700'}}
         />
       </View>
     </Overlay>

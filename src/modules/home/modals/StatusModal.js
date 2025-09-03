@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import useImport from '../../../services/useImport';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE} from '../../../shared/styles.constants';
 import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -16,9 +15,8 @@ import {setSelectedProject} from '../../project/projects.slice';
 import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../home.slice';
 import overlayStyles from '../overlays/overlay.styles';
 
-const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
+const StatusModal = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const isModalLoading = useSelector(state => state.home.loading.modal);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
   const selectedProject = useSelector(state => state.project.selectedProject) || {};
@@ -52,18 +50,18 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
 
   return (
     <StatusDialogBox
-      title={'Status'}
-      isVisible={visible || isStatusMessagesModalVisible}
       closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      showConfirmButton={!isModalLoading && selectedProject.source === ''}
+      isVisible={isStatusMessagesModalVisible}
       onConfirmPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      showConfirmButton={!isModalLoading && selectedProject.source === ''}
+      title={'Status'}
     >
       <View>
         {isModalLoading && (
           <LottieAnimations
-            type={'loadingFile'}
-            show={isModalLoading}
             doesLoop={isModalLoading}
+            show={isModalLoading}
+            type={'loadingFile'}
           />
         )}
         <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
@@ -73,29 +71,20 @@ const StatusModal = ({exportProject, openMainMenuPanel, openUrl, visible}) => {
           )}
           <View style={{flexDirection: 'row'}}>
             <Button
-              title={!isEmpty(selectedProject.source) && selectedProject.source !== '' && 'Continue'}
-              type={'clear'}
               containerStyle={{padding: 10}}
               onPress={() => getProjectFromSource(selectedProject)}
+              title={!isEmpty(selectedProject.source) && selectedProject.source !== '' && 'Continue'}
+              type={'clear'}
             />
             {!isEmpty(selectedProject.source) && selectedProject.source !== '' && (
               <Button
-                title={'Cancel'}
                 containerStyle={{padding: 10}}
-                type={'clear'}
                 onPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
+                title={'Cancel'}
+                type={'clear'}
               />
             )}
-
           </View>
-          {/*{statusMessages.includes('Complete!') && (*/}
-          {/*  <Button*/}
-          {/*    title={'Export Project?'}*/}
-          {/*    containerStyle={{padding: 10}}*/}
-          {/*    type={'clear'}*/}
-          {/*    onPress={exportProject}*/}
-          {/*  />*/}
-          {/*)}*/}
         </View>
         }
       </View>

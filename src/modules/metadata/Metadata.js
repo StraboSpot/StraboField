@@ -28,10 +28,10 @@ const Metadata = () => {
   const renderMetadataForm = () => {
     return (
       <Formik
-        initialValues={spot.properties}
-        onSubmit={values => console.log('Submitting form...', values)}
-        innerRef={metadataFormRef}
         enableReinitialize={true}
+        initialValues={spot.properties}
+        innerRef={metadataFormRef}
+        onSubmit={values => console.log('Submitting form...', values)}
       >
         {() => (
           <>
@@ -39,10 +39,10 @@ const Metadata = () => {
               <ListItem.Content>
                 <Field
                   component={NumberInputField}
-                  name={'id'}
-                  label={'ID'}
-                  key={'id'}
                   editable={false}
+                  key={'id'}
+                  label={'ID'}
+                  name={'id'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -51,11 +51,11 @@ const Metadata = () => {
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'date'}
-                  label={'Date Created'}
+                  isDisplayOnly={true}
+                  isShowTime={true}
                   key={'date'}
-                  isDisplayOnly={true}
-                  isShowTime={true}
+                  label={'Date Created'}
+                  name={'date'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -64,11 +64,11 @@ const Metadata = () => {
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  key={'modified_timestamp'}
                   isDisplayOnly={true}
                   isShowTime={true}
+                  key={'modified_timestamp'}
+                  label={'Date Last Modified'}
+                  name={'modified_timestamp'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -81,7 +81,7 @@ const Metadata = () => {
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
     return (
-      <ListItem key={dataset.id.toString()} containerStyle={commonStyles.listItem}>
+      <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
           <ListItem.Subtitle>
@@ -92,9 +92,9 @@ const Metadata = () => {
         </ListItem.Content>
         <ListItem.CheckBox
           checked={isChecked}
-          onPress={() => handleDatasetChecked(dataset)}
-          iconType={'material-community'}
           checkedIcon={'radiobox-marked'}
+          iconType={'material-community'}
+          onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}
         />
       </ListItem>

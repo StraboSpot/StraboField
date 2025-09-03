@@ -9,20 +9,20 @@ import {TextInputField} from '../form';
 const NoteForm = ({formRef, initialNotesValues}) => {
   return (
     <Formik
-      initialValues={initialNotesValues}
-      onSubmit={values => console.log('Submitting form...', values)}
-      innerRef={formRef}
       enableReinitialize={true}
+      initialValues={initialNotesValues}
+      innerRef={formRef}
+      onSubmit={values => console.log('Submitting form...', values)}
     >
       {() => (
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field
-              component={TextInputField}
-              name={'note'}
-              key={'note'}
               appearance={'full'}
               autoFocus={true}
+              component={TextInputField}
+              key={'note'}
+              name={'note'}
             />
           </ListItem.Content>
         </ListItem>

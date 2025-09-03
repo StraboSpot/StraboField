@@ -86,34 +86,34 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
     <>
       {isNotebookMenuVisible && (
         <Overlay
-          supportedOrientations={['portrait', 'landscape']}
           isVisible={isNotebookMenuVisible}
           onBackdropPress={closeNotebookMenu}
           overlayStyle={notebookStyles.dialogContainer}
+          supportedOrientations={['portrait', 'landscape']}
         >
           <View style={overlayStyles.titleContainer}>
             <Text style={overlayStyles.titleText}>Spot Actions</Text>
           </View>
           <FlatList
-            key={'notebookActions'}
-            data={actions}
-            contentContainerStyle={{alignItems: 'center'}}
-            renderItem={({item}) => renderActionItem(item)}
             ItemSeparatorComponent={FlatListItemSeparator}
+            contentContainerStyle={{alignItems: 'center'}}
+            data={actions}
+            key={'notebookActions'}
+            renderItem={({item}) => renderActionItem(item)}
           />
         </Overlay>
       )}
       {isDeleteSpotModalVisible && (
         <WarningModal
-          title={'Delete Spot?'}
-          isVisible={isDeleteSpotModalVisible}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           closeModal={() => setIsDeleteSpotModalVisible(false)}
-          showCancelButton={true}
-          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
+          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           confirmText={'DELETE'}
           confirmTitleStyle={overlayStyles.importantText}
+          isVisible={isDeleteSpotModalVisible}
           onConfirmPress={() => continueDeleteSelectedSpot()}
+          showCancelButton={true}
+          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
+          title={'Delete Spot?'}
         >
           {renderDeleteMessage()}
         </WarningModal>

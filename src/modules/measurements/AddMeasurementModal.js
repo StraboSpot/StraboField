@@ -84,8 +84,8 @@ const AddMeasurementModal = ({onPress}) => {
     const prev = prevValuesRef.current;
 
     if (
-      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes) &&
-      JSON.stringify(prev.templates) === JSON.stringify(templates)
+      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes)
+      && JSON.stringify(prev.templates) === JSON.stringify(templates)
     ) return;
 
     prevValuesRef.current = {compassMeasurementTypes, templates};
@@ -199,12 +199,12 @@ const AddMeasurementModal = ({onPress}) => {
       <>
         {!isShowTemplates && !isSelectedAttitude && (
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={onMeasurementTypePress}
+            buttonStyle={{padding: 5}}
             buttons={Object.values(MEASUREMENT_TYPES).map(t => t.add_title)}
             containerStyle={{height: 40, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={onMeasurementTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
             textStyle={{color: PRIMARY_TEXT_COLOR}}
           />
         )}
@@ -231,19 +231,19 @@ const AddMeasurementModal = ({onPress}) => {
               : (
                 <>
                   <Compass
-                    setMeasurements={setMeasurements}
                     formValues={formProps.values}
+                    setMeasurements={setMeasurements}
                     sliderValue={sliderValue}
                   />
                   <View style={compassStyles.sliderContainer}>
                     <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
                     <SliderBar
-                      onSlidingComplete={setSliderValue}
-                      value={sliderValue}
-                      step={1}
+                      labels={['Low', '', '', '', 'High', 'N/R']}
                       maximumValue={6}
                       minimumValue={1}
-                      labels={['Low', '', '', '', 'High', 'N/R']}
+                      onSlidingComplete={setSliderValue}
+                      step={1}
+                      value={sliderValue}
                     />
                   </View>
                 </>
@@ -253,12 +253,12 @@ const AddMeasurementModal = ({onPress}) => {
               && getPlanarTemplates(relevantTemplates).length <= 1 && (
                 <>
                   <AddPlane
-                    survey={survey}
                     choices={choices}
-                    setChoicesViewKey={onSetChoicesViewKey}
                     formName={[groupKey, MEASUREMENT_KEYS.PLANAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
+                    setChoicesViewKey={onSetChoicesViewKey}
+                    survey={survey}
                   />
                 </>
               )}
@@ -266,14 +266,14 @@ const AddMeasurementModal = ({onPress}) => {
               && getLinearTemplates(relevantTemplates).length <= 1 && (
                 <>
                   <AddLine
-                    survey={assocSurvey}
                     choices={assocChoices}
-                    setChoicesViewKey={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR ? onSetChoicesAssocViewKey
-                      : onSetChoicesViewKey}
                     formName={[groupKey, MEASUREMENT_KEYS.LINEAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
                     isPlanarLinear={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR}
+                    setChoicesViewKey={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR ? onSetChoicesAssocViewKey
+                      : onSetChoicesViewKey}
+                    survey={assocSurvey}
                   />
                 </>
               )}
@@ -289,34 +289,34 @@ const AddMeasurementModal = ({onPress}) => {
     const saveTitle = 'Save ' + typeObj.save_title + (relevantTemplates.length > 1 ? 's' : '');
     return (
       <ModalWrapper
-        closeModal={onCloseButton}
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
+        closeModal={onCloseButton}
         onPress={onPress}
         overlayStyleOverride={{height: '80%'}}
       >
         <>
           {measurementTypeForForm && (
             <FlatList
-              bounces={false}
-              listKey={'form'}
               ListHeaderComponent={
                 <Formik
-                  innerRef={formRef}
-                  initialValues={initialValues}
+                  enableReinitialize={true}
                   initialStatus={{formName: formName}}
+                  initialValues={initialValues}
+                  innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={false}
-                  enableReinitialize={true}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
                 </Formik>
               }
+              bounces={false}
+              listKey={'form'}
             />
           )}
           {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <SaveButton title={saveTitle} onPress={saveMeasurement}/>
+            <SaveButton onPress={saveMeasurement} title={saveTitle}/>
           )}
         </>
       </ModalWrapper>

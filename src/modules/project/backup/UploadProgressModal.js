@@ -66,17 +66,17 @@ const UploadProgressModal = ({isProgressModalVisible}) => {
       <View>
         <View style={{alignItems: 'center'}}>
           <Icon
-            name={'warning-outline'}
-            type={'ionicon'}
             color={'orange'}
             containerStyle={{paddingTop: 15}}
+            name={'warning-outline'}
+            type={'ionicon'}
           />
           <Text style={{marginBottom: 15, textAlign: 'left'}}>The following datasets did not upload because the version
             on the server is the same or newer:</Text>
           <FlatList
+            ListEmptyComponent={<Text>All datasets were uploaded.</Text>}
             data={datasetsNotUploaded}
             renderItem={({item}) => renderDatasetsNotUploadedList(item)}
-            ListEmptyComponent={<Text>All datasets were uploaded.</Text>}
           />
         </View>
       </View>
@@ -85,21 +85,21 @@ const UploadProgressModal = ({isProgressModalVisible}) => {
 
   return (
     <ProgressModal
+      animation={
+        <LottieAnimation
+          doesLoop={uploadComplete === 'uploading'}
+          error={error}
+          show={uploadComplete === 'uploading'}
+          type={error ? 'error' : uploadComplete === 'complete' ? 'complete' : 'uploading'}
+        />}
       buttonText={selectedProject.source !== '' && 'Continue'}
       closeProgressModal={() => dispatch(setIsProgressModalVisible(false))}
       dialogTitle={'UPLOADING...'}
+      info={renderDatasetsNotUploaded()}
       isProgressModalVisible={isProgressModalVisible}
       onPressComplete={() => handleCompletePress()}
       showButton={uploadComplete === 'complete' || error}
       showInfo={!isEmpty(datasetsNotUploaded)}
-      animation={
-        <LottieAnimation
-          type={error ? 'error' : uploadComplete === 'complete' ? 'complete' : 'uploading'}
-          doesLoop={uploadComplete === 'uploading'}
-          show={uploadComplete === 'uploading'}
-          error={error}
-        />}
-      info={renderDatasetsNotUploaded()}
     >
       {!error ? (
           <View>
@@ -109,10 +109,10 @@ const UploadProgressModal = ({isProgressModalVisible}) => {
             {isImageTransferring && <View style={{paddingTop: 10}}>
               <Text style={{textAlign: 'center', paddingBottom: 5}}>Uploading images</Text>
               <ProgressBar
+                borderRadius={20}
+                height={15}
                 progress={projectTransferProgress}
                 width={250}
-                height={15}
-                borderRadius={20}
               />
               <Text style={{textAlign: 'center'}}>{`${(projectTransferProgress * 100).toFixed(0)}%`}</Text>
             </View>}

@@ -15,15 +15,15 @@ const MeasureLayers = ({measureFeatures}) => {
       shape={turf.featureCollection(measureFeatures)}
     >
       <MapboxGL.CircleLayer
+        filter={['==', ['geometry-type'], 'Point']}
         id={'measureLayerPoints'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Point']}
         style={getMapSymbology().pointMeasure}
       />
       <MapboxGL.LineLayer
+        filter={['==', ['geometry-type'], 'LineString']}
         id={'measureLayerLines'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'LineString']}
         style={getMapSymbology().lineMeasure}
       />
     </MapboxGL.ShapeSource>

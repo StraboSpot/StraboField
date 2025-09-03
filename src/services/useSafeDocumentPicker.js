@@ -1,15 +1,16 @@
-import {useState, useCallback} from 'react';
+import {useCallback, useState} from 'react';
 
-import {pick, isErrorWithCode, errorCodes} from '@react-native-documents/picker';
+import {errorCodes, isErrorWithCode, pick} from '@react-native-documents/picker';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {setLoadingStatus} from '../modules/home/home.slice';
 
 export const useSafeDocumentPicker = () => {
-  const [isPicking, setIsPicking] = useState(false);
   const dispatch = useDispatch();
   const toast = useToast();
+
+  const [isPicking, setIsPicking] = useState(false);
 
   const safePick = useCallback(async (options) => {
     if (isPicking) return null;
@@ -50,5 +51,8 @@ export const useSafeDocumentPicker = () => {
     }
   };
 
-  return {pick: safePick, isPicking};
+  return {
+    isPicking,
+    safePick: safePick,
+  };
 };

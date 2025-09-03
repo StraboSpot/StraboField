@@ -325,7 +325,7 @@ const useSpots = () => {
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
         const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
-        const imageBasemaps  = getImageBasemapsInSpot(parentSpot);
+        const imageBasemaps = getImageBasemapsInSpot(parentSpot);
         const nestedImageBasemapSpots = imageBasemaps.reduce((acc, imageBasemap) => {
           const spotsMappedOnGivenImageBasemap = getSpotsMappedOnGivenImageBasemap(imageBasemap.id);
           return [...acc, ...spotsMappedOnGivenImageBasemap];

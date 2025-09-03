@@ -51,8 +51,8 @@ const VersionCheckLabel = () => {
     return (
       <View style={versionCheckStyles.versionPositionHome}>
         <Pressable
-          style={versionCheckStyles.container}
-          onPress={handlePress}>
+          onPress={handlePress}
+          style={versionCheckStyles.container}>
           {versionObj.needsUpdate && (
             <Animated.View
               style={{

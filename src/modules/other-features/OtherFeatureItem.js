@@ -36,7 +36,7 @@ const OtherFeatureItem = ({editFeature, feature}) => {
         <ListItem.Title style={commonStyles.listItemTitle}>
           <OtherFeatureLabel item={feature}/>
         </ListItem.Title>
-        <FeatureTagsList spotId={spot.properties.id} featureId={feature.id}/>
+        <FeatureTagsList featureId={feature.id} spotId={spot.properties.id}/>
       </ListItem.Content>
       <ListItem.Chevron/>
     </ListItem>

@@ -29,12 +29,12 @@ const ProjectPrivacyPage = () => {
   return (
     <View>
       <Formik
+        enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
+        initialValues={preferences}
         innerRef={formRef}
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
-        initialValues={preferences}
         validateOnChange={false}
-        enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
       >
         {formProps => <Form {...{
           ...formProps,

@@ -92,17 +92,17 @@ const Nesting = () => {
     return (
       <>
         {type === 'Children' && (
-          <Icon type={'material-icons'} name={'south'} containerStyle={{paddingLeft: 8, alignItems: 'flex-start'}}/>
+          <Icon containerStyle={{paddingLeft: 8, alignItems: 'flex-start'}} name={'south'} type={'material-icons'}/>
         )}
         <Text style={{paddingLeft: 10}}>{generationText}</Text>
         <FlatList
-          listKey={type + i}
-          keyExtractor={index => type + index}
           data={Object.entries(groupedGeneration)}
+          keyExtractor={index => type + index}
+          listKey={type + i}
           renderItem={({item, index}) => renderGroup(type, i, item, index)}
         />
         {type === 'Parents' && (
-          <Icon type={'material-icons'} name={'north'} containerStyle={{paddingLeft: 8, alignItems: 'flex-start'}}/>
+          <Icon containerStyle={{paddingLeft: 8, alignItems: 'flex-start'}} name={'north'} type={'material-icons'}/>
         )}
       </>
     );
@@ -113,9 +113,9 @@ const Nesting = () => {
     if (!isEmpty(generationData)) {
       return (
         <FlatList
-          listKey={type}
-          keyExtractor={(item, index) => type + index}
           data={type === 'Parents' ? generationData.reverse() : generationData}
+          keyExtractor={(item, index) => type + index}
+          listKey={type}
           renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
         />
       );
@@ -145,11 +145,11 @@ const Nesting = () => {
         )}
         <View style={{flex: 1}}>
           <FlatList
-            listKey={type + i + b}
-            keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
-            data={group}
-            renderItem={({item}) => renderName(item)}
             ItemSeparatorComponent={FlatListItemSeparator}
+            data={group}
+            keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
+            listKey={type + i + b}
+            renderItem={({item}) => renderName(item)}
           />
         </View>
       </View>
@@ -193,10 +193,10 @@ const Nesting = () => {
       <ReturnToOverviewButton/>
       <SectionDivider dividerText={'Nesting'}/>
       <FlatList
-        ListHeaderComponent={renderGenerations('Parents')}
         ListFooterComponent={renderGenerations('Children')}
-        keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
+        ListHeaderComponent={renderGenerations('Parents')}
         data={[selectedSpot]}
+        keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
         renderItem={({item}) => renderSelf(item)}
       />
     </View>

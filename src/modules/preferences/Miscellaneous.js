@@ -98,21 +98,21 @@ const Miscellaneous = () => {
 
   const renderPrompt = () => (
     <StandardModal
-      visible={isTestingModalVisible}
+      closeModal={closeModal}
       dialogTitle={'Enter Password'}
       footerButtonsVisible={true}
       onPress={verifyPassword}
-      closeModal={closeModal}
+      visible={isTestingModalVisible}
     >
       <Text style={overlayStyles.importantText}>
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.
       </Text>
       <Input
+        defaultValue={''}
+        errorMessage={isErrorMessage && errorMessage}
+        onChangeText={userEntry}
         placeholder={'Password'}
         placeholderTextColor={themes.MEDIUMGREY}
-        defaultValue={''}
-        onChangeText={userEntry}
-        errorMessage={isErrorMessage && errorMessage}
       />
     </StandardModal>
   );
@@ -140,10 +140,10 @@ const Miscellaneous = () => {
   return (
     <>
       <Formik
+        enableReinitialize
+        initialValues={initialValues}
         innerRef={formRef}
         onSubmit={values => console.log('Submitting Form', values)}
-        initialValues={initialValues}
-        enableReinitialize
       >
         <>
           {renderCustomEndpoint()}
