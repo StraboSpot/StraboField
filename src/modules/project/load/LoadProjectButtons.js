@@ -19,13 +19,14 @@ const LoadProjectButtons = ({
 
   return (
     <>
-      <View>
+      <View style={{paddingHorizontal: 10}}>
         <Button
           buttonStyle={commonStyles.standardButton}
           containerStyle={commonStyles.standardButtonContainer}
           onPress={onStartNewProject}
           title={'New'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         {!isEmpty(user.name) && isOnline.isConnected && (
           <Button
@@ -34,6 +35,7 @@ const LoadProjectButtons = ({
             onPress={onLoadProjectsFromServer}
             title={'Download'}
             titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
           />
         )}
         <Button
@@ -42,6 +44,7 @@ const LoadProjectButtons = ({
           onPress={onLoadProjectsFromDevice}
           title={'Open'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         {!isEmpty(user.name) && !isOnline.isConnected && (
           <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
@@ -54,6 +57,7 @@ const LoadProjectButtons = ({
           onPress={onLoadProjectsFromDownloadsFolder}
           title={'Import'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
       </View>
     </>

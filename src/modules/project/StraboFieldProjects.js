@@ -58,50 +58,53 @@ const StraboFieldProjects = () => {
               onStartNewProject={onStartNewProject}
             />
             <Spacer/>
-            <Spacer/>
-            <SectionDivider dividerText={'Local Projects on Device'}/>
-            <Button
-              buttonStyle={commonStyles.standardButton}
-              containerStyle={commonStyles.standardButtonContainer}
-              onPress={onDeleteLocalCopy}
-              title={'Delete'}
-              titleStyle={commonStyles.standardButtonText}
-            />
-            <Button
-              buttonStyle={commonStyles.standardButton}
-              containerStyle={commonStyles.standardButtonContainer}
-              onPress={onExportOtherSavedProject}
-              title={Platform.OS === 'ios' ? 'Zip' : 'Export to Zip'}
-              titleStyle={commonStyles.standardButtonText}
-            />
-            {Platform.OS === 'ios' && (
-              <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-                <View style={{padding: 10, alignItems: 'center'}}>
-                  <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
-                    Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
-                  </Text>
+            <SectionDivider dividerText={'Other Actions with\nLocal Projects on Device'}/>
+            <View style={{paddingHorizontal: 10}}>
+              <Button
+                buttonStyle={commonStyles.standardButton}
+                containerStyle={commonStyles.standardButtonContainer}
+                onPress={onDeleteLocalCopy}
+                title={'Delete'}
+                titleStyle={commonStyles.standardButtonText}
+                type={'outline'}
+              />
+              <Button
+                buttonStyle={commonStyles.standardButton}
+                containerStyle={commonStyles.standardButtonContainer}
+                onPress={onExportOtherSavedProject}
+                title={Platform.OS === 'ios' ? 'Zip' : 'Export to Zip'}
+                titleStyle={commonStyles.standardButtonText}
+                type={'outline'}
+              />
+              {Platform.OS === 'ios' && (
+                <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
+                  <View style={{padding: 10, alignItems: 'center'}}>
+                    <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
+                      Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
+                    </Text>
+                  </View>
+                  <Button
+                    buttonStyle={commonStyles.standardButton}
+                    containerStyle={commonStyles.buttonPadding}
+                    icon={{
+                      name: 'file-tray-full-outline',
+                      type: 'ionicon',
+                      color: BLUE,
+                    }}
+                    iconContainerStyle={{paddingRight: 10}}
+                    onPress={() => openURL('ProjectBackups')}
+                    title={'View/Edit Files on Device'}
+                    titleStyle={commonStyles.standardButtonText}
+                    type={'outline'}
+                  />
                 </View>
-                <Button
-                  buttonStyle={commonStyles.standardButton}
-                  containerStyle={commonStyles.buttonPadding}
-                  icon={{
-                    name: 'file-tray-full-outline',
-                    type: 'ionicon',
-                    color: BLUE,
-                  }}
-                  iconContainerStyle={{paddingRight: 10}}
-                  onPress={() => openURL('ProjectBackups')}
-                  title={'View/Edit Files on Device'}
-                  titleStyle={commonStyles.standardButtonText}
-                  type={'outline'}
-                />
-              </View>
-            )}
-            {Platform.OS === 'android' && (
-              <Text style={overlayStyles.statusMessageText}>
-                *The imported project must be a .zip file in the {importLocationText} folder.
-              </Text>
-            )}
+              )}
+              {Platform.OS === 'android' && (
+                <Text style={overlayStyles.statusMessageText}>
+                  *The imported project must be a .zip file in the {importLocationText} folder.
+                </Text>
+              )}
+            </View>
           </>
         }
       />

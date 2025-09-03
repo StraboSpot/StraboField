@@ -300,31 +300,31 @@ const UserProfile = () => {
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
-                validate={values =>     validateForm({formName: formName, values: values})}
+                validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={true}
               />
               {isOnline.isInternetReachable ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
-                    <View style={commonStyles.buttonContainer}>
-                      <Button
-                        loading={isDownloading}
-                        loadingProps={userStyles.loadingSpinnerProps}
-                        onPress={onDownloadUserProfile}
-                        title={'Download User Profile'}
-                        type={'clear'}
-                      />
-                    </View>
-                  )}
-                  <View style={commonStyles.buttonContainer}>
                     <Button
-                      containerStyle={userStyles.deleteProfileButtonContainer}
-                      onPress={() => setDeleteProfileModalVisible(true)}
-                      title={'Delete Account'}
-                      titleStyle={userStyles.deleteProfileButtonText}
-                      type={'clear'}
+                      buttonStyle={commonStyles.standardButton}
+                      containerStyle={commonStyles.standardButtonContainer}
+                      loading={isDownloading}
+                      loadingProps={userStyles.loadingSpinnerProps}
+                      onPress={onDownloadUserProfile}
+                      title={'Download User Profile'}
+                      titleStyle={commonStyles.standardButtonText}
+                      type={'outline'}
                     />
-                  </View>
+                  )}
+                  <Button
+                    buttonStyle={commonStyles.standardButton}
+                    containerStyle={commonStyles.standardButtonContainer}
+                    onPress={() => setDeleteProfileModalVisible(true)}
+                    title={'Delete Account'}
+                    titleStyle={userStyles.deleteProfileButtonText}
+                    type={'outline'}
+                  />
                 </View>
               ) : (
                 <Text style={commonStyles.noValueText}>

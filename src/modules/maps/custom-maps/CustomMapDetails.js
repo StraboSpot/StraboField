@@ -335,28 +335,32 @@ const CustomMapDetails = () => {
         {renderTitle()}
         {renderOverlaySection()}
         {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {isEmpty(
-          customMapToEdit) && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
-          || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        {isEmpty(customMapToEdit)
+          && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+            || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
           <Button
+            buttonStyle={commonStyles.standardButton}
             containerStyle={commonStyles.standardButtonContainer}
             disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
                 editableCustomMapData.id)
               || editableCustomMapData.source === 'map_warper')}
             onPress={() => saveMap()}
             title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-            type={'clear'}
+            type={'outline'}
           />
           <Button
+            buttonStyle={commonStyles.standardButton}
             containerStyle={commonStyles.standardButtonContainer}
             onPress={() => confirmDeleteMap()}
             title={'Delete Map'}
             titleStyle={{color: WARNING_COLOR}}
-            type={'clear'}
+            type={'outline'}
           />
         </View>
       </View>
+
+      {/* Modal */}
       <Overlay
         isVisible={isLoadingModalVisible}
         overlayStyle={[overlayStyles.overlayContainer, customMapStyles.loadingMapModalContainer]}

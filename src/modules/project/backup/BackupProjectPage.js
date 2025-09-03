@@ -48,7 +48,7 @@ const BackupProjectPage = () => {
 
   const renderUploadAndBackupButtons = () => {
     return (
-      <View>
+      <View style={{paddingHorizontal: 10}}>
         {user.encoded_login && isOnline.isConnected ? (
           <Button
             buttonStyle={commonStyles.standardButton}
@@ -59,6 +59,7 @@ const BackupProjectPage = () => {
             }}
             title={'Upload'}
             titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
           />
         ) : (
           <View style={uiStyles.spacer}>
@@ -71,6 +72,7 @@ const BackupProjectPage = () => {
           onPress={saveProject}
           title={'Save'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         <Button
           buttonStyle={commonStyles.standardButton}
@@ -78,6 +80,7 @@ const BackupProjectPage = () => {
           onPress={exportProject}
           title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
       </View>
     );

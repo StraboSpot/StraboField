@@ -16,7 +16,7 @@ const AddButton = ({
       icon={{
         name: 'add',
         type: 'ionicon',
-        size: 35,
+        size: 25,
         color: commonStyles.iconColor.color,
       }}
       onPress={onPress}

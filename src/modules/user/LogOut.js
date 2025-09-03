@@ -31,13 +31,14 @@ const LogOut = () => {
 
   const renderLogInOrOutButton = () => {
     return (
-      <View>
+      <View style={{paddingHorizontal: 10}}>
         <Button
           buttonStyle={commonStyles.standardButton}
           containerStyle={commonStyles.standardButtonContainer}
           onPress={() => isEmpty(userData.name) ? dispatch(logout()) : setIsLogoutModalVisible(true)}
-          title={isEmpty(userData.name) ? 'Log In' : 'Log out'}
+          title={isEmpty(userData.name) ? 'Log In' : 'Log Out'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         {isEmpty(userData.name) && (
           <Button
