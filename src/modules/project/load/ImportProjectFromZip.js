@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
@@ -37,6 +38,7 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     makeDirectory,
     unZipAndCopyImportedData,
   } = useDevice();
+  const toast = useToast();
 
   useEffect(() => {
     console.log('UE MyStraboSpot []');
@@ -63,10 +65,10 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
 
   const getZippedProject = async () => {
     const res = await getExternalProjectData();
-    console.log('EXTERNAL PROJECT', res);
     if (isEmpty(res)) {
       if (isProjectLoadSelectionModalVisible) goBackToMain();
       else dispatch(setSidePanelVisible({bool: false}));
+      toast.show('Error getting file to import.', {type: 'danger'});
     }
     else setImportedProject(res);
   };

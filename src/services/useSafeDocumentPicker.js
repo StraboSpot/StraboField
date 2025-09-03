@@ -7,9 +7,10 @@ import {useDispatch} from 'react-redux';
 import {setLoadingStatus} from '../modules/home/home.slice';
 
 export const useSafeDocumentPicker = () => {
-  const [isPicking, setIsPicking] = useState(false);
   const dispatch = useDispatch();
   const toast = useToast();
+
+  const [isPicking, setIsPicking] = useState(false);
 
   const safePick = useCallback(async (options) => {
     if (isPicking) return null;
@@ -50,5 +51,8 @@ export const useSafeDocumentPicker = () => {
     }
   };
 
-  return {pick: safePick, isPicking};
+  return {
+    isPicking,
+    safePick: safePick,
+  };
 };

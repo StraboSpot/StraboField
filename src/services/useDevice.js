@@ -15,8 +15,8 @@ import {useSafeDocumentPicker} from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
-  const {pick} = useSafeDocumentPicker();
   const {checkPermission} = usePermissions();
+  const {safePick} = useSafeDocumentPicker();
 
   const dispatch = useDispatch();
 
@@ -269,12 +269,12 @@ const useDevice = () => {
 
   const getExternalProjectData = async () => {
     try {
-      const res = await pick({type: [types.zip]});
-      if (res) {
-        console.log('Picked ZIP File:', res.name, res.uri);
+      const [{name, uri}] = await safePick({type: [types.zip]});
+      if (name && uri) {
+        console.log('Picked ZIP File:', name, uri);
         const [localCopy] = await keepLocalCopy({
           destination: 'cachesDirectory',
-          files: [{uri: res.uri, fileName: res.name}],
+          files: [{uri: uri, fileName: name}],
           // presentationStyle: Platform.OS === 'ios' && 'fullScreen',
           transitionStyle: Platform.OS === 'ios' && 'flipHorizontal',
           type: [types.zip],
@@ -282,9 +282,11 @@ const useDevice = () => {
 
         if (localCopy.status === 'success') {
           console.log(localCopy.localUri);
-          return {localUri: localCopy.localUri, name: res.name};
+          return {localUri: localCopy.localUri, name: name};
         }
+        else throw Error;
       }
+      else throw Error;
     }
     catch (err) {
       console.error('Error getting external project data', err);
@@ -354,7 +356,7 @@ const useDevice = () => {
   };
 
   const pickCSV = async () => {
-    const [res] = await pick({type: [types.csv]});
+    const [res] = await safePick({type: [types.csv]});
     return res;
   };
 
