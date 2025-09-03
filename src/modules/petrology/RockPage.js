@@ -13,7 +13,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {SelectInputField, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
@@ -202,12 +201,10 @@ const RockPage = ({page}) => {
       '');
     if (sectionKey) {
       return (
-        <View style={uiStyles.sectionHeaderBackground}>
-          <SectionDividerWithRightButton
-            dividerText={sectionTitle}
-            onPress={() => addRock(sectionKey)}
-          />
-        </View>
+        <SectionDividerWithRightButton
+          dividerText={sectionTitle}
+          onPress={() => addRock(sectionKey)}
+        />
       );
     }
     else return <SectionDivider dividerText={sectionTitle}/>;

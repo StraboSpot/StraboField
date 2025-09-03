@@ -9,7 +9,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -75,13 +74,11 @@ const ThreeDStructuresPage = ({page}) => {
     const sectionKey = Object.values(SECTIONS).reduce((acc, {title, key}) => sectionTitle === title ? key : acc,
       '');
     return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDividerWithRightButton
-          disabled={isMultipleFeaturesTaggingEnabled}
-          dividerText={sectionTitle}
-          onPress={() => add3dStructure(sectionKey)}
-        />
-      </View>
+      <SectionDividerWithRightButton
+        disabled={isMultipleFeaturesTaggingEnabled}
+        dividerText={sectionTitle}
+        onPress={() => add3dStructure(sectionKey)}
+      />
     );
   };
 

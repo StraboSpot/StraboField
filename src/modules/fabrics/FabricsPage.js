@@ -9,7 +9,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
@@ -84,12 +83,10 @@ const FabricsPage = ({page}) => {
       '');
     if (sectionKey) {
       return (
-        <View style={uiStyles.sectionHeaderBackground}>
-          <SectionDividerWithRightButton
-            dividerText={sectionTitle}
-            onPress={() => addFabric(sectionKey)}
-          />
-        </View>
+        <SectionDividerWithRightButton
+          dividerText={sectionTitle}
+          onPress={() => addFabric(sectionKey)}
+        />
       );
     }
     else return <SectionDivider dividerText={sectionTitle}/>;

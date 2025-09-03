@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Text} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -97,12 +97,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
         type={'outline'}
       />
       <SectionDivider dividerText={'Current Custom Maps'}/>
-      {isSelected && (
-        <SectionDivider
-          dividerText={`Endpoint: ${endpoint.replace('/db', '')}`}
-          textStyle={{fontSize: 12, textAlign: 'center'}}
-        />
-      )}
+      {isSelected && <Text style={commonStyles.standardDescriptionText}>Endpoint: {endpoint.replace('/db', '')}</Text>}
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Custom Maps'}/>}

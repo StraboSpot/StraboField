@@ -9,7 +9,7 @@ import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {BLUE, DARKGREY, MEDIUMGREY, PRIMARY_BACKGROUND_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
@@ -262,11 +262,11 @@ const CustomMapDetails = () => {
       <>
         <SectionDivider dividerText={'Custom Map Title'}/>
         <Input
-          containerStyle={{paddingHorizontal: 0}}
+          containerStyle={{paddingHorizontal: 10}}
           errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
           errorStyle={customMapStyles.requiredMessage}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+          inputContainerStyle={{borderBottomWidth: 0, backgroundColor: PRIMARY_BACKGROUND_COLOR}}
+          inputStyle={formStyles.fieldValue}
           onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
           value={editableCustomMapData?.title || ''}
         />

@@ -54,11 +54,7 @@ const Form = ({
     );
   };
 
-  const renderGroupHeading = (field) => {
-    return (
-      <SectionDivider dividerText={field.label}/>
-    );
-  };
+  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
 
   const renderTextInput = (field) => {
     return (

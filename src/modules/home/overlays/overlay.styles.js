@@ -1,7 +1,7 @@
 import {Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../../shared/styles.constants';
-import {SMALL_SCREEN} from '../../../shared/styles.constants';
+import {LIGHTGREY, SMALL_SCREEN} from '../../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   animationContainer: {
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: 'lightgrey',
+    borderColor: LIGHTGREY,
   },
   // Extra Specific Modal Styles
   titleText: {

@@ -160,9 +160,7 @@ const Documentation = () => {
   return (
     <View style={styles.container}>
       {renderSpotDataModelSection()}
-      <View>
-        <SectionDivider dividerText={'Manual'}/>
-      </View>
+      <SectionDivider dividerText={'Manual'}/>
       <OpenUrlLink
         buttonStyle={styles.button}
         color={WHITE}
@@ -171,9 +169,7 @@ const Documentation = () => {
         titleStyle={styles.buttonText}
         url={STRABO_APIS.STRABO + '/help'}
       />
-      <View>
-        <SectionDivider dividerText={'Helpful Docs'}/>
-      </View>
+      <SectionDivider dividerText={'Helpful Docs'}/>
       {renderFAQList()}
       {renderPDF()}
     </View>

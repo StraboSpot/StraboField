@@ -15,7 +15,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import uiStyles from '../../shared/ui/ui.styles';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setModalVisible} from '../home/home.slice';
@@ -157,8 +156,8 @@ const MeasurementsPage = ({page}) => {
   const renderSectionHeader = ({title, data}) => {
     const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === title);
     return (
-      <View style={[styles.measurementsSectionDividerContainer, uiStyles.sectionHeaderBackground]}>
-        <SectionDivider dividerText={title}/>
+      <View style={styles.measurementsSectionDividerContainer}>
+        <SectionDivider dividerText={title} style={{borderBottomWidth: 0}}/>
         <View style={styles.measurementsSectionDividerButtonContainer}>
           {multiSelectMode && sectionType === multiSelectMode && (
             <Button

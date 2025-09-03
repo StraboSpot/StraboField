@@ -1,6 +1,18 @@
 import {Platform, StyleSheet} from 'react-native';
 
-import * as themes from '../styles.constants';
+import {
+  BLACK,
+  GOLD,
+  LIGHTGREY,
+  MEDIUM_TEXT_SIZE,
+  MEDIUMGREY,
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_HEADER_TEXT_SIZE,
+  PRIMARY_TEXT_COLOR,
+  SECONDARY_BACKGROUND_COLOR,
+  SMALL_TEXT_SIZE,
+  WHITE,
+} from '../styles.constants';
 
 const styles = StyleSheet.create({
   accessPointIcon: {
@@ -24,7 +36,7 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   batteryLevelText: {
-    color: themes.BLACK,
+    color: BLACK,
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -39,14 +51,14 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   buttonText: {
-    color: themes.PRIMARY_ACCENT_COLOR,
-    fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
+    color: PRIMARY_ACCENT_COLOR,
+    fontSize: PRIMARY_HEADER_TEXT_SIZE,
   },
   connectionStatusContainer: {
     padding: 5,
   },
   container: {
-    backgroundColor: Platform.OS === 'ios' ? themes.BLACK : themes.WHITE,
+    backgroundColor: Platform.OS === 'ios' ? BLACK : WHITE,
     flex: 1,
     overflow: 'hidden',
   },
@@ -61,8 +73,8 @@ const styles = StyleSheet.create({
     width: '75%',
   },
   customEndpointText: {
-    color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.MEDIUM_TEXT_SIZE,
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
     marginEnd: 30,
     textAlign: 'center',
   },
@@ -82,7 +94,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
     height: 60,
     justifyContent: 'center',
   },
@@ -91,7 +103,7 @@ const styles = StyleSheet.create({
     width: Platform.OS === 'web' ? 50 : 55,
   },
   itemSeparator: {
-    borderColor: themes.LIGHTGREY,
+    borderColor: LIGHTGREY,
     borderTopWidth: 1,
   },
   leftContainer: {
@@ -119,30 +131,34 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   sectionDivider: {
+    borderBottomWidth: 1,
+    borderColor: MEDIUMGREY,
     flexShrink: 1,
     paddingLeft: 10,
     paddingTop: 10,
   },
   sectionDividerText: {
-    color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.MEDIUM_TEXT_SIZE,
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     paddingBottom: 5,
   },
   sectionDividerWithButtonContainer: {
     alignItems: 'flex-end',
+    borderBottomWidth: 1,
+    borderColor: MEDIUMGREY,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   sectionHeaderBackground: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
   },
   slider: {
     width: '100%',
   },
   sliderLabel: {
-    color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.SMALL_TEXT_SIZE,
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
   },
   sliderTextContainer: {
     flexDirection: 'row',
@@ -159,7 +175,7 @@ const styles = StyleSheet.create({
   },
   toastContainer: {
     alignItems: 'center',
-    backgroundColor: themes.GOLD,
+    backgroundColor: GOLD,
     flexDirection: 'row',
     padding: 5,
   },

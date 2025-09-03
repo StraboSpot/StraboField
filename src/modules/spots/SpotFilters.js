@@ -9,7 +9,12 @@ import SortingButtons from './SortingButtons';
 import {SORT_ORDER, SORTED_VIEWS} from './spots.constants';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import {DARKGREY, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {
+  DARKGREY,
+  PRIMARY_BACKGROUND_COLOR,
+  PRIMARY_TEXT_SIZE,
+  SECONDARY_BACKGROUND_COLOR,
+} from '../../shared/styles.constants';
 import PickerOverlay from '../../shared/ui/PickerOverlay';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 
@@ -103,14 +108,14 @@ const SpotFilters = ({
       <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
         <SearchBar
           containerStyle={{
-            backgroundColor: PRIMARY_BACKGROUND_COLOR,
+            backgroundColor: SECONDARY_BACKGROUND_COLOR,
             borderBottomColor: 'transparent',
             borderTopColor: 'transparent',
             flex: 1,
             padding: 0,
           }}
-          inputContainerStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}
-          inputStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, outlineStyle: 'none'}}
+          inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
+          inputStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
           onChangeText={updateSearch}
           placeholder={'Search Spot Names'}
           placeholderTextColor={DARKGREY}

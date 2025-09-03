@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import uiStyles from '../../shared/ui/ui.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
@@ -38,17 +37,9 @@ const TagsList = ({type, selectedIndex}) => {
     {title: 'No Type Specified', key: undefined},
   ];
 
-  const getTagTitle = (tag) => {
-    return tag.name || '';
-  };
+  const getTagTitle = tag => tag.name || '';
 
-  const renderSectionHeader = (title) => {
-    return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={title}/>
-      </View>
-    );
-  };
+  const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 
   const renderTag = (tag) => {
     const tagSpotCount = getTagSpotsCount(tag);
