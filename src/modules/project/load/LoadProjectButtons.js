@@ -1,11 +1,10 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 
 const LoadProjectButtons = ({
@@ -20,44 +19,28 @@ const LoadProjectButtons = ({
   return (
     <>
       <View style={{paddingHorizontal: 10}}>
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
+        <OutlineButton
           onPress={onStartNewProject}
           title={'New'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
         {!isEmpty(user.name) && isOnline.isConnected && (
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
+          <OutlineButton
             onPress={onLoadProjectsFromServer}
             title={'Download'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
           />
         )}
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
+        <OutlineButton
           onPress={onLoadProjectsFromDevice}
           title={'Open'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
         {!isEmpty(user.name) && !isOnline.isConnected && (
           <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
             Please connect to the Internet.
           </Text>
         )}
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
+        <OutlineButton
           onPress={onLoadProjectsFromDownloadsFolder}
           title={'Import'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
       </View>
     </>
