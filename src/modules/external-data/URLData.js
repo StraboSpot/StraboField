@@ -59,11 +59,11 @@ const UrlData = ({
         <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <ListItem.Title
             onPress={() => openURL(urlItem)}
-            style={[commonStyles.listItemTitle, {color: BLUE}]}>
+            style={[commonStyles.listItemTitle, {color: BLUE, paddingHorizontal: 5}]}>
             {truncateText(urlItem, 33)}
           </ListItem.Title>
 
-          <View style={{flexDirection: 'row'}}>
+          {editable && <View style={{flexDirection: 'row'}}>
             <Button
               buttonStyle={externalDataStyles.iconButton}
               icon={
@@ -78,23 +78,21 @@ const UrlData = ({
               onPress={() => editUrl(urlItem, i)}
               type={'clear'}
             />
-            {editable && (
-              <Button
-                buttonStyle={externalDataStyles.iconButton}
-                icon={
-                  <Icon
-                    color={'darkgrey'}
-                    containerStyle={externalDataStyles.iconContainer}
-                    name={'trash'}
-                    size={25}
-                    type={'font-awesome'}
-                  />
-                }
-                onPress={() => initializeDelete('url', urlItem)}
-                type={'clear'}
-              />
-            )}
-          </View>
+            <Button
+              buttonStyle={externalDataStyles.iconButton}
+              icon={
+                <Icon
+                  color={'darkgrey'}
+                  containerStyle={externalDataStyles.iconContainer}
+                  name={'trash'}
+                  size={25}
+                  type={'font-awesome'}
+                />
+              }
+              onPress={() => initializeDelete('url', urlItem)}
+              type={'clear'}
+            />
+          </View>}
         </ListItem.Content>
       </ListItem>
     );

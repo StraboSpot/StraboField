@@ -93,8 +93,8 @@ function TablesData({
           onPress={() => selectTable(table)}
           style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
         >
-          <Text>{table.name}</Text>
-          <Pressable
+          <Text>{table.name} (.CSV)</Text>
+          {editable && <Pressable
             onPress={() => initializeDelete('csv', table)}
             style={({pressed}) => [{backgroundColor: pressed ? '#b4b6b8' : 'transparent'}]}
           >
@@ -105,7 +105,7 @@ function TablesData({
               size={25}
               type={'font-awesome'}
             />
-          </Pressable>
+          </Pressable>}
         </Pressable>
       </View>
     );
@@ -124,7 +124,7 @@ function TablesData({
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No tables saved'}/>}
