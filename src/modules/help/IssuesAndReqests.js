@@ -2,9 +2,10 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import styles from './issuesAndRequest.styles';
+import UrlLinkButton from './UrlLinkButton';
 import {SUPPORT_PATHS} from '../../services/urls.constants';
 import {WHITE} from '../../shared/styles.constants';
-import OpenUrlLink from '../../shared/ui/OpenUrlLink';
+import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const IssuesAndRequests = () => {
   return (
@@ -14,7 +15,7 @@ const IssuesAndRequests = () => {
         Found a bug or want to suggest an improvement?
         You can report issues directly on GitHub (preferred method) or email our team.
       </Text>
-      <OpenUrlLink
+      <UrlLinkButton
         buttonStyle={styles.button}
         color={WHITE}
         icon={'logo-github'}
@@ -22,7 +23,8 @@ const IssuesAndRequests = () => {
         titleStyle={styles.buttonText}
         url={SUPPORT_PATHS.GITHUB}
       />
-      <OpenUrlLink
+      <FlatListItemSeparator/>
+      <UrlLinkButton
         buttonStyle={styles.button}
         color={WHITE}
         icon={'mail-outline'}

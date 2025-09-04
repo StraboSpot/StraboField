@@ -5,7 +5,6 @@ import {
   DARKGREY,
   LARGE_TEXT_SIZE,
   MEDIUM_TEXT_SIZE,
-  PRIMARY_BACKGROUND_COLOR,
   TEXT_WEIGHT_700,
   WHITE,
 } from '../../shared/styles.constants';
@@ -26,10 +25,8 @@ const styles = StyleSheet.create({
     fontSize: MEDIUM_TEXT_SIZE,
   },
   container: {
-    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    paddingHorizontal: 10,
   },
   description: {
     color: DARKGREY,
