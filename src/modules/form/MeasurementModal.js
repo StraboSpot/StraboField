@@ -8,12 +8,12 @@ import {formStyles, useForm} from '.';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN, WARNING_COLOR} from '../../shared/styles.constants';
-import ModalWrapperHeader from '../../shared/ui/modal/ModalWrapperHeader';
+import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
 import compassStyles from '../compass/compass.styles';
 import ManualMeasurement from '../compass/ManualMeasurement';
-import overlayStyles from '../home/overlays/overlay.styles';
 
 const MeasurementModal = ({
                             formName,

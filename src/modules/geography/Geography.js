@@ -6,13 +6,13 @@ import * as turf from '@turf/turf';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import GeoFieldInputs from './GeoFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
-import GeoFieldInputs from './GeoFieldInputs';
 import useMapView from '../maps/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';

@@ -1,7 +1,7 @@
 import {Platform, StyleSheet} from 'react-native';
 
-import * as themes from '../../../shared/styles.constants';
-import {LIGHTGREY, SMALL_SCREEN} from '../../../shared/styles.constants';
+import * as themes from '../../styles.constants';
+import {LIGHTGREY, SMALL_SCREEN} from '../../styles.constants';
 
 const styles = StyleSheet.create({
   animationContainer: {

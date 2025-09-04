@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import ButtonRounded from './ButtonRounded';
+import ButtonRounded from './buttons/ButtonRounded';
 import {setModalVisible} from '../../modules/home/home.slice';
 import {imageStyles} from '../../modules/images';
 import {setNotebookPageVisible} from '../../modules/notebook-panel/notebook.slice';

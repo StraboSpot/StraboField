@@ -2,7 +2,7 @@ import {StyleSheet} from 'react-native';
 
 import * as themes from '../../styles.constants';
 
-const modalStyle = StyleSheet.create({
+const modalStyles = StyleSheet.create({
   modalHeaderButtonsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -43,4 +43,4 @@ const modalStyle = StyleSheet.create({
   },
 });
 
-export default modalStyle;
+export default modalStyles;

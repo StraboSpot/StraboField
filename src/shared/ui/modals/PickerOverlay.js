@@ -3,9 +3,9 @@ import {FlatList} from 'react-native';
 
 import {Button, CheckBox, Overlay} from '@rn-vui/base';
 
-import SectionDivider from './SectionDivider';
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
-import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../styles.constants';
+import overlayStyles from './overlay.styles';
+import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
+import SectionDivider from '../SectionDivider';
 
 const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelect, value}) => {
   // const [isPickerVisible, setIsPickerVisible] = useState(false);

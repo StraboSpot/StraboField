@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../styles.constants';
 
 const SaveButton = ({
                       isLoading,

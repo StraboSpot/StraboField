@@ -8,11 +8,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import AddButton from '../../shared/ui/AddButton';
-import SaveButton from '../../shared/ui/ButtonRounded';
+import AddButton from '../../shared/ui/buttons/AddButton';
+import SaveButton from '../../shared/ui/buttons/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import modalStyle from '../../shared/ui/modal/modal.style';
+import modalStyles from '../../shared/ui/modals/modal.styles';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -196,16 +196,17 @@ const TagsModal = ({
   return (
     <>
       <View style={{flex: 1}}>
-        <View style={modalStyle.textContainer}>
+        <View style={modalStyles.textContainer}>
           <AddButton
             onPress={addTag}
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
             type={'outline'}
           />
         </View>
-        <View style={modalStyle.textContainer}>
-          {tags && !isEmpty(tags) ? <Text style={modalStyle.textStyle}>Check all {label.toLowerCase()} that apply</Text>
-            : <Text style={modalStyle.textStyle}>No {label}</Text>}
+        <View style={modalStyles.textContainer}>
+          {tags && !isEmpty(tags)
+            ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>
+            : <Text style={modalStyles.textStyle}>No {label}</Text>}
         </View>
         {renderSpotTagsList()}
         {(!isEmpty(tags)

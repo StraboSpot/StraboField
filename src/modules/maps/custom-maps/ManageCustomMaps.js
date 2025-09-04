@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
-import AddButton from '../../../shared/ui/AddButton';
+import AddButton from '../../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';

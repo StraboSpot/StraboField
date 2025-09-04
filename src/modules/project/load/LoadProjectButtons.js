@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import overlayStyles from '../../home/overlays/overlay.styles';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 
 const LoadProjectButtons = ({
                               onLoadProjectsFromDevice,

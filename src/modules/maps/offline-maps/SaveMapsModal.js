@@ -13,13 +13,13 @@ import useDevice from '../../../services/useDevice';
 import useServerRequests from '../../../services/useServerRequests';
 import {toNumberFixedValue} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
   addedStatusMessage,
   clearedStatusMessages,
   removedLastStatusMessage,
   setIsOfflineMapsModalVisible,
 } from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAP_PROVIDERS} from '../maps.constants';
 
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {

@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';

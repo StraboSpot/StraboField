@@ -9,7 +9,7 @@ import useServerRequests from '../../services/useServerRequests';
 import {validate} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
-import StatusDialog from '../../shared/ui/StatusDialogBox';
+import StatusDialog from '../../shared/ui/modals/StatusDialogBox';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignUp = ({navigation}) => {

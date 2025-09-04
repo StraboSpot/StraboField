@@ -12,9 +12,9 @@ import useDownload from '../../services/useDownload';
 import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 

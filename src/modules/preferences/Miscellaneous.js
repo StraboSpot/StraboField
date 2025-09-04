@@ -12,11 +12,11 @@ import {PRIMARY_BACKGROUND_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import StandardModal from '../../shared/ui/modals/StandardModal';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import StandardModal from '../../shared/ui/StandardModal';
 import formStyles from '../form/form.styles';
 import {setLoadingStatus} from '../home/home.slice';
-import overlayStyles from '../home/overlays/overlay.styles';
 import useMapLocation from '../maps/useMapLocation';
 import {setTestingMode} from '../project/projects.slice';
 

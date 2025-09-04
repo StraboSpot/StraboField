@@ -3,9 +3,9 @@ import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
-import {setIsWarningMessagesModalVisible} from '../home.slice';
-import overlayStyles from '../overlays/overlay.styles';
+import overlayStyles from './overlay.styles';
+import StatusDialogBox from './StatusDialogBox';
+import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const WarningModal = ({
                         children,

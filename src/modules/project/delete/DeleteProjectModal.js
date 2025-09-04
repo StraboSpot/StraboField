@@ -4,9 +4,9 @@ import {Text, View} from 'react-native';
 import deleteProjectModalStyle from './deleteProjectModalStyle';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
-import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import StatusDialogBox from '../../../shared/ui/modals/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import overlayStyles from '../../home/overlays/overlay.styles';
 
 const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
 
@@ -53,7 +53,8 @@ const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPag
       <View style={overlayStyles.overlayContent}>
         {deleteProjectStatus === DELETE_STATUS.PENDING ? (
           <Text style={overlayStyles.contentText}>
-            Are you sure you want to delete {'\n'} the following locally saved project? {'\n\n' + projectToDeleteFilename}
+            Are you sure you want to delete {'\n'} the following locally saved
+            project? {'\n\n' + projectToDeleteFilename}
             {'\n'}{'\n'}*Uploaded copy on server will remain.
           </Text>
         ) : (

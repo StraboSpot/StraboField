@@ -5,7 +5,7 @@ import {Button} from '@rn-vui/base';
 
 import {FOLD_GEOMETRY_KEYS, FOLD_ICONS} from './';
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles} from '../../form';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {

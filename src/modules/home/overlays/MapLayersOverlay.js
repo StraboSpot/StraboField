@@ -4,13 +4,13 @@ import {FlatList, Text, View} from 'react-native';
 import {Icon, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
 import {BASEMAPS} from '../../maps/maps.constants';

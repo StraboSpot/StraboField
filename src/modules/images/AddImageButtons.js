@@ -10,7 +10,7 @@ import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import ButtonRounded from '../../shared/ui/ButtonRounded';
+import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 

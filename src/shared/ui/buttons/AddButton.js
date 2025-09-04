@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import commonStyles from '../../shared/common.styles';
+import commonStyles from '../../common.styles';
 
 const AddButton = ({
                      onPress,

@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {imageSliderStyles, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {isEmpty} from '../../shared/Helpers';
-import IconButton from '../../shared/ui/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {PAGE_KEYS} from '../page/page.constants';
 import {setSelectedSpot} from '../spots/spots.slice';

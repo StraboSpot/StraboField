@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const UserLocationButton = ({clickHandler}) => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);

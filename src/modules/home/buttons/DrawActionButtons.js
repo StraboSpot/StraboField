@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
 import useDrawActionButtons from './useDrawActionButtons';

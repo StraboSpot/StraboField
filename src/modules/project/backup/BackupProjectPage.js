@@ -4,16 +4,16 @@ import {Platform, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDevice from '../../../services/useDevice';
-import commonStyles from '../../../shared/common.styles';
-import {BLUE} from '../../../shared/styles.constants';
-import uiStyles from '../../../shared/ui/ui.styles';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
-import {setSelectedProject} from '../projects.slice';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
 import UploadProgressModal from './UploadProgressModal';
+import useDevice from '../../../services/useDevice';
+import commonStyles from '../../../shared/common.styles';
+import {BLUE} from '../../../shared/styles.constants';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import uiStyles from '../../../shared/ui/ui.styles';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {setSelectedProject} from '../projects.slice';
 
 const BackupProjectPage = () => {
   console.log('Rendering BackupProjectPage...');

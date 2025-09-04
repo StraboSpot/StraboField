@@ -15,7 +15,7 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
-import PickerOverlay from '../../shared/ui/PickerOverlay';
+import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 
 const SpotFilters = ({

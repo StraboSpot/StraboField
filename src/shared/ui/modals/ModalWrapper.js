@@ -4,8 +4,8 @@ import {Button, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
+import overlayStyles from './overlay.styles';
 import compassStyles from '../../../modules/compass/compass.styles';
-import overlayStyles from '../../../modules/home/overlays/overlay.styles';
 import {MODAL_KEYS, NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';

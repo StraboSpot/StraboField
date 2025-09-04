@@ -7,10 +7,10 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
-import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {setSelectedProject} from '../projects.slice';
 
 const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {

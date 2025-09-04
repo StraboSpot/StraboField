@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
 

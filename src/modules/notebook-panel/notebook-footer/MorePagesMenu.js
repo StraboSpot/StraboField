@@ -8,8 +8,8 @@ import footerStyles from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import usePage from '../../page/usePage';
 import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
 

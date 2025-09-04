@@ -9,10 +9,10 @@ import {getNewId, isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
 import {useTags} from '../tags';
@@ -44,7 +44,7 @@ const TagDetailModal = ({closeModal}) => {
     if (selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS) formName = ['project', 'geologic_unit'];
     initialValues = selectedTag;
   }
-  else console.error('Tag Problem. No modal and no selected tag');
+  else console.error('Tag Problem. No modals and no selected tag');
 
   const confirmDeleteTag = () => {
     alert(

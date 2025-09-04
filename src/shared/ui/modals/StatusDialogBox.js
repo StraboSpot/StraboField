@@ -3,9 +3,9 @@ import {ScrollView, Text, View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
-import {SMALL_SCREEN} from '../styles.constants';
-import {useWindowSize} from './useWindowSize';
+import overlayStyles from './overlay.styles';
+import {SMALL_SCREEN} from '../../styles.constants';
+import {useWindowSize} from '../useWindowSize';
 
 
 const StatusDialogBox = ({

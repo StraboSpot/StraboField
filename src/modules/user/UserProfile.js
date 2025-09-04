@@ -23,10 +23,10 @@ import useUpload from '../../services/useUpload';
 import useUploadImages from '../../services/useUploadImages';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import TextInputModal from '../../shared/ui/TextInputModal';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
-import overlayStyles from '../home/overlays/overlay.styles';
 
 const UserProfile = () => {
   const formRef = useRef(null);

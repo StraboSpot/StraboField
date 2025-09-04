@@ -12,13 +12,13 @@ import {isEmpty} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import Loading from '../../../shared/ui/Loading';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
   addedStatusMessage,
   setIsErrorMessagesModalVisible,
   setIsProjectLoadSelectionModalVisible,
   setStatusMessageModalTitle,
 } from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';

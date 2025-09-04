@@ -3,8 +3,8 @@ import {Text, View} from 'react-native';
 
 import {Button, Input, Overlay} from '@rn-vui/base';
 
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
 import * as themes from '../styles.constants';
+import overlayStyles from './modals/overlay.styles';
 
 const TextInputModal = ({
                           autoCapitalize,

@@ -8,7 +8,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
-import AddButton from '../../shared/ui/AddButton';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';

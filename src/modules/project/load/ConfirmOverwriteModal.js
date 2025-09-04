@@ -4,9 +4,9 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import uiStyles from '../../../shared/ui/ui.styles';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 

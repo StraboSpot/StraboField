@@ -5,7 +5,7 @@ import TablesData from './TablesData';
 import UrlData from './URLData';
 import useExternalData from './useExternalData';
 import {isEmpty} from '../../shared/Helpers';
-import DeleteConformationDialogBox from '../../shared/ui/DeleteConformationDialogBox';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 
 function DataWrapper({
                        editable,

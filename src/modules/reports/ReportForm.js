@@ -4,8 +4,8 @@ import {View} from 'react-native';
 import {Button, Overlay} from '@rn-vui/base';
 import {Formik} from 'formik';
 
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {Form, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {PAGE_KEYS} from '../page/page.constants';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {

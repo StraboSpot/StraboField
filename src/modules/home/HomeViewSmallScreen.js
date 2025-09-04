@@ -9,7 +9,7 @@ import {ActionButtonsSmallScreen, MainMenuButton, ShortcutButtons} from './butto
 import {setModalVisible} from './home.slice';
 import homeStyles from './home.style';
 import * as themes from '../../shared/styles.constants';
-import IconButton from '../../shared/ui/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';

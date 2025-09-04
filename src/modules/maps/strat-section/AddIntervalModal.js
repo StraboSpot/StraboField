@@ -10,7 +10,7 @@ import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
-import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {Form, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
@@ -119,7 +119,7 @@ const AddIntervalModal = () => {
     return true;
   };
 
-  // Extract the data from the Spot object in the format needed for the Add Interval modal
+  // Extract the data from the Spot object in the format needed for the Add Interval modals
   const extractAddIntervalData = (sedData) => {
     const addIntervalSurvey = getSurvey(formName);
     const addIntervalFieldNames = addIntervalSurvey.map(f => f.name);
