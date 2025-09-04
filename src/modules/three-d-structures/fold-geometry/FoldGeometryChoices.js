@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {FOLD_GEOMETRY_KEYS, FOLD_ICONS} from './';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles, useForm} from '../../form';
 
 const FoldGeometryChoices = ({

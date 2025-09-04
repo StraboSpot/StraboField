@@ -3,9 +3,9 @@ import {View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
-import IconButton from '../../shared/ui/IconButton';
-import ModalWrapperHeader from '../../shared/ui/modal/ModalWrapperHeader';
-import overlayStyles from '../home/overlays/overlay.styles';
+import IconButton from '../../shared/ui/buttons/IconButton';
+import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 // Modal to prompt the user to select a geometry if no geometry has been set
 const VertexActionsOverlay = ({

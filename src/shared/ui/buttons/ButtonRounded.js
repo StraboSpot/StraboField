@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import uiStyles from '../ui/ui.styles';
+import uiStyles from '../ui.styles';
 
 const ButtonRounded = ({
                          buttonStyle,

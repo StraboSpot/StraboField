@@ -7,11 +7,11 @@ import {useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ButtonRounded from '../../shared/ui/ButtonRounded';
+import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 

@@ -6,7 +6,7 @@ import {Button} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch} from 'react-redux';
 
-import DateDialogBox from '../../shared/ui/StatusDialogBox';
+import DateDialogBox from '../../shared/ui/modals/StatusDialogBox';
 import {formStyles} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 

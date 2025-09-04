@@ -5,9 +5,9 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID} from '../../shared/Helpers';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
-import SaveButton from '../../shared/ui/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';

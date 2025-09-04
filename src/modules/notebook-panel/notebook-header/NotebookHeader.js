@@ -9,7 +9,7 @@ import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import {PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import useMapLocation from '../../maps/useMapLocation';
 import {PAGE_KEYS} from '../../page/page.constants';

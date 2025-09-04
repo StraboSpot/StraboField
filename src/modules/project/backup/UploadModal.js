@@ -13,11 +13,11 @@ import useUpload from '../../../services/useUpload';
 import useUploadImages from '../../../services/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
-import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {setIsImageTransferring} from '../projects.slice';
 
 const UploadModal = ({closeModal}) => {

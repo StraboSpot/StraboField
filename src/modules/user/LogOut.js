@@ -8,9 +8,9 @@ import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import uiStyles from '../../shared/ui/ui.styles';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
 
@@ -24,20 +24,21 @@ const LogOut = () => {
 
   const goToBackupPage = () => {
     setIsLogoutModalVisible(false);
-    setTimeout(() => {          // Added timeOut cause state of modal wasn't changing fast enough
+    setTimeout(() => {          // Added timeOut cause state of modals wasn't changing fast enough
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
     }, 200);
   };
 
   const renderLogInOrOutButton = () => {
     return (
-      <View>
+      <View style={{paddingHorizontal: 10}}>
         <Button
           buttonStyle={commonStyles.standardButton}
           containerStyle={commonStyles.standardButtonContainer}
           onPress={() => isEmpty(userData.name) ? dispatch(logout()) : setIsLogoutModalVisible(true)}
-          title={isEmpty(userData.name) ? 'Log In' : 'Log out'}
+          title={isEmpty(userData.name) ? 'Log In' : 'Log Out'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         {isEmpty(userData.name) && (
           <Button

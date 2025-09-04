@@ -8,8 +8,8 @@ import footerStyles from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import usePage from '../../page/usePage';
 import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
 
@@ -76,19 +76,13 @@ const MorePagesMenu = ({
           {generalPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
           {!isEmpty(petPagesToShow) && (
             <>
-              <SectionDivider
-                dividerText={'Rocks & Minerals'}
-                style={footerStyles.morePagesSectionDivider}
-              />
+              <SectionDivider dividerText={'Rocks & Minerals'}/>
               {petPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
             </>
           )}
           {!isEmpty(sedPagesToShow) && (
             <>
-              <SectionDivider
-                dividerText={'Sedimentology'}
-                style={footerStyles.morePagesSectionDivider}
-              />
+              <SectionDivider dividerText={'Sedimentology'}/>
               {sedPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
             </>
           )}

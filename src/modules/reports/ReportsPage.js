@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {ReportsList} from '.';
 import commonStyles from '../../shared/common.styles';
-import AddButton from '../../shared/ui/AddButton';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
@@ -35,7 +35,7 @@ const ReportsPage = ({}) => {
         title={'Create New Report with this Spot'}
         type={'outline'}
       />
-      <Text style={[commonStyles.listItemTitle,commonStyles.textBold, {paddingLeft: 10}]}>
+      <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
         Reports referencing this Spot:
       </Text>
       <ReportsList reportsSubset={reportsUsingThisSpot}/>

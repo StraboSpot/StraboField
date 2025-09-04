@@ -10,7 +10,7 @@ import {PAGE_KEYS} from './page.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, useForm} from '../form';
 import NoteForm from '../notes/NoteForm';
 import usePetrology from '../petrology/usePetrology';
@@ -261,7 +261,7 @@ const BasicPageDetail = ({
 
   const updateIGSNAndShowModal = async (formCurrent) => {
     setIsIGSNModalVisible(true);
-    console.log('setting form values for IGSN modal');
+    console.log('setting form values for IGSN modals');
     await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
     console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
   };

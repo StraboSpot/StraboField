@@ -4,16 +4,16 @@ import {Platform, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDevice from '../../../services/useDevice';
-import commonStyles from '../../../shared/common.styles';
-import {BLUE} from '../../../shared/styles.constants';
-import uiStyles from '../../../shared/ui/ui.styles';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
-import {setSelectedProject} from '../projects.slice';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
 import UploadProgressModal from './UploadProgressModal';
+import useDevice from '../../../services/useDevice';
+import commonStyles from '../../../shared/common.styles';
+import {BLUE} from '../../../shared/styles.constants';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import uiStyles from '../../../shared/ui/ui.styles';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {setSelectedProject} from '../projects.slice';
 
 const BackupProjectPage = () => {
   console.log('Rendering BackupProjectPage...');
@@ -48,7 +48,7 @@ const BackupProjectPage = () => {
 
   const renderUploadAndBackupButtons = () => {
     return (
-      <View>
+      <View style={{paddingHorizontal: 10}}>
         {user.encoded_login && isOnline.isConnected ? (
           <Button
             buttonStyle={commonStyles.standardButton}
@@ -59,6 +59,7 @@ const BackupProjectPage = () => {
             }}
             title={'Upload'}
             titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
           />
         ) : (
           <View style={uiStyles.spacer}>
@@ -71,6 +72,7 @@ const BackupProjectPage = () => {
           onPress={saveProject}
           title={'Save'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
         <Button
           buttonStyle={commonStyles.standardButton}
@@ -78,6 +80,7 @@ const BackupProjectPage = () => {
           onPress={exportProject}
           title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
           titleStyle={commonStyles.standardButtonText}
+          type={'outline'}
         />
       </View>
     );

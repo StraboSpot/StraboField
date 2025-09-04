@@ -5,7 +5,7 @@ import {Button, Overlay} from '@rn-vui/base';
 
 import {messages} from './Messages';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import overlayStyles from '../../home/overlays/overlay.styles';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 
 const DeleteOverlay = ({closeModal, deleteSample, isVisible}) => {
 
@@ -13,7 +13,10 @@ const DeleteOverlay = ({closeModal, deleteSample, isVisible}) => {
     <Overlay
       isVisible={isVisible}
       onBackdropPress={closeModal}
-      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {...overlayStyles.overlayContainer, height: '30%'}}
+      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {
+        ...overlayStyles.overlayContainer,
+        height: '30%',
+      }}
       supportedOrientations={['portrait', 'landscape']}
     >
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'yellow'}}>

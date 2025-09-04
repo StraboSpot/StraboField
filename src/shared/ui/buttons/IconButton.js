@@ -3,7 +3,7 @@ import {Pressable} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import uiStyles from '../ui/ui.styles';
+import uiStyles from '../ui.styles';
 
 const IconButton = ({
                       containerStyle,

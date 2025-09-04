@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
+import overlayStyles from './overlay.styles';
 
 const StandardModal = ({
                          children,

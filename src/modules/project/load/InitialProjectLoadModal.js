@@ -16,7 +16,7 @@ import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
 import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
-import ModalWrapper from '../../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const InitialProjectLoadModal = ({openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');

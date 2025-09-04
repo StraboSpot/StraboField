@@ -1,16 +1,15 @@
 import React, {useState} from 'react';
-import {SectionList, View} from 'react-native';
+import {SectionList, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 
 import {ImagesList, imageStyles} from '.';
+import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 import {useSpots} from '../spots';
@@ -51,13 +50,11 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const renderSectionHeader = ({spot}) => {
     return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDividerWithRightButton
-          buttonTitle={'View In Spot'}
-          dividerText={spot.properties.name}
-          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
-        />
-      </View>
+      <SectionDividerWithRightButton
+        buttonTitle={'View In Spot'}
+        dividerText={spot.properties.name}
+        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
+      />
     );
   };
 
@@ -88,7 +85,10 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={imageStyles.galleryImageContainer}>
-          <SectionDivider dividerText={count + (count === 1 ? ' Image' : ' Images') + ' in active Spots'}/>
+          <LittleSpacer/>
+          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
+            Found {count + (count === 1 ? ' image' : ' images')} in active Spots
+          </Text>
           <LittleSpacer/>
           <SectionList
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}

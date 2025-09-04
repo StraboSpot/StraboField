@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SectionList, View} from 'react-native';
+import {SectionList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
@@ -7,9 +7,8 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDivider from '../../shared/ui/SectionDivider';
+import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {PAGE_KEYS} from '../page/page.constants';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
@@ -65,7 +64,10 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={{flex: 1}}>
-          <SectionDivider dividerText={count + (count === 1 ? ' Sample' : ' Samples') + ' in active Spots'}/>
+          <LittleSpacer/>
+          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
+            Found {count + (count === 1 ? ' sample' : ' samples')} in active Spots
+          </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
@@ -82,13 +84,11 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const renderSectionHeader = ({title, spot}) => {
     return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDividerWithRightButton
-          buttonTitle={'View In Spot'}
-          dividerText={title}
-          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
-        />
-      </View>
+      <SectionDividerWithRightButton
+        buttonTitle={'View In Spot'}
+        dividerText={title}
+        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
+      />
     );
   };
 

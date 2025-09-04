@@ -4,16 +4,16 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import overlayStyles from './overlay.styles';
+import StatusDialogBox from './StatusDialogBox';
+import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../../../modules/home/home.slice';
+import {MAIN_MENU_ITEMS} from '../../../modules/main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage} from '../../../modules/main-menu-panel/mainMenuPanel.slice';
+import {setSelectedProject} from '../../../modules/project/projects.slice';
 import useDownload from '../../../services/useDownload';
 import useImport from '../../../services/useImport';
-import {isEmpty} from '../../../shared/Helpers';
-import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage} from '../../main-menu-panel/mainMenuPanel.slice';
-import {setSelectedProject} from '../../project/projects.slice';
-import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../home.slice';
-import overlayStyles from '../overlays/overlay.styles';
+import {isEmpty} from '../../Helpers';
 
 const StatusModal = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();

@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import MorePagesMenu from './MorePagesMenu';
 import footerStyle from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 

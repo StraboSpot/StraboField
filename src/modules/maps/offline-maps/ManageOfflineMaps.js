@@ -14,10 +14,10 @@ import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
+import {WarningModal} from '../../../shared/ui/modals';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
-import {WarningModal} from '../../home/modals';
 import useMap from '../useMap';
 
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {

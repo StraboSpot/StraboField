@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
-import styles from '../../shared/ui/ui.styles';
+import styles from '../ui.styles';
 
 const SaveAndCancelButtons = ({cancel, save, getIsDisabled}) => {
   return (

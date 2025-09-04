@@ -9,16 +9,16 @@ import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {BLUE, DARKGREY, MEDIUMGREY, PRIMARY_BACKGROUND_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SliderBar from '../../../shared/ui/SliderBar';
 import {formStyles} from '../../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
@@ -262,11 +262,11 @@ const CustomMapDetails = () => {
       <>
         <SectionDivider dividerText={'Custom Map Title'}/>
         <Input
-          containerStyle={{paddingHorizontal: 0}}
+          containerStyle={{paddingHorizontal: 10}}
           errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
           errorStyle={customMapStyles.requiredMessage}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+          inputContainerStyle={{borderBottomWidth: 0, backgroundColor: PRIMARY_BACKGROUND_COLOR}}
+          inputStyle={formStyles.fieldValue}
           onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
           value={editableCustomMapData?.title || ''}
         />
@@ -335,28 +335,32 @@ const CustomMapDetails = () => {
         {renderTitle()}
         {renderOverlaySection()}
         {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {isEmpty(
-          customMapToEdit) && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
-          || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        {isEmpty(customMapToEdit)
+          && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+            || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
           <Button
+            buttonStyle={commonStyles.standardButton}
             containerStyle={commonStyles.standardButtonContainer}
             disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
                 editableCustomMapData.id)
               || editableCustomMapData.source === 'map_warper')}
             onPress={() => saveMap()}
             title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-            type={'clear'}
+            type={'outline'}
           />
           <Button
+            buttonStyle={commonStyles.standardButton}
             containerStyle={commonStyles.standardButtonContainer}
             onPress={() => confirmDeleteMap()}
             title={'Delete Map'}
             titleStyle={{color: WARNING_COLOR}}
-            type={'clear'}
+            type={'outline'}
           />
         </View>
       </View>
+
+      {/* Modal */}
       <Overlay
         isVisible={isLoadingModalVisible}
         overlayStyle={[overlayStyles.overlayContainer, customMapStyles.loadingMapModalContainer]}

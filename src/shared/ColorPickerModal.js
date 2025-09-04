@@ -4,8 +4,8 @@ import {Pressable, Text, View} from 'react-native';
 import {Button, Icon, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import overlayStyles from './ui/modals/overlay.styles';
 import Spacer from './ui/Spacer';
-import overlayStyles from '../modules/home/overlays/overlay.styles';
 import {useTags} from '../modules/tags';
 
 const ColorPickerModal = ({

@@ -12,9 +12,9 @@ import useDownload from '../../services/useDownload';
 import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
@@ -97,16 +97,20 @@ const UserProfile = () => {
     return (
       <>
         <SectionDivider dividerText={'Convert Measurements'}/>
-        <Button
-          onPress={convertStrikeDipDirection}
-          title={'Convert Strike <-> Dip Direction'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'clear'}
-        />
-        <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
-          *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
-          updated.
-        </Text>
+        <View style={{paddingHorizontal: 10}}>
+          <Button
+            buttonStyle={commonStyles.standardButton}
+            containerStyle={commonStyles.standardButtonContainer}
+            onPress={convertStrikeDipDirection}
+            title={'Convert Strike <-> Dip Direction'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'outline'}
+          />
+          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
+            updated.
+          </Text>
+        </View>
       </>
     );
   };
@@ -144,22 +148,23 @@ const UserProfile = () => {
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
-                validate={values =>     validateForm({formName: formName, values: values})}
+                validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={true}
               />
               {renderBulkUpdatesSection()}
               {isOnline.isInternetReachable ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
-                    <View style={commonStyles.buttonContainer}>
-                      <Button
-                        loading={isDownloading}
-                        loadingProps={userStyles.loadingSpinnerProps}
-                        onPress={onDownloadUserProfile}
-                        title={'Download User Conventions'}
-                        type={'clear'}
-                      />
-                    </View>
+                    <Button
+                      buttonStyle={commonStyles.standardButton}
+                      containerStyle={commonStyles.standardButtonContainer}
+                      loading={isDownloading}
+                      loadingProps={userStyles.loadingSpinnerProps}
+                      onPress={onDownloadUserProfile}
+                      title={'Download User Conventions'}
+                      titleStyle={commonStyles.standardButtonText}
+                      type={'outline'}
+                    />
                   )}
                 </View>
               ) : (

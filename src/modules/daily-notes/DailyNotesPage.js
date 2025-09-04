@@ -6,6 +6,7 @@ import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -48,6 +49,7 @@ const DailyNotesPage = () => {
         onPress={addDailyNote}
       />
       <FlatList
+        ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={
           <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
         }

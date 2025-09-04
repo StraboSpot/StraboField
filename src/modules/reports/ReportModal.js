@@ -6,11 +6,11 @@ import {Icon} from '@rn-vui/base';
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
-import SaveButton from '../../shared/ui/SaveButton';
-import {WarningModal} from '../home/modals';
-import overlayStyles from '../home/overlays/overlay.styles';
+import {WarningModal} from '../../shared/ui/modals';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 

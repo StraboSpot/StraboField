@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);

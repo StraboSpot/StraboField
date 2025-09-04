@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import useImport from '../../../services/useImport';
 import {isEmpty} from '../../../shared/Helpers';
-import ProgressModal from '../../../shared/ui/modal/ProgressModal';
+import ProgressModal from '../../../shared/ui/modals/ProgressModal';
 import LottieAnimation from '../../../utils/animations/LottieAnimations';
 import {setIsProgressModalVisible} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';

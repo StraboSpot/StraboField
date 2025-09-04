@@ -4,7 +4,7 @@ import {Animated} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {MainMenuButton, MapActionButtons, UserLocationButton} from './index';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import homeStyles from '../home.style';
 
 const LeftSideButtons = ({

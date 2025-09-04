@@ -8,7 +8,7 @@ import JSONTree from 'react-native-json-tree';
 import forms from '../../assets/forms';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const SpotDataModelModal = ({close}) => {
 

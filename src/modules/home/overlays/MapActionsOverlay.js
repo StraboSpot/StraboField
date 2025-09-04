@@ -4,9 +4,9 @@ import {FlatList, Platform, Text, View} from 'react-native';
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 
 const MapActionsOverlay = ({
                              onPress,

@@ -3,8 +3,8 @@ import {Text, View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
-import IconButton from '../../shared/ui/IconButton';
-import overlayStyles from '../home/overlays/overlay.styles';
+import IconButton from '../../shared/ui/buttons/IconButton';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 // Modal to prompt the user to select a geometry if no geometry has been set
 const SetInCurrentViewOverlay = ({

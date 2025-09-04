@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import commonStyles from '../../shared/common.styles';
+import commonStyles from '../../common.styles';
 
 const AddButton = ({
                      onPress,
@@ -16,7 +16,7 @@ const AddButton = ({
       icon={{
         name: 'add',
         type: 'ionicon',
-        size: 35,
+        size: 25,
         color: commonStyles.iconColor.color,
       }}
       onPress={onPress}

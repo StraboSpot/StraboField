@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 
 import {imageStyles} from '.';
 import {SwitchWrapper} from '../../shared/ui';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToView}) => {

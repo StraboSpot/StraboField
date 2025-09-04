@@ -8,7 +8,7 @@ import {useToast} from 'react-native-toast-notifications';
 import useDevice from '../../services/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR, WHITE} from '../../shared/styles.constants';
-import overlayStyles from '../home/overlays/overlay.styles';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   const {exportMicroProjectPDF} = useDevice();

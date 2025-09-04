@@ -7,9 +7,9 @@ import DatasetList from './DatasetList';
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
+import {WarningModal} from '../../../shared/ui/modals';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
-import {WarningModal} from '../../home/modals';
 import {setActiveDatasets, setTargetDataset} from '../projects.slice';
 import useProject from '../useProject';
 
@@ -86,7 +86,8 @@ const DatasetsPage = ({setDatasetToView}) => {
         />
         <DatasetList setDatasetToView={setDatasetToView}/>
         <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
-          <Text style={commonStyles.standardDescriptionText}>*Starred dataset will be set as the target dataset for new Spots.</Text>
+          <Text style={commonStyles.standardDescriptionText}>*Starred dataset will be set as the target dataset for new
+            Spots.</Text>
         </View>
       </View>
 

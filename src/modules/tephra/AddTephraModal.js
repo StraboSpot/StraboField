@@ -13,7 +13,7 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
-import ModalWrapper from '../../shared/ui/modal/ModalWrapper';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';

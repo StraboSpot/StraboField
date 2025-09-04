@@ -25,7 +25,7 @@ const MacrostratOverlay = ({
 
   useEffect(() => {
     return () => {
-      console.log('Closing Macrostrat modal and setting to {}');
+      console.log('Closing Macrostrat modals and setting to {}');
       setDataObject({});
     };
   }, []);

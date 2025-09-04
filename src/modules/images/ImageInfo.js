@@ -6,10 +6,10 @@ import {Image} from '@rn-vui/base';
 import {ImagePropertiesModal, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
-import IconButton from '../../shared/ui/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
+import {WarningModal} from '../../shared/ui/modals';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {WarningModal} from '../home/modals';
-import overlayStyles from '../home/overlays/overlay.styles';
 import SketchModal from '../sketch/SketchModal';
 
 const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageToView, setIsImageModalVisible}) => {

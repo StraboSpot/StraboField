@@ -77,7 +77,7 @@ const ExternalData = () => {
                 value={protocol || ''}
               />
             </View>
-            <View>
+            <View style={{flex: 1}}>
               <TextInput
                 autoCapitalize={'none'}
                 keyboardType={'url'}

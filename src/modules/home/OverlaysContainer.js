@@ -4,9 +4,10 @@ import {Platform} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import Dialog from './Dialog';
-import {ErrorModal, InitialProjectLoadModal, StatusModal, WarningModal} from './modals';
 import LoadingSpinner from '../../shared/ui/Loading';
+import {ErrorModal, StatusModal, WarningModal} from '../../shared/ui/modals';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
+import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
 
 const OverlaysContainer = forwardRef(({
                                         openSpotInNotebook,

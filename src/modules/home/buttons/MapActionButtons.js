@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
 import useMap from '../../maps/useMap';
 import useMapFeatures from '../../maps/useMapFeatures';

@@ -8,13 +8,15 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {PRIMARY_BACKGROUND_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import StandardModal from '../../shared/ui/modals/StandardModal';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import StandardModal from '../../shared/ui/StandardModal';
+import formStyles from '../form/form.styles';
 import {setLoadingStatus} from '../home/home.slice';
-import overlayStyles from '../home/overlays/overlay.styles';
 import useMapLocation from '../maps/useMapLocation';
 import {setTestingMode} from '../project/projects.slice';
 
@@ -80,9 +82,10 @@ const Miscellaneous = () => {
         <Input
           containerStyle={{paddingTop: 10}}
           defaultValue={numRandomSpots}
-          inputContainerStyle={{padding: 0}}
+          inputContainerStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, padding: 0}}
+          inputStyle={formStyles.fieldValue}
           label={'Number of Spots'}
-          labelStyle={{color: themes.PRIMARY_TEXT_COLOR}}
+          labelStyle={{color: PRIMARY_TEXT_COLOR}}
           onChangeText={value => setNumRandomSpots(value || 100)}
           placeholder={JSON.stringify(numRandomSpots)}
           placeholderTextColor={themes.MEDIUMGREY}

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   fieldValue: {
     backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderBottomColor: themes.MEDIUMGREY,
-    borderBottomWidth: 0.75,
+    borderBottomWidth: 0.5,
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
     padding: 5,

@@ -6,7 +6,7 @@ import ProgressBar from 'react-native-progress/Bar';
 
 import {toNumberFixedValue} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import overlayStyles from '../home/overlays/overlay.styles';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import offlineMapsStyles from '../maps/offline-maps/offlineMaps.styles';
 
 

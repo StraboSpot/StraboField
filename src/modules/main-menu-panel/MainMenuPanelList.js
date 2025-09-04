@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {MAIN_MENU_DATA, MAIN_MENU_DATA_NO_PROJECT, MAIN_MENU_DATA_WEB} from './mainMenu.constants';
 import {setSectionsCollapsed} from './mainMenuPanel.slice';
 import MainMenuPanelListItem from './MainMenuPanelListItem';
-import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {MEDIUMGREY} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
@@ -32,10 +32,10 @@ const MainMenuPanelList = () => {
   const renderMenuSectionHeader = ({section: {title}}) => {
     return (
       <ListItem.Accordion
-        containerStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, padding: 0, paddingRight: 10}}
+        containerStyle={{padding: 0, paddingRight: 10, borderBottomWidth: 1, borderColor: MEDIUMGREY}}
         content={
           <ListItem.Content>
-            <SectionDivider dividerText={title.split('_').join(' ')}/>
+            <SectionDivider dividerText={title.split('_').join(' ')} style={{borderBottomWidth: 0}}/>
           </ListItem.Content>
         }
         isExpanded={!sectionsCollapsed.includes(title)}

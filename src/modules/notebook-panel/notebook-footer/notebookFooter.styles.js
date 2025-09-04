@@ -41,9 +41,6 @@ const notebookFooterStyles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 5,
   },
-  morePagesSectionDivider: {
-    borderBottomWidth: 1,
-  },
 });
 
 export default notebookFooterStyles;

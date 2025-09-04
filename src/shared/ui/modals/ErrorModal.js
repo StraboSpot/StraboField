@@ -3,9 +3,9 @@ import {Platform, Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import StatusDialogBox from '../../../shared/ui/StatusDialogBox';
-import {setIsErrorMessagesModalVisible} from '../home.slice';
-import overlayStyles from '../overlays/overlay.styles';
+import overlayStyles from './overlay.styles';
+import StatusDialogBox from './StatusDialogBox';
+import {setIsErrorMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const ErrorModal = ({closeModal, children, isVisible}) => {
   const dispatch = useDispatch();

@@ -11,8 +11,8 @@ import SesarLogo from '../../assets/images/logos/sesar2_logo.png';
 import {isEmpty, truncateText} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {updatedKey} from '../user/userProfile.slice';
 
 const IGNSModal = forwardRef(({
