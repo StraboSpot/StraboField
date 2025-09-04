@@ -9,7 +9,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {MEDIUMGREY, POSITIVE_COLOR, RED, WARNING_COLOR} from '../../../shared/styles.constants';
-import DeleteConformationDialogBox from '../../../shared/ui/DeleteConformationDialogBox';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
@@ -62,25 +61,25 @@ const DatasetDetail = ({dataset}) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
-  const renderDeleteConfirmationModal = () => {
-    return (
-      <DeleteConformationDialogBox
-        cancel={() => setIsDeleteConfirmModalVisible(false)}
-        deleteOverlay={initializeDeleteDataset}
-        isVisible={isDeleteConfirmModalVisible}
-        title={'Confirm Delete!'}
-      >
-        <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
-          {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
-        </Text>
-        <Text style={overlayStyles.statusMessageText}>
-          This will
-          <Text style={overlayStyles.importantText}> ERASE </Text>
-          everything in this dataset including Spots, images, and all other data!
-        </Text>
-      </DeleteConformationDialogBox>
-    );
-  };
+  // const renderDeleteConfirmationModal = () => {
+  //   return (
+  //     <DeleteConformationDialogBox
+  //       cancel={() => setIsDeleteConfirmModalVisible(false)}
+  //       deleteOverlay={initializeDeleteDataset}
+  //       isVisible={isDeleteConfirmModalVisible}
+  //       title={'Confirm Delete!'}
+  //     >
+  //       <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
+  //         {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
+  //       </Text>
+  //       <Text style={overlayStyles.statusMessageText}>
+  //         This will
+  //         <Text style={overlayStyles.importantText}> ERASE </Text>
+  //         everything in this dataset including Spots, images, and all other data!
+  //       </Text>
+  //     </DeleteConformationDialogBox>
+  //   );
+  // };
 
   // Delete Dataset Button
   const renderDeleteDatasetButton = () => {
@@ -294,7 +293,7 @@ const DatasetDetail = ({dataset}) => {
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 
       {/* Child Modal */}
-      {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
+      {/*{isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}*/}
     </>
   );
 };
