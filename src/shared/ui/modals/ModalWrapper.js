@@ -11,7 +11,7 @@ import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
-import {useWindowSize} from '../useWindowSize';
+import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 const ModalWrapper = ({
                         buttonTitleLeft,
@@ -19,13 +19,18 @@ const ModalWrapper = ({
                         cancel,
                         children,
                         closeModal,
+                        disabled,
                         isFullScreen,
+                        isVisible,
+                        onCancelPress,
                         onPress,
+                        onSavePress,
                         overlayStyleOverride,
-                        title,
+                        headerTitle,
+                        actionTitle,
+                        shouldShowButtons,
+                        showCloseButton,
                       }) => {
-
-  const {height, width} = useWindowSize();
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
@@ -36,9 +41,6 @@ const ModalWrapper = ({
     return {
       ...overlayStyles.overlayContainer,
       ...overlayStyleOverride,
-      // flex: 1,
-      // maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
-      width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
     };
   };
 
@@ -80,12 +82,12 @@ const ModalWrapper = ({
 
   return (
     <Overlay
-      animationType={'slide'}
+      animationType={'fade'}
       backdropStyle={overlayStyles.backdropStyles}
       fullScreen={SMALL_SCREEN}
       isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
         || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
-        || SMALL_SCREEN || isFullScreen}
+        || SMALL_SCREEN || isFullScreen || isVisible}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
@@ -94,10 +96,19 @@ const ModalWrapper = ({
         buttonTitleRight={buttonTitleRight}
         cancel={cancel}
         closeModal={closeModal}
-        title={title}
+        headerTitle={headerTitle}
+        showCloseButton={showCloseButton}
       />
       {children}
       {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+      {shouldShowButtons && (
+        <ModalSaveAndCancelButtons
+          actionTitle={actionTitle}
+          disabled={disabled}
+          onCancelPress={onCancelPress}
+          onSavePress={onSavePress}
+        />
+      )}
     </Overlay>
   );
 };
