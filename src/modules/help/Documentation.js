@@ -4,7 +4,7 @@ import {FlatList, Platform, View} from 'react-native';
 import {Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 
-import styles from './documentation.styles';
+import documentationStyles from './documentation.styles';
 import DocumentationModalHeader from './DocumentationModalHeader';
 import SpotDataModelModal from './SpotDataModelModal';
 import UrlLinkButton from './UrlLinkButton';
@@ -102,7 +102,7 @@ const Documentation = () => {
     <Overlay
       fullScreen
       isVisible={visible}
-      overlayStyle={styles.overlayContainer}
+      overlayStyle={documentationStyles.overlayContainer}
       supportedOrientations={['portrait', 'landscape']}
     >
       <DocumentationModalHeader
@@ -126,7 +126,7 @@ const Documentation = () => {
           onPressLink={openLink}
           ref={ref}
           source={doc.file}
-          style={styles.pdf}
+          style={documentationStyles.pdf}
         />
       )}
     </Overlay>
@@ -134,7 +134,7 @@ const Documentation = () => {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={documentationStyles.container}>
         <UrlLinkButton
           icon={'globe-outline'}
           title={'Online Help Page'}
