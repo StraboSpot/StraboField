@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {MEDIUMGREY, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   buttons: {
@@ -11,6 +11,8 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    borderRightColor: MEDIUMGREY,
+    borderRightWidth: 2,
     flex: 1,
   },
   documentListItem: {
