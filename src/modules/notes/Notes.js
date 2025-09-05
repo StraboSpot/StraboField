@@ -15,6 +15,7 @@ import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
@@ -69,6 +70,7 @@ const Notes = ({zoomToCurrentLocation}) => {
   const renderCancelSaveButtons = () => {
     return (
       <View>
+        <NotebookPageHeader hideBackButton pageTitle={'Notes'}/>
         <SaveAndCancelButtons
           cancel={() => cancelFormAndGo()}
           save={() => saveFormAndGo()}

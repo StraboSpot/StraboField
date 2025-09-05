@@ -10,12 +10,11 @@ import commonStyles from '../../shared/common.styles';
 import {getNewCopyId, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {SelectInputField} from '../form';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -114,19 +113,13 @@ const MineralsPage = ({page}) => {
     if (!Array.isArray(mineralData)) mineralData = [];
     const mineralDataSorted = mineralData.slice().sort((a, b) => getMineralTitle(a).localeCompare(getMineralTitle(b)));
     return (
-      <>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addMineral}
-        />
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
-          data={mineralDataSorted}
-          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-          renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
-        />
-      </>
+      <FlatList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
+        data={mineralDataSorted}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
+      />
     );
   };
 
@@ -144,7 +137,7 @@ const MineralsPage = ({page}) => {
   const renderMineralsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton/>
         {renderCopyDataSelectBox()}
         {renderMineralsList()}
       </View>

@@ -18,6 +18,7 @@ import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -122,14 +123,17 @@ const Overview = ({openMainMenuPanel}) => {
 
   const renderSections = () => {
     return (
-      <SectionList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({item}) => item}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        sections={sections}
-        stickySectionHeadersEnabled={true}
-      />
+      <View>
+        <NotebookPageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <SectionList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({item}) => item}
+          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+          sections={sections}
+          stickySectionHeadersEnabled={true}
+        />
+      </View>
     );
   };
 

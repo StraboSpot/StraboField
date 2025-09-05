@@ -6,11 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -68,8 +67,7 @@ const IntervalPage = ({page}) => {
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>
-      <ReturnToOverviewButton/>
-      <SectionDivider dividerText={page.label}/>
+      <NotebookPageHeader pageTitle={page.label}/>
       <SaveAndCancelButtons
         cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
         save={() => saveInterval(intervalRef.current)}

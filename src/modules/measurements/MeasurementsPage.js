@@ -13,11 +13,11 @@ import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({page}) => {
@@ -259,7 +259,7 @@ const MeasurementsPage = ({page}) => {
   const renderMeasurementsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookContentTopSection returnToOverviewAction={() => setModalVisible({modal: null})}/>
+        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>

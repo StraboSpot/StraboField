@@ -7,10 +7,9 @@ import {useSelector} from 'react-redux';
 import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import {ImageCard, useImages, useImageThumbnails} from '../images';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {
@@ -190,8 +189,7 @@ const Nesting = () => {
 
   return (
     <View style={{flex: 1}}>
-      <ReturnToOverviewButton/>
-      <SectionDivider dividerText={'Nesting'}/>
+      <NotebookPageHeader pageTitle={'Nesting'}/>
       <FlatList
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}

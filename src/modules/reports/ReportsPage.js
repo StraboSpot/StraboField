@@ -7,8 +7,8 @@ import {ReportsList} from '.';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 
 const ReportsPage = ({}) => {
   console.log('Rendering ReportsPage...');
@@ -29,7 +29,7 @@ const ReportsPage = ({}) => {
 
   return (
     <View style={{flex: 1}}>
-      <ReturnToOverviewButton/>
+      <NotebookPageHeader pageTitle={'Reports'}/>
       <AddButton
         onPress={addReport}
         title={'Create New Report with this Spot'}

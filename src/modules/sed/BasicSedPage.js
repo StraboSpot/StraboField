@@ -9,13 +9,12 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import TruncatedText from '../../shared/ui/TruncatedText';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -98,11 +97,7 @@ const BasicSedPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addAttribute}
-        />
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}

@@ -14,10 +14,10 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -117,8 +117,8 @@ const BeddingPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
-        <SectionDivider dividerText={page.label}/>
+        <NotebookPageHeader pageTitle={page.label}/>
+        <SectionDivider dividerText={'Shared Bedding'}/>
         {renderBeddingShared()}
         <SectionDividerWithRightButton
           dividerText={'Beds'}

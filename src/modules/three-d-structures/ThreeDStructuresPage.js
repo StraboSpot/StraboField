@@ -7,10 +7,10 @@ import ThreeDStructureItem from './ThreeDStructureItem';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
@@ -71,8 +71,8 @@ const ThreeDStructuresPage = ({page}) => {
   };
 
   const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(SECTIONS).reduce((acc, {title, key}) => sectionTitle === title ? key : acc,
-      '');
+    const sectionKey = Object.values(SECTIONS).reduce(
+      (acc, {title, key}) => sectionTitle === title ? key : acc, '');
     return (
       <SectionDividerWithRightButton
         disabled={isMultipleFeaturesTaggingEnabled}
@@ -108,7 +108,7 @@ const ThreeDStructuresPage = ({page}) => {
     <>
       {!isDetailView && (
         <View>
-          <NotebookContentTopSection/>
+          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
           {renderSections()}
         </View>
       )}

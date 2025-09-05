@@ -15,10 +15,10 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {SelectInputField, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -257,7 +257,7 @@ const RockPage = ({page}) => {
   const renderRockMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         {renderCopySelect()}
         {renderSections()}
       </View>

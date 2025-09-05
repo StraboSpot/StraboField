@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {AddImageButtons, ImagesInSpot} from '.';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
@@ -25,7 +25,7 @@ const ImagesPage = () => {
 
   return (
     <View style={{flex: 1}}>
-      <ReturnToOverviewButton/>
+      <NotebookPageHeader pageTitle={'Images'}/>
       <View style={{alignItems: 'center', flex: 1}}>
         <AddImageButtons saveImages={saveImagesToSpot}/>
         <ImagesInSpot saveImages={saveImagesToSpot}/>
