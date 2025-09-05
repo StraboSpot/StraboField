@@ -10,9 +10,11 @@ import UploadProgressModal from './UploadProgressModal';
 import useDevice from '../../../services/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {BLUE} from '../../../shared/styles.constants';
+import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
 import {setSelectedProject} from '../projects.slice';
 
 const BackupProjectPage = () => {
@@ -46,43 +48,28 @@ const BackupProjectPage = () => {
     }
   };
 
+  const onUpload = () => {
+    dispatch(setSelectedProject({source: '', project: ''}));
+    setIsUploadModalVisible(true);
+  };
+
   const renderUploadAndBackupButtons = () => {
     return (
-      <View style={{paddingHorizontal: 10}}>
-        {user.encoded_login && isOnline.isConnected ? (
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            onPress={() => {
-              dispatch(setSelectedProject({source: '', project: ''}));
-              setIsUploadModalVisible(true);
-            }}
-            title={'Upload'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
-          />
-        ) : (
-          <View style={uiStyles.spacer}>
-            <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
-          </View>
-        )}
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
-          onPress={saveProject}
-          title={'Save'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
-        />
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
+      <>
+        {user.encoded_login && isOnline.isConnected ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+          : (
+            <View style={uiStyles.spacer}>
+              <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
+            </View>
+          )}
+        <FlatListItemSeparator/>
+        <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
+        <FlatListItemSeparator/>
+        <MainMenuPanelListItem
           onPress={exportProject}
           title={Platform.OS === 'ios' ? 'Save & Zip' : 'Save & Export to Zip'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
-      </View>
+      </>
     );
   };
 

@@ -11,7 +11,7 @@ import {isEmpty, truncateText} from '../../shared/Helpers';
 import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import useProject from '../project/useProject';
 
-const MainMenuPanelListItem = ({title}) => {
+const MainMenuPanelListItem = ({onPress, title}) => {
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
 
@@ -32,8 +32,9 @@ const MainMenuPanelListItem = ({title}) => {
   };
 
   return (
-    <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
+    <ListItem containerStyle={commonStyles.listItem} onPress={onPress || handleMenuItemPress}>
       <ListItem.Content>{getTitle()}</ListItem.Content>
+      <ListItem.Chevron/>
     </ListItem>
   );
 };

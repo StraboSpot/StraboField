@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-import {LARGE_TEXT_SIZE} from '../../shared/styles.constants';
+import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE} from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   bold: {
@@ -9,30 +9,20 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
-    marginTop: 15,
-  },
-  content: {
-    padding: 16,
-  },
-  descriptionContainer: {
-    // backgroundColor: '#fff',
-    // flex: 1,
+    paddingHorizontal: 10,
   },
   heading: {
-    // color: '#2b2b2b',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: LARGE_TEXT_SIZE,
     marginBottom: 8,
   },
   paragraph: {
-    // color: '#444',
-    fontSize: 15,
+    fontSize: MEDIUM_TEXT_SIZE,
     lineHeight: 22,
     marginBottom: 24,
   },
   versionText: {
     fontSize: LARGE_TEXT_SIZE,
+    paddingBottom: 20,
   },
 });
 

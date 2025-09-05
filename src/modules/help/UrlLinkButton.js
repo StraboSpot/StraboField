@@ -1,20 +1,14 @@
 import React from 'react';
 import {Linking} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
+import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {BLUE} from '../styles.constants';
-import alert from './alert';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import alert from '../../shared/ui/alert';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 
-const OpenUrlLink = ({
-                       buttonStyle,
-                       color,
-                       icon,
-                       title,
-                       titleStyle,
-                       url,
-                     }) => {
+const UrlLinkButton = ({icon, title, url}) => {
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
@@ -33,11 +27,10 @@ const OpenUrlLink = ({
   return (
     <>
       {isOnline && (
-        <Button
-          buttonStyle={buttonStyle}
+        <OutlineButton
           icon={
             <Icon
-              color={color || BLUE}
+              color={PRIMARY_ACCENT_COLOR}
               iconStyle={{paddingHorizontal: 10}}
               name={icon}
               size={20}
@@ -45,14 +38,11 @@ const OpenUrlLink = ({
             />
           }
           onPress={openLink}
-          raised
           title={title}
-          titleStyle={titleStyle}
-          type={'clear'}
         />
       )}
     </>
   );
 };
 
-export default OpenUrlLink;
+export default UrlLinkButton;

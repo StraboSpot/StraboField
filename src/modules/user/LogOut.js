@@ -6,8 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import uiStyles from '../../shared/ui/ui.styles';
@@ -32,21 +32,14 @@ const LogOut = () => {
   const renderLogInOrOutButton = () => {
     return (
       <View style={{paddingHorizontal: 10}}>
-        <Button
-          buttonStyle={commonStyles.standardButton}
-          containerStyle={commonStyles.standardButtonContainer}
+        <OutlineButton
           onPress={() => isEmpty(userData.name) ? dispatch(logout()) : setIsLogoutModalVisible(true)}
           title={isEmpty(userData.name) ? 'Log In' : 'Log Out'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
         {isEmpty(userData.name) && (
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
+          <OutlineButton
             onPress={clearUser}
             title={isEmpty(userData.name) && 'Clear and Return to Log In'}
-            titleStyle={commonStyles.standardButtonText}
           />
         )}
       </View>

@@ -1,21 +1,18 @@
 import React, {useRef, useState} from 'react';
 import {FlatList, Platform, View} from 'react-native';
 
-import {Button, ListItem, Overlay} from '@rn-vui/base';
+import {Overlay} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 
 import styles from './documentation.styles';
 import DocumentationModalHeader from './DocumentationModalHeader';
 import SpotDataModelModal from './SpotDataModelModal';
+import UrlLinkButton from './UrlLinkButton';
 import {STRABO_APIS} from '../../services/urls.constants';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty, openUrl} from '../../shared/Helpers';
-import {WHITE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import OpenUrlLink from '../../shared/ui/OpenUrlLink';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
 const Documentation = () => {
   const ref = useRef(null);
@@ -45,7 +42,7 @@ const Documentation = () => {
       id: 3,
       platform: ['ios', 'android'],
       label: 'helpDocument',
-      name: 'Strabo Help Guide',
+      name: 'Help Guide',
       file:
         Platform.OS === 'ios' ? require('../../assets/documents/Strabo_Help_Guide.pdf')
           : {uri: 'bundle-assets://Strabo_Help_Guide.pdf'},
@@ -95,17 +92,10 @@ const Documentation = () => {
   };
 
   const renderFAQListItem = item => (
-    <ListItem
-      containerStyle={mainMenuPanelStyles.documentListItem}
+    <OutlineButton
       onPress={() => handlePress(item)}
-    >
-      <ListItem.Content style={commonStyles.listItemContent}>
-        <ListItem.Title style={commonStyles.listItemTitle}>
-          {item.name}
-        </ListItem.Title>
-      </ListItem.Content>
-      <ListItem.Chevron size={20}/>
-    </ListItem>
+      title={item.name}
+    />
   );
 
   const renderPDF = () => (
@@ -142,37 +132,25 @@ const Documentation = () => {
     </Overlay>
   );
 
-  const renderSpotDataModelSection = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Spot Data Model'}/>
-        <Button
-          onPress={() => setIsSpotDataModelModalVisible(true)}
-          title={'Show Data Model'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'clear'}
-        />
-        {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
-      </>
-    );
-  };
-
   return (
-    <View style={styles.container}>
-      {renderSpotDataModelSection()}
-      <SectionDivider dividerText={'Manual'}/>
-      <OpenUrlLink
-        buttonStyle={styles.button}
-        color={WHITE}
-        icon={'globe-outline'}
-        title={'Strabo Spot Help'}
-        titleStyle={styles.buttonText}
-        url={STRABO_APIS.STRABO + '/help'}
-      />
-      <SectionDivider dividerText={'Helpful Docs'}/>
-      {renderFAQList()}
+    <>
+      <View style={styles.container}>
+        <UrlLinkButton
+          icon={'globe-outline'}
+          title={'Online Help Page'}
+          url={STRABO_APIS.STRABO + '/help'}
+        />
+        {renderFAQList()}
+        <OutlineButton
+          onPress={() => setIsSpotDataModelModalVisible(true)}
+          title={'Spot Data Model'}
+        />
+      </View>
+
+      {/* Modals */}
       {renderPDF()}
-    </View>
+      {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
+    </>
   );
 };
 
