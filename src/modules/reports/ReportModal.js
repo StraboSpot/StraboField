@@ -6,7 +6,6 @@ import {Icon} from '@rn-vui/base';
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -41,11 +40,14 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
-
       <ModalWrapper
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
-        overlayStylesOverride={{width: '80%'}}
+        onCancelPress={confirmCloseModal}
+        onSavePress={handleSavePressed}
+        overlayStyleOverride={{width: '80%'}}
+        saveTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
+        shouldShowButtons
         title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
       >
         <FlatList
@@ -76,7 +78,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{width: 40}}/>
-          <SaveButton onPress={handleSavePressed} title={'Save Report'}/>
           <Icon
             color={RED}
             containerStyle={{padding: 10, alignSelf: 'flex-end'}}

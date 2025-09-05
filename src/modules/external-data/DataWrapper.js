@@ -32,8 +32,8 @@ function DataWrapper({
       <DeleteConformationDialogBox
         cancel={() => setIsDeleteConfirmModalVisible(false)}
         deleteOverlay={() => deleteSelection()}
+        headerTitle={`Delete ${itemToDelete.type.toUpperCase()}?`}
         isVisible={isDeleteConfirmModalVisible}
-        title={`${itemToDelete.type.toUpperCase()} to delete`}
       >
         <Text>Are you sure you want to delete</Text>
         <Text>{title}?</Text>

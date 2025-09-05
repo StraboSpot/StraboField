@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
@@ -282,7 +282,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           bounces={false}
         />
         {!choicesViewKey && (
-          <SaveButton
+          <ActionButton
             isLoading={isLoading}
             onPress={() => saveForm(formRef.current)}
             title={'Save Sample'}
