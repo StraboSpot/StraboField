@@ -23,13 +23,16 @@ const ModalWrapper = ({
                         isFullScreen,
                         isVisible,
                         onCancelPress,
+                        onDeletePress,
                         onPress,
-                        onSavePress,
+                        onActionPressed,
                         overlayStyleOverride,
                         headerTitle,
                         actionTitle,
+                        hideActionButton,
                         shouldShowButtons,
                         showCloseButton,
+                        showDeleteButton,
                       }) => {
 
   const modalVisible = useSelector(state => state.home.modalVisible);
@@ -105,9 +108,11 @@ const ModalWrapper = ({
         <ModalSaveAndCancelButtons
           actionTitle={actionTitle}
           disabled={disabled}
+          hideActionButton={hideActionButton}
+          onActionPressed={onActionPressed}
           onCancelPress={onCancelPress}
-          onSavePress={onSavePress}
-        />
+          onDeletePress={onDeletePress}
+          showDeleteButton={showDeleteButton}/>
       )}
     </Overlay>
   );

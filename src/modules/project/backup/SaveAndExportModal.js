@@ -25,7 +25,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
-  const [modalTitle, setModalTitle] = useState('Confirm or Change Folder Name');
+  const [modalTitle, setModalTitle] = useState('Confirm or Change\nFolder Name');
 
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
   const toast = useToast();
@@ -92,25 +92,28 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
     }
   };
 
-  // const renderBackingUpView = () => (
-  //   <View>
-  //     <LottieAnimations
-  //       doesLoop={backingUpStatus === 'inProgress'}
-  //       show={backingUpStatus === 'inProgress'}
-  //       type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
-  //     />
-  //     <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
-  //     <View style={overlayStyles.buttonContainer}>
-  //       <Button
-  //         disabled={backingUpStatus !== 'complete'}
-  //         onPress={handleClosePress}
-  //         title={'OK'}
-  //         titleStyle={overlayStyles.buttonText}
-  //         type={'clear'}
-  //       />
-  //     </View>
-  //   </View>
-  // );
+  const renderBackingUpView = () => (
+    <View style={{padding: 20, alignItems: 'center'}}>
+      <LottieAnimations
+        doesLoop={backingUpStatus === 'inProgress'}
+        show
+        type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
+      />
+      <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
+        {statusMessages.join('\n')}
+      </Text>
+      {backingUpStatus === 'complete' && (
+        <View style={{marginTop: 16}}>
+          <Button
+            buttonStyle={overlayStyles.buttonStyle}
+            onPress={handleClosePress}
+            title='OK'
+            type='solid'
+          />
+        </View>
+      )}
+    </View>
+  );
 
   // const renderExportMessage = () => {
   //   return (
@@ -146,7 +149,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   return (
-    <ModalWrapper closeModal={closeModal} title={modalTitle}>
+    <ModalWrapper
+      actionTitle={getButtonTitle()}
+      disabled={backupFileName.trim() === '' || isFileNameError}
+      headerTitle={modalTitle}
+      onActionPressed={backupAction === 'save' ? initiateBackup : exportProject}
+      onCancelPress={handleClosePress}
+      shouldShowButtons={backingUpStatus === ''}
+    >
       {backingUpStatus === '' ? (
         <View style={{padding: 16}}>
           {/* Instruction Text */}
@@ -185,55 +195,9 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
           <Text style={{fontSize: 12, color: '#666', marginBottom: 16}}>
             *File names cannot contain spaces or special characters. Do not include a file extension.
           </Text>
-
-          Action Buttons
-          <View style={{flexDirection: 'row', justifyContent: 'flex-end', gap: 10}}>
-            <Button
-              onPress={handleClosePress}
-              title='Cancel'
-              titleStyle={{color: '#888'}}
-              type='clear'
-            />
-            <Button
-              buttonStyle={{
-                paddingVertical: 12,
-                paddingHorizontal: 24,
-                borderRadius: 8,
-                backgroundColor: '#007AFF',
-              }}
-              disabled={backupFileName.trim() === '' || isFileNameError}
-              onPress={backupAction === 'save' ? initiateBackup : exportProject}
-              title={getButtonTitle()}
-              titleStyle={{fontWeight: '600', fontSize: 16}}
-            />
-          </View>
         </View>
       ) : (
-        <View style={{padding: 20, alignItems: 'center'}}>
-          <LottieAnimations
-            doesLoop={backingUpStatus === 'inProgress'}
-            show
-            type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
-          />
-          <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
-            {statusMessages.join('\n')}
-          </Text>
-          {backingUpStatus === 'complete' && (
-            <View style={{marginTop: 16}}>
-              <Button
-                buttonStyle={{
-                  backgroundColor: '#28a745',
-                  borderRadius: 8,
-                  paddingHorizontal: 24,
-                  paddingVertical: 10,
-                }}
-                onPress={handleClosePress}
-                title='OK'
-                type='solid'
-              />
-            </View>
-          )}
-        </View>
+        renderBackingUpView()
       )}
     </ModalWrapper>
   );

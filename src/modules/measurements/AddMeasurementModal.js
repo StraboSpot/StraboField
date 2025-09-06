@@ -293,6 +293,7 @@ const AddMeasurementModal = ({onPress}) => {
         closeModal={onCloseButton}
         onPress={onPress}
         overlayStyleOverride={{height: '80%'}}
+        showCloseButton
       >
         <>
           {measurementTypeForForm && (

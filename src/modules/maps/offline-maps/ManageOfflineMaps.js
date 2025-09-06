@@ -101,27 +101,16 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const renderEditMapModal = () => {
     return (
       <TextInputModal
-        closeModal={() => setIsNameModalVisible(false)}
         dialogTitle={'Edit Map Name'}
+        onActionPressed={() => saveMapEdits()}
+        onCancelPress={() => setIsNameModalVisible(false)}
         onChangeText={text => setSelectedMap({...selectedMap, name: text})}
-        onPress={() => saveMapEdits()}
+        onDeletePress={confirmDeleteMap}
         placeholder={selectedMap.name}
-        style={styles.dialogTitle}
+        showDeleteButton={true}
         value={selectedMap.name}
         visible={isNameModalVisible}
-      >
-        <Button
-          icon={
-            <Icon
-              color={'red'}
-              name={'trash-outline'}
-              type={'ionicon'}
-            />
-          }
-          onPress={() => confirmDeleteMap()}
-          type={'clear'}
-        />
-      </TextInputModal>
+      />
     );
   };
 

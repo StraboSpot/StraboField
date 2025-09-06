@@ -1,11 +1,8 @@
 import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
-
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
-import {RED} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -41,14 +38,16 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
       <ModalWrapper
+        actionTitle={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
+        onActionPressed={handleSavePressed}
         onCancelPress={confirmCloseModal}
-        onSavePress={handleSavePressed}
+        onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
         saveTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
         shouldShowButtons
-        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
+        showDeleteButton={!isEmpty(initialValues)}
       >
         <FlatList
           ListHeaderComponent={
@@ -76,16 +75,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           }
           bounces={false}
         />
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{width: 40}}/>
-          <Icon
-            color={RED}
-            containerStyle={{padding: 10, alignSelf: 'flex-end'}}
-            name={'trash'}
-            onPress={handleDeletePressed}
-            type={'ionicon'}
-          />
-        </View>
 
         <WarningModal
           closeModal={() => setIsDeleteReportModalVisible(false)}

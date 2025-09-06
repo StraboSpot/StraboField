@@ -1,10 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 
 import IconButton from '../../shared/ui/buttons/IconButton';
-import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 // Modal to prompt the user to select a geometry if no geometry has been set
@@ -44,20 +44,15 @@ const VertexActionsOverlay = ({
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
+    <ModalWrapper
+      actionTitle={'Add'}
+      headerTitle={'Select an Action'}
+      isActionButtonVisible={false}
       isVisible={isShowVertexActionsModal}
-      onBackdropPress={() => setIsShowVertexActionsModal(false)}
-      overlayStyle={overlayStyles.overlayContainer}
-      supportedOrientations={['portrait', 'landscape']}
+      onActionPressed={() => handleActionPressed('Add Vertex')}
+      onCancelPress={() => setIsShowVertexActionsModal(false)}
+      shouldShowButtons
     >
-      <View style={overlayStyles.titleContainer}>
-        <ModalWrapperHeader
-          buttonTitleRight={'Cancel'}
-          closeModal={() => setIsShowVertexActionsModal(false)}
-          title={'Select an Action'}
-        />
-      </View>
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
         {buttons.map((button) => {
             return (
@@ -82,7 +77,7 @@ const VertexActionsOverlay = ({
           },
         )}
       </View>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

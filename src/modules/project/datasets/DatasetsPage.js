@@ -41,6 +41,7 @@ const DatasetsPage = ({setDatasetToView}) => {
   const onAddDataset = async () => {
     const addedDataset = await addDataset(datasetName);
     console.log(addedDataset);
+    setDatasetName('');
     setIsAddDatasetModalVisible(false);
   };
 
@@ -52,10 +53,10 @@ const DatasetsPage = ({setDatasetToView}) => {
   const renderAddDatasetModal = () => {
     return (
       <TextInputModal
-        closeModal={() => setIsAddDatasetModalVisible(false)}
         dialogTitle={'Add a Dataset'}
+        onActionPressed={onAddDataset}
+        onCancelPress={() => setIsAddDatasetModalVisible(false)}
         onChangeText={text => setDatasetName(text)}
-        onPress={onAddDataset}
         value={datasetName}
         visible={isAddDatasetModalVisible}
       />

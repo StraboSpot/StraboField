@@ -122,6 +122,7 @@ const AddThreeDStructureModal = ({onPress}) => {
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
+        showCloseButton
       >
         <FlatList
           ListHeaderComponent={

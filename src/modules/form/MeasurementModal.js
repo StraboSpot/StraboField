@@ -1,16 +1,16 @@
 import React, {useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import {formStyles, useForm} from '.';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {SMALL_SCREEN, WARNING_COLOR} from '../../shared/styles.constants';
-import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import {WARNING_COLOR} from '../../shared/styles.constants';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
+import Spacer from '../../shared/ui/Spacer';
 import Compass from '../compass/Compass';
 import compassStyles from '../compass/compass.styles';
 import ManualMeasurement from '../compass/ManualMeasurement';
@@ -64,65 +64,58 @@ const MeasurementModal = ({
   };
 
   return (
-    <Overlay
-      fullScreen={SMALL_SCREEN}
-      isVisible={true}
-      overlayStyle={
-        SMALL_SCREEN
-          ? overlayStyles.overlayContainerFullScreen
-          : [{...overlayStyles.overlayContainer, height: 0.60}, overlayStyles.overlayPosition]
-      }
-      supportedOrientations={['portrait', 'landscape']}
+    <ModalWrapper
+      closeModal={() => setIsMeasurementModalVisible(false)}
+      overlayStyleOverride={{maxHeight: isManualMeasurement ? '45%' : '40%', flex: 1}}
+      showCloseButton
     >
-      <ModalWrapperHeader
-        buttonTitleRight={'Done'}
-        closeModal={() => setIsMeasurementModalVisible(false)}
-        title={measurementsGroupLabel}
-      />
-      {Platform.OS === 'ios' && (
-        <Button
-          buttonStyle={formStyles.formButtonSmall}
-          onPress={() => setIsManualMeasurement(!isManualMeasurement)}
-          title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
-          titleProps={formStyles.formButtonTitle}
-          type={'clear'}
-        />
-      )}
-      {isManualMeasurement ? (
-        <ManualMeasurement
-          addAttributeMeasurement={addAttributeMeasurement}
-          measurementTypes={compassMeasurementTypes}
-          setAttributeMeasurements={setMeasurements}
-          setSliderValue={setSliderValue}
-          sliderValue={sliderValue}
-        />
-      ) : (
-        <>
-          <Compass
-            closeCompass={() => setIsMeasurementModalVisible(false)}
+      <ScrollView>
+        {Platform.OS === 'ios' && (
+          <Button
+            buttonStyle={formStyles.formButtonSmall}
+            onPress={() => setIsManualMeasurement(!isManualMeasurement)}
+            title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
+            titleProps={formStyles.formButtonTitle}
+            type={'clear'}
+          />
+        )}
+        {isManualMeasurement ? (
+          <ManualMeasurement
+            addAttributeMeasurement={addAttributeMeasurement}
+            measurementTypes={compassMeasurementTypes}
             setAttributeMeasurements={setMeasurements}
+            setSliderValue={setSliderValue}
             sliderValue={sliderValue}
           />
-          <View style={compassStyles.sliderContainer}>
-            <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
-            <SliderBar
-              labels={['Low', '', '', '', 'High', 'N/R']}
-              maximumValue={6}
-              minimumValue={1}
-              onSlidingComplete={setSliderValue}
-              step={1}
-              value={sliderValue}
+        ) : (
+          <>
+            <Spacer/>
+            <Compass
+              // closeCompass={() => setIsMeasurementModalVisible(false)}
+              setAttributeMeasurements={setMeasurements}
+              sliderValue={sliderValue}
             />
-          </View>
-        </>
-      )}
+            <View style={compassStyles.sliderContainer}>
+              <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
+              <SliderBar
+                labels={['Low', '', '', '', 'High', 'N/R']}
+                maximumValue={6}
+                minimumValue={1}
+                onSlidingComplete={setSliderValue}
+                step={1}
+                value={sliderValue}
+              />
+            </View>
+          </>
+        )}
+      </ScrollView>
       <Button
         onPress={() => setMeasurements({})}
         title={'Clear Measurement'}
         titleStyle={{color: WARNING_COLOR}}
         type={'clear'}
       />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

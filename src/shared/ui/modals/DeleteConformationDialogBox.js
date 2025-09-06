@@ -1,23 +1,24 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import ModalWrapper from './modal/ModalWrapper';
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
+import overlayStyles from '../../ui/modals/overlay.styles';
+import ModalWrapper from '../modals/ModalWrapper';
 
 const DeleteConformationDialogBox = ({
                                        cancel,
                                        children,
                                        deleteOverlay,
                                        isVisible,
-                                       title,
+                                       headerTitle,
                                      }) => {
   return (
     <ModalWrapper
+      actionTitle={'Delete'}
+      headerTitle={headerTitle}
       isVisible={isVisible}
+      onActionPressed={deleteOverlay}
       onCancelPress={cancel}
-      onSavePress={deleteOverlay}
-      title={title}
-      titleText={'Delete'}
+      shouldShowButtons
     >
       <View style={overlayStyles.overlayContent}>
         {children}

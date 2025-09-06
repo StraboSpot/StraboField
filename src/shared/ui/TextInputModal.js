@@ -1,45 +1,43 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
-import {Button, Input, Overlay} from '@rn-vui/base';
+import {Input} from '@rn-vui/base';
 
 import * as themes from '../styles.constants';
+import ModalWrapper from './modals/ModalWrapper';
 import overlayStyles from './modals/overlay.styles';
 
 const TextInputModal = ({
                           autoCapitalize,
                           buttonText,
                           children,
-                          closeModal,
                           dialogTitle,
                           errorMessage,
                           keyboardType,
                           multiline,
+                          onActionPressed,
                           onChangeText,
-                          onPress,
+                          onCancelPress,
+                          onDeletePress,
                           onSubmitEditing,
-                          onTouchOutside,
-                          overlayButtonText,
-                          overlayTitleText,
                           placeholder,
                           renderErrorMessage,
-                          style,
+                          showDeleteButton,
                           textAboveInput,
                           value,
                           visible,
                         }) => {
   return (
-    <Overlay
-      animationType={'fade'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+    <ModalWrapper
+      actionTitle={buttonText || 'Save'}
+      headerTitle={dialogTitle}
       isVisible={visible}
-      onBackdropPress={onTouchOutside}
-      overlayStyle={[overlayStyles.overlayContainer]}
-      supportedOrientations={['portrait', 'landscape']}
+      onActionPressed={onActionPressed}
+      onCancelPress={onCancelPress}
+      onDeletePress={onDeletePress}
+      shouldShowButtons
+      showDeleteButton={showDeleteButton}
     >
-      <View style={[overlayStyles.titleContainer, style]}>
-        <Text style={[overlayStyles.titleText, overlayTitleText]}>{dialogTitle}</Text>
-      </View>
       <View>
         {textAboveInput}
         <Input
@@ -51,7 +49,7 @@ const TextInputModal = ({
           multiline={multiline}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
-          placeholder={placeholder || 'Enter text here...'}
+          placeholder={placeholder || ' Enter text here...'}
           placeholderTextColor={themes.MEDIUMGREY}
           renderErrorMessage={renderErrorMessage}
           style={[{verticalAlign: 'top'}, multiline ? {height: 100} : {height: 40}]}
@@ -59,22 +57,9 @@ const TextInputModal = ({
         />
         {children}
       </View>
-      <View style={overlayStyles.buttonContainer}>
-        <Button
-          onPress={onPress}
-          title={buttonText || 'Save'}
-          titleStyle={[overlayStyles.buttonText, overlayButtonText]}
-          type={'clear'}
-        />
-        <Button
-          onPress={closeModal}
-          title={'Cancel'}
-          titleStyle={overlayStyles.buttonText}
-          type={'clear'}
-        />
-      </View>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 
 export default TextInputModal;
+
