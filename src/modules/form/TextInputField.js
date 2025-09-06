@@ -47,7 +47,7 @@ const TextInputField = ({
       )}
       <TextInput
         autoCapitalize={autoCapitalize}
-        autoFocus={autoFocus}
+        // autoFocus={autoFocus}
         editable={editable}
         multiline={appearance === 'multiline' || appearance === 'full'}
         onBlur={onBlur(name)}
