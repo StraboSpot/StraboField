@@ -74,6 +74,12 @@ const UserProfile = () => {
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
 
+  const handleCancel = () => {
+    setDeleteProfileModalVisible(false);
+    setDeleteProfileInputValue('');
+    setErrorMessage('');
+  };
+
   const handleOnChange = (text) => {
     if (!isEmpty(errorMessage)) setErrorMessage('');
     setDeleteProfileInputValue(text);
@@ -93,7 +99,10 @@ const UserProfile = () => {
         toast.show('Account Successfully Deleted!', {type: 'success', duration: 2000});
         setTimeout(() => navigation.navigate('SignIn'), 200);
       }
-      else setErrorMessage('Wrong password');
+      else {
+        setErrorMessage('Wrong password');
+        setDeleteProfileInputValue('');
+      }
     }
     else setErrorMessage('Need to enter your password');
   };
@@ -166,16 +175,17 @@ const UserProfile = () => {
     return (
       <TextInputModal
         buttonText={'DELETE'}
-        closeModal={() => setDeleteProfileModalVisible(false)}
         dialogTitle={'DANGER!'}
         errorMessage={errorMessage}
+        onActionPressed={onDeleteProfile}
+        onCancelPress={handleCancel}
         onChangeText={text => handleOnChange(text)}
-        onPress={onDeleteProfile}
         onSubmitEditing={onDeleteProfile}
         overlayButtonText={overlayStyles.importantText}
         overlayTitleText={overlayStyles.importantText}
         textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
         topPosition={10}
+        value={deleteProfileInputValue}
         visible={isDeleteProfileModalVisible}
       />
     );

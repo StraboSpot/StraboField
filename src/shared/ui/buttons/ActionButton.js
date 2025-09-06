@@ -2,7 +2,8 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import {PRIMARY_ACCENT_COLOR} from '../../styles.constants';
+import commonStyles from '../../common.styles';
+import {PRIMARY_ACCENT_COLOR, SECONDARY_TEXT_COLOR} from '../../styles.constants';
 
 const ActionButton = ({
                         disabled,
@@ -12,12 +13,13 @@ const ActionButton = ({
                       }) => {
   return (
     <Button
-      buttonStyle={{borderRadius: 10, marginTop: 10, marginBottom: 10, backgroundColor: PRIMARY_ACCENT_COLOR}}
-      containerStyle={{alignItems: 'center', padding: 10}}
+      buttonStyle={[commonStyles.standardButton, {backgroundColor: PRIMARY_ACCENT_COLOR}]}
+      containerStyle={commonStyles.standardButtonContainer}
       disabled={disabled}
       loading={isLoading}
       onPress={onPress}
       title={title}
+      titleStyle={[commonStyles.standardButtonText, {color: SECONDARY_TEXT_COLOR}]}
       type={'solid'}
     />
   );

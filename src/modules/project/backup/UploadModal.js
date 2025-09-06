@@ -172,10 +172,10 @@ const UploadModal = ({closeModal}) => {
       <Spacer/>
       <View style={overlayStyles.buttonContainer}>
         <Button
-          title='Cancel'
-          type='outline'
-          titleStyle={overlayStyles.buttonText }
           onPress={handleClosePress}
+          title='Cancel'
+          titleStyle={overlayStyles.buttonText}
+          type='outline'
         />
         <Button
           onPress={() => initiateUpload()}
@@ -184,9 +184,9 @@ const UploadModal = ({closeModal}) => {
       </View>
       {__DEV__ && (
         <Button
+          onPress={uploadImagesOnly}
           title={'Upload Images Only (Dev Mode)'}
           type={'clear'}
-          onPress={uploadImagesOnly}
         />
       )}
     </View>
@@ -264,7 +264,7 @@ const UploadModal = ({closeModal}) => {
   return (
     <ModalWrapper
       closeModal={closeModal}
-      title={modalTitle}
+      headerTitle={modalTitle}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()
@@ -272,17 +272,16 @@ const UploadModal = ({closeModal}) => {
           ? renderUploadProgress()
           : renderErrorView()}
       <View style={overlayStyles.buttonContainer}>
-        {(uploadState === 'complete' || uploadState === 'error')
-          && (
-            <Button
-              // disabled={uploadState !== 'complete'}
-              onPress={handleClosePress}
-              title={'OK'}
-              titleStyle={overlayStyles.buttonText}
-              type={'clear'}
-            />
-          )
-        }
+        {(uploadState === 'complete' || uploadState === 'error') && (
+          <Button
+            // disabled={uploadState !== 'complete'}
+            buttonStyle={overlayStyles.buttonStyle}
+            onPress={handleClosePress}
+            title={'OK'}
+            titleStyle={overlayStyles.buttonText}
+            type={'solid'}
+          />
+        )}
       </View>
     </ModalWrapper>
   );

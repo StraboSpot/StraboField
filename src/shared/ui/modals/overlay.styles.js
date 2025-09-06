@@ -16,11 +16,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     justifyContent: 'flex-end',
+    marginRight: 10,
     paddingTop: 10,
   },
+  buttonStyle: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR,
+    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+  },
   buttonText: {
-    color: themes.PRIMARY_TEXT_COLOR,
+    // color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
+  },
+  clearButtonText: {
+    color: themes.PRIMARY_ACCENT_COLOR,
   },
   closeButton: {
     alignItems: 'flex-end',

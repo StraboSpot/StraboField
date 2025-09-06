@@ -108,8 +108,8 @@ const SpotDataModelModal = ({close}) => {
     <ModalWrapper
       closeModal={close}
       isFullScreen
-      title={'Spot Data Model Object'}
       overlayStylesOverride={{width: '90%', height: '80%'}}
+      title={'Spot Data Model Object'}
     >
       <ScrollView>
         <Button
