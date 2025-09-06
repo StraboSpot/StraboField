@@ -10,7 +10,7 @@ import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {formStyles} from '../form';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 
 const ExternalData = () => {
   const inputRef = useRef(null);
@@ -56,7 +56,7 @@ const ExternalData = () => {
 
   return (
     <View style={{flex: 1}}>
-      <ReturnToOverviewButton/>
+      <NotebookPageHeader pageTitle={'External Data'}/>
       <SectionDivider dividerText={'Links To Web Resources'}/>
       <View style={{flex: 1}}>
         <ButtonGroup

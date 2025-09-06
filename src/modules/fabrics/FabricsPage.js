@@ -10,8 +10,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsPage = ({page}) => {
@@ -105,7 +105,7 @@ const FabricsPage = ({page}) => {
   const renderFabricsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         {renderFabricSections()}
       </View>
     );

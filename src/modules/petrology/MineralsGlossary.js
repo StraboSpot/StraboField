@@ -4,9 +4,9 @@ import {FlatList, Linking, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 
 import {MINERAL_GLOSSARY_INFO} from './petrology.constants';
+import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import styles from '../page/ui/ui.styles';
 
 const MineralsGlossary = ({addMineral}) => {
   const [activeMineralInfo, setActiveMineralInfo] = useState({});
@@ -26,13 +26,13 @@ const MineralsGlossary = ({addMineral}) => {
           <Button
             onPress={() => setActiveMineralInfo({})}
             title={'Cancel'}
-            titleStyle={styles.buttonText}
+            titleStyle={commonStyles.standardButtonText}
             type={'clear'}
           />
           <Button
             onPress={() => addMineral(activeMineralInfo)}
             title={'Add Mineral'}
-            titleStyle={styles.buttonText}
+            titleStyle={commonStyles.standardButtonText}
             type={'clear'}
           />
         </View>

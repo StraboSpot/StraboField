@@ -67,7 +67,6 @@ const commonStyles = StyleSheet.create({
   standardButton: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderRadius: 10,
-    height: 50,
   },
   standardButtonContainer: {
     paddingBottom: 5,

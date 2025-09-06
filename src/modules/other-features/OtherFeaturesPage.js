@@ -8,8 +8,7 @@ import OtherFeatureItem from './OtherFeatureItem';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesPage = () => {
@@ -55,13 +54,13 @@ const OtherFeaturesPage = () => {
     <>
       {!isFeatureDetailVisible && (
         <View>
-          <NotebookContentTopSection/>
-          {!isMultipleFeaturesTaggingEnabled && (
-            <SectionDividerWithRightButton
-              dividerText={'Other Features'}
-              onPress={addFeature}
-            />
-          )}
+          <NotebookPageHeader onPressAdd={addFeature} pageTitle={'Other Features'} showAddButton showFeaturesTagButton/>
+          {/*{!isMultipleFeaturesTaggingEnabled && (*/}
+          {/*  <SectionDividerWithRightButton*/}
+          {/*    dividerText={'Other Features'}*/}
+          {/*    onPress={addFeature}*/}
+          {/*  />*/}
+          {/*)}*/}
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}

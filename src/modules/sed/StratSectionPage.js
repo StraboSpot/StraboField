@@ -22,8 +22,8 @@ import {Form, useForm} from '../form';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 
 const StratSectionPage = ({page}) => {
   // console.log('Rendering StratSectionPage...');
@@ -125,7 +125,7 @@ const StratSectionPage = ({page}) => {
   const renderStratSectionsMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         <View style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={

@@ -9,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField} from '../form';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
 const Metadata = () => {
@@ -117,8 +117,7 @@ const Metadata = () => {
     <FlatList
       ListHeaderComponent={
         <>
-          <ReturnToOverviewButton/>
-          <SectionDivider dividerText={'Metadata'}/>
+          <NotebookPageHeader pageTitle={'Metadata'}/>
           {renderMetadataForm()}
           {renderDatasets()}
         </>
