@@ -60,7 +60,7 @@ const Form = ({
     return (
       <Field
         appearance={field.appearance}
-        autoFocus={field.name === 'name'}
+        // autoFocus={field.name === 'name'}
         component={TextInputField}
         editable={getIsDisabled ? !getIsDisabled(field.name) : true}
         key={subkey ? subkey + '[0].' + field.name : field.name}
