@@ -79,6 +79,12 @@ const UserProfile = () => {
     setDeleteProfileInputValue(text);
   };
 
+  const handleDeleteModalClose = () => {
+    setDeleteProfileModalVisible(false);
+    setDeleteProfileInputValue('');
+    setErrorMessage('');
+  };
+
   const onDeleteProfile = async () => {
     console.log(deleteProfileInputValue);
     if (!isEmpty(deleteProfileInputValue)) {
@@ -166,16 +172,16 @@ const UserProfile = () => {
     return (
       <TextInputModal
         buttonText={'DELETE'}
-        closeModal={() => setDeleteProfileModalVisible(false)}
+        closeModal={handleDeleteModalClose}
         dialogTitle={'DANGER!'}
         errorMessage={errorMessage}
         onChangeText={text => handleOnChange(text)}
         onPress={onDeleteProfile}
-        onSubmitEditing={onDeleteProfile}
         overlayButtonText={overlayStyles.importantText}
         overlayTitleText={overlayStyles.importantText}
         textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
         topPosition={10}
+        value={deleteProfileInputValue}
         visible={isDeleteProfileModalVisible}
       />
     );
