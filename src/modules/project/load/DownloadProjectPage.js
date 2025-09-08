@@ -24,16 +24,18 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
-  const confirmOpenProject = (project) => {
+  const confirmOpenProject = async (project) => {
     setProjectToOpen(project);
-    if (isProjectLoadSelectionModalVisible) downloadProject(project);
+    if (isProjectLoadSelectionModalVisible) {
+      await initializeDownload(project);
+      openMainMenuPanel();
+    }
     else setIsConfirmOverwriteModalVisible(true);
   };
 
-  const downloadProject = async () => {
+  const downloadProject = async (project) => {
     closeConfirmOverwriteModal();
     await initializeDownload(projectToOpen);
-    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   return (

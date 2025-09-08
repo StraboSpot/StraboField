@@ -43,7 +43,6 @@ import UserProfile from '../user/UserProfile';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
-                                    openMainMenuPanel,
                                     openNotebookPanel,
                                     openSpotInNotebook,
                                   }, mapComponentRef) => {
@@ -87,13 +86,15 @@ const MainMenuPanel = forwardRef(({
         return (
           <SpotsList
             onPress={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>
+            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+          />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.IMAGES:
         return (
           <ImageGallery
             openSpotInNotebook={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}/>
+            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
+          />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.SAMPLES:
         return (

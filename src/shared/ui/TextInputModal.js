@@ -42,7 +42,7 @@ const TextInputModal = ({
         {textAboveInput}
         <Input
           autoCapitalize={autoCapitalize || 'none'}
-          enterKeyHint={'done'}
+          // enterKeyHint={'done'}
           errorMessage={errorMessage}
           inputContainerStyle={overlayStyles.inputContainer}
           keyboardType={keyboardType}

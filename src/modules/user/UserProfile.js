@@ -74,15 +74,15 @@ const UserProfile = () => {
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
 
-  const handleCancel = () => {
-    setDeleteProfileModalVisible(false);
-    setDeleteProfileInputValue('');
-    setErrorMessage('');
-  };
-
   const handleOnChange = (text) => {
     if (!isEmpty(errorMessage)) setErrorMessage('');
     setDeleteProfileInputValue(text);
+  };
+
+  const handleDeleteModalClose = () => {
+    setDeleteProfileModalVisible(false);
+    setDeleteProfileInputValue('');
+    setErrorMessage('');
   };
 
   const onDeleteProfile = async () => {
@@ -175,12 +175,12 @@ const UserProfile = () => {
     return (
       <TextInputModal
         buttonText={'DELETE'}
+        closeModal={handleDeleteModalClose}
         dialogTitle={'DANGER!'}
         errorMessage={errorMessage}
         onActionPressed={onDeleteProfile}
         onCancelPress={handleCancel}
         onChangeText={text => handleOnChange(text)}
-        onSubmitEditing={onDeleteProfile}
         overlayButtonText={overlayStyles.importantText}
         overlayTitleText={overlayStyles.importantText}
         textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
