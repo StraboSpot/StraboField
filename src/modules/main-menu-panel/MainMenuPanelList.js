@@ -16,7 +16,6 @@ const MainMenuPanelList = () => {
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
 
-
   const renderItem = ({item, section}) => {
     if (!sectionsCollapsed.includes(section.title)) return <MainMenuPanelListItem title={item}/>;
   };

@@ -17,13 +17,15 @@ const MainMenuPanelListItem = ({onPress, title}) => {
 
   const {getTargetDatasetFromId} = useProject();
 
-  const targetDatasetName = isEmpty(currentProjectId) ? '' : getTargetDatasetFromId().name;
-
   const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
 
   const getTitle = () => {
-    const subtitle = title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
-      && '  (Target: ' + truncateText(targetDatasetName, 25) + ')';
+    let subtitle;
+    if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS) {
+      const targetDatasetName = isEmpty(currentProjectId) ? '' : getTargetDatasetFromId().name;
+      subtitle = '  (Target: ' + truncateText(targetDatasetName, 25) + ')';
+    }
+
     return (
       <ListItem.Title style={commonStyles.listItemTitle}>
         {title}{subtitle && <Text style={{fontSize: SMALL_TEXT_SIZE, fontStyle: 'italic'}}>{subtitle}</Text>}
