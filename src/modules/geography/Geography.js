@@ -10,7 +10,6 @@ import GeoFieldInputs from './GeoFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
 import useMapView from '../maps/useMapView';
@@ -134,7 +133,6 @@ const Geography = () => {
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             {isOnGeoMap(spot) ? renderGeoCoords(initialGeomValues) : renderPixelCoords(initialGeomValues)}
           </View>
         )}
@@ -172,7 +170,6 @@ const Geography = () => {
       <>
         {!isEmpty(initialGeomValues.x_pixels) && !isEmpty(initialGeomValues.y_pixels)
           ? renderPixelFieldInputs() : renderPixelFieldText(initialGeomValues)}
-        <FlatListItemSeparator/>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <View style={formStyles.fieldLabelContainer}>

@@ -7,7 +7,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setNotebookPageVisible} from './notebook.slice';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {DARKGREY, PRIMARY_ACCENT_COLOR, PRIMARY_HEADER_TEXT_SIZE} from '../../shared/styles.constants';
+import {
+  DARKGREY,
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_BACKGROUND_COLOR,
+  PRIMARY_HEADER_TEXT_SIZE,
+} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setModalVisible} from '../home/home.slice';
@@ -33,7 +38,7 @@ const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddB
   };
   return (
     <>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', backgroundColor: PRIMARY_BACKGROUND_COLOR}}>
         <View style={{alignItems: 'center', flexDirection: 'row', height: 40, justifyContent: 'flex-start', width: 70}}>
           {!hideBackButton && (
             <Icon
@@ -75,7 +80,7 @@ const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddB
         </View>
       </View>
       {isMultipleFeaturesTaggingEnabled && (
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{paddingHorizontal: 10, backgroundColor: PRIMARY_BACKGROUND_COLOR}}>
           <Text style={commonStyles.standardDescriptionText}>
             1. Select feature(s) to tag below.{'\n'}
             2. Hit 'Choose Tags to Apply button.{'\n'}

@@ -11,7 +11,7 @@ import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
 const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, iconType, iconSize, onPress}) => {
   return (
     <View style={styles.sectionDividerWithButtonContainer}>
-      <SectionDivider dividerText={dividerText} style={{borderBottomWidth: 0}}/>
+      <SectionDivider dividerText={dividerText}/>
       <Button
         disabled={disabled}
         icon={!buttonTitle && (

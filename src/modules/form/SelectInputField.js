@@ -142,6 +142,7 @@ const SelectInputField = ({
             styleDropdownMenuSubsection={formStyles.dropdownSelectedContainer}
             styleIndicator={formStyles.dropdownIndicator}
             styleInputGroup={formStyles.dropdownInputGroup}
+            styleItemsContainer={formStyles.dropdownItemsContainer}
             tagBorderColor={themes.PRIMARY_TEXT_COLOR}
             tagContainerStyle={formStyles.dropdownTagContainer}
             tagTextColor={themes.PRIMARY_TEXT_COLOR}

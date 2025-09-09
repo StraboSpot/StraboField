@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import uiStyles from '../../../shared/ui/ui.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 
@@ -26,11 +25,9 @@ const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
       title={'Open Project'}
     >
       <View>
-        <View style={uiStyles.sectionDivider}>
-          <Text style={overlayStyles.statusMessageText}>
-            What do you want to do with the current project ({currentProjectName})?
-          </Text>
-        </View>
+        <Text style={overlayStyles.statusMessageText}>
+          What do you want to do with the current project ({currentProjectName})?
+        </Text>
         <View style={{padding: 10}}>
           <Button
             containerStyle={{padding: 2.5}}

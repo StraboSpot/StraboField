@@ -3,10 +3,9 @@ import {Platform, StyleSheet} from 'react-native';
 import {
   BLACK,
   GOLD,
-  LIGHTGREY,
   MEDIUM_TEXT_SIZE,
-  MEDIUMGREY,
   PRIMARY_ACCENT_COLOR,
+  PRIMARY_BACKGROUND_COLOR,
   PRIMARY_HEADER_TEXT_SIZE,
   PRIMARY_TEXT_COLOR,
   SECONDARY_BACKGROUND_COLOR,
@@ -103,7 +102,7 @@ const styles = StyleSheet.create({
     width: Platform.OS === 'web' ? 50 : 55,
   },
   itemSeparator: {
-    borderColor: LIGHTGREY,
+    borderColor: PRIMARY_BACKGROUND_COLOR,
     borderTopWidth: 1,
   },
   leftContainer: {
@@ -131,8 +130,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   sectionDivider: {
-    borderBottomWidth: 1,
-    borderColor: MEDIUMGREY,
+    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     flexShrink: 1,
     paddingLeft: 10,
     paddingTop: 10,
@@ -145,8 +143,7 @@ const styles = StyleSheet.create({
   },
   sectionDividerWithButtonContainer: {
     alignItems: 'flex-end',
-    borderBottomWidth: 1,
-    borderColor: MEDIUMGREY,
+    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

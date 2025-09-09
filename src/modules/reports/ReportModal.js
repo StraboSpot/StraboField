@@ -7,7 +7,6 @@ import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from 
 import {isEmpty} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
 import SaveButton from '../../shared/ui/buttons/SaveButton';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -41,7 +40,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
-
       <ModalWrapper
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
@@ -51,10 +49,8 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           ListHeaderComponent={
             <>
               <ReportForm initialValues={initialValues} ref={formRef}/>
-              <FlatListItemSeparator/>
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
@@ -62,7 +58,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
