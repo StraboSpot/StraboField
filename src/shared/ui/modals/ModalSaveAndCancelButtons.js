@@ -8,12 +8,15 @@ import ActionButton from '../buttons/ActionButton';
 import OutlineButton from '../buttons/OutlineButton';
 
 const ModalSaveAndCancelButtons = ({
+                                     cancelTitle,
                                      disabled,
                                      onCancelPress,
                                      onDeletePress,
                                      onActionPressed,
                                      actionTitle,
-                                     hideActionButton = false,
+                                     isLoading,
+                                     showActionButton = true,
+                                     showCancelButton = true,
                                      showDeleteButton = false,
                                    }) => {
   return (
@@ -38,20 +41,21 @@ const ModalSaveAndCancelButtons = ({
         )}
       </View>
       <View style={overlayStyles.buttonContainer}>
-        <OutlineButton
-          onPress={onCancelPress}
-          title={'Cancel'}
-        />
-        {!hideActionButton && (
+        {showCancelButton && (
+          <OutlineButton
+            onPress={onCancelPress}
+            title={cancelTitle || 'Cancel'}
+          />
+        )}
+        {showActionButton && (
           <ActionButton
             disabled={disabled}
-            isLoading={false}
+            isLoading={isLoading}
             onPress={onActionPressed}
-            title={actionTitle}
+            title={actionTitle || 'Save'}
           />
         )}
       </View>
-
     </View>
   );
 };

@@ -4,9 +4,8 @@ import {FlatList, Text, View} from 'react-native';
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import {WarningModal} from '../../shared/ui/modals';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
@@ -37,16 +36,15 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
+
       <ModalWrapper
-        actionTitle={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
+        actionTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
         onActionPressed={handleSavePressed}
         onCancelPress={confirmCloseModal}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
-        saveTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
-        shouldShowButtons
         showDeleteButton={!isEmpty(initialValues)}
       >
         <FlatList
@@ -76,22 +74,15 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           bounces={false}
         />
 
-        <WarningModal
-          closeModal={() => setIsDeleteReportModalVisible(false)}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
-          confirmText={'DELETE'}
-          confirmTitleStyle={overlayStyles.importantText}
+        <DeleteConformationDialogBox
+          cancel={() => setIsDeleteReportModalVisible(false)}
+          deleteOverlay={deleteReport}
           isVisible={isDeleteReportModalVisible}
-          onConfirmPress={deleteReport}
-          showCancelButton={true}
-          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
-          title={'Delete Report?'}
         >
-          {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
-            : <Text>Are you sure you want to delete this report?</Text>}
-        </WarningModal>
-
+          <Text>Are you sure you want to delete this report?</Text>
+        </DeleteConformationDialogBox>
       </ModalWrapper>
+
     </>
   );
 };

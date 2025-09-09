@@ -51,7 +51,6 @@ const VertexActionsOverlay = ({
       isVisible={isShowVertexActionsModal}
       onActionPressed={() => handleActionPressed('Add Vertex')}
       onCancelPress={() => setIsShowVertexActionsModal(false)}
-      shouldShowButtons
     >
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
         {buttons.map((button) => {

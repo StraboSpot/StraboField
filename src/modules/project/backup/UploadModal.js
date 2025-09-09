@@ -265,6 +265,7 @@ const UploadModal = ({closeModal}) => {
     <ModalWrapper
       closeModal={closeModal}
       headerTitle={modalTitle}
+      showActionButton={false}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()

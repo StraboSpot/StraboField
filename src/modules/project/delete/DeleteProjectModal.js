@@ -4,8 +4,8 @@ import {Text, View} from 'react-native';
 import deleteProjectModalStyle from './deleteProjectModalStyle';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import StatusDialogBox from '../../../shared/ui/modals/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 
 const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
@@ -43,14 +43,23 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
   };
 
   return (
-    <StatusDialogBox
+    // <StatusDialogBox
+    //   actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
+    //   headerTitle={'Delete Locally Saved Project'}
+    //   isVisible={isDeleteProjectModalVisible}
+    //   onActionPressed={handleConfirmPress}
+    //   onCancelPress={closeModal}
+    //   showActionButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
+    //   showCancelButton={deleteProjectStatus === DELETE_STATUS.PENDING}
+    // >
+    <ModalWrapper
       actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
+      headerTitle={'Delete Locally Saved Project'}
       isVisible={isDeleteProjectModalVisible}
       onActionPressed={handleConfirmPress}
       onCancelPress={closeModal}
       showActionButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
       showCancelButton={deleteProjectStatus === DELETE_STATUS.PENDING}
-      title={'Delete Locally Saved Project'}
     >
       <View style={overlayStyles.overlayContent}>
         {deleteProjectStatus === DELETE_STATUS.PENDING ? (
@@ -75,7 +84,8 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
           </>
         )}
       </View>
-    </StatusDialogBox>
+    </ModalWrapper>
+    // </StatusDialogBox>
   );
 };
 

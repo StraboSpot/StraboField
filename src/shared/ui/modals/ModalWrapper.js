@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
 import compassStyles from '../../../modules/compass/compass.styles';
-import {MODAL_KEYS, NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
+import {NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
@@ -14,23 +14,26 @@ import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 const ModalWrapper = ({
+                        actionTitle,
                         buttonTitleLeft,
                         buttonTitleRight,
                         cancel,
+                        cancelTitle,
                         children,
                         closeModal,
                         disabled,
+                        headerTitle,
+                        hideActionButton,
                         isFullScreen,
+                        isLoading,
                         isVisible,
+                        onActionPressed,
                         onCancelPress,
                         onDeletePress,
                         onPress,
-                        onActionPressed,
                         overlayStyleOverride,
-                        headerTitle,
-                        actionTitle,
-                        hideActionButton,
-                        shouldShowButtons,
+                        showActionButton,
+                        showCancelButton,
                         showCloseButton,
                         showDeleteButton,
                       }) => {
@@ -88,9 +91,10 @@ const ModalWrapper = ({
       animationType={'fade'}
       backdropStyle={overlayStyles.backdropStyles}
       fullScreen={SMALL_SCREEN}
-      isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
-        || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
-        || SMALL_SCREEN || isFullScreen || isVisible}
+      isVisible={isVisible}
+      // isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
+      //   || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
+      //   || SMALL_SCREEN || isFullScreen || isVisible}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
@@ -104,18 +108,21 @@ const ModalWrapper = ({
       />
       {children}
       {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
-      {shouldShowButtons && (
-        <ModalSaveAndCancelButtons
-          actionTitle={actionTitle}
-          disabled={disabled}
-          hideActionButton={hideActionButton}
-          onActionPressed={onActionPressed}
-          onCancelPress={onCancelPress}
-          onDeletePress={onDeletePress}
-          showDeleteButton={showDeleteButton}/>
-      )}
+      <ModalSaveAndCancelButtons
+        actionTitle={actionTitle}
+        cancelTitle={cancelTitle}
+        disabled={disabled}
+        hideActionButton={hideActionButton}
+        isLoading={isLoading}
+        onActionPressed={onActionPressed}
+        onCancelPress={onCancelPress}
+        onDeletePress={onDeletePress}
+        showActionButton={showActionButton}
+        showCancelButton={showCancelButton}
+        showDeleteButton={showDeleteButton}
+      />
     </Overlay>
   );
 };
 
-export default ModalWrapper;
+export default React.memo(ModalWrapper);
