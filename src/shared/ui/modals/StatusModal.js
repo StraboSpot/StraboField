@@ -50,11 +50,12 @@ const StatusModal = ({openMainMenuPanel}) => {
 
   return (
     <StatusDialogBox
-      closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      headerTitle={'Status'}
       isVisible={isStatusMessagesModalVisible}
-      onConfirmPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      showConfirmButton={!isModalLoading && selectedProject.source === ''}
-      title={'Status'}
+      onActionPressed={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      onCancelPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      showActionButton={!isModalLoading && selectedProject.source === ''}
+      showCancelButton={!isModalLoading && selectedProject.source !== ''}
     >
       <View>
         {isModalLoading && (
