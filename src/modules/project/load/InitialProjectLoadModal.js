@@ -168,8 +168,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
 
   return (
     <ModalWrapper
+      headerTitle={statusMessageModalTitle}
       overlayStyleOverride={{justifyContent: 'center', height: '80%'}}
-      title={statusMessageModalTitle}
+      showActionButton={false}
+      showCancelButton={false}
     >
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}

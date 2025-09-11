@@ -5,12 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import useDevice from './useDevice';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  removedLastStatusMessage,
-  setIsWarningMessagesModalVisible,
-} from '../modules/home/home.slice';
+import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../shared/Helpers';
 
@@ -246,46 +241,49 @@ const useExport = () => {
   };
 
   const zipAndExportProjectFolder = async (selectedBackupFile, exportedFilename, isBeingExported) => {
-    try {
-      // dispatch(setLoadingStatus({view: 'modal', bool: true}));
-      await makeDirectory(appExportDirectory + selectedBackupFile);
+    // try {
+    // dispatch(setLoadingStatus({view: 'modal', bool: true}));
+    await makeDirectory(appExportDirectory + selectedBackupFile);
 
-      // Make temp directory for the export files to be zipped up.
-      console.log('Directory made:', appExportDirectory);
+    // Make temp directory for the export files to be zipped up.
+    console.log('Directory made:', appExportDirectory);
 
-      // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
-      const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
-      const destination = appExportDirectory + selectedBackupFile;
-      Platform.OS === 'android' && await requestWriteDirectoryPermission();
-      console.log(selectedBackupFile);
+    // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
+    const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
+    const destination = appExportDirectory + selectedBackupFile;
+    Platform.OS === 'android' && await requestWriteDirectoryPermission();
+    console.log(selectedBackupFile);
 
-      const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
-      const exportedJSON = JSON.parse(dataFile);
-      await copyFiles(source, `${destination}/data.json`);
-      console.log('Files Copied', exportedJSON);
-      dispatch(removedLastStatusMessage());
-      await gatherImagesForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
-      console.log('Images copied to:', destination);
-      await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
-      console.log('Map tiles copied to:', destination);
-      await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
-      const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
-      const path = await zip(appExportDirectory + selectedBackupFile,
-        zipPath + exportedFilename + '.zip');
+    const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
+    const exportedJSON = JSON.parse(dataFile);
+    await copyFiles(source, `${destination}/data.json`);
+    console.log('Files Copied', exportedJSON);
+    dispatch(removedLastStatusMessage());
+    await gatherImagesForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
+    console.log('Images copied to:', destination);
+    await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
+    console.log('Map tiles copied to:', destination);
+    await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
+    const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
+    const path = await zip(appExportDirectory + selectedBackupFile,
+      zipPath + exportedFilename + '.zip');
 
-      const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
-      console.log('Folder', deleteTempFolder);
-      console.log(`zip completed at ${path}`);
-      console.log('All Done Exporting');
-      dispatch(clearedStatusMessages());
-    }
-    catch (e) {
-      const warningMessage = 'Error Exporting\n' + e;
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(warningMessage));
-      dispatch(setIsWarningMessagesModalVisible(true));
-      throw Error;
-    }
+    const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
+    console.log('Folder', deleteTempFolder);
+    console.log(`zip completed at ${path}`);
+    console.log('All Done Exporting');
+    dispatch(clearedStatusMessages());
+    // throw Error('This is an ERROR YEEHAW');
+
+    // return 'complete';
+    // }
+    // catch (e) {
+    //   const warningMessage = 'Error Exporting\n' + e;
+    //   dispatch(clearedStatusMessages());
+    //   dispatch(addedStatusMessage(warningMessage));
+    //   dispatch(setIsWarningMessagesModalVisible(true));
+    //   throw Error;
+    // }
   };
 
   return {
