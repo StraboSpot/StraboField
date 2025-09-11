@@ -2,7 +2,7 @@ import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 // Constants
 import * as themes from '../../shared/styles.constants';
-import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
@@ -18,11 +18,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   dropdownInputGroup: {
-    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     paddingLeft: 0,
   },
+  dropdownItemsContainer: {
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    borderWidth: 0.5,
+  },
   dropdownSelectedContainer: {
-    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     borderBottomWidth: 0,
     paddingBottom: 0, //Overrides default
     paddingTop: 0, //Overrides default
@@ -35,6 +37,7 @@ const styles = StyleSheet.create({
   },
   dropdownTagContainer: {
     borderRadius: 5,
+    borderWidth: 0.5,
     margin: 1,
   },
   fieldError: {
@@ -54,7 +57,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   fieldValue: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderBottomColor: themes.MEDIUMGREY,
     borderBottomWidth: 0.5,
     color: themes.PRIMARY_TEXT_COLOR,
@@ -63,11 +65,15 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   fieldValueFull: {
+    borderColor: themes.MEDIUMGREY,
+    borderWidth: 0.5,
     maxHeight: height * 0.5,
     minHeight: height * 0.5,
     verticalAlign: 'top',
   },
   fieldValueMultiline: {
+    borderColor: themes.MEDIUMGREY,
+    borderWidth: 0.5,
     height: 75,
     verticalAlign: 'top',
   },

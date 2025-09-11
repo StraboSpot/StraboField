@@ -9,7 +9,6 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {DateInputField, TextInputField} from '../form';
@@ -90,7 +89,6 @@ const DailyNotesModal = () => {
                   />
                 </ListItem.Content>
               </ListItem>
-              <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field

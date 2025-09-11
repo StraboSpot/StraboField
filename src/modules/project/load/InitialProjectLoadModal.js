@@ -11,6 +11,7 @@ import NewProjectForm from './NewProjectForm';
 import useResetState from '../../../services/useResetState';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
@@ -62,7 +63,8 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
         onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
         onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
         onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
-        onStartNewProject={() => handleOnPress('project')}/>
+        onStartNewProject={() => handleOnPress('project')}
+      />
     );
   };
 
@@ -130,7 +132,9 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
         return (
           <>
             {renderBackButton()}
-            <NewProjectForm openMainMenuPanel={openMainMenuPanel}/>
+            <View style={{backgroundColor: PRIMARY_BACKGROUND_COLOR, flex: 1}}>
+              <NewProjectForm openMainMenuPanel={openMainMenuPanel}/>
+            </View>
           </>
         );
       case 'importData':

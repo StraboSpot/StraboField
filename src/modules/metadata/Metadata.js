@@ -6,7 +6,6 @@ import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField} from '../form';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
@@ -46,7 +45,6 @@ const Metadata = () => {
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
@@ -59,7 +57,6 @@ const Metadata = () => {
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field

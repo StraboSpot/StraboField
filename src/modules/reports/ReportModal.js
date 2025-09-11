@@ -36,7 +36,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
-
       <ModalWrapper
         actionTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
         buttonTitleRight={'Close'}
@@ -51,10 +50,8 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           ListHeaderComponent={
             <>
               <ReportForm initialValues={initialValues} ref={formRef}/>
-              <FlatListItemSeparator/>
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
@@ -62,7 +59,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}

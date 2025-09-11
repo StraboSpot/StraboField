@@ -157,7 +157,7 @@ const MeasurementsPage = ({page}) => {
     const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === title);
     return (
       <View style={styles.measurementsSectionDividerContainer}>
-        <SectionDivider dividerText={title} style={{borderBottomWidth: 0}}/>
+        <SectionDivider dividerText={title}/>
         <View style={styles.measurementsSectionDividerButtonContainer}>
           {multiSelectMode && sectionType === multiSelectMode && (
             <Button

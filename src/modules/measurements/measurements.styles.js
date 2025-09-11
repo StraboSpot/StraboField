@@ -1,7 +1,7 @@
 import {Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUMGREY} from '../../shared/styles.constants';
+import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   basicText: {
@@ -31,8 +31,7 @@ const styles = StyleSheet.create({
   },
   measurementsSectionDividerContainer: {
     alignItems: 'center',
-    borderBottomColor: MEDIUMGREY,
-    borderBottomWidth: 1,
+    backgroundColor: PRIMARY_BACKGROUND_COLOR,
     flex: 1,
     flexDirection: 'row',
   },

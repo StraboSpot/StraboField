@@ -5,7 +5,6 @@ import styles from './issuesAndRequest.styles';
 import UrlLinkButton from './UrlLinkButton';
 import {SUPPORT_PATHS} from '../../services/urls.constants';
 import {WHITE} from '../../shared/styles.constants';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const IssuesAndRequests = () => {
   return (
@@ -23,7 +22,6 @@ const IssuesAndRequests = () => {
         titleStyle={styles.buttonText}
         url={SUPPORT_PATHS.GITHUB}
       />
-      <FlatListItemSeparator/>
       <UrlLinkButton
         buttonStyle={styles.button}
         color={WHITE}

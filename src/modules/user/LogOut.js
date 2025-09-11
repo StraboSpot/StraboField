@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/Helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
-import uiStyles from '../../shared/ui/ui.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
 
@@ -53,11 +52,9 @@ const LogOut = () => {
         title={'Log Out?'}
       >
         <View>
-          <View style={uiStyles.sectionDivider}>
-            <Text style={overlayStyles.importantText}>
-              Please make sure to backup your project before logging out.
-            </Text>
-          </View>
+          <Text style={[overlayStyles.importantText, {padding: 5}]}>
+            Please make sure to backup your project before logging out.
+          </Text>
           <View style={{padding: 10}}>
             <Button
               containerStyle={{padding: 2.5}}

@@ -1,11 +1,11 @@
 import React, {useRef} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import commonStyles from '../../../shared/common.styles';
+import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {Form, useForm} from '../../form';
 import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -63,14 +63,11 @@ const NewProjectForm = ({openMainMenuPanel}) => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
       <FlatList ListHeaderComponent={renderFormFields}/>
-      <Button
-        buttonStyle={commonStyles.standardButton}
-        containerStyle={commonStyles.standardButtonContainer}
+      <OutlineButton
         onPress={saveForm}
         title={'Save New Project'}
-        titleStyle={commonStyles.standardButtonText}
       />
     </View>
   );

@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import {PRIMARY_BACKGROUND_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
@@ -82,7 +82,6 @@ const Miscellaneous = () => {
         <Input
           containerStyle={{paddingTop: 10}}
           defaultValue={numRandomSpots}
-          inputContainerStyle={{backgroundColor: PRIMARY_BACKGROUND_COLOR, padding: 0}}
           inputStyle={formStyles.fieldValue}
           label={'Number of Spots'}
           labelStyle={{color: PRIMARY_TEXT_COLOR}}

@@ -9,7 +9,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {MEDIUMGREY, POSITIVE_COLOR, RED, WARNING_COLOR} from '../../../shared/styles.constants';
-import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
@@ -158,7 +157,6 @@ const DatasetDetail = ({dataset}) => {
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
@@ -171,7 +169,6 @@ const DatasetDetail = ({dataset}) => {
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
@@ -250,13 +247,9 @@ const DatasetDetail = ({dataset}) => {
       />
 
       {renderNameField()}
-      <FlatListItemSeparator/>
       {renderMetadataForm()}
-      <FlatListItemSeparator/>
       {renderSpotsField()}
-      <FlatListItemSeparator/>
       {renderImagesField()}
-      <FlatListItemSeparator/>
       <LittleSpacer/>
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 

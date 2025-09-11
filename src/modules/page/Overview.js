@@ -123,7 +123,7 @@ const Overview = ({openMainMenuPanel}) => {
 
   const renderSections = () => {
     return (
-      <View>
+      <View style={{flex: 1}}>
         <NotebookPageHeader hideBackButton pageTitle={'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}

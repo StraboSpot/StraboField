@@ -11,7 +11,6 @@ import * as themes from '../../shared/styles.constants';
 import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
 import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -129,7 +128,6 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
@@ -140,7 +138,6 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
@@ -155,7 +152,6 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              <FlatListItemSeparator/>
               {formRef.current && formRef.current.values.type === 'other' && (
                 <>
                   <ListItem containerStyle={commonStyles.listItemFormField}>
@@ -172,7 +168,6 @@ const OtherFeatureDetail = ({
                       />
                     </ListItem.Content>
                   </ListItem>
-                  <FlatListItemSeparator/>
                 </>
               )}
               <ListItem containerStyle={commonStyles.listItemFormField}>
