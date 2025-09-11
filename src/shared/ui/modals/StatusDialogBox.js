@@ -32,12 +32,10 @@ const StatusDialogBox = ({
   const {height, width} = useWindowSize();
 
   const getResponsiveOverlayStyle = () => {
-    if (width < 600) {
-      return overlayStyles.overlayContainerFullScreen;
-    }
+    if (width < SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
-      maxHeight: height * 0.9,
+      maxHeight: height * 0.8,
     };
   };
 

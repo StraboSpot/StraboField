@@ -59,13 +59,12 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
 
   const renderLoadProjectButtons = () => {
     return (
-      <View>
-        <LoadProjectButtons
-          onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
-          onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
-          onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
-          onStartNewProject={() => handleOnPress('project')}/>
-      </View>
+      <LoadProjectButtons
+        onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
+        onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
+        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
+        onStartNewProject={() => handleOnPress('project')}
+      />
     );
   };
 
@@ -172,7 +171,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
   };
 
   return (
-    <ModalWrapper title={statusMessageModalTitle}>
+    <ModalWrapper
+      overlayStyleOverride={{justifyContent: 'center', height: '80%'}}
+      title={statusMessageModalTitle}
+    >
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}
     </ModalWrapper>
