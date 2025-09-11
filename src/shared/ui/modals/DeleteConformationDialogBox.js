@@ -5,20 +5,21 @@ import overlayStyles from '../../ui/modals/overlay.styles';
 import ModalWrapper from '../modals/ModalWrapper';
 
 const DeleteConformationDialogBox = ({
-                                       cancel,
+                                       onCancelPress,
                                        children,
-                                       deleteOverlay,
+                                       onActionPressed,
                                        isVisible,
                                        headerTitle,
+                                       showActionButton,
                                      }) => {
   return (
     <ModalWrapper
       actionTitle={'Delete'}
       headerTitle={headerTitle}
       isVisible={isVisible}
-      onActionPressed={deleteOverlay}
-      onCancelPress={cancel}
-      shouldShowButtons
+      onActionPressed={onActionPressed}
+      onCancelPress={onCancelPress}
+      showActionButton={showActionButton}
     >
       <View style={overlayStyles.overlayContent}>
         {children}

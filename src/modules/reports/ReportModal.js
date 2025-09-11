@@ -75,11 +75,13 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
 
         <DeleteConformationDialogBox
-          cancel={() => setIsDeleteReportModalVisible(false)}
-          deleteOverlay={deleteReport}
           isVisible={isDeleteReportModalVisible}
+          onActionPressed={deleteReport}
+          onCancelPress={() => setIsDeleteReportModalVisible(false)}
+          showActionButton={isDeleteReportModalVisible && !errorMessage}
         >
-          <Text>Are you sure you want to delete this report?</Text>
+          {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
+            : <Text>Are you sure you want to delete this report?</Text>}
         </DeleteConformationDialogBox>
       </ModalWrapper>
 

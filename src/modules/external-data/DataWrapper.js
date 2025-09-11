@@ -30,10 +30,10 @@ function DataWrapper({
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
     return (
       <DeleteConformationDialogBox
-        cancel={() => setIsDeleteConfirmModalVisible(false)}
-        deleteOverlay={() => deleteSelection()}
         headerTitle={`Delete ${itemToDelete.type.toUpperCase()}?`}
         isVisible={isDeleteConfirmModalVisible}
+        onActionPressed={() => deleteSelection()}
+        onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
       >
         <Text>Are you sure you want to delete</Text>
         <Text>{title}?</Text>
