@@ -19,6 +19,7 @@ const HomeContainer = ({navigation, route}) => {
   console.log('Rendering HomeContainer...');
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const mapComponentRef = useRef(null);
 
@@ -93,14 +94,16 @@ const HomeContainer = ({navigation, route}) => {
         ref={mapComponentRef}
         zoomToCurrentLocation={zoomToCurrentLocation}
       />
-      <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
-        <MainMenuPanel
-          closeMainMenuPanel={closeMainMenuPanel}
-          openNotebookPanel={openNotebookPanel}
-          openSpotInNotebook={openSpotInNotebook}
-          ref={mapComponentRef}
-        />
-      </Animated.View>
+      {!isProjectLoadSelectionModalVisible && (
+        <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
+          <MainMenuPanel
+            closeMainMenuPanel={closeMainMenuPanel}
+            openNotebookPanel={openNotebookPanel}
+            openSpotInNotebook={openSpotInNotebook}
+            ref={mapComponentRef}
+          />
+        </Animated.View>
+      )}
     </Animated.View>
   );
 };
