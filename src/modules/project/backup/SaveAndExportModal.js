@@ -1,14 +1,12 @@
 import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import moment from 'moment';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
@@ -34,6 +32,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
 
   const getButtonTitle = () => {
     if (backupAction === 'save') return 'Save';
+    if (backingUpStatus === 'complete') return 'Close';
     else {
       if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
       else return selectedFilename ? 'Export' : 'Save & Export';
@@ -77,6 +76,12 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
     closeModal();
   };
 
+  const handleActionPressed = async () => {
+    if (backupAction === 'save') await initiateBackup();
+    if (backingUpStatus === 'complete') handleClosePress();
+    else await exportProject();
+  };
+
   const initiateBackup = async () => {
     try {
       setBackingUpStatus('inProgress');
@@ -102,42 +107,8 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
         {statusMessages.join('\n')}
       </Text>
-      {backingUpStatus === 'complete' && (
-        <View style={{marginTop: 16}}>
-          <Button
-            buttonStyle={overlayStyles.buttonStyle}
-            onPress={handleClosePress}
-            title='OK'
-            type='solid'
-          />
-        </View>
-      )}
     </View>
   );
-
-  // const renderExportMessage = () => {
-  //   return (
-  //     <Text style={overlayStyles.contentText}>
-  //       {Platform.OS === 'ios' ? (
-  //         'All project data, images, and offline maps will be saved as a .zip file to the Distribution folder in '
-  //         + 'the My Files App\\StraboField\\ProjectBackups\\Distribution.\n\nYou may want to export '
-  //         + 'your zipped project by moving it out of the StraboField Folder using the iOS Files app.\n\n'
-  //         + 'Zipped project will be saved as:'
-  //       ) : (
-  //         'All project data, images, and offline maps will be EXPORTED as a .zip file to the Downloads folder '
-  //         + 'in the Android My Files app.\n\nZipped project will be exported as:'
-  //       )}
-  //     </Text>
-  //   );
-  // };
-  //
-  // const renderSaveMessage = () => {
-  //   return (
-  //     <Text style={overlayStyles.contentText}>
-  //       All datasets will be saved locally, along with any images and custom maps.
-  //     </Text>
-  //   );
-  // };
 
   const validateFileName = (filenameChanged) => {
     const regexp = /^[a-zA-Z0-9-_]+$/; // Check for alphanumberic characters, a dash or underscore
@@ -153,9 +124,10 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       actionTitle={getButtonTitle()}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
-      onActionPressed={backupAction === 'save' ? initiateBackup : exportProject}
+      onActionPressed={handleActionPressed}
       onCancelPress={handleClosePress}
-      shouldShowButtons={backingUpStatus === ''}
+      showActionButton={backingUpStatus === '' || backingUpStatus === 'complete'}
+      showCancelButton={backingUpStatus === ''}
     >
       {backingUpStatus === '' ? (
         <View style={{padding: 16}}>
