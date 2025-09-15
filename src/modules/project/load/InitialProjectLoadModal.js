@@ -172,7 +172,7 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
 
   return (
     <ModalWrapper
-      overlayStyleOverride={{justifyContent: 'center', height: '80%'}}
+      overlayStyleOverride={{justifyContent: 'center', height: visibleInitialSection === 'none' ? null : '80%'}}
       title={statusMessageModalTitle}
     >
       {visibleInitialSection === 'none' && renderUserProfile()}

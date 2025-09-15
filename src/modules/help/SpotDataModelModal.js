@@ -105,7 +105,12 @@ const SpotDataModelModal = ({close}) => {
   };
 
   return (
-    <ModalWrapper closeModal={close} isFullScreen title={'Spot Data Model Object'}>
+    <ModalWrapper
+      closeModal={close}
+      isFullScreen
+      overlayStyleOverride={{width: '50%'}}
+      title={'Spot Data Model Object'}
+    >
       <ScrollView>
         <Button
           onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}

@@ -36,9 +36,6 @@ const ModalWrapper = ({
     return {
       ...overlayStyles.overlayContainer,
       ...overlayStyleOverride,
-      // flex: 1,
-      // maxHeight: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? height * 0.8 : height * 0.7,
-      width: modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS ? width * 0.80 : 300,
     };
   };
 
