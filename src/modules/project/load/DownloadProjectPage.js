@@ -14,9 +14,10 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const project = useSelector(state => state.project.project);
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
-  const [projectToOpen, setProjectToOpen] = useState(null);
+  const [projectToDownload, setProjectToDownload] = useState(null);
 
   const {initializeDownload} = useDownload();
 
@@ -24,18 +25,30 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
-  const confirmOpenProject = async (project) => {
-    setProjectToOpen(project);
+  const confirmDownloadProject = async (projectSelected) => {
+    setProjectToDownload(projectSelected);
     if (isProjectLoadSelectionModalVisible) {
-      await initializeDownload(project);
+      await initializeDownload(projectSelected);
       openMainMenuPanel();
     }
     else setIsConfirmOverwriteModalVisible(true);
   };
 
-  const downloadProject = async (project) => {
+  const downloadProject = async () => {
     closeConfirmOverwriteModal();
-    await initializeDownload(projectToOpen);
+    await initializeDownload(projectToDownload);
+  };
+
+  const getTextOverride = () => {
+    // Server is returning the timestamp w/o the milliseconds so remove
+    // the milliseconds from the current project timestamp to compare
+    const projectTimestampNoMilliseconds = Math.floor(project.modified_timestamp / 1000);
+    if (project.id === projectToDownload.id
+      && projectTimestampNoMilliseconds.toString() > projectToDownload.modified_timestamp.toString()) {
+      return 'The current project is newer than the project on the server. Are you sure you want to'
+        + ' overwrite the current project?';
+    }
+    else return undefined;
   };
 
   return (
@@ -48,7 +61,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
             title={'My StraboField Projects'}
           />
         )}
-        <ProjectList onProjectPress={confirmOpenProject} source={source}/>
+        <ProjectList onProjectPress={confirmDownloadProject} source={source}/>
       </View>
 
       {/* Modal */}
@@ -56,6 +69,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}
           loadProject={downloadProject}
+          textOverride={getTextOverride()}
         />
       )}
     </>
