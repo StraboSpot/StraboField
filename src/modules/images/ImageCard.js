@@ -30,6 +30,7 @@ const ImageCard = ({
 
   const placeholderTitle = `Untitled ${index + 1}`;
 
+  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
   const [title, setTitle] = useState(
     image.title && typeof image.title === 'string' && image.title.trim() !== ''
       ? image.title.toString()
@@ -73,7 +74,9 @@ const ImageCard = ({
         console.log('Got Image');
         const uriObj = await getImageThumbnailURIs([image]);
         setImageThumbnailURIs({...imageThumbnailURIs, ...uriObj});
+        if (isImageMissingOnServer) setIsImageMissingOnServer(false);
       }
+      else setIsImageMissingOnServer(true);
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: false});
     }
   };
@@ -127,6 +130,7 @@ const ImageCard = ({
       <View style={imageStyles.cardImageContainer}>
         <ImageThumbnail
           imageThumbnailURI={imageThumbnailURIs?.[image.id]}
+          isImageMissingOnServer={isImageMissingOnServer}
           isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
           isThumbnailOnly={isThumbnailOnly}
           onFinishedLoading={handleImageFinishedLoading}
