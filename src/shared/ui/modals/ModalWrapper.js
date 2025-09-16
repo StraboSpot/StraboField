@@ -92,9 +92,6 @@ const ModalWrapper = ({
       backdropStyle={overlayStyles.backdropStyles}
       fullScreen={SMALL_SCREEN}
       isVisible={isVisible}
-      // isVisible={modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
-      //   || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT || modalVisible === MODAL_KEYS.NOTEBOOK.REPORTS
-      //   || SMALL_SCREEN || isFullScreen || isVisible}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >

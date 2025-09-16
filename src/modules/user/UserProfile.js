@@ -175,16 +175,12 @@ const UserProfile = () => {
     return (
       <TextInputModal
         buttonText={'DELETE'}
-        closeModal={handleDeleteModalClose}
         dialogTitle={'DANGER!'}
         errorMessage={errorMessage}
         onActionPressed={onDeleteProfile}
-        onCancelPress={handleCancel}
+        onCancelPress={handleDeleteModalClose}
         onChangeText={text => handleOnChange(text)}
-        overlayButtonText={overlayStyles.importantText}
-        overlayTitleText={overlayStyles.importantText}
         textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
-        topPosition={10}
         value={deleteProfileInputValue}
         visible={isDeleteProfileModalVisible}
       />

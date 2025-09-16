@@ -53,6 +53,7 @@ export const MODAL_BORDER_RADIUS = 10;
 
 export const UPDATE_LABEL_WIDTH = 150;
 export const UPDATE_LABEL_HEIGHT = 150;
+export const MODAL_BACKDROP = 'rgba(0, 0, 0, 0.5)';
 
 // Home Menu and Notebook widths
 export const MAIN_MENU_DRAWER_WIDTH = 300;

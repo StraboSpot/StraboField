@@ -48,7 +48,8 @@ const LogOut = () => {
   const renderLogoutModal = () => {
     return (
       <ModalWrapper
-        closeModal={() => setIsLogoutModalVisible(false)}
+        onCancelPress={() => setIsLogoutModalVisible(false)}
+        showActionButton={false}
         title={'Log Out?'}
       >
         <View>
