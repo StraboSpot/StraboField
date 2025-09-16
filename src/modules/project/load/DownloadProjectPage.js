@@ -40,11 +40,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   };
 
   const getTextOverride = () => {
-    // Server is returning the timestamp w/o the milliseconds so remove
-    // the milliseconds from the current project timestamp to compare
-    const projectTimestampNoMilliseconds = Math.floor(project.modified_timestamp / 1000);
-    if (project.id === projectToDownload.id
-      && projectTimestampNoMilliseconds.toString() > projectToDownload.modified_timestamp.toString()) {
+    if (project.id === projectToDownload.id && project.modified_timestamp > projectToDownload.modified_timestamp) {
       return 'The current project is newer than the project on the server. Are you sure you want to'
         + ' overwrite the current project?';
     }
