@@ -104,13 +104,12 @@ const BackupProjectPage = () => {
       )}
 
       {/* Modals */}
-      {isSaveAndExportModalVisible && (
-        <SaveAndExportModal
-          backupAction={backupAction}
-          closeModal={() => setIsSaveAndExportModalVisible(false)}
-        />
-      )}
-      {isUploadModalVisible && <UploadModal closeModal={() => setIsUploadModalVisible(false)}/>}
+      <SaveAndExportModal
+        backupAction={backupAction}
+        closeModal={() => setIsSaveAndExportModalVisible(false)}
+        isVisible={isSaveAndExportModalVisible}
+      />
+      <UploadModal closeModal={() => setIsUploadModalVisible(false)} isVisible={isUploadModalVisible}/>
       <UploadProgressModal
         isProgressModalVisible={isProgressModalVisible}
       />

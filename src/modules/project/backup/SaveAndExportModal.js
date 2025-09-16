@@ -11,7 +11,7 @@ import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
 
-const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
+const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const statusMessages = useSelector(state => state.home.statusMessages);
@@ -31,12 +31,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   const fileName = backupFileName.replace(/\s/g, '_');
 
   const getButtonTitle = () => {
-    if (backupAction === 'save') return 'Save';
-    if (backingUpStatus === 'complete') return 'Close';
-    else {
-      if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
-      else return selectedFilename ? 'Export' : 'Save & Export';
+    if (backingUpStatus === '') {
+      if (backupAction === 'save') return 'Save';
+      if (backupAction === 'export') {
+        if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
+        else return selectedFilename ? 'Export' : 'Save & Export';
+      }
     }
+    else if (backingUpStatus === 'complete' || backingUpStatus === 'error') return 'Close';
   };
 
   const exportProject = async () => {
@@ -51,22 +53,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       await zipAndExportProjectFolder(backupFileName, exportFileName, true);
       setBackingUpStatus('complete');
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS === 'ios') {
-        setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
-        console.log('Project has been saved and zipped!');
-        toast.show('Project has been saved and zipped! Please move zip out of the StraboSpot folder.');
-      }
-      else {
-        setModalTitle(selectedFilename ? 'Project Exported to Zip!' : 'Project Saved and Exported to Zip!');
-        console.log('Project has been saved and exported to the Downloads folder!');
-        toast.show('Project has been exported!');
-      }
+      if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
+      else setModalTitle(selectedFilename ? 'Project Exported to Zip!' : 'Project Saved and Exported to Zip!');
     }
     catch (err) {
       console.error('Error exporting project!', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS === 'ios') toast.show('ZIP FAILED!\n' + err);
-      else toast.show('EXPORT FAILED!\n' + err);
+      setModalTitle(selectedFilename ? 'Export Failed!' : 'Save & Export Failed!');
+      setBackingUpStatus('error');
     }
   };
 
@@ -77,9 +71,11 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   const handleActionPressed = async () => {
-    if (backupAction === 'save') await initiateBackup();
-    if (backingUpStatus === 'complete') handleClosePress();
-    else await exportProject();
+    if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
+    else {
+      if (backupAction === 'save') await initiateBackup();
+      else if (backupAction === 'export') await exportProject();
+    }
   };
 
   const initiateBackup = async () => {
@@ -102,7 +98,8 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       <LottieAnimations
         doesLoop={backingUpStatus === 'inProgress'}
         show
-        type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
+        type={backingUpStatus === 'inProgress' ? 'loadingFile'
+          : backingUpStatus === 'complete' ? 'complete' : 'error'}
       />
       <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
         {statusMessages.join('\n')}
@@ -124,9 +121,10 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       actionTitle={getButtonTitle()}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
-      onActionPressed={handleActionPressed}
+      isVisible={isVisible}
+      onActionPressed={backingUpStatus === 'complete' ? handleClosePress : handleActionPressed}
       onCancelPress={handleClosePress}
-      showActionButton={backingUpStatus === '' || backingUpStatus === 'complete'}
+      showActionButton={backingUpStatus === '' || backingUpStatus === 'complete' || backingUpStatus === 'error'}
       showCancelButton={backingUpStatus === ''}
     >
       {backingUpStatus === '' ? (
