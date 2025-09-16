@@ -56,7 +56,7 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
-      if (datasets.length >= 1) {
+      if ((isEmpty(project) || (!isEmpty(project) && project.id !== selectedProject.id)) && datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
         dispatch(setTargetDataset(datasets[0].id));
       }
@@ -79,7 +79,7 @@ const useDownload = () => {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
-      if (!isEmpty(project)) clearProject();
+      if (!isEmpty(project) && project.id !== selectedProject.id) clearProject();
       dispatch(addedProject(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
