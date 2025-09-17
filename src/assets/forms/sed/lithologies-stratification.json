@@ -173,7 +173,7 @@
     },
     {
       "type": "text",
-      "name": "Notes",
+      "name": "notes",
       "label": "Notes",
       "read_only": false,
       "required": false,
