@@ -141,7 +141,6 @@ const UserProfile = () => {
       }
     }
   };
-
   const removeProfileImage = async () => {
     try {
       setIsDeletingProfileImage(true);

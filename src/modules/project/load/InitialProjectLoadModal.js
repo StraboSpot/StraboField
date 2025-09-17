@@ -173,7 +173,7 @@ const InitialProjectLoadModal = ({openMainMenuPanel}) => {
   return (
     <ModalWrapper
       headerTitle={statusMessageModalTitle}
-      overlayStyleOverride={{justifyContent: 'center', height: '80%'}}
+      overlayStyleOverride={{justifyContent: 'center', height: visibleInitialSection === 'none' ? null : '80%'}}
       showActionButton={false}
       showCancelButton={false}
     >

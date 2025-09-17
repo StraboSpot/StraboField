@@ -51,13 +51,8 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
   const getAllProjects = async () => {
     let projectsResponse;
     setLoading(true);
-    if (source === 'server') {
-      projectsResponse = await getAllServerProjects();
-    }
-    else if (source === 'device') {
-      projectsResponse = await getAllDeviceProjects(APP_DIRECTORIES.BACKUP_DIR);
-      console.log('Device Files', projectsResponse);
-    }
+    if (source === 'server') projectsResponse = await getAllServerProjects();
+    else if (source === 'device') projectsResponse = await getAllDeviceProjects(APP_DIRECTORIES.BACKUP_DIR);
     if (!projectsResponse) {
       if (source === 'device') {
         dispatch(doesBackupDirectoryExist(false));

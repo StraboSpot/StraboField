@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Platform, View} from 'react-native';
+import {Platform, View, Text} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,7 +27,6 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const spotsCount = dataset.spotIds?.length || 0;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
-  const imagesIcon = <Icon color={WARNING_COLOR} name={'alert-circle-outline'} size={12} type={'ionicon'}/>;
 
   const viewDataset = () => {
     setDatasetToView(dataset);
@@ -59,7 +58,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{truncateText(dataset.name, 18)}</ListItem.Title>
           <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
-            Spots: {spotsCount}, Images: {imagesCount} {imagesNeededCount > 0 && Platform.OS !== 'web' && imagesIcon}
+            Spots: {spotsCount}{'\n'}
+            Images: {imagesCount}
+            {imagesNeededCount > 0 && Platform.OS !== 'web' && (
+              <Text style={{color: WARNING_COLOR}}> (MISSING {imagesNeededCount})</Text>
+            )}
           </ListItem.Subtitle>
         </ListItem.Content>
 

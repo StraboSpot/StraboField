@@ -4,7 +4,7 @@ export const MAIN_MENU_ITEMS = {
   MANAGE_PROJECT: {
     DATASETS: 'Datasets ',
     BACKUP: 'Backup',
-    DESCRIPTION: 'Metadata',
+    DESCRIPTION: 'Project Description',
     SETTINGS: 'Privacy',
   },
   CUSTOMIZE_AND_PRESET: {

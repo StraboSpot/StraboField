@@ -120,10 +120,7 @@ const SpotDataModelModal = ({close}) => {
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
         />
-        <JSONTree
-          data={spotDataModel}
-          hideRoot
-        />
+        <JSONTree data={spotDataModel} hideRoot/>
       </ScrollView>
     </ModalWrapper>
   );

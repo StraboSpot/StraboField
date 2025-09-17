@@ -4,14 +4,18 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import commonStyles from '../../../shared/common.styles';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 
-const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
+const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
   const dispatch = useDispatch();
   const currentProjectName = useSelector(state => state.project.project?.description?.project_name);
+
+  const modalText = textOverride ? textOverride
+    : 'What do you want to do with the current project (' + currentProjectName + ')?';
 
   const goToBackupPage = () => {
     closeModal();
@@ -22,15 +26,13 @@ const ConfirmOverwriteModal = ({closeModal, loadProject}) => {
   return (
     <ModalWrapper
       actionTitle={'Cancel'}
-      headerTitle={'Open Project'}
+      headerTitle={'Load Project'}
       onActionPressed={closeModal}
       showCancelButton={false}
     >
       <View>
-        <Text style={overlayStyles.statusMessageText}>
-          What do you want to do with the current project ({currentProjectName})?
-        </Text>
-        <View style={{padding: 10}}>
+        <Text style={overlayStyles.statusMessageText}>{modalText}</Text>
+        <View style={[commonStyles.standardDescriptionText, {padding: 10}]}>
           <Button
             containerStyle={{padding: 2.5}}
             onPress={loadProject}
