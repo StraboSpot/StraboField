@@ -302,9 +302,9 @@ const useSed = () => {
 
       // Update geometry if Interval
       if (isStratInterval(spot)) {
-        let updatedSpot = checkForIntervalUpdates(pageKey, editedSpot, spot);
+        editedSpot.properties.sed = editedSedData;
+        const updatedSpot = checkForIntervalUpdates(pageKey, editedSpot, spot);
         // console.log('Saving', pageKey, 'data to Spot ...');
-        updatedSpot.properties.sed = editedSedData;
         dispatch(updatedModifiedTimestampsBySpotsIds([updatedSpot.properties.id]));
         dispatch(editedOrCreatedSpot(updatedSpot));
       }
