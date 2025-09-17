@@ -6,7 +6,7 @@ import {setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
-import {TagsNotebookModal} from '../tags';
+import {TagsModal} from '../tags';
 
 const FeatureTagsModal = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const FeatureTagsModal = () => {
 
   const renderFeatureTagsModal = () => {
     return (
-      <TagsNotebookModal
+      <TagsModal
         closeModal={closeFeatureTaggingModal}
         isFeatureLevelTagging={isFeatureLevelTaggingOn}
       />

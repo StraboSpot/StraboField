@@ -44,14 +44,7 @@ import IntervalPage from '../sed/IntervalPage';
 import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
 import SpotsRawDataView from '../spots/SpotsRawDataView';
-import {
-  AddTagsToSpotsShortcutModal,
-  FeatureTagsModal,
-  TagsAtSpotList,
-  TagsNotebook,
-  TagsNotebookModal,
-  TagsShortcutModal,
-} from '../tags';
+import {FeatureTagsModal, TagsAtSpotList, TagsModal, TagsNotebook} from '../tags';
 import AddTephraModal from '../tephra/AddTephraModal';
 import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
@@ -111,7 +104,7 @@ export const PRIMARY_PAGES = [
     icon_pressed_src: require('../../assets/icons/GeologicUnit_pressed.png'),
     overview_component: TagsAtSpotList,
     page_component: TagsNotebook,
-    modal_component: TagsNotebookModal,
+    modal_component: TagsModal,
     action_label: 'Add Geologic Units',
   }, {
     key: PAGE_KEYS.NOTES,
@@ -144,7 +137,7 @@ export const PRIMARY_PAGES = [
     icon_pressed_src: require('../../assets/icons/Tag_pressed.png'),
     overview_component: TagsAtSpotList,
     page_component: TagsNotebook,
-    modal_component: TagsNotebookModal,
+    modal_component: TagsModal,
     action_label: 'Add Spot Tags',
   }, {
     key: PAGE_KEYS.SAMPLES,
@@ -428,7 +421,7 @@ export const SHORTCUT_MODALS = [
     action_label: 'Shortcut Mode: \nAdd Geologic Unit',
     icon_src: require('../../assets/icons/GeologicUnitButtonShortcut.png'),
     icon_pressed_src: require('../../assets/icons/GeologicUnitButtonShortcut_pressed.png'),
-    modal_component: TagsShortcutModal,
+    modal_component: TagsModal,
     notebook_modal_key: MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS,
   }, {
     key: MODAL_KEYS.SHORTCUTS.TAG,
@@ -436,7 +429,7 @@ export const SHORTCUT_MODALS = [
     action_label: 'Shortcut Mode: \nAdd Tags',
     icon_src: require('../../assets/icons/TagButtonShortcut.png'),
     icon_pressed_src: require('../../assets/icons/TagButtonShortcut_pressed.png'),
-    modal_component: TagsShortcutModal,
+    modal_component: TagsModal,
     notebook_modal_key: MODAL_KEYS.NOTEBOOK.TAGS,
   }, {
     key: MODAL_KEYS.SHORTCUTS.MEASUREMENT,
@@ -493,7 +486,7 @@ const OTHER_MODALS = [
   }, {
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
     label: 'Add Tags To Spots',
-    modal_component: AddTagsToSpotsShortcutModal,
+    modal_component: TagsModal,
   }, {
     key: MODAL_KEYS.OTHER.DAILY_NOTES,
     label: 'Daily Notes',

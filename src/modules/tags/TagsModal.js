@@ -13,6 +13,7 @@ import SaveButton from '../../shared/ui/buttons/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -26,6 +27,7 @@ const TagsModal = ({
                      handleTagChecked,
                      isFeatureLevelTagging,
                      zoomToCurrentLocation,
+                     closeModal,
                    }) => {
   const toast = useToast();
   const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
@@ -194,7 +196,13 @@ const TagsModal = ({
   };
 
   return (
-    <>
+    <ModalWrapper
+      onCancelPress={closeModal}
+      overlayStyleOverride={{flex: 1}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
+    >
       <View style={{flex: 1}}>
         <View style={modalStyles.textContainer}>
           <AddButton
@@ -221,7 +229,7 @@ const TagsModal = ({
         )}
       </View>
       {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
-    </>
+    </ModalWrapper>
   );
 };
 
