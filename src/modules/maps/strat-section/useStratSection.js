@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
-import {isEmpty} from '../../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../../shared/Helpers';
 import {useForm} from '../../form';
 import {useSpots} from '../../spots';
 
@@ -78,7 +78,9 @@ const useStratSection = () => {
         lithologiesFields[1][key.slice(0, -2)] = value;
       }
     });
-    if (!isEmpty(lithologiesFields)) geojsonObj.properties.sed.lithologies = lithologiesFields;
+    if (!isEmpty(lithologiesFields)) {
+      geojsonObj.properties.sed.lithologies = lithologiesFields.map(l => ({...l, id: getNewUUID()}));
+    }
 
     geojsonObj.geometry = calculateIntervalGeometry(stratSectionId, geojsonObj.properties.sed);
     return geojsonObj;
