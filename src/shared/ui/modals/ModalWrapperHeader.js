@@ -14,7 +14,7 @@ const ModalWrapperHeader = ({
                               buttonTitleRight,
                               cancel,
                               closeModal,
-                              showCloseButton,
+                              showCloseButton = false,
                               headerTitle,
                             }) => {
   const dispatch = useDispatch();
@@ -40,8 +40,8 @@ const ModalWrapperHeader = ({
             {showCloseButton && (
               <Button
                 onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
-                title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
-                titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+                title={buttonTitleRight === '' ? '' : buttonTitleRight || 'X'}
+                titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 18}}
                 type={'clear'}
               />
             )}

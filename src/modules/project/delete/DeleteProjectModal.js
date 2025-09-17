@@ -43,15 +43,6 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
   };
 
   return (
-    // <StatusDialogBox
-    //   actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
-    //   headerTitle={'Delete Locally Saved Project'}
-    //   isVisible={isDeleteProjectModalVisible}
-    //   onActionPressed={handleConfirmPress}
-    //   onCancelPress={closeModal}
-    //   showActionButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
-    //   showCancelButton={deleteProjectStatus === DELETE_STATUS.PENDING}
-    // >
     <ModalWrapper
       actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
       headerTitle={'Delete Locally Saved Project'}
@@ -85,7 +76,6 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
         )}
       </View>
     </ModalWrapper>
-    // </StatusDialogBox>
   );
 };
 

@@ -36,12 +36,17 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
   ];
 
   const continueDeleteSelectedSpot = () => {
-    if (isStratInterval(spot)) deleteInterval(spot);
+    if (errorMessage) {
+      setErrorMessage('');
+      setIsDeleteSpotModalVisible(false);
+    }
+    else if (isStratInterval(spot)) deleteInterval(spot);
     else deleteSpot(spot.properties.id);
   };
 
   const deleteSelectedSpot = () => {
-    setErrorMessage(checkIsSafeDelete(spot));
+    const safeDeleteMessage = checkIsSafeDelete(spot);
+    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
     setIsDeleteSpotModalVisible(true);
   };
 
@@ -64,6 +69,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
   };
 
   const renderActionItem = (item) => {
+    console.log('LALALLALALLALAALLALALLALALALALLALALALALALALAL');
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
@@ -84,40 +90,34 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
 
   return (
     <>
-      {isNotebookMenuVisible && (
-        <Overlay
-          isVisible={isNotebookMenuVisible}
-          onBackdropPress={closeNotebookMenu}
-          overlayStyle={notebookStyles.dialogContainer}
-          supportedOrientations={['portrait', 'landscape']}
-        >
-          <View style={overlayStyles.titleContainer}>
-            <Text style={overlayStyles.titleText}>Spot Actions</Text>
-          </View>
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            contentContainerStyle={{alignItems: 'center'}}
-            data={actions}
-            key={'notebookActions'}
-            renderItem={({item}) => renderActionItem(item)}
-          />
-        </Overlay>
-      )}
-      {isDeleteSpotModalVisible && (
-        <WarningModal
-          closeModal={() => setIsDeleteSpotModalVisible(false)}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
-          confirmText={'DELETE'}
-          confirmTitleStyle={overlayStyles.importantText}
-          isVisible={isDeleteSpotModalVisible}
-          onConfirmPress={() => continueDeleteSelectedSpot()}
-          showCancelButton={true}
-          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
-          title={'Delete Spot?'}
-        >
-          {renderDeleteMessage()}
-        </WarningModal>
-      )}
+      <Overlay
+        isVisible={isNotebookMenuVisible}
+        onBackdropPress={closeNotebookMenu}
+        overlayStyle={notebookStyles.dialogContainer}
+        supportedOrientations={['portrait', 'landscape']}
+      >
+        <View style={overlayStyles.titleContainer}>
+          <Text style={overlayStyles.titleText}>Spot Actions</Text>
+        </View>
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          contentContainerStyle={{alignItems: 'center'}}
+          data={actions}
+          key={'notebookActions'}
+          renderItem={({item}) => renderActionItem(item)}
+        />
+      </Overlay>
+      <WarningModal
+        closeModal={() => setIsDeleteSpotModalVisible(false)}
+        confirmText={errorMessage ? 'Ok' : 'Delete'}
+        confirmTitleStyle={overlayStyles.importantText}
+        isVisible={isDeleteSpotModalVisible}
+        onConfirmPress={continueDeleteSelectedSpot}
+        showCancelButton={!errorMessage}
+        title={errorMessage ? 'Can\'t Delete Spot' : 'Delete Spot?'}
+      >
+        {renderDeleteMessage()}
+      </WarningModal>
     </>
   );
 };

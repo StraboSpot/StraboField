@@ -107,9 +107,11 @@ const SpotDataModelModal = ({close}) => {
   return (
     <ModalWrapper
       closeModal={close}
-      isFullScreen
-      overlayStylesOverride={{width: '90%', height: '80%'}}
-      title={'Spot Data Model Object'}
+      headerTitle={'Spot Data Model Object'}
+      overlayStyleOverride={{width: '40%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
       <ScrollView>
         <Button
@@ -118,7 +120,10 @@ const SpotDataModelModal = ({close}) => {
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
         />
-        <JSONTree data={spotDataModel} hideRoot/>
+        <JSONTree
+          data={spotDataModel}
+          hideRoot
+        />
       </ScrollView>
     </ModalWrapper>
   );

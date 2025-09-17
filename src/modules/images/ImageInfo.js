@@ -8,7 +8,6 @@ import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {WarningModal} from '../../shared/ui/modals';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
 
@@ -43,7 +42,6 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
       <WarningModal
         closeModal={() => setIsImageDeleteModalVisible(false)}
         confirmText={'Delete'}
-        confirmTitleStyle={overlayStyles.importantText}
         isVisible={isImageDeleteModalVisible}
         onConfirmPress={onDeleteImage}
         showCancelButton
@@ -106,6 +104,7 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
         <ImagePropertiesModal
           closeModal={() => setIsImagePropertiesModalVisible(false)}
           image={image}
+          isVisible={isImagePropertiesModalVisible}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
         />

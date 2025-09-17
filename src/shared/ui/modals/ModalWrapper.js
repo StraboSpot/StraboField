@@ -23,8 +23,6 @@ const ModalWrapper = ({
                         closeModal,
                         disabled,
                         headerTitle,
-                        hideActionButton,
-                        isFullScreen,
                         isLoading,
                         isVisible,
                         onActionPressed,
@@ -109,7 +107,6 @@ const ModalWrapper = ({
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}
         disabled={disabled}
-        hideActionButton={hideActionButton}
         isLoading={isLoading}
         onActionPressed={onActionPressed}
         onCancelPress={onCancelPress}

@@ -8,7 +8,7 @@ import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToView}) => {
+const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, setImageToView}) => {
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
@@ -50,13 +50,11 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
 
   return (
     <ModalWrapper
-      buttonTitleLeft={'Cancel'}
-      buttonTitleRight={'Save'}
-      cancel={closeModal}
-      closeModal={saveFormAndGo}
-      title={'Image Properties'}
+      headerTitle={'Image Properties'}
+      isVisible={isVisible}
+      onActionPressed={saveFormAndGo}
+      onCancelPress={closeModal}
       overlayStylesOverride={{height: '90%'}}
-
     >
       <FlatList
         ListFooterComponent={
