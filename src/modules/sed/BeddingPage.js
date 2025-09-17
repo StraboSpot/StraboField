@@ -118,7 +118,6 @@ const BeddingPage = ({page}) => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
         <NotebookPageHeader pageTitle={page.label}/>
-        <SectionDivider dividerText={'Shared Bedding'}/>
         {renderBeddingShared()}
         <SectionDividerWithRightButton
           dividerText={'Beds'}
@@ -147,28 +146,40 @@ const BeddingPage = ({page}) => {
     || spot?.properties?.sed?.character === 'bed_mixed_lit' ? ['sed', 'bedding_shared_interbedded']
       : spot?.properties?.sed?.character === 'package_succe' ? ['sed', 'bedding_shared_package']
         : [];
-    return isEmpty(formName) ? (
-      <ListEmptyText
-        text={'No shared bedding. Add bedding character of interbedded, mixed lithologies or package on the Interval Page first.'}
-      />
-    ) : (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-          save={() => saveBeddingShared(beddingSharedRef.current)}
+    return (
+      <View style={{maxHeight: 300}}>
+        <SectionDivider dividerText={'Shared Bedding'}/>
+        <FlatList
+          ListEmptyComponent={
+            <ListEmptyText
+              text={'No shared bedding. Add bedding character of interbedded, mixed lithologies or package on the Interval Page first.'}
+            />
+          }
+          ListHeaderComponent={
+            !isEmpty(formName) && (
+              <>
+                <SaveAndCancelButtons
+                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                  save={() => saveBeddingShared(beddingSharedRef.current)}
+                />
+                <Formik
+                  enableReinitialize={true}
+                  initialValues={bedding}
+                  innerRef={beddingSharedRef}
+                  onReset={() => console.log('Resetting form...')}
+                  onSubmit={() => console.log('Submitting form...')}
+                  validate={values => validateForm({formName: formName, values: values})}
+                  validateOnChange={false}
+                >
+                  {formProps => <Form {...{...formProps, formName: formName}}/>}
+                </Formik>
+              </>
+            )
+          }
+          data={formName}
         />
-        <Formik
-          enableReinitialize={true}
-          initialValues={bedding}
-          innerRef={beddingSharedRef}
-          onReset={() => console.log('Resetting form...')}
-          onSubmit={() => console.log('Submitting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          validateOnChange={false}
-        >
-          {formProps => <Form {...{...formProps, formName: formName}}/>}
-        </Formik>
       </View>
+
     );
   };
 
