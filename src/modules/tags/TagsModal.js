@@ -13,7 +13,6 @@ import SaveButton from '../../shared/ui/buttons/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -26,8 +25,8 @@ const TagsModal = ({
                      checkedTagsIds,
                      handleTagChecked,
                      isFeatureLevelTagging,
+                     onPress,
                      zoomToCurrentLocation,
-                     closeModal,
                    }) => {
   const toast = useToast();
   const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
@@ -195,42 +194,40 @@ const TagsModal = ({
     return filterTagsByTagType(tagsCopy, tagType);
   };
 
-  return (
-    <ModalWrapper
-      onCancelPress={closeModal}
-      overlayStyleOverride={{flex: 1}}
-      showActionButton={false}
-      showCancelButton={false}
-      showCloseButton={true}
-    >
-      <View style={{flex: 1}}>
-        <View style={modalStyles.textContainer}>
-          <AddButton
-            onPress={addTag}
-            title={`Create New ${toTitleCase(label).slice(0, -1)}`}
-            type={'outline'}
-          />
+  const renderTagsModalContent = () => {
+    return (
+      <>
+        <View style={{flex: 1}}>
+          <View style={modalStyles.textContainer}>
+            <AddButton
+              onPress={addTag}
+              title={`Create New ${toTitleCase(label).slice(0, -1)}`}
+              type={'outline'}
+            />
+          </View>
+          <View style={modalStyles.textContainer}>
+            {tags && !isEmpty(tags)
+              ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>
+              : <Text style={modalStyles.textStyle}>No {label}</Text>}
+          </View>
+          {renderSpotTagsList()}
+          {(!isEmpty(tags)
+            && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+            && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
+            <SaveButton
+              buttonStyle={{backgroundColor: 'red'}}
+              disabled={isEmpty(checkedTagsTemp)}
+              onPress={save}
+              title={`Save ${label}`}
+            />
+          )}
         </View>
-        <View style={modalStyles.textContainer}>
-          {tags && !isEmpty(tags)
-            ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>
-            : <Text style={modalStyles.textStyle}>No {label}</Text>}
-        </View>
-        {renderSpotTagsList()}
-        {(!isEmpty(tags)
-          && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-          && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
-          <SaveButton
-            buttonStyle={{backgroundColor: 'red'}}
-            disabled={isEmpty(checkedTagsTemp)}
-            onPress={save}
-            title={`Save ${label}`}
-          />
-        )}
-      </View>
-      {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
-    </ModalWrapper>
-  );
+        {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
+      </>
+    );
+  };
+
+  return renderTagsModalContent();
 };
 
 export default TagsModal;

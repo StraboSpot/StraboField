@@ -4,17 +4,14 @@ import {Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import DatasetList from './DatasetList';
-import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {WarningModal} from '../../../shared/ui/modals';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setActiveDatasets, setTargetDataset} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetsPage = ({setDatasetToView}) => {
-  const {initializeDownload} = useDownload();
   const {addDataset} = useProject();
 
   const [datasetName, setDatasetName] = useState(null);
@@ -24,7 +21,6 @@ const DatasetsPage = ({setDatasetToView}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const datasets = useSelector(state => state.project.datasets);
-  const project = useSelector(state => state.project.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   useEffect(() => {
@@ -45,11 +41,6 @@ const DatasetsPage = ({setDatasetToView}) => {
     setIsAddDatasetModalVisible(false);
   };
 
-  const confirm = async () => {
-    setIsWarningModalVisible(false);
-    await initializeDownload(project);
-  };
-
   const renderAddDatasetModal = () => {
     return (
       <TextInputModal
@@ -60,21 +51,6 @@ const DatasetsPage = ({setDatasetToView}) => {
         value={datasetName}
         visible={isAddDatasetModalVisible}
       />
-    );
-  };
-
-  const renderWarningModal = () => {
-    return (
-      <WarningModal
-        closeModal={() => setIsWarningModalVisible(false)}
-        isVisible={isWarningModalVisible}
-        onConfirmPress={confirm}
-        showCancelButton={true}
-        showConfirmButton={true}
-        title={'Overwrite Warning!'}
-      >
-        <Text>This will OVERWRITE anything that has not been uploaded to the server</Text>
-      </WarningModal>
     );
   };
 
@@ -94,7 +70,6 @@ const DatasetsPage = ({setDatasetToView}) => {
 
       {/* Modals */}
       {renderAddDatasetModal()}
-      {renderWarningModal()}
     </>
   );
 };

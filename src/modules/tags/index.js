@@ -1,6 +1,6 @@
 export {default as AddRemoveTagFeatures} from './AddRemoveTagFeatures';
 export {default as AddRemoveTagSpots} from './AddRemoveTagSpots';
-// export {default as AddTagsToSpotsShortcutModal} from './AddTagsToSpotsShortcutModal';
+export {default as AddTagsToSpotsShortcutModal} from './AddTagsToSpotsShortcutModal';
 export {default as FeatureTagsModal} from './FeatureTagsModal';
 export {default as TagDetailModal} from './TagDetailModal';
 export {default as TagDetailSidePanel} from './TagDetailSidePanel';
@@ -10,7 +10,8 @@ export {default as TagsListItem} from './TagsListItem';
 export {default as TagsList} from './TagsList';
 export {default as TagsModal} from './TagsModal';
 export {default as TagsNotebook} from './TagsNotebook';
-// export {default as TagsShortcutModal} from './TagsShortcutModal';
+export {default as TagsNotebookModal} from './TagsNotebookModal';
+export {default as TagsShortcutModal} from './TagsShortcutModal';
 export {default as Tags} from './Tags';
 export {default as tagsStyles} from './tags.styles';
 export {default as useTags} from './useTags';
