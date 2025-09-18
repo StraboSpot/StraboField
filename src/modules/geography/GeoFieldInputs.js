@@ -34,30 +34,30 @@ const GeoFieldsInputs = ({formRef, geomFormRef}) => {
             <View style={{flex: 1, paddingRight: 5}}>
               <Field
                 component={NumberInputField}
-                name={'longitude'}
                 key={'longitude'}
                 label={'Longitude'}
+                name={'longitude'}
               />
             </View>
             <View style={{flex: 1}}>
               <Field
                 component={NumberInputField}
-                name={'latitude'}
                 key={'latitude'}
                 label={'Latitude'}
+                name={'latitude'}
               />
             </View>
           </View>
           <View>
             <Button
-              onPress={fillWithCurrentLocation}
-              type={'clear'}
               icon={{
                 name: 'locate',
                 type: 'ionicon',
                 size: 30,
                 color: commonStyles.iconColor.color,
               }}
+              onPress={fillWithCurrentLocation}
+              type={'clear'}
             />
           </View>
         </View>

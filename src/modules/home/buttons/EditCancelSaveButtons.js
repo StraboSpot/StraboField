@@ -9,20 +9,20 @@ const EditCancelSaveButtons = ({clickHandler}) => {
   return (
     <>
       <Button
-        containerStyle={{alignContent: 'center'}}
         buttonStyle={homeStyles.drawToolsButtons}
+        containerStyle={{alignContent: 'center'}}
+        onPress={() => clickHandler('saveEdits')}
+        title={'Save Edits'}
         titleStyle={homeStyles.drawToolsTitle}
         type={'clear'}
-        title={'Save Edits'}
-        onPress={() => clickHandler('saveEdits')}
       />
       <Button
-        containerStyle={{alignContent: 'center', paddingTop: 5}}
         buttonStyle={{...homeStyles.drawToolsButtons, backgroundColor: SECONDARY_BACKGROUND_COLOR}}
+        containerStyle={{alignContent: 'center', paddingTop: 5}}
+        onPress={() => clickHandler('cancelEdits')}
+        title={'Cancel'}
         titleStyle={{...homeStyles.drawToolsTitle, color: PRIMARY_TEXT_COLOR}}
         type={'clear'}
-        title={'Cancel'}
-        onPress={() => clickHandler('cancelEdits')}
       />
     </>
   );

@@ -17,7 +17,6 @@ const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, icon
         icon={!buttonTitle && (
           <Icon
             color={PRIMARY_ACCENT_COLOR}
-            disabled={disabled}
             name={iconName || 'add'}
             onPress={onPress}
             size={iconSize || 20}

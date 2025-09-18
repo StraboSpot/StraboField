@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  ImageBackground,
-  Platform,
-  Pressable,
-  View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Animated, Easing, ImageBackground, Platform, Pressable, View} from 'react-native';
 
-import { COMPASS_TOGGLE_BUTTONS } from './compass.constants';
+import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 
-const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements }) => {
+const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
   const [strikeSpinValue] = useState(new Animated.Value(0));
   const [trendSpinValue] = useState(new Animated.Value(0));
 
@@ -56,12 +49,12 @@ const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements })
   const renderStrikeDipSymbol = () => {
     return (
       <Animated.Image
+        resizeMode={'contain'}
         source={require('../../assets/images/compass/strike-dip-centered.png')}
         style={[
           compassStyles.strikeAndDipLine,
-          { position: 'absolute', transform: [{ rotate: strikeSpin }] },
+          {position: 'absolute', transform: [{rotate: strikeSpin}]},
         ]}
-        resizeMode='contain'
       />
     );
   };
@@ -69,12 +62,12 @@ const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements })
   const renderTrendSymbol = () => {
     return (
       <Animated.Image
+        resizeMode={'contain'}
         source={require('../../assets/images/compass/trendLine.png')}
         style={[
           compassStyles.trendLine,
-          { position: 'absolute', transform: [{ rotate: trendSpin }] },
+          {position: 'absolute', transform: [{rotate: trendSpin}]},
         ]}
-        resizeMode='contain'
       />
     );
   };
@@ -83,16 +76,9 @@ const CompassFace = ({ compassMeasurementTypes, compassData, grabMeasurements })
     const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
     const planarOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
 
-    if (linearOn && planarOn && trend >= 0 && strike >= 0) {
-      return [renderTrendSymbol(), renderStrikeDipSymbol()];
-    }
- else if (linearOn) {
-      return renderTrendSymbol();
-    }
- else if (planarOn) {
-      return renderStrikeDipSymbol();
-    }
-
+    if (linearOn && planarOn && trend >= 0 && strike >= 0) return [renderTrendSymbol(), renderStrikeDipSymbol()];
+    else if (linearOn) return renderTrendSymbol();
+    else if (planarOn) return renderStrikeDipSymbol();
     return null;
   };
 

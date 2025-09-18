@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {imageSliderStyles, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {isEmpty} from '../../shared/Helpers';
-import IconButton from '../../shared/ui/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {PAGE_KEYS} from '../page/page.constants';
 import {setSelectedSpot} from '../spots/spots.slice';
@@ -85,55 +85,55 @@ const ImageSlider = ({route, navigation}) => {
       <View>
         <View style={imageSliderStyles.buttonsContainer}>
           <IconButton
-            style={imageStyles.imageInfoButtons}
-            source={require('../../assets/icons/NotebookNavButton.png')}
             onPress={getSpotFromId}
+            source={require('../../assets/icons/NotebookNavButton.png')}
+            style={imageStyles.imageInfoButtons}
           />
           <IconButton
-            style={imageStyles.imageInfoButtons}
-            source={require('../../assets/icons/Close.png')}
             onPress={() => navigation.goBack()}
+            source={require('../../assets/icons/Close.png')}
+            style={imageStyles.imageInfoButtons}
           />
         </View>
         <Image
-          source={imageURI && {uri: imageURI}}
+          PlaceholderContent={isImageLoading ? <ActivityIndicator/>
+            : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
           containerStyle={[imageStyles.thumbnailImageContainer, Platform.OS === 'web' ? {width: width, height: height}
             : {width: '100%', height: '100%'}]}
-          resizeMode={'contain'}
-          PlaceholderContent={isImageLoading ? <ActivityIndicator/>
-            : <Image style={imageStyles.thumbnail} source={placeholderImage}/>}
-          placeholderStyle={imageStyles.placeholderImage}
           onError={() => {
             if (imageURI) setIsImageLoading(false);
           }}
           onLoadEnd={() => {
             if (imageURI) setIsImageLoading(false);
           }}
+          placeholderStyle={imageStyles.placeholderImage}
+          resizeMode={'contain'}
+          source={imageURI && {uri: imageURI}}
         />
         <View style={imageSliderStyles.navButtonsContainer}>
           <Button
+            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
             icon={
               <Icon
                 name={'chevron-back'}
-                type={'ionicon'}
                 size={36}
+                type={'ionicon'}
               />
             }
-            type={'clear'}
-            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
             onPress={onPressPrevious}
+            type={'clear'}
           />
           <Button
+            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
             icon={
               <Icon
                 name={'chevron-forward'}
-                type={'ionicon'}
                 size={36}
+                type={'ionicon'}
               />
             }
-            type={'clear'}
-            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
             onPress={onPressNext}
+            type={'clear'}
           />
         </View>
       </View>

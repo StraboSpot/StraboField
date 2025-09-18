@@ -12,11 +12,10 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -65,11 +64,11 @@ const TephraPage = ({page}) => {
     return (
       <>
         <ButtonGroup
-          selectedIndex={selectedTypeIndex}
-          onPress={i => setSelectedTypeIndex(i)}
           buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
           containerStyle={tephraStyles.buttonGroupContainer}
+          onPress={i => setSelectedTypeIndex(i)}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          selectedIndex={selectedTypeIndex}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         <BasicPageDetail
@@ -84,46 +83,44 @@ const TephraPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={tephraStyles.mainAttributesContainer}>
-        <ReturnToOverviewButton/>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addAttribute}
-        />
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
         <View style={tephraStyles.draggableListContainer}>
-        {data.length > 1 && (
-          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
-        )}
-        <DraggableFlatList
-          keyExtractor={item => item.id}
-          data={data}
-          onDragBegin={() => setIsReorderingActive(true)}
-          onDragEnd={({data}) => setData(data)}
-          renderItem={({item, getIndex, drag}) => (
-            <ShadowDecorator>
-              <BasicListItem
-                drag={Platform.OS === 'web' ? undefined : drag}
-                item={item}
-                index={getIndex()}
-                page={page}
-                editItem={editAttribute}
-                isReorderingActive={isReorderingActive}
-              />
-            </ShadowDecorator>
+          {data.length > 1 && (
+            <Text
+              style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
           )}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
-        />
-        {data.length > 1 && (
-          <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Bottom</Text>
-        )}
-        {isReorderingActive && (
-          <Button
-            onPress={updateOrder}
-            type={'clear'}
-            title={'Done Reordering ' + page.label}
-            titleStyle={commonStyles.standardButtonText}
+          <DraggableFlatList
+            ItemSeparatorComponent={FlatListItemSeparator}
+            ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+            data={data}
+            keyExtractor={item => item.id}
+            onDragBegin={() => setIsReorderingActive(true)}
+            onDragEnd={({data}) => setData(data)}
+            renderItem={({item, getIndex, drag}) => (
+              <ShadowDecorator>
+                <BasicListItem
+                  drag={Platform.OS === 'web' ? undefined : drag}
+                  editItem={editAttribute}
+                  index={getIndex()}
+                  isReorderingActive={isReorderingActive}
+                  item={item}
+                  page={page}
+                />
+              </ShadowDecorator>
+            )}
           />
-        )}
+          {data.length > 1 && (
+            <Text
+              style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Bottom</Text>
+          )}
+          {isReorderingActive && (
+            <Button
+              onPress={updateOrder}
+              title={'Done Reordering ' + page.label}
+              titleStyle={commonStyles.standardButtonText}
+              type={'clear'}
+            />
+          )}
         </View>
       </View>
     );

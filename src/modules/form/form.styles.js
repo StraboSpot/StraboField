@@ -2,6 +2,7 @@ import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 // Constants
 import * as themes from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
@@ -10,12 +11,22 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     marginBottom: -5,
     marginTop: -5,
+    paddingBottom: 0,
+    paddingTop: 0,
+  },
+  dropdownIndicator: {
+    fontSize: 20,
+  },
+  dropdownInputGroup: {
+    paddingLeft: 0,
+  },
+  dropdownItemsContainer: {
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    borderWidth: 0.5,
   },
   dropdownSelectedContainer: {
     borderBottomWidth: 0,
-    marginRight: -20,
     paddingBottom: 0, //Overrides default
-    paddingRight: 15,
     paddingTop: 0, //Overrides default
   },
   dropdownSelectionListHeader: {
@@ -23,6 +34,11 @@ const styles = StyleSheet.create({
     marginLeft: -15,
     marginRight: -20,
     padding: 0,
+  },
+  dropdownTagContainer: {
+    borderRadius: 5,
+    borderWidth: 0.5,
+    margin: 1,
   },
   fieldError: {
     color: themes.WARNING_COLOR,
@@ -41,30 +57,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   fieldValue: {
+    borderBottomColor: themes.MEDIUMGREY,
+    borderBottomWidth: 0.5,
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
-    padding: 0,
-    paddingLeft: 5,
+    padding: 5,
     width: '100%',
   },
   fieldValueFull: {
+    borderColor: themes.MEDIUMGREY,
+    borderWidth: 0.5,
     maxHeight: height * 0.5,
     minHeight: height * 0.5,
     verticalAlign: 'top',
   },
   fieldValueMultiline: {
+    borderColor: themes.MEDIUMGREY,
+    borderWidth: 0.5,
     height: 75,
     verticalAlign: 'top',
   },
   formButton: {
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
+    borderWidth: 0.75,
     height: 60,
     width: '100%',
   },
   formButtonLarge: {
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
+    borderWidth: 0.75,
     height: 80,
     width: '100%',
   },
@@ -76,6 +99,7 @@ const styles = StyleSheet.create({
   formButtonSmall: {
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
+    borderWidth: 0.75,
     height: 40,
     width: '100%',
   },
@@ -101,9 +125,6 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 8,
     paddingTop: 2.5,
-  },
-  selectorContainer: {
-    marginRight: -20,
   },
 });
 export default styles;

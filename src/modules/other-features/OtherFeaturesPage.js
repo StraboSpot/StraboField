@@ -8,8 +8,7 @@ import OtherFeatureItem from './OtherFeatureItem';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesPage = () => {
@@ -47,7 +46,7 @@ const OtherFeaturesPage = () => {
 
   const renderFeature = (feature) => {
     return (
-      <OtherFeatureItem feature={feature} editFeature={() => editFeature(feature)}/>
+      <OtherFeatureItem editFeature={() => editFeature(feature)} feature={feature}/>
     );
   };
 
@@ -55,19 +54,19 @@ const OtherFeaturesPage = () => {
     <>
       {!isFeatureDetailVisible && (
         <View>
-          <NotebookContentTopSection/>
-          {!isMultipleFeaturesTaggingEnabled && (
-            <SectionDividerWithRightButton
-              dividerText={'Other Features'}
-              onPress={addFeature}
-            />
-          )}
+          <NotebookPageHeader onPressAdd={addFeature} pageTitle={'Other Features'} showAddButton showFeaturesTagButton/>
+          {/*{!isMultipleFeaturesTaggingEnabled && (*/}
+          {/*  <SectionDividerWithRightButton*/}
+          {/*    dividerText={'Other Features'}*/}
+          {/*    onPress={addFeature}*/}
+          {/*  />*/}
+          {/*)}*/}
           <FlatList
-            data={spot.properties.other_features}
-            renderItem={item => renderFeature(item.item)}
-            keyExtractor={item => item.id.toString()}
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
+            data={spot.properties.other_features}
+            keyExtractor={item => item.id.toString()}
+            renderItem={item => renderFeature(item.item)}
           />
         </View>
       )}
@@ -75,8 +74,8 @@ const OtherFeaturesPage = () => {
         <OtherFeatureDetail
           featureTypes={otherFeatures}
           hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
-          selectedFeature={selectedFeature}
           renderFeature={feature => renderFeature(feature)}
+          selectedFeature={selectedFeature}
         />
       )}
     </>

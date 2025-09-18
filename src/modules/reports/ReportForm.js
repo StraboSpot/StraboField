@@ -4,8 +4,8 @@ import {View} from 'react-native';
 import {Button, Overlay} from '@rn-vui/base';
 import {Formik} from 'formik';
 
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {Form, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {PAGE_KEYS} from '../page/page.constants';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {
@@ -18,7 +18,6 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
   const formName = [groupKey, pageKey];
 
   const survey = getSurvey(formName);
-  const choices = getChoices(formName);
 
   const mainFormKeys = ['report_privacy', 'report_type', 'subject', 'notes'];
   const mainFormKeysFields = mainFormKeys.map(k => survey.find(f => f.name === k));
@@ -32,15 +31,15 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
       <Overlay
-        supportedOrientations={['portrait', 'landscape']}
         overlayStyle={overlayStyles.overlayContainer}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <View style={{alignItems: 'flex-end'}}>
           <Button
+            buttonStyle={{padding: 0}}
+            icon={{name: 'close', type: 'ionicon', size: 20}}
             onPress={() => setChoicesViewKey(null)}
             type={'clear'}
-            icon={{name: 'close', type: 'ionicon', size: 20}}
-            buttonStyle={{padding: 0}}
           />
         </View>
         <Form {...{
@@ -54,8 +53,8 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
 
   return (
     <Formik
-      innerRef={formRef}
       initialValues={initialValues}
+      innerRef={formRef}
       onSubmit={values => console.log('Submitting form...', values)}
       validate={values => validateForm({formName: formName, values: values})}
       validateOnChange={false}

@@ -64,8 +64,8 @@ const TagDetail = ({
     return (
       <SpotsListItem
         doShowTags={true}
-        spot={spot}
         onPress={openSpot}
+        spot={spot}
       />
     );
   };
@@ -73,12 +73,12 @@ const TagDetail = ({
   const renderTaggedFeaturesList = () => {
     return (
       <FlatList
-        listKey={'features'}
-        keyExtractor={item => 'Feature' + item.id.toString()}
-        data={getAllTaggedFeatures(selectedTag)}
-        renderItem={({item}) => renderSpotFeatureItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Features'}/>}
+        data={getAllTaggedFeatures(selectedTag)}
+        keyExtractor={item => 'Feature' + item.id.toString()}
+        listKey={'features'}
+        renderItem={({item}) => renderSpotFeatureItem(item)}
       />
     );
   };
@@ -88,29 +88,29 @@ const TagDetail = ({
       ListHeaderComponent={
         <>
           <SectionDividerWithRightButton
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
             buttonTitle={'View/Edit'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
             onPress={setIsDetailModalVisible}
           />
           {selectedTag && renderTagInfo()}
           <SectionDividerWithRightButton
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots W/Geologic Unit' : 'Tagged Spots'}
             buttonTitle={'Add/Remove'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots W/Geologic Unit' : 'Tagged Spots'}
             onPress={addRemoveSpots}
           />
           <FlatList
-            listKey={'spots'}
-            keyExtractor={item => 'Spot' + item.toString()}
-            data={selectedTag.spots && selectedTag.spots.filter(spotId => spots[spotId])}
-            renderItem={({item}) => renderSpotItem(item)}
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No Spots'}/>}
+            data={selectedTag.spots && selectedTag.spots.filter(spotId => spots[spotId])}
+            keyExtractor={item => 'Spot' + item.toString()}
+            listKey={'spots'}
+            renderItem={({item}) => renderSpotItem(item)}
           />
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
               <SectionDividerWithRightButton
-                dividerText={'Tagged Features'}
                 buttonTitle={'Add/Remove'}
+                dividerText={'Tagged Features'}
                 onPress={addRemoveFeatures}
               />
               {refresh ? renderTaggedFeaturesList() : renderTaggedFeaturesList()}

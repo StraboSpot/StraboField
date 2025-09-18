@@ -10,9 +10,9 @@ import MineralsGlossary from './MineralsGlossary';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -101,12 +101,12 @@ const AddMineralModal = ({onPress}) => {
       <>
         {!choicesViewKey && !areMultipleTemplates && (
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={onViewTypePress}
+            buttonStyle={{padding: 5}}
             buttons={['Look up by Rock Class', 'Look up in Glossary']}
             containerStyle={{height: 50, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={onViewTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
             textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE, textAlign: 'center'}}
           />
         )}
@@ -119,9 +119,9 @@ const AddMineralModal = ({onPress}) => {
 
   const renderAddMineralModalContent = () => {
     return (
-      <Modal
-        closeModal={onCloseModalPressed}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
+        closeModal={onCloseModalPressed}
         onPress={onPress}
       >
         {!choicesViewKey && (
@@ -131,7 +131,7 @@ const AddMineralModal = ({onPress}) => {
           />
         )}
         {!isShowTemplates && renderAddMineral()}
-      </Modal>
+      </ModalWrapper>
     );
   };
 
@@ -147,26 +147,26 @@ const AddMineralModal = ({onPress}) => {
         <LittleSpacer/>
         <ChoiceButtons
           choiceFieldKey={igOrMetKey}
-          survey={survey}
           choices={choices}
+          formProps={formProps}
           onPress={onIgOrMetSelected}
           size={'small'}
-          formProps={formProps}
+          survey={survey}
         />
         {!isEmpty(formProps.values[igOrMetKey]) && formProps.values[igOrMetKey] === 'ig_min' && (
           <MainButtons
-            mainKeys={igButtonsKeys}
             formName={formName}
-            setChoicesViewKey={setChoicesViewKey}
             formProps={formProps}
+            mainKeys={igButtonsKeys}
+            setChoicesViewKey={setChoicesViewKey}
           />
         )}
         {!isEmpty(formProps.values[igOrMetKey]) && formProps.values[igOrMetKey] === 'met_min' && (
           <MainButtons
-            mainKeys={metButtonsKeys}
             formName={formName}
-            setChoicesViewKey={setChoicesViewKey}
             formProps={formProps}
+            mainKeys={metButtonsKeys}
+            setChoicesViewKey={setChoicesViewKey}
           />
         )}
         <LittleSpacer/>
@@ -181,14 +181,13 @@ const AddMineralModal = ({onPress}) => {
       <>
         {!areMultipleTemplates && (
           <FlatList
-            bounces={false}
             ListHeaderComponent={
               <View style={{flex: 1}}>
                 <Formik
-                  innerRef={formRef}
-                  initialValues={initialValues}
-                  onSubmit={values => console.log('Submitting form...', values)}
                   enableReinitialize={true}
+                  initialValues={initialValues}
+                  innerRef={formRef}
+                  onSubmit={values => console.log('Submitting form...', values)}
                 >
                   {formProps => (
                     <View style={{flex: 1}}>
@@ -198,9 +197,10 @@ const AddMineralModal = ({onPress}) => {
                 </Formik>
               </View>
             }
+            bounces={false}
           />
         )}
-        {!choicesViewKey && <SaveButton title={saveMineralTitle} onPress={saveMineral}/>}
+        {!choicesViewKey && <SaveButton onPress={saveMineral} title={saveMineralTitle}/>}
       </>
     );
   };

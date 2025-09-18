@@ -7,8 +7,8 @@ import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
@@ -27,24 +27,24 @@ const TagsNotebook = ({openMainMenuPanel, page}) => {
 
   return (
     <>
-      <ReturnToOverviewButton/>
+      <NotebookPageHeader pageTitle={page.label}/>
       <FlatList
-        ListHeaderComponent={
-          <>
-            <SectionDividerWithRightButton
-              dividerText={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units'}
-              buttonTitle={'Assign/Remove'}
-              onPress={() => dispatch(setModalVisible({modal: pageVisible}))}
-            />
-            <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
-          </>
-        }
         ListFooterComponent={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS && (
           <>
             <SectionDivider dividerText={'Feature Tags'}/>
             <FeatureTagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
           </>
         )}
+        ListHeaderComponent={
+          <>
+            <SectionDividerWithRightButton
+              buttonTitle={'Assign/Remove'}
+              dividerText={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units'}
+              onPress={() => dispatch(setModalVisible({modal: pageVisible}))}
+            />
+            <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
+          </>
+        }
       />
       {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
     </>

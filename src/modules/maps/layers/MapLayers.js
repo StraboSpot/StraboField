@@ -60,12 +60,12 @@ const MapLayers = ({
       />
 
       <MapboxGL.Camera
-        ref={cameraRef}
-        zoomLevel={initialZoom}
-        centerCoordinate={initialCenter}
         animationDuration={0}
+        centerCoordinate={initialCenter}
         // followUserLocation={true}   // Can't follow user location if wanting to zoom to extent of Spots
         // followUserMode='normal'
+        ref={cameraRef}
+        zoomLevel={initialZoom}
       />
 
       {/* Custom Overlay Layer */}

@@ -9,7 +9,7 @@ import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import {PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import useMapLocation from '../../maps/useMapLocation';
 import {PAGE_KEYS} from '../../page/page.constants';
@@ -111,11 +111,11 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
   const renderCoordsText = () => {
     return (
       <Button
-        type={'clear'}
-        title={getSpotCoordText()}
-        titleStyle={{textAlign: 'left', color: PRIMARY_TEXT_COLOR}}
         buttonStyle={{padding: 0, justifyContent: 'flex-start'}}
         onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+        title={getSpotCoordText()}
+        titleStyle={{textAlign: 'left', color: PRIMARY_TEXT_COLOR}}
+        type={'clear'}
       />
     );
   };
@@ -125,22 +125,22 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
       <View style={{flexDirection: 'row'}}>
         {!spot.properties.trace && !spot.properties.surface_feature && (
           <Button
-            type={'clear'}
-            title={'Set To Current Location'}
-            titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
             buttonStyle={{padding: 0, paddingRight: 15}}
             onPress={setToCurrentLocation}
+            title={'Set To Current Location'}
+            titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
+            type={'clear'}
           />
         )}
         <Button
-          type={'clear'}
-          title={'Set in Current View'}
-          titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
           buttonStyle={{padding: 0}}
           onPress={() => {
             createDefaultGeom();
             closeNotebookPanel();
           }}
+          title={'Set in Current View'}
+          titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
+          type={'clear'}
         />
       </View>
     );
@@ -164,16 +164,16 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
   return (
     <>
       <Image
-        source={getSpotGeometryIconSource(spot)}
-        style={notebookHeaderStyles.headerImage}
         onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
         resizeMode={'contain'}
+        source={getSpotGeometryIconSource(spot)}
+        style={notebookHeaderStyles.headerImage}
       />
       <View style={notebookHeaderStyles.headerSpotNameAndCoordsContainer}>
         <TextInput
-          value={spot.properties.name || ''}
           onChangeText={text => onSpotEdit('name', text)}
           style={notebookHeaderStyles.headerSpotName}
+          value={spot.properties.name || ''}
         />
         {getSpotCoordText() ? renderCoordsText() : renderSetCoordsText()}
       </View>

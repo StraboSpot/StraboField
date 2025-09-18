@@ -9,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import Modal from '../../shared/ui/modal/Modal';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {NumberInputField, SelectInputField, useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -94,25 +94,27 @@ const AddImageOverlayModal = ({
 
   const renderAddImageOverlayModal = () => {
     return (
-      <Modal
-        title={'Add Image Overlay'}
+      <ModalWrapper
         buttonTitleLeft={'Cancel'}
         buttonTitleRight={'Save'}
         cancel={() => closeModal()}
-        closeModal={() => saveImageOverlay(overlayFormRef?.current?.values)}>
+        closeModal={() => saveImageOverlay(overlayFormRef?.current?.values)}
+        title={'Add Image Overlay'}
+      >
         <Formik
+          enableReinitialize={false}
           initialValues={image || {}}
+          innerRef={overlayFormRef}
           onSubmit={() => console.log('Submitting form...')}
           validate={validateImageOverlay}
           validateOnChange={false}
-          innerRef={overlayFormRef}
-          enableReinitialize={false}
         >
           {outerFormProps => (
             <View>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
+                    choices={getImageChoices()}
                     component={formProps =>
                       SelectInputField({
                         setFieldValue: formProps.form.setFieldValue,
@@ -120,10 +122,9 @@ const AddImageOverlayModal = ({
                         ...formProps,
                       })
                     }
-                    name={'id'}
                     key={'id'}
                     label={'Image to Use as Overlay'}
-                    choices={getImageChoices()}
+                    name={'id'}
                     single={true}
                   />
                 </ListItem.Content>
@@ -134,11 +135,11 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'image_origin_x'}
-                        label={'Image Origin X Value'}
                         key={'image_origin_x'}
+                        label={'Image Origin X Value'}
+                        name={'image_origin_x'}
+                        onShowFieldInfo={showFieldInfo}
                         placeholder={'x value for the bottom left corner of image relative to axes origin (0,0)'}
-                        onShowFieldInfo={showFieldInfo}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -146,11 +147,11 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'image_origin_y'}
-                        label={'Image Origin Y Value'}
                         key={'image_origin_y'}
+                        label={'Image Origin Y Value'}
+                        name={'image_origin_y'}
+                        onShowFieldInfo={showFieldInfo}
                         placeholder={'y value for the bottom left corner of image relative to axes origin (0,0)'}
-                        onShowFieldInfo={showFieldInfo}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -158,12 +159,12 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'image_width'}
-                        label={'Adjusted Image Width'}
                         key={'image_width'}
+                        label={'Adjusted Image Width'}
+                        name={'image_width'}
+                        onMyChange={onMyChange}
+                        onShowFieldInfo={showFieldInfo}
                         placeholder={'height adjusted automatically to maintain aspect ratio'}
-                        onShowFieldInfo={showFieldInfo}
-                        onMyChange={onMyChange}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -171,12 +172,12 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'image_height'}
-                        label={'Adjusted Image Height'}
                         key={'image_height'}
-                        placeholder={'width adjusted automatically to maintain aspect ratio'}
-                        onShowFieldInfo={showFieldInfo}
+                        label={'Adjusted Image Height'}
+                        name={'image_height'}
                         onMyChange={onMyChange}
+                        onShowFieldInfo={showFieldInfo}
+                        placeholder={'width adjusted automatically to maintain aspect ratio'}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -184,11 +185,11 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'image_opacity'}
-                        label={'Image Opacity'}
                         key={'image_opacity'}
-                        placeholder={'0-1 with 0 being transparent and 1 opaque'}
+                        label={'Image Opacity'}
+                        name={'image_opacity'}
                         onShowFieldInfo={showFieldInfo}
+                        placeholder={'0-1 with 0 being transparent and 1 opaque'}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -196,11 +197,11 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
-                        name={'z_index'}
-                        label={'Z-Index'}
                         key={'z_index'}
-                        placeholder={'layer ordering'}
+                        label={'Z-Index'}
+                        name={'z_index'}
                         onShowFieldInfo={showFieldInfo}
+                        placeholder={'layer ordering'}
                       />
                     </ListItem.Content>
                   </ListItem>
@@ -211,13 +212,13 @@ const AddImageOverlayModal = ({
         </Formik>
         {!isEmpty(image) && (
           <Button
-            titleStyle={{color: WARNING_COLOR}}
-            title={'Remove Image Overlay'}
-            type={'clear'}
             onPress={deleteImageOverlayConfirm}
+            title={'Remove Image Overlay'}
+            titleStyle={{color: WARNING_COLOR}}
+            type={'clear'}
           />
         )}
-      </Modal>
+      </ModalWrapper>
     );
   };
 

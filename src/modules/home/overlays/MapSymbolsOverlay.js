@@ -4,12 +4,12 @@ import {FlatList, Text, View} from 'react-native';
 import {ButtonGroup, ListItem, Overlay} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui/';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import SwitchWrapper from '../../../shared/ui/Switch';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
   setFeatureTypesOff,
   setGeometryTypesOff,
@@ -96,12 +96,12 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'slide'}
       backdropStyle={{backgroundColor: 'transparent'}}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
       overlayStyle={[overlayStyles.overlayContainer, overlayStyle]}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={[overlayStyles.titleContainer]}>
         <Text style={[overlayStyles.titleText]}>Map Symbols</Text>
@@ -112,7 +112,6 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
             {!isEmpty(mapSymbols) && (
               <>
                 <ListItem.Accordion
-                  key={'feature_types'}
                   containerStyle={commonStyles.listItem}
                   content={
                     <ListItem.Content>
@@ -120,21 +119,21 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
                     </ListItem.Content>
                   }
                   isExpanded={isFeatureTypesExpanded}
+                  key={'feature_types'}
                   onPress={() => setFeatureTypesExpanded(!isFeatureTypesExpanded)}
                 >
                   <FlatListItemSeparator/>
                   <FlatList
-                    keyExtractor={item => item}
-                    data={mapSymbols}
-                    renderItem={renderSymbolsList}
                     ItemSeparatorComponent={FlatListItemSeparator}
+                    data={mapSymbols}
+                    keyExtractor={item => item}
+                    renderItem={renderSymbolsList}
                   />
                 </ListItem.Accordion>
               </>
             )}
 
             <ListItem.Accordion
-              key={'geometry_types'}
               containerStyle={commonStyles.listItem}
               content={
                 <ListItem.Content>
@@ -142,20 +141,21 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
                 </ListItem.Content>
               }
               isExpanded={isGeometryTypesExpanded}
+              key={'geometry_types'}
               onPress={() => setGeometryTypesExpanded(!isGeometryTypesExpanded)}
             >
               <FlatListItemSeparator/>
               <FlatList
-                keyExtractor={item => item}
-                data={['points', 'lines', 'polygons']}
-                renderItem={renderGeometryTypesList}
                 ItemSeparatorComponent={FlatListItemSeparator}
+                data={['points', 'lines', 'polygons']}
+                keyExtractor={item => item}
+                renderItem={renderGeometryTypesList}
               />
             </ListItem.Accordion>
 
             <FlatListItemSeparator/>
 
-            <ListItem key={'spotLabels'} containerStyle={commonStyles.listItemFormField}>
+            <ListItem containerStyle={commonStyles.listItemFormField} key={'spotLabels'}>
               <>
                 <ListItem.Content>
                   <ListItem.Title style={commonStyles.listItemTitle}>Labels</ListItem.Title>
@@ -176,7 +176,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
             <FlatListItemSeparator/>
 
-            <ListItem key={'Only1stMeas'} containerStyle={commonStyles.listItemFormField}>
+            <ListItem containerStyle={commonStyles.listItemFormField} key={'Only1stMeas'}>
               <>
                 <ListItem.Content>
                   <ListItem.Title style={commonStyles.listItemTitle}>Only 1st Measurements</ListItem.Title>
@@ -187,7 +187,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
             <FlatListItemSeparator/>
 
-            <ListItem key={'tag_color'} containerStyle={commonStyles.listItemFormField}>
+            <ListItem containerStyle={commonStyles.listItemFormField} key={'tag_color'}>
               <>
                 <ListItem.Content>
                   <ListItem.Title style={commonStyles.listItemTitle}>Tag Colors</ListItem.Title>
@@ -208,7 +208,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
             <FlatListItemSeparator/>
 
-            <ListItem key={'samples'} containerStyle={commonStyles.listItemFormField}>
+            <ListItem containerStyle={commonStyles.listItemFormField} key={'samples'}>
               <>
                 <ListItem.Content>
                   <ListItem.Title style={commonStyles.listItemTitle}>Show Samples</ListItem.Title>

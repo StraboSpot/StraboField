@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProjectTransferProgress} from './connections.slice';
-import {MICRO_PATHS, STRABO_APIS, ORCID_PATHS, SESAR_PATHS} from './urls.constants';
+import {MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import alert from '../shared/ui/alert';
 
 const useServerRequests = () => {

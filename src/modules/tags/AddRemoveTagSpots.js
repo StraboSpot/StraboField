@@ -23,8 +23,8 @@ const AddRemoveTagSpots = ({updateSpotsInMapExtent}) => {
     <View style={{flex: 1}}>
       <SidePanelHeader
         backButton={() => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}))}
-        title={`${selectedTag.name}`}
         headerTitle={!isEmpty(selectedTag) && `Add/Remove ${selectedTag.name}`}
+        title={`${selectedTag.name}`}
       />
       <View style={{...commonStyles.buttonContainer, flex: 1}}>
         <SpotsList

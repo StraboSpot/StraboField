@@ -7,11 +7,11 @@ import {useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ButtonRounded from '../../shared/ui/ButtonRounded';
+import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
@@ -37,18 +37,18 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
         <SectionDivider dividerText={'Tags'}/>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
           <ButtonRounded
+            buttonStyle={imageStyles.buttonContainer}
             icon={
               <Icon
-                name={'plus-minus'}
-                type={'material-community'}
+                color={commonStyles.iconColor.color}
                 iconStyle={imageStyles.icon}
-                color={commonStyles.iconColor.color}/>
+                name={'plus-minus'}
+                type={'material-community'}/>
             }
+            onPress={addAssociatedSpots}
             title={'Add/Remove Tags'}
             titleStyle={commonStyles.standardButtonText}
-            buttonStyle={imageStyles.buttonContainer}
             type={'outline'}
-            onPress={addAssociatedSpots}
           />
         </View>
 
@@ -67,15 +67,15 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
 
       {isTagsListModalVisible && (
         <Overlay
-          supportedOrientations={['portrait', 'landscape']}
           overlayStyle={[overlayStyles.overlayContainer, {height: 500}]}
+          supportedOrientations={['portrait', 'landscape']}
         >
           <View style={{alignItems: 'flex-end'}}>
             <Button
+              buttonStyle={{padding: 0}}
+              icon={{name: 'close', type: 'ionicon', size: 20}}
               onPress={() => setIsTagsListModalVisible(false)}
               type={'clear'}
-              icon={{name: 'close', type: 'ionicon', size: 20}}
-              buttonStyle={{padding: 0}}
             />
           </View>
           {Platform.OS === 'web' ? (

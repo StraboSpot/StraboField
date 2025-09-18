@@ -38,14 +38,14 @@ const MainButtons = ({
         const isSingle = mainKeys.length === 1;
         return (
           <Button
-            key={k}
-            containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
             buttonStyle={[formStyles.formButtonLarge, {
               backgroundColor: formProps?.values[k] ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
             }]}
+            containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
+            key={k}
+            onPress={() => setChoicesViewKey(k)}
             title={<MainButtonsText fieldKey={k}/>}
             type={'outline'}
-            onPress={() => setChoicesViewKey(k)}
           />
         );
       })}

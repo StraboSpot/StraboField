@@ -5,10 +5,10 @@ import {Button, Overlay} from '@rn-vui/base';
 
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ModalHeader from '../../shared/ui/modal/ModalHeader';
+import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
-import overlayStyles from '../home/overlays/overlay.styles';
 
 const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey}) => {
   const {width} = useWindowSize();
@@ -53,14 +53,14 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
   const FaciesButton = (faciesProps) => {
     return (
       <Button
-        containerStyle={{padding: 2.5}}
         buttonStyle={[formStyles.formButtonLarge, {
           backgroundColor: formProps?.values?.facies?.includes(faciesProps.faciesKey)
             ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
           height: '100%',
         }]}
-        type={'outline'}
+        containerStyle={{padding: 2.5}}
         onPress={() => addFacies(faciesProps.faciesKey)}
+        type={'outline'}
       >
         {faciesButtonText(faciesProps.faciesKey)}
       </Button>
@@ -72,76 +72,81 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     return (
       <Overlay
         fullScreen={SMALL_SCREEN}
-        supportedOrientations={['portrait', 'landscape']}
+        isVisible={true}
         overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : [overlayStyles.overlayContainer, overlayStyles.overlayPosition, {
           width: faciesModalWidth,
           left: 20,
-          height: '50%'
+          height: '50%',
         }]}
-        isVisible={true}
+        supportedOrientations={['portrait', 'landscape']}
       >
-        <ModalHeader
+        <ModalWrapperHeader
           buttonTitleRight={'Done'}
-          title={'Facies'}
           closeModal={() => setIsFaciesModalVisible(false)}
+          title={'Facies'}
         />
-        <View style={{ flex: 1, padding: 10 }}>
-          <ScrollView contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', overflow: 'visible' }}>
-          <View style={{ flexDirection: 'row', flex: 1 }}>
-            {/* Pressure axis */}
-            <View style={{ width: 60, alignItems: 'center', justifyContent: 'center' }}>
-              <Text
-                style={{
-                  transform: [{ rotate: '-90deg' }],
-                  textAlign: 'center',
-                  fontSize: 14,
-                }}
-              >
-                Pressure
-              </Text>
-            </View>
-            <View style={{
-              flex: 1,
-              flexDirection: 'column',
-              borderStyle: 'solid',
-              borderLeftWidth: 1,
-              borderBottomWidth: 1,
-            }}>
-              <View style={{flex: 8, flexDirection: 'row'}}>
-                <View style={{flex: 9, flexDirection: 'column'}}>
-                  <View style={{flex: 2, flexDirection: 'row'}}>
-                    <View style={{flex: 4}}/>
-                    <View style={{flex: 5}}>
-                      <FaciesButton faciesKey={'eclogite'}/>
-                    </View>
-                  </View>
-                  <View style={{flex: 4, flexDirection: 'row'}}>
-                    <View style={{flex: 5, flexDirection: 'column'}}>
-                      <View style={{flex: 2, flexDirection: 'row'}}>
-                        <View style={{flex: 2}}/>
-                        <View style={{flex: 2}}><FaciesButton faciesKey={'blueschist'}/></View>
-                        <View style={{flex: 1}}/>
-                      </View>
-                      <View style={{flex: 2, flexDirection: 'row'}}>
-                        <View style={{flex: 1}}/>
-                        <View style={{flex: 2}}><FaciesButton faciesKey={'prehnite_pumpy'}/></View>
-                        <View style={{flex: 2}}><FaciesButton faciesKey={'greenschist'}/></View>
+        <View style={{flex: 1, padding: 10}}>
+          <ScrollView contentContainerStyle={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            overflow: 'visible',
+          }}>
+            <View style={{flexDirection: 'row', flex: 1}}>
+              {/* Pressure axis */}
+              <View style={{width: 60, alignItems: 'center', justifyContent: 'center'}}>
+                <Text
+                  style={{
+                    transform: [{rotate: '-90deg'}],
+                    textAlign: 'center',
+                    fontSize: 14,
+                  }}
+                >
+                  Pressure
+                </Text>
+              </View>
+              <View style={{
+                flex: 1,
+                flexDirection: 'column',
+                borderStyle: 'solid',
+                borderLeftWidth: 1,
+                borderBottomWidth: 1,
+              }}>
+                <View style={{flex: 8, flexDirection: 'row'}}>
+                  <View style={{flex: 9, flexDirection: 'column'}}>
+                    <View style={{flex: 2, flexDirection: 'row'}}>
+                      <View style={{flex: 4}}/>
+                      <View style={{flex: 5}}>
+                        <FaciesButton faciesKey={'eclogite'}/>
                       </View>
                     </View>
-                    <View style={{flex: 2}}><FaciesButton faciesKey={'amphibolite'}/></View>
-                    <View style={{flex: 2}}><FaciesButton faciesKey={'upper_amph'}/></View>
+                    <View style={{flex: 4, flexDirection: 'row'}}>
+                      <View style={{flex: 5, flexDirection: 'column'}}>
+                        <View style={{flex: 2, flexDirection: 'row'}}>
+                          <View style={{flex: 2}}/>
+                          <View style={{flex: 2}}><FaciesButton faciesKey={'blueschist'}/></View>
+                          <View style={{flex: 1}}/>
+                        </View>
+                        <View style={{flex: 2, flexDirection: 'row'}}>
+                          <View style={{flex: 1}}/>
+                          <View style={{flex: 2}}><FaciesButton faciesKey={'prehnite_pumpy'}/></View>
+                          <View style={{flex: 2}}><FaciesButton faciesKey={'greenschist'}/></View>
+                        </View>
+                      </View>
+                      <View style={{flex: 2}}><FaciesButton faciesKey={'amphibolite'}/></View>
+                      <View style={{flex: 2}}><FaciesButton faciesKey={'upper_amph'}/></View>
+                    </View>
                   </View>
+                  <View style={{flex: 2}}><FaciesButton faciesKey={'granulite'}/></View>
                 </View>
-                <View style={{flex: 2}}><FaciesButton faciesKey={'granulite'}/></View>
-              </View>
-              <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 2}}><FaciesButton faciesKey={'zeolite'}/></View>
-                <View style={{flex: 2}}/>
-                <View style={{flex: 5}}><FaciesButton faciesKey={'hornfels'}/></View>
-                <View style={{flex: 2}}/>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <View style={{flex: 2}}><FaciesButton faciesKey={'zeolite'}/></View>
+                  <View style={{flex: 2}}/>
+                  <View style={{flex: 5}}><FaciesButton faciesKey={'hornfels'}/></View>
+                  <View style={{flex: 2}}/>
+                </View>
               </View>
             </View>
-          </View>
           </ScrollView>
           <View style={{height: 30, alignItems: 'center', justifyContent: 'center'}}>
             <Text style={formStyles.formButtonTitle}>Temperature</Text>

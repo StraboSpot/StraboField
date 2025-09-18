@@ -68,4 +68,4 @@ export const ORCID_PATHS = {
 export const SUPPORT_PATHS = {
   GITHUB: 'https://github.com/StraboSpot/StraboField/issues/new/choose',
   EMAIL: 'mailto: strabospot@gmail.com?subject=StraboSpot2%20Issue',
-}
+};

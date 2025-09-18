@@ -8,9 +8,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import {WarningModal} from '../../../shared/ui/modals';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {setLoadingStatus} from '../../home/home.slice';
-import {WarningModal} from '../../home/modals';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/page.constants';
 import {useSpots} from '../../spots';
@@ -86,34 +86,34 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
     <>
       {isNotebookMenuVisible && (
         <Overlay
-          supportedOrientations={['portrait', 'landscape']}
           isVisible={isNotebookMenuVisible}
           onBackdropPress={closeNotebookMenu}
           overlayStyle={notebookStyles.dialogContainer}
+          supportedOrientations={['portrait', 'landscape']}
         >
           <View style={overlayStyles.titleContainer}>
             <Text style={overlayStyles.titleText}>Spot Actions</Text>
           </View>
           <FlatList
-            key={'notebookActions'}
-            data={actions}
-            contentContainerStyle={{alignItems: 'center'}}
-            renderItem={({item}) => renderActionItem(item)}
             ItemSeparatorComponent={FlatListItemSeparator}
+            contentContainerStyle={{alignItems: 'center'}}
+            data={actions}
+            key={'notebookActions'}
+            renderItem={({item}) => renderActionItem(item)}
           />
         </Overlay>
       )}
       {isDeleteSpotModalVisible && (
         <WarningModal
-          title={'Delete Spot?'}
-          isVisible={isDeleteSpotModalVisible}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           closeModal={() => setIsDeleteSpotModalVisible(false)}
-          showCancelButton={true}
-          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
+          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           confirmText={'DELETE'}
           confirmTitleStyle={overlayStyles.importantText}
+          isVisible={isDeleteSpotModalVisible}
           onConfirmPress={() => continueDeleteSelectedSpot()}
+          showCancelButton={true}
+          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
+          title={'Delete Spot?'}
         >
           {renderDeleteMessage()}
         </WarningModal>

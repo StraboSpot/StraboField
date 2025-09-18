@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Pressable, SectionList, Switch, Text, View} from 'react-native';
+import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -8,15 +8,17 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import usePage from './usePage';
 import {isEmpty} from '../../shared/Helpers';
+import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -96,13 +98,13 @@ const Overview = ({openMainMenuPanel}) => {
           ListHeaderComponent={
             <View>
               <Formik
+                component={formProps => Form({formName: formName, ...formProps})}
+                enableReinitialize={true}
+                initialStatus={{formName: formName}}
+                initialValues={initialValues}
                 innerRef={formRef}
                 onSubmit={onSubmitForm}
                 validate={values => validateForm({formName: formName, values: values})}
-                component={formProps => Form({formName: formName, ...formProps})}
-                initialValues={initialValues}
-                initialStatus={{formName: formName}}
-                enableReinitialize={true}
               />
             </View>
           }
@@ -113,7 +115,7 @@ const Overview = ({openMainMenuPanel}) => {
 
   const renderSectionHeader = (page) => {
     return (
-      <Pressable style={uiStyles.sectionHeaderBackground} onPress={() => openPage(page)}>
+      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={page.label}/>
       </Pressable>
     );
@@ -121,14 +123,17 @@ const Overview = ({openMainMenuPanel}) => {
 
   const renderSections = () => {
     return (
-      <SectionList
-        keyExtractor={(item, index) => item + index}
-        sections={sections}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        renderItem={({item}) => item}
-        stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
-      />
+      <View style={{flex: 1}}>
+        <NotebookPageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <SectionList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({item}) => item}
+          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+          sections={sections}
+          stickySectionHeadersEnabled={true}
+        />
+      </View>
     );
   };
 
@@ -207,18 +212,16 @@ const Overview = ({openMainMenuPanel}) => {
             {(spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
                 || spot.geometry.type === 'GeometryCollection')
               && <Text style={notebookStyles.traceSurfaceFeatureToggleText}>This is a surface feature</Text>}
-            <Switch
-              onValueChange={toggleTraceSurfaceFeature}
-              value={isTraceSurfaceFeatureEnabled}
-            />
+            <SwitchWrapper onValueChange={toggleTraceSurfaceFeature} value={isTraceSurfaceFeatureEnabled}/>
           </View>
           <View>
             <Button
-              title={'Edit'}
-              type={'clear'}
               disabled={!isTraceSurfaceFeatureEnabled}
               disabledTitleStyle={notebookStyles.traceSurfaceFeatureDisabledText}
-              onPress={() => setIsTraceSurfaceFeatureEdit(true)}/>
+              onPress={() => setIsTraceSurfaceFeatureEdit(true)}
+              title={'Edit'}
+              type={'clear'}
+            />
           </View>
         </View>
       )}

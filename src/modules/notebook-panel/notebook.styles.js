@@ -1,11 +1,11 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {MEDIUMGREY, SMALL_SCREEN} from '../../shared/styles.constants';
 
 const notebookStyles = StyleSheet.create({
   centerContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     flex: 1,
   },
   dialogBoxPosition: {
@@ -51,6 +51,8 @@ const notebookStyles = StyleSheet.create({
   },
   notebookPanel: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderLeftColor: MEDIUMGREY,
+    borderLeftWidth: 2,
     flex: 1,
   },
   traceSurfaceFeatureContainer: {

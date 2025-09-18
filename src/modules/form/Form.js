@@ -8,7 +8,6 @@ import AcknowledgeInput from './AcknowledgeInput';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
@@ -31,12 +30,12 @@ const Form = ({
     return (
       <Field
         as={AcknowledgeInput}
+        key={field.name}
+        label={field.label}
         name={field.name}
         onShowFieldInfo={showFieldInfo}
-        label={field.label}
-        key={field.name}
-        setFieldValue={setFieldValue}
         placeholder={field.hint}
+        setFieldValue={setFieldValue}
       />
     );
   };
@@ -45,34 +44,31 @@ const Form = ({
     return (
       <Field
         component={DateInputField}
-        name={field.name}
-        label={field.label}
-        key={field.name}
         isShowTimeOnly={isShowTimeOnly}
+        key={field.name}
+        label={field.label}
+        name={field.name}
         onMyChange={onMyChange}
+        setFieldValue={setFieldValue}
       />
     );
   };
 
-  const renderGroupHeading = (field) => {
-    return (
-      <SectionDivider dividerText={field.label}/>
-    );
-  };
+  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
 
   const renderTextInput = (field) => {
     return (
       <Field
-        component={TextInputField}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
         appearance={field.appearance}
-        placeholder={field.hint}
+        // autoFocus={field.name === 'name'}
+        component={TextInputField}
+        editable={getIsDisabled ? !getIsDisabled(field.name) : true}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
         onShowFieldInfo={showFieldInfo}
-        editable={getIsDisabled ? !getIsDisabled(field.name) : true}
-        autoFocus={field.name === 'name'}
+        placeholder={field.hint}
       />
     );
   };
@@ -81,12 +77,12 @@ const Form = ({
     return (
       <Field
         component={NumberInputField}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
         key={subkey ? subkey + '[0].' + field.name : field.name}
-        placeholder={field.hint}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
         onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
       />
     );
   };
@@ -112,17 +108,17 @@ const Form = ({
     return (
       <Field
         as={SelectInputField}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
         choices={fieldChoicesCopy}
-        setFieldValue={setFieldValue}
-        single={fieldType === 'select_one'}
-        placeholder={field.hint}
-        onShowFieldInfo={showFieldInfo}
-        showExpandedChoices={isExpanded}
         errors={errors}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+        setFieldValue={setFieldValue}
+        showExpandedChoices={isExpanded}
+        single={fieldType === 'select_one'}
       />
     );
   };
@@ -166,11 +162,10 @@ const Form = ({
 
   return (
     <FlatList
-      listKey={JSON.stringify(survey)}
-      keyExtractor={(item, index) => index.toString()}
       data={Object.values(survey.filter(item => isRelevant(item, values)))}
+      keyExtractor={(item, index) => index.toString()}
+      listKey={JSON.stringify(survey)}
       renderItem={({item}) => renderField(item)}
-      ItemSeparatorComponent={FlatListItemSeparator}
     />
   );
 };

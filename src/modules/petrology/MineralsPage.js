@@ -10,12 +10,11 @@ import commonStyles from '../../shared/common.styles';
 import {getNewCopyId, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {SelectInputField} from '../form';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -86,21 +85,21 @@ const MineralsPage = ({page}) => {
   const renderCopyDataSelectBox = () => {
     return (
       <Formik
+        initialValues={{}}
         innerRef={preFormRef}
         validate={fieldValues => copyMineralData(fieldValues.spot_id_for_pet_copy)}
         validateOnChange={true}
-        initialValues={{}}
       >
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field
+              choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
               component={formProps => (
                 SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
               )}
-              name={'spot_id_for_pet_copy'}
               key={'spot_id_for_pet_copy'}
               label={'Copy ' + page.label + ' Data From:'}
-              choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+              name={'spot_id_for_pet_copy'}
               single={true}
             />
           </ListItem.Content>
@@ -114,19 +113,13 @@ const MineralsPage = ({page}) => {
     if (!Array.isArray(mineralData)) mineralData = [];
     const mineralDataSorted = mineralData.slice().sort((a, b) => getMineralTitle(a).localeCompare(getMineralTitle(b)));
     return (
-      <>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addMineral}
-        />
-        <FlatList
-          data={mineralDataSorted}
-          renderItem={({item}) => <BasicListItem page={page} item={item} editItem={editMineral}/>}
-          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
-        />
-      </>
+      <FlatList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
+        data={mineralDataSorted}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
+      />
     );
   };
 
@@ -134,9 +127,9 @@ const MineralsPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
         page={page}
         selectedFeature={selectedMineral}
-        groupKey={'pet'}
       />
     );
   };
@@ -144,7 +137,7 @@ const MineralsPage = ({page}) => {
   const renderMineralsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton/>
         {renderCopyDataSelectBox()}
         {renderMineralsList()}
       </View>

@@ -24,22 +24,22 @@ const NumberInputField = ({
         <Text style={formStyles.fieldLabel}>{label}</Text>
         {placeholder && (
           <Icon
-            name={'information-circle-outline'}
-            type={'ionicon'}
             color={themes.PRIMARY_ACCENT_COLOR}
+            name={'information-circle-outline'}
             onPress={() => onShowFieldInfo(label, placeholder)}
+            type={'ionicon'}
           />
         )}
       </View>
       <TextInput
-        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        editable={editable}
+        keyboardType={'numeric'}
         onBlur={onBlur(name)}
-        style={formStyles.fieldValue}
-        value={getDisplayValue()}
+        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
-        keyboardType={'numeric'}
-        editable={editable}
+        style={formStyles.fieldValue}
+        value={getDisplayValue()}
       />
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>

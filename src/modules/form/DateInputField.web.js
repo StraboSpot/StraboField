@@ -56,25 +56,25 @@ const DateInputField = ({
     if (isShowTimeOnly) {
       return (
         <DatePicker
-          showIcon
-          selected={date}
+          dateFormat={'h:mm aa'}
           onChange={changeDate}
           portalId={'root-portal'}
+          selected={date}
+          showIcon
           showTimeSelect
           showTimeSelectOnly
-          timeIntervals={15}
           timeCaption={'Time'}
-          dateFormat={'h:mm aa'}
+          timeIntervals={15}
         />
       );
     }
     else {
       return (
         <DatePicker
-          showIcon
-          selected={date}
           onChange={changeDate}
           portalId={'root-portal'}
+          selected={date}
+          showIcon
         />
       );
     }

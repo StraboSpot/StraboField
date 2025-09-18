@@ -10,20 +10,20 @@ const CustomMapLayer = ({basemap, customMap}) => {
 
   return (
     <Source
-      key={customMap.id}
       id={customMap.id}
-      type={'raster'}
+      key={customMap.id}
       tiles={[buildTileURL(customMap)]}
+      type={'raster'}
     >
       <Layer
         // beforeId={'pointLayerSelectedHalo'}
-        type={'raster'}
         id={customMap.id + 'Layer'}
         paint={{
           'raster-opacity': customMap.opacity && parseFloat(customMap.opacity.toString())
           && parseFloat(customMap.opacity.toString()) >= 0 && parseFloat(customMap.opacity.toString()) <= 1
             ? parseFloat(customMap.opacity.toString()) : 1,
         }}
+        type={'raster'}
       />
     </Source>
   );

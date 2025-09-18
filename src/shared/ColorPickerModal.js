@@ -4,8 +4,8 @@ import {Pressable, Text, View} from 'react-native';
 import {Button, Icon, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import overlayStyles from './ui/modals/overlay.styles';
 import Spacer from './ui/Spacer';
-import overlayStyles from '../modules/home/overlays/overlay.styles';
 import {useTags} from '../modules/tags';
 
 const ColorPickerModal = ({
@@ -40,21 +40,21 @@ const ColorPickerModal = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      isVisible={isVisible}
       animationType={'slide'}
-      windowBackgroundColor={'rgba(0, 0, 0, .5)'}
       backdropStyle={{backgroundColor: 'transparent'}}
+      isVisible={isVisible}
       overlayStyle={{...overlayStyles.overlayContainer, width: 400}}
+      supportedOrientations={['portrait', 'landscape']}
+      windowBackgroundColor={'rgba(0, 0, 0, .5)'}
     >
       <View style={{maxHeight: '100%'}}>
         <Icon
-          name={'close-outline'}
-          type={'ionicon'}
-          size={20}
           color={'darkgrey'}
-          onPress={() => closeModal()}
           containerStyle={overlayStyles.closeButton}
+          name={'close-outline'}
+          onPress={() => closeModal()}
+          size={20}
+          type={'ionicon'}
         />
         <View
           style={overlayStyles.titleContainer}>
@@ -63,13 +63,13 @@ const ColorPickerModal = ({
         <Spacer/>
         {COLOR_CHOICES.map((colorRow) => {
           return (
-            <View style={overlayStyles.tagColorPickerContent} key={colorRow}>
+            <View key={colorRow} style={overlayStyles.tagColorPickerContent}>
               {colorRow.map((colorChoice) => {
                 return (
                   <Pressable
-                    style={{...overlayStyles.tagColorPickerColorItem, backgroundColor: colorChoice}}
-                    onPress={() => setColor(colorChoice)}
                     key={colorChoice}
+                    onPress={() => setColor(colorChoice)}
+                    style={{...overlayStyles.tagColorPickerColorItem, backgroundColor: colorChoice}}
                   />
                 );
               })}
@@ -78,9 +78,9 @@ const ColorPickerModal = ({
         })}
         <Spacer/>
         <Button
+          onPress={() => clearColor()}
           title={'Clear Custom Color'}
           type={'clear'}
-          onPress={() => clearColor()}
         />
       </View>
     </Overlay>

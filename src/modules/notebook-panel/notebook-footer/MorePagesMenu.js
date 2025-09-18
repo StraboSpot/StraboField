@@ -1,14 +1,15 @@
 import React from 'react';
-import {Platform, Pressable, ScrollView, Switch, Text, View} from 'react-native';
+import {Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
+import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import usePage from '../../page/usePage';
 import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
 
@@ -44,8 +45,8 @@ const MorePagesMenu = ({
       >
         <ListItem.Content style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <Pressable
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}
-            onPress={() => switchPage(page.key)}>
+            onPress={() => switchPage(page.key)}
+            style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
             <AvatarWrapper
               size={20}
               source={page.icon_src}
@@ -53,10 +54,7 @@ const MorePagesMenu = ({
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>{page.label}</ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
-            <Switch
-              onValueChange={() => togglePageSwitch(page.key)}
-              value={notebookPagesOn.includes(page.key)}
-            />
+            <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>
           </View>
         </ListItem.Content>
       </ListItem>
@@ -65,10 +63,10 @@ const MorePagesMenu = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
-      overlayStyle={footerStyles.morePagesDialog}
       isVisible={visible}
       onBackdropPress={closeMorePagesMenu}
+      overlayStyle={footerStyles.morePagesDialog}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>More Pages</Text>
@@ -78,19 +76,13 @@ const MorePagesMenu = ({
           {generalPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
           {!isEmpty(petPagesToShow) && (
             <>
-              <SectionDivider
-                dividerText={'Rocks & Minerals'}
-                style={footerStyles.morePagesSectionDivider}
-              />
+              <SectionDivider dividerText={'Rocks & Minerals'}/>
               {petPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
             </>
           )}
           {!isEmpty(sedPagesToShow) && (
             <>
-              <SectionDivider
-                dividerText={'Sedimentology'}
-                style={footerStyles.morePagesSectionDivider}
-              />
+              <SectionDivider dividerText={'Sedimentology'}/>
               {sedPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
             </>
           )}

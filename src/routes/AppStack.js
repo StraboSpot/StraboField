@@ -18,14 +18,14 @@ const AppStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name={'HomeScreen'}
         component={HomeContainer}
+        name={'HomeScreen'}
         options={navigationOptions}
         // initialParams={{setIsSignedIn}}
       />
       <Stack.Screen
-        name={'ImageSlider'}
         component={ImageSlider}
+        name={'ImageSlider'}
         options={navigationOptions}
       />
     </Stack.Navigator>

@@ -1,37 +1,83 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Pressable, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {MAIN_MENU_TITLE} from './mainMenu.constants';
+import {MAIN_MENU_ITEMS, MAIN_MENU_TITLE} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
+import {truncateText} from '../../shared/Helpers';
+import {BLACK} from '../../shared/styles.constants';
+import {AvatarWrapper} from '../../shared/ui/avatars';
 
-const MainMenuPanelHeader = ({onPress}) => {
+const MainMenuPanelHeader = () => {
   const dispatch = useDispatch();
-
-  const settingsPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const isSideMenuVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
+  const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
+
+  const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.ACCOUNT).includes(mainMenuPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.APP_SETTINGS).includes(mainMenuPageVisible)
+    && !Object.values(MAIN_MENU_ITEMS.HELP).includes(mainMenuPageVisible);
 
   return (
-    <View style={mainMenuPanelStyles.mainMenuHeaderContainer}>
-      <View style={mainMenuPanelStyles.mainMenuIconContainer}>
-        {settingsPageVisible && !isSideMenuVisible && (
-          <Icon
-            name={'arrow-back'}
-            type={'ionicon'}
-            color={'black'}
-            iconStyle={mainMenuPanelStyles.buttons}
-            onPress={() => dispatch(setMenuSelectionPage({name: null}))}
-            size={30}
-          />
+    <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>
+      <Pressable onPress={() => dispatch(setMenuSelectionPage({name: null}))} style={{flex: 1, flexDirection: 'row'}}>
+        {mainMenuPageVisible ? (
+          !isSideMenuVisible && (
+            <View style={mainMenuPanelStyles.mainMenuIconContainer}>
+              <Icon
+                iconStyle={mainMenuPanelStyles.buttons}
+                name={'arrow-back'}
+                size={30}
+                type={'ionicon'}
+              />
+            </View>
+          )
+        ) : (
+          <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingHorizontal: 5, paddingVertical: 0}]}>
+            <AvatarWrapper
+              rounded
+              size={30}
+              source={require('../../assets/icons/strabospot.png')}
+            />
+          </View>
         )}
-      </View>
-      <View style={mainMenuPanelStyles.mainMenuHeaderTextContainer}>
-        <Text style={mainMenuPanelStyles.headerText}>{settingsPageVisible || MAIN_MENU_TITLE}</Text>
-      </View>
-      <View style={{flex: 1, paddingBottom: 10}}/>
+        <View style={{flex: 1, justifyContent: 'center'}}>
+          {mainMenuPageVisible ? (
+            <>
+              {doShowSubheader ? (
+                <>
+                  <Text style={mainMenuPanelStyles.headerText}>{mainMenuPageVisible || MAIN_MENU_TITLE}</Text>
+                  <Text style={mainMenuPanelStyles.subheaderText}>
+                    Project: {truncateText(projectName, 22) || 'No Project Selected'}
+                  </Text>
+                </>
+              ) : (
+                <Text style={mainMenuPanelStyles.headerText}>
+                  {mainMenuPageVisible || MAIN_MENU_TITLE}
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text style={mainMenuPanelStyles.headerText}>
+              {truncateText(projectName, 35) || 'No Project Selected'}
+            </Text>
+          )}
+        </View>
+      </Pressable>
+      {!mainMenuPageVisible && Platform.OS !== 'web' && (
+        <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingLeft: 5}]}>
+          <Icon
+            color={BLACK}
+            name={'swap-horizontal'}
+            onPress={() => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS}))}
+            size={25}
+            type={'ionicon'}
+          />
+        </View>
+      )}
     </View>
   );
 };

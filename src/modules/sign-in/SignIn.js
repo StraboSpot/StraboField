@@ -9,7 +9,7 @@ import useSignIn from './useSignIn';
 import {PASSWORD_TEST, USERNAME_TEST} from '../../../dev-test-logins';
 import * as themes from '../../shared/styles.constants';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
-import {ErrorModal} from '../home/modals';
+import {ErrorModal} from '../../shared/ui/modals';
 import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 import {login} from '../user/userProfile.slice';
@@ -47,27 +47,27 @@ const SignIn = ({navigation, route}) => {
     return (
       <View style={signInStyles.buttonsContainer}>
         <Button
-          type={'solid'}
-          containerStyle={signInStyles.buttonContainer}
-          onPress={handleSignIn}
           buttonStyle={signInStyles.buttonStyle}
+          containerStyle={signInStyles.buttonContainer}
           disabled={username === '' || password === '' || !isOnline.isConnected}
-          title={'Log In'}
           loading={loading}
+          onPress={handleSignIn}
+          title={'Log In'}
+          type={'solid'}
         />
         <Button
-          type={'solid'}
+          buttonStyle={signInStyles.buttonStyle}
           containerStyle={signInStyles.buttonContainer}
           onPress={() => navigation.navigate('SignUp')}
-          buttonStyle={signInStyles.buttonStyle}
           title={'Register'}
+          type={'solid'}
         />
         <Button
-          type={'solid'}
-          onPress={handleGuestSignIn}
-          containerStyle={signInStyles.buttonContainer}
           buttonStyle={signInStyles.buttonStyle}
+          containerStyle={signInStyles.buttonContainer}
+          onPress={handleGuestSignIn}
           title={'Continue as Guest'}
+          type={'solid'}
         />
       </View>
     );
@@ -76,8 +76,8 @@ const SignIn = ({navigation, route}) => {
   const renderErrorModal = () => {
     return (
       <ErrorModal
-        isVisible={isErrorModalVisible}
         closeModal={() => setIsErrorModalVisible(false)}
+        isVisible={isErrorModalVisible}
       >
         <Text style={signInStyles.errorText}>{errorMessage.toString()}</Text>
       </ErrorModal>
@@ -89,27 +89,27 @@ const SignIn = ({navigation, route}) => {
       <View style={{marginTop: 20}}>
         <View style={signInStyles.signInContainer}>
           <TextInput
-            style={signInStyles.input}
-            placeholder={'Email'}
             autoCapitalize={'none'}
             autoCorrect={false}
-            placeholderTextColor={themes.MEDIUMGREY}
-            onChangeText={val => setUsername(val.toLowerCase())}
-            value={username || ''}
             keyboardType={'email-address'}
+            onChangeText={val => setUsername(val.toLowerCase())}
+            placeholder={'Email'}
+            placeholderTextColor={themes.MEDIUMGREY}
             returnKeyType={'go'}
+            style={signInStyles.input}
+            value={username || ''}
           />
           <TextInput
-            style={signInStyles.input}
-            placeholder={'Password'}
             autoCapitalize={'none'}
-            secureTextEntry={true}
-            placeholderTextColor={themes.MEDIUMGREY}
             onChangeText={val => setPassword(val)}
-            value={password || ''}
-            returnKeyType={'go'}
             onSubmitEditing={() => signIn(username, password, setUsername, setPassword, setErrorMessage,
               setIsErrorModalVisible)}
+            placeholder={'Password'}
+            placeholderTextColor={themes.MEDIUMGREY}
+            returnKeyType={'go'}
+            secureTextEntry={true}
+            style={signInStyles.input}
+            value={password || ''}
           />
           {renderButtons()}
           <CustomEndpoint

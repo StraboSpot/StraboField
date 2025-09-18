@@ -3,8 +3,8 @@ import {Text, View} from 'react-native';
 
 import {Button, Input, Overlay} from '@rn-vui/base';
 
-import overlayStyles from '../../modules/home/overlays/overlay.styles';
 import * as themes from '../styles.constants';
+import overlayStyles from './modals/overlay.styles';
 
 const TextInputModal = ({
                           autoCapitalize,
@@ -30,12 +30,12 @@ const TextInputModal = ({
                         }) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'fade'}
-      isVisible={visible}
-      overlayStyle={[overlayStyles.overlayContainer]}
-      onBackdropPress={onTouchOutside}
       backdropStyle={{backgroundColor: 'transparent'}}
+      isVisible={visible}
+      onBackdropPress={onTouchOutside}
+      overlayStyle={[overlayStyles.overlayContainer]}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={[overlayStyles.titleContainer, style]}>
         <Text style={[overlayStyles.titleText, overlayTitleText]}>{dialogTitle}</Text>
@@ -44,33 +44,33 @@ const TextInputModal = ({
         {textAboveInput}
         <Input
           autoCapitalize={autoCapitalize || 'none'}
-          multiline={multiline}
-          value={value || ''}
-          enterKeyHint={'done'}
-          keyboardType={keyboardType}
+          // enterKeyHint={'done'}
+          errorMessage={errorMessage}
           inputContainerStyle={overlayStyles.inputContainer}
+          keyboardType={keyboardType}
+          multiline={multiline}
           onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
           placeholder={placeholder || 'Enter text here...'}
           placeholderTextColor={themes.MEDIUMGREY}
-          errorMessage={errorMessage}
           renderErrorMessage={renderErrorMessage}
-          onSubmitEditing={onSubmitEditing}
           style={[{verticalAlign: 'top'}, multiline ? {height: 100} : {height: 40}]}
+          value={value || ''}
         />
         {children}
       </View>
       <View style={overlayStyles.buttonContainer}>
         <Button
-          title={buttonText || 'Save'}
-          type={'clear'}
-          titleStyle={[overlayStyles.buttonText, overlayButtonText]}
           onPress={onPress}
+          title={buttonText || 'Save'}
+          titleStyle={[overlayStyles.buttonText, overlayButtonText]}
+          type={'clear'}
         />
         <Button
-          title={'Cancel'}
-          type={'clear'}
-          titleStyle={overlayStyles.buttonText}
           onPress={closeModal}
+          title={'Cancel'}
+          titleStyle={overlayStyles.buttonText}
+          type={'clear'}
         />
       </View>
     </Overlay>

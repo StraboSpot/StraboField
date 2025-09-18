@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
@@ -14,10 +14,10 @@ const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
 
   return (
     <IconButton
+      onPress={toggleNotebookPanel}
       source={isNotebookPanelVisible
         ? require('../../../assets/icons/NotebookViewButton_pressed.png')
         : require('../../../assets/icons/NotebookViewButton.png')}
-      onPress={toggleNotebookPanel}
     />
   );
 };

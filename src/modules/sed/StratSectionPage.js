@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Switch, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
@@ -11,18 +11,19 @@ import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import {AvatarWrapper} from '../../shared/ui/avatars';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {Form, useForm} from '../form';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 
 const StratSectionPage = ({page}) => {
   // console.log('Rendering StratSectionPage...');
@@ -72,11 +73,11 @@ const StratSectionPage = ({page}) => {
           onPress={() => setSelectedImage({})}
         />
         <FlatList
-          keyExtractor={item => item.id}
-          data={stratSection.images}
-          renderItem={({item, index}) => renderImageItem(item, index)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Image Overlays'}/>}
+          data={stratSection.images}
+          keyExtractor={item => item.id}
+          renderItem={({item, index}) => renderImageItem(item, index)}
         />
       </View>
     );
@@ -92,13 +93,13 @@ const StratSectionPage = ({page}) => {
           save={saveStratSection}
         />
         <Formik
-          innerRef={stratSectionRef}
-          onSubmit={() => console.log('Submitting form...')}
-          onReset={() => console.log('Resetting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          initialValues={stratSection}
-          validateOnChange={false}
           enableReinitialize={true}
+          initialValues={stratSection}
+          innerRef={stratSectionRef}
+          onReset={() => console.log('Resetting form...')}
+          onSubmit={() => console.log('Submitting form...')}
+          validate={values => validateForm({formName: formName, values: values})}
+          validateOnChange={false}
         >
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>
@@ -115,10 +116,7 @@ const StratSectionPage = ({page}) => {
               Add a Stratigraphic Section at this Spot?
             </ListItem.Title>
           </ListItem.Content>
-          <Switch
-            value={!isEmpty(stratSection)}
-            onValueChange={() => toggleStratSection(spot)}
-          />
+          <SwitchWrapper onValueChange={() => toggleStratSection(spot)} value={!isEmpty(stratSection)}/>
         </ListItem>
       </View>
     );
@@ -127,7 +125,7 @@ const StratSectionPage = ({page}) => {
   const renderStratSectionsMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         <View style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={

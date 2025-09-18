@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const UserLocationButton = ({clickHandler}) => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -39,13 +39,13 @@ const UserLocationButton = ({clickHandler}) => {
   if (!currentImageBasemap && !stratSection) {
     return (
       <IconButton
-        source={userLocationButtonOn
-          ? require('../../../assets/icons/MyLocationButton_pressed.png')
-          : require('../../../assets/icons/MyLocationButton.png')}
         onPress={() => {
           setUserLocationButtonOn(!userLocationButtonOn);
           clickHandler('toggleUserLocation', !userLocationButtonOn);
         }}
+        source={userLocationButtonOn
+          ? require('../../../assets/icons/MyLocationButton_pressed.png')
+          : require('../../../assets/icons/MyLocationButton.png')}
       />
     );
   }

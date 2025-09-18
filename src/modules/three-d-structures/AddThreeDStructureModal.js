@@ -12,8 +12,8 @@ import {AddFold, FoldGeometryChoices} from './fold-geometry';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -70,30 +70,30 @@ const AddThreeDStructureModal = ({onPress}) => {
       return (
         <>
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={on3DStructureTypePress}
+            buttonStyle={{padding: 5}}
             buttons={Object.values(THREE_D_STRUCTURE_TYPES).map(v => toTitleCase(v))}
             containerStyle={{height: 40, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={on3DStructureTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
             textStyle={{color: PRIMARY_TEXT_COLOR}}
           />
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.FOLD && (
             <AddFold
-              survey={survey}
               choices={choices}
-              setChoicesViewKey={setChoicesViewKey}
               formName={formProps.status.formName}
               formProps={formProps}
+              setChoicesViewKey={setChoicesViewKey}
+              survey={survey}
             />
           )}
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.FAULT && (
             <AddFault
-              survey={survey}
               choices={choices}
-              setChoicesViewKey={setChoicesViewKey}
               formName={formProps.status.formName}
               formProps={formProps}
+              setChoicesViewKey={setChoicesViewKey}
+              survey={survey}
             />
           )}
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.TENSOR && (
@@ -104,10 +104,10 @@ const AddThreeDStructureModal = ({onPress}) => {
           )}
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.OTHER && (
             <AddOther
-              survey={survey}
-              setChoicesViewKey={setChoicesViewKey}
               formName={formProps.status.formName}
               formProps={formProps}
+              setChoicesViewKey={setChoicesViewKey}
+              survey={survey}
             />
           )}
         </>
@@ -118,18 +118,17 @@ const AddThreeDStructureModal = ({onPress}) => {
   const renderNotebookThreeDStructureModalContent = () => {
     const formName = [groupKey, types[selectedTypeIndex]];
     return (
-      <Modal
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={false}
@@ -142,15 +141,16 @@ const AddThreeDStructureModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
-        {!choicesViewKey && <SaveButton title={'Save 3D Structure'} onPress={save3DStructure}/>}
-      </Modal>
+        {!choicesViewKey && <SaveButton onPress={save3DStructure} title={'Save 3D Structure'}/>}
+      </ModalWrapper>
     );
   };
 
   const renderSubform = (formProps) => {
     if (choicesViewKey === 'fold_geometry') {
-      return <FoldGeometryChoices formProps={formProps} survey={survey} choices={choices}/>;
+      return <FoldGeometryChoices choices={choices} formProps={formProps} survey={survey}/>;
     }
     else {
       let relevantFields = getRelevantFields(survey, choicesViewKey);

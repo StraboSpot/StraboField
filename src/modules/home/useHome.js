@@ -22,10 +22,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
+  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
+  const {getTargetDatasetFromId} = useProject();
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
-  const {getSelectedDatasetFromId} = useProject();
-  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
 
   const dispatch = useDispatch();
   const toast = useToast();
@@ -56,9 +56,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
       case MAP_MODES.DRAW.POINTLOCATION:
         setSelectingMode(null);
         dispatch(clearedSelectedSpots());
-        const selectedDataset = getSelectedDatasetFromId();
-        if (!isEmpty(selectedDataset) && name === MAP_MODES.DRAW.POINTLOCATION) await createPointAtCurrentLocation();
-        else if (!isEmpty(selectedDataset)) setDraw(name).catch(console.error);
+        const targetDataset = getTargetDatasetFromId();
+        if (!isEmpty(targetDataset) && name === MAP_MODES.DRAW.POINTLOCATION) await createPointAtCurrentLocation();
+        else if (!isEmpty(targetDataset)) setDraw(name).catch(console.error);
         else toast.show('No Current Dataset! \n A current dataset needs to be set before drawing Spots.');
         break;
       case 'cancelEdits':
@@ -133,7 +133,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       await setPointAtCurrentLocation();
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show(`Point Spot Added at Current\n Location to Dataset ${getSelectedDatasetFromId().name.toUpperCase()}`,
+      toast.show(`Point Spot Added at Current\n Location to Dataset ${getTargetDatasetFromId().name.toUpperCase()}`,
         {type: 'success'});
       openNotebookPanel();
     }

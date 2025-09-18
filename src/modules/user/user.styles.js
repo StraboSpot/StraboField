@@ -45,7 +45,7 @@ const UserStyles = StyleSheet.create({
     alignItems: 'center',
     margin: 10,
   },
-  initialProjectLoadProfileHeaderText:{
+  initialProjectLoadProfileHeaderText: {
     fontSize: themes.LARGE_TEXT_SIZE,
     margin: 10,
   },
@@ -65,6 +65,7 @@ const UserStyles = StyleSheet.create({
     borderWidth: 7,
   },
   saveButtonContainer: {
+    paddingHorizontal: 10,
     paddingVertical: 20,
   },
 });

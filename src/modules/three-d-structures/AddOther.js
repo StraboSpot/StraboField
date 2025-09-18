@@ -33,33 +33,33 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
     <>
       <Form {...{surveyFragment: labelField, ...formProps}}/>
       <MainButtons
-        mainKeys={firstKeys}
         formName={formName}
         formProps={formProps}
+        mainKeys={firstKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
       {formProps.values.feature_type === 'boudinage' && (
         <>
           <MainButtons
-            mainKeys={boudinageFirstKeys}
             formName={formName}
             formProps={formProps}
+            mainKeys={boudinageFirstKeys}
             setChoicesViewKey={setChoicesViewKey}
           />
           <MeasurementButtons
             formProps={formProps}
             measurementsKeys={BOUDINAGE_MEASUREMENTS_KEYS}
-            setMeasurementsGroupField={setOtherMeasurementsGroupField}
             setIsMeasurementsModalVisible={setIsOtherMeasurementsModalVisible}
+            setMeasurementsGroupField={setOtherMeasurementsGroupField}
             survey={survey}
           />
           <Form {...{surveyFragment: boudinageKeysFields, ...formProps}}/>
           {isOtherMeasurementsModalVisible && (
             <MeasurementModal
-              measurementsGroup={BOUDINAGE_MEASUREMENTS_KEYS[otherMeasurementsGroupField.name]}
-              measurementsGroupLabel={otherMeasurementsGroupField.label}
               formName={formName}
               formProps={formProps}
+              measurementsGroup={BOUDINAGE_MEASUREMENTS_KEYS[otherMeasurementsGroupField.name]}
+              measurementsGroupLabel={otherMeasurementsGroupField.label}
               setIsMeasurementModalVisible={setIsOtherMeasurementsModalVisible}
             />
           )}
@@ -68,25 +68,25 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
       {formProps.values.feature_type === 'mullion' && (
         <>
           <MainButtons
-            mainKeys={mullionFirstKeys}
             formName={formName}
             formProps={formProps}
+            mainKeys={mullionFirstKeys}
             setChoicesViewKey={setChoicesViewKey}
           />
           <MeasurementButtons
             formProps={formProps}
             measurementsKeys={MULLION_MEASUREMENTS_KEYS}
-            setMeasurementsGroupField={setOtherMeasurementsGroupField}
             setIsMeasurementsModalVisible={setIsOtherMeasurementsModalVisible}
+            setMeasurementsGroupField={setOtherMeasurementsGroupField}
             survey={survey}
           />
           <Form {...{surveyFragment: mullionKeysFields, ...formProps}}/>
           {isOtherMeasurementsModalVisible && (
             <MeasurementModal
-              measurementsGroup={MULLION_MEASUREMENTS_KEYS[otherMeasurementsGroupField.name]}
-              measurementsGroupLabel={otherMeasurementsGroupField.label}
               formName={formName}
               formProps={formProps}
+              measurementsGroup={MULLION_MEASUREMENTS_KEYS[otherMeasurementsGroupField.name]}
+              measurementsGroupLabel={otherMeasurementsGroupField.label}
               setIsMeasurementModalVisible={setIsOtherMeasurementsModalVisible}
             />
           )}

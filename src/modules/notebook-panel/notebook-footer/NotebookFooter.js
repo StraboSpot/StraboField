@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import MorePagesMenu from './MorePagesMenu';
 import footerStyle from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 
@@ -36,22 +36,22 @@ const NotebookFooter = ({openPage}) => {
         {notebookPagesValidOn.map(key => (
           <IconButton
             key={key}
-            source={getPageIcon(key)}
             onPress={() => openPage(key)}
+            source={getPageIcon(key)}
           />
         ))}
         <Button
-          containerStyle={{alignSelf: 'center'}}
           buttonStyle={{padding: 15}}
-          title={'MORE'}
-          type={'clear'}
-          titleStyle={footerStyle.morePagesButton}
+          containerStyle={{alignSelf: 'center'}}
           onPress={() => setIsMorePagesMenuVisible(true)}
+          title={'MORE'}
+          titleStyle={footerStyle.morePagesButton}
+          type={'clear'}
         />
       </View>
       <MorePagesMenu
-        visible={isMorePagesMenuVisible}
         closeMorePagesMenu={() => setIsMorePagesMenuVisible(false)}
+        visible={isMorePagesMenuVisible}
       />
     </>
   );

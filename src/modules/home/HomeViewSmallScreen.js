@@ -9,7 +9,7 @@ import {ActionButtonsSmallScreen, MainMenuButton, ShortcutButtons} from './butto
 import {setModalVisible} from './home.slice';
 import homeStyles from './home.style';
 import * as themes from '../../shared/styles.constants';
-import IconButton from '../../shared/ui/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
@@ -74,16 +74,6 @@ const HomeViewSmallScreen = forwardRef(({
       <Header
         backgroundColor={themes.SECONDARY_BACKGROUND_COLOR}
         barStyle={'dark-content'}
-        centerContainerStyle={{justifyContent: 'center'}}
-        edges={'top'}
-        leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
-          <Icon
-            color={themes.PRIMARY_TEXT_COLOR}
-            name={'chevron-back'}
-            onPress={toggleSpotNavigator}
-            type={'ionicon'}
-          />
-        ) : <MainMenuButton closeMainMenuPanel={closeMainMenuPanel} openMainMenuPanel={openMainMenuPanel}/>}
         centerComponent={
           <Button
             icon={!isShowingSpotNavigator && (
@@ -101,6 +91,16 @@ const HomeViewSmallScreen = forwardRef(({
             type={'clear'}
           />
         }
+        centerContainerStyle={{justifyContent: 'center'}}
+        edges={'top'}
+        leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
+          <Icon
+            color={themes.PRIMARY_TEXT_COLOR}
+            name={'chevron-back'}
+            onPress={toggleSpotNavigator}
+            type={'ionicon'}
+          />
+        ) : <MainMenuButton closeMainMenuPanel={closeMainMenuPanel} openMainMenuPanel={openMainMenuPanel}/>}
       />
       {isShowingSpotNavigator && !isNotebookPanelVisible ? (
         <SpotNavigator
@@ -140,23 +140,23 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {currentImageBasemap && (
                   <IconButton
-                    source={require('../../assets/icons/Close.png')}
                     onPress={() => clickHandler('closeImageBasemap')}
+                    source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
                 )}
                 {stratSection && (
                   <IconButton
-                    source={require('../../assets/icons/Close.png')}
                     onPress={() => clickHandler('closeStratSection')}
+                    source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
                 )}
 
                 {stratSection && (
                   <IconButton
-                    source={require('../../assets/icons/AddIntervalButton.png')}
                     onPress={() => dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}))}
+                    source={require('../../assets/icons/AddIntervalButton.png')}
                     style={homeStyles.addIntervalButton}
                   />
                 )}
@@ -177,10 +177,10 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogClickHandler={dialogClickHandler}
                     dialogs={dialogs}
                     distance={distance}
-                    onCancel={onCancel}
                     endMeasurement={endMeasurement}
                     mapComponentRef={mapComponentRef}
                     mapMode={mapMode}
+                    onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}
                     selectingMode={selectingMode}
                     toggleDialog={toggleDialog}

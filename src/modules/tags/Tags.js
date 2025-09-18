@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Switch, View} from 'react-native';
+import {View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -7,7 +7,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import AddButton from '../../shared/ui/AddButton';
+import {SwitchWrapper} from '../../shared/ui';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
@@ -47,12 +48,12 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
       {!isEmpty(tags) && (
         <>
           <ButtonGroup
-            selectedIndex={selectedIndex}
-            onPress={index => setSelectedIndex(index)}
+            buttonStyle={{padding: 5}}
             buttons={getButtonTitle()}
             containerStyle={{height: 50}}
-            buttonStyle={{padding: 5}}
+            onPress={index => setSelectedIndex(index)}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedIndex}
             textStyle={{fontSize: 12}}
           />
           {selectedIndex === 1 && (
@@ -72,9 +73,9 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
         </ListItem.Content>
-        <Switch onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
+        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
       </ListItem>
-      <TagsList type={type} selectedIndex={selectedIndex}/>
+      <TagsList selectedIndex={selectedIndex} type={type}/>
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
     </View>
   );

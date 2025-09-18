@@ -80,16 +80,16 @@ const MeasurementButtons = ({
       {groupFields.map((field) => {
         return (
           <Button
-            key={field.name}
-            containerStyle={{flex: 1, padding: 2}}
             buttonStyle={[formStyles.formButtonSmall, {
               height: 60,
               backgroundColor: isGroupEmpty(field) ? SECONDARY_BACKGROUND_COLOR : PRIMARY_ACCENT_COLOR,
               padding: 1,
             }]}
+            containerStyle={{flex: 1, padding: 2}}
+            key={field.name}
+            onPress={() => addMeasurement(field)}
             title={<ButtonText field={field}/>}
             type={'outline'}
-            onPress={() => addMeasurement(field)}
           />
         );
       })}

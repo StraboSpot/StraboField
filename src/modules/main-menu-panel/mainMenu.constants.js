@@ -1,36 +1,45 @@
 export const MAIN_MENU_TITLE = 'StraboField';
 
 export const MAIN_MENU_ITEMS = {
-  MANAGE: {
-    MY_STRABOSPOT: 'My StraboSpot',
-    ACTIVE_PROJECTS: 'Active Project',
-    UPLOAD_BACKUP_EXPORT: 'Upload, Backup & Export',
-    // DATABASE_DETAILS: 'Database Details',
-    STRABOMICRO_PROJECTS: 'StraboMicro Projects',
-    REPORTS: 'Reports',
+  MANAGE_PROJECT: {
+    DATASETS: 'Datasets ',
+    BACKUP: 'Backup',
+    DESCRIPTION: 'Project Description',
+    SETTINGS: 'Privacy',
   },
-  ATTRIBUTES: {
+  CUSTOMIZE_AND_PRESET: {
+    NAMING_CONVENTIONS: 'Naming Conventions',
+    CUSTOM_FEATURE_TYPES: 'Custom Feature Types',
+    // TEMPLATES: 'Templates',
+    // FORMS_PAGES: 'Forms/Pages',
+  },
+  PROJECT_DATA: {
     SPOTS: 'Spots',
-    IMAGE_GALLERY: 'Image Gallery',
+    IMAGES: 'Images',
     SAMPLES: 'Samples',
-    GEOLOGIC_UNITS: 'Geologic Units',
     TAGS: 'Tags',
+    GEOLOGIC_UNITS: 'Geologic Units',
+    STRAT_SECTIONS: 'Stratigraphic Sections',
+    REPORTS: 'Reports',
+    DAILY_NOTES: 'Daily Notes',
   },
   MAPS: {
     CUSTOM: 'Custom Maps',
     IMAGE_BASEMAPS: 'Image Basemaps',
-    STRAT_SECTIONS: 'Strat Sections',
-    MANAGE_OFFLINE_MAPS: 'Manage Offline Maps',
+    MANAGE_OFFLINE_MAPS: 'Offline Maps',
   },
-  PREFERENCES: {
-    SHORTCUTS: 'Shortcuts',
-    // NOTEBOOK_BAR: 'Notebook Bar',
-    NAMING_CONVENTIONS: 'Naming Conventions',
-    MISCELLANEOUS: 'Miscellaneous',
-    // UNITS: 'Units',
+  ACCOUNT: {
+    PROFILE: 'Profile',
+    STRABOFIELD_PROJECTS: 'StraboField Projects',
+    STRABOMICRO_PROJECTS: 'StraboMicro Projects',
+    USER_CONVENTIONS: 'User Conventions',
+  },
+  APP_SETTINGS: {
+    ADDING_NEW_SPOTS: 'Adding New Spots',
+    ADVANCED_OPTIONS: 'Advanced Options',
   },
   HELP: {
-    ABOUT: 'About Strabo',
+    ABOUT: 'About StraboField',
     DOCUMENTATION: 'Documentation',
     ISSUES: 'Issues & Requests',
   },
@@ -40,12 +49,33 @@ export const MAIN_MENU_DATA = Object.entries(MAIN_MENU_ITEMS).map(([key, value])
   return {title: key, data: Object.values(value)};
 });
 
+const listItemsToHideOnWeb = [
+  MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP,
+  MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS,
+  MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS,
+  MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS];
+export const MAIN_MENU_DATA_WEB = Object.entries(MAIN_MENU_ITEMS).map(([key, value]) => {
+  return {
+    title: key,
+    data: Object.values(value).reduce((acc, val) => listItemsToHideOnWeb.includes(val) ? acc : [...acc, val], []),
+  };
+});
+
+const sectionsToHideIfNoProject = ['MANAGE_PROJECT', 'CUSTOMIZE_AND_PRESET', 'PROJECT_DATA', 'MAPS'];
+export const MAIN_MENU_DATA_NO_PROJECT = Object.entries(MAIN_MENU_ITEMS).reduce((acc, [key, value]) => {
+  return sectionsToHideIfNoProject.includes(key) ? acc : [...acc, {title: key, data: Object.values(value)}];
+}, []);
+
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',
+  DELETE_PROJECT: 'Delete Locally Saved Project',
+  DOWNLOAD_PROJECT: 'Download Project',
+  EXPORT_PROJECT: 'Export Locally Saved Project',
+  IMPORT_PROJECT: 'Import Project',
   MANAGE_CUSTOM_MAP: 'manageCustomMap',
-  PROJECT_DESCRIPTION: 'project description',
-  TAG_DETAIL: 'tag detail',
-  TAG_ADD_REMOVE_SPOTS: 'add remove tag spots',
+  NEW_PROJECT: 'New Project',
+  OPEN_PROJECT: 'Open Project',
   TAG_ADD_REMOVE_FEATURES: 'add remove tag features',
-  USER_PROFILE: 'userProfile',
+  TAG_ADD_REMOVE_SPOTS: 'add remove tag spots',
+  TAG_DETAIL: 'tag detail',
 };

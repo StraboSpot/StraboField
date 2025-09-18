@@ -40,7 +40,7 @@ const useHomeAnimations = ({navigation}) => {
     console.log('Closing Main Menu Panel...');
     dispatch(setIsMainMenuPanelVisible(false));
     dispatch(setMenuSelectionPage({name: null}));
-    SMALL_SCREEN && dispatch(setSidePanelVisible(false));
+    SMALL_SCREEN && dispatch(setSidePanelVisible({bool: false}));
     animateDrawer(animatedValueMainMenuDrawer, -MAIN_MENU_DRAWER_WIDTH);
     animateDrawer(animatedValueLeftSide, 0);
   };

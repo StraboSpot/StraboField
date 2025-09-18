@@ -7,11 +7,10 @@ import ThreeDStructureItem from './ThreeDStructureItem';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
@@ -68,20 +67,18 @@ const ThreeDStructuresPage = ({page}) => {
   };
 
   const render3dStructure = (threeDStructure) => {
-    return <ThreeDStructureItem item={threeDStructure} edit3dStructure={item => edit3dStructure((item))}/>;
+    return <ThreeDStructureItem edit3dStructure={item => edit3dStructure((item))} item={threeDStructure}/>;
   };
 
   const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(SECTIONS).reduce((acc, {title, key}) => sectionTitle === title ? key : acc,
-      '');
+    const sectionKey = Object.values(SECTIONS).reduce(
+      (acc, {title, key}) => sectionTitle === title ? key : acc, '');
     return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDividerWithRightButton
-          dividerText={sectionTitle}
-          onPress={() => add3dStructure(sectionKey)}
-          disabled={isMultipleFeaturesTaggingEnabled}
-        />
-      </View>
+      <SectionDividerWithRightButton
+        disabled={isMultipleFeaturesTaggingEnabled}
+        dividerText={sectionTitle}
+        onPress={() => add3dStructure(sectionKey)}
+      />
     );
   };
 
@@ -94,15 +91,15 @@ const ThreeDStructuresPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={dataSectioned}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
         renderItem={({item}) => render3dStructure(item)}
         renderSectionFooter={({section: {data, title}}) => {
           return data.length === 0 && <ListEmptyText text={'No ' + title + ' Observations'}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={dataSectioned}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };
@@ -111,7 +108,7 @@ const ThreeDStructuresPage = ({page}) => {
     <>
       {!isDetailView && (
         <View>
-          <NotebookContentTopSection/>
+          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
           {renderSections()}
         </View>
       )}

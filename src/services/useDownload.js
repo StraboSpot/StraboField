@@ -19,7 +19,7 @@ import {
 } from '../modules/home/home.slice';
 import {useImages} from '../modules/images';
 import {MAIN_MENU_ITEMS} from '../modules/main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage} from '../modules/main-menu-panel/mainMenuPanel.slice';
+import {setMenuSelectionPage, setSidePanelVisible} from '../modules/main-menu-panel/mainMenuPanel.slice';
 import {MAP_PROVIDERS} from '../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {
@@ -27,7 +27,7 @@ import {
   addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
-  setSelectedDataset,
+  setTargetDataset,
 } from '../modules/project/projects.slice';
 import {addedSpotsFromServer} from '../modules/spots/spots.slice';
 import {setUserData} from '../modules/user/userProfile.slice';
@@ -56,9 +56,9 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
-      if (datasets.length >= 1) {
+      if ((isEmpty(project) || (!isEmpty(project) && project.id !== selectedProject.id)) && datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setSelectedDataset(datasets[0].id));
+        dispatch(setTargetDataset(datasets[0].id));
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -79,7 +79,7 @@ const useDownload = () => {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
-      if (!isEmpty(project)) clearProject();
+      if (!isEmpty(project) && project.id !== selectedProject.id) clearProject();
       dispatch(addedProject(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
@@ -233,7 +233,8 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS}));
+      dispatch(setSidePanelVisible({bool: false}));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
     catch (err) {

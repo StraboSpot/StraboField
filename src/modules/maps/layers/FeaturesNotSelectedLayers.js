@@ -18,30 +18,30 @@ const FeaturesNotSelectedLayers = ({features, isStratStyleLoaded}) => {
     >
       {/* Polygon Not Selected */}
       <MapboxGL.FillLayer
+        filter={['all', ['==', ['geometry-type'], 'Polygon'], ['!', ['has', 'fillPattern', ['get', 'symbology']]]]}
         id={'polygonLayerNotSelected'}
         minZoomLevel={1}
-        filter={['all', ['==', ['geometry-type'], 'Polygon'], ['!', ['has', 'fillPattern', ['get', 'symbology']]]]}
         style={getMapSymbology().polygon}
       />
       <MapboxGL.FillLayer
+        filter={['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'fillPattern', ['get', 'symbology']]]}
         id={'polygonLayerWithPatternNotSelected'}
         minZoomLevel={1}
-        filter={['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'fillPattern', ['get', 'symbology']]]}
         style={{
           ...getMapSymbology().polygonWithPattern,
           visibility: stratSection && isStratStyleLoaded ? 'visible' : 'none',
         }}
       />
       <MapboxGL.LineLayer
+        filter={['==', ['geometry-type'], 'Polygon']}
         id={'polygonLayerNotSelectedBorder'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Polygon']}
         style={getMapSymbology().line}
       />
       <MapboxGL.SymbolLayer
+        filter={['==', ['geometry-type'], 'Polygon']}
         id={'polygonLabelLayerNotSelected'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Polygon']}
         style={getMapSymbology().polygonLabel}
       />
 
@@ -49,41 +49,41 @@ const FeaturesNotSelectedLayers = ({features, isStratStyleLoaded}) => {
       {/* Need 4 different lines for the different types of line dashes since
        lineDasharray is not supported with data-driven styling*/}
       <MapboxGL.LineLayer
+        filter={getLinesFilteredByPattern('solid')}
         id={'lineLayerNotSelected'}
         minZoomLevel={1}
-        filter={getLinesFilteredByPattern('solid')}
         style={getMapSymbology().line}
       />
       <MapboxGL.LineLayer
+        filter={getLinesFilteredByPattern('dotted')}
         id={'lineLayerNotSelectedDotted'}
         minZoomLevel={1}
-        filter={getLinesFilteredByPattern('dotted')}
         style={getMapSymbology().lineDotted}
       />
       <MapboxGL.LineLayer
+        filter={getLinesFilteredByPattern('dashed')}
         id={'lineLayerNotSelectedDashed'}
         minZoomLevel={1}
-        filter={getLinesFilteredByPattern('dashed')}
         style={getMapSymbology().lineDashed}
       />
       <MapboxGL.LineLayer
+        filter={getLinesFilteredByPattern('dotDashed')}
         id={'lineLayerNotSelectedDotDashed'}
         minZoomLevel={1}
-        filter={getLinesFilteredByPattern('dotDashed')}
         style={getMapSymbology().lineDotDashed}
       />
       <MapboxGL.SymbolLayer
+        filter={['==', ['geometry-type'], 'LineString']}
         id={'lineLabelLayerNotSelected'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'LineString']}
         style={getMapSymbology().lineLabel}
       />
 
       {/* Point Not Selected */}
       <MapboxGL.SymbolLayer
+        filter={['==', ['geometry-type'], 'Point']}
         id={'pointLayerNotSelected'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Point']}
         style={getMapSymbology().point}
       />
     </MapboxGL.ShapeSource>

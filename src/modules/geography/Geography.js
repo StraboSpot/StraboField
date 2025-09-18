@@ -6,13 +6,12 @@ import * as turf from '@turf/turf';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import GeoFieldInputs from './GeoFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
-import GeoFieldInputs from './GeoFieldInputs';
 import useMapView from '../maps/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -49,13 +48,13 @@ const Geography = () => {
     return (
       <View style={{flex: 1}}>
         <Formik
+          component={formProps => Form({formName: formName, ...formProps})}
+          enableReinitialize={true}
+          initialStatus={{formName: formName}}
+          initialValues={spot.properties}
           innerRef={formRef}
           onSubmit={() => console.log('Submitting form...')}
           validate={values => validateForm({formName: formName, values: values})}
-          component={formProps => Form({formName: formName, ...formProps})}
-          initialValues={spot.properties}
-          initialStatus={{formName: formName}}
-          enableReinitialize={true}
         />
       </View>
     );
@@ -116,11 +115,11 @@ const Geography = () => {
 
     return (
       <Formik
+        enableReinitialize={true}
         initialValues={initialGeomValues}
+        innerRef={geomFormRef}
         onSubmit={() => console.log('Submitting form...')}
         validate={validateGeometry}
-        innerRef={geomFormRef}
-        enableReinitialize={true}
       >
         {() => (
           <View>
@@ -128,13 +127,12 @@ const Geography = () => {
               <ListItem.Content>
                 <Field
                   component={TextInputField}
-                  name={'geomType'}
-                  label={'Geometry'}
                   key={'geomType'}
+                  label={'Geometry'}
+                  name={'geomType'}
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             {isOnGeoMap(spot) ? renderGeoCoords(initialGeomValues) : renderPixelCoords(initialGeomValues)}
           </View>
         )}
@@ -156,11 +154,11 @@ const Geography = () => {
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
           <Field
-            component={TextInputField}
-            name={'coordsString'}
-            label={'Coordinates as [Longitude, Latitude]'}
-            key={'coordsString'}
             appearance={'multiline'}
+            component={TextInputField}
+            key={'coordsString'}
+            label={'Coordinates as [Longitude, Latitude]'}
+            name={'coordsString'}
           />
         </ListItem.Content>
       </ListItem>
@@ -172,7 +170,6 @@ const Geography = () => {
       <>
         {!isEmpty(initialGeomValues.x_pixels) && !isEmpty(initialGeomValues.y_pixels)
           ? renderPixelFieldInputs() : renderPixelFieldText(initialGeomValues)}
-        <FlatListItemSeparator/>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <View style={formStyles.fieldLabelContainer}>
@@ -183,17 +180,17 @@ const Geography = () => {
                 <View style={{flex: 1, paddingRight: 5}}>
                   <Field
                     component={NumberInputField}
-                    name={'longitude'}
                     key={'longitude'}
                     label={'Longitude'}
+                    name={'longitude'}
                   />
                 </View>
                 <View style={{flex: 1}}>
                   <Field
                     component={NumberInputField}
-                    name={'latitude'}
                     key={'latitude'}
                     label={'Latitude'}
+                    name={'latitude'}
                   />
                 </View>
               </View>
@@ -216,17 +213,17 @@ const Geography = () => {
               <View style={{flex: 1, paddingRight: 5}}>
                 <Field
                   component={NumberInputField}
-                  name={'x_pixels'}
                   key={'x_pixels'}
                   label={'X Pixels'}
+                  name={'x_pixels'}
                 />
               </View>
               <View style={{flex: 1}}>
                 <Field
                   component={NumberInputField}
-                  name={'y_pixels'}
                   key={'y_pixels'}
                   label={'Y Pixels'}
+                  name={'y_pixels'}
                 />
               </View>
             </View>
@@ -241,11 +238,11 @@ const Geography = () => {
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
           <Field
-            component={TextInputField}
-            name={'coordsString'}
-            label={'Coordinates as [X Pixels, Y Pixels]'}
-            key={'coordsString'}
             appearance={'multiline'}
+            component={TextInputField}
+            key={'coordsString'}
+            label={'Coordinates as [X Pixels, Y Pixels]'}
+            name={'coordsString'}
           />
         </ListItem.Content>
       </ListItem>

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Button, Icon, Input, ListItem, Overlay} from '@rn-vui/base';
 import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
@@ -10,21 +10,20 @@ import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SliderBar from '../../../shared/ui/SliderBar';
 import {formStyles} from '../../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
-import overlayStyles from '../../home/overlays/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
-import useMapCoords from '../useMapCoords';
-
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 // const {State: TextInputState} = TextInput;
@@ -32,12 +31,12 @@ const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 const CustomMapDetails = () => {
   let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
-  const {getMyMapsBboxCoords} = useMapCoords();
+  // const {getMyMapsBboxCoords} = useMapCoords();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  const isOnline = useSelector(state => state.connections.isOnline);
+  // const isOnline = useSelector(state => state.connections.isOnline);
 
   const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
@@ -124,13 +123,13 @@ const CustomMapDetails = () => {
 
   const handlePress = () => {
     setIsLoadingModalVisible(false);
-    dispatch(setSidePanelVisible({view: null, bool: false}));
+    dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
   };
 
   const renderCustomMapName = (item) => {
-    const radioSelected = <Icon name={'radiobox-marked'} type={'material-community'} color={BLUE}/>;
-    const radioUnselected = <Icon name={'radiobox-blank'} type={'material-community'} color={DARKGREY}/>;
+    const radioSelected = <Icon color={BLUE} name={'radiobox-marked'} type={'material-community'}/>;
+    const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
     return (
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
@@ -139,8 +138,8 @@ const CustomMapDetails = () => {
         <ListItem.CheckBox
           checked={item.source === editableCustomMapData?.source}
           checkedIcon={radioSelected}
-          uncheckedIcon={radioUnselected}
           onPress={() => setEditableCustomMapData(e => ({...e, source: item.source}))}
+          uncheckedIcon={radioUnselected}
         />
       </ListItem>
     );
@@ -197,10 +196,10 @@ const CustomMapDetails = () => {
         </Text>
       </View>
       <FlatList
-        keyExtractor={item => item.source}
-        data={CUSTOM_MAP_TYPES}
-        renderItem={({item, index}) => renderCustomMapName(item, index)}
         ItemSeparatorComponent={FlatListItemSeparator}
+        data={CUSTOM_MAP_TYPES}
+        keyExtractor={item => item.source}
+        renderItem={({item, index}) => renderCustomMapName(item, index)}
       />
       {editableCustomMapData?.source === ''
         && <Text style={customMapStyles.requiredMessage}>Map type is required</Text>}
@@ -218,8 +217,8 @@ const CustomMapDetails = () => {
     catch (err) {
       console.error('Error getting bbox coords', err);
       dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n' +
-        'Please pan to the map manually.'));
+      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n'
+        + 'Please pan to the map manually.'));
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };
@@ -231,7 +230,7 @@ const CustomMapDetails = () => {
           <Row data={['', 'Longitude', 'Latitude']} flexArr={[1, 2, 2]} style={customMapStyles.bboxTableHead}
                textStyle={customMapStyles.bboxText}/>
           <TableWrapper style={{flexDirection: 'row'}}>
-            <Col data={['SW', 'NE']} style={customMapStyles.bboxColumnContainer} heightArr={[25, 25]}
+            <Col data={['SW', 'NE']} heightArr={[25, 25]} style={customMapStyles.bboxColumnContainer}
                  textStyle={customMapStyles.bboxText}/>
             <Rows data={bboxCoords} flexArr={[2, 2]} style={customMapStyles.bboxRowContainer}
                   textStyle={customMapStyles.bboxText}/>
@@ -263,13 +262,13 @@ const CustomMapDetails = () => {
       <>
         <SectionDivider dividerText={'Custom Map Title'}/>
         <Input
-          inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
-          containerStyle={{paddingHorizontal: 0}}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
-          value={editableCustomMapData?.title || ''}
+          containerStyle={{paddingHorizontal: 10}}
           errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
           errorStyle={customMapStyles.requiredMessage}
+          inputContainerStyle={{borderBottomWidth: 0}}
+          inputStyle={formStyles.fieldValue}
+          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
+          value={editableCustomMapData?.title || ''}
         />
       </>
     );
@@ -288,9 +287,9 @@ const CustomMapDetails = () => {
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>Display as overlay</ListItem.Title>
           </ListItem.Content>
-          <Switch
-            value={editableCustomMapData?.overlay}
+          <SwitchWrapper
             onValueChange={val => setEditableCustomMapData(e => ({...e, overlay: val}))}
+            value={editableCustomMapData?.overlay}
           />
         </ListItem>
         {editableCustomMapData?.overlay && (
@@ -301,13 +300,13 @@ const CustomMapDetails = () => {
             </ListItem.Content>
             <View style={{flex: 2}}>
               <SliderBar
-                value={opacity}
-                onValueChange={val => setEditableCustomMapData(e => ({...e, opacity: val}))}
+                labels={['5%', '50%', '100%']}
                 maximumValue={1}
                 minimumValue={0.05}
-                step={0.05}
+                onValueChange={val => setEditableCustomMapData(e => ({...e, opacity: val}))}
                 rotateLabels
-                labels={['5%', '50%', '100%']}
+                step={0.05}
+                value={opacity}
               />
             </View>
           </ListItem>
@@ -323,8 +322,8 @@ const CustomMapDetails = () => {
           dispatch(setSidePanelVisible({bool: false}));
           dispatch(selectedCustomMapToEdit({}));
         }}
-        title={'Custom Maps'}
         headerTitle={!isEmpty(customMapToEdit) ? 'Edit Map' : 'Add Map'}
+        title={'Custom Maps'}
       />
     );
   };
@@ -336,32 +335,36 @@ const CustomMapDetails = () => {
         {renderTitle()}
         {renderOverlaySection()}
         {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {isEmpty(
-          customMapToEdit) && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
-          || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        {isEmpty(customMapToEdit)
+          && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+            || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
           <Button
-            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            buttonStyle={commonStyles.standardButton}
             containerStyle={commonStyles.standardButtonContainer}
-            type={'clear'}
             disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
                 editableCustomMapData.id)
               || editableCustomMapData.source === 'map_warper')}
             onPress={() => saveMap()}
+            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            type={'outline'}
           />
           <Button
+            buttonStyle={commonStyles.standardButton}
+            containerStyle={commonStyles.standardButtonContainer}
+            onPress={() => confirmDeleteMap()}
             title={'Delete Map'}
             titleStyle={{color: WARNING_COLOR}}
-            containerStyle={commonStyles.standardButtonContainer}
-            type={'clear'}
-            onPress={() => confirmDeleteMap()}
+            type={'outline'}
           />
         </View>
       </View>
+
+      {/* Modal */}
       <Overlay
-        supportedOrientations={['portrait', 'landscape']}
         isVisible={isLoadingModalVisible}
         overlayStyle={[overlayStyles.overlayContainer, customMapStyles.loadingMapModalContainer]}
+        supportedOrientations={['portrait', 'landscape']}
       >
         <View style={{flex: 1}}>
           <View style={[overlayStyles.titleContainer, customMapStyles.loadingMapModalTitleContainer]}>
@@ -373,10 +376,10 @@ const CustomMapDetails = () => {
           </View>
           <View style={customMapStyles.loadingMapButtonContainer}>
             <Button
+              disabled={isLoading}
+              onPress={handlePress}
               title={'Ok'}
               type={'clear'}
-              onPress={handlePress}
-              disabled={isLoading}
             />
           </View>
           <View style={{flex: 1}}>

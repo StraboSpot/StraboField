@@ -25,13 +25,14 @@ const ChoiceButtons = ({
       {getChoicesByKey(survey, choices, choiceFieldKey).map((choice) => {
         return (
           <Button
-            key={choice.name}
-            containerStyle={formStyles.halfWidthButtonContainer}
             buttonStyle={[buttonStyle, {
               backgroundColor: formProps?.values[choiceFieldKey]?.includes(choice.name)
                 ? PRIMARY_ACCENT_COLOR
                 : SECONDARY_BACKGROUND_COLOR,
             }]}
+            containerStyle={formStyles.halfWidthButtonContainer}
+            key={choice.name}
+            onPress={() => onPress(choice.name)}
             title={choice.label}
             titleProps={{
               style: formProps?.values[choiceFieldKey]?.includes(choice.name)
@@ -41,7 +42,6 @@ const ChoiceButtons = ({
               ellipsizeMode: 'tail',
             }}
             type={'outline'}
-            onPress={() => onPress(choice.name)}
           />
         );
       })}

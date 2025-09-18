@@ -11,8 +11,8 @@ import IgneousRockFabric from './IgneousRockFabric';
 import MetamRockFabric from './MetamRockFabric';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -68,39 +68,39 @@ const AddFabricModal = ({onPress}) => {
     return (
       <>
         <ButtonGroup
-          selectedIndex={selectedTypeIndex}
-          onPress={onFabricTypePress}
+          buttonStyle={{padding: 5}}
           buttons={Object.values(FABRIC_TYPES)}
           containerStyle={{height: 40, borderRadius: 10}}
-          buttonStyle={{padding: 5}}
+          onPress={onFabricTypePress}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          selectedIndex={selectedTypeIndex}
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         {types[selectedTypeIndex] === 'fault_rock' && (
           <FaultRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
         {types[selectedTypeIndex] === 'igneous_rock' && (
           <IgneousRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
         {types[selectedTypeIndex] === 'metamorphic_rock' && (
           <MetamRockFabric
-            survey={survey}
             choices={choices}
-            setChoicesViewKey={setChoicesViewKey}
             formName={formProps.status.formName}
             formProps={formProps}
+            setChoicesViewKey={setChoicesViewKey}
+            survey={survey}
           />
         )}
       </>
@@ -110,19 +110,18 @@ const AddFabricModal = ({onPress}) => {
   const renderNotebookFabricModalContent = () => {
     const formName = [groupKey, types[selectedTypeIndex]];
     return (
-      <Modal
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <>
           <FlatList
-            bounces={false}
             ListHeaderComponent={
               <View style={{flex: 1}}>
                 <Formik
-                  innerRef={formRef}
                   initialValues={{}}
+                  innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={false}
@@ -135,10 +134,11 @@ const AddFabricModal = ({onPress}) => {
                 </Formik>
               </View>
             }
+            bounces={false}
           />
         </>
-        {!choicesViewKey && <SaveButton title={'Save Fabric'} onPress={saveFabric}/>}
-      </Modal>
+        {!choicesViewKey && <SaveButton onPress={saveFabric} title={'Save Fabric'}/>}
+      </ModalWrapper>
     );
   };
 

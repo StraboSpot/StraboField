@@ -44,18 +44,18 @@ const SelectInputField = ({
   };
 
   const renderChoiceItem = (item, isWrapped) => {
-    const radioSelected = <Icon name={'radiobox-marked'} type={'material-community'} color={PRIMARY_ACCENT_COLOR}/>;
-    const radioUnselected = <Icon name={'radiobox-blank'} type={'material-community'} color={DARKGREY}/>;
+    const radioSelected = <Icon color={PRIMARY_ACCENT_COLOR} name={'radiobox-marked'} type={'material-community'}/>;
+    const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
     return (
       <React.Fragment key={item.value}>
         {isWrapped ? (
           <CheckBox
             checked={value === item.value}
             checkedIcon={radioSelected}
-            uncheckedIcon={radioUnselected}
+            containerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0, padding: 1}}
             onPress={() => fieldValueChanged([item.value])}
             title={item.label}
-            containerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0, padding: 1}}
+            uncheckedIcon={radioUnselected}
           />
         ) : (
           <ListItem containerStyle={commonStyles.listItemFormField}>
@@ -66,8 +66,8 @@ const SelectInputField = ({
               <ListItem.CheckBox
                 checked={value === item.value}
                 checkedIcon={radioSelected}
-                uncheckedIcon={radioUnselected}
                 onPress={() => fieldValueChanged([item.value])}
+                uncheckedIcon={radioUnselected}
               />
             ) : (
               <ListItem.CheckBox
@@ -107,10 +107,10 @@ const SelectInputField = ({
         <Text style={formStyles.fieldLabel}>{label}</Text>
         {placeholder && (
           <Icon
-            name={'information-circle-outline'}
-            type={'ionicon'}
             color={themes.PRIMARY_ACCENT_COLOR}
+            name={'information-circle-outline'}
             onPress={() => onShowFieldInfo(label, placeholder)}
+            type={'ionicon'}
           />
         )}
       </View>
@@ -121,32 +121,34 @@ const SelectInputField = ({
     return (
       <>
         {renderFieldLabel()}
-        <View style={formStyles.fieldValue}>
+        <View style={[formStyles.fieldValue, {paddingBottom: 0}]}>
           <MultiSelect
+            displayKey={'label'}
+            fontSize={themes.PRIMARY_TEXT_SIZE}
+            hideDropdown={true}
             hideSubmitButton={true}
             hideTags={false}
-            single={single}
-            hideDropdown={true}
-            searchIcon={false}
-            items={choices}
-            uniqueKey={'value'}
-            displayKey={'label'}
-            onSelectedItemsChange={fieldValueChanged}
-            selectedItems={isEmpty(value) || typeof value === 'object' ? value : [value]}
-            textInputProps={{editable: false}}
-            selectText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
-            searchInputPlaceholderText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
-            searchInputStyle={formStyles.dropdownSelectionListHeader}
-            fontSize={themes.PRIMARY_TEXT_SIZE}
-            selectedItemTextColor={themes.PRIMARY_TEXT_COLOR}
-            selectedItemIconColor={themes.PRIMARY_TEXT_COLOR}
-            textColor={themes.PRIMARY_TEXT_COLOR}
             itemTextColor={themes.PRIMARY_TEXT_COLOR}
+            items={choices}
+            onSelectedItemsChange={fieldValueChanged}
+            searchIcon={false}
+            searchInputPlaceholderText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
+            selectText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
+            selectedItemIconColor={themes.PRIMARY_TEXT_COLOR}
+            selectedItemTextColor={themes.PRIMARY_TEXT_COLOR}
+            selectedItems={isEmpty(value) || typeof value === 'object' ? value : [value]}
+            single={single}
             styleDropdownMenu={formStyles.dropdownContainer}
             styleDropdownMenuSubsection={formStyles.dropdownSelectedContainer}
-            styleSelectorContainer={formStyles.selectorContainer}
+            styleIndicator={formStyles.dropdownIndicator}
+            styleInputGroup={formStyles.dropdownInputGroup}
+            styleItemsContainer={formStyles.dropdownItemsContainer}
             tagBorderColor={themes.PRIMARY_TEXT_COLOR}
+            tagContainerStyle={formStyles.dropdownTagContainer}
             tagTextColor={themes.PRIMARY_TEXT_COLOR}
+            textColor={themes.PRIMARY_TEXT_COLOR}
+            textInputProps={{editable: false}}
+            uniqueKey={'value'}
           />
         </View>
         {errors && errors[name]

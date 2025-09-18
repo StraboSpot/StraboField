@@ -6,18 +6,19 @@ import {Button} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch} from 'react-redux';
 
-import DateDialogBox from '../../shared/ui/StatusDialogBox';
+import DateDialogBox from '../../shared/ui/modals/StatusDialogBox';
 import {formStyles} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
 const DateInputField = ({
                           field: {name, onBlur, onChange, value},
-                          form: {errors, touched, setFieldValue, values},
+                          form: {errors, values},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
                           onMyChange,
+                          setFieldValue,
                         }) => {
   const [isDatePickerModalVisible, setIsDatePickerModalVisible] = useState(false);
   const [date, setDate] = useState(Date.parse(value) ? new Date(value) : new Date());
@@ -32,7 +33,7 @@ const DateInputField = ({
       },
     );
     return () => subscription.remove();
-    }, [colorScheme]);
+  }, [colorScheme]);
 
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
@@ -80,12 +81,12 @@ const DateInputField = ({
     return (
       <View style={{width: '100%'}}>
         <DateTimePicker
-          mode={isShowTimeOnly ? 'time' : 'date'}
-          value={date}
-          textColor={colorScheme === 'dark' && 'black'}
-          onChange={changeDate}
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          mode={isShowTimeOnly ? 'time' : 'date'}
           neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
+          onChange={changeDate}
+          textColor={colorScheme === 'dark' && 'black'}
+          value={date}
         />
       </View>
     );
@@ -101,20 +102,20 @@ const DateInputField = ({
         {renderDatePicker()}
         <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-evenly'}}>
           <Button
-            title={'Clear'}
-            type={'clear'}
             onPress={() => {
               setFieldValue(name, undefined);
               setIsDatePickerModalVisible(false);
             }}
+            title={'Clear'}
+            type={'clear'}
           />
           <Button
-            title={'Close'}
-            type={'clear'}
             onPress={() => {
               saveDate(null, date);
               setIsDatePickerModalVisible(false);
             }}
+            title={'Close'}
+            type={'clear'}
           />
         </View>
       </DateDialogBox>
@@ -135,8 +136,8 @@ const DateInputField = ({
         )
         : (
           <Text
-            style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}
             onPress={() => setIsDatePickerModalVisible(true)}
+            style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}
           >
             {title}
           </Text>

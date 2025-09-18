@@ -6,10 +6,9 @@ import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField} from '../form';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
 const Metadata = () => {
@@ -28,10 +27,10 @@ const Metadata = () => {
   const renderMetadataForm = () => {
     return (
       <Formik
-        initialValues={spot.properties}
-        onSubmit={values => console.log('Submitting form...', values)}
-        innerRef={metadataFormRef}
         enableReinitialize={true}
+        initialValues={spot.properties}
+        innerRef={metadataFormRef}
+        onSubmit={values => console.log('Submitting form...', values)}
       >
         {() => (
           <>
@@ -39,36 +38,34 @@ const Metadata = () => {
               <ListItem.Content>
                 <Field
                   component={NumberInputField}
-                  name={'id'}
-                  label={'ID'}
-                  key={'id'}
                   editable={false}
+                  key={'id'}
+                  label={'ID'}
+                  name={'id'}
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'date'}
-                  label={'Date Created'}
+                  isDisplayOnly={true}
+                  isShowTime={true}
                   key={'date'}
-                  isDisplayOnly={true}
-                  isShowTime={true}
+                  label={'Date Created'}
+                  name={'date'}
                 />
               </ListItem.Content>
             </ListItem>
-            <FlatListItemSeparator/>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
                   component={DateInputField}
-                  name={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  key={'modified_timestamp'}
                   isDisplayOnly={true}
                   isShowTime={true}
+                  key={'modified_timestamp'}
+                  label={'Date Last Modified'}
+                  name={'modified_timestamp'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -81,7 +78,7 @@ const Metadata = () => {
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
     return (
-      <ListItem key={dataset.id.toString()} containerStyle={commonStyles.listItem}>
+      <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
           <ListItem.Subtitle>
@@ -92,9 +89,9 @@ const Metadata = () => {
         </ListItem.Content>
         <ListItem.CheckBox
           checked={isChecked}
-          onPress={() => handleDatasetChecked(dataset)}
-          iconType={'material-community'}
           checkedIcon={'radiobox-marked'}
+          iconType={'material-community'}
+          onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}
         />
       </ListItem>
@@ -117,8 +114,7 @@ const Metadata = () => {
     <FlatList
       ListHeaderComponent={
         <>
-          <ReturnToOverviewButton/>
-          <SectionDivider dividerText={'Metadata'}/>
+          <NotebookPageHeader pageTitle={'Metadata'}/>
           {renderMetadataForm()}
           {renderDatasets()}
         </>

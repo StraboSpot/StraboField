@@ -12,9 +12,9 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ReactionTexturesPage = ({page}) => {
@@ -66,9 +66,9 @@ const ReactionTexturesPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
         page={page}
         selectedFeature={selectedReaction}
-        groupKey={'pet'}
       />
     );
   };
@@ -76,7 +76,7 @@ const ReactionTexturesPage = ({page}) => {
   const renderReactionsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         <View>
           <SectionDivider
             dividerText={'Minerals Added to this Spot'}
@@ -92,13 +92,13 @@ const ReactionTexturesPage = ({page}) => {
           onPress={addReaction}
         />
         <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
           data={spot.properties.pet && spot.properties.pet[page.key]
             && spot.properties.pet[page.key].slice().sort(
               (a, b) => (a[page.key] || 'Unknown').localeCompare((b[page.key] || 'Unknown')))}
-          renderItem={({item}) => <BasicListItem page={page} item={item} editItem={editReaction}/>}
           keyExtractor={item => item.id.toString()}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
+          renderItem={({item}) => <BasicListItem editItem={editReaction} item={item} page={page}/>}
         />
       </View>
     );

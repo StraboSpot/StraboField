@@ -6,18 +6,18 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -117,26 +117,25 @@ const BeddingPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
-        <SectionDivider dividerText={page.label}/>
+        <NotebookPageHeader pageTitle={page.label}/>
         {renderBeddingShared()}
         <SectionDividerWithRightButton
           dividerText={'Beds'}
           onPress={addAttribute}
         />
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={bedding.beds}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              item={item}
-              index={index}
-              page={page}
-              editItem={itemToEdit => editAttribute(itemToEdit, index)}
-            />
-          )}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Beds'}/>}
+          data={bedding.beds}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item, index}) => (
+            <BasicListItem
+              editItem={itemToEdit => editAttribute(itemToEdit, index)}
+              index={index}
+              item={item}
+              page={page}
+            />
+          )}
         />
       </View>
     );
@@ -147,28 +146,40 @@ const BeddingPage = ({page}) => {
     || spot?.properties?.sed?.character === 'bed_mixed_lit' ? ['sed', 'bedding_shared_interbedded']
       : spot?.properties?.sed?.character === 'package_succe' ? ['sed', 'bedding_shared_package']
         : [];
-    return isEmpty(formName) ? (
-      <ListEmptyText
-        text={'No shared bedding. Add bedding character of interbedded, mixed lithologies or package on the Interval Page first.'}
-      />
-    ) : (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-          save={() => saveBeddingShared(beddingSharedRef.current)}
+    return (
+      <View style={{maxHeight: 300}}>
+        <SectionDivider dividerText={'Shared Bedding'}/>
+        <FlatList
+          ListEmptyComponent={
+            <ListEmptyText
+              text={'No shared bedding. Add bedding character of interbedded, mixed lithologies or package on the Interval Page first.'}
+            />
+          }
+          ListHeaderComponent={
+            !isEmpty(formName) && (
+              <>
+                <SaveAndCancelButtons
+                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                  save={() => saveBeddingShared(beddingSharedRef.current)}
+                />
+                <Formik
+                  enableReinitialize={true}
+                  initialValues={bedding}
+                  innerRef={beddingSharedRef}
+                  onReset={() => console.log('Resetting form...')}
+                  onSubmit={() => console.log('Submitting form...')}
+                  validate={values => validateForm({formName: formName, values: values})}
+                  validateOnChange={false}
+                >
+                  {formProps => <Form {...{...formProps, formName: formName}}/>}
+                </Formik>
+              </>
+            )
+          }
+          data={formName}
         />
-        <Formik
-          innerRef={beddingSharedRef}
-          onSubmit={() => console.log('Submitting form...')}
-          onReset={() => console.log('Resetting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
-          initialValues={bedding}
-          validateOnChange={false}
-          enableReinitialize={true}
-        >
-          {formProps => <Form {...{...formProps, formName: formName}}/>}
-        </Formik>
       </View>
+
     );
   };
 

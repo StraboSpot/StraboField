@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
-import {Button, Icon, Tab} from '@rn-vui/base';
+import {Button, Tab} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,7 +13,7 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -42,9 +42,9 @@ const AddTephraModal = ({onPress}) => {
     const subpages = TEPHRA_SUBPAGES;
     const formName = [pageKey, Object.values(subpages)[tabIndex]];
     return (
-      <Modal
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <Tab
@@ -64,12 +64,11 @@ const AddTephraModal = ({onPress}) => {
           ))}
         </Tab>
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={true}
@@ -84,16 +83,17 @@ const AddTephraModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
         {!choicesViewKey && (
           <Button
-            title={'Save'}
             containerStyle={{height: 40, borderRadius: 10, marginTop: 10, marginBottom: 10}}
             onPress={saveTephra}
             textStyle={{color: PRIMARY_ACCENT_COLOR}}
+            title={'Save'}
           />
         )}
-      </Modal>
+      </ModalWrapper>
     );
   };
 

@@ -33,9 +33,9 @@ const ActionButtonsSmallScreen = ({
         <DrawInfo
           clickHandler={clickHandler}
           distance={distance}
-          onCancel={onCancel}
           endMeasurement={endMeasurement}
           mapMode={mapMode}
+          onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
           selectingMode={selectingMode}
         />

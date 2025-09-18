@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Text} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
-import AddButton from '../../../shared/ui/AddButton';
+import AddButton from '../../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';
@@ -65,13 +65,13 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
         </ListItem.Content>
         {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
           <Icon
+            color={PRIMARY_ACCENT_COLOR}
             disabled={!isInternetReachable && !isConnected}
             disabledStyle={{backgroundColor: 'transparent'}}
             name={(isInternetReachable && isConnected) || !isInternetReachable && isConnected ? 'map-outline'
               : !isInternetReachable && !isConnected ? 'cloud-offline' : null}
-            type={'ionicon'}
-            color={PRIMARY_ACCENT_COLOR}
             onPress={() => viewCustomMap(item)}
+            type={'ionicon'}
           />
         )}
         <ListItem.Chevron/>
@@ -97,18 +97,13 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
         type={'outline'}
       />
       <SectionDivider dividerText={'Current Custom Maps'}/>
-      {isSelected && (
-        <SectionDivider
-          textStyle={{fontSize: 12, textAlign: 'center'}}
-          dividerText={`Endpoint: ${endpoint.replace('/db', '')}`}
-        />
-      )}
+      {isSelected && <Text style={commonStyles.standardDescriptionText}>Endpoint: {endpoint.replace('/db', '')}</Text>}
       <FlatList
-        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-        data={filteredMaps}
-        renderItem={({item}) => renderCustomMapListItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Custom Maps'}/>}
+        data={filteredMaps}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        renderItem={({item}) => renderCustomMapListItem(item)}
       />
     </>
   );

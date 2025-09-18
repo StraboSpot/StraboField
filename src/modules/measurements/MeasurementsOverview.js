@@ -20,17 +20,17 @@ const MeasurementsOverview = ({page}) => {
 
   return (
     <FlatList
-      keyExtractor={(item, index) => index.toString()}
+      ItemSeparatorComponent={FlatListItemSeparator}
+      ListEmptyComponent={<ListEmptyText text={'No Measurements'}/>}
       data={orientationsData}
+      keyExtractor={(item, index) => index.toString()}
       renderItem={({item}) => (
         <MeasurementItem
           item={item}
-          selectedIds={[]}
           onPress={() => onMeasurementPressed(item)}
+          selectedIds={[]}
         />
       )}
-      ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Measurements'}/>}
     />
   );
 };

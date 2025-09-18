@@ -20,18 +20,18 @@ const SampleLayers = ({features}) => {
       <>
         {/* Starburst at Point Features with a Sample Layer */}
         <Source
+          data={turf.featureCollection(featuresWithSamples)}
           id={'pointFeaturesSamplesSource'}
           type={'geojson'}
-          data={turf.featureCollection(featuresWithSamples)}
         >
           <Layer
-            type={'symbol'}
             beforeId={'polygonLayerNotSelected'}
-            id={'pointLayerSampleSymbols'}
-            minZoomLevel={1}
             filter={['==', ['geometry-type'], 'Point']}
+            id={'pointLayerSampleSymbols'}
             layout={getLayoutSymbology().sample}
+            minZoomLevel={1}
             paint={getPaintSymbology().sample}
+            type={'symbol'}
           />
         </Source>
       </>

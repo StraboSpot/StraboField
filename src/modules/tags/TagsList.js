@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import uiStyles from '../../shared/ui/ui.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
@@ -38,17 +37,9 @@ const TagsList = ({type, selectedIndex}) => {
     {title: 'No Type Specified', key: undefined},
   ];
 
-  const getTagTitle = (tag) => {
-    return tag.name || '';
-  };
+  const getTagTitle = tag => tag.name || '';
 
-  const renderSectionHeader = (title) => {
-    return (
-      <View style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={title}/>
-      </View>
-    );
-  };
+  const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 
   const renderTag = (tag) => {
     const tagSpotCount = getTagSpotsCount(tag);
@@ -59,7 +50,7 @@ const TagsList = ({type, selectedIndex}) => {
       <ListItem
         containerStyle={commonStyles.listItem}
         onPress={() => {
-          dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.TAG_DETAIL, bool: true}));
+          dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
           dispatch(setSelectedTag(tag));
         }}
       >
@@ -98,11 +89,11 @@ const TagsList = ({type, selectedIndex}) => {
 
     return (
       <FlatList
-        keyExtractor={item => item.id.toString()}
-        data={tagsInMapExtent}
-        renderItem={({item}) => renderTag(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={`No Spots with ${label.toLowerCase()} in current map extent`}/>}
+        data={tagsInMapExtent}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({item}) => renderTag(item)}
       />
     );
   };
@@ -120,15 +111,15 @@ const TagsList = ({type, selectedIndex}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={dataSectioned}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
         renderItem={({item}) => renderTag(item)}
         renderSectionFooter={({section: {data, title}}) => {
           return data.length === 0 && <ListEmptyText text={'No ' + title}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={dataSectioned}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };

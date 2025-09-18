@@ -7,11 +7,11 @@ import {useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ButtonRounded from '../../shared/ui/ButtonRounded';
+import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import overlayStyles from '../home/overlays/overlay.styles';
 import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
@@ -37,18 +37,18 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
         <SectionDivider dividerText={'Associated Spots'}/>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
           <ButtonRounded
+            buttonStyle={imageStyles.buttonContainer}
             icon={
               <Icon
-                name={'plus-minus'}
-                type={'material-community'}
+                color={commonStyles.iconColor.color}
                 iconStyle={imageStyles.icon}
-                color={commonStyles.iconColor.color}/>
+                name={'plus-minus'}
+                type={'material-community'}/>
             }
+            onPress={addAssociatedSpots}
             title={'Add/Remove Spots'}
             titleStyle={commonStyles.standardButtonText}
-            buttonStyle={imageStyles.buttonContainer}
             type={'outline'}
-            onPress={addAssociatedSpots}
           />
           {/*<ButtonRounded*/}
           {/*  icon={*/}
@@ -81,15 +81,15 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
       </View>
       {isSpotsListModalVisible && (
         <Overlay
-          supportedOrientations={['portrait', 'landscape']}
           overlayStyle={{...overlayStyles.overlayContainer, maxHeight: height * 0.80}}
+          supportedOrientations={['portrait', 'landscape']}
         >
           <View style={{alignItems: 'flex-end'}}>
             <Button
+              buttonStyle={{padding: 0}}
+              icon={{name: 'close', type: 'ionicon', size: 20}}
               onPress={() => setIsSpotsListModalVisible(false)}
               type={'clear'}
-              icon={{name: 'close', type: 'ionicon', size: 20}}
-              buttonStyle={{padding: 0}}
             />
           </View>
           {Platform.OS === 'web' ? (

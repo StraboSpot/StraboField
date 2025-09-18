@@ -1,12 +1,14 @@
 import React from 'react';
-import {Platform, ActivityIndicator} from 'react-native';
+import {ActivityIndicator, Platform, Text} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
 import {imageStyles, PlaceholderImageIcon} from '.';
+import {WARNING_COLOR} from '../../shared/styles.constants';
 
 const ImageThumbnail = ({
                           imageThumbnailURI,
+                          isImageMissingOnServer,
                           isImageThumbnailLoading,
                           isThumbnailOnly,
                           onFinishedLoading,
@@ -17,7 +19,10 @@ const ImageThumbnail = ({
 
   return (
     <Image
-      PlaceholderContent={isImageThumbnailLoading ? <ActivityIndicator/> : <PlaceholderImageIcon/>}
+      PlaceholderContent={isImageThumbnailLoading ? <ActivityIndicator/>
+        : isImageMissingOnServer
+          ? <Text style={{color: WARNING_COLOR, textAlign: 'center'}}>Image Not Found On Server</Text>
+          : <PlaceholderImageIcon/>}
       containerStyle={[imageStyles.thumbnailImageContainer, {height: height, width: height}]}
       onError={onFinishedLoading}
       onLoadEnd={onFinishedLoading}

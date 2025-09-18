@@ -100,17 +100,17 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       <View style={{justifyContent: 'flex-start'}}>
         <SectionDivider dividerText={'Parent Spot'}/>
         <FlatList
-          keyExtractor={item => item?.properties?.id?.toString()}
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'No Parent Spot Found'}/>}
           data={[parentSpot]}
+          keyExtractor={item => item?.properties?.id?.toString()}
           renderItem={({item}) => (
             <SpotsListItem
               doShowTags={true}
-              spot={item}
               onPress={() => handleSpotSelected(item)}
+              spot={item}
             />
           )}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Parent Spot Found'}/>}
         />
       </View>
     );
@@ -128,24 +128,24 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         {currentImageBasemap && renderParentSpot()}
         <SectionDivider dividerText={'Recent Spots'}/>
         <FlatList
-          keyExtractor={item => item.properties.id.toString()}
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
           data={spotsList}
+          keyExtractor={item => item.properties.id.toString()}
           renderItem={({item}) => (
             <SpotsListItem
               doShowTags={true}
-              spot={item}
               onPress={() => handleSpotSelected(item)}
+              spot={item}
             />
           )}
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
         />
         {!SMALL_SCREEN && (
           <Button
-            title={'Close Notebook'}
-            type={'clear'}
-            titleStyle={commonStyles.standardButtonText}
             onPress={closeNotebookPanel}
+            title={'Close Notebook'}
+            titleStyle={commonStyles.standardButtonText}
+            type={'clear'}
           />
         )}
       </View>

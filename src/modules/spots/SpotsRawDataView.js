@@ -8,8 +8,7 @@ import Toast from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import Modal from '../../shared/ui/modal/Modal';
-import {setIntersectedSpotsForTagging} from './spots.slice';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
 
@@ -29,22 +28,22 @@ const SpotsRawDataView = () => {
     buildObject();
   }, [selectedSpots]);
 
- const buildObject = () => {
-   const filteredDataJson = {
-     Project: {
-       project,
-     },
-     Spots: {selectedSpots}
-   }
-   console.log(filteredDataJson);
-   setDataJson(filteredDataJson);
- };
+  const buildObject = () => {
+    const filteredDataJson = {
+      Project: {
+        project,
+      },
+      Spots: {selectedSpots},
+    };
+    console.log(filteredDataJson);
+    setDataJson(filteredDataJson);
+  };
 
- const closeModal = () => {
+  const closeModal = () => {
 
-   // dispatch(setIntersectedSpotsForTagging([]));
-   dispatch(setModalVisible({modal: null}))
- };
+    // dispatch(setIntersectedSpotsForTagging([]));
+    dispatch(setModalVisible({modal: null}));
+  };
 
   const onClipboardPress = () => {
     Clipboard.setString(JSON.stringify(selectedSpots));
@@ -52,16 +51,16 @@ const SpotsRawDataView = () => {
   };
 
   return (
-    <Modal
-      isFullScreen
+    <ModalWrapper
       closeModal={closeModal}
+      isFullScreen
     >
       <ScrollView>
         <Button
+          onPress={onClipboardPress}
           title={'Copy JSON to Clipboard'}
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
-          onPress={onClipboardPress}
         />
         <JSONTree
           data={dataJson}
@@ -69,7 +68,7 @@ const SpotsRawDataView = () => {
         />
       </ScrollView>
       <Toast ref={toast}/>
-    </Modal>
+    </ModalWrapper>
   );
 };
 

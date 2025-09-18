@@ -3,8 +3,8 @@ import {Text, View} from 'react-native';
 
 import {Button, Overlay} from '@rn-vui/base';
 
-import IconButton from '../../shared/ui/IconButton';
-import overlayStyles from '../home/overlays/overlay.styles';
+import IconButton from '../../shared/ui/buttons/IconButton';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 // Modal to prompt the user to select a geometry if no geometry has been set
 const SetInCurrentViewOverlay = ({
@@ -29,11 +29,11 @@ const SetInCurrentViewOverlay = ({
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'slide'}
-      overlayStyle={overlayStyles.overlayContainer}
       isVisible={showSetInCurrentViewModal}
       onBackdropPress={() => setShowSetInCurrentViewModal(false)}
+      overlayStyle={overlayStyles.overlayContainer}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>Select a Geometry Type</Text>
@@ -41,18 +41,18 @@ const SetInCurrentViewOverlay = ({
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
         {buttons.map(button =>
           <Button
+            buttonStyle={overlayStyles.buttonText}
             icon={
               <IconButton
-                style={{paddingRight: 15}}
-                source={buttonIcon(button)}
                 onPress={() => updateDefaultGeomType(button)}
+                source={buttonIcon(button)}
+                style={{paddingRight: 15}}
               />
             }
-            title={button}
-            buttonStyle={overlayStyles.buttonText}
-            type={'clear'}
-            onPress={() => updateDefaultGeomType(button)}
             key={button}
+            onPress={() => updateDefaultGeomType(button)}
+            title={button}
+            type={'clear'}
           />,
         )}
       </View>

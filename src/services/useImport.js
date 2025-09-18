@@ -3,19 +3,15 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import useDevice from './useDevice';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  removedLastStatusMessage,
-} from '../modules/home/home.slice';
+import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../modules/maps/offline-maps/offlineMaps.slice';
 import {
   addedDatasets,
   addedProject,
   setActiveDatasets,
-  setSelectedDataset,
   setSelectedProject,
+  setTargetDataset,
 } from '../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../modules/spots/spots.slice';
 import {isEmpty} from '../shared/Helpers';
@@ -165,7 +161,7 @@ const useImport = () => {
       dispatch(addedDatasets(projectDb.datasets));
       if (Object.values(projectDb.datasets).length > 0 && !isEmpty(Object.values(projectDb.datasets)[0])) {
         dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
-        dispatch(setSelectedDataset(Object.values(projectDb.datasets)[0].id));
+        dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
       }
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage(`${selectedProject}\nProject loaded.`));

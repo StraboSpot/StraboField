@@ -2,8 +2,8 @@ import {StyleSheet} from 'react-native';
 
 const tephraStyles = StyleSheet.create({
   buttonGroupContainer: {
+    borderRadius: 10,
     height: 40,
-    borderRadius: 10
   },
   draggableListContainer: {
     flex: 1,

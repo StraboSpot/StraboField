@@ -11,77 +11,77 @@ const FeaturesNotSelectedLayers = ({features}) => {
 
   return (
     <Source
+      data={turf.featureCollection(features)}
       id={'spotsNotSelectedSource'}
       type={'geojson'}
-      data={turf.featureCollection(features)}
     >
       {/* Polygon Not Selected */}
       <Layer
-        type={'fill'}
-        id={'polygonLayerNotSelected'}
         filter={['all', ['==', ['geometry-type'], 'Polygon'], ['!', ['has', 'fillPattern', ['get', 'symbology']]]]}
+        id={'polygonLayerNotSelected'}
         paint={getPaintSymbology().polygon}
-      />
-      <Layer
         type={'fill'}
-        id={'polygonLayerWithPatternNotSelected'}
+      />
+      <Layer
         filter={['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'fillPattern', ['get', 'symbology']]]}
+        id={'polygonLayerWithPatternNotSelected'}
         paint={getPaintSymbology().polygonWithPattern}
+        type={'fill'}
       />
       <Layer
-        type={'line'}
+        filter={['==', ['geometry-type'], 'Polygon']}
         id={'polygonLayerNotSelectedBorder'}
-        filter={['==', ['geometry-type'], 'Polygon']}
         paint={getPaintSymbology().line}
+        type={'line'}
       />
       <Layer
-        type={'symbol'}
-        id={'polygonLabelLayerNotSelected'}
         filter={['==', ['geometry-type'], 'Polygon']}
+        id={'polygonLabelLayerNotSelected'}
         layout={getLayoutSymbology().polygonLabel}
+        type={'symbol'}
       />
 
       {/* Line Not Selected */}
       {/* Need 4 different lines for the different types of line dashes since
        lineDasharray is not supported with data-driven styling*/}
       <Layer
-        type={'line'}
-        id={'lineLayerNotSelected'}
         filter={getLinesFilteredByPattern('solid')}
+        id={'lineLayerNotSelected'}
         paint={getPaintSymbology().line}
+        type={'line'}
       />
       <Layer
-        type={'line'}
-        id={'lineLayerNotSelectedDotted'}
         filter={getLinesFilteredByPattern('dotted')}
+        id={'lineLayerNotSelectedDotted'}
         paint={getPaintSymbology().lineDotted}
+        type={'line'}
       />
       <Layer
-        type={'line'}
-        id={'lineLayerNotSelectedDashed'}
         filter={getLinesFilteredByPattern('dashed')}
+        id={'lineLayerNotSelectedDashed'}
         paint={getPaintSymbology().lineDashed}
-      />
-      <Layer
         type={'line'}
-        id={'lineLayerNotSelectedDotDashed'}
-        filter={getLinesFilteredByPattern('dotDashed')}
-        paint={getPaintSymbology().lineDotDashed}
       />
       <Layer
-        type={'symbol'}
-        id={'lineLabelLayerNotSelected'}
+        filter={getLinesFilteredByPattern('dotDashed')}
+        id={'lineLayerNotSelectedDotDashed'}
+        paint={getPaintSymbology().lineDotDashed}
+        type={'line'}
+      />
+      <Layer
         filter={['==', ['geometry-type'], 'LineString']}
+        id={'lineLabelLayerNotSelected'}
         layout={getLayoutSymbology().lineLabel}
+        type={'symbol'}
       />
 
       {/* Point Not Selected */}
       <Layer
-        type={'symbol'}
-        id={'pointLayerNotSelected'}
         filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerNotSelected'}
         layout={getLayoutSymbology().point}
         paint={getPaintSymbology().point}
+        type={'symbol'}
       />
     </Source>
   );

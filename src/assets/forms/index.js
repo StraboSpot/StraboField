@@ -20,6 +20,7 @@ import rockTypePlutonic from './pet/rock-type-igneous-plutonic.json';
 import rockTypeVolcanic from './pet/rock-type-igneous-volcanic.json';
 import rockTypeMetamorphic from './pet/rock-type-metamorphic.json';
 import projectDescription from './project-description.json';
+import projectSettings from './project-settings.json';
 import report from './report.json';
 import sample from './sample.json';
 import addInterval from './sed/add-interval.json';
@@ -53,6 +54,7 @@ import fold from './three-d-structures/fold.json';
 import other from './three-d-structures/other.json';
 import tensor from './three-d-structures/tensor.json';
 import trace from './trace.json';
+import userConventions from './user-conventions.json';
 import userProfile from './user-profile.json';
 
 const getMeasurementSurveyForBulkInput = (form) => {
@@ -88,12 +90,13 @@ const forms = {
     geography: geography,
     images: imageProperties,
     project_description: projectDescription,
+    reports: report,
     samples: sample,
     site_safety: siteSafety,
     surface_feature: surfaceFeature,
     trace: trace,
+    user_conventions: userConventions,
     user_profile: userProfile,
-    reports: report,
   },
   measurement: {
     linear_orientation: linearOrientation,
@@ -128,7 +131,8 @@ const forms = {
     igneous: rockTypeIgneousDeprecated,
     metamorphic: rockTypeMetamorphicDeprecated,
   },
-  preferences: {
+  settings: {
+    project_settings: projectSettings,
     naming_conventions: namingConventions,
   },
   project: {

@@ -5,10 +5,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/Helpers';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({page}) => {
@@ -58,13 +57,11 @@ const SamplesPage = ({page}) => {
   const renderSamplesMain = () => {
     return (
       <View style={{flex: 1}}>
-        <>
-          <ReturnToOverviewButton/>
-          <SectionDividerWithRightButton
-            dividerText={page.label}
-            onPress={() => dispatch(setModalVisible({modal: page.key}))}
-          />
-        </>
+        <NotebookPageHeader
+          onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
+          pageTitle={page.label}
+          showAddButton
+        />
         <SamplesList
           onPress={editSample}
           page={page}

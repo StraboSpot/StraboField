@@ -1,15 +1,15 @@
 import React from 'react';
 
 import Notes from './Notes';
-import Modal from '../../shared/ui/modal/Modal';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
 
   const renderNotesShortcutModal = () => {
     return (
-      <Modal onPress={onPress}>
+      <ModalWrapper onPress={onPress}>
         <Notes zoomToCurrentLocation={zoomToCurrentLocation}/>
-      </Modal>
+      </ModalWrapper>
     );
   };
 

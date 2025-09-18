@@ -8,7 +8,7 @@ import {useToast} from 'react-native-toast-notifications';
 import useDevice from '../../services/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR, WHITE} from '../../shared/styles.constants';
-import overlayStyles from '../home/overlays/overlay.styles';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   const {exportMicroProjectPDF} = useDevice();
@@ -38,64 +38,64 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
 
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       isVisible={visible}
       overlayStyle={{height: '100%', width: '100%', backgroundColor: WHITE}}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
         {wasExported ? (
           <Icon
-            name={'check-circle-outline'}
-            type={'material-community'}
-            size={25}
             color={POSITIVE_COLOR}
             containerStyle={overlayStyles.closeButton}
+            name={'check-circle-outline'}
+            size={25}
+            type={'material-community'}
           />
         ) : isExportError ? (
           <Icon
-            name={'alert-circle-outline'}
-            type={'material-community'}
-            size={25}
             color={WARNING_COLOR}
             containerStyle={overlayStyles.closeButton}
+            name={'alert-circle-outline'}
+            size={25}
+            type={'material-community'}
           />
         ) : (
           <Icon
-            name={'export'}
-            type={'material-community'}
-            size={25}
             color={BLACK}
-            onPress={handleExport}
             containerStyle={overlayStyles.closeButton}
+            name={'export'}
+            onPress={handleExport}
+            size={25}
+            type={'material-community'}
           />
         )}
         <Button
-          type={'clear'}
-          onPress={() => setVisible(!visible)}
           icon={
             <Icon
-              name={'close-outline'}
-              type={'ionicon'}
-              size={30}
               color={BLACK}
+              name={'close-outline'}
+              size={30}
+              type={'ionicon'}
             />
           }
+          onPress={() => setVisible(!visible)}
+          type={'clear'}
         />
       </View>
       {!isEmpty(doc) && (
         <Pdf
-          source={doc.file}
-          style={{flex: 1}}
-          onLoadComplete={(numberOfPages, filePath) => {
-            console.log(`Number of pages: ${numberOfPages}`);
-          }}
           onError={(error) => {
             console.log(error);
+          }}
+          onLoadComplete={(numberOfPages, filePath) => {
+            console.log(`Number of pages: ${numberOfPages}`);
           }}
           onPressLink={async (uri) => {
             console.log(`Link pressed: ${uri}`);
             await openUrl(uri);
           }}
+          source={doc.file}
+          style={{flex: 1}}
         />
       )}
     </Overlay>

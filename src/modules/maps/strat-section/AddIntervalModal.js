@@ -10,7 +10,7 @@ import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
-import Modal from '../../../shared/ui/modal/Modal';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {Form, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
@@ -119,7 +119,7 @@ const AddIntervalModal = () => {
     return true;
   };
 
-  // Extract the data from the Spot object in the format needed for the Add Interval modal
+  // Extract the data from the Spot object in the format needed for the Add Interval modals
   const extractAddIntervalData = (sedData) => {
     const addIntervalSurvey = getSurvey(formName);
     const addIntervalFieldNames = addIntervalSurvey.map(f => f.name);
@@ -152,10 +152,10 @@ const AddIntervalModal = () => {
     const intervalsForInsert = [...orderedIntervals, {properties: {name: '-- Bottom --', id: 1}}];
     return (
       <Formik
-        initialValues={initialIntervalName}
-        onSubmit={() => console.log('Submitting form...')}
-        innerRef={preFormRef}
         enableReinitialize={false}
+        initialValues={initialIntervalName}
+        innerRef={preFormRef}
+        onSubmit={() => console.log('Submitting form...')}
         validate={validatePreForm}
         validateOnChange={true}
       >
@@ -164,13 +164,13 @@ const AddIntervalModal = () => {
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
+                  choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
                   component={formProps => (
                     SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                   )}
-                  name={'intervalToInsertAfter'}
                   key={'intervalToInsertAfter'}
                   label={'Insert New Interval After:'}
-                  choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                  name={'intervalToInsertAfter'}
                   single={true}
                 />
               </ListItem.Content>
@@ -178,13 +178,13 @@ const AddIntervalModal = () => {
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <Field
+                  choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
                   component={formProps => (
                     SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                   )}
-                  name={'intervalToCopyId'}
                   key={'intervalToCopyId'}
                   label={'Copy Interval Data From:'}
-                  choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                  name={'intervalToCopyId'}
                   single={true}
                 />
               </ListItem.Content>
@@ -193,9 +193,9 @@ const AddIntervalModal = () => {
               <ListItem.Content>
                 <Field
                   component={TextInputField}
-                  name={'intervalName'}
-                  label={'Interval Name'}
                   key={'intervalName'}
+                  label={'Interval Name'}
+                  name={'intervalName'}
                 />
               </ListItem.Content>
             </ListItem>
@@ -208,12 +208,12 @@ const AddIntervalModal = () => {
   const renderAddIntervalFormFields = () => {
     return (
       <Formik
+        enableReinitialize={true}
+        initialStatus={{formName: formName}}
+        initialValues={initialFormValues}
         innerRef={formRef}
         onSubmit={() => console.log('Submitting form...')}
         validate={values => validateForm({formName: formName, values: values})}
-        initialValues={initialFormValues}
-        initialStatus={{formName: formName}}
-        enableReinitialize={true}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>
@@ -222,18 +222,18 @@ const AddIntervalModal = () => {
 
   const renderAddIntervalModal = () => {
     return (
-      <Modal
-        title={'Add Interval'}
+      <ModalWrapper
         buttonTitleLeft={'Cancel'}
         buttonTitleRight={'Save'}
         cancel={() => close()}
         closeModal={() => saveInterval(formRef?.current?.values)}
+        title={'Add Interval'}
       >
         <FlatList
-          ListHeaderComponent={renderAddIntervalNameField()}
           ListFooterComponent={renderAddIntervalFormFields()}
+          ListHeaderComponent={renderAddIntervalNameField()}
         />
-      </Modal>
+      </ModalWrapper>
     );
   };
 

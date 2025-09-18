@@ -4,7 +4,7 @@ import {Animated} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {MainMenuButton, MapActionButtons, UserLocationButton} from './index';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import homeStyles from '../home.style';
 
 const LeftSideButtons = ({
@@ -42,14 +42,14 @@ const LeftSideButtons = ({
 
         {currentImageBasemap && (
           <IconButton
-            source={require('../../../assets/icons/Close.png')}
             onPress={() => clickHandler('closeImageBasemap')}
+            source={require('../../../assets/icons/Close.png')}
           />
         )}
         {stratSection && (
           <IconButton
-            source={require('../../../assets/icons/Close.png')}
             onPress={() => clickHandler('closeStratSection')}
+            source={require('../../../assets/icons/Close.png')}
           />
         )}
       </Animated.View>

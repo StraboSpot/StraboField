@@ -1,13 +1,14 @@
 import React from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import shortcutMenuStyles from './shortcutsMenu.styles';
 import commonStyles from '../../../shared/common.styles';
+import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import {setShortcutSwitchPositions} from '../../home/home.slice';
 import {MODAL_KEYS, SHORTCUT_MODALS} from '../../page/page.constants';
 
@@ -31,7 +32,7 @@ const ShortcutMenu = () => {
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>{toggleButton.label}</ListItem.Title>
           </ListItem.Content>
-          <Switch
+          <SwitchWrapper
             onValueChange={() => toggleSwitch(toggleButton.key)}
             value={shortcutSwitchPositions[toggleButton.key]}
           />
@@ -41,26 +42,26 @@ const ShortcutMenu = () => {
   };
 
   return (
-    <>
-      <View style={shortcutMenuStyles.textContainer}>
-        <Text style={shortcutMenuStyles.textStyle}>Shortcuts will create a NEW spot</Text>
-      </View>
+    <View style={{flex: 1, flexDirection: 'column'}}>
+      <SectionDivider dividerText={'Shortcuts'}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>All</ListItem.Title>
         </ListItem.Content>
-        <Switch
-          onValueChange={() => toggleSwitch('all')}
-          value={shortcutSwitchPositions.all}
-        />
+        <SwitchWrapper onValueChange={() => toggleSwitch('all')} value={shortcutSwitchPositions.all}/>
       </ListItem>
-      <FlatList
-        keyExtractor={item => item.key}
-        data={SHORTCUT_MODALS}
-        renderItem={({item}) => renderShortcutListItem(item)}
-        ItemSeparatorComponent={FlatListItemSeparator}
-      />
-    </>
+      <View>
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          data={SHORTCUT_MODALS}
+          keyExtractor={item => item.key}
+          renderItem={({item}) => renderShortcutListItem(item)}
+        />
+      </View>
+      <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
+        <Text style={commonStyles.standardDescriptionText}>*Shortcuts will create a NEW spot</Text>
+      </View>
+    </View>
   );
 };
 

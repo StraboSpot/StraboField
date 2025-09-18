@@ -1,0 +1,28 @@
+{
+  "survey": [
+    {
+      "type": "start",
+      "name": "start"
+    },
+    {
+      "type": "end",
+      "name": "end"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_ei8vf77",
+      "label": "Privacy Setting",
+      "required": "false"
+    },
+    {
+      "type": "acknowledge",
+      "name": "public",
+      "label": "Make Project Public?",
+      "required": "false",
+      "hint": "Public datasets are accessible at StraboSpot.org/search.  Privacy settings are reversible and update when project is uploaded."
+    },
+    {
+      "type": "end_group"
+    }
+  ]
+}

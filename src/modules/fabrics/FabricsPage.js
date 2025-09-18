@@ -9,10 +9,9 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import uiStyles from '../../shared/ui/ui.styles';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsPage = ({page}) => {
@@ -64,15 +63,15 @@ const FabricsPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={fabricsGrouped}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        renderItem={({item}) => <FabricListItem fabric={item} editFabric={editFabric}/>}
+        renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
+        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        sections={fabricsGrouped}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };
@@ -84,12 +83,10 @@ const FabricsPage = ({page}) => {
       '');
     if (sectionKey) {
       return (
-        <View style={uiStyles.sectionHeaderBackground}>
-          <SectionDividerWithRightButton
-            dividerText={sectionTitle}
-            onPress={() => addFabric(sectionKey)}
-          />
-        </View>
+        <SectionDividerWithRightButton
+          dividerText={sectionTitle}
+          onPress={() => addFabric(sectionKey)}
+        />
       );
     }
     else return <SectionDivider dividerText={sectionTitle}/>;
@@ -108,7 +105,7 @@ const FabricsPage = ({page}) => {
   const renderFabricsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <ReturnToOverviewButton/>
+        <NotebookPageHeader pageTitle={page.label}/>
         {renderFabricSections()}
       </View>
     );

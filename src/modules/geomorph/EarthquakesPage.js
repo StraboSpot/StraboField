@@ -6,11 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -62,24 +61,20 @@ const EarthquakesPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addAttribute}
-        />
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={attributes}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              item={item}
-              index={index}
-              page={page}
-              editItem={itemToEdit => editAttribute(itemToEdit, index)}
-            />
-          )}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+          data={attributes}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item, index}) => (
+            <BasicListItem
+              editItem={itemToEdit => editAttribute(itemToEdit, index)}
+              index={index}
+              item={item}
+              page={page}
+            />
+          )}
         />
       </View>
     );

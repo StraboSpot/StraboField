@@ -6,9 +6,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -61,18 +61,17 @@ const AddReactionTextureModal = ({onPress}) => {
 
   const renderAddReactionTextureModalContent = () => {
     return (
-      <Modal
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{id: getNewId()}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
               >
                 {formProps => (
@@ -83,9 +82,10 @@ const AddReactionTextureModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
-        {!choicesViewKey && <SaveButton title={'Save Reaction Texture'} onPress={saveReactionTexture}/>}
-      </Modal>
+        {!choicesViewKey && <SaveButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
+      </ModalWrapper>
     );
   };
 
@@ -102,10 +102,10 @@ const AddReactionTextureModal = ({onPress}) => {
         </View>
         <ChoiceButtons
           choiceFieldKey={basedOnKey}
-          survey={survey}
           choices={choices}
           formProps={formProps}
           onPress={choice => onMultiChoiceSelected(basedOnKey, choice)}
+          survey={survey}
         />
         {!isEmpty(formRef.current?.values[basedOnKey]) && formRef.current?.values[basedOnKey].includes('other') && (
           <>

@@ -41,12 +41,12 @@ const useCustomMap = () => {
       dispatch(updatedProject({field: 'other_maps', value: filteredCustomMaps})); // Deletes map from project
     }
     dispatch(deletedCustomMap(customMapsCopy)); // replaces customMaps with updated object
-    dispatch(setSidePanelVisible({view: null, bool: false}));
+    dispatch(setSidePanelVisible({bool: false}));
   };
 
   const getCustomMapDetails = (map) => {
     dispatch(selectedCustomMapToEdit(map));
-    dispatch(setSidePanelVisible({view: SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP, bool: true}));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP}));
   };
 
   const getMyMapsBBox = async (mapId) => {

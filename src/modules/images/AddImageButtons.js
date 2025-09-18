@@ -10,7 +10,7 @@ import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import ButtonRounded from '../../shared/ui/ButtonRounded';
+import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 
@@ -109,59 +109,59 @@ const AddImageButtons = ({saveImages}) => {
       <View style={imageStyles.buttonsContainer}>
         {Platform.OS === 'web' ? (
           <input
-            style={{display: 'none'}}
-            id={'selectedImage'}
-            ref={inputRef}
-            type={'file'}
-            name={'image'}
             accept={'image/jpeg'}
+            id={'selectedImage'}
+            name={'image'}
             onChange={handleFileChange}
             onClick={clickedFileInput}
+            ref={inputRef}
+            style={{display: 'none'}}
+            type={'file'}
           />
         ) : (
           <ButtonRounded
+            buttonStyle={imageStyles.buttonContainer}
             icon={
               <Icon
-                name={'camera-outline'}
-                type={'ionicon'}
+                color={commonStyles.iconColor.color}
                 iconStyle={imageStyles.icon}
-                color={commonStyles.iconColor.color}/>
+                name={'camera-outline'}
+                type={'ionicon'}/>
             }
+            onPress={takePhoto}
             title={'Take'}
             titleStyle={commonStyles.standardButtonText}
-            buttonStyle={imageStyles.buttonContainer}
             type={'outline'}
-            onPress={takePhoto}
           />
         )}
         <ButtonRounded
+          buttonStyle={imageStyles.buttonContainer}
           icon={
             <Icon
-              name={'images-outline'}
-              type={'ionicon'}
+              color={commonStyles.iconColor.color}
               iconStyle={imageStyles.icon}
-              color={commonStyles.iconColor.color}/>
+              name={'images-outline'}
+              type={'ionicon'}/>
           }
+          onPress={importImages}
           title={'Import'}
           titleStyle={commonStyles.standardButtonText}
-          buttonStyle={imageStyles.buttonContainer}
           type={'outline'}
-          onPress={importImages}
         />
         {Platform.OS !== 'web' && (
           <ButtonRounded
+            buttonStyle={imageStyles.buttonContainer}
             icon={
               <Icon
-                name={'images-outline'}
-                type={'ionicon'}
+                color={commonStyles.iconColor.color}
                 iconStyle={imageStyles.icon}
-                color={commonStyles.iconColor.color}/>
+                name={'images-outline'}
+                type={'ionicon'}/>
             }
+            onPress={() => setIsSketchModalVisible(true)}
             title={'Sketch'}
             titleStyle={commonStyles.standardButtonText}
-            buttonStyle={imageStyles.buttonContainer}
             type={'outline'}
-            onPress={() => setIsSketchModalVisible(true)}
           />
         )}
       </View>

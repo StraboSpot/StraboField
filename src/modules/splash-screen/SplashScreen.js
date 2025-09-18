@@ -23,7 +23,8 @@ const SplashScreen = ({children}) => {
   return (
     <ImageBackground
       source={require('../../assets/images/splash-screen.jpeg')}
-      style={splashScreenStyles.backgroundImage}>
+      style={splashScreenStyles.backgroundImage}
+    >
       <ScrollView automaticallyAdjustKeyboardInsets={true} style={{flex: 1}}>
         <View style={splashScreenStyles.wifiIndicatorContainer}>
           <ConnectionStatusIcon/>

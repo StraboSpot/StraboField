@@ -60,11 +60,11 @@ const StratSectionsList = ({closeManMenuPanel}) => {
   return (
     <View style={{flex: 1}}>
       <FlatList
-        keyExtractor={spot => spot.properties.id.toString()}
-        data={spotsWithStratSection}
-        renderItem={({item}) => renderStratSectionItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Strat Sections in Active Datasets'}/>}
+        data={spotsWithStratSection}
+        keyExtractor={spot => spot.properties.id.toString()}
+        renderItem={({item}) => renderStratSectionItem(item)}
       />
     </View>
   );

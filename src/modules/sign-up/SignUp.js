@@ -9,7 +9,7 @@ import useServerRequests from '../../services/useServerRequests';
 import {validate} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
-import StatusDialog from '../../shared/ui/StatusDialogBox';
+import StatusDialog from '../../shared/ui/modals/StatusDialogBox';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignUp = ({navigation}) => {
@@ -141,17 +141,17 @@ const SignUp = ({navigation}) => {
     return (
       <View style={styles.buttonsContainer}>
         <Button
-          title={'Register'}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainer}
           disabled={!isOnline.isInternetReachable}
           onPress={signUp}
+          title={'Register'}
         />
         <Button
-          title={'Back to Log In'}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainer}
           onPress={() => navigation.navigate('SignIn')}
+          title={'Back to Log In'}
         />
       </View>
     );
@@ -162,21 +162,21 @@ const SignUp = ({navigation}) => {
       <View style={styles.signUpContainer}>
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
-            placeholder={'First Name'}
             autoCapitalize={'none'}
             autoCorrect={false}
-            placeholderTextColor={themes.MEDIUMGREY}
             onChangeText={val => onChangeText('firstName', val)}
+            placeholder={'First Name'}
+            placeholderTextColor={themes.MEDIUMGREY}
+            style={styles.input}
             value={userData.firstName.value || ''}
           />
           <TextInput
-            style={styles.input}
-            placeholder={'Last Name'}
             autoCapitalize={'none'}
             autoCorrect={false}
-            placeholderTextColor={themes.MEDIUMGREY}
             onChangeText={val => onChangeText('lastName', val)}
+            placeholder={'Last Name'}
+            placeholderTextColor={themes.MEDIUMGREY}
+            style={styles.input}
             value={userData.lastName.value || ''}
           />
         </View>
@@ -185,33 +185,33 @@ const SignUp = ({navigation}) => {
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
-            placeholder={'Password'}
             autoCapitalize={'none'}
             autoCorrect={false}
-            placeholderTextColor={themes.MEDIUMGREY}
             onChangeText={val => onChangeText('password', val)}
+            placeholder={'Password'}
+            placeholderTextColor={themes.MEDIUMGREY}
+            style={styles.input}
             value={userData.password.value || ''}
           />
           <TextInput
-            style={styles.input}
-            placeholder={'Confirm Password'}
             autoCapitalize={'none'}
             autoCorrect={false}
+            onChangeText={val => onChangeText('confirmPassword', val)}
+            placeholder={'Confirm Password'}
             placeholderTextColor={themes.MEDIUMGREY}
             secureTextEntry={!userData.password.showPassword}
-            onChangeText={val => onChangeText('confirmPassword', val)}
+            style={styles.input}
             value={userData.confirmPassword.value || ''}
           />
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
-            placeholder={'Email'}
             autoCapitalize={'none'}
             autoCorrect={false}
-            placeholderTextColor={themes.MEDIUMGREY}
             onChangeText={val => onChangeText('email', val)}
+            placeholder={'Email'}
+            placeholderTextColor={themes.MEDIUMGREY}
+            style={styles.input}
             value={userData.email.value || ''}
           />
         </View>
@@ -219,8 +219,8 @@ const SignUp = ({navigation}) => {
       </View>
       <StatusDialog
         isVisible={statusDialog}
-        title={statusDialogTitle}
         onTouchOutside={() => setStatusDialog(false)}
+        title={statusDialogTitle}
       >
         <Text>{statusMessage}</Text>
       </StatusDialog>

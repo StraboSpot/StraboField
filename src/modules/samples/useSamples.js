@@ -14,7 +14,7 @@ const useSamples = () => {
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
   const {name} = useSelector(state => state.user);
-  const selectedSpot= useSelector(state => state.spot.selectedSpot);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const authenticateWithSesar = async (sesarTokens) => {
     const validSesarTokens = await getValidToken(sesarTokens);

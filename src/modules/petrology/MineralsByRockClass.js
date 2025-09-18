@@ -16,10 +16,10 @@ const MineralsByRockClass = ({addMineral}) => {
             {MINERALS_BY_CLASS.plutonic.map(mineral => (
               <Button
                 key={mineral.Name}
+                onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
                 type={'clear'}
-                onPress={() => addMineral(mineral)}
               />
             ))}
           </View>
@@ -28,10 +28,10 @@ const MineralsByRockClass = ({addMineral}) => {
             {MINERALS_BY_CLASS.metamorphic.map(mineral => (
               <Button
                 key={mineral.Name}
+                onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
                 type={'clear'}
-                onPress={() => addMineral(mineral)}
               />
             ))}
           </View>
@@ -42,10 +42,10 @@ const MineralsByRockClass = ({addMineral}) => {
             {MINERALS_BY_CLASS.volcanic.map(mineral => (
               <Button
                 key={mineral.Name}
+                onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
                 type={'clear'}
-                onPress={() => addMineral(mineral)}
               />
             ))}
           </View>
@@ -54,10 +54,10 @@ const MineralsByRockClass = ({addMineral}) => {
             {MINERALS_BY_CLASS.alteration_ore.map(mineral => (
               <Button
                 key={mineral.Name}
+                onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
                 type={'clear'}
-                onPress={() => addMineral(mineral)}
               />
             ))}
           </View>

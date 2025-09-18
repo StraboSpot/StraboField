@@ -139,8 +139,8 @@ const useMapFeatures = () => {
       else if (spot.geometry.type === 'GeometryCollection') {
         spot.geometry.geometries.forEach((g, i) => {
           const feature = JSON.parse(JSON.stringify(spot));
-          if (i % 2 === 1) feature.properties.isInterbed = true;
           feature.geometry = g;
+          feature.properties.symbology = spot.properties.symbology[i];
           mappedFeatures.push(feature);
         });
       }

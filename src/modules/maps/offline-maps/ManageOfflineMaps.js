@@ -14,10 +14,10 @@ import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
+import {WarningModal} from '../../../shared/ui/modals';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
-import {WarningModal} from '../../home/modals';
 import useMap from '../useMap';
 
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
@@ -101,25 +101,25 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const renderEditMapModal = () => {
     return (
       <TextInputModal
+        closeModal={() => setIsNameModalVisible(false)}
         dialogTitle={'Edit Map Name'}
+        onChangeText={text => setSelectedMap({...selectedMap, name: text})}
+        onPress={() => saveMapEdits()}
         placeholder={selectedMap.name}
         style={styles.dialogTitle}
-        visible={isNameModalVisible}
-        onPress={() => saveMapEdits()}
-        closeModal={() => setIsNameModalVisible(false)}
         value={selectedMap.name}
-        onChangeText={text => setSelectedMap({...selectedMap, name: text})}
+        visible={isNameModalVisible}
       >
         <Button
-          type={'clear'}
           icon={
             <Icon
+              color={'red'}
               name={'trash-outline'}
               type={'ionicon'}
-              color={'red'}
             />
           }
           onPress={() => confirmDeleteMap()}
+          type={'clear'}
         />
       </TextInputModal>
     );
@@ -128,17 +128,17 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const renderMapsList = () => {
     return (
       <FlatList
-        keyExtractor={item => item.id}
-        data={Object.values(offlineMaps)}
-        renderItem={({item}) => renderMapsListItem(item)}
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={
           <ListEmptyText
+            containerStyle={{padding: 20}}
             text={'No Offline Maps.\n\nIf you just logged in press the reload button in the upper right to load your offline maps from the device.\n\nTo download a map select area and zoom'
               + ' level on map then select "Download tiles of current map"'}
             textStyle={{textAlign: 'center'}}
-            containerStyle={{padding: 20}}
           />}
+        data={Object.values(offlineMaps)}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => renderMapsListItem(item)}
       />
     );
   };
@@ -160,39 +160,39 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
             {item.count === 0 && (
               <Animated.View style={{transform: [{scale: animatedPulse}]}}>
                 <Icon
+                  color={'red'}
                   containerStyle={{margin: 5}}
                   name={'alert'}
-                  type={'material-community'}
                   size={17}
-                  color={'red'}
+                  type={'material-community'}
                 />
               </Animated.View>
             )}
             {isOnline.isInternetReachable && (
               <Button
-                onPress={() => toggleOfflineMap(item)}
-                disabled={item.count === 0}
                 containerStyle={{marginRight: 20}}
+                disabled={item.count === 0}
+                icon={<Icon
+                  name={item.isOfflineMapVisible ? 'eye-off-outline' : item.count === 0 ? 'No tiles to view' : 'eye-outline'}
+                  size={20}
+                  type={'ionicon'}
+                />}
+                onPress={() => toggleOfflineMap(item)}
                 titleStyle={commonStyles.viewMapsButtonText}
                 type={'clear'}
-                icon={<Icon
-                  type={'ionicon'}
-                  size={20}
-                  name={item.isOfflineMapVisible ? 'eye-off-outline' : item.count === 0 ? 'No tiles to view' : 'eye-outline'}
-                />}
               />
             )}
             {item.id !== 'mapbox.outdoors' && item.id !== 'mapbox.satellite' && item.id !== 'osm' && item.id !== 'macrostrat'
               && <Button
-                onPress={() => editMap(item)}
-                type={'clear'}
                 icon={
                   <Icon
-                    type={'material'}
                     name={'edit'}
                     size={15}
+                    type={'material'}
                   />
                 }
+                onPress={() => editMap(item)}
+                type={'clear'}
               />}
           </View>
           {/*</View>*/}
@@ -204,8 +204,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const renderWarningModal = () => {
     return (
       <WarningModal
-        title={'Map Not Available!'}
         isVisible={isWarningModalVisible}
+        title={'Map Not Available!'}
       >
         <Text>Selected map is not available for offline use. Switching to first available map: {selectedMap.name}</Text>
       </WarningModal>
@@ -244,22 +244,22 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   return (
     <>
       <Button
-        title={'Download tiles of current map'}
+        buttonStyle={commonStyles.standardButton}
+        containerStyle={styles.buttonContainer}
         disabled={(!isOnline.isInternetReachable && !isOnline.isConnected) || isSelected
           || Object.values(offlineMaps).some(map => map.isOfflineMapVisible === true)}
         onPress={() => {
           closeMainMenuPanel();
           dispatch(setIsOfflineMapsModalVisible(true));
         }}
-        containerStyle={styles.buttonContainer}
-        buttonStyle={commonStyles.standardButton}
+        title={'Download tiles of current map'}
         titleStyle={commonStyles.standardButtonText}
       />
       <SectionDividerWithRightButton
         dividerText={'Offline Maps'}
         iconName={'reload-outline'}
-        iconType={'ionicon'}
         iconSize={20}
+        iconType={'ionicon'}
         onPress={() => updateMapsFromDevice()}
       />
       {!loading && renderMapsList()}

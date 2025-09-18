@@ -22,11 +22,11 @@ const ThreeDStructuresOverview = ({page}) => {
 
   return (
     <FlatList
-      keyExtractor={(item, index) => index.toString()}
-      data={threeDStructures}
-      renderItem={({item}) => <ThreeDStructureItem item={item} edit3dStructure={() => on3DStructurePressed(item)}/>}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={'No 3D Structures yet'}/>}
+      data={threeDStructures}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({item}) => <ThreeDStructureItem edit3dStructure={() => on3DStructurePressed(item)} item={item}/>}
     />
   );
 };

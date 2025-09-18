@@ -6,7 +6,7 @@ import ProgressBar from 'react-native-progress/Bar';
 
 import {toNumberFixedValue} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import overlayStyles from '../home/overlays/overlay.styles';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import offlineMapsStyles from '../maps/offline-maps/offlineMaps.styles';
 
 
@@ -21,20 +21,20 @@ const MicroProjectsStatusOverlay = ({
                                     }) => {
   return (
     <Overlay
-      supportedOrientations={['portrait', 'landscape']}
       animationType={'slide'}
-      isVisible={showLoadingBar || isError || showComplete}
       backdropStyle={overlayStyles.backdropStyles}
-      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer, {justifyContent: 'space-between'}]}
+      isVisible={showLoadingBar || isError || showComplete}
       onBackdropPress={closeStatusOverlay}
+      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer, {justifyContent: 'space-between'}]}
+      supportedOrientations={['portrait', 'landscape']}
     >
       <Icon
-        name={'close-outline'}
-        type={'ionicon'}
-        size={20}
         color={'darkgrey'}
-        onPress={closeStatusOverlay}
         containerStyle={overlayStyles.closeButton}
+        name={'close-outline'}
+        onPress={closeStatusOverlay}
+        size={20}
+        type={'ionicon'}
       />
       <View>
         {!showComplete && !isError && (
@@ -43,7 +43,7 @@ const MicroProjectsStatusOverlay = ({
         {showLoadingBar && (
           <View style={overlayStyles.overlayContent}>
             {isLoadingWave ? (
-              <ActivityIndicator size={'large'} color={themes.BLACK}/>
+              <ActivityIndicator color={themes.BLACK} size={'large'}/>
             ) : (
               <View>
                 <ProgressBar progress={percentDone} width={200}/>
@@ -70,9 +70,9 @@ const MicroProjectsStatusOverlay = ({
         )}
       </View>
       <Button
+        containerStyle={{paddingBottom: 20, paddingHorizontal: 40}}
         onPress={closeStatusOverlay}
         title={'OK'}
-        containerStyle={{paddingBottom: 20, paddingHorizontal: 40}}
       />
     </Overlay>
   );

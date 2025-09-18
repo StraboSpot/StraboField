@@ -12,29 +12,29 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
     <>
       {/* Halo Around Selected Point Feature Layer */}
       <Source
+        data={turf.featureCollection(featuresSelected)}
         id={'pointFeaturesSelectedSource'}
         type={'geojson'}
-        data={turf.featureCollection(featuresSelected)}
       >
         <Layer
-          type={'circle'}
-          id={'pointLayerSelectedHalo'}
           filter={['==', ['geometry-type'], 'Point']}
+          id={'pointLayerSelectedHalo'}
           paint={getPaintSymbology().pointSelected}
+          type={'circle'}
         />
       </Source>
 
       {/* Colored Halo Around Points Layer */}
       <Source
+        data={turf.featureCollection(featuresNotSelected)}
         id={'pointSourceColorHalo'}
         type={'geojson'}
-        data={turf.featureCollection(featuresNotSelected)}
       >
         <Layer
-          type={'circle'}
-          id={'pointLayerColorHalo'}
           filter={['==', ['geometry-type'], 'Point']}
+          id={'pointLayerColorHalo'}
           paint={getPaintSymbology().pointColorHalo}
+          type={'circle'}
         />
       </Source>
     </>

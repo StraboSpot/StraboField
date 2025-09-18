@@ -6,11 +6,10 @@ import {Icon} from '@rn-vui/base';
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
-import {WarningModal} from '../home/modals';
-import overlayStyles from '../home/overlays/overlay.styles';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
+import {WarningModal} from '../../shared/ui/modals';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
@@ -41,21 +40,18 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   return (
     <>
-
-      <Modal
-        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
+      <ModalWrapper
         buttonTitleRight={'Close'}
         closeModal={confirmCloseModal}
+        overlayStyleOverride={{width: '80%'}}
+        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <>
               <ReportForm initialValues={initialValues} ref={formRef}/>
-              <FlatListItemSeparator/>
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
@@ -63,7 +59,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
-              <FlatListItemSeparator/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
@@ -72,35 +67,36 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
               />
             </>
           }
+          bounces={false}
         />
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{width: 40}}/>
-          <SaveButton title={'Save Report'} onPress={handleSavePressed}/>
+          <SaveButton onPress={handleSavePressed} title={'Save Report'}/>
           <Icon
-            name={'trash'}
-            type={'ionicon'}
             color={RED}
-            onPress={handleDeletePressed}
             containerStyle={{padding: 10, alignSelf: 'flex-end'}}
+            name={'trash'}
+            onPress={handleDeletePressed}
+            type={'ionicon'}
           />
         </View>
 
         <WarningModal
-          title={'Delete Report?'}
-          isVisible={isDeleteReportModalVisible}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           closeModal={() => setIsDeleteReportModalVisible(false)}
-          showCancelButton={true}
-          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
           confirmText={'DELETE'}
           confirmTitleStyle={overlayStyles.importantText}
+          isVisible={isDeleteReportModalVisible}
           onConfirmPress={deleteReport}
+          showCancelButton={true}
+          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          title={'Delete Report?'}
         >
           {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
             : <Text>Are you sure you want to delete this report?</Text>}
         </WarningModal>
 
-      </Modal>
+      </ModalWrapper>
     </>
   );
 };

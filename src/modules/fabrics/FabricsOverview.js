@@ -23,11 +23,11 @@ const FabricsOverview = ({page}) => {
 
   return (
     <FlatList
-      keyExtractor={(item, index) => index.toString()}
-      data={fabrics}
-      renderItem={({item}) => <FabricListItem fabric={item} editFabric={() => onFabricPressed(item)}/>}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={'No Fabrics'}/>}
+      data={fabrics}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({item}) => <FabricListItem editFabric={() => onFabricPressed(item)} fabric={item}/>}
     />
   );
 };

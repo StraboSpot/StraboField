@@ -5,12 +5,11 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
-import SectionDivider from '../../shared/ui/SectionDivider';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -68,20 +67,19 @@ const IntervalPage = ({page}) => {
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>
-      <ReturnToOverviewButton/>
-      <SectionDivider dividerText={page.label}/>
+      <NotebookPageHeader pageTitle={page.label}/>
       <SaveAndCancelButtons
         cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
         save={() => saveInterval(intervalRef.current)}
       />
       <Formik
-        innerRef={intervalRef}
-        onSubmit={() => console.log('Submitting form...')}
-        onReset={() => console.log('Resetting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        initialValues={{...interval, character}}
-        validateOnChange={false}
         enableReinitialize={true}
+        initialValues={{...interval, character}}
+        innerRef={intervalRef}
+        onReset={() => console.log('Resetting form...')}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={false}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>

@@ -5,9 +5,9 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID} from '../../shared/Helpers';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
@@ -86,60 +86,60 @@ const AddEarthquakeModal = ({onPress}) => {
       <>
         <LittleSpacer/>
         <MainButtons
-          mainKeys={mainButtonsKeysRelevant1}
           formName={formName}
-          setChoicesViewKey={setChoicesViewKey}
           formProps={formProps}
+          mainKeys={mainButtonsKeysRelevant1}
+          setChoicesViewKey={setChoicesViewKey}
         />
         {formProps.values.earthquake_feature === 'fault_rupture' && (
           <MeasurementButtons
             formProps={formProps}
             measurementsKeys={FAULT_ORIENTATION_KEYS}
-            setMeasurementsGroupField={setMeasurementsGroupField}
             setIsMeasurementsModalVisible={setIsFaultOrientationModalVisible}
+            setMeasurementsGroupField={setMeasurementsGroupField}
             survey={survey}
           />
         )}
         <MainButtons
-          mainKeys={mainButtonsKeysRelevant2}
           formName={formName}
-          setChoicesViewKey={setChoicesViewKey}
           formProps={formProps}
+          mainKeys={mainButtonsKeysRelevant2}
+          setChoicesViewKey={setChoicesViewKey}
         />
         {formProps.values.fault_slip_meas?.includes('vector_measurement') && (
           <MeasurementButtons
             formProps={formProps}
             measurementsKeys={VECTOR_MEASUREMENT_KEYS}
-            setMeasurementsGroupField={setMeasurementsGroupField}
             setIsMeasurementsModalVisible={setIsVectorMeasurementModalVisible}
+            setMeasurementsGroupField={setMeasurementsGroupField}
             survey={survey}
           />
         )}
         <LittleSpacer/>
         <FormSlider
+          choices={choices}
           fieldKey={confidenceInFeatureKey}
           formProps={formProps}
-          survey={survey}
-          choices={choices}
           labels={['Low', 'High']}
+          survey={survey}
         />
         <LittleSpacer/>
         <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
         {isFaultOrientationModalVisible && (
           <MeasurementModal
-            measurementsGroup={FAULT_ORIENTATION_KEYS[measurementsGroupField.name]}
-            measurementsGroupLabel={measurementsGroupField.label}
             formName={formName}
             formProps={formProps}
+            measurementsGroup={FAULT_ORIENTATION_KEYS[measurementsGroupField.name]}
+            measurementsGroupLabel={measurementsGroupField.label}
             setIsMeasurementModalVisible={setIsFaultOrientationModalVisible}
           />
         )}
         {isVectorMeasurementModalVisible && (
           <MeasurementModal
-            measurementsGroup={VECTOR_MEASUREMENT_KEYS[measurementsGroupField.name]}
-            measurementsGroupLabel={measurementsGroupField.label}
             formName={formName}
             formProps={formProps}
+            measurementsGroup={VECTOR_MEASUREMENT_KEYS[measurementsGroupField.name]}
+            measurementsGroupLabel={measurementsGroupField.label}
             setIsMeasurementModalVisible={setIsVectorMeasurementModalVisible}
           />
         )}
@@ -149,18 +149,17 @@ const AddEarthquakeModal = ({onPress}) => {
 
   const renderNotebookEarthquakeModal = () => {
     return (
-      <Modal
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+      <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
       >
         <FlatList
-          bounces={false}
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                innerRef={formRef}
                 initialValues={{}}
+                innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={false}
@@ -173,9 +172,10 @@ const AddEarthquakeModal = ({onPress}) => {
               </Formik>
             </View>
           }
+          bounces={false}
         />
-        {!choicesViewKey && <SaveButton title={'Save Earthquake'} onPress={saveEarthquake}/>}
-      </Modal>
+        {!choicesViewKey && <SaveButton onPress={saveEarthquake} title={'Save Earthquake'}/>}
+      </ModalWrapper>
     );
   };
 

@@ -29,13 +29,13 @@ const ImageBasemapLayer = () => {
   if (currentImageBasemap && !isEmpty(coordQuad) && doesImageExist) {
     return (
       <MapboxGL.ImageSource
-        id={'currentImageBasemap'}
         coordinates={coordQuad}
+        id={'currentImageBasemap'}
         url={getLocalImageURI(currentImageBasemap.id)}>
         <MapboxGL.RasterLayer
+          aboveLayerID={'background'}
           id={'imageBasemapLayer'}
           style={{rasterOpacity: 1}}
-          aboveLayerID={'background'}
         />
       </MapboxGL.ImageSource>
     );

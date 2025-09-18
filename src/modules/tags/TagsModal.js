@@ -8,12 +8,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import AddButton from '../../shared/ui/AddButton';
-import SaveButton from '../../shared/ui/ButtonRounded';
+import AddButton from '../../shared/ui/buttons/AddButton';
+import SaveButton from '../../shared/ui/buttons/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import modalStyle from '../../shared/ui/modal/modal.style';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
+import modalStyles from '../../shared/ui/modals/modal.styles';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -28,7 +27,6 @@ const TagsModal = ({
                      isFeatureLevelTagging,
                      zoomToCurrentLocation,
                    }) => {
-  const {height} = useWindowSize();
   const toast = useToast();
   const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -113,23 +111,23 @@ const TagsModal = ({
           && modalVisible !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS && (
             <Formik
               initialValues={{}}
-              validate={fieldValues => setSearchText(fieldValues.searchText)}
-              onSubmit={values => console.log('Submitting form...', values)}
               innerRef={formRef}
+              onSubmit={values => console.log('Submitting form...', values)}
+              validate={fieldValues => setSearchText(fieldValues.searchText)}
             >
               {() => (
                 <ListItem containerStyle={commonStyles.listItemFormField}>
                   <ListItem.Content>
                     <Field
+                      choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                        tagType => ({label: getTagLabel(tagType), value: tagType}))}
                       component={formProps => (
                         SelectInputField(
                           {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                       )}
-                      name={'searchText'}
                       key={'searchText'}
                       label={'Tag Type'}
-                      choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                        tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                      name={'searchText'}
                       single={true}
                     />
                   </ListItem.Content>
@@ -138,15 +136,15 @@ const TagsModal = ({
             </Formik>
           )}
         <FlatList
-          keyExtractor={item => item.id.toString()}
-          data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
-          renderItem={({item}) => renderTagItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={
             <ListEmptyText
               text={!isEmpty(tags) && isEmpty(getRelevantTags()) ? 'There are no tags with this type.' : ''}
             />
           }
+          data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => renderTagItem(item)}
         />
       </>
     );
@@ -198,16 +196,17 @@ const TagsModal = ({
   return (
     <>
       <View style={{flex: 1}}>
-        <View style={modalStyle.textContainer}>
+        <View style={modalStyles.textContainer}>
           <AddButton
+            onPress={addTag}
             title={`Create New ${toTitleCase(label).slice(0, -1)}`}
             type={'outline'}
-            onPress={addTag}
           />
         </View>
-        <View style={modalStyle.textContainer}>
-          {tags && !isEmpty(tags) ? <Text style={modalStyle.textStyle}>Check all {label.toLowerCase()} that apply</Text>
-            : <Text style={modalStyle.textStyle}>No {label}</Text>}
+        <View style={modalStyles.textContainer}>
+          {tags && !isEmpty(tags)
+            ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>
+            : <Text style={modalStyles.textStyle}>No {label}</Text>}
         </View>
         {renderSpotTagsList()}
         {(!isEmpty(tags)
@@ -215,9 +214,9 @@ const TagsModal = ({
           && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
           <SaveButton
             buttonStyle={{backgroundColor: 'red'}}
-            title={`Save ${label}`}
-            onPress={save}
             disabled={isEmpty(checkedTagsTemp)}
+            onPress={save}
+            title={`Save ${label}`}
           />
         )}
       </View>

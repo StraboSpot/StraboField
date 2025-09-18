@@ -59,18 +59,18 @@ const BasicOverviewList = ({page}) => {
 
   return (
     <FlatList
-      keyExtractor={(item, index) => index.toString()}
-      data={getData()}
-      renderItem={({item, index}) => (
-        <BasicListItem
-          page={page}
-          item={item}
-          index={index}
-          editItem={itemToEdit => onItemPressed(itemToEdit, index)}
-        />
-      )}
       ItemSeparatorComponent={FlatListItemSeparator}
       ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+      data={getData()}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({item, index}) => (
+        <BasicListItem
+          editItem={itemToEdit => onItemPressed(itemToEdit, index)}
+          index={index}
+          item={item}
+          page={page}
+        />
+      )}
     />
   );
 };

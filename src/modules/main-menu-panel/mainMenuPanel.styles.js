@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
+import {MEDIUMGREY, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   buttons: {
@@ -9,7 +10,9 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   container: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    borderRightColor: MEDIUMGREY,
+    borderRightWidth: 2,
     flex: 1,
   },
   documentListItem: {
@@ -18,25 +21,15 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: themes.PRIMARY_TEXT_COLOR,
-    flex: 3,
-    fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
+    fontSize: themes.LARGE_TEXT_SIZE,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   mainMenuHeaderContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     flexDirection: 'row',
-    height: 70,
-    justifyContent: 'center',
-  },
-  mainMenuHeaderTextContainer: {
-    alignItems: 'center',
-    flex: 4,
-    flexDirection: 'row',
+    height: 80,
+    padding: 10,
   },
   mainMenuIconContainer: {
-    alignItems: 'flex-start',
-    flex: 1,
     justifyContent: 'center',
   },
   settingsDrawer: {
@@ -45,6 +38,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 300,
     zIndex: 0,
+  },
+  subheaderText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    fontWeight: 'bold',
   },
 });
 

@@ -15,9 +15,9 @@ const EditLayers = ({editFeatureVertex}) => {
       shape={turf.featureCollection(editFeatureVertex)}
     >
       <MapboxGL.CircleLayer
+        filter={['==', ['geometry-type'], 'Point']}
         id={'pointLayerEdit'}
         minZoomLevel={1}
-        filter={['==', ['geometry-type'], 'Point']}
         style={getMapSymbology().pointEdit}
       />
     </MapboxGL.ShapeSource>

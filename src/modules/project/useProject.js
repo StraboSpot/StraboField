@@ -8,8 +8,8 @@ import {
   addedProjectDescription,
   deletedDataset,
   setActiveDatasets,
-  setSelectedDataset,
   setSelectedProject,
+  setTargetDataset,
 } from './projects.slice';
 import useDevice from '../../services/useDevice';
 import useDownload from '../../services/useDownload';
@@ -36,10 +36,10 @@ const useProject = () => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
-  const selectedDatasetId = useSelector(state => state.project.selectedDatasetId);
   const selectedProject = useSelector(state => state.project.selectedProject) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const user = useSelector(state => state.user);
 
   const toast = useToast();
@@ -186,25 +186,25 @@ const useProject = () => {
   //   return datasetIdFound;
   // };
 
-  // Get selected dataset, if none selected make one
-  const getSelectedDatasetFromId = () => {
-    let selectedDataset = datasets[selectedDatasetId];
-    if (isEmpty(selectedDataset)) {
+  // Get target dataset, if none selected make one
+  const getTargetDatasetFromId = () => {
+    let targetDataset = datasets[targetDatasetId];
+    if (isEmpty(targetDataset)) {
       const datasetToSelect = Object.values(datasets)?.[0];
       if (!isEmpty(datasetToSelect) && datasetToSelect.id) {
         dispatch(setActiveDatasets({bool: true, dataset: datasetToSelect.id}));
-        dispatch(setSelectedDataset(datasetToSelect.id));
+        dispatch(setTargetDataset(datasetToSelect.id));
       }
       else {
-        alert('No Selected Dataset. Creating a new Default Dataset.');
-        selectedDataset = createDataset();
-        dispatch(addedDataset(selectedDataset));
-        dispatch(setActiveDatasets({bool: true, dataset: selectedDataset.id}));
-        dispatch(setSelectedDataset(selectedDataset.id));
+        alert('No Target Dataset. Creating a new Default Dataset.');
+        targetDataset = createDataset();
+        dispatch(addedDataset(targetDataset));
+        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
+        dispatch(setTargetDataset(targetDataset.id));
       }
     }
-    console.log('Selected Dataset', selectedDataset);
-    return selectedDataset;
+    console.log('Target Dataset', targetDataset);
+    return targetDataset;
   };
 
   const initializeNewProject = async (descriptionData) => {
@@ -216,7 +216,7 @@ const useProject = () => {
   const makeDatasetCurrent = (datasetId) => {
     const datasetName = datasets[datasetId].name;
     toast.show(
-      `Selected Dataset switched to ${datasetName}!`,
+      `Target Dataset switched to ${datasetName}!`,
       {
         type: 'warning',
         animationType: 'slide-in',
@@ -224,7 +224,7 @@ const useProject = () => {
         placement: 'top',
       });
     toast.hideAll();
-    dispatch(setSelectedDataset(datasetId));
+    dispatch(setTargetDataset(datasetId));
   };
 
   const setSwitchValue = async (val, dataset) => {
@@ -283,7 +283,7 @@ const useProject = () => {
     getActiveDatasets: getActiveDatasets,
     getAllDeviceProjects: getAllDeviceProjects,
     getAllServerProjects: getAllServerProjects,
-    getSelectedDatasetFromId: getSelectedDatasetFromId,
+    getTargetDatasetFromId: getTargetDatasetFromId,
     initializeNewProject: initializeNewProject,
     makeDatasetCurrent: makeDatasetCurrent,
     setSwitchValue: setSwitchValue,

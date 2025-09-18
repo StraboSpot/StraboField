@@ -39,7 +39,7 @@ function ThreeDStructureItem({
         <ListItem.Title style={commonStyles.listItemTitle}>
           <ThreeDStructureLabel item={item}/>
         </ListItem.Title>
-        <FeatureTagsList spotId={spot.properties.id} featureId={item.id}/>
+        <FeatureTagsList featureId={item.id} spotId={spot.properties.id}/>
       </ListItem.Content>
       <ListItem.Chevron/>
     </ListItem>

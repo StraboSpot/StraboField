@@ -9,13 +9,12 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import TruncatedText from '../../shared/ui/TruncatedText';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
-import ReturnToOverviewButton from '../page/ui/ReturnToOverviewButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -66,13 +65,13 @@ const BasicSedPage = ({page}) => {
       return (
         <>
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={i => setSelectedTypeIndex(i)}
+            buttonStyle={{padding: 5}}
             buttons={Object.values(subpages).map(
               v => ({element: () => <TruncatedText title={toTitleCase(v.replace(/_/g, ' '))}/>}))}
             containerStyle={{height: 40, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={i => setSelectedTypeIndex(i)}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
           />
           <BasicPageDetail
             closeDetailView={() => setIsDetailView(false)}
@@ -98,24 +97,20 @@ const BasicSedPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <ReturnToOverviewButton/>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addAttribute}
-        />
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
         <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          data={attributes}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              item={item}
-              index={index}
-              page={page}
-              editItem={itemToEdit => editAttribute(itemToEdit, index)}
-            />
-          )}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+          data={attributes}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item, index}) => (
+            <BasicListItem
+              editItem={itemToEdit => editAttribute(itemToEdit, index)}
+              index={index}
+              item={item}
+              page={page}
+            />
+          )}
         />
       </View>
     );

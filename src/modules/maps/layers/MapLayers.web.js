@@ -40,8 +40,8 @@ const MapLayers = ({
       {!stratSection && !currentImageBasemap && (
         <ScaleControl
           maxWidth={useDimensions.width * 0.25}
-          unit={'imperial'}
           style={mapStyles.scaleWeb}
+          unit={'imperial'}
         />
       )}
 

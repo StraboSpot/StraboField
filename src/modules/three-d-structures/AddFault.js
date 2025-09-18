@@ -32,8 +32,8 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
       <MeasurementButtons
         formProps={formProps}
         measurementsKeys={FAULT_MEASUREMENTS_KEYS}
-        setMeasurementsGroupField={setFaultMeasurementsGroupField}
         setIsMeasurementsModalVisible={setIsFaultMeasurementsModalVisible}
+        setMeasurementsGroupField={setFaultMeasurementsGroupField}
         survey={survey}
       />
       <MainButtons
@@ -45,10 +45,10 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
       <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
       {isFaultMeasurementsModalVisible && (
         <MeasurementModal
-          measurementsGroup={FAULT_MEASUREMENTS_KEYS[faultMeasurementsGroupField.name]}
-          measurementsGroupLabel={faultMeasurementsGroupField.label}
           formName={formName}
           formProps={formProps}
+          measurementsGroup={FAULT_MEASUREMENTS_KEYS[faultMeasurementsGroupField.name]}
+          measurementsGroupLabel={faultMeasurementsGroupField.label}
           setIsMeasurementModalVisible={setIsFaultMeasurementsModalVisible}
         />
       )}

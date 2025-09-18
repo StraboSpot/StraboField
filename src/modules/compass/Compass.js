@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {AppState, NativeEventEmitter, Platform, Switch, Text, View} from 'react-native';
+import {AppState, NativeEventEmitter, Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setCompassMeasurements} from './compass.slice';
@@ -12,6 +11,7 @@ import useCompassSound from './useCompassSound';
 import CompassModule from '../../services/CompassModule';
 import useCompass from '../../services/useCompass';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
+import {SwitchWrapper} from '../../shared/ui';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/page.constants';
@@ -207,7 +207,7 @@ const Compass = ({
 
   const toggleSwitch = () => {
     setShowCompassRawDataView(previousState => !previousState);
-  }
+  };
 
   const unsubscribeFromSensors = () => {
     try {
@@ -222,18 +222,15 @@ const Compass = ({
 
   return (
     <View style={{flex: 1}}>
-        <CompassFace
-          compassMeasurementTypes={compassMeasurementTypes}
-          grabMeasurements={grabMeasurements}
-          compassData={compassData}
-        />
+      <CompassFace
+        compassData={compassData}
+        compassMeasurementTypes={compassMeasurementTypes}
+        grabMeasurements={grabMeasurements}
+      />
       <View style={compassStyles.matrixDataButtonContainer}>
         <View style={compassStyles.matrixDataButtonContainer}>
           <Text style={compassStyles.switchText}>Display Raw Data</Text>
-          <Switch
-            onValueChange={toggleSwitch}
-            value={showCompassRawDataView}
-          />
+          <SwitchWrapper onValueChange={toggleSwitch} value={showCompassRawDataView}/>
         </View>
 
 

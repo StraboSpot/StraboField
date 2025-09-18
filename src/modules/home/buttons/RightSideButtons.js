@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {DrawActionButtons, ShortcutButtons} from './';
 import NotebookButton from './NotebookButton';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MODAL_KEYS} from '../../page/page.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
@@ -35,10 +35,10 @@ const RightSideButtons = ({
       {stratSection && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
+            onPress={() => dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}))}
             source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
               ? require('../../../assets/icons/AddIntervalButton_pressed.png')
               : require('../../../assets/icons/AddIntervalButton.png')}
-            onPress={() => dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}))}
           />
         </Animated.View>
       )}
@@ -60,8 +60,8 @@ const RightSideButtons = ({
             distance={distance}
             endMeasurement={endMeasurement}
             mapMode={mapMode}
-            onEndDrawPressed={onEndDrawPressed}
             onCancel={onCancel}
+            onEndDrawPressed={onEndDrawPressed}
             selectingMode={selectingMode}
           />
         </View>

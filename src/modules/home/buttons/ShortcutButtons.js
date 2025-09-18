@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {useImages} from '../../images';
 import useMapLocation from '../../maps/useMapLocation';
 import {MODAL_KEYS, SHORTCUT_MODALS} from '../../page/page.constants';
@@ -76,8 +76,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
           return [...acc, (
             <IconButton
               key={sm.key}
-              source={modalVisible === sm.key ? sm.icon_pressed_src : sm.icon_src}
               onPress={() => toggleShortcutModal(sm.key)}
+              source={modalVisible === sm.key ? sm.icon_pressed_src : sm.icon_src}
             />
           )];
         }

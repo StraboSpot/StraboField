@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -102,13 +102,13 @@ const SiteSafetyPage = () => {
   const renderSiteSafetyForm = () => {
     return (
       <Formik
-        innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        onReset={() => console.log('Resetting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        initialValues={initialValues}
         enableReinitialize={true}
         initialStatus={{formName: formName}}
+        initialValues={initialValues}
+        innerRef={formRef}
+        onReset={() => console.log('Resetting form...')}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>

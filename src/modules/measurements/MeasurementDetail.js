@@ -13,9 +13,8 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import SaveAndCancelButtons from '../../shared/ui/SaveAndCancelButtons';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import useCompassCalculations from '../compass/useCompassCalculations';
@@ -254,10 +253,10 @@ const MeasurementDetail = ({
         {selectedMeasurement && selectedAttitude && selectedAttitude.associated_orientation && (
           <>
             <MeasurementItem
-              item={selectedAttitude}
-              selectedIds={[selectedMeasurement.id]}
               isDetail={true}
+              item={selectedAttitude}
               onPress={() => onSwitchSelectedMeasurement(selectedAttitude)}
+              selectedIds={[selectedMeasurement.id]}
             />
             <FlatListItemSeparator/>
           </>
@@ -269,9 +268,9 @@ const MeasurementDetail = ({
               <React.Fragment key={item.id + 'Outer'}>
                 <MeasurementItem
                   item={item}
-                  selectedIds={[selectedMeasurement.id]}
-                  onPress={() => onSwitchSelectedMeasurement(item)}
                   key={item.id}
+                  onPress={() => onSwitchSelectedMeasurement(item)}
+                  selectedIds={[selectedMeasurement.id]}
                 />
                 <FlatListItemSeparator/>
               </React.Fragment>,
@@ -280,10 +279,10 @@ const MeasurementDetail = ({
 
         {/* Button to add an associated measurement */}
         <Button
-          titleStyle={styles.buttonText}
-          title={addButtonText}
-          type={'clear'}
           onPress={() => onAddAssociatedMeasurement()}
+          title={addButtonText}
+          titleStyle={styles.buttonText}
+          type={'clear'}
         />
       </View>
     );
@@ -305,16 +304,15 @@ const MeasurementDetail = ({
       selectedAttributes, '\nSelected Individual Measurement:', selectedMeasurement);
     return (
       <View>
-        <SectionDivider dividerText={'Feature Type'}/>
         <View style={{flex: 1}}>
           <Formik
-            innerRef={formRef}
-            onSubmit={values => console.log('Submitting form...', values)}
-            onReset={() => console.log('Resetting form...')}
-            validate={values => validateForm({formName: formName, values: values})}
-            initialValues={selectedMeasurement}
             enableReinitialize={true}
             initialStatus={{formName: formName}}
+            initialValues={selectedMeasurement}
+            innerRef={formRef}
+            onReset={() => console.log('Resetting form...')}
+            onSubmit={values => console.log('Submitting form...', values)}
+            validate={values => validateForm({formName: formName, values: values})}
           >
             {formProps => <Form {...{...formProps, formName: formName, onMyChange: onMyChange}}/>}
           </Formik>
@@ -390,11 +388,11 @@ const MeasurementDetail = ({
   const renderPlanarTabularSwitches = () => {
     return (
       <ButtonGroup
-        onPress={i => onSwitchPlanarTabular(i)}
-        selectedIndex={selectedMeasurement.type === 'planar_orientation' ? 0 : 1}
         buttons={['Planar Feature', 'Tabular Zone']}
         containerStyle={styles.measurementDetailSwitches}
+        onPress={i => onSwitchPlanarTabular(i)}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+        selectedIndex={selectedMeasurement.type === 'planar_orientation' ? 0 : 1}
         textStyle={{color: PRIMARY_ACCENT_COLOR}}
       />
     );
@@ -519,10 +517,10 @@ const MeasurementDetail = ({
                 </View>
                 {selectedAttributes.length === 1 && (
                   <Button
-                    titleStyle={{color: WARNING_COLOR}}
-                    title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
-                    type={'clear'}
                     onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
+                    title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
+                    titleStyle={{color: WARNING_COLOR}}
+                    type={'clear'}
                   />
                 )}
               </View>

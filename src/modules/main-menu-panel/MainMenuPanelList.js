@@ -2,50 +2,56 @@ import React from 'react';
 import {Platform, SectionList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
-import {MAIN_MENU_DATA, MAIN_MENU_ITEMS} from './mainMenu.constants';
-import {setMenuSelectionPage} from './mainMenuPanel.slice';
-import commonStyles from '../../shared/common.styles';
-import {toTitleCase} from '../../shared/Helpers';
+import {MAIN_MENU_DATA, MAIN_MENU_DATA_NO_PROJECT, MAIN_MENU_DATA_WEB} from './mainMenu.constants';
+import {setSectionsCollapsed} from './mainMenuPanel.slice';
+import MainMenuPanelListItem from './MainMenuPanelListItem';
+import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
-const MainMenuPanelList = ({activeProject}) => {
+const MainMenuPanelList = () => {
   const dispatch = useDispatch();
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
+  const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
 
-  const renderMenuListItem = ({item}) => {
-
-    const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: item}));
-
-    if (item !== MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT && item !== MAIN_MENU_ITEMS.MANAGE.STRABOMICRO_PROJECTS
-      && item !== MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS
-      || ((item === MAIN_MENU_ITEMS.MANAGE.UPLOAD_BACKUP_EXPORT || item === MAIN_MENU_ITEMS.MANAGE.STRABOMICRO_PROJECTS
-        || item === MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS) && Platform.OS !== 'web')) {
-      return (
-        <ListItem containerStyle={commonStyles.listItem} onPress={handleMenuItemPress}>
-          <ListItem.Content>
-            {<ListItem.Title style={commonStyles.listItemTitle}>
-              {item === MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS
-                ? MAIN_MENU_ITEMS.MANAGE.ACTIVE_PROJECTS + ` (${activeProject})`
-                : item
-              }
-            </ListItem.Title>}
-          </ListItem.Content>
-        </ListItem>
-      );
-    }
+  const renderItem = ({item, section}) => {
+    if (!sectionsCollapsed.includes(section.title)) return <MainMenuPanelListItem title={item}/>;
   };
 
-  const renderMenuSectionHeader = ({section: {title}}) => <SectionDivider dividerText={toTitleCase(title)}/>;
+  const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
+
+  const getMainMenuData = () => {
+    if (Platform.OS === 'web') return MAIN_MENU_DATA_WEB;
+    if (!projectName) return MAIN_MENU_DATA_NO_PROJECT;
+    else return MAIN_MENU_DATA;
+  };
+
+  const renderMenuSectionHeader = ({section: {title}}) => {
+    return (
+      <ListItem.Accordion
+        containerStyle={{padding: 0, paddingRight: 10, backgroundColor: PRIMARY_BACKGROUND_COLOR}}
+        content={
+          <ListItem.Content>
+            <SectionDivider dividerText={title.split('_').join(' ')} style={{borderBottomWidth: 0}}/>
+          </ListItem.Content>
+        }
+        isExpanded={!sectionsCollapsed.includes(title)}
+        key={'section_header'}
+        onPress={() => onPressSectionAccordion(title)}
+      />
+    );
+  };
 
   return (
     <SectionList
-      keyExtractor={(item, index) => item + index}
-      sections={MAIN_MENU_DATA}
-      renderItem={renderMenuListItem}
-      renderSectionHeader={renderMenuSectionHeader}
       ItemSeparatorComponent={FlatListItemSeparator}
+      keyExtractor={(item, index) => item + index}
+      renderItem={renderItem}
+      renderSectionHeader={renderMenuSectionHeader}
+      sections={getMainMenuData()}
+      stickySectionHeadersEnabled={true}
     />
   );
 };

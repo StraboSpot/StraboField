@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
 import useDrawActionButtons from './useDrawActionButtons';
@@ -23,27 +23,27 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
   return (
     <View style={homeStyles.drawToolsContainer}>
       <IconButton
-        source={getImageSource(MAP_MODES.DRAW.POINT)}
-        onPress={handlePointPressed}
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onLongPress={handlePointLongPressed}
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        onPress={handlePointPressed}
+        source={getImageSource(MAP_MODES.DRAW.POINT)}
       />
       <IconButton
-        source={getImageSource(MAP_MODES.DRAW.LINE)}
-        onPress={handleLinePressed}
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onLongPress={handleLineLongPressed}
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        onPress={handleLinePressed}
+        source={getImageSource(MAP_MODES.DRAW.LINE)}
       />
       <IconButton
-        source={getImageSource(MAP_MODES.DRAW.POLYGON)}
-        onPress={handlePolygonPressed}
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onLongPress={handlePolygonLongPressed}
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        onPress={handlePolygonPressed}
+        source={getImageSource(MAP_MODES.DRAW.POLYGON)}
       />
       <IconButton
-        source={getImageSource(MAP_MODES.EDIT)}
-        onPress={handleEditShapePressed}
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        onPress={handleEditShapePressed}
+        source={getImageSource(MAP_MODES.EDIT)}
       />
     </View>
   );

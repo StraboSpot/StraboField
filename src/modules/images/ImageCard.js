@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Switch, Text, TextInput, View, TouchableOpacity, Platform} from 'react-native';
+import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import {Button, Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -8,6 +8,7 @@ import {imageStyles, ImageThumbnail, useImages} from '.';
 import useDevice from '../../services/useDevice';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -29,6 +30,7 @@ const ImageCard = ({
 
   const placeholderTitle = `Untitled ${index + 1}`;
 
+  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
   const [title, setTitle] = useState(
     image.title && typeof image.title === 'string' && image.title.trim() !== ''
       ? image.title.toString()
@@ -72,7 +74,9 @@ const ImageCard = ({
         console.log('Got Image');
         const uriObj = await getImageThumbnailURIs([image]);
         setImageThumbnailURIs({...imageThumbnailURIs, ...uriObj});
+        if (isImageMissingOnServer) setIsImageMissingOnServer(false);
       }
+      else setIsImageMissingOnServer(true);
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: false});
     }
   };
@@ -102,8 +106,10 @@ const ImageCard = ({
             value={title}
           />
         ) : (
-          <TouchableOpacity style={imageStyles.cardTitleEditingButton} onPress={() => setIsEditing(true)}>
+          <TouchableOpacity onPress={() => setIsEditing(true)} style={imageStyles.cardTitleEditingButton}>
             <Text
+              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
+              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
               style={[
                 imageStyles.cardTitle,
                 Platform.OS === 'web' && {
@@ -114,8 +120,6 @@ const ImageCard = ({
                   whiteSpace: 'nowrap',
                 },
               ]}
-              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
-              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
             >
               {title || placeholderTitle}
             </Text>
@@ -126,6 +130,7 @@ const ImageCard = ({
       <View style={imageStyles.cardImageContainer}>
         <ImageThumbnail
           imageThumbnailURI={imageThumbnailURIs?.[image.id]}
+          isImageMissingOnServer={isImageMissingOnServer}
           isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
           isThumbnailOnly={isThumbnailOnly}
           onFinishedLoading={handleImageFinishedLoading}
@@ -135,7 +140,7 @@ const ImageCard = ({
 
       {!isThumbnailOnly && (
         <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
-          <Switch
+          <SwitchWrapper
             disabled={getIsSwitchDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
             value={image.annotated}
@@ -147,10 +152,10 @@ const ImageCard = ({
             disabled={!image.annotated}
             icon={
               <Icon
-                type={'ionicon'}
-                size={20}
-                name={'map-outline'}
                 color={image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY}
+                name={'map-outline'}
+                size={20}
+                type={'ionicon'}
               />
             }
             onPress={() => getImageBasemap(image)}

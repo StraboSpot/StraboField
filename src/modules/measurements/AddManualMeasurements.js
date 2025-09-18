@@ -65,12 +65,12 @@ const AddManualMeasurements = ({formProps, measurementType}) => {
         <View style={compassStyles.sliderContainer}>
           <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
           <SliderBar
-            onSlidingComplete={setSliderValue}
-            value={sliderValue}
-            step={1}
+            labels={['Low', '', '', '', 'High', 'N/R']}
             maximumValue={6}
             minimumValue={1}
-            labels={['Low', '', '', '', 'High', 'N/R']}
+            onSlidingComplete={setSliderValue}
+            step={1}
+            value={sliderValue}
           />
         </View>
       </>

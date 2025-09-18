@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {FOLD_GEOMETRY_KEYS, FOLD_ICONS} from './';
-import IconButton from '../../../shared/ui/IconButton';
+import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles, useForm} from '../../form';
 
 const FoldGeometryChoices = ({
@@ -23,7 +23,7 @@ const FoldGeometryChoices = ({
     const foldGeometryField = getRelevantFields(survey, key)[0];
     const foldGeometryChoices = getChoicesByKey(survey, choices, key);
     return (
-      <View style={{padding: 10}} key={key}>
+      <View key={key} style={{padding: 10}}>
         {foldGeometryField.label && (
           <View style={[formStyles.fieldLabelContainer, {paddingLeft: 10}]}>
             <Text style={formStyles.fieldLabel}>{foldGeometryField.label}</Text>
@@ -35,10 +35,10 @@ const FoldGeometryChoices = ({
               FOLD_ICONS[key] && FOLD_ICONS[key].DEFAULT && FOLD_ICONS[key].DEFAULT[c.name] && FOLD_ICONS[key].PRESSED
               && FOLD_ICONS[key].PRESSED[c.name] && (
                 <IconButton
-                  key={c.name}
-                  source={formProps.values[key] === c.name ? FOLD_ICONS[key].PRESSED[c.name] : FOLD_ICONS[key].DEFAULT[c.name]}
                   imageStyle={{margin: -5}}
+                  key={c.name}
                   onPress={() => onGeometryChoiceButtonPress(key, c.name)}
+                  source={formProps.values[key] === c.name ? FOLD_ICONS[key].PRESSED[c.name] : FOLD_ICONS[key].DEFAULT[c.name]}
                 />
               )
             );

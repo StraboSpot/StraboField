@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Switch, Text, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {Icon, ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import overlayStyles from './overlay.styles';
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
 import {BASEMAPS} from '../../maps/maps.constants';
@@ -56,12 +57,12 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       <View key={'DefaultMapsList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
-          keyExtractor={item => item.id + 'DefaultMap'}
-          data={mapsToDisplay}
-          renderItem={({item}) => renderDefaultMapItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
-          scrollEnabled={false}
           ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
+          data={mapsToDisplay}
+          keyExtractor={item => item.id + 'DefaultMap'}
+          renderItem={({item}) => renderDefaultMapItem(item)}
+          scrollEnabled={false}
         />
       </View>
     );
@@ -76,11 +77,11 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       <View key={'CustomMapsList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
-          keyExtractor={item => item.id + 'CustomMap'}
-          data={customMapsToDisplay}
-          renderItem={({item}) => renderCustomMapItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
+          data={customMapsToDisplay}
+          keyExtractor={item => item.id + 'CustomMap'}
+          renderItem={({item}) => renderCustomMapItem(item)}
         />
       </View>
     );
@@ -95,11 +96,11 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       <View key={'OfflineCustomMapsList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
-          keyExtractor={item => item.id + 'OfflineCustomMap'}
-          data={offlineCustomMapsToDisplay}
-          renderItem={({item}) => renderOfflineCustomMapItem(item)}
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
+          data={offlineCustomMapsToDisplay}
+          keyExtractor={item => item.id + 'OfflineCustomMap'}
+          renderItem={({item}) => renderOfflineCustomMapItem(item)}
         />
       </View>
     );
@@ -114,10 +115,10 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       <View key={'CustomOverlaysList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
-          keyExtractor={item => item.id + 'CustomOverlay'}
-          data={customOverlaysToDisplay}
-          renderItem={({item}) => renderMapOverlayItem(item)}
           ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
+          data={customOverlaysToDisplay}
+          keyExtractor={item => item.id + 'CustomOverlay'}
+          renderItem={({item}) => renderMapOverlayItem(item)}
         />
       </View>
     );
@@ -132,10 +133,10 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       <View key={'OfflineCustomOverlaysList'}>
         <SectionDivider dividerText={sectionTitle}/>
         <FlatList
-          keyExtractor={item => item.id + 'OfflineCustomOverlay'}
-          data={offlineCustomOverlaysToDisplay}
-          renderItem={({item}) => renderMapOverlayItem(item)}
           ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
+          data={offlineCustomOverlaysToDisplay}
+          keyExtractor={item => item.id + 'OfflineCustomOverlay'}
+          renderItem={({item}) => renderMapOverlayItem(item)}
         />
       </View>
     );
@@ -153,7 +154,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
             ({customMap.source || customMap.sources['raster-tiles'].type})
           </ListItem.Title>
         </ListItem.Content>
-        {customMap.id === currentBasemap?.id && <Icon type={'ionicon'} color={themes.BLUE} name={'checkmark-outline'}/>}
+        {customMap.id === currentBasemap?.id && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
       </ListItem>
     );
   };
@@ -173,7 +174,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
           {/*  && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles!!!)</ListItem.Subtitle>}*/}
         </ListItem.Content>
         {customMap.id === currentBasemap?.id && currentBasemap.sources[currentBasemap.id].tiles[0].includes('file:/')
-          && <Icon type={'ionicon'} color={themes.BLUE} name={'checkmark-outline'}/>}
+          && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
       </ListItem>
     );
   };
@@ -189,7 +190,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
           && <ListItem.Subtitle style={{paddingTop: 5}}>({map.count} tiles)</ListItem.Subtitle>}
       </ListItem.Content>
       {currentBasemap && currentBasemap.id && map.id === currentBasemap.id
-        && <Icon type={'ionicon'} color={themes.BLUE} name={'checkmark-outline'}/>}
+        && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
     </ListItem>
   );
 
@@ -204,11 +205,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
         {!isInternetReachable
           && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles)</ListItem.Subtitle>}
       </ListItem.Content>
-      <Switch
-        style={{marginRight: 10}}
-        value={customMap.isViewable}
-        onValueChange={val => setCustomMapSwitchValue(val, customMap)}
-      />
+      <SwitchWrapper onValueChange={val => setCustomMapSwitchValue(val, customMap)} value={customMap.isViewable}/>
     </ListItem>
   );
 

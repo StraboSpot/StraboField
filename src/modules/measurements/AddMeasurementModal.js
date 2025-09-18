@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Switch, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -13,8 +13,9 @@ import {MEASUREMENT_KEYS, MEASUREMENT_TYPES} from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import Modal from '../../shared/ui/modal/Modal';
-import SaveButton from '../../shared/ui/SaveButton';
+import {SwitchWrapper} from '../../shared/ui/';
+import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
@@ -67,12 +68,14 @@ const AddMeasurementModal = ({onPress}) => {
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    !SMALL_SCREEN && lockToPortrait();
-    toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
+    if (!SMALL_SCREEN && Platform.OS !== 'web') {
+      lockToPortrait();
+      toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
+    }
     return () => {
       dispatch(setModalValues({}));
-      unlockOrientation();
-    }
+      if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -81,8 +84,8 @@ const AddMeasurementModal = ({onPress}) => {
     const prev = prevValuesRef.current;
 
     if (
-      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes) &&
-      JSON.stringify(prev.templates) === JSON.stringify(templates)
+      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes)
+      && JSON.stringify(prev.templates) === JSON.stringify(templates)
     ) return;
 
     prevValuesRef.current = {compassMeasurementTypes, templates};
@@ -196,12 +199,12 @@ const AddMeasurementModal = ({onPress}) => {
       <>
         {!isShowTemplates && !isSelectedAttitude && (
           <ButtonGroup
-            selectedIndex={selectedTypeIndex}
-            onPress={onMeasurementTypePress}
+            buttonStyle={{padding: 5}}
             buttons={Object.values(MEASUREMENT_TYPES).map(t => t.add_title)}
             containerStyle={{height: 40, borderRadius: 10}}
-            buttonStyle={{padding: 5}}
+            onPress={onMeasurementTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+            selectedIndex={selectedTypeIndex}
             textStyle={{color: PRIMARY_TEXT_COLOR}}
           />
         )}
@@ -218,10 +221,7 @@ const AddMeasurementModal = ({onPress}) => {
               <>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', padding: 5}}>
                   <Text style={{}}>Compass</Text>
-                  <Switch
-                    value={isManualMeasurement}
-                    onValueChange={value => setIsManualMeasurement(value)}
-                  />
+                  <SwitchWrapper onValueChange={value => setIsManualMeasurement(value)} value={isManualMeasurement}/>
                   <Text style={{}}>Manual</Text>
                 </View>
               </>
@@ -231,19 +231,19 @@ const AddMeasurementModal = ({onPress}) => {
               : (
                 <>
                   <Compass
-                    setMeasurements={setMeasurements}
                     formValues={formProps.values}
+                    setMeasurements={setMeasurements}
                     sliderValue={sliderValue}
                   />
                   <View style={compassStyles.sliderContainer}>
                     <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
                     <SliderBar
-                      onSlidingComplete={setSliderValue}
-                      value={sliderValue}
-                      step={1}
+                      labels={['Low', '', '', '', 'High', 'N/R']}
                       maximumValue={6}
                       minimumValue={1}
-                      labels={['Low', '', '', '', 'High', 'N/R']}
+                      onSlidingComplete={setSliderValue}
+                      step={1}
+                      value={sliderValue}
                     />
                   </View>
                 </>
@@ -253,12 +253,12 @@ const AddMeasurementModal = ({onPress}) => {
               && getPlanarTemplates(relevantTemplates).length <= 1 && (
                 <>
                   <AddPlane
-                    survey={survey}
                     choices={choices}
-                    setChoicesViewKey={onSetChoicesViewKey}
                     formName={[groupKey, MEASUREMENT_KEYS.PLANAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
+                    setChoicesViewKey={onSetChoicesViewKey}
+                    survey={survey}
                   />
                 </>
               )}
@@ -266,14 +266,14 @@ const AddMeasurementModal = ({onPress}) => {
               && getLinearTemplates(relevantTemplates).length <= 1 && (
                 <>
                   <AddLine
-                    survey={assocSurvey}
                     choices={assocChoices}
-                    setChoicesViewKey={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR ? onSetChoicesAssocViewKey
-                      : onSetChoicesViewKey}
                     formName={[groupKey, MEASUREMENT_KEYS.LINEAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
                     isPlanarLinear={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR}
+                    setChoicesViewKey={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR ? onSetChoicesAssocViewKey
+                      : onSetChoicesViewKey}
+                    survey={assocSurvey}
                   />
                 </>
               )}
@@ -288,37 +288,38 @@ const AddMeasurementModal = ({onPress}) => {
     const formName = [groupKey, measurementTypeForForm];
     const saveTitle = 'Save ' + typeObj.save_title + (relevantTemplates.length > 1 ? 's' : '');
     return (
-      <Modal
-        closeModal={onCloseButton}
+      <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
+        closeModal={onCloseButton}
         onPress={onPress}
+        overlayStyleOverride={{height: '80%'}}
       >
         <>
           {measurementTypeForForm && (
             <FlatList
-              bounces={false}
-              listKey={'form'}
               ListHeaderComponent={
                 <Formik
-                  innerRef={formRef}
-                  initialValues={initialValues}
+                  enableReinitialize={true}
                   initialStatus={{formName: formName}}
+                  initialValues={initialValues}
+                  innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={false}
-                  enableReinitialize={true}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
                 </Formik>
               }
+              bounces={false}
+              listKey={'form'}
             />
           )}
           {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <SaveButton title={saveTitle} onPress={saveMeasurement}/>
+            <SaveButton onPress={saveMeasurement} title={saveTitle}/>
           )}
         </>
-      </Modal>
+      </ModalWrapper>
     );
   };
 

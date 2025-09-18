@@ -13,12 +13,11 @@ import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookContentTopSection from '../../shared/ui/NotebookContentTopSection';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import uiStyles from '../../shared/ui/ui.styles';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({page}) => {
@@ -157,25 +156,25 @@ const MeasurementsPage = ({page}) => {
   const renderSectionHeader = ({title, data}) => {
     const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === title);
     return (
-      <View style={[styles.measurementsSectionDividerContainer, uiStyles.sectionHeaderBackground]}>
+      <View style={styles.measurementsSectionDividerContainer}>
         <SectionDivider dividerText={title}/>
         <View style={styles.measurementsSectionDividerButtonContainer}>
           {multiSelectMode && sectionType === multiSelectMode && (
             <Button
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              title={'Cancel'}
-              type={'clear'}
-              onPress={() => onSelectingCancel()}
               disabled={isMultipleFeaturesTaggingEnabled}
+              onPress={() => onSelectingCancel()}
+              title={'Cancel'}
+              titleStyle={styles.measurementsSectionDividerButtonText}
+              type={'clear'}
             />
           )}
           {multiSelectMode && selectedFeaturesTemp.length >= 1 && sectionType === multiSelectMode && (
             <Button
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              title={'Identify Selected'}
-              type={'clear'}
-              onPress={() => onSelectingEnd()}
               disabled={isMultipleFeaturesTaggingEnabled}
+              onPress={() => onSelectingEnd()}
+              title={'Identify Selected'}
+              titleStyle={styles.measurementsSectionDividerButtonText}
+              type={'clear'}
             />
           )}
           {!multiSelectMode && (
@@ -183,32 +182,32 @@ const MeasurementsPage = ({page}) => {
               <>
                 <Button
                   disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  title={'Identify All'}
-                  type={'clear'}
                   onPress={() => onIdentifyAll(sectionType, data)}
+                  title={'Identify All'}
+                  titleStyle={styles.measurementsSectionDividerButtonText}
+                  type={'clear'}
                 />
                 <Button
                   disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  title={'Select'}
-                  type={'clear'}
                   onPress={() => onSelectingStart(sectionType)}
+                  title={'Select'}
+                  titleStyle={styles.measurementsSectionDividerButtonText}
+                  type={'clear'}
                 />
               </>
               {!modalVisible && (
                 <Button
+                  disabled={isMultipleFeaturesTaggingEnabled}
                   icon={
                     <Icon
+                      color={PRIMARY_ACCENT_COLOR}
                       name={'add'}
                       size={20}
                       style={{paddingHorizontal: 5}}
-                      color={PRIMARY_ACCENT_COLOR}
                     />
                   }
-                  type={'clear'}
                   onPress={() => addMeasurement(sectionType)}
-                  disabled={isMultipleFeaturesTaggingEnabled}
+                  type={'clear'}
                 />
               )}
             </View>
@@ -229,21 +228,21 @@ const MeasurementsPage = ({page}) => {
 
     return (
       <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        sections={sections}
-        renderSectionHeader={({section}) => renderSectionHeader(section)}
         renderItem={({item, i, section}) => (
           <MeasurementItem
             item={item}
-            selectedIds={getIdsOfSelected()}
             onPress={() => onMeasurementPressed(item, section.title)}
+            selectedIds={getIdsOfSelected()}
           />
         )}
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
+        renderSectionHeader={({section}) => renderSectionHeader(section)}
+        sections={sections}
         stickySectionHeadersEnabled={true}
-        ItemSeparatorComponent={FlatListItemSeparator}
       />
     );
   };
@@ -260,15 +259,15 @@ const MeasurementsPage = ({page}) => {
   const renderMeasurementsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookContentTopSection returnToOverviewAction={() => setModalVisible({modal: null})}/>
+        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>
             <Button
-              titleStyle={{color: WARNING_COLOR}}
-              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
-              type={'clear'}
               onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
+              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
+              titleStyle={{color: WARNING_COLOR}}
+              type={'clear'}
             />
           </View>
         )}
