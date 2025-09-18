@@ -28,7 +28,7 @@ const ModalWrapper = ({
                         onActionPressed,
                         onCancelPress,
                         onDeletePress,
-                        onPress,
+                        onFooterButtonPress,
                         overlayStyleOverride,
                         showActionButton,
                         showCancelButton,
@@ -54,9 +54,12 @@ const ModalWrapper = ({
 
     if (shortcutModal && shortcutModal.notebook_modal_key) {
       return (
+        // <Button
+        //   title={'View In Notebook Mode'}
+        // />
         <ListItem
           containerStyle={commonStyles.listItem}
-          onPress={() => onPress(shortcutModal.notebook_modal_key)}
+          onPress={() => onFooterButtonPress(shortcutModal.notebook_modal_key)}
         >
           <AvatarWrapper
             size={20}
@@ -74,7 +77,7 @@ const ModalWrapper = ({
       if (shortcutModalSwitch) {
         return (
           <Button
-            onPress={() => onPress(shortcutModalSwitch.key)}
+            onPress={() => onFooterButtonPress(shortcutModalSwitch.key)}
             title={'View In Shortcut Mode'}
             titleStyle={compassStyles.buttonTitleStyle}
             type={'clear'}
@@ -102,7 +105,7 @@ const ModalWrapper = ({
         showCloseButton={showCloseButton}
       />
       {children}
-      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+      {isEmpty(selectedAttributes) && renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}

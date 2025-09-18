@@ -296,7 +296,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
-      onPress={onPress}
+      onFooterButtonPress={onPress}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
