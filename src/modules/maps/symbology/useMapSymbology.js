@@ -374,6 +374,15 @@ const useMapSymbology = () => {
       case 'Polygon':
       case 'MultiPolygon':
         return getPolygonSymbology(feature);
+      case 'GeometryCollection':
+        const geometryCollectionSymbology = [];
+        feature.geometry.geometries.forEach((g, i) => {
+          let tempFeature = JSON.parse(JSON.stringify(feature));
+          tempFeature.geometry = g;
+          if (i % 2 === 1) tempFeature.properties.isInterbed = true;
+          geometryCollectionSymbology.push(getSymbology(tempFeature));
+        });
+        return geometryCollectionSymbology;
       default:
         return {};
     }
