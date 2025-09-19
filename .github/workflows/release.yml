@@ -3,7 +3,7 @@ name: Automated Release
 
 on:
   push:
-    branches: [main, master, develop]  # Add your branch name here
+    branches: [master]  # Add your branch name here
     paths:
       - 'package.json'  # Trigger when version changes
 
