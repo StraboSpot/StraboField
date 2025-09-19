@@ -26,21 +26,33 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           
           # Get previous version from the last commit
-          git show HEAD~1:package.json > prev-package.json
-          PREVIOUS_VERSION=$(node -p "require('./prev-package.json').version" 2>/dev/null || echo "0.0.0")
-          rm -f prev-package.json
+          if git show HEAD~1:package.json > prev-package.json 2>/dev/null; then
+            PREVIOUS_VERSION=$(node -p "require('./prev-package.json').version" 2>/dev/null || echo "0.0.0")
+            rm -f prev-package.json
+          else
+            echo "No previous commit found, treating as first release"
+            PREVIOUS_VERSION="0.0.0"
+          fi
           
-          echo "Current version: $CURRENT_VERSION"
-          echo "Previous version: $PREVIOUS_VERSION"
+          echo "::notice::Current version: $CURRENT_VERSION"
+          echo "::notice::Previous version: $PREVIOUS_VERSION"
+          
+          # Debug: Show the actual file differences
+          echo "::group::Debug Info"
+          echo "Files changed in this commit:"
+          git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "No previous commit"
+          echo "Package.json diff:"
+          git diff HEAD~1 HEAD package.json 2>/dev/null || echo "No package.json changes or no previous commit"
+          echo "::endgroup::"
           
           if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
             echo "previous-version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
-            echo "✅ Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            echo "::notice::✅ Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "❌ No version change detected"
+            echo "::warning::❌ No version change detected (both versions are $CURRENT_VERSION)"
           fi
 
   create-release:
