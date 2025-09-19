@@ -4,7 +4,7 @@
   "categories": [
     {
       "title": "## 🚀 Features",
-      "labels": ["feature", "enhancement"]
+      "labels": ["feature", "enhancement", "feat"]
     },
     {
       "title": "## 🐛 Fixes",
@@ -15,12 +15,24 @@
       "labels": ["test"]
     },
     {
+      "title": "## ✏️ Refactors"
+      "labels": ["refactor"]
+    },
+    {
+      "title": "## 💬 Build",
+      "labels": ["build"]
+    },
+     {
       "title": "## 💬 Other",
       "labels": ["other"]
     },
     {
       "title": "## 📦 Dependencies",
       "labels": ["dependencies"]
+    },
+    {
+      "title": "## ⏮️ Revert",
+      "labels": ["revert"]
     }
   ],
   "ignore_labels": [
