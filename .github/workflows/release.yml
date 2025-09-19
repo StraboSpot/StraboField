@@ -1,0 +1,95 @@
+# .github/workflows/release.yml
+name: Automated Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'  # Trigger when version changes
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version-changed: ${{ steps.check.outputs.changed }}
+      new-version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check if version changed
+        id: check
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          # Get previous version
+          git checkout HEAD~1
+          PREVIOUS_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
+          git checkout -
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "Previous version: $PREVIOUS_VERSION"
+          
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  create-release:
+    needs: check-version
+    if: needs.check-version.outputs.version-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate changelog
+        run: |
+          # Generate changelog for the new version
+          npx generate-changelog
+          
+          # Extract the latest version's changelog for release notes
+          VERSION="${{ needs.check-version.outputs.new-version }}"
+          
+          # Create a temporary file with just the latest version's notes
+          awk -v version="$VERSION" '
+            /^## / { 
+              if (found) exit
+              if ($0 ~ version) { found=1; next }
+              if (found) next
+            }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+      - name: Create Git tag
+        run: |
+          VERSION="${{ needs.check-version.outputs.new-version }}"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.check-version.outputs.new-version }}
+          release_name: Release v${{ needs.check-version.outputs.new-version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
