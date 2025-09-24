@@ -82,11 +82,19 @@ const documentationStyles = StyleSheet.create({
     borderRadius: 8,
     maxHeight: '50%',
     padding: 16,
-    width: 200,
+    width: 250,
+  },
+  pickerList: {
+    maxHeight: 300,
+    padding: 10,
+    width: '100%',
   },
   pickerOverlay: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  viewerContainer: {
+    flex: 1,
   },
 });
 

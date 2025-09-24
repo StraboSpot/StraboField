@@ -98,6 +98,7 @@ const HomeContainer = ({navigation, route}) => {
         <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
           <MainMenuPanel
             closeMainMenuPanel={closeMainMenuPanel}
+            navigation={navigation}
             openNotebookPanel={openNotebookPanel}
             openSpotInNotebook={openSpotInNotebook}
             ref={mapComponentRef}

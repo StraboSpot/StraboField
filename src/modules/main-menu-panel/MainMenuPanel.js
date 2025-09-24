@@ -43,6 +43,7 @@ import UserProfile from '../user/UserProfile';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
+                                    navigation,
                                     openNotebookPanel,
                                     openSpotInNotebook,
                                   }, mapComponentRef) => {
@@ -147,7 +148,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.HELP.ABOUT:
         return <About/>;
       case MAIN_MENU_ITEMS.HELP.DOCUMENTATION:
-        return <Documentation/>;
+        return <Documentation navigation={navigation}/>;
       case MAIN_MENU_ITEMS.HELP.ISSUES:
         return <IssuesAndReqests/>;
 

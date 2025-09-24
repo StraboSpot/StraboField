@@ -22,6 +22,7 @@ const ModalWrapper = ({
                         children,
                         closeModal,
                         disabled,
+                        fullscreen,
                         headerTitle,
                         isLoading,
                         isVisible,
@@ -88,7 +89,7 @@ const ModalWrapper = ({
     <Overlay
       animationType={'fade'}
       backdropStyle={overlayStyles.backdropStyles}
-      fullScreen={SMALL_SCREEN}
+      fullScreen={fullscreen || SMALL_SCREEN}
       isVisible={isVisible}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
