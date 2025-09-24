@@ -41,6 +41,7 @@ const externalDataStyles = StyleSheet.create({
   modalContent: {
     flex: 1,
     justifyContent: 'space-between',
+    padding: 10,
   },
   modalHeader: {
     alignItems: 'center',
@@ -66,10 +67,12 @@ const externalDataStyles = StyleSheet.create({
     padding: 35,
   },
   overlayContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    alignItems: 'center',
+    // backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderRadius: 15,
-    maxHeight: '90%',
-    maxWidth: '90%',
+    // flex: 1,
+    height: '90%',
+    width: 'auto',
     padding: 16,
   },
 });

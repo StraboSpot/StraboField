@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 
 import {imageStyles} from '.';
 import {SwitchWrapper} from '../../shared/ui';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
@@ -50,11 +51,14 @@ const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, s
 
   return (
     <ModalWrapper
+      closeModal={closeModal}
       headerTitle={'Image Properties'}
       isVisible={isVisible}
       onActionPressed={saveFormAndGo}
-      onCancelPress={closeModal}
       overlayStylesOverride={{height: '90%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
     >
       <FlatList
         ListFooterComponent={
@@ -64,6 +68,10 @@ const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, s
           </View>
         }
         ListHeaderComponent={renderFormFields()}
+      />
+      <ActionButton
+        onPress={saveFormAndGo}
+        title={'Save'}
       />
     </ModalWrapper>
   );

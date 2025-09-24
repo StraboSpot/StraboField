@@ -54,9 +54,6 @@ const ModalWrapper = ({
 
     if (shortcutModal && shortcutModal.notebook_modal_key) {
       return (
-        // <Button
-        //   title={'View In Notebook Mode'}
-        // />
         <ListItem
           containerStyle={commonStyles.listItem}
           onPress={() => onFooterButtonPress(shortcutModal.notebook_modal_key)}
@@ -72,7 +69,7 @@ const ModalWrapper = ({
         </ListItem>
       );
     }
-    else if (notebookModal) {
+    else if (notebookModal && !SMALL_SCREEN) {
       const shortcutModalSwitch = SHORTCUT_MODALS.find(m => m.notebook_modal_key === modalVisible);
       if (shortcutModalSwitch) {
         return (
@@ -105,7 +102,7 @@ const ModalWrapper = ({
         showCloseButton={showCloseButton}
       />
       {children}
-      {isEmpty(selectedAttributes) && renderModalBottom()}
+      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}

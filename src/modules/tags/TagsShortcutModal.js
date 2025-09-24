@@ -19,7 +19,6 @@ const TagsShortcutModal = ({
         showCloseButton={true}
       >
         <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
-        {/*<Text>HELLO I AM A TAG</Text>*/}
       </ModalWrapper>
     );
   };

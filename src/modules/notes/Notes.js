@@ -152,18 +152,21 @@ const Notes = ({zoomToCurrentLocation}) => {
       }
       <FlatListItemSeparator/>
       {!isShowTemplates && (
-        <ScrollView style={noteStyle.noteContainer}>
-          <NoteForm
-            formRef={formRef}
-            initialNotesValues={initialNotesValues}
-          />
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
-            <ActionButton
-              onPress={() => saveFormAndGo()}
-              title={'Save Note'}
+        <>
+          <ScrollView style={noteStyle.noteContainer}>
+            <NoteForm
+              formRef={formRef}
+              initialNotesValues={initialNotesValues}
             />
-          )}
-        </ScrollView>
+
+          </ScrollView>
+      {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
+        <ActionButton
+          onPress={() => saveFormAndGo()}
+          title={'Save Note'}
+        />
+      )}
+        </>
       )}
     </View>
   );

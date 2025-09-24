@@ -1,14 +1,16 @@
 import React, {useRef} from 'react';
 import {Platform, ScrollView, Text} from 'react-native';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
+import {setIsErrorMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const ErrorModal = ({closeModal, children, isVisible}) => {
   const scrollView = useRef();
 
+  const dispatch = useDispatch();
   const isErrorMessagesModalVisible = useSelector(state => state.home.isErrorMessagesModalVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
 
@@ -17,7 +19,7 @@ const ErrorModal = ({closeModal, children, isVisible}) => {
       actionTitle={'Ok'}
       headerTitle={'Error!'}
       isVisible={isErrorMessagesModalVisible}
-      onCancelPress={closeModal}
+      onActionPressed={() => dispatch(setIsErrorMessagesModalVisible(false))}
       showActionButton={!(Platform.OS === 'web' && statusMessages.includes('Error loading project!'))}
       showCancelButton={false}
     >

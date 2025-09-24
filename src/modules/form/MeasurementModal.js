@@ -66,7 +66,9 @@ const MeasurementModal = ({
   return (
     <ModalWrapper
       closeModal={() => setIsMeasurementModalVisible(false)}
-      overlayStyleOverride={{maxHeight: isManualMeasurement ? '45%' : '40%', flex: 1}}
+      headerTitle={measurementsGroupLabel}
+      showActionButton={false}
+      showCancelButton={false}
       showCloseButton
     >
       <ScrollView>
@@ -91,7 +93,7 @@ const MeasurementModal = ({
           <>
             <Spacer/>
             <Compass
-              // closeCompass={() => setIsMeasurementModalVisible(false)}
+              closeCompass={() => setIsMeasurementModalVisible(false)}
               setAttributeMeasurements={setMeasurements}
               sliderValue={sliderValue}
             />

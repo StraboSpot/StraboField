@@ -121,7 +121,10 @@ const AddThreeDStructureModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
-        onPress={onPress}
+        headerTitle={'Add 3D Structure'}
+        // onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
         showCloseButton
       >
         <FlatList

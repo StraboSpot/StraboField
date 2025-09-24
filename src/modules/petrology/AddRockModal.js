@@ -130,7 +130,9 @@ const AddRockModal = ({modalKey, onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
-        onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         {Object.values(IGNEOUS_ROCK_CLASSES).includes(rockKey) && !choicesViewKey && !isShowTemplates && (
           <ButtonGroup

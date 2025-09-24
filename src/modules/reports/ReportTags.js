@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-native';
 
-import {Button, Icon, Overlay} from '@rn-vui/base';
+import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
@@ -9,7 +9,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
@@ -66,18 +66,15 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
       </View>
 
       {isTagsListModalVisible && (
-        <Overlay
-          overlayStyle={[overlayStyles.overlayContainer, {height: 500}]}
-          supportedOrientations={['portrait', 'landscape']}
+        <ModalWrapper
+          buttonTitleRight={'Done'}
+          closeModal={() => setIsTagsListModalVisible(false)}
+          headerTitle={'Add/Remove Tags'}
+          isVisible={isTagsListModalVisible}
+          showActionButton={false}
+          showCancelButton={false}
+          showCloseButton
         >
-          <View style={{alignItems: 'flex-end'}}>
-            <Button
-              buttonStyle={{padding: 0}}
-              icon={{name: 'close', type: 'ionicon', size: 20}}
-              onPress={() => setIsTagsListModalVisible(false)}
-              type={'clear'}
-            />
-          </View>
           {Platform.OS === 'web' ? (
             <ScrollView>
               <TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
@@ -89,7 +86,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
               }
             />
           )}
-        </Overlay>
+        </ModalWrapper>
       )}
     </>
   );

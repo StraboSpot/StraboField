@@ -70,7 +70,7 @@ const commonStyles = StyleSheet.create({
   },
   standardButtonContainer: {
     paddingBottom: 5,
-    paddingTop: 5,
+    paddingTop: 15,
   },
   standardButtonText: {
     color: themes.PRIMARY_ACCENT_COLOR,
