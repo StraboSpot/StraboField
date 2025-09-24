@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Pressable, ScrollView, Text, View} from 'react-native';
+import {Dimensions, FlatList, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
@@ -42,25 +42,36 @@ function TablesData({
       });
     });
     const cellWidths = cellMaxWidths.map(w => Math.min(w * 20, 150));
+    const totalTableWidth = cellWidths.reduce((sum, width) => sum + width, 0);
 
-    return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed};
+    return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed, totalTableWidth: totalTableWidth};
   };
 
   const renderTable = async () => {
-    const {cellWidths, tableDataTrimmed} = await getTableData();
+    const {cellWidths, tableDataTrimmed, totalTableWidth} = await getTableData();
     const tableName = toTitleCase(selectedTable?.name.replace(/[_-]/g, ' '));
+
+    const screenWidth = Dimensions.get('window').width;
+    const padding = 32; // 16px padding on each side
+    const modalPadding = 20; // Additional modal padding
+    const minModalWidth = 400;
+    const maxModalWidth = screenWidth * 0.9;
+
+    const requiredWidth = totalTableWidth + padding + modalPadding;
+    const dynamicWidth = Math.max(minModalWidth, Math.min(requiredWidth, maxModalWidth));
+
+    const dynamicOverlayStyle = {
+      ...externalDataStyles.overlayContainer,
+      width: dynamicWidth,
+      minWidth: minModalWidth,
+    };
+
     return (
-      // <Overlay
-      //   isVisible={isTableVisible}
-      //   onBackdropPress={() => setIsTableVisible(false)}
-      //   overlayStyle={loading ? externalDataStyles.loadingContainer : externalDataStyles.overlayContainer}
-      //   supportedOrientations={['portrait', 'landscape']}
-      // >
       <ModalWrapper
         closeModal={closeTable}
         headerTitle={loading ? 'Loading Table...' : tableName}
         isVisible={isTableVisible}
-        overlayStyleOverride={loading ? externalDataStyles.loadingContainer : externalDataStyles.overlayContainer}
+        overlayStyleOverride={loading ? externalDataStyles.loadingContainer : dynamicOverlayStyle}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
@@ -85,7 +96,6 @@ function TablesData({
           )}
         </View>
       </ModalWrapper>
-      // </Overlay>
     );
   };
 

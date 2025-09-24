@@ -28,7 +28,6 @@ const externalDataStyles = StyleSheet.create({
     shadowRadius: 2,
   },
   loadingContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderRadius: 15,
     maxHeight: '20%',
     maxWidth: '20%',
@@ -68,11 +67,8 @@ const externalDataStyles = StyleSheet.create({
   },
   overlayContainer: {
     alignItems: 'center',
-    // backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderRadius: 15,
-    // flex: 1,
     height: '90%',
-    width: 'auto',
     padding: 16,
   },
 });
