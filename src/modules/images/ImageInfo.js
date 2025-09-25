@@ -7,17 +7,28 @@ import {ImagePropertiesModal, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
 import IconButton from '../../shared/ui/buttons/IconButton';
+import Loading from '../../shared/ui/Loading';
 import {WarningModal} from '../../shared/ui/modals';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
 
-const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageToView, setIsImageModalVisible}) => {
+const ImageInfo = ({
+                     deleteImage,
+                     image,
+                     isVisible,
+                     saveImages,
+                     saveUpdatedImage,
+                     setImageToView,
+                     setIsImageModalVisible,
+                   }) => {
   console.log('Rendering ImageInfo...');
 
   const {width, height} = useWindowSize();
 
   const [isImageDeleteModalVisible, setIsImageDeleteModalVisible] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 
@@ -28,8 +39,10 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
   };
 
   const onDeleteImage = async () => {
+    setIsLoading(true);
     setIsImageDeleteModalVisible(false);
     const isImageDeleted = await deleteImage(image);
+    setIsLoading(false);
     if (isImageDeleted) setIsImageModalVisible(false);
   };
 
@@ -55,8 +68,15 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
   };
 
   return (
-    <>
-      <View style={{backgroundColor: 'black', justifyContent: 'center', alignContent: 'center'}}>
+    <ModalWrapper
+      closeModal={() => setIsImageModalVisible(false)}
+      fullscreen
+      isVisible={isVisible}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
+    >
+      <View style={{flex: 1, backgroundColor: 'black', justifyContent: 'center', alignContent: 'center'}}>
         <Image
           PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
             : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
@@ -73,13 +93,13 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
           style={Platform.OS === 'web' ? {width: width, height: height}
             : {width: '100%', height: '100%'}}
         />
-        <View style={imageStyles.closeButtonContainer}>
-          <IconButton
-            onPress={() => setIsImageModalVisible(false)}
-            source={require('../../assets/icons/Close.png')}
-            style={imageStyles.closeButtonStyle}
-          />
-        </View>
+        {/*<View style={imageStyles.closeButtonContainer}>*/}
+        {/*  <IconButton*/}
+        {/*    onPress={() => setIsImageModalVisible(false)}*/}
+        {/*    source={require('../../assets/icons/Close.png')}*/}
+        {/*    style={imageStyles.closeButtonStyle}*/}
+        {/*  />*/}
+        {/*</View>*/}
         <View style={imageStyles.rightsideIcons}>
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}
@@ -113,7 +133,8 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
       {isSketchModalVisible && (
         <SketchModal image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
       )}
-    </>
+      <Loading isLoading={isLoading}/>
+    </ModalWrapper>
   );
 };
 

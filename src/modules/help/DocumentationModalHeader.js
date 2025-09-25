@@ -52,7 +52,6 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
           />
         </View>
       </ModalWrapper>
-      {/*</Overlay>*/}
     </>
   );
 };
