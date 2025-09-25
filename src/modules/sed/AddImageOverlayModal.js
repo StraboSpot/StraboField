@@ -18,6 +18,7 @@ import {editedSpotProperties} from '../spots/spots.slice';
 const AddImageOverlayModal = ({
                                 closeModal,
                                 image,
+                                isReadOnly,
                               }) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -72,6 +73,7 @@ const AddImageOverlayModal = ({
     return sortedImages?.map((img, i) => ({
       label: getImageLabel(img, i),
       value: img.id,
+      disabled: isReadOnly,
     })) || [];
   };
 
@@ -95,10 +97,10 @@ const AddImageOverlayModal = ({
   const renderAddImageOverlayModal = () => {
     return (
       <ModalWrapper
-        buttonTitleLeft={'Cancel'}
-        buttonTitleRight={'Save'}
-        cancel={() => closeModal()}
-        closeModal={() => saveImageOverlay(overlayFormRef?.current?.values)}
+        buttonTitleLeft={!isReadOnly && 'Cancel'}
+        buttonTitleRight={!isReadOnly && 'Save'}
+        cancel={() => !isReadOnly && closeModal()}
+        closeModal={() => isReadOnly ? closeModal() : saveImageOverlay(overlayFormRef?.current?.values)}
         title={'Add Image Overlay'}
       >
         <Formik
@@ -135,6 +137,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'image_origin_x'}
                         label={'Image Origin X Value'}
                         name={'image_origin_x'}
@@ -147,6 +150,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'image_origin_y'}
                         label={'Image Origin Y Value'}
                         name={'image_origin_y'}
@@ -159,6 +163,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'image_width'}
                         label={'Adjusted Image Width'}
                         name={'image_width'}
@@ -172,6 +177,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'image_height'}
                         label={'Adjusted Image Height'}
                         name={'image_height'}
@@ -185,6 +191,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'image_opacity'}
                         label={'Image Opacity'}
                         name={'image_opacity'}
@@ -197,6 +204,7 @@ const AddImageOverlayModal = ({
                     <ListItem.Content>
                       <Field
                         component={NumberInputField}
+                        editable={!isReadOnly}
                         key={'z_index'}
                         label={'Z-Index'}
                         name={'z_index'}
@@ -210,7 +218,7 @@ const AddImageOverlayModal = ({
             </View>
           )}
         </Formik>
-        {!isEmpty(image) && (
+        {!isEmpty(image) && !isReadOnly && (
           <Button
             onPress={deleteImageOverlayConfirm}
             title={'Remove Image Overlay'}
@@ -249,7 +257,7 @@ const AddImageOverlayModal = ({
   };
 
   const showFieldInfo = (label, info) => {
-    alert(label, info, []);
+    alert(label, info);
   };
 
   const validateImageOverlay = (values) => {

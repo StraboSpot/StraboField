@@ -14,7 +14,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const IntervalPage = ({page}) => {
+const IntervalPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -67,11 +67,13 @@ const IntervalPage = ({page}) => {
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>
-      <NotebookPageHeader pageTitle={page.label}/>
-      <SaveAndCancelButtons
-        cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-        save={() => saveInterval(intervalRef.current)}
-      />
+      <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
+      {!isReadOnly && (
+        <SaveAndCancelButtons
+          cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+          save={() => saveInterval(intervalRef.current)}
+        />
+      )}
       <Formik
         enableReinitialize={true}
         initialValues={{...interval, character}}
@@ -81,7 +83,7 @@ const IntervalPage = ({page}) => {
         validate={values => validateForm({formName: formName, values: values})}
         validateOnChange={false}
       >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
+        {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
       </Formik>
     </View>
   );

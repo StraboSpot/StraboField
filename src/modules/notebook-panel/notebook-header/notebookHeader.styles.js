@@ -17,10 +17,13 @@ const notebookHeaderStyles = StyleSheet.create({
   headerSpotNameAndCoordsContainer: {
     flex: 1,
     flexDirection: 'column',
+    justifyContent: 'center',
     paddingLeft: 5,
   },
   threeDotMenu: {
-    width: 50,
+    alignItems: 'center',
+    height: 50,
+    width: 40,
   },
 });
 

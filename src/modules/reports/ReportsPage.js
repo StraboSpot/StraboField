@@ -10,7 +10,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS} from '../page/page.constants';
 
-const ReportsPage = ({}) => {
+const ReportsPage = () => {
   console.log('Rendering ReportsPage...');
 
   const dispatch = useDispatch();

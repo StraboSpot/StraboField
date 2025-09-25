@@ -25,7 +25,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
 
-const StratSectionPage = ({page}) => {
+const StratSectionPage = ({isReadOnly, page}) => {
   // console.log('Rendering StratSectionPage...');
 
   const dispatch = useDispatch();
@@ -66,12 +66,16 @@ const StratSectionPage = ({page}) => {
   };
 
   const renderImageOverlaysSection = () => {
+    const dividerText = 'Image Overlays';
     return (
       <View>
-        <SectionDividerWithRightButton
-          dividerText={'Image Overlays'}
-          onPress={() => setSelectedImage({})}
-        />
+        {isReadOnly ? <SectionDivider dividerText={dividerText}/>
+          : (
+            <SectionDividerWithRightButton
+              dividerText={dividerText}
+              onPress={() => setSelectedImage({})}
+            />
+          )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Image Overlays'}/>}
@@ -88,10 +92,12 @@ const StratSectionPage = ({page}) => {
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
-        <SaveAndCancelButtons
-          cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-          save={saveStratSection}
-        />
+        {!isReadOnly && (
+          <SaveAndCancelButtons
+            cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+            save={saveStratSection}
+          />
+        )}
         <Formik
           enableReinitialize={true}
           initialValues={stratSection}
@@ -101,7 +107,7 @@ const StratSectionPage = ({page}) => {
           validate={values => validateForm({formName: formName, values: values})}
           validateOnChange={false}
         >
-          {formProps => <Form {...{...formProps, formName: formName}}/>}
+          {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
         </Formik>
       </View>
     );
@@ -159,7 +165,11 @@ const StratSectionPage = ({page}) => {
                   </View>
                 )}
                 {selectedImage && (
-                  <AddImageOverlayModal closeModal={() => setSelectedImage(undefined)} image={selectedImage}/>
+                  <AddImageOverlayModal
+                    closeModal={() => setSelectedImage(undefined)}
+                    image={selectedImage}
+                    isReadOnly={isReadOnly}
+                  />
                 )}
               </>
             }

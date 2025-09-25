@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux';
 import RockPage from './RockPage';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const RockIgneousPage = ({page}) => {
+const RockIgneousPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const RockIgneousPage = ({page}) => {
   }, [page]);
 
   return (
-    <RockPage page={page}/>
+    <RockPage isReadOnly={isReadOnly} page={page}/>
   );
 };
 

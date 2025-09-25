@@ -14,7 +14,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const FabricsPage = ({page}) => {
+const FabricsPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -81,7 +81,7 @@ const FabricsPage = ({page}) => {
         return sectionTitle === title ? key : acc;
       },
       '');
-    if (sectionKey) {
+    if (sectionKey && !isReadOnly) {
       return (
         <SectionDividerWithRightButton
           dividerText={sectionTitle}
@@ -96,6 +96,7 @@ const FabricsPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedFabric}
       />

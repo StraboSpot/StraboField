@@ -45,7 +45,7 @@ const useMapFeaturesDraw = ({
     identifyClosestVertexOnSpotPress,
   } = useMapFeaturesCalculated(mapRef);
   const {getSymbology} = useMapSymbology();
-  const {getTargetDatasetFromId} = useProject();
+  const {getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
   const {createSpot} = useSpots();
   const {getStereonet} = useStereonet();
 
@@ -658,14 +658,26 @@ const useMapFeaturesDraw = ({
 
   const selectSpotsForTagging = (feature) => {
     const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
-    if (selectedSpots.length > 0) {
-      dispatch(setIntersectedSpotsForTagging(selectedSpots));
+
+    // Filter out Read Only Spots
+    const selectedSpotsFiltered = selectedSpots.filter((spot) => {
+      if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+    });
+
+    if (selectedSpotsFiltered.length > 0) {
+      dispatch(setIntersectedSpotsForTagging(selectedSpotsFiltered));
       dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS}));
+    }
+    else if (selectedSpots.length > 0) {
+      alert(
+        'Error!',
+        'Only Read Only Spots Selected',
+      );
     }
     else {
       alert(
         'Error!',
-        'No Spots selected.',
+        'No Spots Selected',
       );
     }
   };

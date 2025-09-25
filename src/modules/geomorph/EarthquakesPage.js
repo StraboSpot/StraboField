@@ -13,7 +13,7 @@ import BasicPageDetail from '../page/BasicPageDetail';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const EarthquakesPage = ({page}) => {
+const EarthquakesPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -52,6 +52,7 @@ const EarthquakesPage = ({page}) => {
     return (
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedAttribute}
       />
@@ -61,7 +62,7 @@ const EarthquakesPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}

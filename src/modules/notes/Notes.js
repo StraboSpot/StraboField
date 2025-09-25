@@ -21,7 +21,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import Templates from '../templates/Templates';
 
-const Notes = ({zoomToCurrentLocation}) => {
+const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
   const modalVisible = useSelector(state => state.home.modalVisible);
@@ -70,11 +70,8 @@ const Notes = ({zoomToCurrentLocation}) => {
   const renderCancelSaveButtons = () => {
     return (
       <View>
-        <NotebookPageHeader hideBackButton pageTitle={'Notes'}/>
-        <SaveAndCancelButtons
-          cancel={() => cancelFormAndGo()}
-          save={() => saveFormAndGo()}
-        />
+        <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
       </View>
     );
   };
@@ -125,37 +122,38 @@ const Notes = ({zoomToCurrentLocation}) => {
   return (
     <View style={{flex: 1}}>
       {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE ? (
-          <>
-            {!isShowTemplates && (
-              <View style={uiStyles.alignItemsToCenter}>
-                <Text>Saving a note will create</Text>
-                <Text>a new spot.</Text>
-              </View>
-            )}
+        <>
+          {!isShowTemplates && (
+            <View style={uiStyles.alignItemsToCenter}>
+              <Text>Saving a note will create</Text>
+              <Text>a new spot.</Text>
+            </View>
+          )}
+          <Templates
+            isShowTemplates={isShowTemplates}
+            page={page}
+            setIsShowTemplates={bool => setIsShowTemplates(bool)}
+          />
+        </>
+      ) : (
+        <>
+          {!isShowTemplates && renderCancelSaveButtons()}
+          {!isReadOnly && (
             <Templates
               isShowTemplates={isShowTemplates}
               page={page}
               setIsShowTemplates={bool => setIsShowTemplates(bool)}
             />
-          </>
-        )
-        : (
-          <>
-            {!isShowTemplates && renderCancelSaveButtons()}
-            <Templates
-              isShowTemplates={isShowTemplates}
-              page={page}
-              setIsShowTemplates={bool => setIsShowTemplates(bool)}
-            />
-          </>
-        )
-      }
+          )}
+        </>
+      )}
       <FlatListItemSeparator/>
       {!isShowTemplates && (
         <ScrollView style={noteStyle.noteContainer}>
           <NoteForm
             formRef={formRef}
             initialNotesValues={initialNotesValues}
+            isReadOnly={isReadOnly}
           />
           {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
             <SaveButton

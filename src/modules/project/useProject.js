@@ -36,6 +36,7 @@ const useProject = () => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const selectedProject = useSelector(state => state.project.selectedProject) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -172,19 +173,19 @@ const useProject = () => {
     }
   };
 
-  // const getDatasetFromSpotId = (spotId) => {
-  //   let datasetIdFound;
-  //   for (const dataset of Object.values(datasets)) {
-  //     const spotIdFound = dataset.spotIds.find(id => id === spotId);
-  //     if (spotIdFound) {
-  //       datasetIdFound = dataset.id;
-  //       break;
-  //     }
-  //   }
-  //   console.log('HERE IS THE DATASET', datasetIdFound);
-  //   if (!datasetIdFound) console.error('Dataset not found');
-  //   return datasetIdFound;
-  // };
+  const getDatasetIdFromSpotId = (spotId) => {
+    let datasetIdFound;
+    for (const dataset of Object.values(datasets)) {
+      const spotIdFound = dataset.spotIds.find(id => id === spotId);
+      if (spotIdFound) {
+        datasetIdFound = dataset.id;
+        break;
+      }
+    }
+    console.log('HERE IS THE DATASET', datasetIdFound);
+    if (!datasetIdFound) console.error('Dataset for Spot ' + spotId + ' not found');
+    return datasetIdFound;
+  };
 
   // Get target dataset, if none selected make one
   const getTargetDatasetFromId = () => {
@@ -211,6 +212,11 @@ const useProject = () => {
     clearProject();
     await createProject(descriptionData);
     return Promise.resolve();
+  };
+
+  const isSpotInReadOnlyDataset = (spotId) => {
+    const datasetId = getDatasetIdFromSpotId(spotId);
+    return readOnlyDatasetsIds.includes(datasetId);
   };
 
   const makeDatasetCurrent = (datasetId) => {
@@ -285,6 +291,7 @@ const useProject = () => {
     getAllServerProjects: getAllServerProjects,
     getTargetDatasetFromId: getTargetDatasetFromId,
     initializeNewProject: initializeNewProject,
+    isSpotInReadOnlyDataset: isSpotInReadOnlyDataset,
     makeDatasetCurrent: makeDatasetCurrent,
     setSwitchValue: setSwitchValue,
     switchProject: switchProject,

@@ -8,6 +8,7 @@ import modalStyles from './modal.styles';
 import {setModalVisible} from '../../../modules/home/home.slice';
 import {MODALS} from '../../../modules/page/page.constants';
 import * as themes from '../../styles.constants';
+import {BLACK} from '../../styles.constants';
 
 const ModalWrapperHeader = ({
                               buttonTitleLeft,
@@ -38,8 +39,8 @@ const ModalWrapperHeader = ({
             />
             <Button
               onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
-              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'Close'}
-              titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
+              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'X'}
+              titleStyle={{color: BLACK, fontSize: 18}}
               type={'clear'}
             />
           </View>

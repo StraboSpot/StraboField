@@ -9,7 +9,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesPage = () => {
+const ImagesPage = ({isReadOnly}) => {
   console.log('Rendering ImagesPage...');
 
   const dispatch = useDispatch();
@@ -27,8 +27,8 @@ const ImagesPage = () => {
     <View style={{flex: 1}}>
       <NotebookPageHeader pageTitle={'Images'}/>
       <View style={{alignItems: 'center', flex: 1}}>
-        <AddImageButtons saveImages={saveImagesToSpot}/>
-        <ImagesInSpot saveImages={saveImagesToSpot}/>
+        {!isReadOnly && <AddImageButtons saveImages={saveImagesToSpot}/>}
+        <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>
       </View>
     </View>
   );

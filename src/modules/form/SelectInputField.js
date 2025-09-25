@@ -13,6 +13,7 @@ import {formStyles} from '../form';
 const SelectInputField = ({
                             choices,
                             errors,
+                            isReadOnly,
                             label,
                             name,
                             onMyChange,
@@ -145,6 +146,7 @@ const SelectInputField = ({
             styleItemsContainer={formStyles.dropdownItemsContainer}
             tagBorderColor={themes.PRIMARY_TEXT_COLOR}
             tagContainerStyle={formStyles.dropdownTagContainer}
+            tagRemoveIconColor={isReadOnly ? themes.SECONDARY_BACKGROUND_COLOR : themes.WARNING_COLOR}
             tagTextColor={themes.PRIMARY_TEXT_COLOR}
             textColor={themes.PRIMARY_TEXT_COLOR}
             textInputProps={{editable: false}}

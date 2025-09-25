@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
@@ -11,6 +11,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
+import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 import {useTags} from '../tags';
 
@@ -28,6 +29,8 @@ const TagDetail = ({
   const spots = useSelector(state => state.spot.spots);
   const [refresh, setRefresh] = useState(false);
 
+  const {isSpotInReadOnlyDataset} = useProject();
+
   // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
 
   useEffect(() => {
@@ -40,6 +43,7 @@ const TagDetail = ({
     const spot = getSpotById(feature.parentSpotId);
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
     if (!isEmpty(spot)) {
+      const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
       return (
         <ListItem
           containerStyle={commonStyles.listItem}
@@ -53,7 +57,18 @@ const TagDetail = ({
             </ListItem.Title>
             <ListItem.Subtitle>{spot.properties.name}</ListItem.Subtitle>
           </ListItem.Content>
-          <ListItem.Chevron/>
+          {isReadOnly ? (
+            <>
+              <Icon
+                containerStyle={{justifyContent: 'center', paddingRight: 5}}
+                name={'lock-closed'}
+                size={12}
+                type={'ionicon'}
+              />
+              <ListItem.Chevron/>
+            </>
+          ) : <ListItem.Chevron/>
+          }
         </ListItem>
       );
     }

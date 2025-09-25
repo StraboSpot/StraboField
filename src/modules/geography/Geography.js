@@ -10,14 +10,14 @@ import GeoFieldInputs from './GeoFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
 import useMapView from '../maps/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
-const Geography = () => {
+const Geography = ({isReadOnly}) => {
   const {showErrors, validateForm} = useForm();
   const {isOnGeoMap} = useMapView();
 
@@ -31,24 +31,13 @@ const Geography = () => {
     dispatch(setNotebookPageVisibleToPrev());
   };
 
-  const renderCancelSaveButtons = () => {
-    return (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => cancelFormAndGo()}
-          save={() => saveFormAndGo()}
-        />
-      </View>
-    );
-  };
-
   const renderFormFields = () => {
     const formName = ['general', 'geography'];
     console.log('Rendering Form:', formName[0] + '.' + formName[1], 'with', spot.properties);
     return (
       <View style={{flex: 1}}>
         <Formik
-          component={formProps => Form({formName: formName, ...formProps})}
+          component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
           enableReinitialize={true}
           initialStatus={{formName: formName}}
           initialValues={spot.properties}
@@ -127,6 +116,7 @@ const Geography = () => {
               <ListItem.Content>
                 <Field
                   component={TextInputField}
+                  editable={false}
                   key={'geomType'}
                   label={'Geometry'}
                   name={'geomType'}
@@ -144,7 +134,9 @@ const Geography = () => {
     return (
       <>
         {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
-          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef}/> : renderGeoFieldText(initialGeomValues)}
+          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
+          : renderGeoFieldText(initialGeomValues)
+        }
       </>
     );
   };
@@ -156,6 +148,7 @@ const Geography = () => {
           <Field
             appearance={'multiline'}
             component={TextInputField}
+            editable={false}
             key={'coordsString'}
             label={'Coordinates as [Longitude, Latitude]'}
             name={'coordsString'}
@@ -180,6 +173,7 @@ const Geography = () => {
                 <View style={{flex: 1, paddingRight: 5}}>
                   <Field
                     component={NumberInputField}
+                    editable={false}
                     key={'longitude'}
                     label={'Longitude'}
                     name={'longitude'}
@@ -188,6 +182,7 @@ const Geography = () => {
                 <View style={{flex: 1}}>
                   <Field
                     component={NumberInputField}
+                    editable={false}
                     key={'latitude'}
                     label={'Latitude'}
                     name={'latitude'}
@@ -213,6 +208,7 @@ const Geography = () => {
               <View style={{flex: 1, paddingRight: 5}}>
                 <Field
                   component={NumberInputField}
+                  editable={false}
                   key={'x_pixels'}
                   label={'X Pixels'}
                   name={'x_pixels'}
@@ -221,6 +217,7 @@ const Geography = () => {
               <View style={{flex: 1}}>
                 <Field
                   component={NumberInputField}
+                  editable={false}
                   key={'y_pixels'}
                   label={'Y Pixels'}
                   name={'y_pixels'}
@@ -240,6 +237,7 @@ const Geography = () => {
           <Field
             appearance={'multiline'}
             component={TextInputField}
+            editable={false}
             key={'coordsString'}
             label={'Coordinates as [X Pixels, Y Pixels]'}
             name={'coordsString'}
@@ -295,11 +293,11 @@ const Geography = () => {
 
   return (
     <>
-      {renderCancelSaveButtons()}
       <FlatList
         ListHeaderComponent={
           <>
-            <SectionDivider dividerText={'Geography'}/>
+            <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Geography'}/>
+            {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
             {renderGeometryForm()}
             {renderFormFields()}
           </>

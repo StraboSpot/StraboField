@@ -10,7 +10,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const SamplesPage = ({page}) => {
+const SamplesPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
 
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
@@ -47,6 +47,7 @@ const SamplesPage = ({page}) => {
             console.log('closeDetailView');
             setIsDetailView(false);
           }}
+          isReadOnly={isReadOnly}
           page={page}
           selectedFeature={selectedSample}
         />
@@ -60,7 +61,7 @@ const SamplesPage = ({page}) => {
         <NotebookPageHeader
           onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
           pageTitle={page.label}
-          showAddButton
+          showAddButton={!isReadOnly}
         />
         <SamplesList
           onPress={editSample}

@@ -8,7 +8,7 @@ import commonStyles from '../../shared/common.styles';
 import {NumberInputField} from '../form';
 import useMapLocation from '../maps/useMapLocation';
 
-const GeoFieldsInputs = ({formRef, geomFormRef}) => {
+const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
 
   const {getCurrentLocation} = useMapLocation();
 
@@ -34,6 +34,7 @@ const GeoFieldsInputs = ({formRef, geomFormRef}) => {
             <View style={{flex: 1, paddingRight: 5}}>
               <Field
                 component={NumberInputField}
+                editable={!isReadOnly}
                 key={'longitude'}
                 label={'Longitude'}
                 name={'longitude'}
@@ -42,24 +43,27 @@ const GeoFieldsInputs = ({formRef, geomFormRef}) => {
             <View style={{flex: 1}}>
               <Field
                 component={NumberInputField}
+                editable={!isReadOnly}
                 key={'latitude'}
                 label={'Latitude'}
                 name={'latitude'}
               />
             </View>
           </View>
-          <View>
-            <Button
-              icon={{
-                name: 'locate',
-                type: 'ionicon',
-                size: 30,
-                color: commonStyles.iconColor.color,
-              }}
-              onPress={fillWithCurrentLocation}
-              type={'clear'}
-            />
-          </View>
+          {!isReadOnly && (
+            <View>
+              <Button
+                icon={{
+                  name: 'locate',
+                  type: 'ionicon',
+                  size: 30,
+                  color: commonStyles.iconColor.color,
+                }}
+                onPress={fillWithCurrentLocation}
+                type={'clear'}
+              />
+            </View>
+          )}
         </View>
       </ListItem.Content>
     </ListItem>

@@ -17,7 +17,7 @@ import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) => {
+const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -63,16 +63,19 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
     closeNotebookMenu();
   };
 
-  const renderActionItem = (item) => {
-    return (
-      <ListItem
-        containerStyle={commonStyles.listItem}
-        key={item.key}
-        onPress={() => onPress(item.key)}
-      >
-        <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
-      </ListItem>
-    );
+  const renderActionItem = ({item}) => {
+    if (isReadOnly && item.key === 'delete') return;
+    else {
+      return (
+        <ListItem
+          containerStyle={commonStyles.listItem}
+          key={item.key}
+          onPress={() => onPress(item.key)}
+        >
+          <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
+        </ListItem>
+      );
+    }
   };
 
   const renderDeleteMessage = () => {
@@ -99,7 +102,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
             contentContainerStyle={{alignItems: 'center'}}
             data={actions}
             key={'notebookActions'}
-            renderItem={({item}) => renderActionItem(item)}
+            renderItem={renderActionItem}
           />
         </Overlay>
       )}

@@ -20,7 +20,7 @@ import {setModalVisible} from '../home/home.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const MeasurementsPage = ({page}) => {
+const MeasurementsPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -36,17 +36,17 @@ const MeasurementsPage = ({page}) => {
 
   const SECTIONS = {
     PLANAR: {
-      title: 'Planar \nMeasurements',
+      title: isReadOnly ? 'Planar Measurements' : 'Planar \nMeasurements',
       keys: ['planar_orientation', 'tabular_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR],
     },
     LINEAR: {
-      title: 'Linear \nMeasurements',
+      title: isReadOnly ? 'Linear Measurements' : 'Linear \nMeasurements',
       keys: ['linear_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
     PLANARLINEAR: {
-      title: 'Planar + Linear \nMeasurements',
+      title: isReadOnly ? 'Planar + Linear Measurements' : 'Planar + Linear \nMeasurements',
       keys: ['linear_orientation', 'planar_orientation', 'tabular_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR, COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
@@ -158,61 +158,63 @@ const MeasurementsPage = ({page}) => {
     return (
       <View style={styles.measurementsSectionDividerContainer}>
         <SectionDivider dividerText={title}/>
-        <View style={styles.measurementsSectionDividerButtonContainer}>
-          {multiSelectMode && sectionType === multiSelectMode && (
-            <Button
-              disabled={isMultipleFeaturesTaggingEnabled}
-              onPress={() => onSelectingCancel()}
-              title={'Cancel'}
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              type={'clear'}
-            />
-          )}
-          {multiSelectMode && selectedFeaturesTemp.length >= 1 && sectionType === multiSelectMode && (
-            <Button
-              disabled={isMultipleFeaturesTaggingEnabled}
-              onPress={() => onSelectingEnd()}
-              title={'Identify Selected'}
-              titleStyle={styles.measurementsSectionDividerButtonText}
-              type={'clear'}
-            />
-          )}
-          {!multiSelectMode && (
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <>
-                <Button
-                  disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  onPress={() => onIdentifyAll(sectionType, data)}
-                  title={'Identify All'}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  type={'clear'}
-                />
-                <Button
-                  disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
-                  onPress={() => onSelectingStart(sectionType)}
-                  title={'Select'}
-                  titleStyle={styles.measurementsSectionDividerButtonText}
-                  type={'clear'}
-                />
-              </>
-              {!modalVisible && (
-                <Button
-                  disabled={isMultipleFeaturesTaggingEnabled}
-                  icon={
-                    <Icon
-                      color={PRIMARY_ACCENT_COLOR}
-                      name={'add'}
-                      size={20}
-                      style={{paddingHorizontal: 5}}
-                    />
-                  }
-                  onPress={() => addMeasurement(sectionType)}
-                  type={'clear'}
-                />
-              )}
-            </View>
-          )}
-        </View>
+        {!isReadOnly && (
+          <View style={styles.measurementsSectionDividerButtonContainer}>
+            {multiSelectMode && sectionType === multiSelectMode && (
+              <Button
+                disabled={isMultipleFeaturesTaggingEnabled}
+                onPress={() => onSelectingCancel()}
+                title={'Cancel'}
+                titleStyle={styles.measurementsSectionDividerButtonText}
+                type={'clear'}
+              />
+            )}
+            {multiSelectMode && selectedFeaturesTemp.length >= 1 && sectionType === multiSelectMode && (
+              <Button
+                disabled={isMultipleFeaturesTaggingEnabled}
+                onPress={() => onSelectingEnd()}
+                title={'Identify Selected'}
+                titleStyle={styles.measurementsSectionDividerButtonText}
+                type={'clear'}
+              />
+            )}
+            {!multiSelectMode && (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <>
+                  <Button
+                    disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
+                    onPress={() => onIdentifyAll(sectionType, data)}
+                    title={'Identify All'}
+                    titleStyle={styles.measurementsSectionDividerButtonText}
+                    type={'clear'}
+                  />
+                  <Button
+                    disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
+                    onPress={() => onSelectingStart(sectionType)}
+                    title={'Select'}
+                    titleStyle={styles.measurementsSectionDividerButtonText}
+                    type={'clear'}
+                  />
+                </>
+                {!modalVisible && (
+                  <Button
+                    disabled={isMultipleFeaturesTaggingEnabled}
+                    icon={
+                      <Icon
+                        color={PRIMARY_ACCENT_COLOR}
+                        name={'add'}
+                        size={20}
+                        style={{paddingHorizontal: 5}}
+                      />
+                    }
+                    onPress={() => addMeasurement(sectionType)}
+                    type={'clear'}
+                  />
+                )}
+              </View>
+            )}
+          </View>
+        )}
       </View>
     );
   };
@@ -251,6 +253,7 @@ const MeasurementsPage = ({page}) => {
     return (
       <MeasurementDetail
         closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
         page={page}
       />
     );
@@ -259,7 +262,7 @@ const MeasurementsPage = ({page}) => {
   const renderMeasurementsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
+        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>

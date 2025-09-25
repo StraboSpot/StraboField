@@ -12,7 +12,15 @@ import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
 
-const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageToView, setIsImageModalVisible}) => {
+const ImageInfo = ({
+                     deleteImage,
+                     image,
+                     isReadOnly,
+                     saveImages,
+                     saveUpdatedImage,
+                     setImageToView,
+                     setIsImageModalVisible,
+                   }) => {
   console.log('Rendering ImageInfo...');
 
   const {width, height} = useWindowSize();
@@ -88,24 +96,27 @@ const ImageInfo = ({deleteImage, image, saveImages, saveUpdatedImage, setImageTo
             source={require('../../assets/icons/ImagePropertiesButton.png')}
             style={imageStyles.imageInfoButtons}
           />
-          {Platform.OS !== 'web' && (
+          {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
               onPress={openInSketch}
               source={require('../../assets/icons/ImageSketchButton.png')}
               style={imageStyles.imageInfoButtons}
             />
           )}
-          <IconButton
-            onPress={() => handleDeleteImageOnPress()}
-            source={require('../../assets/icons/DeleteButton.png')}
-            style={imageStyles.imageInfoButtons}
-          />
+          {!isReadOnly && (
+            <IconButton
+              onPress={() => handleDeleteImageOnPress()}
+              source={require('../../assets/icons/DeleteButton.png')}
+              style={imageStyles.imageInfoButtons}
+            />
+          )}
         </View>
       </View>
       {isImagePropertiesModalVisible && (
         <ImagePropertiesModal
           closeModal={() => setIsImagePropertiesModalVisible(false)}
           image={image}
+          isReadOnly={isReadOnly}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
         />

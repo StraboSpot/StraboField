@@ -8,7 +8,7 @@ import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToView}) => {
+const ImagePropertiesModal = ({closeModal, image, isReadOnly, saveUpdatedImage, setImageToView}) => {
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
@@ -21,7 +21,7 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
     console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
     return (
       <Formik
-        component={formProps => Form({formName: formName, ...formProps})}
+        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
         initialStatus={{formName: formName}}
         initialValues={image}
         innerRef={formRef}
@@ -50,17 +50,17 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
 
   return (
     <ModalWrapper
-      buttonTitleLeft={'Cancel'}
-      buttonTitleRight={'Save'}
+      buttonTitleLeft={!isReadOnly && 'Cancel'}
+      buttonTitleRight={!isReadOnly && 'Save'}
       cancel={closeModal}
-      closeModal={saveFormAndGo}
+      closeModal={isReadOnly ? closeModal : saveFormAndGo}
       title={'Image Properties'}
     >
       <FlatList
         ListFooterComponent={
           <View style={imageStyles.switch}>
             <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
-            <SwitchWrapper onValueChange={setIsAnnotated} value={isAnnotated}/>
+            <SwitchWrapper disabled={isReadOnly} onValueChange={setIsAnnotated} value={isAnnotated}/>
           </View>
         }
         ListHeaderComponent={renderFormFields()}
