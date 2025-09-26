@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL} from 'react-map-gl';
@@ -38,6 +38,10 @@ const Map = ({
   const {mapRef} = forwardedRef;
 
   const [viewState, setViewState] = React.useState({});
+  const [mapKey, setMapKey] = useState(0);
+
+  // Track map ID changes to force re-render and prevent layer conflicts
+  const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
 
   const {isDrawMode} = useMap();
   const {handleMapMoved} = useMapMoveEvents({setViewState});
@@ -60,6 +64,12 @@ const Map = ({
       setViewState(getInitialViewState());
     }, [currentImageBasemap, stratSection],
   );
+
+  useEffect(() => {
+    // Force map re-render when map ID changes to prevent layer conflicts
+    setMapKey(prev => prev + 1);
+    console.log('Web Map ID changed to:', currentMapId);
+  }, [currentMapId]);
 
   // Add the image to the map style.
   mapRef.current?.on('styleimagemissing', (e) => {
@@ -86,7 +96,8 @@ const Map = ({
       doubleClickZoom={!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT)}
       dragPan={allowMapViewMove}
       dragRotate={false}
-      id={currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id}
+      id={currentMapId}
+      key={`web-map-${mapKey}-${currentMapId}`}
       interactiveLayerIds={[...layerIdsNotSelected, ...layerIdsSelected]}
       mapStyle={currentImageBasemap || stratSection ? BACKGROUND : basemap}
       mapboxAccessToken={MAPBOX_TOKEN}

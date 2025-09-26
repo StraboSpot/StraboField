@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, memo} from 'react';
 
 import {Layer, Source} from 'react-map-gl';
 
@@ -7,6 +7,19 @@ import useMapURL from '../useMapURL';
 const CustomMapLayer = ({basemap, customMap}) => {
 
   const {buildTileURL} = useMapURL();
+
+  useEffect(() => {
+    return () => {
+      // Cleanup: Log when component unmounts for debugging
+      console.log('CustomMapLayer (web) unmounting for map:', customMap.id);
+    };
+  }, [customMap.id]);
+
+  // Defensive check to ensure customMap is valid
+  if (!customMap || !customMap.id) {
+    console.warn('CustomMapLayer: Invalid customMap provided', customMap);
+    return null;
+  }
 
   return (
     <Source
@@ -29,4 +42,4 @@ const CustomMapLayer = ({basemap, customMap}) => {
   );
 };
 
-export default CustomMapLayer;
+export default memo(CustomMapLayer);
