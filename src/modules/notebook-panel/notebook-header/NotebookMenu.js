@@ -91,12 +91,6 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
 
   return (
     <>
-      {/*<Overlay*/}
-      {/*  isVisible={isNotebookMenuVisible}*/}
-      {/*  onBackdropPress={closeNotebookMenu}*/}
-      {/*  overlayStyle={notebookStyles.dialogContainer}*/}
-      {/*  supportedOrientations={['portrait', 'landscape']}*/}
-      {/*>*/}
       <ModalWrapper
         headerTitle={'Spot Actions'}
         isVisible={isNotebookMenuVisible}
@@ -113,7 +107,6 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
           renderItem={({item}) => renderActionItem(item)}
         />
       </ModalWrapper>
-      {/*</Overlay>*/}
       <WarningModal
         closeModal={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
