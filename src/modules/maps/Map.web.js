@@ -15,19 +15,19 @@ import useMapMoveEvents from './useMapMoveEvents';
 import useMapView from './useMapView';
 
 const Map = ({
-                   allowMapViewMove,
-                   basemap,
-                   drawFeatures,
-                   editFeatureVertex,
-                   handleMapLongPress,
-                   handleMapPress,
-                   isShowMacrostratOverlay,
-                   location,
-                   mapMode,
-                   measureFeatures,
-                   spotsNotSelected,
-                   spotsSelected,
-                 }, forwardedRef) => {
+               allowMapViewMove,
+               basemap,
+               drawFeatures,
+               editFeatureVertex,
+               handleMapLongPress,
+               handleMapPress,
+               isShowMacrostratOverlay,
+               location,
+               mapMode,
+               measureFeatures,
+               spotsNotSelected,
+               spotsSelected,
+             }, forwardedRef) => {
   // console.log('Rendering Map...');
 
   const dispatch = useDispatch();
@@ -108,6 +108,7 @@ const Map = ({
         editFeatureVertex={editFeatureVertex}
         isShowMacrostratOverlay={isShowMacrostratOverlay}
         location={location}
+        mapMode={mapMode}
         measureFeatures={measureFeatures}
         spotsNotSelected={spotsNotSelected}
         spotsSelected={spotsSelected}
