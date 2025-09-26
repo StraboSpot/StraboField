@@ -1,10 +1,9 @@
 import React, {forwardRef, useState} from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
 import {Formik} from 'formik';
 
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {PAGE_KEYS} from '../page/page.constants';
 
@@ -30,24 +29,19 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Overlay
-        overlayStyle={overlayStyles.overlayContainer}
-        supportedOrientations={['portrait', 'landscape']}
+      <ModalWrapper
+        actionTitle={'[Action]'}
+        headerTitle={'[Subform]'}
+        onActionPressed={() => setChoicesViewKey(null)}
+        onCancelPress={() => setChoicesViewKey(null)}
       >
-        <View style={{alignItems: 'flex-end'}}>
-          <Button
-            buttonStyle={{padding: 0}}
-            icon={{name: 'close', type: 'ionicon', size: 20}}
-            onPress={() => setChoicesViewKey(null)}
-            type={'clear'}
-          />
-        </View>
+        <Text style={{textAlign: 'center'}}>This is a placeholder for the subform</Text>
         <Form {...{
           formName: [groupKey, pageKey],
           surveyFragment: relevantFields, ...formProps,
           onMyChange: onMyChange,
         }}/>
-      </Overlay>
+      </ModalWrapper>
     );
   };
 

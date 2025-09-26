@@ -10,6 +10,7 @@ const DeleteConformationDialogBox = ({
                                        onActionPressed,
                                        isVisible,
                                        headerTitle,
+                                       overlayStyleOverride,
                                        showActionButton,
                                      }) => {
   return (
@@ -19,6 +20,7 @@ const DeleteConformationDialogBox = ({
       isVisible={isVisible}
       onActionPressed={onActionPressed}
       onCancelPress={onCancelPress}
+      overlayStyleOverride={overlayStyleOverride}
       showActionButton={showActionButton}
     >
       <View style={overlayStyles.overlayContent}>

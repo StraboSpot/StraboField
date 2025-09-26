@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
-import {Icon, ListItem, Overlay} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
@@ -145,11 +147,24 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   const renderCustomMapItem = (customMap) => {
     return (
       <ListItem
+        containerStyle={[
+          SMALL_SCREEN && {
+            minHeight: 50,
+            paddingVertical: 15,
+            paddingHorizontal: 20,
+          },
+        ]}
         key={customMap.id + 'CustomMapItem'}
         onPress={() => onSetBasemap(customMap)}
       >
         <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>
+          <ListItem.Title style={[
+            commonStyles.listItemTitle,
+            SMALL_SCREEN && {
+              fontSize: 16,
+              fontWeight: '500',
+            },
+          ]}>
             {customMap.title || customMap.name || truncateText(customMap?.id, 16)} -
             ({customMap.source || customMap.sources['raster-tiles'].type})
           </ListItem.Title>
@@ -162,11 +177,24 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   const renderOfflineCustomMapItem = (customMap) => {
     return (
       <ListItem
+        containerStyle={[
+          SMALL_SCREEN && {
+            minHeight: 50,
+            paddingVertical: 15,
+            paddingHorizontal: 20,
+          },
+        ]}
         key={customMap.id + 'OfflineCustomMapItem'}
         onPress={() => onSetBasemap(customMap)}
       >
         <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>
+          <ListItem.Title style={[
+            commonStyles.listItemTitle,
+            SMALL_SCREEN && {
+              fontSize: 16,
+              fontWeight: '500',
+            },
+          ]}>
             {customMap.title || customMap.name || truncateText(customMap?.id, 16)} -
             ({customMap.source || customMap.sources['raster-tiles'].type})
           </ListItem.Title>
@@ -179,13 +207,31 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
     );
   };
 
+  const setMap = async (map) => {
+    await setBasemap(map.id);
+    SMALL_SCREEN && onTouchOutside();
+  };
+
   const renderDefaultMapItem = map => (
     <ListItem
+      containerStyle={[
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]}
       key={map.id + 'DefaultMapItem'}
-      onPress={() => isInternetReachable ? setBasemap(map.id) : setOfflineMapTiles(map)}
+      onPress={() => isInternetReachable ? setMap(map) : setOfflineMapTiles(map)}
     >
       <ListItem.Content>
-        <ListItem.Title style={commonStyles.listItemTitle}>{map.title || map.name}</ListItem.Title>
+        <ListItem.Title style={[
+          commonStyles.listItemTitle,
+          SMALL_SCREEN && {
+            fontSize: 16,
+            fontWeight: '500',
+          },
+        ]}>{map.title || map.name}</ListItem.Title>
         {!isInternetReachable
           && <ListItem.Subtitle style={{paddingTop: 5}}>({map.count} tiles)</ListItem.Subtitle>}
       </ListItem.Content>
@@ -196,11 +242,24 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
 
   const renderMapOverlayItem = (customMap, isOffline) => (
     <ListItem
-      containerStyle={overlayStyles.overlayContent}
+      containerStyle={[
+        overlayStyles.overlayContent,
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]}
       key={customMap.id + 'CustomOverlayItem' + (isOffline ? 'Offline' : '')}
     >
       <ListItem.Content>
-        <ListItem.Title style={commonStyles.listItemTitle}>{customMap.title || customMap.name} -
+        <ListItem.Title style={[
+          commonStyles.listItemTitle,
+          SMALL_SCREEN && {
+            fontSize: 16,
+            fontWeight: '500',
+          },
+        ]}>{customMap.title || customMap.name} -
           ({customMap.source})</ListItem.Title>
         {!isInternetReachable
           && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles)</ListItem.Subtitle>}
@@ -231,17 +290,17 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+    <ModalWrapper
+      closeModal={onTouchOutside}
+      fullscreen={SMALL_SCREEN}
+      headerTitle={dialogTitle}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyle={[overlayStyles.overlayContainer, overlayStyle]}
-      supportedOrientations={['portrait', 'landscape']}
+      overlayStyleOverride={SMALL_SCREEN ? {} : overlayStyles.overlayMapMenuPosition}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={SMALL_SCREEN}
     >
-      <View style={overlayStyles.titleContainer}>
-        <Text style={[overlayStyles.titleText]}>{dialogTitle}</Text>
-      </View>
       <FlatList
         ListHeaderComponent={
           <>
@@ -249,8 +308,15 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
             {determineWhatCustomMapListToRender()}
           </>
         }
+        contentContainerStyle={{
+          paddingVertical: SMALL_SCREEN ? 20 : 0,
+          flexGrow: SMALL_SCREEN ? 1 : 0,
+        }}
+        style={{
+          width: '100%',
+        }}
       />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

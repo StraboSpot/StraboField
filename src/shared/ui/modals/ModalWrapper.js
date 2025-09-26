@@ -27,6 +27,7 @@ const ModalWrapper = ({
                         isLoading,
                         isVisible,
                         onActionPressed,
+                        onBackdropPress,
                         onCancelPress,
                         onDeletePress,
                         onFooterButtonPress,
@@ -42,7 +43,11 @@ const ModalWrapper = ({
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const getResponsiveOverlayStyle = () => {
-    if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
+    if (fullscreen || SMALL_SCREEN) {
+      console.log('Small Screen');
+      return overlayStyles.overlayContainerFullScreen;
+    }
+    console.log('Large Screen');
     return {
       ...overlayStyles.overlayContainer,
       ...overlayStyleOverride,
@@ -91,6 +96,7 @@ const ModalWrapper = ({
       backdropStyle={overlayStyles.backdropStyles}
       fullScreen={fullscreen || SMALL_SCREEN}
       isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >

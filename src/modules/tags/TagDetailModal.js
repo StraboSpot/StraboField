@@ -102,21 +102,12 @@ const TagDetailModal = ({closeModal}) => {
   };
 
   return (
-    // <Overlay
-    //   animationType={'slide'}
-    //   fullScreen={SMALL_SCREEN}
-    //   isVisible
-    //   overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen
-    //     : {...overlayStyles.overlayContainer, maxHeight: height * 0.80}}
-    //   supportedOrientations={['portrait', 'landscape']}
-    // >
     <ModalWrapper
       headerTitle={'Create New Tag'}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
     >
       <>
-        {/*{renderCancelSaveButtons()}*/}
         <FlatList
           ListHeaderComponent={
             <>
@@ -144,7 +135,6 @@ const TagDetailModal = ({closeModal}) => {
         />
       </>
     </ModalWrapper>
-    // </Overlay>
   );
 };
 

@@ -12,8 +12,8 @@ import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
-import StandardModal from '../../shared/ui/modals/StandardModal';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import formStyles from '../form/form.styles';
 import {setLoadingStatus} from '../home/home.slice';
@@ -99,12 +99,12 @@ const Miscellaneous = () => {
   };
 
   const renderPrompt = () => (
-    <StandardModal
-      closeModal={closeModal}
-      dialogTitle={'Enter Password'}
-      footerButtonsVisible={true}
-      onPress={verifyPassword}
-      visible={isTestingModalVisible}
+    <ModalWrapper
+      actionTitle={'Ok'}
+      headerTitle={'Enter Password'}
+      isVisible={isTestingModalVisible}
+      onActionPressed={verifyPassword}
+      onCancelPress={closeModal}
     >
       <Text style={overlayStyles.importantText}>
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.
@@ -116,7 +116,7 @@ const Miscellaneous = () => {
         placeholder={'Password'}
         placeholderTextColor={themes.MEDIUMGREY}
       />
-    </StandardModal>
+    </ModalWrapper>
   );
 
   const renderTestingModeField = () => (

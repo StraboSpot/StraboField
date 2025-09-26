@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
   titleText: {
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    paddingBottom: 10,
     textAlign: 'center',
   },
   titleTextError: {

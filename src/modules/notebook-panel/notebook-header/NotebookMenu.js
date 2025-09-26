@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Text} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {ListItem, Overlay} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../../shared/ui/modals';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
@@ -90,15 +91,20 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
 
   return (
     <>
-      <Overlay
+      {/*<Overlay*/}
+      {/*  isVisible={isNotebookMenuVisible}*/}
+      {/*  onBackdropPress={closeNotebookMenu}*/}
+      {/*  overlayStyle={notebookStyles.dialogContainer}*/}
+      {/*  supportedOrientations={['portrait', 'landscape']}*/}
+      {/*>*/}
+      <ModalWrapper
+        headerTitle={'Spot Actions'}
         isVisible={isNotebookMenuVisible}
         onBackdropPress={closeNotebookMenu}
-        overlayStyle={notebookStyles.dialogContainer}
-        supportedOrientations={['portrait', 'landscape']}
+        overlayStyleOverride={{...notebookStyles.dialogContainer, width: 200}}
+        showActionButton={false}
+        showCancelButton={false}
       >
-        <View style={overlayStyles.titleContainer}>
-          <Text style={overlayStyles.titleText}>Spot Actions</Text>
-        </View>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           contentContainerStyle={{alignItems: 'center'}}
@@ -106,7 +112,8 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, zoomToSpots}) =
           key={'notebookActions'}
           renderItem={({item}) => renderActionItem(item)}
         />
-      </Overlay>
+      </ModalWrapper>
+      {/*</Overlay>*/}
       <WarningModal
         closeModal={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
