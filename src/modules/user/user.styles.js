@@ -31,12 +31,6 @@ const UserStyles = StyleSheet.create({
     paddingTop: 10,
     textAlign: 'center',
   },
-  imageSelectionModal: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-    borderRadius: 20,
-    padding: 20,
-    width: 300,
-  },
   initialProjectLoadProfileContainer: {
     alignItems: 'center',
     paddingTop: 15,

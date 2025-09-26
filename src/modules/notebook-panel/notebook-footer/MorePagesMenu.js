@@ -1,13 +1,14 @@
 import React from 'react';
 import {Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
-import {ListItem, Overlay} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import usePage from '../../page/usePage';
@@ -62,11 +63,13 @@ const MorePagesMenu = ({
   };
 
   return (
-    <Overlay
+    <ModalWrapper
+      headerTitle={'More Pages'}
       isVisible={visible}
       onBackdropPress={closeMorePagesMenu}
-      overlayStyle={footerStyles.morePagesDialog}
-      supportedOrientations={['portrait', 'landscape']}
+      overlayStyleOverride={footerStyles.morePagesDialog}
+      showActionButton={false}
+      showCancelButton={false}
     >
       <View style={overlayStyles.titleContainer}>
         <Text style={overlayStyles.titleText}>More Pages</Text>
@@ -88,7 +91,7 @@ const MorePagesMenu = ({
           )}
         </ScrollView>
       </View>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

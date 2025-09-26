@@ -2,7 +2,7 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, PermissionsAndroid, Platform, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {Button, Icon, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {Base64} from 'js-base64';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -23,6 +23,7 @@ import useUpload from '../../services/useUpload';
 import useUploadImages from '../../services/useUploadImages';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import TextInputModal from '../../shared/ui/TextInputModal';
 import {Form, useForm} from '../form';
@@ -188,18 +189,14 @@ const UserProfile = () => {
 
   const renderProfileImageModal = () => {
     return (
-      <Overlay
+      <ModalWrapper
+        closeModal={closeProfileImageModal}
+        headerTitle={'Edit Profile Image'}
         isVisible={isImageDialogVisible}
-        overlayStyle={userStyles.imageSelectionModal}
-        supportedOrientations={['portrait', 'landscape']}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
-        <View style={{alignItems: 'flex-end'}}>
-          <Icon
-            name={'close-outline'}
-            onPress={closeProfileImageModal}
-            type={'ionicon'}
-          />
-        </View>
         <View style={{alignItems: 'center'}}>
           <UserProfileAvatar size={'xlarge'} tempUserProfileImageURI={tempUserProfileImage?.uri}/>
         </View>
@@ -233,7 +230,7 @@ const UserProfile = () => {
           onPress={saveImage}
           title={'Upload New Profile Image'}
         />
-      </Overlay>
+      </ModalWrapper>
     );
   };
 

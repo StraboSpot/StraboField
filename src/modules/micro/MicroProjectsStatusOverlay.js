@@ -1,13 +1,12 @@
 import React from 'react';
 import {ActivityIndicator, Text, View} from 'react-native';
 
-import {Button, Icon, Overlay} from '@rn-vui/base';
 import ProgressBar from 'react-native-progress/Bar';
 
 import {toNumberFixedValue} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
-import offlineMapsStyles from '../maps/offline-maps/offlineMaps.styles';
 
 
 const MicroProjectsStatusOverlay = ({
@@ -20,22 +19,13 @@ const MicroProjectsStatusOverlay = ({
                                       showLoadingBar,
                                     }) => {
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={overlayStyles.backdropStyles}
+    <ModalWrapper
+      actionTitle={'OK'}
+      headerTitle={'StraboMicro Project'}
       isVisible={showLoadingBar || isError || showComplete}
-      onBackdropPress={closeStatusOverlay}
-      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer, {justifyContent: 'space-between'}]}
-      supportedOrientations={['portrait', 'landscape']}
+      onActionPressed={closeStatusOverlay}
+      showCancelButton={false}
     >
-      <Icon
-        color={'darkgrey'}
-        containerStyle={overlayStyles.closeButton}
-        name={'close-outline'}
-        onPress={closeStatusOverlay}
-        size={20}
-        type={'ionicon'}
-      />
       <View>
         {!showComplete && !isError && (
           <Text style={overlayStyles.contentText}>Getting your StraboMicro Project...</Text>
@@ -69,12 +59,7 @@ const MicroProjectsStatusOverlay = ({
           </View>
         )}
       </View>
-      <Button
-        containerStyle={{paddingBottom: 20, paddingHorizontal: 40}}
-        onPress={closeStatusOverlay}
-        title={'OK'}
-      />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

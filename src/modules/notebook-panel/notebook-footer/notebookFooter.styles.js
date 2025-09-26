@@ -20,7 +20,7 @@ const notebookFooterStyles = StyleSheet.create({
   morePagesDialog: {
     backgroundColor: SECONDARY_BACKGROUND_COLOR,
     borderRadius: 20,
-    bottom: 10,
+    bottom: 30,
     height: '95%',
     paddingBottom: 0,
     position: 'absolute',
