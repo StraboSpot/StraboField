@@ -188,6 +188,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
           editable={!isReadOnly}
           onChangeText={text => onSpotEdit('name', text)}
           style={notebookHeaderStyles.headerSpotName}
+          textAlign={'left'}
           value={spot.properties.name || ''}
         />
         {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
