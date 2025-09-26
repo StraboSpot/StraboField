@@ -1,5 +1,5 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
@@ -55,8 +55,11 @@ const Map = ({
 
   useEffect(() => {
     // Force map re-render when map ID changes to prevent layer conflicts
-    setMapKey(prev => prev + 1);
-    console.log('Map ID changed to:', currentMapId);
+    // For web, be more selective about when to re-render to prevent flickering
+    if (Platform.OS !== 'web') {
+      setMapKey(prev => prev + 1);
+      console.log('Map ID changed to:', currentMapId);
+    }
   }, [currentMapId]);
 
   // Set flag for when the map has been loaded
