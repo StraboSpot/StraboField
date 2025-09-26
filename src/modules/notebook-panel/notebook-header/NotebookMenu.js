@@ -94,12 +94,14 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
   return (
     <>
       <ModalWrapper
+        closeModal={closeNotebookMenu}
         headerTitle={'Spot Actions'}
         isVisible={isNotebookMenuVisible}
         onBackdropPress={closeNotebookMenu}
         overlayStyleOverride={{...notebookStyles.dialogContainer, width: 200}}
         showActionButton={false}
         showCancelButton={false}
+        showCloseButton={SMALL_SCREEN}
       >
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
