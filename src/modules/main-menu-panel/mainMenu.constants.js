@@ -2,7 +2,7 @@ export const MAIN_MENU_TITLE = 'StraboField';
 
 export const MAIN_MENU_ITEMS = {
   MANAGE_PROJECT: {
-    DATASETS: 'Datasets ',
+    DATASETS: 'Datasets',
     BACKUP: 'Backup',
     DESCRIPTION: 'Project Description',
     SETTINGS: 'Privacy',
