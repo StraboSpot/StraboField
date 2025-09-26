@@ -71,10 +71,10 @@ const DatasetDetail = ({dataset}) => {
   const renderDeleteConfirmationModal = () => {
     return (
       <DeleteConformationDialogBox
-        cancel={() => setIsDeleteConfirmModalVisible(false)}
-        deleteOverlay={initializeDeleteDataset}
+        headerTitle={'Confirm Delete!'}
         isVisible={isDeleteConfirmModalVisible}
-        title={'Confirm Delete!'}
+        onActionPressed={initializeDeleteDataset}
+        onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
       >
         <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
           {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
