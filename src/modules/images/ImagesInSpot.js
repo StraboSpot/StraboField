@@ -7,7 +7,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const ImagesInSpot = ({saveImages}) => {
+const ImagesInSpot = ({isReadOnly, saveImages}) => {
 
   const dispatch = useDispatch();
   const images = useSelector(state => state.spot.selectedSpot.properties?.images) || [];
@@ -32,6 +32,7 @@ const ImagesInSpot = ({saveImages}) => {
     <ImagesList
       deleteImage={deleteImage}
       images={images}
+      isReadOnly={isReadOnly}
       saveImages={saveImages}
       saveUpdatedImage={saveUpdatedImage}
     />

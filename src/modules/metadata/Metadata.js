@@ -11,7 +11,7 @@ import {DateInputField, NumberInputField} from '../form';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
-const Metadata = () => {
+const Metadata = ({isReadOnly}) => {
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -90,6 +90,7 @@ const Metadata = () => {
         <ListItem.CheckBox
           checked={isChecked}
           checkedIcon={'radiobox-marked'}
+          disabled={isReadOnly}
           iconType={'material-community'}
           onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}

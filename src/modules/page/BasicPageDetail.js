@@ -14,6 +14,7 @@ import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {overlayStyles} from '../home/overlays';
 import NoteForm from '../notes/NoteForm';
 import usePetrology from '../petrology/usePetrology';
@@ -33,10 +34,10 @@ const BasicPageDetail = ({
                            closeDetailView,
                            deleteTemplate,
                            groupKey = 'general',
+                           isReadOnly,
                            page,
-                           openModal,
-                           selectedFeature,
                            saveTemplate,
+                           selectedFeature,
                          }) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -77,7 +78,7 @@ const BasicPageDetail = ({
 
   useLayoutEffect(() => {
     console.log('ULE BasicPageDetail []');
-    return () => confirmLeavePage();
+    return () => !isReadOnly && confirmLeavePage();
   }, []);
 
   useEffect(() => {
@@ -167,10 +168,13 @@ const BasicPageDetail = ({
   };
 
   const getIsDisabled = (fieldName) => {
-    return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
-      ? isInternetReachable
-        ? fieldName === 'Sample_IGSN' : true
-      : false;
+    if (isReadOnly) return true;
+    else {
+      return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
+        ? isInternetReachable
+          ? fieldName === 'Sample_IGSN' : true
+        : false;
+    }
   };
 
   const renderIGSNUpload = () => {
@@ -203,7 +207,7 @@ const BasicPageDetail = ({
     const formName = getFormName();
     return (
       <View style={{flex: 1}}>
-        {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && renderIGSNUpload()}
+        {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && renderIGSNUpload()}
         <Formik
           enableReinitialize={true}
           initialStatus={{formName: formName}}
@@ -218,6 +222,7 @@ const BasicPageDetail = ({
               <Form {...{
                 ...formProps,
                 formName: formName,
+                isReadOnly: isReadOnly,
                 onMyChange: page.key === PAGE_KEYS.MINERALS
                   ? ((name, value) => onMineralChange(formRef.current, name, value))
                   : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
@@ -231,29 +236,14 @@ const BasicPageDetail = ({
             </>
           )}
         </Formik>
-        <Button
-          onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          titleStyle={{color: themes.RED}}
-          type={'clear'}
-        />
-      </View>
-    );
-  };
-
-  const renderNotesField = () => {
-    return (
-      <View style={{flex: 1}}>
-        <NoteForm
-          formRef={formRef}
-          initialNotesValues={selectedFeature}
-        />
-        <Button
-          onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          titleStyle={{color: themes.RED}}
-          type={'clear'}
-        />
+        {!isReadOnly && (
+          <Button
+            onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+            title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+            titleStyle={{color: themes.RED}}
+            type={'clear'}
+          />
+        )}
       </View>
     );
   };
@@ -332,15 +322,16 @@ const BasicPageDetail = ({
     <>
       {(isTemplate || !isEmpty(selectedFeature)) && (
         <>
-          <SaveAndCancelButtons
-            cancel={cancelForm}
-            getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
-              && !selectedFeature?.isOnMySesar}
-            save={saveButtonOnPress}
-          />
-          <FlatList
-            ListHeaderComponent={page?.key === PAGE_KEYS.NOTES ? renderNotesField() : renderFormFields()}
-          />
+          <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+          {!isReadOnly && (
+            <SaveAndCancelButtons
+              cancel={cancelForm}
+              getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
+                && !selectedFeature?.isOnMySesar}
+              save={saveButtonOnPress}
+            />
+          )}
+          <FlatList ListHeaderComponent={renderFormFields()}/>
         </>
       )}
       {/*{isIGSNModalVisible && (*/}

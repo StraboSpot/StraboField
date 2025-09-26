@@ -19,6 +19,7 @@ import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, PAGE_KEYS, SUBPAGES} from '../page/page.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
+import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
@@ -33,8 +34,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const spots = useSelector(state => state.spot.spots);
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
+  const {isSpotInReadOnlyDataset} = useProject();
   const {getRootSpot, getSpotsSortedReverseChronologically, handleSpotSelected} = useSpots();
 
+  const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const pageVisible = pagesStack.slice(-1)[0];
 
   useEffect(() => {
@@ -65,7 +68,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     let pageKey = isRelevantPage ? pageVisible : PAGE_KEYS.OVERVIEW;
     const page = NOTEBOOK_PAGES.find(p => p.key === pageKey);
     const Page = page?.page_component || Overview;
-    let pageProps = {openMainMenuPanel: openMainMenuPanel, page: page};
+    let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
     return (
       <>
@@ -73,6 +76,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           <NotebookHeader
             closeNotebookPanel={closeNotebookPanel}
             createDefaultGeom={createDefaultGeom}
+            isReadOnly={isReadOnly}
+            openMainMenuPanel={openMainMenuPanel}
             zoomToSpots={zoomToSpots}
           />
         </View>

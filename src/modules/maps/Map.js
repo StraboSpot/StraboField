@@ -109,6 +109,7 @@ const Map = ({
           isShowMacrostratOverlay={isShowMacrostratOverlay}
           isStratStyleLoaded={isStratStyleLoaded}
           location={location}
+          mapMode={mapMode}
           measureFeatures={measureFeatures}
           ref={cameraRef}
           showUserLocation={showUserLocation}

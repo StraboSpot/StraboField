@@ -6,7 +6,7 @@ import {Field, Formik} from 'formik';
 import commonStyles from '../../shared/common.styles';
 import {TextInputField} from '../form';
 
-const NoteForm = ({formRef, initialNotesValues}) => {
+const NoteForm = ({formRef, initialNotesValues, isReadOnly}) => {
   return (
     <Formik
       enableReinitialize={true}
@@ -21,6 +21,7 @@ const NoteForm = ({formRef, initialNotesValues}) => {
               appearance={'full'}
               autoFocus={true}
               component={TextInputField}
+              editable={!isReadOnly}
               key={'note'}
               name={'note'}
             />

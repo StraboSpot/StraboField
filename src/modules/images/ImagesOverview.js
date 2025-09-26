@@ -7,7 +7,7 @@ import {ImagesInSpot} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesOverview = () => {
+const ImagesOverview = ({isReadOnly}) => {
   console.log('Rendering ImagesOverview...');
 
   const dispatch = useDispatch();
@@ -21,7 +21,7 @@ const ImagesOverview = () => {
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
 
-  return <ImagesInSpot saveImages={saveImagesToSpot}/>;
+  return <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>;
 };
 
 export default ImagesOverview;

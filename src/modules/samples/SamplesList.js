@@ -29,10 +29,9 @@ const SamplesList = ({onPress, page, openModal}) => {
         >
           <ListItem.Content style={sampleStyles.listContentContainer}>
             <View>
-              <ListItem.Title titleStyle={{
-                ...commonStyles.listItemTitle,
-                textAlign: 'left',
-              }}>{item.sample_id_name || 'Unknown'}</ListItem.Title>
+              <ListItem.Title titleStyle={{...commonStyles.listItemTitle, textAlign: 'left'}}>
+                {item.sample_id_name || 'Unknown'}
+              </ListItem.Title>
               <ListItem.Subtitle>
                 {oriented} - {item.sample_description ? truncateText(item.sample_description, 25) : 'No Description'}
               </ListItem.Subtitle>

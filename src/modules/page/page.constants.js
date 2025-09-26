@@ -131,8 +131,7 @@ export const PRIMARY_PAGES = [
     action_label: 'Take a Measurement',
   }, {
     key: PAGE_KEYS.IMAGES,
-    label: 'Photos & Sketches',
-    label_singular: 'Photo/Sketch',
+    label: 'Images',
     icon_src: require('../../assets/icons/Photo.png'),
     icon_pressed_src: require('../../assets/icons/Photo_pressed.png'),
     overview_component: ImagesOverview,

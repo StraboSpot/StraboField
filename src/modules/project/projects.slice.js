@@ -12,6 +12,7 @@ const initialProjectState = {
   backupFileName: '',
   downloadsDirectory: false, //Android Only
   isTestingMode: false,
+  readOnlyDatasetsIds: [],
   selectedProject: {
     project: '',
     source: '',
@@ -230,6 +231,12 @@ const projectSlice = createSlice({
     setIsImageTransferring(state, action) {
       state.isImageTransferring = action.payload;
     },
+    setReadOnlyDatasetsIds(state, action) {
+      if (state.readOnlyDatasetsIds?.includes(action.payload)) {
+        state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(r => r !== action.payload);
+      }
+      else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
+    },
     setMultipleFeaturesTaggingEnabled(state, action) {
       state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
@@ -325,6 +332,7 @@ export const {
   setActiveTemplates,
   setBackupFileName,
   setIsImageTransferring,
+  setReadOnlyDatasetsIds,
   setMultipleFeaturesTaggingEnabled,
   setSelectedProject,
   setSelectedTag,

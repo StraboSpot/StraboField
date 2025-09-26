@@ -12,11 +12,12 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS, SECONDARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const SiteSafetyPage = () => {
+const SiteSafetyPage = ({isReadOnly}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -110,14 +111,15 @@ const SiteSafetyPage = () => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
+        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
       </Formik>
     );
   };
 
   return (
     <>
-      {renderCancelSaveButtons()}
+      <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
+      {!isReadOnly && renderCancelSaveButtons()}
       <FlatList
         ListHeaderComponent={
           <>

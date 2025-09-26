@@ -17,11 +17,10 @@ import useProject from '../useProject';
 const DatasetListItem = ({dataset, setDatasetToView}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {makeDatasetCurrent, setSwitchValue} = useProject();
-
-  const [isMakeDatasetCurrentModalVisible, setMakeIsDatasetCurrentModalVisible] = useState(false);
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const spotsCount = dataset.spotIds?.length || 0;
@@ -38,6 +37,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const isDisabled = (id) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
+
+  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
 
   const onSwitch = async (val) => {
     const value = await setSwitchValue(val, dataset);
@@ -67,10 +68,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         </ListItem.Content>
 
         <Icon
-          color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive ? themes.MEDIUMGREY : themes.SECONDARY_BACKGROUND_COLOR}
+          color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
+            : themes.SECONDARY_BACKGROUND_COLOR}
           disabled={!isActive}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
-          name={checked ? 'star' : 'star-outline'}
+          name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
           onPress={() => makeDatasetCurrent(dataset.id)}
           type={'ionicon'}
         />

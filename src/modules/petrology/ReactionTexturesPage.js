@@ -17,7 +17,7 @@ import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const ReactionTexturesPage = ({page}) => {
+const ReactionTexturesPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -67,6 +67,7 @@ const ReactionTexturesPage = ({page}) => {
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'pet'}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedReaction}
       />
@@ -87,10 +88,12 @@ const ReactionTexturesPage = ({page}) => {
             </ListItem.Content>
           </ListItem>
         </View>
-        <SectionDividerWithRightButton
-          dividerText={page.label}
-          onPress={addReaction}
-        />
+        {isReadOnly ? <SectionDivider dividerText={page.label}/> : (
+          <SectionDividerWithRightButton
+            dividerText={page.label}
+            onPress={addReaction}
+          />
+        )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}

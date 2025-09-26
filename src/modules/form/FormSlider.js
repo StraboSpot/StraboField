@@ -11,6 +11,7 @@ import {useForm} from '../form';
 
 const FormSlider = ({
                       choices,
+                      disabled,
                       fieldKey,
                       formProps,
                       hasNoneChoice,
@@ -63,6 +64,7 @@ const FormSlider = ({
       </ListItem>
       <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR, padding: 10, paddingTop: 0}}>
         <SliderBar
+          disabled={disabled}
           isHideLabels={isHideLabels}
           labels={labels ? labels
             : hasNoneChoice ? [...choicesList.map(c => c.label), 'N/R']

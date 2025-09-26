@@ -1,4 +1,4 @@
-import React, {forwardRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
@@ -12,6 +12,7 @@ import About from '../help/About';
 import Documentation from '../help/Documentation';
 import IssuesAndReqests from '../help/IssuesAndReqests';
 import {ImageGallery} from '../images';
+import MenuSearch from './MenuSearch';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
 import ImageBasemapsList from '../maps/ImageBasemapsList';
@@ -54,6 +55,11 @@ const MainMenuPanel = forwardRef(({
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
   const [datasetToView, setDatasetToView] = useState({});
+  const [searchState, setSearchState] = useState('');
+
+  useEffect(() => {
+    setSearchState('');
+  }, [mainMenuPageVisible]);
 
   const renderMainMenuContent = () => {
     return (
@@ -153,7 +159,12 @@ const MainMenuPanel = forwardRef(({
         return <IssuesAndReqests/>;
 
       default:
-        return <MainMenuPanelList/>;
+        return (
+          <>
+            <MenuSearch searchState={searchState} setSearchState={setSearchState}/>
+            <MainMenuPanelList searchText={searchState}/>
+          </>
+        );
     }
   };
 

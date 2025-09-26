@@ -3,16 +3,21 @@ import React, {useState} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
+import useProject from '../../project/useProject';
+import {MAP_MODES} from '../maps.constants';
 import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from '../symbology/mapSymbology.constants';
 import useMapSymbology from '../symbology/useMapSymbology';
 import useMapFeatures from '../useMapFeatures';
+import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
+import {isEmpty} from '../../../shared/Helpers';
 
-const FeaturesLayers = ({isStratStyleLoaded, spotsNotSelected, spotsSelected}) => {
+const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
   const [symbols, setSymbol] = useState({...MAP_SYMBOLS, ...STRAT_PATTERNS});
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
+  const {isSpotInReadOnlyDataset} = useProject();
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
   console.log('Getting Spots Not Selected as Features...');
@@ -32,6 +37,16 @@ const FeaturesLayers = ({isStratStyleLoaded, spotsNotSelected, spotsSelected}) =
   const features = [...featuresNotSelected, ...featuresSelected?.filter(
     spot => spot.geometry.type === 'Point') || []];
 
+  // If in Edit Mode split into Editiable and Read Only features
+  const featuresReadOnly = [];
+  const featuresEditable = [];
+  if (mapMode === MAP_MODES.EDIT) {
+    features.forEach((f) => {
+      if (isSpotInReadOnlyDataset(f.properties.id)) featuresReadOnly.push(f);
+      else featuresEditable.push(f);
+    });
+  }
+
   return (
     <>
       {/* Halos Around Point Features Layers */}
@@ -48,7 +63,15 @@ const FeaturesLayers = ({isStratStyleLoaded, spotsNotSelected, spotsSelected}) =
       />
 
       {/* Not Selected Features Layer */}
-      <FeaturesNotSelectedLayers features={features} isStratStyleLoaded={isStratStyleLoaded}/>
+      {isEmpty(featuresReadOnly) ? (
+        <FeaturesNotSelectedLayers features={features} isStratStyleLoaded={isStratStyleLoaded}/>
+      ) : (
+        <>
+          {/* Editable & Read Only Features Layers */}
+          <FeaturesNotSelectedLayers features={featuresEditable} isStratStyleLoaded={isStratStyleLoaded}/>
+          <FeaturesReadOnlyLayers features={featuresReadOnly}/>
+        </>
+      )}
 
       {/* Selected Features Layer */}
       <FeaturesSelectedLayers featuresSelected={featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>

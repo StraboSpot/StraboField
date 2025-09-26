@@ -7,7 +7,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import usePage from './usePage';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -22,7 +23,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const Overview = ({openMainMenuPanel}) => {
+const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -41,7 +42,7 @@ const Overview = ({openMainMenuPanel}) => {
       const SectionOverview = page.overview_component;
       const sectionOverview = {
         title: page,
-        data: [<SectionOverview key={key} openMainMenuPanel={openMainMenuPanel} page={page}/>],
+        data: [<SectionOverview isReadOnly={isReadOnly} key={key} openMainMenuPanel={openMainMenuPanel} page={page}/>],
       };
       return [...acc, sectionOverview];
     }
@@ -61,6 +62,11 @@ const Overview = ({openMainMenuPanel}) => {
     }
   };
 
+  const handleToggleShowTraceSurfaceFeatureForm = () => {
+    if (isTraceSurfaceFeatureEdit) setIsTraceSurfaceFeatureEdit(false);
+    else setIsTraceSurfaceFeatureEdit(true);
+  };
+
   const openPage = (page) => {
     dispatch(setNotebookPageVisible(page.key));
     if (page.modal) dispatch(setModalVisible({modal: page.modal}));
@@ -73,32 +79,23 @@ const Overview = ({openMainMenuPanel}) => {
     console.log('In onSubmitForm');
   };
 
-  const renderCancelSaveButtons = () => {
-    return (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => cancelFormAndGo()}
-          save={() => saveFormAndGo()}
-        />
-      </View>
-    );
-  };
-
   const renderTraceSurfaceFeatureForm = () => {
     const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
       ? ['general', 'trace'] : ['general', 'surface_feature'];
+    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
     let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
     if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
       initialValues = {...initialValues, 'trace_feature': true};
     }
     return (
       <View>
-        {renderCancelSaveButtons()}
+        <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={pageTitle}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
         <FlatList
           ListHeaderComponent={
             <View>
               <Formik
-                component={formProps => Form({formName: formName, ...formProps})}
+                component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
                 enableReinitialize={true}
                 initialStatus={{formName: formName}}
                 initialValues={initialValues}
@@ -212,16 +209,23 @@ const Overview = ({openMainMenuPanel}) => {
             {(spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
                 || spot.geometry.type === 'GeometryCollection')
               && <Text style={notebookStyles.traceSurfaceFeatureToggleText}>This is a surface feature</Text>}
-            <SwitchWrapper onValueChange={toggleTraceSurfaceFeature} value={isTraceSurfaceFeatureEnabled}/>
-          </View>
-          <View>
-            <Button
-              disabled={!isTraceSurfaceFeatureEnabled}
-              disabledTitleStyle={notebookStyles.traceSurfaceFeatureDisabledText}
-              onPress={() => setIsTraceSurfaceFeatureEdit(true)}
-              title={'Edit'}
-              type={'clear'}
+            <SwitchWrapper
+              disabled={isReadOnly}
+              onValueChange={toggleTraceSurfaceFeature}
+              value={isTraceSurfaceFeatureEnabled}
             />
+          </View>
+          <View style={{height: 40}}>
+            {(isReadOnly || !isTraceSurfaceFeatureEdit) && (
+              <Button
+                disabled={!isTraceSurfaceFeatureEnabled}
+                disabledTitleStyle={notebookStyles.traceSurfaceFeatureDisabledText}
+                onPress={handleToggleShowTraceSurfaceFeatureForm}
+                title={isTraceSurfaceFeatureEdit ? 'Close' : isReadOnly ? 'View' : 'Edit'}
+                titleStyle={{color: PRIMARY_ACCENT_COLOR}}
+                type={'clear'}
+              />
+            )}
           </View>
         </View>
       )}

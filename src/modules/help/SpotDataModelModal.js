@@ -29,25 +29,30 @@ const SpotDataModelModal = ({close}) => {
       },
       properties: {
         date: 'ISOString Date',
-        id: 'ID',
-        modified_timestamp: 'Date Object',
+        id: 'Integer',
+        modified_timestamp: 'Unix Timestamp',
         name: 'Spot Name',
         notes: 'Notes',
-        notesTimestamp: 'Date Object',
+        notesTimestamp: 'JavaScript Date Object',
         time: 'ISOString Date',
+        image_basemap: 'integer id of parent image basemap',
+        strat_section_id: 'uuid of parent strat section',
+        data: {urls: '[string]', links: '[string]'},
       },
     };
 
     // Get forms
     Object.entries(forms).map(([categoryKey, formsInCategory]) => {
 
-      if (categoryKey !== 'project' && categoryKey !== 'measurement_bulk' && categoryKey !== 'preferences') {
+      if (categoryKey !== 'project' && categoryKey !== 'measurement_bulk' && categoryKey !== 'preferences'
+        && categoryKey !== 'settings') {
         let geographyTemp = {};
 
         // Get forms for a category
-        const formsObj = Object.entries(formsInCategory).reduce((acc1, [formKey, formValue]) => {
+        const formsObj = Object.entries(formsInCategory).reduce((acc1, [formKey, formValue], j) => {
 
-          if (formKey !== 'project_description' && formKey !== 'user_profile') {
+          if (formKey !== 'add_interval' && formKey !== 'lithology' && formKey !== 'project_description'
+            && formKey !== 'reports' && formKey !== 'user_conventions' && formKey !== 'user_profile') {
 
             // Get survey fields
             const survey = formValue.survey.reduce((acc2, field) => {
@@ -67,9 +72,55 @@ const SpotDataModelModal = ({close}) => {
               else return acc2;
             }, {});
 
+            // console.log(i, formKey, survey);
+
             if (formKey === 'geography') {
               geographyTemp = survey;
               return acc1;
+            }
+            else if (formKey === 'plutonic') {
+              return {...acc1, igneous: {0: {id: 'uuid', igneous_rock_class: formKey, ...survey}}};
+            }
+            else if (formKey === 'volcanic') {
+              return {...acc1, igneous: {...acc1.igneous, 1: {id: 'uuid', igneous_rock_class: formKey, ...survey}}};
+            }
+            else if (formKey === 'images' || formKey === 'minerals' || formKey === 'samples') {
+              return {...acc1, ...{[formKey]: {id: 'integer', ...survey}}};
+            }
+            else if (formKey === 'interval') {
+              const {character, ...interval} = survey;
+              return {...acc1, character: character, ...{[formKey]: {id: 'integer', ...interval}}};
+            }
+            else if (formKey === 'bedding') {
+              return {...acc1, bedding: {...acc1.bedding, beds: survey}};
+            }
+            else if (formKey === 'bedding_shared_interbedded') {
+              return {...acc1, bedding: {...acc1.bedding, 0: survey}};
+            }
+            else if (formKey === 'bedding_shared_package') {
+              return {...acc1, bedding: {...acc1.bedding, 1: survey}};
+            }
+            else if (formKey === 'architecture' || formKey === 'environment' || formKey === 'process' || formKey === 'surfaces') {
+              return {...acc1, interpretations: {...acc1.structures, id: 'uuid', ...survey}};
+            }
+            else if (formKey === 'bedding_plane' || formKey === 'bioturbation' || formKey === 'pedogenic' || formKey === 'physical') {
+              return {...acc1, structures: {...acc1.structures, id: 'uuid', ...survey}};
+            }
+            else if (formKey === 'lithologies' || formKey === 'composition' || formKey === 'stratification' || formKey === 'texture') {
+              return {...acc1, lithologies: {...acc1.lithologies, id: 'uuid', ...survey}};
+            }
+            else if (categoryKey === 'pet' || categoryKey === 'sed' || formKey === 'earthquakes') {
+              return {...acc1, ...{[formKey]: {id: 'uuid', ...survey}}};
+            }
+            else if (categoryKey === 'tephra') {
+              return {...acc1, id: 'uuid', ...survey};
+            }
+            else if (categoryKey === 'measurement') {
+              return {...acc1, ...{[j]: {id: 'uuid', type: formKey, ...survey}}};
+            }
+            else if (categoryKey === '_3d_structures' || categoryKey === 'fabrics') {
+              if (formKey === 'fabric') return {...acc1, ...{DEPRECATED: {id: 'integer', type: formKey, ...survey}}};
+              else return {...acc1, ...{[j]: {id: 'integer', type: formKey, ...survey}}};
             }
             else return {...acc1, ...{[formKey]: survey}};
           }
@@ -91,6 +142,15 @@ const SpotDataModelModal = ({close}) => {
               properties: {...spotDataModelTemp.properties, orientation_data: formsObj},
             };
           }
+          else if (categoryKey === 'pet_deprecated') {
+            spotDataModelTemp = {
+              ...spotDataModelTemp,
+              properties: {
+                ...spotDataModelTemp.properties,
+                pet: {...spotDataModelTemp.properties.pet, DEPRECATED: formsObj},
+              },
+            };
+          }
           else {
             spotDataModelTemp = {
               ...spotDataModelTemp,
@@ -102,6 +162,13 @@ const SpotDataModelModal = ({close}) => {
     });
 
     setSpotDataModel(spotDataModelTemp);
+  };
+
+  const shouldExpandNode = (keyName, data, level) => {
+    // Since hideRoot is true, level 0 is actually the first visible level
+    // Level 0: type, geometry, properties
+    // Level 1: contents of properties (what we want to show)
+    return level <= 1;
   };
 
   return (
@@ -120,7 +187,7 @@ const SpotDataModelModal = ({close}) => {
           titleStyle={commonStyles.standardButtonText}
           type={'clear'}
         />
-        <JSONTree data={spotDataModel} hideRoot/>
+        <JSONTree data={spotDataModel} hideRoot shouldExpandNode={shouldExpandNode}/>
       </ScrollView>
     </ModalWrapper>
   );

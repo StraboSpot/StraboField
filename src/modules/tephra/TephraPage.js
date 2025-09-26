@@ -19,7 +19,7 @@ import BasicPageDetail from '../page/BasicPageDetail';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const TephraPage = ({page}) => {
+const TephraPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -73,6 +73,7 @@ const TephraPage = ({page}) => {
         />
         <BasicPageDetail
           closeDetailView={() => setIsDetailView(false)}
+          isReadOnly={isReadOnly}
           page={{...page, key: 'tephra', subkey: Object.values(subpages)[selectedTypeIndex]}}
           selectedFeature={selectedAttribute}
         />
@@ -83,7 +84,7 @@ const TephraPage = ({page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={tephraStyles.mainAttributesContainer}>
-        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton/>
+        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <View style={tephraStyles.draggableListContainer}>
           {data.length > 1 && (
             <Text
@@ -99,7 +100,7 @@ const TephraPage = ({page}) => {
             renderItem={({item, getIndex, drag}) => (
               <ShadowDecorator>
                 <BasicListItem
-                  drag={Platform.OS === 'web' ? undefined : drag}
+                  drag={Platform.OS === 'web' || isReadOnly ? undefined : drag}
                   editItem={editAttribute}
                   index={getIndex()}
                   isReorderingActive={isReorderingActive}
@@ -110,8 +111,9 @@ const TephraPage = ({page}) => {
             )}
           />
           {data.length > 1 && (
-            <Text
-              style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Bottom</Text>
+            <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>
+              Bottom
+            </Text>
           )}
           {isReorderingActive && (
             <Button

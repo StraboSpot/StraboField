@@ -1,0 +1,159 @@
+# .github/workflows/release.yml
+name: Automated Release
+
+on:
+  push:
+    branches: [master]  # Add your branch name here
+    paths:
+      - 'package.json'  # Trigger when version changes
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version-changed: ${{ steps.check.outputs.changed }}
+      new-version: ${{ steps.check.outputs.version }}
+      previous-version: ${{ steps.check.outputs.previous-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Check if version changed
+        id: check
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          # Get previous version from the last commit
+          if git show HEAD~1:package.json > prev-package.json 2>/dev/null; then
+            PREVIOUS_VERSION=$(node -p "require('./prev-package.json').version" 2>/dev/null || echo "0.0.0")
+            rm -f prev-package.json
+          else
+            echo "No previous commit found, treating as first release"
+            PREVIOUS_VERSION="0.0.0"
+          fi
+          
+          echo "::notice::Current version: $CURRENT_VERSION"
+          echo "::notice::Previous version: $PREVIOUS_VERSION"
+          
+          # Debug: Show the actual file differences
+          echo "::group::Debug Info"
+          echo "Files changed in this commit:"
+          git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "No previous commit"
+          echo "Package.json diff:"
+          git diff HEAD~1 HEAD package.json 2>/dev/null || echo "No package.json changes or no previous commit"
+          echo "::endgroup::"
+          
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "previous-version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
+            echo "::notice::✅ Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "::warning::❌ No version change detected (both versions are $CURRENT_VERSION)"
+          fi
+
+  create-release:
+    needs: check-version
+    if: needs.check-version.outputs.version-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate changelog
+        run: |
+          # Run your existing changelog generation
+          yarn create-changelog
+          
+          echo "📝 Changelog generated successfully"
+
+      - name: Extract release notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.check-version.outputs.new-version }}"
+          
+          # Extract the latest version's changelog for release notes
+          # Look for the version section in CHANGELOG.md
+          if [ -f "CHANGELOG.md" ]; then
+            # Create release notes from the latest version section
+            awk -v version="$VERSION" '
+              BEGIN { found=0; inSection=0 }
+              /^## / { 
+                if (found && inSection) exit
+                if ($0 ~ version) { found=1; inSection=1; next }
+                inSection=0
+              }
+              found && inSection && !/^## / { 
+                if (NF > 0 || length($0) > 0) print 
+              }
+            ' CHANGELOG.md > release-notes.md
+            
+            # If no specific version section found, create a generic message
+            if [ ! -s release-notes.md ]; then
+              echo "## Changes in v$VERSION" > release-notes.md
+              echo "" >> release-notes.md
+              echo "See [CHANGELOG.md](./CHANGELOG.md) for details." >> release-notes.md
+            fi
+          else
+            echo "## Release v$VERSION" > release-notes.md
+            echo "" >> release-notes.md
+            echo "New version released with latest changes." >> release-notes.md
+          fi
+          
+          echo "📋 Release notes extracted:"
+          cat release-notes.md
+
+      - name: Create Git tag
+        run: |
+          VERSION="${{ needs.check-version.outputs.new-version }}"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create and push tag
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+          
+          echo "🏷️ Created and pushed tag v$VERSION"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.check-version.outputs.new-version }}
+          name: Release v${{ needs.check-version.outputs.new-version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: true  # This adds auto-generated notes from commits
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Success notification
+        run: |
+          VERSION="${{ needs.check-version.outputs.new-version }}"
+          echo "🎉 Successfully created release v$VERSION"
+          echo "📍 Release URL: https://github.com/${{ github.repository }}/releases/tag/v$VERSION"

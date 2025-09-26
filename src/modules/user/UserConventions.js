@@ -16,6 +16,7 @@ import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const UserProfile = () => {
@@ -28,10 +29,11 @@ const UserProfile = () => {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const toast = useToast();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
+  const {isSpotInReadOnlyDataset} = useProject();
   const {uploadProfile} = useUpload();
+  const toast = useToast();
 
   const formName = ['general', 'user_conventions'];
 
@@ -40,44 +42,52 @@ const UserProfile = () => {
   }, []);
 
   const convertStrikeDipDirection = () => {
-    if (isEmpty(spots)) toast.show('No Spots Found.', {placement: 'top'});
+    if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
     else {
-      const spotsEdited = [];
-      let spotsEditedIds = [];
-      Object.values(spots).forEach((s) => {
-        if (s.properties.orientation_data) {
-          let editedMeasurements = JSON.parse(JSON.stringify(s.properties.orientation_data));
-          Object.values(editedMeasurements).forEach((m) => {
-            if (!isEmpty(m.strike) && isEmpty(m.dip_direction)) {
-              const dipDirection = (m.strike + 90) % 360;
-              console.log('Strike', m.strike, '-> Dip Direction', dipDirection);
-              m.dip_direction = dipDirection;
-              spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-            }
-            else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
-              const strike = (m.dipDirection - 90) % 360;
-              console.log('Dip direction', m.dip_direction, '-> Strike', strike);
-              m.strike = strike;
-              spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-            }
-          });
-          if (spotsEditedIds.includes(s.properties.id.toString())) {
-            const updatedSpot = JSON.parse(JSON.stringify(s));
-            updatedSpot.properties.orientation_data = editedMeasurements;
-            spotsEdited.push(updatedSpot);
-          }
-        }
+      // Filter out Read Only Spots
+      const spotsFiltered = Object.values(spots).filter((spot) => {
+        if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
       });
-      if (!isEmpty(spotsEdited)) {
-        // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
-        //   return spotsEditedIds.includes(s.properties.id.toString()) ? [...acc, s] : acc;
-        // }, []));
-        // console.log('Spots to update', spotsEdited);
-        dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
-        dispatch(editedOrCreatedSpots(spotsEdited));
-        toast.show('Finished conversions. Spots updated', {placement: 'top', type: 'success'});
+      if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found.  No changes made.', {placement: 'top'});
+
+      else {
+        const spotsEdited = [];
+        let spotsEditedIds = [];
+        spotsFiltered.forEach((s) => {
+          if (s.properties.orientation_data) {
+            let editedMeasurements = JSON.parse(JSON.stringify(s.properties.orientation_data));
+            Object.values(editedMeasurements).forEach((m) => {
+              if (!isEmpty(m.strike) && isEmpty(m.dip_direction)) {
+                const dipDirection = (m.strike + 90) % 360;
+                console.log('Strike', m.strike, '-> Dip Direction', dipDirection);
+                m.dip_direction = dipDirection;
+                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
+              }
+              else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
+                const strike = (m.dipDirection - 90) % 360;
+                console.log('Dip direction', m.dip_direction, '-> Strike', strike);
+                m.strike = strike;
+                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
+              }
+            });
+            if (spotsEditedIds.includes(s.properties.id.toString())) {
+              const updatedSpot = JSON.parse(JSON.stringify(s));
+              updatedSpot.properties.orientation_data = editedMeasurements;
+              spotsEdited.push(updatedSpot);
+            }
+          }
+        });
+        if (!isEmpty(spotsEdited)) {
+          // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
+          //   return spotsEditedIds.includes(s.properties.id.toString()) ? [...acc, s] : acc;
+          // }, []));
+          // console.log('Spots to update', spotsEdited);
+          dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
+          dispatch(editedOrCreatedSpots(spotsEdited));
+          toast.show('Finished conversions. Spots updated', {placement: 'top', type: 'success'});
+        }
+        else toast.show('No conversions needed. No Spots updated.', {placement: 'top'});
       }
-      else toast.show('No conversions needed. No Spots updated.', {placement: 'top'});
     }
   };
 

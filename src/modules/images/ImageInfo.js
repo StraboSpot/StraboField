@@ -16,12 +16,13 @@ import SketchModal from '../sketch/SketchModal';
 const ImageInfo = ({
                      deleteImage,
                      image,
+                     isReadOnly,
                      isVisible,
                      saveImages,
                      saveUpdatedImage,
                      setImageToView,
-                     setIsImageModalVisible,
-                   }) => {
+                     setIsImageModalVisible
+}) => {
   console.log('Rendering ImageInfo...');
 
   const {width, height} = useWindowSize();
@@ -93,37 +94,33 @@ const ImageInfo = ({
           style={Platform.OS === 'web' ? {width: width, height: height}
             : {width: '100%', height: '100%'}}
         />
-        {/*<View style={imageStyles.closeButtonContainer}>*/}
-        {/*  <IconButton*/}
-        {/*    onPress={() => setIsImageModalVisible(false)}*/}
-        {/*    source={require('../../assets/icons/Close.png')}*/}
-        {/*    style={imageStyles.closeButtonStyle}*/}
-        {/*  />*/}
-        {/*</View>*/}
         <View style={imageStyles.rightsideIcons}>
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}
             source={require('../../assets/icons/ImagePropertiesButton.png')}
             style={imageStyles.imageInfoButtons}
           />
-          {Platform.OS !== 'web' && (
+          {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
               onPress={openInSketch}
               source={require('../../assets/icons/ImageSketchButton.png')}
               style={imageStyles.imageInfoButtons}
             />
           )}
-          <IconButton
-            onPress={() => handleDeleteImageOnPress()}
-            source={require('../../assets/icons/DeleteButton.png')}
-            style={imageStyles.imageInfoButtons}
-          />
+          {!isReadOnly && (
+            <IconButton
+              onPress={() => handleDeleteImageOnPress()}
+              source={require('../../assets/icons/DeleteButton.png')}
+              style={imageStyles.imageInfoButtons}
+            />
+          )}
         </View>
       </View>
       {isImagePropertiesModalVisible && (
         <ImagePropertiesModal
           closeModal={() => setIsImagePropertiesModalVisible(false)}
           image={image}
+          isReadOnly={isReadOnly}
           isVisible={isImagePropertiesModalVisible}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}

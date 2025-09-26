@@ -1,0 +1,81 @@
+# Configuration file for release-changelog-builder-action
+# File: .github/changelog_config.json
+{
+  "categories": [
+    {
+      "title": "## 🚀 Features",
+      "labels": ["feature", "enhancement", "feat"]
+    },
+    {
+      "title": "## 🐛 Fixes",
+      "labels": ["fix", "bugfix", "bug"]
+    },
+    {
+      "title": "## 🧪 Tests",
+      "labels": ["test"]
+    },
+    {
+      "title": "## ✏️ Refactors"
+      "labels": ["refactor"]
+    },
+    {
+      "title": "## 💬 Build",
+      "labels": ["build"]
+    },
+     {
+      "title": "## 💬 Other",
+      "labels": ["other"]
+    },
+    {
+      "title": "## 📦 Dependencies",
+      "labels": ["dependencies"]
+    },
+    {
+      "title": "## ⏮️ Revert",
+      "labels": ["revert"]
+    }
+  ],
+  "ignore_labels": [
+    "ignore"
+  ],
+  "sort": "ASC",
+  "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+  "pr_template": "- #{{TITLE}} by @#{{AUTHOR}} in ##{{NUMBER}}",
+  "empty_template": "- no changes",
+  "label_extractor": [
+    {
+      "pattern": "(.)\\s*:\\s*(.*)",
+      "target": "$1",
+      "flags": "gu"
+    },
+    {
+      "pattern": "\\[Issue\\]",
+      "target": "bug",
+      "flags": "gu"
+    }
+  ],
+  "duplicate_filter": {
+    "pattern": "\\[ABC-....\\]",
+    "on_property": "title",
+    "method": "match"
+  },
+  "transformers": [
+    {
+      "pattern": "[\\-\\*] (\\[(...|TEST|CI|SKIP)\\])( )?(.+?)\n(.+?[\\-\\*] )(.+)",
+      "target": "- $4\n  - $6"
+    }
+  ],
+  "max_tags_to_fetch": 200,
+  "max_pull_requests": 200,
+  "max_back_track_time_days": 90,
+  "exclude_merge_branches": [
+    "Owner/qa"
+  ],
+  "tag_resolver": {
+    "method": "semver"
+  },
+  "base_branches": [
+    "main",
+    "master"
+  ]
+}

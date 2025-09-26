@@ -9,23 +9,31 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {MEDIUMGREY, POSITIVE_COLOR, RED, WARNING_COLOR} from '../../../shared/styles.constants';
+import {SwitchWrapper} from '../../../shared/ui';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
+import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
-import {updatedDatasetProperties} from '../projects.slice';
+import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
+import useProject from '../useProject';
 
 const DatasetDetail = ({dataset}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
+  const {destroyDataset} = useProject();
   const toast = useToast();
 
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [datasetName, setDatasetName] = useState(dataset.name);
+
+  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
+  const isTarget = targetDatasetId === dataset.id;
 
   const backToProjectPanel = () => dispatch(setSidePanelVisible({bool: false}));
 
@@ -44,8 +52,40 @@ const DatasetDetail = ({dataset}) => {
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
+  const initializeDeleteDataset = () => {
+    setIsDeleteConfirmModalVisible(false);
+    if (dataset && dataset.id) {
+      destroyDataset(dataset.id)
+        .then(backToProjectPanel)
+        .catch(err => console.log('Error deleting dataset', err));
+    }
+    else console.error('Target dataset or id is undefined!');
+  };
+
   const isDisabled = (id) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
+  };
+
+  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
+
+  const renderDeleteConfirmationModal = () => {
+    return (
+      <DeleteConformationDialogBox
+        cancel={() => setIsDeleteConfirmModalVisible(false)}
+        deleteOverlay={initializeDeleteDataset}
+        isVisible={isDeleteConfirmModalVisible}
+        title={'Confirm Delete!'}
+      >
+        <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
+          {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
+        </Text>
+        <Text style={overlayStyles.statusMessageText}>
+          This will
+          <Text style={overlayStyles.importantText}> ERASE </Text>
+          everything in this dataset including Spots, images, and all other data!
+        </Text>
+      </DeleteConformationDialogBox>
+    );
   };
 
   // Delete Dataset Button
@@ -200,12 +240,32 @@ const DatasetDetail = ({dataset}) => {
                 <Text style={formStyles.fieldLabel}>{'Name'}</Text>
               </View>
               <TextInput
+                editable={!isReadOnly}
                 onChangeText={text => setDatasetName(text)}
                 style={formStyles.fieldValue}
                 value={datasetName}
               />
             </View>
           </ListItem.Content>
+        </ListItem>
+      </View>
+    );
+  };
+
+  const renderReadOnlyDatasetButton = () => {
+    return (
+      <View style={{alignContent: 'flex-start'}}>
+        <ListItem containerStyle={commonStyles.listItemFormField}>
+          <ListItem.Content
+            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+          >
+            <View style={{flex: 1}}>
+              <View style={formStyles.fieldLabelContainer}>
+                <Text style={formStyles.fieldLabel}>{'Read Only'}</Text>
+              </View>
+            </View>
+          </ListItem.Content>
+          <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
         </ListItem>
       </View>
     );
@@ -251,10 +311,12 @@ const DatasetDetail = ({dataset}) => {
       {renderSpotsField()}
       {renderImagesField()}
       <LittleSpacer/>
+      {renderReadOnlyDatasetButton()}
+      <LittleSpacer/>
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 
       {/* Child Modal */}
-      {/*{isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}*/}
+      {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );
 };

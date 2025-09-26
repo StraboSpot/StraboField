@@ -3,6 +3,7 @@ import {TextInput, View} from 'react-native';
 
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
@@ -11,6 +12,8 @@ import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import {PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
+import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useMapLocation from '../../maps/useMapLocation';
 import {PAGE_KEYS} from '../../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
@@ -19,7 +22,7 @@ import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) => {
+const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, openMainMenuPanel, zoomToSpots}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -27,6 +30,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
 
   const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
   const {getCurrentLocation} = useMapLocation();
+  const toast = useToast();
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -111,7 +115,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
   const renderCoordsText = () => {
     return (
       <Button
-        buttonStyle={{padding: 0, justifyContent: 'flex-start'}}
+        buttonStyle={{justifyContent: 'flex-start', padding: 0, paddingHorizontal: 0}}
         onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
         title={getSpotCoordText()}
         titleStyle={{textAlign: 'left', color: PRIMARY_TEXT_COLOR}}
@@ -125,7 +129,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
       <View style={{flexDirection: 'row'}}>
         {!spot.properties.trace && !spot.properties.surface_feature && (
           <Button
-            buttonStyle={{padding: 0, paddingRight: 15}}
+            buttonStyle={{padding: 0, paddingRight: 15, paddingLeft: 0}}
             onPress={setToCurrentLocation}
             title={'Set To Current Location'}
             titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
@@ -161,6 +165,14 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
     return +parseFloat(value).toFixed(dp);
   };
 
+  const goToDatasetsPage = () => {
+    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
+      {duration: 4000, placement: 'top', type: 'warning'});
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
+  };
+
   return (
     <>
       <Image
@@ -169,15 +181,32 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
         source={getSpotGeometryIconSource(spot)}
         style={notebookHeaderStyles.headerImage}
       />
-      <View style={notebookHeaderStyles.headerSpotNameAndCoordsContainer}>
+      <View
+        style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
+      >
         <TextInput
+          editable={!isReadOnly}
           onChangeText={text => onSpotEdit('name', text)}
           style={notebookHeaderStyles.headerSpotName}
+          textAlign={'left'}
           value={spot.properties.name || ''}
         />
-        {getSpotCoordText() ? renderCoordsText() : renderSetCoordsText()}
+        {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
       </View>
-      <View>
+      <View style={{flexDirection: 'row'}}>
+        {isReadOnly && (
+          <Button
+            buttonStyle={{
+              backgroundColor: 'transparent',
+              paddingVertical: 0,
+              paddingHorizontal: 2,
+              height: 50,
+              width: 40,
+            }}
+            icon={{type: 'ionicon', name: 'lock-closed'}}
+            onPress={goToDatasetsPage}
+          />
+        )}
         <IconButton
           onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
           source={require('../../../assets/icons/MapActions.png')}
@@ -187,6 +216,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, zoomToSpots}) =>
       <NotebookMenu
         closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
         isNotebookMenuVisible={isNotebookMenuVisible}
+        isReadOnly={isReadOnly}
         overlayStyle={notebookStyles.dialogBoxPosition}
         zoomToSpots={zoomToSpots}
       />

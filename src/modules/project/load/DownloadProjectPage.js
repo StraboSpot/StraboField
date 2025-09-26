@@ -40,8 +40,8 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   };
 
   const getTextOverride = () => {
-    if (project.id === projectToDownload.id && project.modified_timestamp > projectToDownload.modified_timestamp) {
-      return 'The current project is newer than the project on the server. Are you sure you want to'
+    if (project.id === projectToDownload.id && project.modified_timestamp >= projectToDownload.modified_timestamp) {
+      return 'The select project to download is NOT NEWER than the current project. Are you sure you want to'
         + ' overwrite the current project?';
     }
     else return undefined;

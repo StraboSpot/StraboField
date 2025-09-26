@@ -14,7 +14,7 @@ const TextInputField = ({
                           appearance,
                           autoCapitalize,
                           autoFocus,
-                          editable,
+                          editable = true,
                           label,
                           onMyChange,
                           onShowFieldInfo,

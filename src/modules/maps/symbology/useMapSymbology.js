@@ -1,12 +1,14 @@
 import {useSelector} from 'react-redux';
 
 import {hexToRgb, isEmpty} from '../../../shared/Helpers';
+import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
 
 const useMapSymbology = () => {
-  const {getTagsAtSpot} = useTags();
   const {getStratIntervalFill} = useStratSectionSymbology();
+  const {getTagsAtSpot} = useTags();
+
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
   const labelTypeOn = useSelector(state => state.map.labelTypeOn);
 
@@ -374,6 +376,15 @@ const useMapSymbology = () => {
       case 'Polygon':
       case 'MultiPolygon':
         return getPolygonSymbology(feature);
+      case 'GeometryCollection':
+        const geometryCollectionSymbology = [];
+        feature.geometry.geometries.forEach((g, i) => {
+          let tempFeature = JSON.parse(JSON.stringify(feature));
+          tempFeature.geometry = g;
+          if (i % 2 === 1) tempFeature.properties.isInterbed = true;
+          geometryCollectionSymbology.push(getSymbology(tempFeature));
+        });
+        return geometryCollectionSymbology;
       default:
         return {};
     }
@@ -529,6 +540,18 @@ const useMapSymbology = () => {
       textOffset: [-1, 0],
       textIgnorePlacement: true,
       textSize: 10,
+    },
+    pointCircleReadOnly: {
+      circleRadius: 6,
+      circleColor: MEDIUMGREY,
+    },
+    polygonReadOnly: {
+      fillColor: MEDIUMGREY,
+      fillOpacity: 0.7,
+    },
+    lineReadOnly: {
+      lineColor: MEDIUMGREY,
+      lineWidth: 3,
     },
   };
 

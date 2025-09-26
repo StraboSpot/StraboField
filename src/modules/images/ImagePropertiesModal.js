@@ -9,7 +9,7 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, setImageToView}) => {
+const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
@@ -22,7 +22,7 @@ const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, s
     console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
     return (
       <Formik
-        component={formProps => Form({formName: formName, ...formProps})}
+        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
         initialStatus={{formName: formName}}
         initialValues={image}
         innerRef={formRef}
@@ -64,15 +64,17 @@ const ImagePropertiesModal = ({closeModal, image, isVisible, saveUpdatedImage, s
         ListFooterComponent={
           <View style={imageStyles.switch}>
             <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
-            <SwitchWrapper onValueChange={setIsAnnotated} value={isAnnotated}/>
+            <SwitchWrapper disabled={isReadOnly} onValueChange={setIsAnnotated} value={isAnnotated}/>
           </View>
         }
         ListHeaderComponent={renderFormFields()}
       />
-      <ActionButton
-        onPress={saveFormAndGo}
-        title={'Save'}
-      />
+      {!isReadOnly && (
+        <ActionButton
+          onPress={saveFormAndGo}
+          title={'Save'}
+        />
+      )}
     </ModalWrapper>
   );
 };

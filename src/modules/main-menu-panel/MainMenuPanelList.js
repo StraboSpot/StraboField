@@ -1,32 +1,55 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, SectionList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MAIN_MENU_DATA, MAIN_MENU_DATA_NO_PROJECT, MAIN_MENU_DATA_WEB} from './mainMenu.constants';
+import {MENU_KEYWORDS} from './mainMenuKeywords.constants';
 import {setSectionsCollapsed} from './mainMenuPanel.slice';
 import MainMenuPanelListItem from './MainMenuPanelListItem';
+import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
-const MainMenuPanelList = () => {
+const MainMenuPanelList = ({searchText}) => {
   const dispatch = useDispatch();
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
+
+  const [menuItems, setMenuItems] = useState(MAIN_MENU_DATA);
+
+  useEffect(() => {
+    filterMenuItems();
+  }, [searchText]);
+
+  const filterMenuItems = () => {
+    let mainMenuData = MAIN_MENU_DATA;
+    if (Platform.OS === 'web') mainMenuData = MAIN_MENU_DATA_WEB;
+    else if (!projectName) mainMenuData = MAIN_MENU_DATA_NO_PROJECT;
+
+    if (searchText === '') setMenuItems(mainMenuData);
+    else {
+      const filteredItems = mainMenuData.reduce((acc, value) => {
+        const {title, data} = value;
+        const filteredPages = data.filter((d) => {
+          const section = MENU_KEYWORDS[title]?.find(s => s.key === d);
+          if (isEmpty(section)) return false;
+          const foundMatches = section.keywords.filter(k => k.includes(searchText));
+          return !isEmpty(foundMatches);
+        });
+        return isEmpty(filteredPages) ? acc : [...acc, {title: title, data: filteredPages}];
+      }, []);
+      setMenuItems(filteredItems);
+    }
+  };
 
   const renderItem = ({item, section}) => {
     if (!sectionsCollapsed.includes(section.title)) return <MainMenuPanelListItem title={item}/>;
   };
 
   const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
-
-  const getMainMenuData = () => {
-    if (Platform.OS === 'web') return MAIN_MENU_DATA_WEB;
-    if (!projectName) return MAIN_MENU_DATA_NO_PROJECT;
-    else return MAIN_MENU_DATA;
-  };
 
   const renderMenuSectionHeader = ({section: {title}}) => {
     return (
@@ -50,7 +73,7 @@ const MainMenuPanelList = () => {
       keyExtractor={(item, index) => item + index}
       renderItem={renderItem}
       renderSectionHeader={renderMenuSectionHeader}
-      sections={getMainMenuData()}
+      sections={menuItems}
       stickySectionHeadersEnabled={true}
     />
   );
