@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
-import UploadProgressModal from './UploadProgressModal';
 import useDevice from '../../../services/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {BLUE} from '../../../shared/styles.constants';
@@ -110,9 +109,6 @@ const BackupProjectPage = () => {
         isVisible={isSaveAndExportModalVisible}
       />
       <UploadModal closeModal={() => setIsUploadModalVisible(false)} isVisible={isUploadModalVisible}/>
-      <UploadProgressModal
-        isProgressModalVisible={isProgressModalVisible}
-      />
     </View>
   );
 };
