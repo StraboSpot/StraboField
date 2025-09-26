@@ -89,7 +89,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     }
     return (
       <View>
-        <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={pageTitle}/>
+        <NotebookPageHeader hideBackButton pageTitle={pageTitle}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
         <FlatList
           ListHeaderComponent={
