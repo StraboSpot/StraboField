@@ -55,6 +55,7 @@ const StatusModal = ({openMainMenuPanel}) => {
       isVisible={isStatusMessagesModalVisible}
       onActionPressed={() => dispatch(setIsStatusMessagesModalVisible(false))}
       showActionButton={!isModalLoading && selectedProject.source === ''}
+      showCancelButton={!isModalLoading && selectedProject.source !== ''}
     >
       <View>
         {isModalLoading && (

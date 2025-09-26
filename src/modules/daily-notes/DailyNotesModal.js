@@ -8,7 +8,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {DateInputField, TextInputField} from '../form';
@@ -63,11 +62,10 @@ const DailyNotesModal = () => {
 
   const renderDailyNotesModal = () => {
     return (
-      <ModalWrapper buttonTitleRight={''}>
-        <SaveAndCancelButtons
-          cancel={() => close()}
-          save={() => saveNote(formRef?.current?.values)}
-        />
+      <ModalWrapper
+        onActionPressed={() => saveNote(formRef?.current?.values)}
+        onCancelPress={close}
+      >
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
