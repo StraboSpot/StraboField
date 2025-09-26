@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
@@ -84,7 +84,7 @@ const AddReactionTextureModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <SaveButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
       </ModalWrapper>
     );
   };

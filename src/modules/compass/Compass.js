@@ -1,17 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {AppState, NativeEventEmitter, Platform, Text, View} from 'react-native';
+import {AppState, NativeEventEmitter, Platform, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setCompassMeasurements} from './compass.slice';
-import compassStyles from './compass.styles';
 import CompassDebug from './CompassDebug';
 import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
 import CompassModule from '../../services/CompassModule';
 import useCompass from '../../services/useCompass';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
-import {SwitchWrapper} from '../../shared/ui';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/page.constants';
@@ -227,14 +225,14 @@ const Compass = ({
         compassMeasurementTypes={compassMeasurementTypes}
         grabMeasurements={grabMeasurements}
       />
-      <View style={compassStyles.matrixDataButtonContainer}>
-        <View style={compassStyles.matrixDataButtonContainer}>
-          <Text style={compassStyles.switchText}>Display Raw Data</Text>
-          <SwitchWrapper onValueChange={toggleSwitch} value={showCompassRawDataView}/>
-        </View>
+      {/*<View style={compassStyles.matrixDataButtonContainer}>*/}
+      {/*  <View style={compassStyles.matrixDataButtonContainer}>*/}
+      {/*    <Text style={compassStyles.switchText}>Display Raw Data</Text>*/}
+      {/*    <SwitchWrapper onValueChange={toggleSwitch} value={showCompassRawDataView}/>*/}
+      {/*  </View>*/}
 
 
-      </View>
+      {/*</View>*/}
       {showCompassRawDataView && <CompassDebug
         compassData={compassData}
         matrixRotation={matrixRawData?.current}

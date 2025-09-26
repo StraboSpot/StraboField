@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button, Icon, Input, ListItem, Overlay} from '@rn-vui/base';
+import {Button, Icon, Input, ListItem} from '@rn-vui/base';
 import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -14,6 +14,7 @@ import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SliderBar from '../../../shared/ui/SliderBar';
@@ -361,32 +362,24 @@ const CustomMapDetails = () => {
       </View>
 
       {/* Modal */}
-      <Overlay
+      <ModalWrapper
+        actionTitle={'OK'}
+        headerTitle={title}
         isVisible={isLoadingModalVisible}
-        overlayStyle={[overlayStyles.overlayContainer, customMapStyles.loadingMapModalContainer]}
-        supportedOrientations={['portrait', 'landscape']}
+        onActionPressed={handlePress}
+        overlayStyleOverride={{flex: 1, maxHeight: '30%'}}
+        showCancelButton={false}
       >
         <View style={{flex: 1}}>
-          <View style={[overlayStyles.titleContainer, customMapStyles.loadingMapModalTitleContainer]}>
-            <Text style={[overlayStyles.titleText]}>{title}</Text>
-          </View>
           <View style={[overlayStyles.overlayContent, customMapStyles.loadingMapContentContainer]}>
             <Text style={[overlayStyles.titleText]}>{editableCustomMapData.title}</Text>
             <Text style={customMapStyles.loadingMapModalContentText}>{message}</Text>
-          </View>
-          <View style={customMapStyles.loadingMapButtonContainer}>
-            <Button
-              disabled={isLoading}
-              onPress={handlePress}
-              title={'Ok'}
-              type={'clear'}
-            />
           </View>
           <View style={{flex: 1}}>
             <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
           </View>
         </View>
-      </Overlay>
+      </ModalWrapper>
     </>
   );
 };

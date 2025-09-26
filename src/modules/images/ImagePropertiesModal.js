@@ -5,10 +5,11 @@ import {Formik} from 'formik';
 
 import {imageStyles} from '.';
 import {SwitchWrapper} from '../../shared/ui';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ImagePropertiesModal = ({closeModal, image, isReadOnly, saveUpdatedImage, setImageToView}) => {
+const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
@@ -50,11 +51,14 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, saveUpdatedImage, 
 
   return (
     <ModalWrapper
-      buttonTitleLeft={!isReadOnly && 'Cancel'}
-      buttonTitleRight={!isReadOnly && 'Save'}
-      cancel={closeModal}
-      closeModal={isReadOnly ? closeModal : saveFormAndGo}
-      title={'Image Properties'}
+      closeModal={closeModal}
+      headerTitle={'Image Properties'}
+      isVisible={isVisible}
+      onActionPressed={saveFormAndGo}
+      overlayStylesOverride={{height: '90%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
     >
       <FlatList
         ListFooterComponent={
@@ -65,6 +69,12 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, saveUpdatedImage, 
         }
         ListHeaderComponent={renderFormFields()}
       />
+      {!isReadOnly && (
+        <ActionButton
+          onPress={saveFormAndGo}
+          title={'Save'}
+        />
+      )}
     </ModalWrapper>
   );
 };

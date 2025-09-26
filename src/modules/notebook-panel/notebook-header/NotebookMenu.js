@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Text} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {ListItem, Overlay} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../../shared/ui/modals';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
@@ -36,12 +37,17 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
   ];
 
   const continueDeleteSelectedSpot = () => {
-    if (isStratInterval(spot)) deleteInterval(spot);
+    if (errorMessage) {
+      setErrorMessage('');
+      setIsDeleteSpotModalVisible(false);
+    }
+    else if (isStratInterval(spot)) deleteInterval(spot);
     else deleteSpot(spot.properties.id);
   };
 
   const deleteSelectedSpot = () => {
-    setErrorMessage(checkIsSafeDelete(spot));
+    const safeDeleteMessage = checkIsSafeDelete(spot);
+    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
     setIsDeleteSpotModalVisible(true);
   };
 
@@ -87,40 +93,33 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
 
   return (
     <>
-      {isNotebookMenuVisible && (
-        <Overlay
-          isVisible={isNotebookMenuVisible}
-          onBackdropPress={closeNotebookMenu}
-          overlayStyle={notebookStyles.dialogContainer}
-          supportedOrientations={['portrait', 'landscape']}
-        >
-          <View style={overlayStyles.titleContainer}>
-            <Text style={overlayStyles.titleText}>Spot Actions</Text>
-          </View>
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            contentContainerStyle={{alignItems: 'center'}}
-            data={actions}
-            key={'notebookActions'}
-            renderItem={renderActionItem}
-          />
-        </Overlay>
-      )}
-      {isDeleteSpotModalVisible && (
-        <WarningModal
-          closeModal={() => setIsDeleteSpotModalVisible(false)}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
-          confirmText={'DELETE'}
-          confirmTitleStyle={overlayStyles.importantText}
-          isVisible={isDeleteSpotModalVisible}
-          onConfirmPress={() => continueDeleteSelectedSpot()}
-          showCancelButton={true}
-          showConfirmButton={isDeleteSpotModalVisible && !errorMessage}
-          title={'Delete Spot?'}
-        >
-          {renderDeleteMessage()}
-        </WarningModal>
-      )}
+      <ModalWrapper
+        headerTitle={'Spot Actions'}
+        isVisible={isNotebookMenuVisible}
+        onBackdropPress={closeNotebookMenu}
+        overlayStyleOverride={{...notebookStyles.dialogContainer, width: 200}}
+        showActionButton={false}
+        showCancelButton={false}
+      >
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          contentContainerStyle={{alignItems: 'center'}}
+          data={actions}
+          key={'notebookActions'}
+          renderItem={renderActionItem}
+        />
+      </ModalWrapper>
+      <WarningModal
+        closeModal={() => setIsDeleteSpotModalVisible(false)}
+        confirmText={errorMessage ? 'Ok' : 'Delete'}
+        confirmTitleStyle={overlayStyles.importantText}
+        isVisible={isDeleteSpotModalVisible}
+        onConfirmPress={continueDeleteSelectedSpot}
+        showCancelButton={!errorMessage}
+        title={errorMessage ? 'Can\'t Delete Spot' : 'Delete Spot?'}
+      >
+        {renderDeleteMessage()}
+      </WarningModal>
     </>
   );
 };

@@ -15,7 +15,14 @@ const TagsNotebookModal = ({
 
   const renderTagsModalContent = () => {
     return (
-      <ModalWrapper closeModal={closeModal} onPress={onPress}>
+      <ModalWrapper
+        closeModal={closeModal}
+        onFooterButtonPress={onPress}
+        overlayStyleOverride={{height: '80%'}}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
+      >
         <TagsModal isFeatureLevelTagging={isFeatureLevelTagging}/>
       </ModalWrapper>
     );

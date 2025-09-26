@@ -11,7 +11,7 @@ import IgneousRockFabric from './IgneousRockFabric';
 import MetamRockFabric from './MetamRockFabric';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -137,7 +137,7 @@ const AddFabricModal = ({onPress}) => {
             bounces={false}
           />
         </>
-        {!choicesViewKey && <SaveButton onPress={saveFabric} title={'Save Fabric'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveFabric} title={'Save Fabric'}/>}
       </ModalWrapper>
     );
   };

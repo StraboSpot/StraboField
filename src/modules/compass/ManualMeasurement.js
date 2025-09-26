@@ -8,7 +8,7 @@ import {useSelector} from 'react-redux';
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 import commonStyles from '../../shared/common.styles';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
 import {NumberInputField} from '../form';
@@ -110,7 +110,7 @@ const ManualMeasurement = ({
                     step={1}
                     value={sliderValue}
                   />
-                  <SaveButton
+                  <ActionButton
                     onPress={() => addAttributeMeasurement(formProps.values)}
                     title={'Add to Attribute'}
                   />

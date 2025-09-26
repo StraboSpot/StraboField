@@ -1,5 +1,5 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
@@ -44,10 +44,23 @@ const Map = ({
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
   const [isStratStyleLoaded, setIsStratStyleLoaded] = useState(false);
+  const [mapKey, setMapKey] = useState(0);
+
+  // Track map ID changes to force re-render and prevent layer conflicts
+  const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
 
   useEffect(() => {
     console.log('isShowMacrostratOverlay', isShowMacrostratOverlay);
   }, [isShowMacrostratOverlay, basemap]);
+
+  useEffect(() => {
+    // Force map re-render when map ID changes to prevent layer conflicts
+    // For web, be more selective about when to re-render to prevent flickering
+    if (Platform.OS !== 'web') {
+      setMapKey(prev => prev + 1);
+      console.log('Map ID changed to:', currentMapId);
+    }
+  }, [currentMapId]);
 
   // Set flag for when the map has been loaded
   // This is a fix for patterns loading too slowly after v10 update
@@ -70,7 +83,8 @@ const Map = ({
         animated={true}
         attributionEnabled={true}
         attributionPosition={homeStyles.mapboxAttributionPosition}
-        id={currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id}
+        id={currentMapId}
+        key={`map-${mapKey}-${currentMapId}`}
         localizeLabels={true}
         logoEnabled={true}
         logoPosition={homeStyles.mapboxLogoPosition}

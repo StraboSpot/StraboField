@@ -8,8 +8,8 @@ import NoteForm from './NoteForm';
 import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
@@ -149,19 +149,21 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       )}
       <FlatListItemSeparator/>
       {!isShowTemplates && (
-        <ScrollView style={noteStyle.noteContainer}>
-          <NoteForm
-            formRef={formRef}
-            initialNotesValues={initialNotesValues}
-            isReadOnly={isReadOnly}
-          />
+        <>
+          <ScrollView style={noteStyle.noteContainer}>
+            <NoteForm
+              formRef={formRef}
+              initialNotesValues={initialNotesValues}
+              isReadOnly={isReadOnly}
+            />
+          </ScrollView>
           {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
-            <SaveButton
+            <ActionButton
               onPress={() => saveFormAndGo()}
               title={'Save Note'}
             />
           )}
-        </ScrollView>
+        </>
       )}
     </View>
   );

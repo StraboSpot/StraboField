@@ -14,12 +14,23 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 10,
     justifyContent: 'flex-end',
+    marginRight: 10,
     paddingTop: 10,
   },
+  buttonStyle: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR,
+    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+  },
   buttonText: {
-    color: themes.PRIMARY_TEXT_COLOR,
+    // color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
+  },
+  clearButtonText: {
+    color: themes.PRIMARY_ACCENT_COLOR,
   },
   closeButton: {
     alignItems: 'flex-end',
@@ -45,7 +56,7 @@ const styles = StyleSheet.create({
   },
   importantText: {
     color: 'red',
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   inputContainer: {
@@ -72,6 +83,7 @@ const styles = StyleSheet.create({
   overlayContent: {
     alignItems: 'center',
     marginTop: 5,
+    // backgroundColor: 'green',
   },
   overlayMapMenuPosition: {
     bottom: SMALL_SCREEN ? 80 : 100,
@@ -111,7 +123,6 @@ const styles = StyleSheet.create({
   titleText: {
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    paddingBottom: 10,
     textAlign: 'center',
   },
   titleTextError: {

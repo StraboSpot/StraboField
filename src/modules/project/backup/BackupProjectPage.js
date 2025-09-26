@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
-import UploadProgressModal from './UploadProgressModal';
 import useDevice from '../../../services/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {BLUE} from '../../../shared/styles.constants';
@@ -104,16 +103,12 @@ const BackupProjectPage = () => {
       )}
 
       {/* Modals */}
-      {isSaveAndExportModalVisible && (
-        <SaveAndExportModal
-          backupAction={backupAction}
-          closeModal={() => setIsSaveAndExportModalVisible(false)}
-        />
-      )}
-      {isUploadModalVisible && <UploadModal closeModal={() => setIsUploadModalVisible(false)}/>}
-      <UploadProgressModal
-        isProgressModalVisible={isProgressModalVisible}
+      <SaveAndExportModal
+        backupAction={backupAction}
+        closeModal={() => setIsSaveAndExportModalVisible(false)}
+        isVisible={isSaveAndExportModalVisible}
       />
+      <UploadModal closeModal={() => setIsUploadModalVisible(false)} isVisible={isUploadModalVisible}/>
     </View>
   );
 };

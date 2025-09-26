@@ -1,9 +1,9 @@
 export const messages = {
   delete: {
     title: 'IGSN ASSIGNED',
-    message: 'Deleting a sample here, which\n'
-      + 'has already been registered in your MYSESAR account, will not be deleted in your MYSESAR account. \n\nTo make a sample/IGSN '
-      + 'inactive you must go through your MYSESAR account.',
+    message: 'Deleting a sample that has been assigned an IGSN '
+      + 'will not be deleted in your MYSESAR account.\n\n'
+      + 'You must check with SESAR to see how to make the sample inactive.',
   },
   mySesarOffline: {
     title: 'Offline Warning',

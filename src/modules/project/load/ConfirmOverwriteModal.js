@@ -25,8 +25,10 @@ const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
 
   return (
     <ModalWrapper
-      closeModal={closeModal}
-      title={'Load Project'}
+      actionTitle={'Cancel'}
+      headerTitle={'Load Project'}
+      onActionPressed={closeModal}
+      showCancelButton={false}
     >
       <View>
         <Text style={overlayStyles.statusMessageText}>{modalText}</Text>

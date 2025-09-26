@@ -9,21 +9,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import {PAGE_KEYS} from './page.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import {overlayStyles} from '../home/overlays';
+import NoteForm from '../notes/NoteForm';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/IGSNModal';
+import IGSNUploadAndRegister from '../samples/IGSNUploadAndRegister';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
-import DeleteOverlay from './ui/DeleteOverlay';
-import IGSNUploadAndRegister from '../samples/IGSNUploadAndRegister';
+import {messages} from './ui/Messages';
 
 
 const BasicPageDetail = ({
@@ -330,18 +334,40 @@ const BasicPageDetail = ({
           <FlatList ListHeaderComponent={renderFormFields()}/>
         </>
       )}
-      {isIGSNModalVisible && (
-        <IGSNModal
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-        />
-      )}
-      <DeleteOverlay
-        closeModal={() => setIsDeleteOverlayVisible(false)}
-        deleteSample={deleteFeature}
-        isVisible={isDeleteOverlayVisible}
+      {/*{isIGSNModalVisible && (*/}
+      <IGSNModal
+        isVisible={isIGSNModalVisible}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        onSampleSaved={onSampleSaved}
+        ref={formRef}
+        sampleValues={formRef.current?.values}
       />
+      {/*)}*/}
+      {/*Modal when deleting a sample with an IGSN attached*/}
+      <ModalWrapper
+        actionTitle={'Delete'}
+        headerTitle={'Delete Sample'}
+        isVisible={isDeleteOverlayVisible}
+        onActionPressed={deleteFeature}
+        onCancelPress={() => setIsDeleteOverlayVisible(false)}
+        overlayStyleOverride={{flex: 1, maxHeight: '40%'}}
+      >
+        <View style={{
+          flex: 1,
+          paddingVertical: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'yellow',
+        }}>
+          <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
+          <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
+        </View>
+        <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
+          <Text
+            style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
+          </Text>
+        </View>
+      </ModalWrapper>
     </>
   );
 };

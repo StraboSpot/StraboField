@@ -3,7 +3,7 @@ import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-import {ImageCard, ImageModal, imageStyles, useImageThumbnails} from '.';
+import {ImageCard, ImageInfo, imageStyles, useImageThumbnails} from '.';
 import commonStyles from '../../shared/common.styles';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
@@ -92,17 +92,16 @@ const ImagesList = ({
       <View style={{flex: 1}}>
         {isError ? renderError() : renderImages()}
       </View>
-      {isImageModalVisible && (
-        <ImageModal
-          deleteImage={deleteImage}
-          image={imageToView}
-          isReadOnly={isReadOnly}
-          saveImages={saveImages}
-          saveUpdatedImage={saveUpdatedImage}
-          setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
-        />
-      )}
+      <ImageInfo
+        deleteImage={deleteImage}
+        image={imageToView}
+        isReadOnly={isReadOnly}
+        isVisible={isImageModalVisible}
+        saveImages={saveImages}
+        saveUpdatedImage={saveUpdatedImage}
+        setImageToView={setImageToView}
+        setIsImageModalVisible={setIsImageModalVisible}
+      />
     </>
   );
 };

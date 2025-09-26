@@ -14,7 +14,7 @@ import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -120,7 +120,7 @@ const AddRockModal = ({modalKey, onPress}) => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <SaveButton onPress={saveRock} title={saveRockTitle}/>}
+        {!choicesViewKey && <ActionButton onPress={saveRock} title={saveRockTitle}/>}
       </>
     );
   };
@@ -130,7 +130,9 @@ const AddRockModal = ({modalKey, onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
-        onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         {Object.values(IGNEOUS_ROCK_CLASSES).includes(rockKey) && !choicesViewKey && !isShowTemplates && (
           <ButtonGroup

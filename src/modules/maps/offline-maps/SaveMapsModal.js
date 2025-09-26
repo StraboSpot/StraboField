@@ -2,17 +2,16 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Text, View} from 'react-native';
 
 import {Picker} from '@react-native-picker/picker';
-import {Button, Icon, Overlay} from '@rn-vui/base';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
-import offlineMapsStyles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
 import useServerRequests from '../../../services/useServerRequests';
 import {toNumberFixedValue} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
   addedStatusMessage,
@@ -233,28 +232,15 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={overlayStyles.backdropStyles}
-      isVisible={isOfflineMapModalVisible}
-      onBackdropPress={() => {
-        setShowMainMenu(true);
-        setShowComplete(false);
-      }}
-      overlayStyle={[overlayStyles.overlayContainer, offlineMapsStyles.saveModalContainer]}
-      supportedOrientations={['portrait', 'landscape']}
+    <ModalWrapper
+      actionTitle={`Download ${tileCount} Tiles`}
+      cancelTitle={showMainMenu ? 'Cancel' : 'Close'}
+      headerTitle={currentMapName}
+      onActionPressed={saveMap}
+      onCancelPress={() => dispatch(setIsOfflineMapsModalVisible(false))}
+      showActionButton={showMainMenu}
+      showCancelButton={showMainMenu || showComplete || isError}
     >
-      <Icon
-        color={'darkgrey'}
-        containerStyle={overlayStyles.closeButton}
-        name={'close-outline'}
-        onPress={() => dispatch(setIsOfflineMapsModalVisible(false))}
-        size={20}
-        type={'ionicon'}
-      />
-      <View style={overlayStyles.titleContainer}>
-        <Text style={[overlayStyles.titleText]}>{currentMapName}</Text>
-      </View>
       <View style={overlayStyles.contentText}>
         <View>
           <View style={{}}>
@@ -331,15 +317,6 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
           <View>
             {showMainMenu && (
               <View>
-                {isLoadingCircle
-                  ? <ActivityIndicator color={themes.BLACK} size={'large'}/>
-                  : (
-                    <Button
-                      onPress={() => saveMap()}
-                      title={`Download ${tileCount} Tiles`}
-                      type={'clear'}
-                    />
-                  )}
                 {isSelected && (
                   <Text style={overlayStyles.contentText}>
                     Endpoint URL: {endpoint}
@@ -350,7 +327,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
           </View>
         </View>
       </View>
-    </Overlay>
+      {isLoadingCircle && <ActivityIndicator color={themes.BLACK} size={'large'}/>}
+    </ModalWrapper>
   );
 };
 

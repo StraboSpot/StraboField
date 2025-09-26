@@ -11,9 +11,6 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 30,
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-  },
   checkBoxText: {
     color: 'white',
   },

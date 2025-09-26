@@ -1,17 +1,18 @@
 import React from 'react';
 
-import {Overlay} from '@rn-vui/base';
-
 import Sketch from './Sketch';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const SketchModal = ({image, saveImages, setIsSketchModalVisible}) => {
   return (
-    <Overlay
-      fullScreen
-      supportedOrientations={['portrait', 'landscape']}
+    <ModalWrapper
+      fullscreen
+      headerTitle={'Sketch'}
+      showActionButton={false}
+      showCancelButton={false}
     >
       <Sketch image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

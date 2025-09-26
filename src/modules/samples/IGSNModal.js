@@ -1,7 +1,7 @@
 import React, {forwardRef, useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
-import {Button, Image, Overlay} from '@rn-vui/base';
+import {Image} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,19 +9,16 @@ import IGSNModalStyles from './IGSNModal.styles';
 import useSamples from './useSamples';
 import SesarLogo from '../../assets/images/logos/sesar2_logo.png';
 import {isEmpty, truncateText} from '../../shared/Helpers';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {updatedKey} from '../user/userProfile.slice';
 
 const IGNSModal = forwardRef(({
+                                isVisible,
                                 sampleValues,
                                 onModalCancel,
                                 onSampleSaved,
                               }, formRef) => {
-
-  const {height} = useWindowSize();
 
   const dispatch = useDispatch();
   const {
@@ -61,15 +58,14 @@ const IGNSModal = forwardRef(({
   }, []);
 
   const handleConfirmOnPress = () => {
-    onSampleSaved(formRef.current);
+    if (formRef.current) onSampleSaved(formRef.current);
     onModalCancel();
   };
 
   const registerSample = async () => {
     try {
-      // let res;
-      const formValues = formRef.current.values;
-      console.log('Updated FormRef', formRef.current.values);
+      const formValues = formRef.current?.values || {};
+      console.log('Updated FormRef', formRef.current?.values);
       setIsLoading(true);
       const res = formValues.isOnMySesar ? await updateSampleIsSesar(formValues) : await uploadSample(formValues);
       if (res.error && res.error.length > 0) {
@@ -81,7 +77,7 @@ const IGNSModal = forwardRef(({
       else {
         setIsUploaded(true);
         setStatusMessage(res.status);
-        await formRef.current.setValues({...formRef.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
+        await formRef.current?.setValues({...formRef.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
       }
       setIsLoading(false);
     }
@@ -114,12 +110,6 @@ const IGNSModal = forwardRef(({
       <View style={IGSNModalStyles.errorContainer}>
         <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
         {errorMessages.map((msg, index) => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
-        <Button
-          buttonStyle={{backgroundColor: 'rgb(78, 114, 33)', paddingHorizontal: 50}}
-          containerStyle={{marginTop: 25}}
-          onPress={onModalCancel}
-          title={'Ok'}
-        />
       </View>
     );
   };
@@ -140,65 +130,62 @@ const IGNSModal = forwardRef(({
   };
 
   const renderContentItems = () => {
-    const sesarMappedObj = straboSesarMapping(formRef.current.values);
+    const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
     return (
-      <>
+      <View style={{
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+      }}>
         <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
         {!isUploaded && sesarMappedObj.map((item) => {
-          if (item.sesarKey === 'user_code' && formRef.current.values.isOnMySesar) return null;
+          if (item.sesarKey === 'user_code' && formRef.current?.values?.isOnMySesar) return null;
           if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
           return (
             <View key={item.sesarKey}
-                  style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingLeft: 20,
+                  }}>
               <Text style={IGSNModalStyles.uploadContentText}>{item.label}</Text>
               <Text style={IGSNModalStyles.fieldValueText}> {formatContentItems(item)}</Text>
             </View>
           );
         })
         }
-      </>
+      </View>
     );
   };
 
   const renderUploadContent = () => {
     return (
       <>
-        {!isEmpty(formRef.current.values.sample_id_name) && (
+        {!isEmpty(formRef.current?.values?.sample_id_name) && (
           <ScrollView>
-            <View style={{marginLeft: 30}}>
-              <View style={{alignItems: 'flex-start'}}>
-                {renderContentItems()}
-              </View>
-            </View>
+            {renderContentItems()}
           </ScrollView>
         )}
-        <Button
-          buttonStyle={{backgroundColor: 'black', padding: 10}}
-          containerStyle={{padding: 10}}
-          onPress={!isUploaded ? registerSample : handleConfirmOnPress}
-          title={!isUploaded ? 'Register' : 'OK'}
-        />
       </>
     );
   };
 
   return (
-    <Overlay
-      animationType={'fade'}
-      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : {
-        ...overlayStyles.overlayContainer,
-        maxHeight: height * 0.80, width: 500,
+    <ModalWrapper
+      actionTitle={!isUploaded ? 'Register' : 'OK'}
+      isLoading={isLoading}
+      isVisible={isVisible}
+      onActionPressed={!isUploaded ? registerSample : handleConfirmOnPress}
+      onCancelPress={onModalCancel}
+      overlayStyleOverride={{
+        flex: 1,
+        maxHeight: isUploaded || errorView ? '40%' : '80%',
+        width: 500,
       }}
-      supportedOrientations={['portrait', 'landscape']}
+      showActionButton={!isEmpty(formRef.current?.values?.sample_id_name) && !isLoading}
+      showCancelButton={!isLoading && !isUploaded}
     >
       <View style={IGSNModalStyles.container}>
-        {!isUploaded && <Button
-          containerStyle={{alignItems: 'flex-end', width: '100%'}}
-          onPress={onModalCancel}
-          title={'X'}
-          titleStyle={{color: 'black'}}
-          type={'clear'}
-        />}
         <View style={IGSNModalStyles.sesarImageContainer}>
           <Image
             source={SesarLogo}
@@ -208,7 +195,7 @@ const IGNSModal = forwardRef(({
         {setPage()}
       </View>
       <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
-    </Overlay>
+    </ModalWrapper>
   );
 });
 

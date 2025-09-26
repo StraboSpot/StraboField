@@ -7,7 +7,14 @@ const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
 
   const renderAddTagsToSpotsShortcutModal = () => {
     return (
-      <ModalWrapper>
+      <ModalWrapper
+        // onCancelPress={closeModal}
+        // onFooterButtonPress={onPress}
+        overlayStyleOverride={{height: '80%'}}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton={true}
+      >
         <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
       </ModalWrapper>
     );

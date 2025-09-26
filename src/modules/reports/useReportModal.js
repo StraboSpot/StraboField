@@ -72,9 +72,9 @@ const useReportModal = ({openSpotInNotebook}) => {
   const confirmCloseModal = () => checkReportChanged(null, closeModal);
 
   const deleteReport = () => {
+    closeModal();
     const updatedReports = reports.filter(r => r.id !== report.id);
     dispatch(updatedProject({field: 'reports', value: updatedReports}));
-    closeModal();
   };
 
   const goToSpot = (spot) => {
@@ -87,7 +87,10 @@ const useReportModal = ({openSpotInNotebook}) => {
     closeModal();
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
     dispatch(setSelectedTag(tag));
-    if (tag.type === 'geologic_unit') dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
+    if (tag.type === 'geologic_unit') {
+dispatch(
+      setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
+}
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
   };
 

@@ -14,7 +14,7 @@ import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
@@ -290,9 +290,11 @@ const AddMeasurementModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
-        closeModal={onCloseButton}
-        onPress={onPress}
+        onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <>
           {measurementTypeForForm && (
@@ -316,7 +318,7 @@ const AddMeasurementModal = ({onPress}) => {
             />
           )}
           {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <SaveButton onPress={saveMeasurement} title={saveTitle}/>
+            <ActionButton onPress={saveMeasurement} title={saveTitle}/>
           )}
         </>
       </ModalWrapper>

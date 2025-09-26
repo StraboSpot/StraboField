@@ -2,7 +2,6 @@ import React from 'react';
 
 import {createStackNavigator} from '@react-navigation/stack';
 
-import DocumentationScreen from '../modules/help/DocumentationScreen';
 import HomeContainer from '../modules/home/HomeContainer';
 import {ImageSlider} from '../modules/images';
 
@@ -27,11 +26,6 @@ const AppStack = () => {
       <Stack.Screen
         component={ImageSlider}
         name={'ImageSlider'}
-        options={navigationOptions}
-      />
-      <Stack.Screen
-        component={DocumentationScreen}
-        name={'DocumentationScreen'}
         options={navigationOptions}
       />
     </Stack.Navigator>

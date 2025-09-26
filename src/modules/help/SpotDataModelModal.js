@@ -174,9 +174,11 @@ const SpotDataModelModal = ({close}) => {
   return (
     <ModalWrapper
       closeModal={close}
-      isFullScreen
-      overlayStyleOverride={{width: '50%'}}
-      title={'Spot Data Model Object'}
+      headerTitle={'Spot Data Model Object'}
+      overlayStyleOverride={{width: '40%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
       <ScrollView>
         <Button

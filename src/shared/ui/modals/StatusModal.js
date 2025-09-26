@@ -4,8 +4,8 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-import StatusDialogBox from './StatusDialogBox';
 import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../../../modules/home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../../modules/main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../../../modules/main-menu-panel/mainMenuPanel.slice';
@@ -49,12 +49,12 @@ const StatusModal = ({openMainMenuPanel}) => {
   };
 
   return (
-    <StatusDialogBox
-      closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
+    <ModalWrapper
+      actionTitle={'Ok'}
+      headerTitle={'Status'}
       isVisible={isStatusMessagesModalVisible}
-      onConfirmPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      showConfirmButton={!isModalLoading && selectedProject.source === ''}
-      title={'Status'}
+      onActionPressed={() => dispatch(setIsStatusMessagesModalVisible(false))}
+      showActionButton={!isModalLoading && selectedProject.source === ''}
     >
       <View>
         {isModalLoading && (
@@ -88,7 +88,7 @@ const StatusModal = ({openMainMenuPanel}) => {
         </View>
         }
       </View>
-    </StatusDialogBox>
+    </ModalWrapper>
   );
 };
 

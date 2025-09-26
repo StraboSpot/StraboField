@@ -15,7 +15,8 @@ const ModalWrapperHeader = ({
                               buttonTitleRight,
                               cancel,
                               closeModal,
-                              title,
+                              showCloseButton = false,
+                              headerTitle,
                             }) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
@@ -37,15 +38,17 @@ const ModalWrapperHeader = ({
               titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
               type={'clear'}
             />
-            <Button
-              onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
-              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'X'}
-              titleStyle={{color: BLACK, fontSize: 18}}
-              type={'clear'}
-            />
+            {showCloseButton && (
+              <Button
+                onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
+                title={buttonTitleRight === '' ? '' : buttonTitleRight || 'X'}
+                titleStyle={{color: BLACK, fontSize: 18}}
+                type={'clear'}
+              />
+            )}
           </View>
         )}
-        <Text style={modalStyles.modalTitle}>{title || getTitle()}</Text>
+        <Text style={modalStyles.modalTitle}>{headerTitle || getTitle()}</Text>
       </View>
     </View>
   );

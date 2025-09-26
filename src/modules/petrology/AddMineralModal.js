@@ -10,7 +10,7 @@ import MineralsGlossary from './MineralsGlossary';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
@@ -200,7 +200,7 @@ const AddMineralModal = ({onPress}) => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <SaveButton onPress={saveMineral} title={saveMineralTitle}/>}
+        {!choicesViewKey && <ActionButton onPress={saveMineral} title={saveMineralTitle}/>}
       </>
     );
   };

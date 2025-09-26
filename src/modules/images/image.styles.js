@@ -42,8 +42,9 @@ const imageStyles = StyleSheet.create({
   },
   closeButtonContainer: {
     position: 'absolute',
-    right: 20,
+    right: 100,
     top: 40,
+    zIndex: 1,
   },
   closeButtonStyle: {
     height: 40,

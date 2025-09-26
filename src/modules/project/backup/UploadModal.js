@@ -20,7 +20,7 @@ import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 
-const UploadModal = ({closeModal}) => {
+const UploadModal = ({closeModal, isVisible}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
@@ -59,6 +59,11 @@ const UploadModal = ({closeModal}) => {
     setUploadImageSuccess(false);
     resetState();
     closeModal();
+  };
+
+  const handleActionPressed = async () => {
+    if (uploadState === 'not started') await initiateUpload();
+    else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
   };
 
   const initiateUpload = async () => {
@@ -169,20 +174,13 @@ const UploadModal = ({closeModal}) => {
         <Text style={overlayStyles.importantText}> OVERWRITE</Text> any data already on the server
         for this project:
       </Text>
-      <View style={overlayStyles.buttonContainer}>
-        {__DEV__ && (
-          <Button
-            onPress={uploadImagesOnly}
-            title={'Images Only (Dev Mode)'}
-            titleStyle={overlayStyles.buttonText}
-            type={'outline'}
-          />
-        )}
+      {__DEV__ && (
         <Button
-          onPress={() => initiateUpload()}
-          title={'Upload'}
+          onPress={uploadImagesOnly}
+          title={'Upload Images Only (Dev Mode)'}
+          type={'clear'}
         />
-      </View>
+      )}
     </View>
   );
 
@@ -257,27 +255,20 @@ const UploadModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
+      actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
       closeModal={closeModal}
-      title={modalTitle}
+      headerTitle={modalTitle}
+      isVisible={isVisible}
+      onActionPressed={handleActionPressed}
+      onCancelPress={handleClosePress}
+      showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
+      showCancelButton={uploadState === 'not started'}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()
         : uploadState !== 'error'
           ? renderUploadProgress()
           : renderErrorView()}
-      <View style={overlayStyles.buttonContainer}>
-        {(uploadState === 'complete' || uploadState === 'error')
-          && (
-            <Button
-              // disabled={uploadState !== 'complete'}
-              onPress={handleClosePress}
-              title={'OK'}
-              titleStyle={overlayStyles.buttonText}
-              type={'clear'}
-            />
-          )
-        }
-      </View>
     </ModalWrapper>
   );
 };

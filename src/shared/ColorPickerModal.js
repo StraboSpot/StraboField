@@ -1,12 +1,13 @@
 import React from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {Pressable, View} from 'react-native';
 
-import {Button, Icon, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import overlayStyles from './ui/modals/overlay.styles';
 import Spacer from './ui/Spacer';
 import {useTags} from '../modules/tags';
+import ModalWrapper from './ui/modals/ModalWrapper';
 
 const ColorPickerModal = ({
                             closeModal,
@@ -39,28 +40,14 @@ const ColorPickerModal = ({
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+    <ModalWrapper
+      headerTitle={'Select a Custom Color'}
       isVisible={isVisible}
-      overlayStyle={{...overlayStyles.overlayContainer, width: 400}}
-      supportedOrientations={['portrait', 'landscape']}
-      windowBackgroundColor={'rgba(0, 0, 0, .5)'}
+      onCancelPress={closeModal}
+      overlayStyleOverride={{width: 400}}
+      shouldShowButtons
     >
-      <View style={{maxHeight: '100%'}}>
-        <Icon
-          color={'darkgrey'}
-          containerStyle={overlayStyles.closeButton}
-          name={'close-outline'}
-          onPress={() => closeModal()}
-          size={20}
-          type={'ionicon'}
-        />
-        <View
-          style={overlayStyles.titleContainer}>
-          <Text style={overlayStyles.titleText}>Select a Custom Color</Text>
-        </View>
-        <Spacer/>
+      <View>
         {COLOR_CHOICES.map((colorRow) => {
           return (
             <View key={colorRow} style={overlayStyles.tagColorPickerContent}>
@@ -83,7 +70,7 @@ const ColorPickerModal = ({
           type={'clear'}
         />
       </View>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 
