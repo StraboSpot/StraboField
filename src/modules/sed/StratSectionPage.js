@@ -122,7 +122,11 @@ const StratSectionPage = ({isReadOnly, page}) => {
               Add a Stratigraphic Section at this Spot?
             </ListItem.Title>
           </ListItem.Content>
-          <SwitchWrapper onValueChange={() => toggleStratSection(spot)} value={!isEmpty(stratSection)}/>
+          <SwitchWrapper
+            disabled={isReadOnly}
+            onValueChange={() => toggleStratSection(spot)}
+            value={!isEmpty(stratSection)}
+          />
         </ListItem>
       </View>
     );
