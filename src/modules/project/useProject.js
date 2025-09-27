@@ -176,7 +176,7 @@ const useProject = () => {
   const getDatasetIdFromSpotId = (spotId) => {
     let datasetIdFound;
     for (const dataset of Object.values(datasets)) {
-      const spotIdFound = dataset.spotIds.find(id => id === spotId);
+      const spotIdFound = dataset.spotIds?.find(id => id === spotId);
       if (spotIdFound) {
         datasetIdFound = dataset.id;
         break;

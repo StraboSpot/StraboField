@@ -1,10 +1,11 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
+import ActionButton from '../../../shared/ui/buttons/ActionButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -27,23 +28,14 @@ const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
     <ModalWrapper
       actionTitle={'Cancel'}
       headerTitle={'Load Project'}
-      onActionPressed={closeModal}
-      showCancelButton={false}
+      onCancelPress={closeModal}
+      showActionButton={false}
     >
       <View>
         <Text style={overlayStyles.statusMessageText}>{modalText}</Text>
         <View style={[commonStyles.standardDescriptionText, {padding: 10}]}>
-          <Button
-            containerStyle={{padding: 2.5}}
-            onPress={loadProject}
-            title={'Overwrite'}
-          />
-          <Button
-            containerStyle={{padding: 2.5}}
-            onPress={goToBackupPage}
-            title={'Go to Backup Page'}
-            type={'outline'}
-          />
+          <ActionButton onPress={loadProject} title={'Overwrite'}/>
+          <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
         </View>
       </View>
     </ModalWrapper>

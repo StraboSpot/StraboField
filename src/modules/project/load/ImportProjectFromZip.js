@@ -11,6 +11,7 @@ import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import Loading from '../../../shared/ui/Loading';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
@@ -172,11 +173,9 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
             <Text style={{fontWeight: 'bold'}}>Selected Project to Import:{'\n'}{'\n'}</Text>
             {importedProject.name}
           </Text>
-          <Button
-            containerStyle={{marginTop: 20}}
+          <OutlineButton
             onPress={() => verifyFileExistence('data')}
             title={'Unzip and Save'}
-            type={'clear'}
           />
         </View>
       )}
