@@ -71,8 +71,13 @@ const StraboFieldProjects = () => {
             )}
             <FlatListItemSeparator/>
             <MainMenuPanelListItem onPress={onLoadProjectsFromDownloadsFolder} title={'Import'}/>
+            {Platform.OS === 'android' && (
+              <Text style={overlayStyles.statusMessageText}>
+                *The imported project must be a StraboField .zip file in the {importLocationText} folder.
+              </Text>
+            )}
             <Spacer/>
-            <SectionDivider dividerText={'Other Actions with\nLocal Projects on Device'}/>
+            <SectionDivider dividerText={'Actions with Other Locally\nSaved Projects on Device'}/>
             <MainMenuPanelListItem onPress={onDeleteLocalCopy} title={'Delete'}/>
             <FlatListItemSeparator/>
             <MainMenuPanelListItem
@@ -101,11 +106,6 @@ const StraboFieldProjects = () => {
                   type={'outline'}
                 />
               </View>
-            )}
-            {Platform.OS === 'android' && (
-              <Text style={overlayStyles.statusMessageText}>
-                *The imported project must be a .zip file in the {importLocationText} folder.
-              </Text>
             )}
           </>
         }
