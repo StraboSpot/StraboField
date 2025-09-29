@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import signInStyles from './signIn.styles';
 import useSignIn from './useSignIn';
 import {PASSWORD_TEST, USERNAME_TEST} from '../../../dev-test-logins';
 import * as themes from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import {ErrorModal} from '../../shared/ui/modals';
 import GlyphDownloader from '../maps/GlyphDownloader';
@@ -46,29 +47,18 @@ const SignIn = ({navigation, route}) => {
   const renderButtons = () => {
     return (
       <View style={signInStyles.buttonsContainer}>
-        <Button
-          buttonStyle={signInStyles.buttonStyle}
-          containerStyle={signInStyles.buttonContainer}
-          disabled={username === '' || password === '' || !isOnline.isConnected}
-          loading={loading}
-          onPress={handleSignIn}
-          title={'Log In'}
-          type={'solid'}
-        />
-        <Button
-          buttonStyle={signInStyles.buttonStyle}
-          containerStyle={signInStyles.buttonContainer}
-          onPress={() => navigation.navigate('SignUp')}
-          title={'Register'}
-          type={'solid'}
-        />
-        <Button
-          buttonStyle={signInStyles.buttonStyle}
-          containerStyle={signInStyles.buttonContainer}
-          onPress={handleGuestSignIn}
-          title={'Continue as Guest'}
-          type={'solid'}
-        />
+        <View>
+          <ActionButton
+            disabled={username === '' || password === '' || !isOnline.isConnected}
+            isLoading={loading}
+            onPress={handleSignIn}
+            title={'Log In'}
+          />
+          <View style={{flexDirection: 'row', gap: 10}}>
+            <OutlineButton onPress={handleGuestSignIn} title={'Continue as Guest'}/>
+            <OutlineButton onPress={handleSignIn} title={'Register'}/>
+          </View>
+        </View>
       </View>
     );
   };

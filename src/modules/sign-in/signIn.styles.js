@@ -3,21 +3,7 @@ import {StyleSheet} from 'react-native';
 import * as themes from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    margin: 10,
-  },
-  buttonStyle: {
-    borderRadius: 15,
-    height: 48,
-    paddingLeft: 20,
-    paddingRight: 20,
-
-  },
   buttonsContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
     padding: 20,
   },
   customEndpointContainer: {
