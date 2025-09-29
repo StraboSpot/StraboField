@@ -35,6 +35,7 @@ const SplashScreen = ({children}) => {
             <Text style={titleStyles}>StraboField</Text>
             <Text style={splashScreenStyles.versionNumberText}>
               v{VERSION_NUMBER}
+              <Text style={{fontSize: 18, fontWeight: 'bold', color: 'red'}}>BETA TESTING</Text>
             </Text>
           </View>
           {children}
