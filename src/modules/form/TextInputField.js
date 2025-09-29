@@ -1,10 +1,9 @@
-import React, {useCallback} from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import React from 'react';
+import {Text, TextInput, View} from 'react-native';
 
-import {useFocusEffect} from '@react-navigation/native';
 import {Icon} from '@rn-vui/base';
-import KeyboardManager from 'react-native-keyboard-manager';
 
+// import KeyboardManager from 'react-native-keyboard-manager';
 import * as themes from '../../shared/styles.constants';
 import {formStyles} from '../form';
 
@@ -21,14 +20,14 @@ const TextInputField = ({
                           placeholder,
                         }) => {
 
-  const onFocusEffect = useCallback(() => {
-    if (Platform.OS === 'ios') {
-      KeyboardManager.setToolbarDoneBarButtonItemText('Close Keyboard');
-      KeyboardManager.setEnableAutoToolbar(true);
-    }
-  }, []);
+  // const onFocusEffect = useCallback(() => {
+  //   if (Platform.OS === 'ios') {
+  //     KeyboardManager.setToolbarDoneBarButtonItemText('Close Keyboard');
+  //     KeyboardManager.setEnableAutoToolbar(true);
+  //   }
+  // }, []);
 
-  useFocusEffect(onFocusEffect);
+  // useFocusEffect(onFocusEffect);
 
   return (
     <>

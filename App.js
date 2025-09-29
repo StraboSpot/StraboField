@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Platform, StatusBar} from 'react-native';
 
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
+import KeyboardManager from 'react-native-keyboard-manager';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -68,6 +69,17 @@ const linking = Platform.OS !== 'web' && {
 
 
 const App = () => {
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      KeyboardManager.setEnable(true);
+      KeyboardManager.setEnableAutoToolbar(true);
+      KeyboardManager.setToolbarDoneBarButtonItemText('Done');
+      KeyboardManager.setToolbarPreviousNextButtonEnable(true);
+      KeyboardManager.setShouldResignOnTouchOutside(true);
+      KeyboardManager.setKeyboardDistanceFromTextField(10);
+    }
+  }, []);
+
   if (Platform.OS === 'web' && !didInit) {
     console.count('Rendering App...');
     persistor.purge(); // Use this to clear persistStore completely
