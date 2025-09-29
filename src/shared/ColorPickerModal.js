@@ -41,11 +41,13 @@ const ColorPickerModal = ({
 
   return (
     <ModalWrapper
+      closeModal={closeModal}
       headerTitle={'Select a Custom Color'}
       isVisible={isVisible}
-      onCancelPress={closeModal}
       overlayStyleOverride={{width: 400}}
-      shouldShowButtons
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
       <View>
         {COLOR_CHOICES.map((colorRow) => {

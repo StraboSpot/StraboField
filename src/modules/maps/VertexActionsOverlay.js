@@ -45,12 +45,14 @@ const VertexActionsOverlay = ({
 
   return (
     <ModalWrapper
-      actionTitle={'Add'}
+      closeModal={() => setIsShowVertexActionsModal(false)}
       headerTitle={'Select an Action'}
       isActionButtonVisible={false}
       isVisible={isShowVertexActionsModal}
       onActionPressed={() => handleActionPressed('Add Vertex')}
-      onCancelPress={() => setIsShowVertexActionsModal(false)}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
         {buttons.map((button) => {

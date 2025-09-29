@@ -51,11 +51,13 @@ const StatusModal = ({openMainMenuPanel}) => {
   return (
     <ModalWrapper
       actionTitle={'Ok'}
+      closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
       headerTitle={'Status'}
       isVisible={isStatusMessagesModalVisible}
       onActionPressed={() => dispatch(setIsStatusMessagesModalVisible(false))}
       showActionButton={!isModalLoading && selectedProject.source === ''}
-      showCancelButton={!isModalLoading && selectedProject.source !== ''}
+      showCancelButton={false}
+      showCloseButton={!isModalLoading && selectedProject.source !== ''}
     >
       <View>
         {isModalLoading && (

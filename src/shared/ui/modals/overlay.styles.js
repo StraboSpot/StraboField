@@ -108,6 +108,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tagColorPickerColorItem: {
+    borderColor: 'white',
+    borderWidth: 1,
     height: 25,
     width: 25,
   },
