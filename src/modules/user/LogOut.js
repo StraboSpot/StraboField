@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
 import {isEmpty} from '../../shared/Helpers';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -48,26 +49,19 @@ const LogOut = () => {
   const renderLogoutModal = () => {
     return (
       <ModalWrapper
-        onCancelPress={() => setIsLogoutModalVisible(false)}
+        closeModal={() => setIsLogoutModalVisible(false)}
+        headerTitle={'Log Out?'}
         showActionButton={false}
-        title={'Log Out?'}
+        showCancelButton={false}
+        showCloseButton
       >
         <View>
-          <Text style={[overlayStyles.importantText, {padding: 5}]}>
-            Please make sure to backup your project before logging out.
+          <Text style={[overlayStyles.importantText, {padding: 5, paddingTop: 20}]}>
+            Please make sure to backup your{'\n'}project before logging out.
           </Text>
           <View style={{padding: 10}}>
-            <Button
-              containerStyle={{padding: 2.5}}
-              onPress={clearUser}
-              title={'Log Out'}
-            />
-            <Button
-              containerStyle={{padding: 2.5}}
-              onPress={goToBackupPage}
-              title={'Go to Backup Page'}
-              type={'outline'}
-            />
+            <ActionButton onPress={clearUser} title={'Log Out'}/>
+            <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
           </View>
         </View>
       </ModalWrapper>

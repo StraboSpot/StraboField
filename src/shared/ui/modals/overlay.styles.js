@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
   },
   importantText: {
     color: 'red',
+    fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
