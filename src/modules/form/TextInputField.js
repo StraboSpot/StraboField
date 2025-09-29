@@ -3,7 +3,6 @@ import {Text, TextInput, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-// import KeyboardManager from 'react-native-keyboard-manager';
 import * as themes from '../../shared/styles.constants';
 import {formStyles} from '../form';
 
@@ -19,15 +18,6 @@ const TextInputField = ({
                           onShowFieldInfo,
                           placeholder,
                         }) => {
-
-  // const onFocusEffect = useCallback(() => {
-  //   if (Platform.OS === 'ios') {
-  //     KeyboardManager.setToolbarDoneBarButtonItemText('Close Keyboard');
-  //     KeyboardManager.setEnableAutoToolbar(true);
-  //   }
-  // }, []);
-
-  // useFocusEffect(onFocusEffect);
 
   return (
     <>
