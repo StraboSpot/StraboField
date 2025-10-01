@@ -1,19 +1,15 @@
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import * as ProjectActions from './project.constants';
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {
   addedDataset,
   addedProjectDescription,
   deletedDataset,
   setActiveDatasets,
-  setSelectedProject,
   setTargetDataset,
 } from './projects.slice';
 import useDevice from '../../services/useDevice';
-import useDownload from '../../services/useDownload';
-import useImport from '../../services/useImport';
 import useResetState from '../../services/useResetState';
 import useServerRequests from '../../services/useServerRequests';
 import {getNewId, isEmpty} from '../../shared/Helpers';
@@ -22,9 +18,6 @@ import {
   addedStatusMessage,
   clearedStatusMessages,
   removedLastStatusMessage,
-  setIsBackupModalVisible,
-  setIsErrorMessagesModalVisible,
-  setIsProgressModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
 } from '../home/home.slice';
@@ -37,7 +30,6 @@ const useProject = () => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
-  const selectedProject = useSelector(state => state.project.selectedProject) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -45,8 +37,6 @@ const useProject = () => {
 
   const toast = useToast();
   const {doesDeviceBackupDirExist, readDirectory} = useDevice();
-  const {initializeDownload} = useDownload();
-  const {loadProjectFromDevice} = useImport();
   const {clearProject} = useResetState();
   const {getMyProjects} = useServerRequests();
 
@@ -250,38 +240,6 @@ const useProject = () => {
     dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };
 
-  const switchProject = async (action) => {
-    try {
-      console.log('User wants to:', action);
-      if (action === ProjectActions.BACKUP_TO_SERVER) dispatch(setIsProgressModalVisible(true));
-      else if (action === ProjectActions.BACKUP_TO_DEVICE) dispatch(setIsBackupModalVisible(true));
-      else if (action === ProjectActions.OVERWRITE) {
-        if (selectedProject.source === 'device') {
-          dispatch(setSelectedProject({project: '', source: ''}));
-          dispatch(clearedStatusMessages());
-          dispatch(setIsStatusMessagesModalVisible(true));
-          dispatch(setLoadingStatus({view: 'modal', bool: true}));
-          const res = await loadProjectFromDevice(selectedProject.project.fileName);
-          dispatch(setLoadingStatus({view: 'modal', bool: false}));
-          console.log('Done loading project', res);
-        }
-        else if (selectedProject.source === 'server') {
-          dispatch(setSelectedProject({project: '', source: ''}));
-          await initializeDownload(selectedProject.project);
-        }
-      }
-    }
-    catch (err) {
-      dispatch(setIsStatusMessagesModalVisible(false));
-      console.error('Error switching project in useProject', err);
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error loading the project. \n\nMessage:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
-      throw Error('Project Error');
-    }
-  };
-
   return {
     addDataset: addDataset,
     checkValidDateTime: checkValidDateTime,
@@ -294,7 +252,6 @@ const useProject = () => {
     isSpotInReadOnlyDataset: isSpotInReadOnlyDataset,
     makeDatasetCurrent: makeDatasetCurrent,
     setSwitchValue: setSwitchValue,
-    switchProject: switchProject,
   };
 };
 
