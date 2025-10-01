@@ -76,10 +76,9 @@ const StraboFieldProjects = () => {
               </Text>
             )}
             <Spacer/>
-            <SectionDivider dividerText={'Local Project Actions'}/>
+            <SectionDivider dividerText={'Other Project Actions'}/>
             <Text style={overlayStyles.statusMessageText}>
-              These actions affect a previously saved project on your device. The project will not be opened, and
-              your current project in the app will remain unchanged.
+              Affects locally saved projects only. {'\n'}Current project stays unchanged.
             </Text>
             <MainMenuPanelListItem onPress={onDeleteLocalCopy} title={'Delete'}/>
             <FlatListItemSeparator/>
