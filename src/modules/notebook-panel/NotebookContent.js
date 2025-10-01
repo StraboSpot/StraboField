@@ -48,7 +48,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const openPage = (key) => {
     dispatch(setNotebookPageVisible(key));
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+    if (SMALL_SCREEN || isReadOnly) dispatch(setModalVisible({modal: null}));
     else if (page.modal_component) {
       const populatedPagesKeys = getPopulatedPagesKeys(spot);
       if (populatedPagesKeys.includes(page.key)) dispatch(setModalVisible({modal: null}));

@@ -107,7 +107,10 @@ const ImageCard = ({
             value={title}
           />
         ) : (
-          <TouchableOpacity onPress={() => setIsEditing(true)} style={imageStyles.cardTitleEditingButton}>
+          <TouchableOpacity
+            disabled={isReadOnly}
+            onPress={() => setIsEditing(true)}
+            style={imageStyles.cardTitleEditingButton}>
             <Text
               ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
               numberOfLines={Platform.OS !== 'web' ? 1 : undefined}

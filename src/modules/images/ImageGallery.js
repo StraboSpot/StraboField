@@ -12,6 +12,7 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
+import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
@@ -19,6 +20,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   console.log('Rendering ImageGallery...');
 
   const navigate = useNavigation();
+  const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
 
   const dispatch = useDispatch();
@@ -40,8 +42,9 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
-  const renderImagesInSpot = (images) => {
-    return <ImagesList images={images} isThumbnailOnly openImage={openImage}/>;
+  const renderImagesInSpot = (images, section) => {
+    const isReadOnly = !isEmpty(section.spot) && isSpotInReadOnlyDataset(section.spot.properties.id);
+    return <ImagesList images={images} isReadOnly={isReadOnly} isThumbnailOnly openImage={openImage}/>;
   };
 
   const renderNoImagesText = () => {
@@ -93,7 +96,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           <SectionList
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
             keyExtractor={(item, index) => item + index}
-            renderItem={({item}) => renderImagesInSpot(item)}
+            renderItem={({item, section}) => renderImagesInSpot(item, section)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
             sections={spotsAsSections}
             stickySectionHeadersEnabled={true}
