@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
-import {PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -118,7 +118,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
         buttonStyle={{justifyContent: 'flex-start', padding: 0, paddingHorizontal: 0}}
         onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
         title={getSpotCoordText()}
-        titleStyle={{textAlign: 'left', color: PRIMARY_TEXT_COLOR}}
+        titleStyle={{textAlign: 'left', fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
         type={'clear'}
       />
     );
