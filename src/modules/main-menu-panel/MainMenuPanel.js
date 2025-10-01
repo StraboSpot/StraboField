@@ -175,7 +175,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.DELETE_PROJECT:
         return <DeleteProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
-        return <DownloadProjectPage/>;
+        return <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
       case SIDE_PANEL_VIEWS.EXPORT_PROJECT:
         return <ExportProjectPage/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:

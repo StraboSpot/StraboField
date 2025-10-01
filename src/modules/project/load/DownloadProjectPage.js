@@ -8,15 +8,18 @@ import useDownload from '../../../services/useDownload';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
+import LoadProjectModal from './LoadProjectModal';
+import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 
 // Download Project
-const DownloadProjectPage = ({openMainMenuPanel}) => {
+const DownloadProjectPage = ({closeMainMenuPanel}) => {
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const project = useSelector(state => state.project.project);
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
+  const [isLoadProjectModalVisible, setIsLoadProjectModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
 
   const {initializeDownload} = useDownload();
@@ -25,18 +28,23 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
+  const closeProjectLoadModal = () => {
+    if (closeMainMenuPanel) closeMainMenuPanel();
+    setIsLoadProjectModalVisible(false);
+    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+  };
+
   const confirmDownloadProject = async (projectSelected) => {
     setProjectToDownload(projectSelected);
     if (isProjectLoadSelectionModalVisible) {
-      await initializeDownload(projectSelected);
-      openMainMenuPanel();
+      await initializeDownload(projectSelected, undefined, setIsLoadProjectModalVisible);
     }
     else setIsConfirmOverwriteModalVisible(true);
   };
 
   const downloadProject = async () => {
     closeConfirmOverwriteModal();
-    await initializeDownload(projectToDownload);
+    await initializeDownload(projectToDownload, undefined, setIsLoadProjectModalVisible);
   };
 
   const getTextOverride = () => {
@@ -67,6 +75,9 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
           loadProject={downloadProject}
           textOverride={getTextOverride()}
         />
+      )}
+      {isLoadProjectModalVisible && (
+        <LoadProjectModal closeModal={closeProjectLoadModal}/>
       )}
     </View>
   );

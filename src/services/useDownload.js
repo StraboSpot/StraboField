@@ -12,14 +12,11 @@ import {
   clearedStatusMessages,
   removedLastStatusMessage,
   setIsErrorMessagesModalVisible,
-  setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../modules/home/home.slice';
 import {useImages} from '../modules/images';
-import {MAIN_MENU_ITEMS} from '../modules/main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage, setSidePanelVisible} from '../modules/main-menu-panel/mainMenuPanel.slice';
 import {MAP_PROVIDERS} from '../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {
@@ -42,7 +39,6 @@ const useDownload = () => {
 
   const dispatch = useDispatch();
   const encodedLogin = useSelector(state => state.user.encoded_login);
-  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const project = useSelector(state => state.project.project);
 
@@ -216,9 +212,8 @@ const useDownload = () => {
     }
   };
 
-  const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
+  const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin, setIsLoadProjectModalVisible) => {
     const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
-    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     dispatch(setStatusMessageModalTitle(projectName));
     dispatch(clearedStatusMessages());
     if (Platform.OS !== 'web') dispatch(setIsStatusMessagesModalVisible(true));
@@ -233,9 +228,8 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setSidePanelVisible({bool: false}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
+      if (setIsLoadProjectModalVisible) setIsLoadProjectModalVisible(true);
     }
     catch (err) {
       console.error('Error Initializing Download.', err);
