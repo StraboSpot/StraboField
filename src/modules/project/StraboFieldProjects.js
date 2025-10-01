@@ -12,7 +12,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import Spacer from '../../shared/ui/Spacer';
-import uiStyles from '../../shared/ui/ui.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
@@ -77,7 +76,11 @@ const StraboFieldProjects = () => {
               </Text>
             )}
             <Spacer/>
-            <SectionDivider dividerText={'Actions with Other Locally\nSaved Projects on Device'}/>
+            <SectionDivider dividerText={'Local Project Actions'}/>
+            <Text style={overlayStyles.statusMessageText}>
+              These actions affect a previously saved project on your device. The project will not be opened, and
+              your current project in the app will remain unchanged.
+            </Text>
             <MainMenuPanelListItem onPress={onDeleteLocalCopy} title={'Delete'}/>
             <FlatListItemSeparator/>
             <MainMenuPanelListItem
@@ -86,11 +89,6 @@ const StraboFieldProjects = () => {
             />
             {Platform.OS === 'ios' && (
               <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-                <View style={{padding: 10, alignItems: 'center'}}>
-                  <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
-                    Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
-                  </Text>
-                </View>
                 <Button
                   buttonStyle={commonStyles.standardButton}
                   containerStyle={commonStyles.buttonPadding}

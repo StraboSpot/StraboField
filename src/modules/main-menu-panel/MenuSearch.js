@@ -15,6 +15,7 @@ const MenuSearch = ({searchState, setSearchState}) => {
 
   return (
     <SearchBar
+      autoCorrect={false}
       cancelIcon
       clearIcon
       containerStyle={{
