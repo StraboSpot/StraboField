@@ -24,7 +24,6 @@ import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import BackupProjectPage from '../project/backup/BackupProjectPage';
 import ExportProjectPage from '../project/backup/ExportProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
-import DatasetDetail from '../project/datasets/DatasetDetail';
 import DatasetsPage from '../project/datasets/DatasetsPage';
 import DeleteProjectPage from '../project/delete/DeleteProjectPage';
 import DownloadProjectPage from '../project/load/DownloadProjectPage';
@@ -54,7 +53,6 @@ const MainMenuPanel = forwardRef(({
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
-  const [datasetToView, setDatasetToView] = useState({});
   const [searchState, setSearchState] = useState('');
 
   useEffect(() => {
@@ -64,7 +62,11 @@ const MainMenuPanel = forwardRef(({
   const renderMainMenuContent = () => {
     return (
       <>
-        {!isSidePanelVisible && <MainMenuPanelHeader/>}
+        {!isSidePanelVisible
+          && (!mainMenuPageVisible
+            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS))
+          && <MainMenuPanelHeader/>
+        }
         {renderMainMenuList()}
       </>
     );
@@ -74,11 +76,11 @@ const MainMenuPanel = forwardRef(({
     switch (mainMenuPageVisible) {
       // Manage Project
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS:
-        return <DatasetsPage setDatasetToView={setDatasetToView}/>;
+        return <DatasetsPage/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP:
         return <BackupProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
-        return <ProjectDescription setDatasetToView={setDatasetToView}/>;
+        return <ProjectDescription/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
         return <ProjectPrivacyPage/>;
 
@@ -170,8 +172,6 @@ const MainMenuPanel = forwardRef(({
 
   const renderSidePanelContent = () => {
     switch (sidePanelView) {
-      case SIDE_PANEL_VIEWS.DATASET_DETAIL:
-        return <DatasetDetail dataset={datasetToView}/>;
       case SIDE_PANEL_VIEWS.DELETE_PROJECT:
         return <DeleteProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:

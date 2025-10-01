@@ -1,21 +1,17 @@
-import React, {useState} from 'react';
-import {Platform, View, Text} from 'react-native';
+import React from 'react';
+import {Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
-import {setIsProjectLoadComplete} from '../../home/home.slice';
-import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
-import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {
-  const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -27,9 +23,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
 
-  const viewDataset = () => {
+  const handleDatasetPressed = () => {
     setDatasetToView(dataset);
-    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DATASET_DETAIL}));
   };
 
   const isActive = activeDatasetsIds.includes(dataset.id);
@@ -43,7 +38,6 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const onSwitch = async (val) => {
     const value = await setSwitchValue(val, dataset);
     console.log('Value has been switched', value);
-    dispatch(setIsProjectLoadComplete(true));
   };
 
   return (
@@ -51,7 +45,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
       <ListItem
         containerStyle={{paddingHorizontal: 10, paddingVertical: 5}}
         key={dataset.id}
-        onPress={() => viewDataset(dataset.id, dataset.name)}
+        onPress={handleDatasetPressed}
         pad={10}
       >
         <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>

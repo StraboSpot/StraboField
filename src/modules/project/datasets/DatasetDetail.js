@@ -14,12 +14,11 @@ import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
-import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
-const DatasetDetail = ({dataset}) => {
+const DatasetDetail = ({closeDetailView, dataset}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
@@ -35,11 +34,9 @@ const DatasetDetail = ({dataset}) => {
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
 
-  const backToProjectPanel = () => dispatch(setSidePanelVisible({bool: false}));
-
   const downloadImages = async () => {
     await initializeDownloadImages(dataset);
-    backToProjectPanel();
+    closeDetailView();
   };
 
   const handleBackPressed = () => {
@@ -47,7 +44,7 @@ const DatasetDetail = ({dataset}) => {
       saveDataset();
       toast.show('Changes Saved!', 'success');
     }
-    backToProjectPanel();
+    closeDetailView();
   };
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
@@ -56,7 +53,7 @@ const DatasetDetail = ({dataset}) => {
     setIsDeleteConfirmModalVisible(false);
     if (dataset && dataset.id) {
       destroyDataset(dataset.id)
-        .then(backToProjectPanel)
+        .then(closeDetailView())
         .catch(err => console.log('Error deleting dataset', err));
     }
     else console.error('Target dataset or id is undefined!');
@@ -295,7 +292,7 @@ const DatasetDetail = ({dataset}) => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
     datasetCopy = {...datasetCopy, name: datasetName};
     dispatch(updatedDatasetProperties(datasetCopy));
-    backToProjectPanel();
+    closeDetailView();
   };
 
   return (

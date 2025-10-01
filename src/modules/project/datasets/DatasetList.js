@@ -19,7 +19,7 @@ const DatasetList = ({setDatasetToView}) => {
         keyExtractor={item => item.id}
         renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
       />
-     </View>
+    </View>
   );
 };
 
