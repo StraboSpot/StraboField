@@ -60,13 +60,11 @@ const StatusModal = ({openMainMenuPanel}) => {
       showCloseButton={!isModalLoading && selectedProject.source !== ''}
     >
       <View>
-        {isModalLoading && (
-          <LottieAnimations
-            doesLoop={isModalLoading}
-            show={isModalLoading}
-            type={'loadingFile'}
-          />
-        )}
+        <LottieAnimations
+          doesLoop={isModalLoading}
+          show={isModalLoading}
+          type={isModalLoading ? 'loadingFile' : 'complete'}
+        />
         <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
         {!isModalLoading && <View style={{alignItems: 'center'}}>
           {(selectedProject.source === 'device' || selectedProject.source === 'server') && (
