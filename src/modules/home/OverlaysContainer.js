@@ -8,8 +8,8 @@ import {setIsProjectLoadSelectionModalVisible} from './home.slice';
 import LoadingSpinner from '../../shared/ui/Loading';
 import {ErrorModal, StatusModal, WarningModal} from '../../shared/ui/modals';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
+import DatasetPreferencesModal from '../project/datasets/DatasetPreferencesModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
-import LoadProjectModal from '../project/load/LoadProjectModal';
 
 const OverlaysContainer = forwardRef(({
                                         closeMainMenuPanel,
@@ -25,7 +25,7 @@ const OverlaysContainer = forwardRef(({
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
-  const closeProjectLoadModal = () => {
+  const closeDatasetPreferencesModal = () => {
     if (closeMainMenuPanel) closeMainMenuPanel();
     if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
   };
@@ -36,7 +36,7 @@ const OverlaysContainer = forwardRef(({
         <InitialProjectLoadModal closeMainMenuPanel={closeMainMenuPanel} openMainMenuPanel={openMainMenuPanel}/>
       )}
       {isProjectLoadSelectionModalVisible && Platform.OS === 'web' && (
-        <LoadProjectModal closeModal={closeProjectLoadModal}/>
+        <DatasetPreferencesModal closeModal={closeDatasetPreferencesModal}/>
       )}
       <ErrorModal/>
       <StatusModal openMainMenuPanel={openMainMenuPanel}/>

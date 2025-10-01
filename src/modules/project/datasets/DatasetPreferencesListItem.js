@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Pressable, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,7 +13,7 @@ import {SwitchWrapper} from '../../../shared/ui/';
 import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 
-const DatasetSummaryListItem = ({dataset}) => {
+const DatasetPreferencesListItem = ({dataset}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
@@ -152,4 +152,4 @@ const DatasetSummaryListItem = ({dataset}) => {
   );
 };
 
-export default DatasetSummaryListItem;
+export default DatasetPreferencesListItem;
