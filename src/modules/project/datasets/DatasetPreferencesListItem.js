@@ -23,6 +23,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const {makeDatasetCurrent, setSwitchValue} = useProject();
 
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
+  const [downloadedImages, setDownloadedImages] = useState(0);
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
@@ -114,8 +115,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
               type={'material-community'}
             />
           )}
-          <Text style={{color: WARNING_COLOR, fontSize: PRIMARY_TEXT_SIZE, paddingLeft: 5}}>
-            {isDownloadingImages ? 'Downloading...'
+          <Text style={{color: WARNING_COLOR, fontSize: PRIMARY_TEXT_SIZE, paddingLeft: 5, textAlign: 'left'}}>
+            {isDownloadingImages ? `Downloading...\n${imagesNeededCount.toString()} images`
               : 'Download ' + imagesNeededCount.toString() + '\nNeeded '
               + (imagesNeededCount === 1 ? ' Image' : ' Images')}
           </Text>

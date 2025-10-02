@@ -23,7 +23,8 @@ const ConfirmOverwriteModal = ({
   const currentProjectName = useSelector(state => state.project.project?.description?.project_name);
 
   const modalText = textOverride ? textOverride
-    : 'What do you want to do with the current project (' + currentProjectName + ')?';
+    : `You are going to overwrite the project \n${currentProjectName} \nwith the project 
+    ${(project?.name || project?.fileName)}.`;
 
   const goToBackupPage = () => {
     closeModal();
@@ -37,11 +38,15 @@ const ConfirmOverwriteModal = ({
     loadProject();
   };
 
+  const headerTitle = () => {
+    return `Overwrite Project ${currentProjectName}?`;
+  };
+
   return (
     <ModalWrapper
       actionTitle={'Cancel'}
       closeModal={closeModal}
-      headerTitle={'Load Project'}
+      headerTitle={headerTitle()}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton

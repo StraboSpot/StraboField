@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    paddingBottom: 5,
+    paddingBottom: 15,
   },
   sectionDividerWithButtonContainer: {
     alignItems: 'flex-end',

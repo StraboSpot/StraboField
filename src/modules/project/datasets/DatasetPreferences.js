@@ -4,6 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import DatasetPreferencesListItem from './DatasetPreferencesListItem';
+import {truncateText} from '../../../shared/Helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../../shared/ui/SectionDivider';
@@ -11,7 +12,7 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 const DatasetPreferences = () => {
   console.log('Rendering DatasetPreferencesModal...');
 
-  const datasets = useSelector(state => state.project.datasets) || {};
+  const {datasets, project} = useSelector(state => state.project) || {};
 
   return (
     <View style={{flex: 1}}>
@@ -20,7 +21,8 @@ const DatasetPreferences = () => {
           All settings may be modified later on the Datasets page. The Target dataset will be used for new Spots.
         </Text>
       </View>
-      <SectionDivider dividerText={'Datasets'}/>
+      <SectionDivider
+        dividerText={`Datasets for project:  ${truncateText(project.description.project_name, 20)}`}/>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         data={Object.values(datasets)}
