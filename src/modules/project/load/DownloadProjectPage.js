@@ -3,14 +3,14 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/useDownload';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
+import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 
 // Download Project
-const DownloadProjectPage = ({closeMainMenuPanel}) => {
+const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
@@ -27,7 +27,7 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
 
   const confirmDownloadProject = async (projectSelected) => {
     setProjectToDownload(projectSelected);
-    if (isProjectLoadSelectionModalVisible) downloadProject();
+    if (isProjectLoadSelectionModalVisible) await downloadProject();
     else setIsConfirmOverwriteModalVisible(true);
   };
 
@@ -35,6 +35,8 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
     closeConfirmOverwriteModal();
     await initializeDownload(projectToDownload);
     closeMainMenuPanel();
+    closeNotebookPanel();
+    console.log('Done downloading project', projectToDownload);
   };
 
   const getTextOverride = () => {
@@ -61,8 +63,11 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
       {/* Modal */}
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
+          closeMainMenuPanel={closeMainMenuPanel}
           closeModal={closeConfirmOverwriteModal}
+          closeNotebookPanel={closeNotebookPanel}
           loadProject={downloadProject}
+          project={projectToDownload}
           textOverride={getTextOverride()}
         />
       )}

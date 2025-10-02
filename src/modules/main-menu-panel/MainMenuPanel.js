@@ -43,6 +43,7 @@ import UserProfile from '../user/UserProfile';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
+                                    closeNotebookPanel,
                                     navigation,
                                     openNotebookPanel,
                                     openSpotInNotebook,
@@ -175,7 +176,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.DELETE_PROJECT:
         return <DeleteProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
-        return <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
+        return <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.EXPORT_PROJECT:
         return <ExportProjectPage/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
@@ -185,7 +186,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
         return <NewProjectPage/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
-        return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
+        return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:

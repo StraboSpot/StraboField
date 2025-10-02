@@ -11,7 +11,14 @@ import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 
-const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
+const ConfirmOverwriteModal = ({
+                                 closeModal,
+                                 closeNotebookPanel,
+                                 closeMainMenuPanel,
+                                 loadProject,
+                                 project,
+                                 textOverride,
+                               }) => {
   const dispatch = useDispatch();
   const currentProjectName = useSelector(state => state.project.project?.description?.project_name);
 
@@ -22,6 +29,12 @@ const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
     closeModal();
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
+  };
+
+  const handleLoadProject = () => {
+    closeMainMenuPanel();
+    closeNotebookPanel();
+    loadProject();
   };
 
   return (
@@ -36,7 +49,7 @@ const ConfirmOverwriteModal = ({closeModal, loadProject, textOverride}) => {
       <View>
         <Text style={overlayStyles.statusMessageText}>{modalText}</Text>
         <View style={[commonStyles.standardDescriptionText, {padding: 10}]}>
-          <ActionButton onPress={loadProject} title={'Overwrite'}/>
+          <ActionButton onPress={handleLoadProject} title={'Overwrite'}/>
           <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
         </View>
       </View>

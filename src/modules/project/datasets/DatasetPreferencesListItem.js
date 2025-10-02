@@ -1,5 +1,5 @@
-import React from 'react';
-import {Platform, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,6 +22,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const {initializeDownloadImages} = useDownload();
   const {makeDatasetCurrent, setSwitchValue} = useProject();
 
+  const [isDownloadingImages, setIsDownloadingImages] = useState(false);
+
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
@@ -31,7 +33,16 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const isActive = activeDatasetsIds.includes(dataset.id);
 
   const downloadImages = async () => {
-    await initializeDownloadImages(dataset);
+    setIsDownloadingImages(true);
+    try {
+      await initializeDownloadImages(dataset);
+    }
+    catch (err) {
+      console.error('Error downloading images:', err);
+    }
+    finally {
+      setIsDownloadingImages(false);
+    }
   };
 
   const isDisabled = (id) => {
@@ -89,10 +100,13 @@ const DatasetPreferencesListItem = ({dataset}) => {
     return (
       <ListItem
         containerStyle={[commonStyles.listItemFormField, {paddingHorizontal: 0}]}
+        disabled={isDownloadingImages}
         onPress={downloadImages}
       >
-        <ListItem.Content style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
-          {imagesNeededCount > 0 && (
+        <ListItem.Content style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
+          {isDownloadingImages ? (
+            <ActivityIndicator color={WARNING_COLOR} size='small'/>
+          ) : (
             <Icon
               color={WARNING_COLOR}
               name={'download-circle-outline'}
@@ -101,7 +115,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             />
           )}
           <Text style={{color: WARNING_COLOR, fontSize: PRIMARY_TEXT_SIZE, paddingLeft: 5}}>
-            {imagesNeededCount === 0 ? ''
+            {isDownloadingImages ? 'Downloading...'
               : 'Download ' + imagesNeededCount.toString() + '\nNeeded '
               + (imagesNeededCount === 1 ? ' Image' : ' Images')}
           </Text>
@@ -140,7 +154,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
               Images: {imagesCount}
             </ListItem.Subtitle>
           </ListItem.Content>
-          {Platform.OS !== 'web' && renderDownloadImages()}
+          {Platform.OS !== 'web' && imagesNeededCount > 0 && renderDownloadImages()}
         </View>
         <View style={{flex: 1, flexDirection: 'column'}}>
           {renderStateIcon()}

@@ -17,7 +17,7 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Open project on device in StraboSpot app directory
-const OpenProjectPage = ({closeMainMenuPanel}) => {
+const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
@@ -47,7 +47,6 @@ const OpenProjectPage = ({closeMainMenuPanel}) => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setSidePanelVisible({bool: false}));
-      closeMainMenuPanel();
       console.log('Done loading project', res);
     }
     catch (err) {
@@ -74,8 +73,11 @@ const OpenProjectPage = ({closeMainMenuPanel}) => {
       {/* Modal */}
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
+          closeMainMenuPanel={closeMainMenuPanel}
           closeModal={closeConfirmOverwriteModal}
+          closeNotebookPanel={closeNotebookPanel}
           loadProject={() => openProject(projectToOpen)}
+          project={projectToOpen}
         />
       )}
     </>

@@ -28,42 +28,64 @@ const StatusModal = () => {
     if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     if (Platform.OS === 'web' && isLoadingProject) setIsShowingDatasetPreferences(true);
     else setIsShowingDatasetPreferences(false);
-  }, [isStatusMessagesModalVisible]);
+  }, [isStatusMessagesModalVisible, isLoadingProject, dispatch, isProjectLoadSelectionModalVisible]);
 
-  const closeModal = () => dispatch(setIsStatusMessagesModalVisible(false));
+  const closeModal = () => {
+    // Reset dataset preferences view before closing
+    setIsShowingDatasetPreferences(false);
+
+    // Close the modal first
+    dispatch(setIsStatusMessagesModalVisible(false));
+  };
+
+  const getOverlayStyle = () => {
+    // When showing dataset preferences, make modal larger
+    if (isShowingDatasetPreferences) {
+      return {
+        height: '80%',
+        width: Platform.OS === 'web' ? 600 : '40%',
+      };
+    }
+    // When loading or showing status messages, use smaller width
+    return {
+      maxHeight: '80%',
+      // width: Platform.OS === 'web' ? 400 : '40%',
+    };
+  };
 
   return (
     <ModalWrapper
       actionTitle={'Ok'}
       closeModal={closeModal}
       headerTitle={isShowingDatasetPreferences ? 'Dataset Preferences' : 'Status'}
+      isLoading={isModalLoading}
       isVisible={isStatusMessagesModalVisible}
       onActionPressed={closeModal}
       onCancelPress={closeModal}
-      overlayStyleOverride={isLoadingProject && {height: '80%', width: 450}}
+      overlayStyleOverride={getOverlayStyle()}
       showActionButton={isShowingDatasetPreferences}
-      showCancelButton={!isModalLoading && !isLoadingProject}
+      showCancelButton={false}
       showCloseButton={!isModalLoading || isShowingDatasetPreferences}
     >
-      <View style={{flex: 1}}>
-        {!isShowingDatasetPreferences && (
-          <>
-            <LottieAnimations
-              doesLoop={isModalLoading}
-              show={isModalLoading}
-              type={isModalLoading ? 'loadingFile' : 'complete'}
-            />
-            <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
-            {!isModalLoading && isLoadingProject && (
-              <OutlineButton
-                onPress={() => setIsShowingDatasetPreferences(true)}
-                title={'Show Datasets'}
-              />
-            )}
-          </>
-        )}
-        {isShowingDatasetPreferences && isLoadingProject && <DatasetPreferences/>}
-      </View>
+      {!isShowingDatasetPreferences && (
+        <View>
+          <LottieAnimations
+            doesLoop={isModalLoading}
+            show={isModalLoading}
+            type={isModalLoading ? 'loadingFile' : 'complete'}
+          />
+          <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
+        </View>
+      )}
+      {!isModalLoading && isLoadingProject && !isShowingDatasetPreferences && (
+        <OutlineButton
+          onPress={() => setIsShowingDatasetPreferences(true)}
+          title={'Show Datasets'}
+        />
+      )}
+      {isShowingDatasetPreferences && isLoadingProject && (
+        <DatasetPreferences/>
+      )}
     </ModalWrapper>
   );
 };
