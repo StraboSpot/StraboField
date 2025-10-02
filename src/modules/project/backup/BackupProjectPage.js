@@ -25,7 +25,6 @@ const BackupProjectPage = () => {
   const user = useSelector(state => state.user);
 
   const [backupAction, setBackupAction] = useState(undefined);
-  const [isProgressModalVisible, setIsProgressModalVisible] = useState(false);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
@@ -42,7 +41,7 @@ const BackupProjectPage = () => {
     }
     else {
       dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There are no active datasets selected.'));
+      dispatch(addedStatusMessage('There are no visible datasets selected.'));
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };

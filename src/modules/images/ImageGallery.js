@@ -31,7 +31,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
   let sortedSpotsWithImages = [];
 
@@ -48,7 +48,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderNoImagesText = () => {
-    return <ListEmptyText text={'No Images in Active Datasets'}/>;
+    return <ListEmptyText text={'No Images in Visible Datasets'}/>;
   };
 
   const renderSectionHeader = ({spot}) => {
@@ -90,7 +90,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in active Spots
+            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
           </Text>
           <LittleSpacer/>
           <SectionList

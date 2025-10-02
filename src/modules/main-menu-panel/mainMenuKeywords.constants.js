@@ -4,7 +4,7 @@ export const MENU_KEYWORDS = {
   MANAGE_PROJECT: [
     {
       key: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS,
-      keywords: ['datasets', 'read only', 'active', 'target', 'download images'],
+      keywords: ['datasets', 'read only', 'visible', 'target', 'download images'],
     },
     {
       key: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP,

@@ -134,7 +134,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         <SectionDivider dividerText={'Recent Spots'}/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
+          ListEmptyComponent={<ListEmptyText text={'No Spots in Visible Datasets'}/>}
           data={spotsList}
           keyExtractor={item => item.properties.id.toString()}
           renderItem={({item}) => (

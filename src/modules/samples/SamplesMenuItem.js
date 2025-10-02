@@ -22,10 +22,10 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
   const renderNoSamplesText = () => {
-    return <ListEmptyText text={'No Samples in Active Datasets'}/>;
+    return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
   };
 
   const renderSample = (sample, spot) => {
@@ -66,7 +66,7 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={{flex: 1}}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' sample' : ' samples')} in active Spots
+            Found {count + (count === 1 ? ' sample' : ' samples')} in visible Spots
           </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}

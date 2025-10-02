@@ -79,7 +79,7 @@ const AddRemoveTagFeatures = () => {
       <View style={{...commonStyles.buttonContainer, flex: 1}}>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Features in Active Datasets'}/>}
+          ListEmptyComponent={<ListEmptyText text={'No Features in Visible Datasets'}/>}
           data={getAllFeaturesFromSpot()}
           renderItem={({item}) => renderSpotFeatureItem(item)}
         />

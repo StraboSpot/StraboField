@@ -77,7 +77,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
           style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
         >
           <View style={{flex: 1}}>
-            <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Active?'}</Text>
+            <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
           </View>
         </ListItem.Content>
         <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
