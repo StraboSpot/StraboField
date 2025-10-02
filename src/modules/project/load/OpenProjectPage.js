@@ -12,13 +12,12 @@ import {
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../../home/home.slice';
-import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Open project on device in StraboSpot app directory
-const OpenProjectPage = () => {
+const OpenProjectPage = ({closeMainMenuPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
@@ -48,7 +47,7 @@ const OpenProjectPage = () => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setSidePanelVisible({bool: false}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+      closeMainMenuPanel();
       console.log('Done loading project', res);
     }
     catch (err) {

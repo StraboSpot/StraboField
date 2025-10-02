@@ -1,93 +1,68 @@
-import React from 'react';
-import {Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-import {setIsStatusMessagesModalVisible, setLoadingStatus} from '../../../modules/home/home.slice';
+import {setIsProjectLoadSelectionModalVisible, setIsStatusMessagesModalVisible} from '../../../modules/home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../../modules/main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage} from '../../../modules/main-menu-panel/mainMenuPanel.slice';
-import {setSelectedProject} from '../../../modules/project/projects.slice';
-import useDownload from '../../../services/useDownload';
-import useImport from '../../../services/useImport';
+import DatasetPreferences from '../../../modules/project/datasets/DatasetPreferences';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {isEmpty} from '../../Helpers';
+import OutlineButton from '../buttons/OutlineButton';
 
-const StatusModal = ({openMainMenuPanel}) => {
+const StatusModal = () => {
   const dispatch = useDispatch();
   const isModalLoading = useSelector(state => state.home.loading.modal);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
-  const selectedProject = useSelector(state => state.project.selectedProject) || {};
   const statusMessages = useSelector(state => state.home.statusMessages);
+  const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
 
-  const {loadProjectFromDevice} = useImport();
-  const {initializeDownload} = useDownload();
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
-  const getProjectFromSource = async () => {
-    if (selectedProject.source === 'device') {
-      console.log('FROM DEVICE', selectedProject.project);
-      dispatch(setSelectedProject({source: '', project: ''}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
-      dispatch(setLoadingStatus({view: 'modal', bool: true}));
-      const res = await loadProjectFromDevice(selectedProject.project.fileName);
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      console.log('Done loading project', res);
-    }
-    else if (selectedProject.source === 'server') {
-      console.log('FROM SERVER', selectedProject.project);
-      dispatch(setSelectedProject({source: '', project: ''}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
-      await initializeDownload(selectedProject.project);
-    }
-    else {
-      dispatch(setIsStatusMessagesModalVisible(false));
-      openMainMenuPanel();
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.ACTIVE_PROJECTS}));
-    }
-  };
+  const isLoadingProject = mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS;
+
+  const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
+
+  useEffect(() => {
+    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+    if (Platform.OS === 'web' && isLoadingProject) setIsShowingDatasetPreferences(true);
+    else setIsShowingDatasetPreferences(false);
+  }, [isStatusMessagesModalVisible]);
+
+  const closeModal = () => dispatch(setIsStatusMessagesModalVisible(false));
 
   return (
     <ModalWrapper
       actionTitle={'Ok'}
-      closeModal={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      headerTitle={'Status'}
+      closeModal={closeModal}
+      headerTitle={isShowingDatasetPreferences ? 'Dataset Preferences' : 'Status'}
       isVisible={isStatusMessagesModalVisible}
-      onActionPressed={() => dispatch(setIsStatusMessagesModalVisible(false))}
-      showActionButton={!isModalLoading && selectedProject.source === ''}
-      showCancelButton={false}
-      showCloseButton={!isModalLoading && selectedProject.source !== ''}
+      onActionPressed={closeModal}
+      onCancelPress={closeModal}
+      overlayStyleOverride={isLoadingProject && {height: '80%', width: 450}}
+      showActionButton={isShowingDatasetPreferences}
+      showCancelButton={!isModalLoading && !isLoadingProject}
+      showCloseButton={!isModalLoading || isShowingDatasetPreferences}
     >
-      <View>
-        <LottieAnimations
-          doesLoop={isModalLoading}
-          show={isModalLoading}
-          type={isModalLoading ? 'loadingFile' : 'complete'}
-        />
-        <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
-        {!isModalLoading && <View style={{alignItems: 'center'}}>
-          {(selectedProject.source === 'device' || selectedProject.source === 'server') && (
-            <Text style={{fontWeight: 'bold', textAlign: 'center'}}>Press Continue to load project</Text>
-          )}
-          <View style={{flexDirection: 'row'}}>
-            <Button
-              containerStyle={{padding: 10}}
-              onPress={() => getProjectFromSource(selectedProject)}
-              title={!isEmpty(selectedProject.source) && selectedProject.source !== '' && 'Continue'}
-              type={'clear'}
+      <View style={{flex: 1}}>
+        {!isShowingDatasetPreferences && (
+          <>
+            <LottieAnimations
+              doesLoop={isModalLoading}
+              show={isModalLoading}
+              type={isModalLoading ? 'loadingFile' : 'complete'}
             />
-            {!isEmpty(selectedProject.source) && selectedProject.source !== '' && (
-              <Button
-                containerStyle={{padding: 10}}
-                onPress={() => dispatch(setIsStatusMessagesModalVisible(false))}
-                title={'Cancel'}
-                type={'clear'}
+            <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
+            {!isModalLoading && isLoadingProject && (
+              <OutlineButton
+                onPress={() => setIsShowingDatasetPreferences(true)}
+                title={'Show Datasets'}
               />
             )}
-          </View>
-        </View>
-        }
+          </>
+        )}
+        {isShowingDatasetPreferences && isLoadingProject && <DatasetPreferences/>}
       </View>
     </ModalWrapper>
   );

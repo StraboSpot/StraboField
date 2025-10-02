@@ -5,10 +5,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/useDownload';
-import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
-import DatasetPreferencesModal from '../datasets/DatasetPreferencesModal';
 import ProjectList from '../ProjectList';
 
 // Download Project
@@ -19,7 +17,6 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
   const project = useSelector(state => state.project.project);
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
-  const [isDatasetsPreferencesModalVisible, setIsDatasetsPreferencesModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
 
   const {initializeDownload} = useDownload();
@@ -28,23 +25,16 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
-  const closeProjectLoadModal = () => {
-    if (closeMainMenuPanel) closeMainMenuPanel();
-    setIsDatasetsPreferencesModalVisible(false);
-    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
-  };
-
   const confirmDownloadProject = async (projectSelected) => {
     setProjectToDownload(projectSelected);
-    if (isProjectLoadSelectionModalVisible) {
-      await initializeDownload(projectSelected, undefined, setIsDatasetsPreferencesModalVisible);
-    }
+    if (isProjectLoadSelectionModalVisible) downloadProject();
     else setIsConfirmOverwriteModalVisible(true);
   };
 
   const downloadProject = async () => {
     closeConfirmOverwriteModal();
-    await initializeDownload(projectToDownload, undefined, setIsDatasetsPreferencesModalVisible);
+    await initializeDownload(projectToDownload);
+    closeMainMenuPanel();
   };
 
   const getTextOverride = () => {
@@ -76,7 +66,6 @@ const DownloadProjectPage = ({closeMainMenuPanel}) => {
           textOverride={getTextOverride()}
         />
       )}
-      {isDatasetsPreferencesModalVisible && <DatasetPreferencesModal closeModal={closeProjectLoadModal}/>}
     </View>
   );
 };

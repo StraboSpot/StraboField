@@ -97,25 +97,20 @@ const useProject = () => {
 
   const destroyDataset = async (id) => {
     try {
-      dispatch(setIsStatusMessagesModalVisible(true));
-      dispatch(setLoadingStatus({view: 'modal', bool: true}));
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Deleting Dataset...'));
       if (datasets && datasets[id] && datasets[id].spotIds) {
         console.log(datasets[id].spotIds.length, 'Spot(s) in Dataset to Delete.');
-        dispatch(deletedSpots(datasets[id].spotIds));
-        // ToDo Need to delete images for deleted Spots
+        dispatch(deletedSpots(datasets[id].spotIds));     // ToDo Need to delete images for deleted Spots
       }
       dispatch(deletedDataset(id));
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Finished Deleting Dataset.'));
     }
     catch (err) {
+      dispatch(setLoadingStatus({view: 'modal', bool: false}));
+      dispatch(setIsStatusMessagesModalVisible(true));
+      dispatch(clearedStatusMessages());
       console.log('Error Deleting Dataset.');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Deleting Dataset.'));
     }
-    dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };
 
   const getActiveDatasets = () => {

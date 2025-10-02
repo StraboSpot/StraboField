@@ -212,11 +212,11 @@ const useDownload = () => {
     }
   };
 
-  const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin, setIsDatasetsPreferencesModalVisible) => {
+  const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
     const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
     dispatch(setStatusMessageModalTitle(projectName));
     dispatch(clearedStatusMessages());
-    if (Platform.OS !== 'web') dispatch(setIsStatusMessagesModalVisible(true));
+    dispatch(setIsStatusMessagesModalVisible(true));
     dispatch(setLoadingStatus({view: 'modal', bool: true}));
     dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
     try {
@@ -229,7 +229,6 @@ const useDownload = () => {
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      if (setIsDatasetsPreferencesModalVisible) setIsDatasetsPreferencesModalVisible(true);
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

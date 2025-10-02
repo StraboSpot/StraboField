@@ -185,7 +185,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
         return <NewProjectPage/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
-        return <OpenProjectPage/>;
+        return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
