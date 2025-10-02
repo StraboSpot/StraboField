@@ -1,21 +1,21 @@
 import {isEmpty, roundToDecimalPlaces, toDegrees, toRadians} from '../../shared/Helpers';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 
-const useCompassCalculations = ({formRefCurrent, selectedAttitude, selectedMeasurement}) => {
+const useCompassCalculations = () => {
 
-  const calcDipDir = (strike) => {
+  const calcDipDir = (strike, formRefCurrent) => {
     console.log('Calculating dip direction...');
     let dipDirection = (strike + 90) % 360;
     formRefCurrent.setFieldValue('dip_direction', roundToDecimalPlaces(dipDirection, 0));
   };
 
-  const calcStrike = (dipDirection) => {
+  const calcStrike = (dipDirection, formRefCurrent) => {
     console.log('Calculating strike...');
     let strike = (dipDirection - 90) % 360;
     formRefCurrent.setFieldValue('strike', roundToDecimalPlaces(strike, 0));
   };
 
-  const calcTrendPlunge = (rake) => {
+  const calcTrendPlunge = (rake, formRefCurrent, selectedAttitude) => {
     console.log('Calculating trend and plunge...');
     const strike = selectedAttitude.strike;
     const dip = selectedAttitude.dip;
@@ -31,19 +31,24 @@ const useCompassCalculations = ({formRefCurrent, selectedAttitude, selectedMeasu
     formRefCurrent.setFieldValue('plunge', roundToDecimalPlaces(plunge, 0));
   };
 
-  const onMyChange = async (name, value) => {
+  const doMeasurementCalculations = async (name, value, formRefCurrent, selectedAttitude, selectedMeasurement) => {
     //console.log(name, 'changed to', value);
-    const valueAsInt = parseInt(value, 10);
     if (name === 'rake' && !isEmpty(value) && selectedMeasurement.type === MEASUREMENT_KEYS.LINEAR
       && selectedAttitude.id !== selectedMeasurement.id && !isEmpty(selectedAttitude.strike)
-      && !isEmpty(selectedAttitude.dip) && valueAsInt >= 0 && valueAsInt <= 180) calcTrendPlunge(valueAsInt);
-    if (name === 'strike' && !isEmpty(valueAsInt) && valueAsInt >= 0 && valueAsInt <= 360) calcDipDir(valueAsInt);
-    if (name === 'dip_direction' && !isEmpty(valueAsInt) && valueAsInt >= 0 && valueAsInt <= 360) calcStrike(valueAsInt);
+      && !isEmpty(selectedAttitude.dip) && value >= 0 && value <= 180) {
+      calcTrendPlunge(value, formRefCurrent, selectedAttitude);
+    }
+    else if (name === 'strike' && !isEmpty(value) && value >= 0 && value <= 360) {
+      calcDipDir(value, formRefCurrent);
+    }
+    else if (name === 'dip_direction' && !isEmpty(value) && value >= 0 && value <= 360) {
+      calcStrike(value, formRefCurrent);
+    }
     await formRefCurrent.setFieldValue(name, value);
   };
 
   return {
-    onMyChange: onMyChange,
+    doMeasurementCalculations: doMeasurementCalculations,
   };
 };
 

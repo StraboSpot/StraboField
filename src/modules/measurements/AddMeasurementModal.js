@@ -227,28 +227,28 @@ const AddMeasurementModal = ({onPress}) => {
               </>
 
             )}
-            {isManualMeasurement ? <AddManualMeasurements formProps={formProps} measurementType={typeKey}/>
-              : (
-                <>
-                  <Compass
-                    formValues={formProps.values}
-                    setMeasurements={setMeasurements}
-                    sliderValue={sliderValue}
+            {isManualMeasurement ? (
+              <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
+            ) : (
+              <>
+                <Compass
+                  formValues={formProps.values}
+                  setMeasurements={setMeasurements}
+                  sliderValue={sliderValue}
+                />
+                <View style={compassStyles.sliderContainer}>
+                  <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
+                  <SliderBar
+                    labels={['Low', '', '', '', 'High', 'N/R']}
+                    maximumValue={6}
+                    minimumValue={1}
+                    onSlidingComplete={setSliderValue}
+                    step={1}
+                    value={sliderValue}
                   />
-                  <View style={compassStyles.sliderContainer}>
-                    <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
-                    <SliderBar
-                      labels={['Low', '', '', '', 'High', 'N/R']}
-                      maximumValue={6}
-                      minimumValue={1}
-                      onSlidingComplete={setSliderValue}
-                      step={1}
-                      value={sliderValue}
-                    />
-                  </View>
-                </>
-              )
-            }
+                </View>
+              </>
+            )}
             {measurementTypeForForm === MEASUREMENT_KEYS.PLANAR
               && getPlanarTemplates(relevantTemplates).length <= 1 && (
                 <>

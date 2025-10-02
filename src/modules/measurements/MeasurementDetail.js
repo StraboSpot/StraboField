@@ -38,6 +38,7 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {doMeasurementCalculations} = useCompassCalculations();
   const {showErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
 
@@ -52,12 +53,6 @@ const MeasurementDetail = ({
   const selectedAttitude = selectedAttributes?.length > 0 ? JSON.parse(JSON.stringify(selectedAttributes[0]))
     : isTemplate ? selectedAttitudes[0]
       : {};
-
-  const {onMyChange} = useCompassCalculations({
-    formRefCurrent: formRef.current,
-    selectedAttitude: selectedAttitude,
-    selectedMeasurement: selectedMeasurement,
-  });
 
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
@@ -200,6 +195,17 @@ const MeasurementDetail = ({
       );
     }
     else addAssociatedMeasurement();
+  };
+
+  const onMyChange = (name, value) => {
+    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
+      const valueAsFloat = parseFloat(value, 10);
+      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
+        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
+      }
+      else formRef.current.setFieldValue(name, undefined);
+    }
+    else formRef.current.setFieldValue(name, value);
   };
 
   // Confirm switching the selected measurement
