@@ -46,6 +46,9 @@ const AddTephraModal = ({onPress}) => {
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
         onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <Tab
           indicatorStyle={{backgroundColor: PRIMARY_ACCENT_COLOR, height: 3}}

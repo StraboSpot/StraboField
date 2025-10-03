@@ -70,12 +70,12 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     const faciesModalWidth = width > 520 ? 700 : '90%';
     return (
       <ModalWrapper
-        closeModal={() => setIsFaciesModalVisible(false)}
+        actionTitle={'Done'}
         headerTitle={'Facies'}
+        onActionPressed={() => setIsFaciesModalVisible(false)}
         overlayStyleOverride={{width: faciesModalWidth, left: 20, height: '50%'}}
-        showActionButton={false}
+        showActionButton
         showCancelButton={false}
-        showCloseButton
       >
         <View style={{flex: 1, padding: 10}}>
           <ScrollView contentContainerStyle={{

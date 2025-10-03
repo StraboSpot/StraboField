@@ -122,7 +122,9 @@ const AddMineralModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
-        onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton={!areMultipleTemplates}
       >
         {!choicesViewKey && (
           <Templates

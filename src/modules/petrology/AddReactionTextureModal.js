@@ -64,7 +64,9 @@ const AddReactionTextureModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
-        onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <FlatList
           ListHeaderComponent={

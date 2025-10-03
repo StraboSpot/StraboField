@@ -290,6 +290,7 @@ const AddMeasurementModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
+        closeModal={onCloseButton}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
         showActionButton={false}
