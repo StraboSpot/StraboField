@@ -42,7 +42,7 @@ const StatusModal = () => {
     // When showing dataset preferences, make modal larger
     if (isShowingDatasetPreferences) {
       return {
-        height: '80%',
+        height: '60%',
         width: Platform.OS === 'web' ? 600 : '40%',
       };
     }

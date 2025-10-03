@@ -132,9 +132,8 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
-    flexShrink: 1,
     paddingLeft: 10,
-    paddingTop: 10,
+    paddingVertical: 5,
   },
   sectionDividerText: {
     color: PRIMARY_TEXT_COLOR,
