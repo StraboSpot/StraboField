@@ -74,6 +74,7 @@ const AddMineralModal = ({onPress}) => {
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
     else if (isShowTemplates) setIsShowTemplates(false);
+    else if (!isEmpty(selectedTypeIndex)) setSelectedTypeIndex(null);
     else dispatch(setModalVisible({modal: null}));
   };
 
@@ -120,13 +121,14 @@ const AddMineralModal = ({onPress}) => {
   const renderAddMineralModalContent = () => {
     return (
       <ModalWrapper
-        buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
+        buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
+        headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton={!areMultipleTemplates}
       >
-        {!choicesViewKey && (
+        {!choicesViewKey && isEmpty(selectedTypeIndex) && (
           <Templates
             isShowTemplates={isShowTemplates}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
