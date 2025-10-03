@@ -110,10 +110,7 @@ const ManualMeasurement = ({
                     step={1}
                     value={sliderValue}
                   />
-                  <ActionButton
-                    onPress={() => addAttributeMeasurement(formProps.values)}
-                    title={'Add to Attribute'}
-                  />
+                  <ActionButton onPress={() => addAttributeMeasurement(formProps.values)} title={'Add to Attribute'}/>
                 </View>
               </>
             )}

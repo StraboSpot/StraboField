@@ -286,7 +286,6 @@ const AddMeasurementModal = ({onPress}) => {
   const renderMeasurementModalContent = () => {
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     const formName = [groupKey, measurementTypeForForm];
-    const saveTitle = 'Save ' + typeObj.save_title + (relevantTemplates.length > 1 ? 's' : '');
     return (
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
@@ -319,7 +318,7 @@ const AddMeasurementModal = ({onPress}) => {
             />
           )}
           {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <ActionButton onPress={saveMeasurement} title={saveTitle}/>
+            <ActionButton onPress={saveMeasurement}/>
           )}
         </>
       </ModalWrapper>

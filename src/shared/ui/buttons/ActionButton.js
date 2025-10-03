@@ -18,7 +18,7 @@ const ActionButton = ({
       disabled={disabled}
       loading={isLoading}
       onPress={onPress}
-      title={title}
+      title={title || 'Save'}
       titleStyle={[commonStyles.standardButtonText, {color: SECONDARY_TEXT_COLOR}]}
       type={'solid'}
     />

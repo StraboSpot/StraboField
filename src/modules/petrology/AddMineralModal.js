@@ -118,27 +118,6 @@ const AddMineralModal = ({onPress}) => {
     );
   };
 
-  const renderAddMineralModalContent = () => {
-    return (
-      <ModalWrapper
-        buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
-        closeModal={onCloseModalPressed}
-        headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
-        showActionButton={false}
-        showCancelButton={false}
-        showCloseButton={!areMultipleTemplates}
-      >
-        {!choicesViewKey && isEmpty(selectedTypeIndex) && (
-          <Templates
-            isShowTemplates={isShowTemplates}
-            setIsShowTemplates={bool => setIsShowTemplates(bool)}
-          />
-        )}
-        {!isShowTemplates && renderAddMineral()}
-      </ModalWrapper>
-    );
-  };
-
   const renderForm = (formProps) => {
     return (
       <>
@@ -180,7 +159,6 @@ const AddMineralModal = ({onPress}) => {
   };
 
   const renderForms = () => {
-    const saveMineralTitle = 'Save Mineral' + (areMultipleTemplates ? 's' : '');
     return (
       <>
         {!areMultipleTemplates && (
@@ -204,7 +182,7 @@ const AddMineralModal = ({onPress}) => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <ActionButton onPress={saveMineral} title={saveMineralTitle}/>}
+        {!choicesViewKey && <ActionButton onPress={saveMineral}/>}
       </>
     );
   };
@@ -221,7 +199,24 @@ const AddMineralModal = ({onPress}) => {
     if (SMALL_SCREEN) onCloseModalPressed();
   };
 
-  return renderAddMineralModalContent();
+  return (
+    <ModalWrapper
+      buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
+      closeModal={onCloseModalPressed}
+      headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={!areMultipleTemplates}
+    >
+      {!choicesViewKey && isEmpty(selectedTypeIndex) && (
+        <Templates
+          isShowTemplates={isShowTemplates}
+          setIsShowTemplates={bool => setIsShowTemplates(bool)}
+        />
+      )}
+      {!isShowTemplates && renderAddMineral()}
+    </ModalWrapper>
+  );
 };
 
 export default AddMineralModal;

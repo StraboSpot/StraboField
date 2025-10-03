@@ -148,7 +148,7 @@ const AddThreeDStructureModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={save3DStructure} title={'Save 3D Structure'}/>}
+        {!choicesViewKey && <ActionButton onPress={save3DStructure}/>}
       </ModalWrapper>
     );
   };

@@ -142,7 +142,7 @@ const AddFabricModal = ({onPress}) => {
             bounces={false}
           />
         </>
-        {!choicesViewKey && <ActionButton onPress={saveFabric} title={'Save Fabric'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveFabric}/>}
       </ModalWrapper>
     );
   };

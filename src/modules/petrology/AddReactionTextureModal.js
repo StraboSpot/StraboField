@@ -89,7 +89,7 @@ const AddReactionTextureModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveReactionTexture}/>}
       </ModalWrapper>
     );
   };

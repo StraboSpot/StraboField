@@ -36,13 +36,13 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
       <ModalWrapper
-        actionTitle={isEmpty(initialValues) ? 'Add' : 'Update'}
-        buttonTitleRight={'Close'}
+        actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
         onActionPressed={handleSavePressed}
-        onCancelPress={confirmCloseModal}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
+        showCancelButton={false}
+        showCloseButton
         showDeleteButton={!isEmpty(initialValues)}
       >
         <FlatList

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button, Tab} from '@rn-vui/base';
+import {Tab} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -14,6 +14,7 @@ import {
   SECONDARY_BACKGROUND_COLOR,
   SMALL_SCREEN,
 } from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -91,14 +92,7 @@ const AddTephraModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && (
-          <Button
-            containerStyle={{height: 40, borderRadius: 10, marginTop: 10, marginBottom: 10}}
-            onPress={saveTephra}
-            textStyle={{color: PRIMARY_ACCENT_COLOR}}
-            title={'Save'}
-          />
-        )}
+        {!choicesViewKey && <ActionButton onPress={saveTephra}/>}
       </ModalWrapper>
     );
   };

@@ -96,7 +96,6 @@ const AddRockModal = ({modalKey, onPress}) => {
   };
 
   const renderAddRock = () => {
-    const saveRockTitle = 'Save Rock' + (areMultipleTemplates ? 's' : '');
     return (
       <>
         {!areMultipleTemplates && (
@@ -120,7 +119,7 @@ const AddRockModal = ({modalKey, onPress}) => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <ActionButton onPress={saveRock} title={saveRockTitle}/>}
+        {!choicesViewKey && <ActionButton onPress={saveRock}/>}
       </>
     );
   };

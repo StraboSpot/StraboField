@@ -157,12 +157,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
               isReadOnly={isReadOnly}
             />
           </ScrollView>
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && (
-            <ActionButton
-              onPress={() => saveFormAndGo()}
-              title={'Save Note'}
-            />
-          )}
+          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && <ActionButton onPress={saveFormAndGo}/>}
         </>
       )}
     </View>

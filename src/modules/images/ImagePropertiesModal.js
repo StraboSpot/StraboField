@@ -69,12 +69,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
         }
         ListHeaderComponent={renderFormFields()}
       />
-      {!isReadOnly && (
-        <ActionButton
-          onPress={saveFormAndGo}
-          title={'Save'}
-        />
-      )}
+      {!isReadOnly && <ActionButton onPress={saveFormAndGo}/>}
     </ModalWrapper>
   );
 };

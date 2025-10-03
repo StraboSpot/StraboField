@@ -281,13 +281,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && (
-          <ActionButton
-            isLoading={isLoading}
-            onPress={() => saveForm(formRef.current)}
-            title={'Save Sample'}
-          />
-        )}
+        {!choicesViewKey && <ActionButton isLoading={isLoading} onPress={() => saveForm(formRef.current)}/>}
       </>
     );
   };

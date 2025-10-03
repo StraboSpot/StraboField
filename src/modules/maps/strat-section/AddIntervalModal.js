@@ -234,10 +234,7 @@ const AddIntervalModal = () => {
           ListFooterComponent={renderAddIntervalFormFields()}
           ListHeaderComponent={renderAddIntervalNameField()}
         />
-        <ActionButton
-          onPress={() => saveInterval(formRef?.current?.values)}
-          title={'Save Interval'}
-        />
+        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
       </ModalWrapper>
     );
   };

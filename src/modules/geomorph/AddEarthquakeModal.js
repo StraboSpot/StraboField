@@ -179,7 +179,7 @@ const AddEarthquakeModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={saveEarthquake} title={'Save Earthquake'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveEarthquake}/>}
       </ModalWrapper>
     );
   };
