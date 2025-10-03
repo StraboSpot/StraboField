@@ -9,7 +9,7 @@ import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -216,6 +216,7 @@ const AddMineralModal = ({onPress}) => {
     if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
     else savePetFeature(petKey, spot, formRef.current);
     formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
   return renderAddMineralModalContent();

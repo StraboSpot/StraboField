@@ -13,7 +13,7 @@ import AddRockSedimentaryModal from './AddRockSedimentaryModal';
 import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
@@ -222,6 +222,7 @@ const AddRockModal = ({modalKey, onPress}) => {
       else if (groupKey === 'sed') await saveSedFeature(pageKey, spot, formRef.current);
       dispatch(setModalValues({...formRef.current.values, id: getNewId()}));
     }
+    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
   return renderAddRockModalContent();

@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID} from '../../shared/Helpers';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -71,6 +72,8 @@ const AddEarthquakeModal = ({onPress}) => {
     console.log('UE AddEarthquakeModal []');
     return () => dispatch(setModalValues({}));
   }, []);
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const renderForm = (formProps) => {
     const mainButtonsKeysRelevant1 = mainButtonsKeys1.filter((k) => {
@@ -151,7 +154,7 @@ const AddEarthquakeModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
@@ -198,6 +201,7 @@ const AddEarthquakeModal = ({onPress}) => {
       editedEarthquakesData.push({...editedEarthquakeData, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedEarthquakesData}));
+      if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
       console.log('Error submitting form', err);

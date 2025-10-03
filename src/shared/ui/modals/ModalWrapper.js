@@ -43,11 +43,7 @@ const ModalWrapper = ({
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const getResponsiveOverlayStyle = () => {
-    if (fullscreen || SMALL_SCREEN) {
-      console.log('Small Screen');
-      return overlayStyles.overlayContainerFullScreen;
-    }
-    console.log('Large Screen');
+    if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {
       ...overlayStyles.overlayContainer,
       ...overlayStyleOverride,

@@ -12,6 +12,7 @@ import {
   PRIMARY_TEXT_COLOR,
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
+  SMALL_SCREEN,
 } from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
@@ -38,13 +39,15 @@ const AddTephraModal = ({onPress}) => {
     return () => dispatch(setModalValues({}));
   }, []);
 
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
   const renderNotebookTephraModal = () => {
     const subpages = TEPHRA_SUBPAGES;
     const formName = [pageKey, Object.values(subpages)[tabIndex]];
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
         onPress={onPress}
         showActionButton={false}
         showCancelButton={false}
@@ -124,6 +127,7 @@ const AddTephraModal = ({onPress}) => {
       editedTephraLayersData.push({...values, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedTephraLayersData}));
+      if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
       console.log('Error submitting form', err);

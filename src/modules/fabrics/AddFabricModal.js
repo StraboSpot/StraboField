@@ -10,7 +10,7 @@ import FaultRockFabric from './FaultRockFabric';
 import IgneousRockFabric from './IgneousRockFabric';
 import MetamRockFabric from './MetamRockFabric';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
@@ -50,6 +50,8 @@ const AddFabricModal = ({onPress}) => {
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
   }, [modalValues]);
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const onFabricTypePress = (i) => {
     if (i !== selectedTypeIndex) {
@@ -112,8 +114,11 @@ const AddFabricModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
         onPress={onPress}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <>
           <FlatList
@@ -158,6 +163,7 @@ const AddFabricModal = ({onPress}) => {
       editedFabricsData.push({...editedFabricData, id: getNewId()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: editedFabricsData}));
+      if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
       console.log('Error submitting form', err);
