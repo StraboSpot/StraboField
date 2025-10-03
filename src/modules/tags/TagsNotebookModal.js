@@ -7,17 +7,19 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {TagsModal} from '../tags';
 
 const TagsNotebookModal = ({
-                             closeModal,
                              isFeatureLevelTagging,
                              onPress,
                            }) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  const handleDonePress = () => {
+    console.log('Done button pressed');
+  };
+
   const renderTagsModalContent = () => {
     return (
       <ModalWrapper
-        closeModal={closeModal}
-        onFooterButtonPress={onPress}
+        onActionPressed={handleDonePress}
         overlayStyleOverride={{height: '80%'}}
         showActionButton={false}
         showCancelButton={false}

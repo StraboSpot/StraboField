@@ -97,11 +97,10 @@ const AddImageOverlayModal = ({
   const renderAddImageOverlayModal = () => {
     return (
       <ModalWrapper
-        buttonTitleLeft={!isReadOnly && 'Cancel'}
         buttonTitleRight={!isReadOnly && 'Save'}
-        cancel={() => !isReadOnly && closeModal()}
-        closeModal={() => isReadOnly ? closeModal() : saveImageOverlay(overlayFormRef?.current?.values)}
-        title={'Add Image Overlay'}
+        headerTitle={'Add Image Overlay'}
+        onActionPressed={() => isReadOnly ? closeModal() : saveImageOverlay(overlayFormRef?.current?.values)}
+        onCancelPress={() => !isReadOnly && closeModal()}
       >
         <Formik
           enableReinitialize={false}
