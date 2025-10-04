@@ -1,12 +1,11 @@
 import React from 'react';
 
-import {Button, ListItem, Overlay} from '@rn-vui/base';
+import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
-import compassStyles from '../../../modules/compass/compass.styles';
-import {NOTEBOOK_MODELS, SHORTCUT_MODALS} from '../../../modules/page/page.constants';
+import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
@@ -52,7 +51,6 @@ const ModalWrapper = ({
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
-    const notebookModal = NOTEBOOK_MODELS.find(m => m.key === modalVisible);
 
     if (shortcutModal && shortcutModal.notebook_modal_key) {
       return (
@@ -70,19 +68,6 @@ const ModalWrapper = ({
           <ListItem.Chevron/>
         </ListItem>
       );
-    }
-    else if (notebookModal && !SMALL_SCREEN) {
-      const shortcutModalSwitch = SHORTCUT_MODALS.find(m => m.notebook_modal_key === modalVisible);
-      if (shortcutModalSwitch) {
-        return (
-          <Button
-            onPress={() => onFooterButtonPress(shortcutModalSwitch.key)}
-            title={'View In Shortcut Mode'}
-            titleStyle={compassStyles.buttonTitleStyle}
-            type={'clear'}
-          />
-        );
-      }
     }
   };
 

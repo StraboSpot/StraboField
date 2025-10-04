@@ -1,13 +1,14 @@
 import React, {useRef, useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
-import {Button, ButtonGroup, ListItem} from '@rn-vui/base';
+import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import DataWrapper from './DataWrapper';
 import useExternalData from './useExternalData';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {formStyles} from '../form';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
@@ -96,14 +97,11 @@ const ExternalData = ({isReadOnly}) => {
               </ListItem.Content>
             </ListItem>
             {error && <Text style={formStyles.fieldError}>Not a valid url</Text>}
-            <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-              <Button
-                containerStyle={commonStyles.standardButtonContainer}
+            <View style={{marginHorizontal: 15}}>
+              <OutlineButton
                 disabled={url === ''}
                 onPress={() => saveUrl()}
-                title={'Add Link'}
-                titleStyle={{fontSize: themes.PRIMARY_TEXT_SIZE}}
-                type={'clear'}
+                title={'🌐 Add Link'}
               />
             </View>
           </>
@@ -128,15 +126,12 @@ const ExternalData = ({isReadOnly}) => {
             />
           )}
           {!isReadOnly && (
-            <Button
-              buttonStyle={commonStyles.standardButton}
-              containerStyle={commonStyles.buttonPadding}
-              icon={{name: 'attach-outline', type: 'ionicon'}}
-              onPress={importCSVFile}
-              title={'Attach table from a .CSV file'}
-              titleStyle={commonStyles.standardButtonText}
-              type={'outline'}
-            />
+            <View style={{marginHorizontal: 15}}>
+              <OutlineButton
+                onPress={importCSVFile}
+                title={'📎  Attach table from a .CSV file'}
+              />
+            </View>
           )}
         </View>
         <View style={{flex: 1}}>

@@ -10,6 +10,7 @@ const OutlineButton = ({icon, onPress, title}) => {
       buttonStyle={commonStyles.standardButton}
       containerStyle={commonStyles.standardButtonContainer}
       icon={icon}
+      iconContainerStyle={{paddingRight: 5}}
       onPress={onPress}
       title={title}
       titleStyle={commonStyles.standardButtonText}
