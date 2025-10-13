@@ -19,7 +19,7 @@ import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
-const InitialProjectLoadModal = ({closeMainMenuPanel, openMainMenuPanel}) => {
+const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');
 
   const dispatch = useDispatch();
@@ -118,14 +118,14 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, openMainMenuPanel}) => {
         return (
           <>
             {renderBackButton()}
-            <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel}/>
+            <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'deviceProjects':
         return (
           <>
             {renderBackButton()}
-            <OpenProjectPage/>
+            <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'project':

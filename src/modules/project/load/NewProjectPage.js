@@ -28,7 +28,7 @@ const NewProjectPage = ({closeNotebookPanel}) => {
           headerTitle={'New Project Metadata'}
           title={'StraboField Projects'}
         />
-        <NewProjectForm closeNotebookPanel={closeNotebookPanel}/>
+        <NewProjectForm/>
       </View>
 
       {/* Modal */}
