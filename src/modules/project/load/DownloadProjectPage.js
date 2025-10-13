@@ -27,16 +27,15 @@ const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
 
   const confirmDownloadProject = async (projectSelected) => {
     setProjectToDownload(projectSelected);
-    if (isProjectLoadSelectionModalVisible) await downloadProject();
+    if (isProjectLoadSelectionModalVisible) await downloadProject(projectSelected);
     else setIsConfirmOverwriteModalVisible(true);
   };
 
-  const downloadProject = async () => {
+  const downloadProject = async (inProjectToDownload) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
-    await initializeDownload(projectToDownload);
+    await initializeDownload(inProjectToDownload);
     closeMainMenuPanel();
-    console.log('Done downloading project', projectToDownload);
   };
 
   const getTextOverride = () => {
@@ -65,7 +64,7 @@ const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}
           closeNotebookPanel={closeNotebookPanel}
-          loadProject={downloadProject}
+          loadProject={() => downloadProject(projectToDownload)}
           project={projectToDownload}
           textOverride={getTextOverride()}
         />
