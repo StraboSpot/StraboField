@@ -439,13 +439,6 @@ const useSpots = () => {
     }, []);
   };
 
-  // Reverse chronologically sort active Spots
-  const getSpotsSortedReverseChronologically = () => {
-    return Object.values(getActiveSpotsObj()).sort(((a, b) => {
-      return new Date(b.properties.date) - new Date(a.properties.date);
-    }));
-  };
-
   const getSpotsWithImages = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties.images));
   };
@@ -569,7 +562,6 @@ const useSpots = () => {
     getSpotsInMapExtent: getSpotsInMapExtent,
     getSpotsMappedOnGivenImageBasemap: getSpotsMappedOnGivenImageBasemap,
     getSpotsMappedOnGivenStratSection: getSpotsMappedOnGivenStratSection,
-    getSpotsSortedReverseChronologically: getSpotsSortedReverseChronologically,
     getSpotsWithImages: getSpotsWithImages,
     getSpotsWithKey: getSpotsWithKey,
     getSpotsWithSamples: getSpotsWithSamples,

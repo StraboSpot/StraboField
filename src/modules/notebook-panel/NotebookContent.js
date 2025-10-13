@@ -29,13 +29,11 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
-  const recentlyViewedSpotIds = useSelector(state => state.spot.recentViews);
   const spot = useSelector(state => state.spot.selectedSpot);
-  const spots = useSelector(state => state.spot.spots);
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {getRootSpot, getSpotsSortedReverseChronologically, handleSpotSelected} = useSpots();
+  const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
 
   const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const pageVisible = pagesStack.slice(-1)[0];
@@ -122,11 +120,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   };
 
   const renderRecentSpotsList = () => {
-    let spotsList = recentlyViewedSpotIds.reduce((obj, key) => {
-      if (spots?.[key]) obj.push(spots[key]);
-      return obj;
-    }, []);
-    if (isEmpty(spotsList)) spotsList = getSpotsSortedReverseChronologically();
+    let spotsList = getRecentSpots();
+    if (isEmpty(spotsList)) {
+      const activeSpotsObj = getActiveSpotsObj();
+      const activeSpots = Object.values(activeSpotsObj);
+      spotsList = sortSpotsByDateCreated(activeSpots);
+    }
 
     return (
       <View style={notebookStyles.centerContainer}>
