@@ -238,6 +238,7 @@ const useProject = () => {
   return {
     addDataset: addDataset,
     checkValidDateTime: checkValidDateTime,
+    createDataset: createDataset,
     destroyDataset: destroyDataset,
     getActiveDatasets: getActiveDatasets,
     getAllDeviceProjects: getAllDeviceProjects,
