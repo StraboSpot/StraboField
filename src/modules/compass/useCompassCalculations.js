@@ -11,7 +11,8 @@ const useCompassCalculations = () => {
 
   const calcStrike = (dipDirection, formRefCurrent) => {
     console.log('Calculating strike...');
-    let strike = (dipDirection - 90) % 360;
+    let strike = dipDirection - 90;
+    if (strike < 0) strike = 360 + strike;
     formRefCurrent.setFieldValue('strike', roundToDecimalPlaces(strike, 0));
   };
 
