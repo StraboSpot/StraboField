@@ -13,14 +13,14 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 
 const ConfirmOverwriteModal = ({
                                  closeModal,
-                                 closeNotebookPanel,
-                                 closeMainMenuPanel,
+                                 isVisible,
                                  loadProject,
                                  project,
                                  textOverride,
                                }) => {
   const dispatch = useDispatch();
   const currentProjectName = useSelector(state => state.project.project?.description?.project_name);
+  const sidePanelView = useSelector(state => state.mainMenu?.sidePanelView);
 
   const modalText = textOverride ? textOverride
     : `You are going to overwrite the project \n${currentProjectName} \nwith the project 
@@ -32,14 +32,12 @@ const ConfirmOverwriteModal = ({
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
   };
 
-  const handleLoadProject = () => {
-    closeMainMenuPanel();
-    closeNotebookPanel();
-    loadProject();
-  };
-
   const headerTitle = () => {
     return `Overwrite Project ${currentProjectName}?`;
+  };
+
+  const actionButtonTitle = () => {
+    return sidePanelView === 'New Project' ? 'Continue' : 'Overwrite Project';
   };
 
   return (
@@ -47,6 +45,7 @@ const ConfirmOverwriteModal = ({
       actionTitle={'Cancel'}
       closeModal={closeModal}
       headerTitle={headerTitle()}
+      isVisible={isVisible}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
@@ -54,7 +53,7 @@ const ConfirmOverwriteModal = ({
       <View>
         <Text style={overlayStyles.statusMessageText}>{modalText}</Text>
         <View style={[commonStyles.standardDescriptionText, {padding: 10}]}>
-          <ActionButton onPress={handleLoadProject} title={'Overwrite'}/>
+          <ActionButton onPress={loadProject} title={actionButtonTitle()}/>
           <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
         </View>
       </View>

@@ -32,10 +32,10 @@ const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   };
 
   const downloadProject = async () => {
+    closeNotebookPanel();
     closeConfirmOverwriteModal();
     await initializeDownload(projectToDownload);
     closeMainMenuPanel();
-    closeNotebookPanel();
     console.log('Done downloading project', projectToDownload);
   };
 
@@ -63,7 +63,6 @@ const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
       {/* Modal */}
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
-          closeMainMenuPanel={closeMainMenuPanel}
           closeModal={closeConfirmOverwriteModal}
           closeNotebookPanel={closeNotebookPanel}
           loadProject={downloadProject}

@@ -184,7 +184,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
-        return <NewProjectPage/>;
+        return <NewProjectPage closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
         return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:

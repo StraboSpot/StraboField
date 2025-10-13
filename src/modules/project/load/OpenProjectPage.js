@@ -30,13 +30,14 @@ const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
-  const confirmOpenProject = (project) => {
+  const confirmOpenProject = async (project) => {
     setProjectToOpen(project);
-    if (isProjectLoadSelectionModalVisible) openProject(project);
+    if (isProjectLoadSelectionModalVisible) await openProject(project);
     else setIsConfirmOverwriteModalVisible(true);
   };
 
   const openProject = async (project) => {
+    closeNotebookPanel();
     closeConfirmOverwriteModal();
     try {
       console.log('Selected Project:', project);
@@ -48,6 +49,7 @@ const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
       if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setSidePanelVisible({bool: false}));
       console.log('Done loading project', res);
+      closeMainMenuPanel();
     }
     catch (err) {
       console.error('Error loading Project.', err);
@@ -71,15 +73,12 @@ const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
       </View>
 
       {/* Modal */}
-      {isConfirmOverwriteModalVisible && (
-        <ConfirmOverwriteModal
-          closeMainMenuPanel={closeMainMenuPanel}
-          closeModal={closeConfirmOverwriteModal}
-          closeNotebookPanel={closeNotebookPanel}
-          loadProject={() => openProject(projectToOpen)}
-          project={projectToOpen}
-        />
-      )}
+      <ConfirmOverwriteModal
+        closeModal={closeConfirmOverwriteModal}
+        isVisible={isConfirmOverwriteModalVisible}
+        loadProject={() => openProject(projectToOpen)}
+        project={projectToOpen}
+      />
     </>
   );
 };
