@@ -10,6 +10,7 @@ import useCompassSound from './useCompassSound';
 import CompassModule from '../../services/CompassModule';
 import useCompass from '../../services/useCompass';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/page.constants';
@@ -22,6 +23,7 @@ const Compass = ({
                  }) => {
   let magneticDeclination = useRef(0);
   let matrixRawData = useRef(null);
+  let hasShownCalibrationAlert = useRef(false);
 
   const CompassEvents = new NativeEventEmitter(CompassModule);
   const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
@@ -63,9 +65,11 @@ const Compass = ({
     console.log('UE Compass []');
     getDeclination().catch(err => console.error('Error getting user\'s declination', err));
     subscribeToSensors();
+    subscribeToCalibrationStatus();
     AppState.addEventListener('change', handleAppStateChange);
     return () => {
       unsubscribeFromSensors();
+      unsubscribeFromCalibrationStatus();
       AppState.addEventListener(
         'change',
         () => console.log('APP STATE EVENT REMOVED IN COMPASS')).remove();
@@ -100,6 +104,11 @@ const Compass = ({
     }
     catch (err) {
       console.error('Magnetic Declination not available', err);
+      const errorMessage = err.message || err;
+      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
+        alert('Location Services Required',
+          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
+      }
     }
 
   };
@@ -192,6 +201,38 @@ const Compass = ({
     }
   };
 
+  const handleCalibrationStatus = (data) => {
+    // Reset flag if calibration is now OK
+    if (data.needsCalibration === false) {
+      hasShownCalibrationAlert.current = false;
+      return;
+    }
+
+    // Only show the alert once per compass session - check and set flag atomically
+    if (data.needsCalibration && Platform.OS === 'ios') {
+      if (hasShownCalibrationAlert.current) {
+        return; // Already shown, ignore this event
+      }
+
+      // Set flag IMMEDIATELY before calling alert to prevent race conditions
+      hasShownCalibrationAlert.current = true;
+
+      alert('Compass Calibration Required',
+        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+    }
+  };
+
+  const subscribeToCalibrationStatus = () => {
+    if (Platform.OS === 'ios') {
+      try {
+        CompassEvents.addListener('compassCalibrationStatus', handleCalibrationStatus);
+      }
+      catch (err) {
+        console.error('Error subscribing to calibration status: ' + err);
+      }
+    }
+  };
+
   const subscribeToSensors = () => {
     try {
       CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
@@ -205,6 +246,18 @@ const Compass = ({
 
   const toggleSwitch = () => {
     setShowCompassRawDataView(previousState => !previousState);
+  };
+
+  const unsubscribeFromCalibrationStatus = () => {
+    if (Platform.OS === 'ios') {
+      try {
+        CompassEvents.addListener('compassCalibrationStatus', handleCalibrationStatus).remove();
+        console.log('%cEnded compass calibration status listener.', 'color: red');
+      }
+      catch (err) {
+        console.error('Error unsubscribing from calibration status', err);
+      }
+    }
   };
 
   const unsubscribeFromSensors = () => {
