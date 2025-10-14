@@ -4,1269 +4,829 @@
       "type": "begin_group",
       "name": "group_ug1cj80",
       "label": "Body",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple zy1yp78",
       "name": "invertebrate",
       "label": "Invertebrate",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_invertebrate",
       "label": "Other Invertebrate",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'other')"
     },
     {
       "type": "select_multiple xg73d31",
       "name": "mollusca",
       "label": "Mollusc",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'mollusca')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'mollusca')"
     },
     {
       "type": "text",
       "name": "other_mollusca",
       "label": "Other Mollusc",
-      "required": false,
-      "relevant": "selected(${mollusca}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${mollusca}, 'other')"
     },
     {
       "type": "select_multiple ez9qn01",
       "name": "arthropoda",
       "label": "Arthropod",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'arthropoda')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'arthropoda')"
     },
     {
       "type": "text",
       "name": "other_anthropoda",
       "label": "Other Arthropod",
-      "required": false,
-      "relevant": "selected(${arthropoda}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${arthropoda}, 'other')"
     },
     {
       "type": "select_multiple wr57l51",
       "name": "echinodermata",
       "label": "Echinoderm",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'echinodermata')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'echinodermata')"
     },
     {
       "type": "text",
       "name": "other_echinodermata",
       "label": "Other Echinoderm",
-      "required": false,
-      "relevant": "selected(${echinodermata}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${echinodermata}, 'other')"
     },
     {
       "type": "select_multiple mx9kl50",
       "name": "cnidaria",
       "label": "Cnidarian",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'cnidaria')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'cnidaria')"
     },
     {
       "type": "text",
       "name": "other_cnidaria",
       "label": "Other Cnidarian",
-      "required": false,
-      "relevant": "selected(${cnidaria}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${cnidaria}, 'other')"
     },
     {
       "type": "select_one jc5qz43",
       "name": "chordate",
       "label": "Chordate",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'porifera_spong')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'porifera_spong')"
     },
     {
       "type": "text",
       "name": "other_chordata",
       "label": "Other Chordate",
-      "required": false,
-      "relevant": "${chordate} = 'other'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "${chordate} = 'other'"
     },
     {
       "type": "select_multiple yg3rh07",
       "name": "protista",
       "label": "Protist",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'protista')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'protista')"
     },
     {
       "type": "text",
       "name": "other_protista",
       "label": "Other Protist",
-      "required": false,
-      "relevant": "selected(${protista}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${protista}, 'other')"
     },
     {
       "type": "select_multiple oh1xa40",
       "name": "calcimicrobe",
       "label": "Calcimicrobe",
-      "required": false,
-      "relevant": "selected(${invertebrate}, 'calcimicrobe')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${invertebrate}, 'calcimicrobe')"
     },
     {
       "type": "text",
       "name": "other_calcimicrobe",
       "label": "Other Calcimicrobe",
-      "required": false,
-      "relevant": "selected(${calcimicrobe}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${calcimicrobe}, 'other')"
     },
     {
       "type": "select_multiple yp6he07",
       "name": "plant_algae",
-      "label": "Plant/algae",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Plant/Algae",
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_plant_algae",
       "label": "Other Plant/Algae",
-      "required": false,
-      "relevant": "selected(${plant_algae}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${plant_algae}, 'other')"
     },
     {
       "type": "select_multiple jr4ma98",
       "name": "green_algae",
       "label": "Green Algae",
-      "required": false,
-      "relevant": "selected(${plant_algae}, 'green')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${plant_algae}, 'green')"
     },
     {
       "type": "text",
       "name": "other_green_algae",
       "label": "Other Green Algae",
-      "required": false,
-      "relevant": "selected(${green_algae}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${green_algae}, 'other')"
     },
     {
       "type": "select_multiple fk5kl89",
       "name": "vertebrate",
       "label": "Vertebrate",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_vertebrate",
       "label": "Other Vertebrate",
-      "required": false,
-      "relevant": "selected(${vertebrate}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${vertebrate}, 'other')"
     },
     {
       "type": "select_one rs3py25",
       "name": "faunal_assemblage",
-      "label": "Faunal assemblage",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Faunal Assemblage",
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_faunal_assemblage",
-      "label": "Other faunal assemblage",
-      "required": false,
-      "relevant": "${faunal_assemblage} = 'other'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Faunal Assemblage",
+      "required": "false",
+      "relevant": "${faunal_assemblage} = 'other'"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "begin_group",
       "name": "biogenic_structures",
       "label": "Trace",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_one bp1qw24",
       "name": "diversity",
       "label": "Diversity",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple yp1hr80",
       "name": "descriptive",
       "label": "Descriptive",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_descriptive",
       "label": "Other Descriptive",
-      "required": false,
-      "relevant": "selected(${descriptive}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${descriptive}, 'other')"
     },
     {
       "type": "select_multiple yb2wj13",
       "name": "burrow_fill_type",
       "label": "Burrow Fill Type",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_burrow_fill",
       "label": "Other Burrow Fill Type",
-      "required": false,
-      "relevant": "selected(${burrow_fill_type}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${burrow_fill_type}, 'other')"
     },
     {
       "type": "select_multiple ql1gi29",
       "name": "behavioral_grouping",
       "label": "Behavioral Grouping",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_behavioral_grouping",
       "label": "Other Behavioral Grouping",
-      "required": false,
-      "relevant": "selected(${behavioral_grouping}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${behavioral_grouping}, 'other')"
     },
     {
       "type": "select_one xn91l41",
       "name": "ichnofacies",
       "label": "Ichnofacies",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_ichnofacies",
       "label": "Other Ichnofacies",
-      "required": false,
-      "relevant": "${ichnofacies} = 'other'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "${ichnofacies} = 'other'"
     },
     {
       "type": "text",
       "name": "list_of_specific_types",
-      "label": "List of specific types",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "List of Specific Types",
+      "required": "false"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "begin_group",
       "name": "group_qa9zp83",
       "label": "Biogenic Growth Structures",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_one cj5tu73",
       "name": "dominant_component",
-      "label": "Dominant component",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Dominant Component",
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_dominant_component",
       "label": "Other Dominant Component",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple vl19n89",
       "name": "microbial_reef_or_skelatal_mic",
       "label": "Microbial Reef or Skeletal-Microbial Reef Type",
-      "required": false,
-      "relevant": "${dominant_component} = 'skeletal_micro' or ${dominant_component} = 'microbial_reef'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "${dominant_component} = 'skeletal_micro' or ${dominant_component} = 'microbial_reef'"
     },
     {
       "type": "text",
       "name": "other_microbial_or_skeletal_mi",
       "label": "Other Microbial or Skeletal Microbial Reef",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple vb0ao86",
       "name": "mud_mound",
       "label": "Mud Mound Type",
-      "required": false,
-      "relevant": "${dominant_component} = 'mud_mound'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "${dominant_component} = 'mud_mound'"
     },
     {
       "type": "text",
       "name": "other_mud_mound",
       "label": "Other Mud Mound",
-      "required": false,
-      "relevant": "selected(${mud_mound}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${mud_mound}, 'other')"
     },
     {
       "type": "begin_group",
       "name": "biogenic_growth_structures_sca",
       "label": "Biogenic Growth Structure Scale and Orientation",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "height",
       "label": "Height",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "width",
       "label": "Width",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "integer",
       "name": "orientation_if_elongate_azimu",
       "label": "Orientation (if elongate, azimuth 0-360)",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "Azimuth value must be between 0 to 360 degrees",
+      "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "constraint_message": "Azimuth value must be between 0 to 360 degrees"
     },
     {
       "type": "select_one oh76z01",
       "name": "shape",
       "label": "Shape",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_one uc1je36",
       "name": "type",
       "label": "Type",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_type",
       "label": "Other Type",
-      "required": false,
-      "relevant": "${type} = 'other'",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "${type} = 'other'"
     },
     {
       "type": "select_multiple ex7vg93",
       "name": "accessory_structures",
       "label": "Accessory Structures",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_accessory_structure",
       "label": "Other Accessory Structure",
-      "required": false,
-      "relevant": "selected(${accessory_structures}, 'other')",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${accessory_structures}, 'other')"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "text",
       "name": "notes",
       "label": "Notes",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "multiline",
-      "calculation": "",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "'v3aztknQxg4sDfKs2JM2kF'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "'vc4CusmkPTkFp2A3rCAZhE'",
-      "$given_name": "__version__"
-    },
-    {
-      "type": "calculate",
-      "name": "_version__001",
-      "label": "",
-      "required": false,
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "'vohx2ac7eAZcFgYFNsbDsK'",
-      "$given_name": "__version__"
-    },
-    {
-      "type": "calculate",
-      "name": "_version__002",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "constraint_message": "",
-      "constraint": "",
-      "appearance": "",
-      "calculation": "'vZAdKDj5GWPY9FXRE3hUtT'",
-      "$given_name": "__version__"
+      "required": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [
     {
       "list_name": "zy1yp78",
       "name": "porifera_spong",
-      "label": "porifera/sponge",
-      "order": ""
+      "label": "porifera/sponge"
     },
     {
       "list_name": "zy1yp78",
       "name": "mollusca",
-      "label": "mollusc",
-      "order": ""
+      "label": "mollusc"
     },
     {
       "list_name": "zy1yp78",
       "name": "brachiopoda",
-      "label": "brachiopod",
-      "order": ""
+      "label": "brachiopod"
     },
     {
       "list_name": "zy1yp78",
       "name": "arthropoda",
-      "label": "arthropod",
-      "order": ""
+      "label": "arthropod"
     },
     {
       "list_name": "zy1yp78",
       "name": "echinodermata",
-      "label": "echinoderm",
-      "order": ""
+      "label": "echinoderm"
     },
     {
       "list_name": "zy1yp78",
       "name": "cnidaria",
-      "label": "cnidarian",
-      "order": ""
+      "label": "cnidarian"
     },
     {
       "list_name": "zy1yp78",
       "name": "chordata",
-      "label": "chordate",
-      "order": ""
+      "label": "chordate"
     },
     {
       "list_name": "zy1yp78",
       "name": "bryozoa",
-      "label": "bryozoan",
-      "order": ""
+      "label": "bryozoan"
     },
     {
       "list_name": "zy1yp78",
       "name": "protista",
-      "label": "protist",
-      "order": ""
+      "label": "protist"
     },
     {
       "list_name": "zy1yp78",
       "name": "calcimicrobe",
-      "label": "calcimicrobe",
-      "order": ""
+      "label": "calcimicrobe"
     },
     {
       "list_name": "zy1yp78",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "xg73d31",
       "name": "gastropod",
-      "label": "gastropod",
-      "order": ""
+      "label": "gastropod"
     },
     {
       "list_name": "xg73d31",
       "name": "cephalopod",
-      "label": "cephalopod",
-      "order": ""
+      "label": "cephalopod"
     },
     {
       "list_name": "xg73d31",
       "name": "scaphopod",
-      "label": "scaphopod",
-      "order": ""
+      "label": "scaphopod"
     },
     {
       "list_name": "xg73d31",
       "name": "bivalve",
-      "label": "bivalve",
-      "order": ""
+      "label": "bivalve"
     },
     {
       "list_name": "xg73d31",
       "name": "ammonite",
-      "label": "ammonite",
-      "order": ""
+      "label": "ammonite"
     },
     {
       "list_name": "xg73d31",
       "name": "nautiloid",
-      "label": "nautiloid",
-      "order": ""
+      "label": "nautiloid"
     },
     {
       "list_name": "xg73d31",
       "name": "belemnite",
-      "label": "belemnite",
-      "order": ""
+      "label": "belemnite"
     },
     {
       "list_name": "xg73d31",
       "name": "rudist",
-      "label": "rudist",
-      "order": ""
+      "label": "rudist"
     },
     {
       "list_name": "xg73d31",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "ez9qn01",
       "name": "trilobite",
-      "label": "trilobite",
-      "order": ""
+      "label": "trilobite"
     },
     {
       "list_name": "ez9qn01",
       "name": "eurypterid",
-      "label": "eurypterid",
-      "order": ""
+      "label": "eurypterid"
     },
     {
       "list_name": "ez9qn01",
       "name": "ostracod",
-      "label": "ostracod",
-      "order": ""
+      "label": "ostracod"
     },
     {
       "list_name": "ez9qn01",
       "name": "crustacean",
-      "label": "crustacean",
-      "order": ""
+      "label": "crustacean"
     },
     {
       "list_name": "ez9qn01",
       "name": "barnacle",
-      "label": "barnacle",
-      "order": ""
+      "label": "barnacle"
     },
     {
       "list_name": "ez9qn01",
       "name": "crab",
-      "label": "crab",
-      "order": ""
+      "label": "crab"
     },
     {
       "list_name": "ez9qn01",
       "name": "shrimp",
-      "label": "shrimp",
-      "order": ""
+      "label": "shrimp"
     },
     {
       "list_name": "ez9qn01",
       "name": "lobster",
-      "label": "lobster",
-      "order": ""
+      "label": "lobster"
     },
     {
       "list_name": "ez9qn01",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "wr57l51",
       "name": "echinoidea",
-      "label": "echinoidea",
-      "order": ""
+      "label": "echinoidea"
     },
     {
       "list_name": "wr57l51",
       "name": "blastazoa",
-      "label": "blastazoa",
-      "order": ""
+      "label": "blastazoa"
     },
     {
       "list_name": "wr57l51",
       "name": "crinoidea",
-      "label": "crinoidea",
-      "order": ""
+      "label": "crinoidea"
     },
     {
       "list_name": "wr57l51",
       "name": "asteroidea",
-      "label": "asteroidea",
-      "order": ""
+      "label": "asteroidea"
     },
     {
       "list_name": "wr57l51",
       "name": "ophiuroidea",
-      "label": "ophiuroidea",
-      "order": ""
+      "label": "ophiuroidea"
     },
     {
       "list_name": "wr57l51",
       "name": "holothuroidea",
-      "label": "holothuroidea",
-      "order": ""
+      "label": "holothuroidea"
     },
     {
       "list_name": "wr57l51",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "mx9kl50",
       "name": "solitary_rugos",
-      "label": "solitary rugose",
-      "order": ""
+      "label": "solitary rugose"
     },
     {
       "list_name": "mx9kl50",
       "name": "fasciculate_ru",
-      "label": "fasciculate rugose",
-      "order": ""
+      "label": "fasciculate rugose"
     },
     {
       "list_name": "mx9kl50",
       "name": "massive_rugose",
-      "label": "massive rugose",
-      "order": ""
+      "label": "massive rugose"
     },
     {
       "list_name": "mx9kl50",
       "name": "tabulate",
-      "label": "tabulate",
-      "order": ""
+      "label": "tabulate"
     },
     {
       "list_name": "mx9kl50",
       "name": "scleractinian",
-      "label": "scleractinian",
-      "order": ""
+      "label": "scleractinian"
     },
     {
       "list_name": "mx9kl50",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "jc5qz43",
       "name": "tunicate",
-      "label": "tunicate",
-      "order": ""
+      "label": "tunicate"
     },
     {
       "list_name": "jc5qz43",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "yg3rh07",
       "name": "foraminifera",
-      "label": "foraminifera",
-      "order": ""
+      "label": "foraminifera"
     },
     {
       "list_name": "yg3rh07",
       "name": "coccolith",
-      "label": "coccolith",
-      "order": ""
+      "label": "coccolith"
     },
     {
       "list_name": "yg3rh07",
       "name": "radiolarian",
-      "label": "radiolarian",
-      "order": ""
+      "label": "radiolarian"
     },
     {
       "list_name": "yg3rh07",
       "name": "diatom",
-      "label": "diatom",
-      "order": ""
+      "label": "diatom"
     },
     {
       "list_name": "yg3rh07",
       "name": "fusulinid",
-      "label": "fusulinid",
-      "order": ""
+      "label": "fusulinid"
     },
     {
       "list_name": "yg3rh07",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "oh1xa40",
       "name": "giryanella",
-      "label": "giryanella",
-      "order": ""
+      "label": "giryanella"
     },
     {
       "list_name": "oh1xa40",
       "name": "epiphyton",
-      "label": "epiphyton",
-      "order": ""
+      "label": "epiphyton"
     },
     {
       "list_name": "oh1xa40",
       "name": "hedstroemia",
-      "label": "hedstroemia",
-      "order": ""
+      "label": "hedstroemia"
     },
     {
       "list_name": "oh1xa40",
       "name": "renalcis",
-      "label": "renalcis",
-      "order": ""
+      "label": "renalcis"
     },
     {
       "list_name": "oh1xa40",
       "name": "garwoodia",
-      "label": "garwoodia",
-      "order": ""
+      "label": "garwoodia"
     },
     {
       "list_name": "oh1xa40",
       "name": "rothpletzella",
-      "label": "rothpletzella",
-      "order": ""
+      "label": "rothpletzella"
     },
     {
       "list_name": "oh1xa40",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "yp6he07",
       "name": "green",
-      "label": "green algae",
-      "order": ""
+      "label": "green algae"
     },
     {
       "list_name": "yp6he07",
       "name": "red_algae",
       "label": "red algae",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "yp6he07",
       "name": "cyanobacteria",
       "label": "cyanobacteria",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "yp6he07",
       "name": "coralline",
       "label": "coralline",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "yp6he07",
       "name": "udoteaceans",
       "label": "udoteaceans",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "yp6he07",
       "name": "dasyclads",
       "label": "dasyclads",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "yp6he07",
       "name": "phylloid",
       "label": "phylloid",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "yp6he07",
       "name": "charophytes",
       "label": "charophytes",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "yp6he07",
       "name": "bryophyta",
       "label": "bryophyta",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "yp6he07",
       "name": "pteridophytae",
       "label": "pteridophytae",
-      "order": 9
+      "order": "9"
     },
     {
       "list_name": "yp6he07",
       "name": "angiosperm",
       "label": "angiosperm",
-      "order": 10
+      "order": "10"
     },
     {
       "list_name": "yp6he07",
       "name": "gymnosperm",
       "label": "gymnosperm",
-      "order": 11
+      "order": "11"
     },
     {
       "list_name": "yp6he07",
       "name": "other",
       "label": "other",
-      "order": 12
+      "order": "12"
     },
     {
       "list_name": "jr4ma98",
       "name": "halimeda",
-      "label": "halimeda",
-      "order": ""
+      "label": "halimeda"
     },
     {
       "list_name": "jr4ma98",
       "name": "penicillus",
-      "label": "penicillus",
-      "order": ""
+      "label": "penicillus"
     },
     {
       "list_name": "jr4ma98",
       "name": "udotea",
-      "label": "udotea",
-      "order": ""
+      "label": "udotea"
     },
     {
       "list_name": "jr4ma98",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "fk5kl89",
       "name": "actinopterygii",
-      "label": "actinopterygii",
-      "order": ""
+      "label": "actinopterygii"
     },
     {
       "list_name": "fk5kl89",
       "name": "chondrichthyes",
       "label": "chondrichthyes",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "fk5kl89",
       "name": "aves",
       "label": "aves",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "fk5kl89",
       "name": "amphibia",
       "label": "amphibia",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "fk5kl89",
       "name": "reptilia",
       "label": "reptilia",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "fk5kl89",
       "name": "mammalia",
       "label": "mammalia",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "fk5kl89",
       "name": "dinosauria",
       "label": "dinosauria",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "fk5kl89",
       "name": "other",
       "label": "other",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "rs3py25",
       "name": "heterozoan",
-      "label": "heterozoan",
-      "order": ""
+      "label": "heterozoan"
     },
     {
       "list_name": "rs3py25",
       "name": "photozoan",
-      "label": "photozoan",
-      "order": ""
+      "label": "photozoan"
     },
     {
       "list_name": "rs3py25",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "bp1qw24",
       "name": "low",
-      "label": "low",
-      "order": ""
+      "label": "low"
     },
     {
       "list_name": "bp1qw24",
       "name": "medium",
-      "label": "medium",
-      "order": ""
+      "label": "medium"
     },
     {
       "list_name": "bp1qw24",
       "name": "high",
-      "label": "high",
-      "order": ""
+      "label": "high"
     },
     {
       "list_name": "yp1hr80",
       "name": "burrowed",
-      "label": "burrowed",
-      "order": ""
+      "label": "burrowed"
     },
     {
       "list_name": "yp1hr80",
@@ -1355,458 +915,393 @@
     {
       "list_name": "yb2wj13",
       "name": "passive",
-      "label": "passive",
-      "order": ""
+      "label": "passive"
     },
     {
       "list_name": "yb2wj13",
       "name": "active",
       "label": "active",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "yb2wj13",
       "name": "siliciclastic",
       "label": "siliciclastic sand",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "yb2wj13",
       "name": "silicic_silt",
       "label": "siliciclastic silt",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "yb2wj13",
       "name": "silicic_mud",
       "label": "siliciclastic mud",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "yb2wj13",
       "name": "carbonate_grai",
       "label": "carbonate grains",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "yb2wj13",
       "name": "mudstone",
       "label": "mudstone",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "yb2wj13",
       "name": "wackestone",
       "label": "wackestone",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "yb2wj13",
       "name": "packstone",
       "label": "packstone",
-      "order": 9
+      "order": "9"
     },
     {
       "list_name": "yb2wj13",
       "name": "grainstone",
       "label": "grainstone",
-      "order": 10
+      "order": "10"
     },
     {
       "list_name": "yb2wj13",
       "name": "cementstone",
       "label": "cementstone",
-      "order": 11
+      "order": "11"
     },
     {
       "list_name": "yb2wj13",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "ql1gi29",
       "name": "resting",
-      "label": "resting",
-      "order": ""
+      "label": "resting"
     },
     {
       "list_name": "ql1gi29",
       "name": "locomotion",
-      "label": "locomotion",
-      "order": ""
+      "label": "locomotion"
     },
     {
       "list_name": "ql1gi29",
       "name": "grazing",
-      "label": "grazing",
-      "order": ""
+      "label": "grazing"
     },
     {
       "list_name": "ql1gi29",
       "name": "feeding",
-      "label": "feeding",
-      "order": ""
+      "label": "feeding"
     },
     {
       "list_name": "ql1gi29",
       "name": "dwelling_struc",
-      "label": "dwelling structure",
-      "order": ""
+      "label": "dwelling structure"
     },
     {
       "list_name": "ql1gi29",
       "name": "escape",
-      "label": "escape",
-      "order": ""
+      "label": "escape"
     },
     {
       "list_name": "ql1gi29",
       "name": "farming",
-      "label": "farming",
-      "order": ""
+      "label": "farming"
     },
     {
       "list_name": "ql1gi29",
       "name": "predation",
-      "label": "predation",
-      "order": ""
+      "label": "predation"
     },
     {
       "list_name": "ql1gi29",
       "name": "brooding",
-      "label": "brooding",
-      "order": ""
+      "label": "brooding"
     },
     {
       "list_name": "ql1gi29",
       "name": "multipurpose",
-      "label": "multipurpose",
-      "order": ""
+      "label": "multipurpose"
     },
     {
       "list_name": "ql1gi29",
       "name": "equilibrium",
-      "label": "equilibrium",
-      "order": ""
+      "label": "equilibrium"
     },
     {
       "list_name": "ql1gi29",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "xn91l41",
       "name": "psilonichnus",
-      "label": "psilonichnus",
-      "order": ""
+      "label": "psilonichnus"
     },
     {
       "list_name": "xn91l41",
       "name": "skolithos",
-      "label": "skolithos",
-      "order": ""
+      "label": "skolithos"
     },
     {
       "list_name": "xn91l41",
       "name": "cruziana",
-      "label": "cruziana",
-      "order": ""
+      "label": "cruziana"
     },
     {
       "list_name": "xn91l41",
       "name": "zoophycos",
-      "label": "zoophycos",
-      "order": ""
+      "label": "zoophycos"
     },
     {
       "list_name": "xn91l41",
       "name": "nereites",
-      "label": "nereites",
-      "order": ""
+      "label": "nereites"
     },
     {
       "list_name": "xn91l41",
       "name": "trypanites",
-      "label": "trypanites",
-      "order": ""
+      "label": "trypanites"
     },
     {
       "list_name": "xn91l41",
       "name": "glossifungites",
-      "label": "glossifungites",
-      "order": ""
+      "label": "glossifungites"
     },
     {
       "list_name": "xn91l41",
       "name": "teredolites",
-      "label": "teredolites",
-      "order": ""
+      "label": "teredolites"
     },
     {
       "list_name": "xn91l41",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "cj5tu73",
       "name": "skeletal_reef",
-      "label": "skeletal reef",
-      "order": ""
+      "label": "skeletal reef"
     },
     {
       "list_name": "cj5tu73",
       "name": "skeletal_micro",
-      "label": "skeletal-microbial reef",
-      "order": ""
+      "label": "skeletal-microbial reef"
     },
     {
       "list_name": "cj5tu73",
       "name": "microbial_reef",
-      "label": "microbial reef",
-      "order": ""
+      "label": "microbial reef"
     },
     {
       "list_name": "cj5tu73",
       "name": "mud_mound",
-      "label": "mud mound",
-      "order": ""
+      "label": "mud mound"
     },
     {
       "list_name": "cj5tu73",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "vl19n89",
       "name": "micro_laminate",
-      "label": "microbial laminate",
-      "order": ""
+      "label": "microbial laminate"
     },
     {
       "list_name": "vl19n89",
       "name": "dome_structure",
-      "label": "domal structure",
-      "order": ""
+      "label": "domal structure"
     },
     {
       "list_name": "vl19n89",
       "name": "columnar_strom",
-      "label": "columnar stromatolite",
-      "order": ""
+      "label": "columnar stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "bran_col_strom",
-      "label": "branching columnar stromatolite",
-      "order": ""
+      "label": "branching columnar stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "conical_strom",
-      "label": "conical stromatolite",
-      "order": ""
+      "label": "conical stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "tufa",
-      "label": "tufa",
-      "order": ""
+      "label": "tufa"
     },
     {
       "list_name": "vl19n89",
       "name": "gt_strom_mnd",
-      "label": "giant stromatolite mound",
-      "order": ""
+      "label": "giant stromatolite mound"
     },
     {
       "list_name": "vl19n89",
       "name": "cusp_micro",
-      "label": "cuspate microbialite",
-      "order": ""
+      "label": "cuspate microbialite"
     },
     {
       "list_name": "vl19n89",
       "name": "thrombolite",
-      "label": "thrombolite",
-      "order": ""
+      "label": "thrombolite"
     },
     {
       "list_name": "vl19n89",
       "name": "oncoid",
-      "label": "oncoid",
-      "order": ""
+      "label": "oncoid"
     },
     {
       "list_name": "vl19n89",
       "name": "turbin_strom",
-      "label": "turbinate stromatolite",
-      "order": ""
+      "label": "turbinate stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "den_bran_strom",
-      "label": "dendritic branching stromatolite",
-      "order": ""
+      "label": "dendritic branching stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "cd_bran_strom",
-      "label": "coalesced branching stromatolite",
-      "order": ""
+      "label": "coalesced branching stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "ana_bran_strom",
-      "label": "anastomosed branching stromatolite",
-      "order": ""
+      "label": "anastomosed branching stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "lat_bran_strom",
-      "label": "lateral branching stromatolite",
-      "order": ""
+      "label": "lateral branching stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "lat_lin_strom",
-      "label": "laterally-linked stromatolite",
-      "order": ""
+      "label": "laterally-linked stromatolite"
     },
     {
       "list_name": "vl19n89",
       "name": "elongate",
-      "label": "elongate",
-      "order": ""
+      "label": "elongate"
     },
     {
       "list_name": "vl19n89",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "vb0ao86",
       "name": "clotted",
-      "label": "clotted",
-      "order": ""
+      "label": "clotted"
     },
     {
       "list_name": "vb0ao86",
       "name": "peloidal",
-      "label": "peloidal",
-      "order": ""
+      "label": "peloidal"
     },
     {
       "list_name": "vb0ao86",
       "name": "laminated",
-      "label": "laminated",
-      "order": ""
+      "label": "laminated"
     },
     {
       "list_name": "vb0ao86",
       "name": "stromatactis",
-      "label": "stromatactis cavities",
-      "order": ""
+      "label": "stromatactis cavities"
     },
     {
       "list_name": "vb0ao86",
       "name": "cement",
-      "label": "cement",
-      "order": ""
+      "label": "cement"
     },
     {
       "list_name": "vb0ao86",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "oh76z01",
       "name": "bioherm_lens",
-      "label": "bioherm (lens-shaped)",
-      "order": ""
+      "label": "bioherm (lens-shaped)"
     },
     {
       "list_name": "oh76z01",
       "name": "biostrom_tabu",
-      "label": "biostrom (tabular)",
-      "order": ""
+      "label": "biostrom (tabular)"
     },
     {
       "list_name": "oh76z01",
       "name": "dome",
-      "label": "dome",
-      "order": ""
+      "label": "dome"
     },
     {
       "list_name": "oh76z01",
       "name": "mound",
-      "label": "mound",
-      "order": ""
+      "label": "mound"
     },
     {
       "list_name": "uc1je36",
       "name": "fringing",
-      "label": "fringing",
-      "order": ""
+      "label": "fringing"
     },
     {
       "list_name": "uc1je36",
       "name": "patch_reef",
-      "label": "patch reef",
-      "order": ""
+      "label": "patch reef"
     },
     {
       "list_name": "uc1je36",
       "name": "atoll",
-      "label": "atoll",
-      "order": ""
+      "label": "atoll"
     },
     {
       "list_name": "uc1je36",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "ex7vg93",
       "name": "fenestrae",
-      "label": "fenestrae",
-      "order": ""
+      "label": "fenestrae"
     },
     {
       "list_name": "ex7vg93",
       "name": "geopetal",
-      "label": "geopetal",
-      "order": ""
+      "label": "geopetal"
     },
     {
       "list_name": "ex7vg93",
       "name": "framework_cavi",
-      "label": "framework cavities",
-      "order": ""
+      "label": "framework cavities"
     },
     {
       "list_name": "ex7vg93",
       "name": "cement_fill",
-      "label": "cement-fill",
-      "order": ""
+      "label": "cement-fill"
     },
     {
       "list_name": "ex7vg93",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     }
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-25)"
+      "id_string": "aa26AFnoKQRKhroeHSkv5w",
+      "version": "vohx2ac7eAZcFgYFNsbDsK"
     }
   ]
 }

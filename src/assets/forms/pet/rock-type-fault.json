@@ -18,14 +18,14 @@
     {
       "type": "select_multiple gu8yk54",
       "name": "fault_rock",
-      "label": "Fault and Shear Zone Rock type",
+      "label": "Fault and Shear Zone Rock Type",
       "required": "false",
       "appearance": "horizontal-compact"
     },
     {
       "type": "text",
       "name": "other_fault_rock",
-      "label": "Characterize other rock type",
+      "label": "Characterize Other Rock Type",
       "required": "false",
       "relevant": "${fault_rock} != ''"
     },
@@ -35,18 +35,6 @@
       "label": "Notes",
       "required": "false",
       "appearance": "multiline"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "required": "false",
-      "calculation": "'vWMK6YMJe6VLDvaKGpDKzA'"
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "calculation": "'vSVxyYb5y3zzprKjpza82J'",
-      "$given_name": "__version__"
     }
   ],
   "choices": [
@@ -108,8 +96,7 @@
   ],
   "settings": [
     {
-      "form_title": "Rock Type - Fault and shear zone (11/21)",
-      "version": "2 (2022-09-09 20:21:36)"
+      "version": "vWMK6YMJe6VLDvaKGpDKzA"
     }
   ]
 }

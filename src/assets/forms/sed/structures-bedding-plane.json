@@ -3,295 +3,238 @@
     {
       "type": "select_multiple cs0rc13",
       "name": "bedding_plane_features",
-      "label": "Bedding plane features",
-      "required": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Bedding Plane Features",
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_bedding_plane_feature",
       "label": "Other Bedding Plane Feature",
-      "required": false,
-      "relevant": "selected(${bedding_plane_features}, 'other')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${bedding_plane_features}, 'other')"
     },
     {
       "type": "text",
       "name": "bedding_plane_features_scale",
       "label": "Bedding Plane Features Scale",
-      "required": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "bedding_plane_features_orientation",
       "label": "Bedding Plane Features Orientation",
-      "required": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple bd2tc58",
       "name": "bedform_type",
       "label": "Bedform Type",
-      "required": false,
-      "relevant": "selected(${bedding_plane_features}, 'bedforms')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${bedding_plane_features}, 'bedforms')"
     },
     {
       "type": "text",
       "name": "other_bedform_type",
       "label": "Other Bedform Type",
-      "required": false,
-      "relevant": "selected(${bedform_type}, 'other')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${bedform_type}, 'other')"
     },
     {
       "type": "text",
       "name": "bedform_scale",
       "label": "Bedform Scale",
-      "required": false,
-      "relevant": "selected(${bedding_plane_features}, 'bedforms')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${bedding_plane_features}, 'bedforms')"
     },
     {
       "type": "text",
       "name": "crest_orientation_azimuth_0_360",
       "label": "Crest Orientation (Azimuth, 0-360)",
-      "required": false,
-      "relevant": "selected(${bedding_plane_features}, 'bedforms')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${bedding_plane_features}, 'bedforms')"
     },
     {
       "type": "text",
       "name": "notes",
       "label": "Notes",
-      "required": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "required": false,
-      "relevant": "",
-      "calculation": "'vYDde4CEYDYojkqNX2ot2w'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "required": "",
-      "relevant": "",
-      "calculation": "'vH7pu28EJEWp6YG7d2m5ic'",
-      "$given_name": "__version__"
+      "required": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [
     {
       "list_name": "cs0rc13",
       "name": "bedforms",
-      "label": "bedforms",
-      "order": ""
+      "label": "bedforms"
     },
     {
       "list_name": "cs0rc13",
       "name": "sole_marks",
-      "label": "sole marks",
-      "order": ""
+      "label": "sole marks"
     },
     {
       "list_name": "cs0rc13",
       "name": "flute_cast",
-      "label": "flute cast",
-      "order": ""
+      "label": "flute cast"
     },
     {
       "list_name": "cs0rc13",
       "name": "groove_cast",
-      "label": "groove cast",
-      "order": ""
+      "label": "groove cast"
     },
     {
       "list_name": "cs0rc13",
       "name": "tool_marks",
-      "label": "tool marks",
-      "order": ""
+      "label": "tool marks"
     },
     {
       "list_name": "cs0rc13",
       "name": "gutter_cast",
-      "label": "gutter cast",
-      "order": ""
+      "label": "gutter cast"
     },
     {
       "list_name": "cs0rc13",
       "name": "load_cast",
-      "label": "load cast",
-      "order": ""
+      "label": "load cast"
     },
     {
       "list_name": "cs0rc13",
       "name": "parting_lineat",
-      "label": "parting lineation",
-      "order": ""
+      "label": "parting lineation"
     },
     {
       "list_name": "cs0rc13",
       "name": "mudcracks",
-      "label": "mudcracks",
-      "order": ""
+      "label": "mudcracks"
     },
     {
       "list_name": "cs0rc13",
       "name": "syneresis_crac",
-      "label": "syneresis cracks",
-      "order": ""
+      "label": "syneresis cracks"
     },
     {
       "list_name": "cs0rc13",
       "name": "evaporite_mold",
-      "label": "evaporite molds",
-      "order": ""
+      "label": "evaporite molds"
     },
     {
       "list_name": "cs0rc13",
       "name": "raindrop_impre",
-      "label": "raindrop impressions",
-      "order": ""
+      "label": "raindrop impressions"
     },
     {
       "list_name": "cs0rc13",
       "name": "glacial_striat",
-      "label": "glacial striations",
-      "order": ""
+      "label": "glacial striations"
     },
     {
       "list_name": "cs0rc13",
       "name": "hardground_fir",
-      "label": "hardground/firmground",
-      "order": ""
+      "label": "hardground/firmground"
     },
     {
       "list_name": "cs0rc13",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "bd2tc58",
       "name": "wave_ripples",
-      "label": "wave ripples",
-      "order": ""
+      "label": "wave ripples"
     },
     {
       "list_name": "bd2tc58",
       "name": "current_ripple",
       "label": "current ripples",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "bd2tc58",
       "name": "dunes",
       "label": "dunes",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "bd2tc58",
       "name": "antidunes",
       "label": "antidunes",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "bd2tc58",
       "name": "2d_crests",
       "label": "2D crests",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "bd2tc58",
       "name": "3d_crests",
       "label": "3D crests",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "bd2tc58",
       "name": "lunate",
       "label": "lunate",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "bd2tc58",
       "name": "cuspate",
       "label": "cuspate",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "bd2tc58",
       "name": "linguoid",
       "label": "linguoid",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "bd2tc58",
       "name": "bifurcations",
       "label": "bifurcations",
-      "order": 9
+      "order": "9"
     },
     {
       "list_name": "bd2tc58",
       "name": "ladderback",
       "label": "ladderback",
-      "order": 10
+      "order": "10"
     },
     {
       "list_name": "bd2tc58",
       "name": "interference_r",
       "label": "interference ripples",
-      "order": 11
+      "order": "11"
     },
     {
       "list_name": "bd2tc58",
       "name": "adhesion_struc",
       "label": "adhesion structures",
-      "order": 12
+      "order": "12"
     },
     {
       "list_name": "bd2tc58",
       "name": "swales",
       "label": "swales",
-      "order": 13
+      "order": "13"
     },
     {
       "list_name": "bd2tc58",
       "name": "hummock_swale",
       "label": "hummocks and swales",
-      "order": 14
+      "order": "14"
     },
     {
       "list_name": "bd2tc58",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     }
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-25)"
+      "version": "vYDde4CEYDYojkqNX2ot2w"
     }
   ]
 }

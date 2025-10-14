@@ -4,435 +4,286 @@
       "type": "select_multiple wj4dz28",
       "name": "package_geometry",
       "label": "Bed Geometry",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "begin_group",
       "name": "group_wx8ze11",
       "label": "Lower Contact",
-      "read_only": "",
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple nt45h93",
       "name": "shape_of_lower_contacts",
-      "label": "Shape of lower contact (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Shape of Lower Contact (if variable, select more than one)",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple bq6ko94",
       "name": "character_of_lower_contacts",
-      "label": "Character of lower contact(s) (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Character of Lower Contact(s) (if variable, select more than one)",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "lower_contact_relief",
-      "label": "Lower contact relief",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Lower Contact Relief",
+      "required": "false",
+      "read_only": "false"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "read_only": "",
-      "required": "",
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "begin_group",
       "name": "group_cl93o58",
       "label": "Upper Contact",
-      "read_only": "",
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple fo9ve04",
       "name": "shape_of_upper_contacts",
-      "label": "Shape of upper contact (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Shape of Upper Contact (if variable, select more than one)",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple rx9bj85",
       "name": "character_of_upper_contacts",
-      "label": "Character of upper contact (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Character of Upper Contact (if variable, select more than one)",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "upper_contact_relief",
       "label": "Upper Contact Relief",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "read_only": "",
-      "required": "",
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "begin_group",
       "name": "group_hh2iq16",
       "label": "Interbed Thickness",
-      "read_only": "",
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "decimal",
       "name": "avg_thickness",
       "label": "Average Thickness",
-      "read_only": "",
-      "required": false,
-      "constraint": ". > 0",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "constraint": ". > 0"
     },
     {
       "type": "decimal",
       "name": "max_thickness",
       "label": "Maximum Thickness",
-      "read_only": "",
-      "required": false,
-      "constraint": ". > 0",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "constraint": ". > 0"
     },
     {
       "type": "decimal",
       "name": "min_thickness",
       "label": "Minimum Thickness",
-      "read_only": "",
-      "required": false,
-      "constraint": ". > 0",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "constraint": ". > 0"
     },
     {
       "type": "select_one zc89y27",
       "name": "interbed_thickness_units",
       "label": "Interbed Thickness Units",
-      "read_only": "",
-      "required": true,
-      "constraint": "",
-      "relevant": "${avg_thickness} != '' or ${max_thickness} != '' or ${min_thickness} != ''",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "true",
+      "relevant": "${avg_thickness} != '' or ${max_thickness} != '' or ${min_thickness} != ''"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "read_only": "",
-      "required": "",
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "type": "end_group"
     },
     {
       "type": "text",
       "name": "notes",
       "label": "Notes",
-      "read_only": false,
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "multiline",
-      "calculation": "",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "read_only": "",
-      "required": false,
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "'vJzGRtoY7niyfJi4odJRgA'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "read_only": "",
-      "required": "",
-      "constraint": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "'v5Dw5WrGFjToG4LGp7UmaW'",
-      "$given_name": "__version__"
+      "required": "false",
+      "read_only": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [
     {
       "list_name": "wj4dz28",
       "name": "discontinuous",
-      "label": "discontinuous",
-      "order": ""
+      "label": "discontinuous"
     },
     {
       "list_name": "wj4dz28",
       "name": "tabular_parall",
       "label": "tabular/parallel",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "wj4dz28",
       "name": "lenticular",
       "label": "lenticular",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "wj4dz28",
       "name": "wedge",
       "label": "wedge",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "wj4dz28",
       "name": "channel_like",
       "label": "channel-like",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "nt45h93",
       "name": "flat",
-      "label": "flat",
-      "order": ""
+      "label": "flat"
     },
     {
       "list_name": "nt45h93",
       "name": "undulatory",
-      "label": "undulatory",
-      "order": ""
+      "label": "undulatory"
     },
     {
       "list_name": "nt45h93",
       "name": "curved",
-      "label": "curved",
-      "order": ""
+      "label": "curved"
     },
     {
       "list_name": "nt45h93",
       "name": "concave_up",
-      "label": "concave up",
-      "order": ""
+      "label": "concave up"
     },
     {
       "list_name": "nt45h93",
       "name": "concave_down",
-      "label": "concave down",
-      "order": ""
+      "label": "concave down"
     },
     {
       "list_name": "nt45h93",
       "name": "irregular",
-      "label": "irregular",
-      "order": ""
+      "label": "irregular"
     },
     {
       "list_name": "nt45h93",
       "name": "covered",
-      "label": "covered",
-      "order": ""
+      "label": "covered"
     },
     {
       "list_name": "bq6ko94",
       "name": "flat",
-      "label": "sharp",
-      "order": ""
+      "label": "sharp"
     },
     {
       "list_name": "bq6ko94",
       "name": "undulatory",
       "label": "gradational",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "bq6ko94",
       "name": "curved",
       "label": "well-defined",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "bq6ko94",
       "name": "covered",
       "label": "poorly-defined",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "fo9ve04",
       "name": "flat",
-      "label": "flat",
-      "order": ""
+      "label": "flat"
     },
     {
       "list_name": "fo9ve04",
       "name": "undulatory",
-      "label": "undulatory",
-      "order": ""
+      "label": "undulatory"
     },
     {
       "list_name": "fo9ve04",
       "name": "curved",
-      "label": "curved",
-      "order": ""
+      "label": "curved"
     },
     {
       "list_name": "fo9ve04",
       "name": "concave_up",
-      "label": "concave up",
-      "order": ""
+      "label": "concave up"
     },
     {
       "list_name": "fo9ve04",
       "name": "concave_down",
-      "label": "concave down",
-      "order": ""
+      "label": "concave down"
     },
     {
       "list_name": "fo9ve04",
       "name": "irregular",
-      "label": "irregular",
-      "order": ""
+      "label": "irregular"
     },
     {
       "list_name": "fo9ve04",
       "name": "covered",
-      "label": "covered",
-      "order": ""
+      "label": "covered"
     },
     {
       "list_name": "rx9bj85",
       "name": "sharp",
-      "label": "sharp",
-      "order": ""
+      "label": "sharp"
     },
     {
       "list_name": "rx9bj85",
       "name": "gradational",
       "label": "gradational",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "rx9bj85",
       "name": "well_defined",
       "label": "well-defined",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "rx9bj85",
       "name": "poorly_defined",
       "label": "poorly-defined",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "zc89y27",
       "name": "cm",
-      "label": "cm",
-      "order": ""
+      "label": "cm"
     },
     {
       "list_name": "zc89y27",
       "name": "m",
-      "label": "m",
-      "order": ""
+      "label": "m"
     },
     {
       "list_name": "zc89y27",
       "name": "in",
-      "label": "in",
-      "order": ""
+      "label": "in"
     },
     {
       "list_name": "zc89y27",
       "name": "ft",
-      "label": "ft",
-      "order": ""
+      "label": "ft"
     }
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-12)"
+      "id_string": "awVZhNfrCEPjUTsQeftCdh",
+      "version": "vJzGRtoY7niyfJi4odJRgA"
     }
   ]
 }
