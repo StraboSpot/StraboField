@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {logout} from './userProfile.slice';
 import useResetState from '../../services/useResetState';
 import {isEmpty} from '../../shared/Helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
@@ -18,6 +19,7 @@ const LogOut = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.user);
 
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
   const {clearUser} = useResetState();
@@ -29,6 +31,23 @@ const LogOut = () => {
     }, 200);
   };
 
+  const handleDeleteDataPressed = () => {
+    setIsDeleteConfirmModalVisible(true);
+  };
+
+  const renderDeleteConfirmationModal = () => {
+    return (
+      <DeleteConformationDialogBox
+        headerTitle={'Confirm Delete Data'}
+        isVisible={isDeleteConfirmModalVisible}
+        onActionPressed={clearUser}
+        onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
+      >
+        <Text style={{textAlign: 'center'}}>Are you sure you want to delete all of your data?</Text>
+      </DeleteConformationDialogBox>
+    );
+  };
+
   const renderLogInOrOutButton = () => {
     return (
       <View style={{paddingHorizontal: 10}}>
@@ -37,9 +56,9 @@ const LogOut = () => {
           title={isEmpty(userData.name) ? 'Log In' : 'Log Out'}
         />
         {isEmpty(userData.name) && (
-          <OutlineButton
-            onPress={clearUser}
-            title={isEmpty(userData.name) && 'Clear and Return to Log In'}
+          <DeleteButton
+            onPress={handleDeleteDataPressed}
+            title={isEmpty(userData.name) && 'Delete Data & Return to Log In'}
           />
         )}
       </View>
@@ -72,6 +91,7 @@ const LogOut = () => {
     <>
       {renderLogInOrOutButton()}
       {isLogoutModalVisible && renderLogoutModal()}
+      {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );
 };
