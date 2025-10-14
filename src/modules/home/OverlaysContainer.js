@@ -1,5 +1,4 @@
 import React, {forwardRef} from 'react';
-import {Platform} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -24,7 +23,7 @@ const OverlaysContainer = forwardRef(({
 
   return (
     <>
-      {isProjectLoadSelectionModalVisible && Platform.OS !== 'web' && (
+      {isProjectLoadSelectionModalVisible && (
         <InitialProjectLoadModal
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}

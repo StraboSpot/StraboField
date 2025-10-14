@@ -9,10 +9,12 @@ import {setIsProjectLoadSelectionModalVisible, setIsStatusMessagesModalVisible} 
 import {MAIN_MENU_ITEMS} from '../../../modules/main-menu-panel/mainMenu.constants';
 import DatasetPreferences from '../../../modules/project/datasets/DatasetPreferences';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
+import {isEmpty} from '../../Helpers';
 import OutlineButton from '../buttons/OutlineButton';
 
 const StatusModal = () => {
   const dispatch = useDispatch();
+  const currentProjectId = useSelector(state => state.project.project?.id);
   const isModalLoading = useSelector(state => state.home.loading.modal);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
@@ -25,7 +27,9 @@ const StatusModal = () => {
   const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
 
   useEffect(() => {
-    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+    if (isProjectLoadSelectionModalVisible && !isEmpty(currentProjectId)) {
+      dispatch(setIsProjectLoadSelectionModalVisible(false));
+    }
     if (Platform.OS === 'web' && isLoadingProject) setIsShowingDatasetPreferences(true);
     else setIsShowingDatasetPreferences(false);
   }, [isStatusMessagesModalVisible, isLoadingProject, dispatch, isProjectLoadSelectionModalVisible]);

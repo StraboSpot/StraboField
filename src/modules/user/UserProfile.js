@@ -305,7 +305,7 @@ const UserProfile = () => {
                 validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={true}
               />
-              {isOnline.isInternetReachable ? (
+              {isOnline.isInternetReachable && !isEmpty(userData.email) && !isEmpty(userData.encoded_login) ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
                     <Button

@@ -19,6 +19,7 @@ const SignIn = ({navigation, route}) => {
 
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
+  const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -44,19 +45,28 @@ const SignIn = ({navigation, route}) => {
     dispatch(login());
   };
 
+  const handleRegister = () => navigation.navigate('SignUp');
+
   const renderButtons = () => {
     return (
       <View style={signInStyles.buttonsContainer}>
         <View>
-          <ActionButton
-            disabled={username === '' || password === '' || !isOnline.isConnected}
-            isLoading={loading}
-            onPress={handleSignIn}
-            title={'Log In'}
-          />
+          {isOnline.isConnected && (
+            <ActionButton
+              disabled={username === '' || password === '' || !isOnline.isConnected}
+              isLoading={loading}
+              onPress={handleSignIn}
+              title={'Log In'}
+            />
+          )}
           <View style={{flexDirection: 'row', gap: 10}}>
             <OutlineButton onPress={handleGuestSignIn} title={'Continue as Guest'}/>
-            <OutlineButton onPress={handleSignIn} title={'Register'}/>
+            {isOnline.isConnected && !isEndpointSelected && (
+              <OutlineButton
+                onPress={handleRegister}
+                title={'Register'}
+              />
+            )}
           </View>
         </View>
       </View>

@@ -186,7 +186,7 @@ const SignUp = ({navigation}) => {
         <Button
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainer}
-          onPress={() => navigation.navigate('SignIn')}
+          onPress={() => navigation.goBack()}
           title={'Back to Log In'}
         />
       </>
