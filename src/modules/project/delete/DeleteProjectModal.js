@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import deleteProjectModalStyle from './deleteProjectModalStyle';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -61,7 +60,7 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
           </Text>
         ) : (
           <>
-            <Text style={deleteProjectModalStyle.contentText}>
+            <Text style={overlayStyles.contentText}>
               {deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'Deleting ' + projectToDeleteFilename
                 : deleteProjectStatus === DELETE_STATUS.SUCCESS ? projectToDeleteFilename + ' has been deleted'
                   : 'Error deleting ' + projectToDeleteFilename}

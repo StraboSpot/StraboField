@@ -43,10 +43,7 @@ const ModalWrapper = ({
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
-    return {
-      ...overlayStyles.overlayContainer,
-      ...overlayStyleOverride,
-    };
+    return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
   };
 
   const renderModalBottom = () => {

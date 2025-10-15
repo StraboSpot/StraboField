@@ -13,7 +13,6 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 const MapActionsOverlay = ({
                              onPress,
                              onTouchOutside,
-                             overlayStyle,
                              visible,
                            }) => {
 
@@ -92,7 +91,7 @@ const MapActionsOverlay = ({
       headerTitle={'Map Actions'}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={SMALL_SCREEN ? {} : overlayStyles.overlayMapMenuPosition}
+      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
@@ -107,9 +106,7 @@ const MapActionsOverlay = ({
         data={actions}
         key={'mapActions'}
         renderItem={({item}) => mapActionItem(item)}
-        style={{
-          width: '100%',
-        }}
+        style={{width: '100%'}}
       />
     </ModalWrapper>
   );

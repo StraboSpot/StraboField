@@ -87,16 +87,10 @@ const styles = StyleSheet.create({
     // backgroundColor: 'green',
   },
   overlayMapMenuPosition: {
-    bottom: SMALL_SCREEN ? 80 : 100,
+    bottom: 100,
     flex: 1,
-    left: SMALL_SCREEN ? 10 : 75,
+    left: 75,
     position: 'absolute',
-  },
-  overlayPosition: {
-    bottom: 60,
-    left: 70,
-    position: 'absolute',
-    zIndex: 1,
   },
   selectGeometryTypeContent: {
     alignItems: 'flex-start',

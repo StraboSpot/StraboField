@@ -19,7 +19,7 @@ import {BASEMAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
 
-const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visible}) => {
+const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const {setCustomMapSwitchValue} = useCustomMap();
   const {setBasemap} = useMap();
@@ -296,7 +296,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
       headerTitle={dialogTitle}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={SMALL_SCREEN ? {} : overlayStyles.overlayMapMenuPosition}
+      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
@@ -312,9 +312,7 @@ const MapLayersOverlay = ({mapComponentRef, onTouchOutside, overlayStyle, visibl
           paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
         }}
-        style={{
-          width: '100%',
-        }}
+        style={{width: '100%'}}
       />
     </ModalWrapper>
   );

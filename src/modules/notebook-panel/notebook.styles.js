@@ -24,7 +24,7 @@ const notebookStyles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     top: SMALL_SCREEN ? 0 : 20,
-    width: 300,
+    width: 200,
   },
   dialogTitle: {
     backgroundColor: themes.PRIMARY_ACCENT_COLOR,

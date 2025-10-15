@@ -178,7 +178,6 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
-                    mapComponentRef={mapComponentRef}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}

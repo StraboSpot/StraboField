@@ -23,7 +23,7 @@ import {
 import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
 
-const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
+const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const dispatch = useDispatch();
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
@@ -129,7 +129,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
       headerTitle={'Map Symbols'}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={SMALL_SCREEN ? {} : overlayStyles.overlayMapMenuPosition}
+      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
@@ -250,9 +250,7 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
           paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
         }}
-        style={{
-          width: '100%',
-        }}
+        style={{width: '100%'}}
       />
     </ModalWrapper>
   );

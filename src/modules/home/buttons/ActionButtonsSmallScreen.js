@@ -14,7 +14,6 @@ const ActionButtonsSmallScreen = ({
                                     distance,
                                     onCancel,
                                     endMeasurement,
-                                    mapComponentRef,
                                     mapMode,
                                     onEndDrawPressed,
                                     selectingMode,
@@ -61,7 +60,6 @@ const ActionButtonsSmallScreen = ({
             <MapActionButtons
               dialogClickHandler={dialogClickHandler}
               dialogs={dialogs}
-              mapComponentRef={mapComponentRef}
               toggleDialog={toggleDialog}
             />
           </View>
