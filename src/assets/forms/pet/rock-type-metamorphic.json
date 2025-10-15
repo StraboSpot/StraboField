@@ -19,7 +19,7 @@
     {
       "type": "select_one yj3tk91",
       "name": "char_mig_met",
-      "label": "Characterize migmatite",
+      "label": "Characterize Migmatite",
       "required": "false",
       "relevant": "${metamorphic_rock_type} = 'migmatite'"
     },
@@ -34,7 +34,7 @@
     {
       "type": "select_one zt6bn36",
       "name": "protolith",
-      "label": "Interpreted protolith",
+      "label": "Interpreted Protolith",
       "hint": "Interpreted metamorphic protolith",
       "required": "false",
       "appearance": "horizontal-compact"
@@ -80,11 +80,6 @@
       "label": "Notes",
       "required": "false",
       "appearance": "multiline"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vpteSYpif9h4aieg3gqWVP'"
     }
   ],
   "choices": [
@@ -312,73 +307,73 @@
       "list_name": "zt6bn36",
       "name": "sandstone",
       "label": "sandstone",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "zt6bn36",
       "name": "greywacke",
       "label": "greywacke/psammite",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "zt6bn36",
       "name": "conglomerate",
       "label": "conglomerate",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "zt6bn36",
       "name": "evaporite",
       "label": "evaporite",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "zt6bn36",
       "name": "marl",
       "label": "marl",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "zt6bn36",
       "name": "carbonate",
       "label": "carbonate",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "zt6bn36",
       "name": "granitoid",
       "label": "granitoid",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "zt6bn36",
       "name": "volc_proto",
       "label": "volcanic",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "zt6bn36",
       "name": "mafic",
       "label": "mafic",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "zt6bn36",
       "name": "ultramafic",
       "label": "ultramafic",
-      "order": "10"
+      "order": 10
     },
     {
       "list_name": "zt6bn36",
       "name": "unclear",
       "label": "unclear",
-      "order": "11"
+      "order": 11
     },
     {
       "list_name": "zt6bn36",
       "name": "other",
       "label": "other",
-      "order": "12"
+      "order": 12
     },
     {
       "list_name": "kt0dp56",
@@ -389,67 +384,67 @@
       "list_name": "kt0dp56",
       "name": "prehnite_pumpy",
       "label": "prehnite-pumpyellite",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "kt0dp56",
       "name": "greenschist",
       "label": "greenschist",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "kt0dp56",
       "name": "amphibolite",
       "label": " lower amphibolite (epidote-amphibolite)",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "kt0dp56",
       "name": "upper_amph",
       "label": "upper amphibolite",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "kt0dp56",
       "name": "granulite",
       "label": "granulite",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "kt0dp56",
       "name": "blueschist",
       "label": "blueschist",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "kt0dp56",
       "name": "eclogite",
       "label": "eclogite",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "kt0dp56",
       "name": "hornfels",
       "label": "hornfels (contact metamorphism)",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "kt0dp56",
       "name": "ultra_high_pre",
       "label": "ultra high pressure",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "kt0dp56",
       "name": "ultra_high_tem",
       "label": "ultra high temperature",
-      "order": "10"
+      "order": 10
     },
     {
       "list_name": "kt0dp56",
       "name": "other",
       "label": "other",
-      "order": "11"
+      "order": 11
     },
     {
       "list_name": "nw3zz67",
@@ -460,55 +455,55 @@
       "list_name": "nw3zz67",
       "name": "biotite",
       "label": "biotite",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "nw3zz67",
       "name": "garnet",
       "label": "garnet",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "nw3zz67",
       "name": "garnet_corider",
       "label": "garnet-cordierite",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "nw3zz67",
       "name": "staurolite",
       "label": "staurolite",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "nw3zz67",
       "name": "staurolite_kya",
       "label": "staurolite-kyanite",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "nw3zz67",
       "name": "andalusite",
       "label": "andalusite",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "nw3zz67",
       "name": "kyanite",
       "label": "kyanite",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "nw3zz67",
       "name": "sillimanite",
       "label": "sillimanite",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "nw3zz67",
       "name": "sill_kspar",
       "label": "sillimanite-K feldspar",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "nw3zz67",
@@ -519,11 +514,6 @@
       "list_name": "nw3zz67",
       "name": "other",
       "label": "other"
-    }
-  ],
-  "settings": [
-    {
-      "version": "2 (2021-06-07 17:11:38)"
     }
   ]
 }

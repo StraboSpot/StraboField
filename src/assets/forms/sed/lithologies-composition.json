@@ -4,2177 +4,1644 @@
       "type": "begin_group",
       "name": "group_gw3td21",
       "label": "Composition",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple yf18f03",
       "name": "minerals_present",
       "label": "Minerals Present",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_minerals",
       "label": "Other Mineral(s)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${minerals_present}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${minerals_present}, 'other')"
     },
     {
       "type": "select_multiple uh8oy57",
       "name": "sandstone_type_dott",
       "label": "Dott Classification",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple vw5id84",
       "name": "sandstone_type_folk_mcbride",
       "label": "Folk/McBride Classification",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple cv9qv11",
       "name": "sandstone_modifier",
-      "label": "Sandstone modifier",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Sandstone Modifier",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_sandstone_modifier",
       "label": "Other Sandstone Modifier",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${sandstone_modifier}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${sandstone_modifier}, 'other')"
     },
     {
       "type": "select_multiple hw9cd71",
       "name": "skeletal_carbonate_components",
       "label": "Skeletal Carbonate Components",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_skeletal_carbonate_component",
       "label": "Other Skeletal Carbonate Component",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'other')"
     },
     {
       "type": "decimal",
       "name": "skeletal_general_percent",
-      "label": "Skeletal (General) percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'skeletal_gener')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Skeletal (General) Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'skeletal_gener')"
     },
     {
       "type": "decimal",
       "name": "mollusc_percent",
-      "label": "Mollusc percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'mollusc')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Mollusc Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'mollusc')"
     },
     {
       "type": "decimal",
       "name": "brachiopod_percent",
-      "label": "Brachiopod percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'brachiopod')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Brachiopod Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'brachiopod')"
     },
     {
       "type": "decimal",
       "name": "coral_percent",
-      "label": "Coral percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'coral')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Coral Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'coral')"
     },
     {
       "type": "decimal",
       "name": "echinoderm_percent",
-      "label": "Echinoderm percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'echinoderm')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Echinoderm Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'echinoderm')"
     },
     {
       "type": "decimal",
       "name": "bryozoan_percent",
-      "label": "Bryozoan percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'bryozoan')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Bryozoan Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'bryozoan')"
     },
     {
       "type": "decimal",
       "name": "calcareous_algae_percent",
-      "label": "Calcareous Algae percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'calcareous_alg')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Calcareous Algae Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'calcareous_alg')"
     },
     {
       "type": "decimal",
       "name": "foraminifera_percent",
-      "label": "Foraminifera percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'foraminifera')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Foraminifera Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'foraminifera')"
     },
     {
       "type": "decimal",
       "name": "stromatolite_percent",
-      "label": "Stromatolite percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'stromatolite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Stromatolite Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'stromatolite')"
     },
     {
       "type": "decimal",
       "name": "thrombolite_percent",
-      "label": "Thrombolite percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'thrombolite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Thrombolite Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'thrombolite')"
     },
     {
       "type": "decimal",
       "name": "dendrolite_percent",
-      "label": "Dendrolite percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'dendrolite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Dendrolite Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'dendrolite')"
     },
     {
       "type": "decimal",
       "name": "leiolite_percent",
-      "label": "Leiolite percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'leiolite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Leiolite Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'leiolite')"
     },
     {
       "type": "decimal",
       "name": "other_skeletal_carbonate_component_percent",
-      "label": "Other Skeletal Carbonate Component percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${skeletal_carbonate_components}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Skeletal Carbonate Component Percent",
+      "required": "false",
+      "relevant": "selected(${skeletal_carbonate_components}, 'other')"
     },
     {
       "type": "select_multiple gi8hz21",
       "name": "non_skeletal_carbonate_compone",
       "label": "Non-Skeletal Carbonate Components",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "text",
       "name": "other_non_skeletal_carbonate_component",
       "label": "Other Non-Skeletal Carbonate Component",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')"
     },
     {
       "type": "decimal",
       "name": "mud_percent",
-      "label": "Mud percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'mud')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Mud Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'mud')"
     },
     {
       "type": "decimal",
       "name": "cement_percent",
-      "label": "Cement percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'cement')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Cement Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'cement')"
     },
     {
       "type": "decimal",
       "name": "intraclast_percent",
-      "label": "Intraclast percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'intraclast')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Intraclast Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'intraclast')"
     },
     {
       "type": "decimal",
       "name": "peloid_percent",
-      "label": "Peloid percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'peloid')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Peloid Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'peloid')"
     },
     {
       "type": "decimal",
       "name": "ooid_percent",
-      "label": "Ooid percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'ooid')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Ooid Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'ooid')"
     },
     {
       "type": "decimal",
       "name": "oncoid_percent",
-      "label": "Oncoid percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'oncoid')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Oncoid Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'oncoid')"
     },
     {
       "type": "decimal",
       "name": "pisoid_percent",
-      "label": "Pisoid percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'pisoid')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Pisoid Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'pisoid')"
     },
     {
       "type": "decimal",
       "name": "coated_grian_percent",
-      "label": "Coated Grian percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'coated_grain')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Coated Grian Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'coated_grain')"
     },
     {
       "type": "decimal",
       "name": "grapestone_percent",
-      "label": "Grapestone percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'grapestone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Grapestone Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'grapestone')"
     },
     {
       "type": "decimal",
       "name": "giant_ooid_percent",
-      "label": "Giant Ooid percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'giant_ooid')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Giant Ooid Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'giant_ooid')"
     },
     {
       "type": "decimal",
       "name": "seafloor_precipitate_percent",
-      "label": "Seafloor Precipitate percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'seafloor_preci')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Seafloor Precipitate Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'seafloor_preci')"
     },
     {
       "type": "decimal",
       "name": "molar_tooth_percent",
-      "label": "Molar Tooth percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'molar_tooth')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Molar Tooth Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'molar_tooth')"
     },
     {
       "type": "decimal",
       "name": "other_non_skeletal_component_percent",
-      "label": "Other Non-Skeletal Component percent",
-      "required": false,
-      "read_only": "",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Non-Skeletal Component Percent",
+      "required": "false",
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')"
     },
     {
       "type": "select_multiple kg6zo76",
       "name": "clay_or_mudstone_type",
       "label": "Claystone or Mudstone Type",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_claystone_mudstone",
       "label": "Other Claystone/Mudstone",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'other')"
     },
     {
       "type": "decimal",
       "name": "siliceous_mudstone_percent",
-      "label": "Siliceous mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_muds')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Siliceous Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_muds')"
     },
     {
       "type": "decimal",
       "name": "siliceous_calcareous_mudstone_percent",
-      "label": "Siliceous calcareous mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_calc')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Siliceous Calcareous Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_calc')"
     },
     {
       "type": "decimal",
       "name": "siliceous_volcanicla_tic_mudstone_percent",
-      "label": "Siliceous volcaniclastic mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_volc')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Siliceous Volcaniclastic Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_volc')"
     },
     {
       "type": "decimal",
       "name": "calcareous_mudstone_percent",
-      "label": "Calcareous mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'calcareous_mud')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Calcareous Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'calcareous_mud')"
     },
     {
       "type": "decimal",
       "name": "black_shale_percent",
-      "label": "Black shale percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'black_shale')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Black Shale Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'black_shale')"
     },
     {
       "type": "decimal",
       "name": "red_clay_percent",
-      "label": "Red clay percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'red_clay')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Red Clay Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'red_clay')"
     },
     {
       "type": "decimal",
       "name": "red_mudstone_percent",
-      "label": "Red mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'red_mudstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Red Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'red_mudstone')"
     },
     {
       "type": "decimal",
       "name": "green_mudstone_percent",
-      "label": "Green mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'green_mudstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Green Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'green_mudstone')"
     },
     {
       "type": "decimal",
       "name": "variegated_mudstone_percent",
-      "label": "Variegated mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'variegated_mud')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Variegated Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'variegated_mud')"
     },
     {
       "type": "decimal",
       "name": "marl_percent",
-      "label": "Marl percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'marl')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Marl Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'marl')"
     },
     {
       "type": "decimal",
       "name": "sarl_percent",
-      "label": "Sarl percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'sarl')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Sarl Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'sarl')"
     },
     {
       "type": "decimal",
       "name": "argillaceous_mudstone_percent",
-      "label": "Argillaceous mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clay_or_mudstone_type}, 'argillaceous_m')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Argillaceous Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clay_or_mudstone_type}, 'argillaceous_m')"
     },
     {
       "type": "select_multiple ih44p58",
       "name": "conglomerate_composition",
       "label": "Conglomerate/Breccia Composition",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple uz9ix58",
       "name": "clast_composition",
       "label": "Clast Composition",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_clast_types",
       "label": "Other Clast Type(s)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'other')"
     },
     {
       "type": "decimal",
       "name": "intrusive_igneous_clast_percent",
-      "label": "Intrusive igneous clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'intrusive_igne')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Intrusive Igneous Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'intrusive_igne')"
     },
     {
       "type": "decimal",
       "name": "extrusive_igneous_clast_percent",
-      "label": "Volcanic clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'extrusive_igne')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Volcanic Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'extrusive_igne')"
     },
     {
       "type": "decimal",
       "name": "metamorphic_clast_percent",
-      "label": "Metamorphic clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'met_clast')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Metamorphic Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'met_clast')"
     },
     {
       "type": "decimal",
       "name": "mudstone_clast_percent",
-      "label": "Mudstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'mudstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Mudstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'mudstone')"
     },
     {
       "type": "decimal",
       "name": "siltstone_clast_percent",
-      "label": "Siltstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'siltstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Siltstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'siltstone')"
     },
     {
       "type": "decimal",
       "name": "sandstone_clast_percent",
-      "label": "Sandstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'sandstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Sandstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'sandstone')"
     },
     {
       "type": "decimal",
       "name": "conglomerate_clast_percent",
-      "label": "Conglomerate clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'conglomerate')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Conglomerate Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'conglomerate')"
     },
     {
       "type": "decimal",
       "name": "limestone_clast_percent",
-      "label": "Limestone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'limestone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Limestone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'limestone')"
     },
     {
       "type": "decimal",
       "name": "dolostone_clast_percent",
-      "label": "Dolostone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'dolostone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Dolostone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'dolostone')"
     },
     {
       "type": "decimal",
       "name": "wackestone_clast_percent",
-      "label": "Wackestone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'wackestone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Wackestone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'wackestone')"
     },
     {
       "type": "decimal",
       "name": "packstone_clast_percent",
-      "label": "Packstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'packstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Packstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'packstone')"
     },
     {
       "type": "decimal",
       "name": "grainstone_clast_percent",
-      "label": "Grainstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'grainstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Grainstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'grainstone')"
     },
     {
       "type": "decimal",
       "name": "boundstone_clast_percent",
-      "label": "Boundstone clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'boundstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Boundstone Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'boundstone')"
     },
     {
       "type": "decimal",
       "name": "other_clast_percent",
-      "label": "Other clast percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${clast_composition}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Clast Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${clast_composition}, 'other')"
     },
     {
       "type": "select_multiple co1jf03",
       "name": "matrix_composition",
-      "label": "Matrix composition",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Matrix Composition",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_matrix_types",
       "label": "Other Matrix Type(s)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'other')"
     },
     {
       "type": "decimal",
       "name": "intrusive_igneous_matrix_percent",
-      "label": "Intrusive igneous matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'intrusive_igneous')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Intrusive igneous Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'intrusive_igneous')"
     },
     {
       "type": "decimal",
       "name": "extrusive_igneous_matrix_percent",
-      "label": "Extrusive igneous matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'extrusive_igneous')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Extrusive igneous Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'extrusive_igneous')"
     },
     {
       "type": "decimal",
       "name": "metamorphic_igneous_matrix_percent",
-      "label": "Metamorphic igneous matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'metamorphic')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Metamorphic igneous Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'metamorphic')"
     },
     {
       "type": "decimal",
       "name": "mudstone_matrix_percent",
-      "label": "Mudstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'mudstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Mudstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'mudstone')"
     },
     {
       "type": "decimal",
       "name": "siltstone_matrix_percent",
-      "label": "Siltstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'siltstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Siltstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'siltstone')"
     },
     {
       "type": "decimal",
       "name": "sandstone_matrix_percent",
-      "label": "Sandstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'sandstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Sandstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'sandstone')"
     },
     {
       "type": "decimal",
       "name": "conglomerate_matrix_percent",
-      "label": "Conglomerate matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'conglomerate')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Conglomerate Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'conglomerate')"
     },
     {
       "type": "select_multiple ng3et79",
       "name": "carbonate_matrix_type",
       "label": "Carbonate Matrix Type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'carbonate')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'carbonate')"
     },
     {
       "type": "decimal",
       "name": "limestone_matrix_percent",
-      "label": "Limestone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'limestone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Limestone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'limestone')"
     },
     {
       "type": "decimal",
       "name": "dolostone_matrix_percent",
-      "label": "Dolostone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'dolostone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Dolostone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'dolostone')"
     },
     {
       "type": "decimal",
       "name": "skeletal_matrix_percent",
-      "label": "Skeletal matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'skeletal')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Skeletal Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'skeletal')"
     },
     {
       "type": "decimal",
       "name": "wackestone_matrix_percent",
-      "label": "Wackestone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'wackestone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Wackestone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'wackestone')"
     },
     {
       "type": "decimal",
       "name": "packstone_matrix_percent",
-      "label": "Packstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'packstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Packstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'packstone')"
     },
     {
       "type": "decimal",
       "name": "grainstone_matrix_percent",
-      "label": "Grainstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'grainstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Grainstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'grainstone')"
     },
     {
       "type": "decimal",
       "name": "boundstone_matrix_percent",
-      "label": "Boundstone matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'boundstone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Boundstone Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'boundstone')"
     },
     {
       "type": "decimal",
       "name": "other_carbonate_matrix_percent",
-      "label": "Other carbonate matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${carbonate_matrix_type}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Carbonate Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${carbonate_matrix_type}, 'other')"
     },
     {
       "type": "decimal",
       "name": "other_matrix_percent",
-      "label": "Other matrix percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${matrix_composition}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Matrix Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${matrix_composition}, 'other')"
     },
     {
       "type": "select_multiple so29n97",
       "name": "volcaniclastic_type",
-      "label": "Volcaniclastic type",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Volcaniclastic Type",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_volcaniclastic_type",
       "label": "Other Volcaniclastic Type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'other')"
     },
     {
       "type": "decimal",
       "name": "glass_percent",
-      "label": "Glass percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'glass')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Glass Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'glass')"
     },
     {
       "type": "decimal",
       "name": "crystals_percent",
-      "label": "Crystals percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'crystals')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Crystals Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'crystals')"
     },
     {
       "type": "decimal",
       "name": "lithic_fragments_percent",
-      "label": "Lithic fragments percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'lithic_fragmen')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Lithic Fragments Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'lithic_fragmen')"
     },
     {
       "type": "decimal",
       "name": "volcanic_mudstone_percent",
-      "label": "Volcanic mudstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_mudst')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Volcanic Mudstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_mudst')"
     },
     {
       "type": "decimal",
       "name": "volcanic_sandstone_percent",
-      "label": "Volcanic sandstone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_sands')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Volcanic Sandstone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_sands')"
     },
     {
       "type": "decimal",
       "name": "lapillistone_percent",
-      "label": "Lapillistone percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'lapillistone')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Lapillistone Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'lapillistone')"
     },
     {
       "type": "decimal",
       "name": "agglomerate_percent",
-      "label": "Agglomerate percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'agglomerate')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Agglomerate Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'agglomerate')"
     },
     {
       "type": "decimal",
       "name": "volcanic_breccia_percent",
-      "label": "Volcanic breccia percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_brecc')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Volcanic Breccia Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_brecc')"
     },
     {
       "type": "decimal",
       "name": "bentonite_percent",
-      "label": "Bentonite percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'bentonite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Bentonite Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'bentonite')"
     },
     {
       "type": "decimal",
       "name": "tuff_percent",
-      "label": "Tuff percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'tuff')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Tuff Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'tuff')"
     },
     {
       "type": "decimal",
       "name": "welded_tuff_percent",
-      "label": "Welded tuff percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'welded_tuff')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Welded Tuff Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'welded_tuff')"
     },
     {
       "type": "decimal",
       "name": "ignimbrite_percent",
-      "label": "Ignimbrite percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'ignimbrite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Ignimbrite Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'ignimbrite')"
     },
     {
       "type": "decimal",
       "name": "other_volcaniclastic_type_percent",
-      "label": "Other volcaniclastic type percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${volcaniclastic_type}, 'other')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Other Volcaniclastic Type Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${volcaniclastic_type}, 'other')"
     },
     {
       "type": "select_multiple gg6bk97",
       "name": "evaporite_type",
-      "label": "Evaporite type",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Evaporite Type",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "decimal",
       "name": "gypsum_anhydrite_primary_percent",
-      "label": "Gypsum - anhydrite primary percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Gypsum - Anhydrite Primary Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')"
     },
     {
       "type": "select_multiple el5ss78",
       "name": "gypsum_anhydrite_primary_type",
-      "label": "Gypsum - anhydrite primary type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Gypsum - Anhydrite Primary Type",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')"
     },
     {
       "type": "decimal",
       "name": "gypsum_anhydrite_diagenetic_percent",
-      "label": "Gypsum - anhydrite diagenetic percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Gypsum - Anhydrite Diagenetic Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')"
     },
     {
       "type": "select_multiple wy2is73",
       "name": "gypsum_anhydrite_diagenetic_type",
-      "label": "Gypsum - anhydrite diagenetic type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Gypsum - Anhydrite Diagenetic Type",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')"
     },
     {
       "type": "decimal",
       "name": "halite_primary_percent",
-      "label": "Halite - primary percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'halite_primary')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Halite - Primary Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'halite_primary')"
     },
     {
       "type": "select_multiple la9sa83",
       "name": "halite_primary_type",
-      "label": "Halite - primary type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'halite_primary')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Halite - Primary Type",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'halite_primary')"
     },
     {
       "type": "decimal",
       "name": "halite_diagenetic_percent",
-      "label": "Halite - diagenetic percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'halite_diagene')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Halite - Diagenetic Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'halite_diagene')"
     },
     {
       "type": "select_multiple dv3xg82",
       "name": "halite_diagenetic_type",
-      "label": "Halite - diagenetic type",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${evaporite_type}, 'halite_diagene')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Halite - Diagenetic Type",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${evaporite_type}, 'halite_diagene')"
     },
     {
       "type": "select_multiple mo7ce83",
       "name": "phosphorite_type",
-      "label": "Phosphorite type",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Phosphorite Type",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple om8xr30",
       "name": "organic_coal_lithologies",
       "label": "Organic/Coal Lithologies",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "decimal",
       "name": "amber_percent",
-      "label": "Amber percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'amber')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Amber Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'amber')"
     },
     {
       "type": "decimal",
       "name": "peat_percent",
-      "label": "Peat percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'peat')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Peat Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'peat')"
     },
     {
       "type": "decimal",
       "name": "lignite_percent",
-      "label": "Lignite percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'lignite')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Lignite Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'lignite')"
     },
     {
       "type": "decimal",
       "name": "subbituminous_percent",
-      "label": "Subbituminous percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'subbituminous')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Subbituminous Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'subbituminous')"
     },
     {
       "type": "decimal",
       "name": "bituminous_percent",
-      "label": "Bituminous percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'bituminous')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Bituminous Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'bituminous')"
     },
     {
       "type": "decimal",
       "name": "coal_ball_percent",
-      "label": "Coal ball percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'coal_ball')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Coal Ball Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'coal_ball')"
     },
     {
       "type": "decimal",
       "name": "tar_percent",
-      "label": "Tar percent",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${organic_coal_lithologies}, 'tar')",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Tar Percent",
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${organic_coal_lithologies}, 'tar')"
     },
     {
       "type": "text",
       "name": "notes",
       "label": "Notes",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "appearance": "multiline",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "appearance": "multiline"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "'vtuzrkPfhvY5znAdhzG8Kn'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "required": "",
-      "read_only": "",
-      "relevant": "",
-      "appearance": "",
-      "calculation": "'votjuabnASCmhdL46mUiSz'",
-      "$given_name": "__version__"
+      "type": "end_group"
     }
   ],
   "choices": [
     {
       "list_name": "yf18f03",
       "name": "quartz",
-      "label": "quartz",
-      "order": ""
+      "label": "quartz"
     },
     {
       "list_name": "yf18f03",
       "name": "mica",
-      "label": "mica",
-      "order": ""
+      "label": "mica"
     },
     {
       "list_name": "yf18f03",
       "name": "glauconite",
-      "label": "glauconite",
-      "order": ""
+      "label": "glauconite"
     },
     {
       "list_name": "yf18f03",
       "name": "feldspar",
-      "label": "feldspar",
-      "order": ""
+      "label": "feldspar"
     },
     {
       "list_name": "yf18f03",
       "name": "clay",
-      "label": "clay",
-      "order": ""
+      "label": "clay"
     },
     {
       "list_name": "yf18f03",
       "name": "lithics",
-      "label": "lithics",
-      "order": ""
+      "label": "lithics"
     },
     {
       "list_name": "yf18f03",
       "name": "rip_up_clasts",
-      "label": "rip-up clasts",
-      "order": ""
+      "label": "rip-up clasts"
     },
     {
       "list_name": "yf18f03",
       "name": "heavy_minerals",
-      "label": "heavy minerals",
-      "order": ""
+      "label": "heavy minerals"
     },
     {
       "list_name": "yf18f03",
       "name": "pyrite",
-      "label": "pyrite",
-      "order": ""
+      "label": "pyrite"
     },
     {
       "list_name": "yf18f03",
       "name": "gypsum",
-      "label": "gypsum",
-      "order": ""
+      "label": "gypsum"
     },
     {
       "list_name": "yf18f03",
       "name": "halite",
-      "label": "halite",
-      "order": ""
+      "label": "halite"
     },
     {
       "list_name": "yf18f03",
       "name": "chert",
-      "label": "chert",
-      "order": ""
+      "label": "chert"
     },
     {
       "list_name": "yf18f03",
       "name": "hematite",
-      "label": "hematite",
-      "order": ""
+      "label": "hematite"
     },
     {
       "list_name": "yf18f03",
       "name": "limonite",
-      "label": "limonite",
-      "order": ""
+      "label": "limonite"
     },
     {
       "list_name": "yf18f03",
       "name": "goethite",
-      "label": "goethite",
-      "order": ""
+      "label": "goethite"
     },
     {
       "list_name": "yf18f03",
       "name": "magnetite",
-      "label": "magnetite",
-      "order": ""
+      "label": "magnetite"
     },
     {
       "list_name": "yf18f03",
       "name": "calcite",
-      "label": "calcite",
-      "order": ""
+      "label": "calcite"
     },
     {
       "list_name": "yf18f03",
       "name": "dolomite",
-      "label": "dolomite",
-      "order": ""
+      "label": "dolomite"
     },
     {
       "list_name": "yf18f03",
       "name": "oragonite",
-      "label": "aragonite",
-      "order": ""
+      "label": "aragonite"
     },
     {
       "list_name": "yf18f03",
       "name": "siderite",
-      "label": "siderite",
-      "order": ""
+      "label": "siderite"
     },
     {
       "list_name": "yf18f03",
       "name": "ankerite",
-      "label": "ankerite",
-      "order": ""
+      "label": "ankerite"
     },
     {
       "list_name": "yf18f03",
       "name": "apatite",
-      "label": "apatite",
-      "order": ""
+      "label": "apatite"
     },
     {
       "list_name": "yf18f03",
       "name": "zeolites",
-      "label": "zeolites",
-      "order": ""
+      "label": "zeolites"
     },
     {
       "list_name": "yf18f03",
       "name": "organics",
-      "label": "organics",
-      "order": ""
+      "label": "organics"
     },
     {
       "list_name": "yf18f03",
       "name": "coalified_wood",
-      "label": "coalified wood",
-      "order": ""
+      "label": "coalified wood"
     },
     {
       "list_name": "yf18f03",
       "name": "illite",
-      "label": "illite",
-      "order": ""
+      "label": "illite"
     },
     {
       "list_name": "yf18f03",
       "name": "bentonite",
-      "label": "bentonite",
-      "order": ""
+      "label": "bentonite"
     },
     {
       "list_name": "yf18f03",
       "name": "smectite",
-      "label": "smectite",
-      "order": ""
+      "label": "smectite"
     },
     {
       "list_name": "yf18f03",
       "name": "chlorite",
-      "label": "chlorite",
-      "order": ""
+      "label": "chlorite"
     },
     {
       "list_name": "yf18f03",
       "name": "kaolinite",
-      "label": "kaolinite",
-      "order": ""
+      "label": "kaolinite"
     },
     {
       "list_name": "yf18f03",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "uh8oy57",
       "name": "quartz_arenite",
-      "label": "quartz arenite",
-      "order": ""
+      "label": "quartz arenite"
     },
     {
       "list_name": "uh8oy57",
       "name": "arkosic_arenit",
-      "label": "feldspathic arenite",
-      "order": ""
+      "label": "feldspathic arenite"
     },
     {
       "list_name": "uh8oy57",
       "name": "subarkose_aren",
-      "label": "subarkose arenite",
-      "order": ""
+      "label": "subarkose arenite"
     },
     {
       "list_name": "uh8oy57",
       "name": "lithic_arenite",
-      "label": "lithic arenite",
-      "order": ""
+      "label": "lithic arenite"
     },
     {
       "list_name": "uh8oy57",
       "name": "sublitharenite",
-      "label": "sublitharenite",
-      "order": ""
+      "label": "sublitharenite"
     },
     {
       "list_name": "uh8oy57",
       "name": "quartz_wacke",
-      "label": "quartz wacke",
-      "order": ""
+      "label": "quartz wacke"
     },
     {
       "list_name": "uh8oy57",
       "name": "lithic_wacke",
-      "label": "lithic wacke",
-      "order": ""
+      "label": "lithic wacke"
     },
     {
       "list_name": "uh8oy57",
       "name": "feldspathic_wa",
-      "label": "feldspathic wacke",
-      "order": ""
+      "label": "feldspathic wacke"
     },
     {
       "list_name": "vw5id84",
       "name": "quartzarenite",
-      "label": "quartzarenite",
-      "order": ""
+      "label": "quartzarenite"
     },
     {
       "list_name": "vw5id84",
       "name": "subarkose",
-      "label": "subarkose",
-      "order": ""
+      "label": "subarkose"
     },
     {
       "list_name": "vw5id84",
       "name": "sublitharenite",
-      "label": "sublitharenite",
-      "order": ""
+      "label": "sublitharenite"
     },
     {
       "list_name": "vw5id84",
       "name": "arkose",
-      "label": "arkose",
-      "order": ""
+      "label": "arkose"
     },
     {
       "list_name": "vw5id84",
       "name": "lithic_arkose",
-      "label": "lithic arkose",
-      "order": ""
+      "label": "lithic arkose"
     },
     {
       "list_name": "vw5id84",
       "name": "arkosic_lithar",
-      "label": "arkosic litharenite",
-      "order": ""
+      "label": "arkosic litharenite"
     },
     {
       "list_name": "vw5id84",
       "name": "litharenite",
-      "label": "litharenite",
-      "order": ""
+      "label": "litharenite"
     },
     {
       "list_name": "cv9qv11",
       "name": "rip_up_clasts",
-      "label": "rip-up clasts",
-      "order": ""
+      "label": "rip-up clasts"
     },
     {
       "list_name": "cv9qv11",
       "name": "wood",
-      "label": "wood",
-      "order": ""
+      "label": "wood"
     },
     {
       "list_name": "cv9qv11",
       "name": "fossils",
-      "label": "fossils",
-      "order": ""
+      "label": "fossils"
     },
     {
       "list_name": "cv9qv11",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "hw9cd71",
       "name": "skeletal_gener",
-      "label": "skeletal (general)",
-      "order": ""
+      "label": "skeletal (general)"
     },
     {
       "list_name": "hw9cd71",
       "name": "mollusc",
-      "label": "mollusc",
-      "order": ""
+      "label": "mollusc"
     },
     {
       "list_name": "hw9cd71",
       "name": "brachiopod",
-      "label": "brachiopod",
-      "order": ""
+      "label": "brachiopod"
     },
     {
       "list_name": "hw9cd71",
       "name": "coral",
-      "label": "coral",
-      "order": ""
+      "label": "coral"
     },
     {
       "list_name": "hw9cd71",
       "name": "echinoderm",
-      "label": "echinoderm",
-      "order": ""
+      "label": "echinoderm"
     },
     {
       "list_name": "hw9cd71",
       "name": "bryozoan",
-      "label": "bryozoan",
-      "order": ""
+      "label": "bryozoan"
     },
     {
       "list_name": "hw9cd71",
       "name": "calcareous_alg",
-      "label": "calcareous algae",
-      "order": ""
+      "label": "calcareous algae"
     },
     {
       "list_name": "hw9cd71",
       "name": "foraminifera",
-      "label": "foraminifera",
-      "order": ""
+      "label": "foraminifera"
     },
     {
       "list_name": "hw9cd71",
       "name": "stromatolite",
-      "label": "stromatolite",
-      "order": ""
+      "label": "stromatolite"
     },
     {
       "list_name": "hw9cd71",
       "name": "thrombolite",
-      "label": "thrombolite",
-      "order": ""
+      "label": "thrombolite"
     },
     {
       "list_name": "hw9cd71",
       "name": "dendrolite",
-      "label": "dendrolite",
-      "order": ""
+      "label": "dendrolite"
     },
     {
       "list_name": "hw9cd71",
       "name": "leiolite",
-      "label": "leiolite",
-      "order": ""
+      "label": "leiolite"
     },
     {
       "list_name": "hw9cd71",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "gi8hz21",
       "name": "mud",
-      "label": "mud",
-      "order": ""
+      "label": "mud"
     },
     {
       "list_name": "gi8hz21",
       "name": "cement",
-      "label": "cement",
-      "order": ""
+      "label": "cement"
     },
     {
       "list_name": "gi8hz21",
       "name": "intraclast",
-      "label": "intraclast",
-      "order": ""
+      "label": "intraclast"
     },
     {
       "list_name": "gi8hz21",
       "name": "peloid",
-      "label": "peloid",
-      "order": ""
+      "label": "peloid"
     },
     {
       "list_name": "gi8hz21",
       "name": "ooid",
-      "label": "ooid",
-      "order": ""
+      "label": "ooid"
     },
     {
       "list_name": "gi8hz21",
       "name": "oncoid",
-      "label": "oncoid",
-      "order": ""
+      "label": "oncoid"
     },
     {
       "list_name": "gi8hz21",
       "name": "pisoid",
-      "label": "pisoid",
-      "order": ""
+      "label": "pisoid"
     },
     {
       "list_name": "gi8hz21",
       "name": "coated_grain",
-      "label": "coated grain",
-      "order": ""
+      "label": "coated grain"
     },
     {
       "list_name": "gi8hz21",
       "name": "grapestone",
-      "label": "grapestone",
-      "order": ""
+      "label": "grapestone"
     },
     {
       "list_name": "gi8hz21",
       "name": "giant_ooid",
-      "label": "giant ooid",
-      "order": ""
+      "label": "giant ooid"
     },
     {
       "list_name": "gi8hz21",
       "name": "seafloor_preci",
-      "label": "seafloor precipitate",
-      "order": ""
+      "label": "seafloor precipitate"
     },
     {
       "list_name": "gi8hz21",
       "name": "molar_tooth",
-      "label": "molar tooth",
-      "order": ""
+      "label": "molar tooth"
     },
     {
       "list_name": "gi8hz21",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "kg6zo76",
       "name": "siliceous_muds",
-      "label": "siliceous mudstone",
-      "order": ""
+      "label": "siliceous mudstone"
     },
     {
       "list_name": "kg6zo76",
       "name": "siliceous_calc",
       "label": "siliceous calcareous mudstone",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "kg6zo76",
       "name": "siliceous_volc",
       "label": "siliceous volcaniclastic mudstone",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "kg6zo76",
       "name": "calcareous_mud",
       "label": "calcareous mudstone",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "kg6zo76",
       "name": "black_shale",
       "label": "black shale",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "kg6zo76",
       "name": "red_clay",
       "label": "red clay",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "kg6zo76",
       "name": "red_mudstone",
       "label": "red mudstone",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "kg6zo76",
       "name": "green_mudstone",
       "label": "green mudstone",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "kg6zo76",
       "name": "variegated_mud",
       "label": "variegated mudstone",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "kg6zo76",
       "name": "marl",
       "label": "marl",
-      "order": 9
+      "order": "9"
     },
     {
       "list_name": "kg6zo76",
       "name": "sarl",
       "label": "sarl",
-      "order": 10
+      "order": "10"
     },
     {
       "list_name": "kg6zo76",
       "name": "argillaceous_m",
       "label": "argillaceous mudstone",
-      "order": 11
+      "order": "11"
     },
     {
       "list_name": "kg6zo76",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "ih44p58",
       "name": "intraformation",
-      "label": "intraformational",
-      "order": ""
+      "label": "intraformational"
     },
     {
       "list_name": "ih44p58",
       "name": "extraformation",
-      "label": "extraformational",
-      "order": ""
+      "label": "extraformational"
     },
     {
       "list_name": "ih44p58",
       "name": "monomictic",
-      "label": "monomictic",
-      "order": ""
+      "label": "monomictic"
     },
     {
       "list_name": "ih44p58",
       "name": "oligomictic",
-      "label": "oligomictic",
-      "order": ""
+      "label": "oligomictic"
     },
     {
       "list_name": "ih44p58",
       "name": "polymictic",
-      "label": "polymictic",
-      "order": ""
+      "label": "polymictic"
     },
     {
       "list_name": "uz9ix58",
       "name": "sed_clast",
-      "label": "sedimentary (general)",
-      "order": ""
+      "label": "sedimentary (general)"
     },
     {
       "list_name": "uz9ix58",
       "name": "igneous_clast",
       "label": "igneous (general)",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "uz9ix58",
       "name": "met_clast",
       "label": "metamorphic (general)",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "uz9ix58",
       "name": "mudstone",
       "label": "mudstone",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "uz9ix58",
       "name": "siltstone",
       "label": "siltstone",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "uz9ix58",
       "name": "sandstone",
       "label": "sandstone",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "uz9ix58",
       "name": "conglomerate",
       "label": "conglomerate",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "uz9ix58",
       "name": "chert_clast",
       "label": "chert",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "uz9ix58",
       "name": "extrusive_igne",
       "label": "volcanic",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "uz9ix58",
       "name": "intrusive_igne",
       "label": "intrusive igneous",
-      "order": 9
+      "order": "9"
     },
     {
       "list_name": "uz9ix58",
       "name": "evap_clast",
       "label": "evaporite",
-      "order": 10
+      "order": "10"
     },
     {
       "list_name": "uz9ix58",
       "name": "schist",
       "label": "schist",
-      "order": 11
+      "order": "11"
     },
     {
       "list_name": "uz9ix58",
       "name": "phyllite_clast",
       "label": "phyllite",
-      "order": 12
+      "order": "12"
     },
     {
       "list_name": "uz9ix58",
       "name": "quartzite_clas",
       "label": "quartzite",
-      "order": 13
+      "order": "13"
     },
     {
       "list_name": "uz9ix58",
       "name": "limestone",
       "label": "limestone",
-      "order": 14
+      "order": "14"
     },
     {
       "list_name": "uz9ix58",
       "name": "dolostone",
       "label": "dolostone",
-      "order": 15
+      "order": "15"
     },
     {
       "list_name": "uz9ix58",
       "name": "wackestone",
       "label": "wackestone",
-      "order": 16
+      "order": "16"
     },
     {
       "list_name": "uz9ix58",
       "name": "packstone",
       "label": "packstone",
-      "order": 17
+      "order": "17"
     },
     {
       "list_name": "uz9ix58",
       "name": "grainstone",
       "label": "grainstone",
-      "order": 18
+      "order": "18"
     },
     {
       "list_name": "uz9ix58",
       "name": "boundstone",
       "label": "boundstone",
-      "order": 19
+      "order": "19"
     },
     {
       "list_name": "uz9ix58",
       "name": "organic_clast",
       "label": "organic/coal",
-      "order": 20
+      "order": "20"
     },
     {
       "list_name": "uz9ix58",
       "name": "ironstone_clas",
       "label": "ironstone",
-      "order": 21
+      "order": "21"
     },
     {
       "list_name": "uz9ix58",
       "name": "other",
       "label": "other",
-      "order": 22
+      "order": "22"
     },
     {
       "list_name": "co1jf03",
       "name": "intrusive_igneous",
-      "label": "intrusive igneous",
-      "order": ""
+      "label": "intrusive igneous"
     },
     {
       "list_name": "co1jf03",
       "name": "extrusive_igneous",
       "label": "volcanic",
-      "order": 1
+      "order": "1"
     },
     {
       "list_name": "co1jf03",
       "name": "metamorphic",
       "label": "metamorphic",
-      "order": 2
+      "order": "2"
     },
     {
       "list_name": "co1jf03",
       "name": "mudstone",
       "label": "mudstone",
-      "order": 3
+      "order": "3"
     },
     {
       "list_name": "co1jf03",
       "name": "siltstone",
       "label": "siltstone",
-      "order": 4
+      "order": "4"
     },
     {
       "list_name": "co1jf03",
       "name": "sandstone",
       "label": "sandstone",
-      "order": 5
+      "order": "5"
     },
     {
       "list_name": "co1jf03",
       "name": "conglomerate",
       "label": "conglomerate",
-      "order": 6
+      "order": "6"
     },
     {
       "list_name": "co1jf03",
       "name": "carbonate",
       "label": "carbonate",
-      "order": 7
+      "order": "7"
     },
     {
       "list_name": "co1jf03",
       "name": "other",
       "label": "other",
-      "order": 8
+      "order": "8"
     },
     {
       "list_name": "ng3et79",
       "name": "limestone",
-      "label": "limestone",
-      "order": ""
+      "label": "limestone"
     },
     {
       "list_name": "ng3et79",
       "name": "dolostone",
-      "label": "dolostone",
-      "order": ""
+      "label": "dolostone"
     },
     {
       "list_name": "ng3et79",
       "name": "skeletal",
-      "label": "skeletal",
-      "order": ""
+      "label": "skeletal"
     },
     {
       "list_name": "ng3et79",
       "name": "wackestone",
-      "label": "wackestone",
-      "order": ""
+      "label": "wackestone"
     },
     {
       "list_name": "ng3et79",
       "name": "packstone",
-      "label": "packstone",
-      "order": ""
+      "label": "packstone"
     },
     {
       "list_name": "ng3et79",
       "name": "grainstone",
-      "label": "grainstone",
-      "order": ""
+      "label": "grainstone"
     },
     {
       "list_name": "ng3et79",
       "name": "boundstone",
-      "label": "boundstone",
-      "order": ""
+      "label": "boundstone"
     },
     {
       "list_name": "ng3et79",
       "name": "other",
-      "label": "other",
-      "order": ""
+      "label": "other"
     },
     {
       "list_name": "so29n97",
       "name": "glass",
-      "label": "glass",
-      "order": ""
+      "label": "glass"
     },
     {
       "list_name": "so29n97",
@@ -2269,248 +1736,208 @@
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_prim",
-      "label": "gypsum - anhydrite primary",
-      "order": ""
+      "label": "gypsum - anhydrite primary"
     },
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_dia",
-      "label": "gypsum - anhydrite diagenetic",
-      "order": ""
+      "label": "gypsum - anhydrite diagenetic"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_primary",
-      "label": "halite - primary",
-      "order": ""
+      "label": "halite - primary"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_diagene",
-      "label": "halite - diagenetic",
-      "order": ""
+      "label": "halite - diagenetic"
     },
     {
       "list_name": "el5ss78",
       "name": "bedded",
-      "label": "bedded",
-      "order": ""
+      "label": "bedded"
     },
     {
       "list_name": "el5ss78",
       "name": "laminated",
-      "label": "laminated",
-      "order": ""
+      "label": "laminated"
     },
     {
       "list_name": "el5ss78",
       "name": "bottom_growth",
-      "label": "bottom growth (point up crystals)",
-      "order": ""
+      "label": "bottom growth (point up crystals)"
     },
     {
       "list_name": "el5ss78",
       "name": "cumulates_rand",
-      "label": "cumulates (random)",
-      "order": ""
+      "label": "cumulates (random)"
     },
     {
       "list_name": "el5ss78",
       "name": "ropy",
-      "label": "ropy",
-      "order": ""
+      "label": "ropy"
     },
     {
       "list_name": "el5ss78",
       "name": "molds",
-      "label": "molds",
-      "order": ""
+      "label": "molds"
     },
     {
       "list_name": "el5ss78",
       "name": "macroscopic_cr",
-      "label": "macroscopic crystals",
-      "order": ""
+      "label": "macroscopic crystals"
     },
     {
       "list_name": "el5ss78",
       "name": "microcrystalli",
-      "label": "microcrystalline",
-      "order": ""
+      "label": "microcrystalline"
     },
     {
       "list_name": "el5ss78",
       "name": "fibrous",
-      "label": "fibrous",
-      "order": ""
+      "label": "fibrous"
     },
     {
       "list_name": "el5ss78",
       "name": "pseudomorph_st",
-      "label": "pseudomorph structures",
-      "order": ""
+      "label": "pseudomorph structures"
     },
     {
       "list_name": "el5ss78",
       "name": "imprints_on_be",
-      "label": "imprints on bedding planes",
-      "order": ""
+      "label": "imprints on bedding planes"
     },
     {
       "list_name": "wy2is73",
       "name": "nodular_to_chi",
-      "label": "nodular to chicken wire",
-      "order": ""
+      "label": "nodular to chicken wire"
     },
     {
       "list_name": "wy2is73",
       "name": "displacive",
-      "label": "displacive (random crystals)",
-      "order": ""
+      "label": "displacive (random crystals)"
     },
     {
       "list_name": "wy2is73",
       "name": "veins_or_yug_f",
-      "label": "veins or yug fills (fibrous, lath, amorphous textures)",
-      "order": ""
+      "label": "veins or yug fills (fibrous, lath, amorphous textures)"
     },
     {
       "list_name": "wy2is73",
       "name": "nodules",
-      "label": "nodules",
-      "order": ""
+      "label": "nodules"
     },
     {
       "list_name": "wy2is73",
       "name": "cement",
-      "label": "cement",
-      "order": ""
+      "label": "cement"
     },
     {
       "list_name": "wy2is73",
       "name": "pseudomorphs",
-      "label": "pseudomorphs",
-      "order": ""
+      "label": "pseudomorphs"
     },
     {
       "list_name": "wy2is73",
       "name": "deformation_st",
-      "label": "deformation structures",
-      "order": ""
+      "label": "deformation structures"
     },
     {
       "list_name": "la9sa83",
       "name": "cubic_crystals",
-      "label": "cubic crystals",
-      "order": ""
+      "label": "cubic crystals"
     },
     {
       "list_name": "la9sa83",
       "name": "hopper_crystal",
-      "label": "hopper crystals",
-      "order": ""
+      "label": "hopper crystals"
     },
     {
       "list_name": "la9sa83",
       "name": "chevrons_bott",
-      "label": "chevrons (bottom growth vertical orientation)",
-      "order": ""
+      "label": "chevrons (bottom growth vertical orientation)"
     },
     {
       "list_name": "la9sa83",
       "name": "random_cumulat",
-      "label": "random cumulates",
-      "order": ""
+      "label": "random cumulates"
     },
     {
       "list_name": "dv3xg82",
       "name": "cements",
-      "label": "cements",
-      "order": ""
+      "label": "cements"
     },
     {
       "list_name": "dv3xg82",
       "name": "displacive_cry",
-      "label": "displacive crystals",
-      "order": ""
+      "label": "displacive crystals"
     },
     {
       "list_name": "dv3xg82",
       "name": "recrystallized",
-      "label": "recrystallized",
-      "order": ""
+      "label": "recrystallized"
     },
     {
       "list_name": "dv3xg82",
       "name": "deformation_st",
-      "label": "deformation structure",
-      "order": ""
+      "label": "deformation structure"
     },
     {
       "list_name": "mo7ce83",
       "name": "nodular",
-      "label": "nodular",
-      "order": ""
+      "label": "nodular"
     },
     {
       "list_name": "mo7ce83",
       "name": "bedded",
-      "label": "bedded",
-      "order": ""
+      "label": "bedded"
     },
     {
       "list_name": "mo7ce83",
       "name": "massive",
-      "label": "massive",
-      "order": ""
+      "label": "massive"
     },
     {
       "list_name": "om8xr30",
       "name": "amber",
-      "label": "amber",
-      "order": ""
+      "label": "amber"
     },
     {
       "list_name": "om8xr30",
       "name": "peat",
-      "label": "peat",
-      "order": ""
+      "label": "peat"
     },
     {
       "list_name": "om8xr30",
       "name": "lignite",
-      "label": "lignite",
-      "order": ""
+      "label": "lignite"
     },
     {
       "list_name": "om8xr30",
       "name": "subbituminous",
-      "label": "subbituminous",
-      "order": ""
+      "label": "subbituminous"
     },
     {
       "list_name": "om8xr30",
       "name": "bituminous",
-      "label": "bituminous",
-      "order": ""
+      "label": "bituminous"
     },
     {
       "list_name": "om8xr30",
       "name": "coal_ball",
-      "label": "coal ball",
-      "order": ""
+      "label": "coal ball"
     },
     {
       "list_name": "om8xr30",
       "name": "tar",
-      "label": "tar",
-      "order": ""
+      "label": "tar"
     }
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-11)"
+      "id_string": "awVZhNfrCEPjUTsQeftCdh",
+      "version": "vtuzrkPfhvY5znAdhzG8Kn"
     }
   ]
 }

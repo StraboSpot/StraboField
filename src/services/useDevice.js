@@ -217,6 +217,8 @@ const useDevice = () => {
 
   const downloadAndSaveProfileImage = async (encodedLogin) => {
     const profileImageURL = getProfileImageURL();
+    const exists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES);
+    if (!exists) await makeDirectory(APP_DIRECTORIES.IMAGES);
     return await RNFS.downloadFile({
       fromUrl: profileImageURL,
       toFile: APP_DIRECTORIES.PROFILE_IMAGE,

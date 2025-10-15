@@ -8,6 +8,7 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
 
 const AcknowledgeInput = ({
+                            disabled = false,
                             label,
                             name,
                             onShowFieldInfo,
@@ -18,7 +19,7 @@ const AcknowledgeInput = ({
   return (
     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', width: '100%'}}>
       <View style={{justifyContent: 'center'}}>
-        <SwitchWrapper onValueChange={bool => setFieldValue(name, bool)} value={value}/>
+        <SwitchWrapper disabled={disabled} onValueChange={bool => setFieldValue(name, bool)} value={value}/>
       </View>
       <View style={[formStyles.fieldLabelContainer, {flex: 1, paddingLeft: 5}]}>
         <Text style={[formStyles.fieldLabel, {fontWeight: 'normal'}]}>{label}</Text>

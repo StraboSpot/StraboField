@@ -19,7 +19,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
-const MineralsPage = ({page}) => {
+const MineralsPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -128,6 +128,7 @@ const MineralsPage = ({page}) => {
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'pet'}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedMineral}
       />
@@ -137,8 +138,8 @@ const MineralsPage = ({page}) => {
   const renderMineralsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton/>
-        {renderCopyDataSelectBox()}
+        <NotebookPageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton={!isReadOnly}/>
+        {!isReadOnly && renderCopyDataSelectBox()}
         {renderMineralsList()}
       </View>
     );

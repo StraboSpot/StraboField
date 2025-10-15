@@ -1,5 +1,4 @@
 import React, {forwardRef} from 'react';
-import {Platform} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -10,13 +9,13 @@ import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
 
 const OverlaysContainer = forwardRef(({
-                                        openSpotInNotebook,
+                                        closeMainMenuPanel,
                                         closeNotebookPanel,
                                         openMainMenuPanel,
                                         openNotebookPanel,
+                                        openSpotInNotebook,
                                         zoomToCurrentLocation,
                                       }, mapComponentRef) => {
-
   const isHomeLoading = useSelector(state => state.home.loading.home);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
@@ -24,11 +23,15 @@ const OverlaysContainer = forwardRef(({
 
   return (
     <>
-      {isProjectLoadSelectionModalVisible && Platform.OS !== 'web' && (
-        <InitialProjectLoadModal openMainMenuPanel={openMainMenuPanel}/>
+      {isProjectLoadSelectionModalVisible && (
+        <InitialProjectLoadModal
+          closeMainMenuPanel={closeMainMenuPanel}
+          closeNotebookPanel={closeNotebookPanel}
+          openMainMenuPanel={openMainMenuPanel}
+        />
       )}
       <ErrorModal/>
-      <StatusModal openMainMenuPanel={openMainMenuPanel}/>
+      <StatusModal/>
       <WarningModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>

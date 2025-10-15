@@ -1,15 +1,10 @@
 import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
-
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
-import {RED} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
-import {WarningModal} from '../../shared/ui/modals';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
@@ -41,15 +36,19 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
       <ModalWrapper
-        buttonTitleRight={'Close'}
+        actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
+        onActionPressed={handleSavePressed}
+        onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
-        title={isEmpty(initialValues) ? 'Create New Report' : 'Update Report'}
+        showCancelButton={false}
+        showCloseButton
+        showDeleteButton={!isEmpty(initialValues)}
       >
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} ref={formRef}/>
+              <ReportForm initialValues={initialValues} ref={formRef}/> \\ Not used yet
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
               <ReportSpots
@@ -69,34 +68,20 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           }
           bounces={false}
         />
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{width: 40}}/>
-          <SaveButton onPress={handleSavePressed} title={'Save Report'}/>
-          <Icon
-            color={RED}
-            containerStyle={{padding: 10, alignSelf: 'flex-end'}}
-            name={'trash'}
-            onPress={handleDeletePressed}
-            type={'ionicon'}
-          />
-        </View>
 
-        <WarningModal
-          closeModal={() => setIsDeleteReportModalVisible(false)}
-          closeTitle={errorMessage ? 'Ok' : 'Cancel'}
-          confirmText={'DELETE'}
-          confirmTitleStyle={overlayStyles.importantText}
+        <DeleteConformationDialogBox
+          headerTitle={'Delete Report?'}
           isVisible={isDeleteReportModalVisible}
-          onConfirmPress={deleteReport}
+          onActionPressed={deleteReport}
+          onCancelPress={() => setIsDeleteReportModalVisible(false)}
+          showActionButton={isDeleteReportModalVisible && !errorMessage}
           showCancelButton={true}
-          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
-          title={'Delete Report?'}
         >
           {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
             : <Text>Are you sure you want to delete this report?</Text>}
-        </WarningModal>
-
+        </DeleteConformationDialogBox>
       </ModalWrapper>
+
     </>
   );
 };

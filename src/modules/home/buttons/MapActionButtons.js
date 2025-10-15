@@ -5,15 +5,11 @@ import {useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {useWindowSize} from '../../../shared/ui/useWindowSize';
-import useMap from '../../maps/useMap';
 import useMapFeatures from '../../maps/useMapFeatures';
 import homeStyles from '../home.style';
-import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay, overlayStyles} from '../overlays';
+import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay} from '../overlays';
 
-const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleDialog}) => {
-  const {height} = useWindowSize();
-  const {setBasemap} = useMap();
+const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
   const {updateFeatureTypes} = useMapFeatures();
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -57,26 +53,20 @@ const MapActionButtons = ({dialogClickHandler, dialogs, mapComponentRef, toggleD
             : require('../../../assets/icons/LayersButton.png')}
         />
       )}
+
+      {/* Modals */}
       <MapActionsOverlay
         onPress={name => dialogClickHandler('mapActionsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapActionsMenuVisible')}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         visible={dialogs.mapActionsMenuVisible}
       />
       <MapSymbolsOverlay
         onPress={name => dialogClickHandler('mapSymbolsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapSymbolsMenuVisible')}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         visible={dialogs.mapSymbolsMenuVisible}
       />
       <MapLayersOverlay
-        mapComponentRef={mapComponentRef}
-        onPress={(name) => {
-          setBasemap(name);
-          toggleDialog('baseMapMenuVisible');
-        }}
         onTouchOutside={() => toggleDialog('baseMapMenuVisible')}
-        overlayStyle={[overlayStyles.overlayMapMenuPosition, {maxHeight: (height - 40) * 0.80}]}
         visible={dialogs.baseMapMenuVisible}
       />
     </>

@@ -16,6 +16,7 @@ const Form = ({
                 getIsDisabled,
                 errors,
                 formName,
+                isReadOnly,
                 onMyChange,
                 setFieldValue,
                 subkey,
@@ -30,6 +31,7 @@ const Form = ({
     return (
       <Field
         as={AcknowledgeInput}
+        disabled={isReadOnly}
         key={field.name}
         label={field.label}
         name={field.name}
@@ -44,6 +46,7 @@ const Form = ({
     return (
       <Field
         component={DateInputField}
+        isDisplayOnly={isReadOnly}
         isShowTimeOnly={isShowTimeOnly}
         key={field.name}
         label={field.label}
@@ -62,7 +65,7 @@ const Form = ({
         appearance={field.appearance}
         // autoFocus={field.name === 'name'}
         component={TextInputField}
-        editable={getIsDisabled ? !getIsDisabled(field.name) : true}
+        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
         key={subkey ? subkey + '[0].' + field.name : field.name}
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}
@@ -77,6 +80,7 @@ const Form = ({
     return (
       <Field
         component={NumberInputField}
+        editable={!isReadOnly}
         key={subkey ? subkey + '[0].' + field.name : field.name}
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}
@@ -88,7 +92,7 @@ const Form = ({
   };
 
   const renderSelectInput = (field, isExpanded) => {
-    const isDisabled = getIsDisabled ? getIsDisabled(field.name) : false;
+    const isDisabled = getIsDisabled ? getIsDisabled(field.name) : isReadOnly;
     const [fieldType, choicesListName] = field.type.split(' ');
     const fieldChoices = getChoices(formName).filter(choice => choice.list_name === choicesListName);
     const fieldChoicesCopy = JSON.parse(JSON.stringify(fieldChoices));
@@ -110,6 +114,7 @@ const Form = ({
         as={SelectInputField}
         choices={fieldChoicesCopy}
         errors={errors}
+        isReadOnly={isReadOnly}
         key={subkey ? subkey + '[0].' + field.name : field.name}
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}

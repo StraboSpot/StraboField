@@ -1,4 +1,4 @@
-import React, {forwardRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
@@ -12,6 +12,7 @@ import About from '../help/About';
 import Documentation from '../help/Documentation';
 import IssuesAndReqests from '../help/IssuesAndReqests';
 import {ImageGallery} from '../images';
+import MenuSearch from './MenuSearch';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
 import ImageBasemapsList from '../maps/ImageBasemapsList';
@@ -23,7 +24,6 @@ import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import BackupProjectPage from '../project/backup/BackupProjectPage';
 import ExportProjectPage from '../project/backup/ExportProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
-import DatasetDetail from '../project/datasets/DatasetDetail';
 import DatasetsPage from '../project/datasets/DatasetsPage';
 import DeleteProjectPage from '../project/delete/DeleteProjectPage';
 import DownloadProjectPage from '../project/load/DownloadProjectPage';
@@ -43,6 +43,8 @@ import UserProfile from '../user/UserProfile';
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
+                                    closeNotebookPanel,
+                                    navigation,
                                     openNotebookPanel,
                                     openSpotInNotebook,
                                   }, mapComponentRef) => {
@@ -52,12 +54,20 @@ const MainMenuPanel = forwardRef(({
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
-  const [datasetToView, setDatasetToView] = useState({});
+  const [searchState, setSearchState] = useState('');
+
+  useEffect(() => {
+    setSearchState('');
+  }, [mainMenuPageVisible]);
 
   const renderMainMenuContent = () => {
     return (
       <>
-        {!isSidePanelVisible && <MainMenuPanelHeader/>}
+        {!isSidePanelVisible
+          && (!mainMenuPageVisible
+            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS))
+          && <MainMenuPanelHeader/>
+        }
         {renderMainMenuList()}
       </>
     );
@@ -67,11 +77,11 @@ const MainMenuPanel = forwardRef(({
     switch (mainMenuPageVisible) {
       // Manage Project
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS:
-        return <DatasetsPage setDatasetToView={setDatasetToView}/>;
+        return <DatasetsPage/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP:
         return <BackupProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
-        return <ProjectDescription setDatasetToView={setDatasetToView}/>;
+        return <ProjectDescription/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
         return <ProjectPrivacyPage/>;
 
@@ -147,23 +157,26 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.HELP.ABOUT:
         return <About/>;
       case MAIN_MENU_ITEMS.HELP.DOCUMENTATION:
-        return <Documentation/>;
+        return <Documentation navigation={navigation}/>;
       case MAIN_MENU_ITEMS.HELP.ISSUES:
         return <IssuesAndReqests/>;
 
       default:
-        return <MainMenuPanelList/>;
+        return (
+          <>
+            <MenuSearch searchState={searchState} setSearchState={setSearchState}/>
+            <MainMenuPanelList searchText={searchState}/>
+          </>
+        );
     }
   };
 
   const renderSidePanelContent = () => {
     switch (sidePanelView) {
-      case SIDE_PANEL_VIEWS.DATASET_DETAIL:
-        return <DatasetDetail dataset={datasetToView}/>;
       case SIDE_PANEL_VIEWS.DELETE_PROJECT:
         return <DeleteProjectPage/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
-        return <DownloadProjectPage/>;
+        return <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.EXPORT_PROJECT:
         return <ExportProjectPage/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
@@ -171,9 +184,9 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
-        return <NewProjectPage/>;
+        return <NewProjectPage closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
-        return <OpenProjectPage/>;
+        return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:

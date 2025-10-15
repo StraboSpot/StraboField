@@ -6,7 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
@@ -44,6 +45,8 @@ const AddReactionTextureModal = ({onPress}) => {
     return () => dispatch(setModalValues({}));
   }, []);
 
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
   const onMultiChoiceSelected = (fieldKey, choiceName) => {
     const fieldValues = formRef.current?.values[fieldKey] || [];
     if (fieldValues.includes(choiceName)) {
@@ -63,8 +66,10 @@ const AddReactionTextureModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
-        onPress={onPress}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <FlatList
           ListHeaderComponent={
@@ -84,7 +89,7 @@ const AddReactionTextureModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <SaveButton onPress={saveReactionTexture} title={'Save Reaction Texture'}/>}
+        {!choicesViewKey && <ActionButton onPress={saveReactionTexture}/>}
       </ModalWrapper>
     );
   };
@@ -127,6 +132,7 @@ const AddReactionTextureModal = ({onPress}) => {
   const saveReactionTexture = () => {
     savePetFeature(petKey, spot, formRef.current);
     formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) closeModal();
   };
 
   return renderAddReactionTextureModalContent();

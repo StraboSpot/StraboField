@@ -1,16 +1,15 @@
 import React, {useRef} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
@@ -103,16 +102,12 @@ const TagDetailModal = ({closeModal}) => {
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      fullScreen={SMALL_SCREEN}
-      isVisible
-      overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen
-        : {...overlayStyles.overlayContainer, maxHeight: height * 0.80}}
-      supportedOrientations={['portrait', 'landscape']}
+    <ModalWrapper
+      headerTitle={'Create New Tag'}
+      onActionPressed={saveFormAndClose}
+      onCancelPress={closeModal}
     >
       <>
-        {renderCancelSaveButtons()}
         <FlatList
           ListHeaderComponent={
             <>
@@ -139,7 +134,7 @@ const TagDetailModal = ({closeModal}) => {
           }
         />
       </>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

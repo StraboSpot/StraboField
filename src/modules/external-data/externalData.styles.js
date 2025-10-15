@@ -20,20 +20,17 @@ const externalDataStyles = StyleSheet.create({
     elevation: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 8,
-    marginVertical: 4,
     paddingHorizontal: 16,
     paddingVertical: 12,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.05,
     shadowRadius: 2,
   },
   loadingContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
     borderRadius: 15,
-    maxHeight: '20%',
-    maxWidth: '20%',
+    height: '20%',
+    width: '20%',
   },
   loadingSpinner: {
     backgroundColor: 'transparent',
@@ -43,6 +40,7 @@ const externalDataStyles = StyleSheet.create({
   modalContent: {
     flex: 1,
     justifyContent: 'space-between',
+    padding: 10,
   },
   modalHeader: {
     alignItems: 'center',
@@ -68,10 +66,9 @@ const externalDataStyles = StyleSheet.create({
     padding: 35,
   },
   overlayContainer: {
-    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    alignItems: 'center',
     borderRadius: 15,
-    maxHeight: '90%',
-    maxWidth: '90%',
+    height: '90%',
     padding: 16,
   },
 });

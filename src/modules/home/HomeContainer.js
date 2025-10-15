@@ -41,9 +41,9 @@ const HomeContainer = ({navigation, route}) => {
   const {openSpotInNotebook, zoomToCurrentLocation} = useHomeContainer({mapComponentRef, openNotebookPanel});
 
   useEffect(() => {
+    if (isEmpty(currentProjectId) || Platform.OS === 'web') dispatch(setIsProjectLoadSelectionModalVisible(true));
     if (Platform.OS !== 'web') {
       createProjectDirectories().catch(err => console.error('Error creating app directories', err));
-      if (isEmpty(currentProjectId)) dispatch(setIsProjectLoadSelectionModalVisible(true));
     }
   }, []);
 
@@ -87,6 +87,7 @@ const HomeContainer = ({navigation, route}) => {
         zoomToCurrentLocation={zoomToCurrentLocation}
       />
       <OverlaysContainer
+        closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
         openMainMenuPanel={openMainMenuPanel}
         openNotebookPanel={openNotebookPanel}
@@ -98,6 +99,8 @@ const HomeContainer = ({navigation, route}) => {
         <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
           <MainMenuPanel
             closeMainMenuPanel={closeMainMenuPanel}
+            closeNotebookPanel={closeNotebookPanel}
+            navigation={navigation}
             openNotebookPanel={openNotebookPanel}
             openSpotInNotebook={openSpotInNotebook}
             ref={mapComponentRef}

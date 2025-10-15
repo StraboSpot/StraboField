@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {ScrollView, Text, TextInput, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -9,7 +9,7 @@ import useServerRequests from '../../services/useServerRequests';
 import {validate} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
-import StatusDialog from '../../shared/ui/modals/StatusDialogBox';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignUp = ({navigation}) => {
@@ -65,7 +65,34 @@ const SignUp = ({navigation}) => {
   const [statusDialog, setStatusDialog] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
   const [statusDialogTitle, setStatusDialogTitle] = useState(null);
+  const [statusType, setStatusType] = useState('info'); // 'success', 'error', 'info'
   const [userData, setUserData] = useState(initialState);
+
+  // Helper function to parse validation errors
+  const parseValidationErrors = (message) => {
+    if (!message) return [];
+
+    // Split by periods and filter out empty strings
+    const errors = message.split('.').filter(error => error.trim().length > 0);
+
+    // Format as bullet points for better readability
+    return errors.map(error => `• ${error.trim()}`).join('\n');
+  };
+
+  // Helper function to format success messages
+  const formatMessage = (message, isSuccess = false) => {
+    if (isSuccess) {
+      return message;
+    }
+
+    // Check if it looks like validation errors (contains "cannot be blank" or similar patterns)
+    if (message.includes('cannot be blank') || message.includes('is invalid') || message.includes('must')) {
+      return parseValidationErrors(message);
+    }
+
+    // For other messages, just clean up the formatting
+    return message.replace(/\./g, '.\n');
+  };
 
   const onChangeText = (key, value) => {
     let connectedValue = {};
@@ -80,9 +107,6 @@ const SignUp = ({navigation}) => {
       };
     }
     if (key === 'password') {
-      // schema.has().digits();
-      // schema.has().uppercase();
-      // console.log('Validating Password', schema.validate(value));
       connectedValue = {
         ...connectedValue,
         equalTo: value,
@@ -112,34 +136,46 @@ const SignUp = ({navigation}) => {
     try {
       const newUser = await registerUser(userData);
       console.log('res', newUser);
-      if (newUser.valid) {
+
+      if (newUser.valid === true || newUser.valid === 'true') {
+        // Success case
         if (newUser.message.includes('A confirmation link has been emailed')) {
           setStatusDialogTitle('Welcome!');
+          setStatusType('success');
           setUserData(initialState);
-          console.log('user successfully signed up!: ');
+          console.log('user successfully signed up!');
         }
-        else setStatusDialogTitle('Something went wrong...!');
+        else {
+          setStatusDialogTitle('Registration Complete');
+          setStatusType('success');
+        }
+
+        setStatusMessage(formatMessage(newUser.message, true));
         setIsLoading(false);
         setStatusDialog(true);
-        setStatusMessage(newUser.message);
       }
       else {
+        // Validation error case
         setIsLoading(false);
-        setStatusDialogTitle('Uh Oh!');
-        setStatusMessage(newUser.message);
+        setStatusDialogTitle('Please Fix These Issues');
+        setStatusType('error');
+        setStatusMessage(formatMessage(newUser.message, false));
+        setStatusDialog(true);
       }
     }
     catch (err) {
       console.log('error signing up: ', err);
       setIsLoading(false);
-      setStatusMessage('Error signing up. \n Possible bad network connection');
+      setStatusDialogTitle('Connection Error');
+      setStatusType('error');
+      setStatusMessage('Unable to create account.\nPlease check your internet connection and try again.');
       setStatusDialog(true);
     }
   };
 
   const renderButtons = () => {
     return (
-      <View style={styles.buttonsContainer}>
+      <>
         <Button
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainer}
@@ -150,82 +186,122 @@ const SignUp = ({navigation}) => {
         <Button
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainer}
-          onPress={() => navigation.navigate('SignIn')}
+          onPress={() => navigation.goBack()}
           title={'Back to Log In'}
         />
-      </View>
+      </>
     );
   };
 
+  const getModalStyles = () => {
+    // You can customize modal appearance based on status type
+    switch (statusType) {
+      case 'success':
+        return {
+          headerStyle: {backgroundColor: '#d4edda'},
+          titleStyle: {color: '#155724'},
+        };
+      case 'error':
+        return {
+          headerStyle: {backgroundColor: '#f8d7da'},
+          titleStyle: {color: '#721c24'},
+        };
+      default:
+        return {};
+    }
+  };
+
   return (
-    <SplashScreen>
-      <View style={styles.signUpContainer}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            onChangeText={val => onChangeText('firstName', val)}
-            placeholder={'First Name'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            style={styles.input}
-            value={userData.firstName.value || ''}
-          />
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            onChangeText={val => onChangeText('lastName', val)}
-            placeholder={'Last Name'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            style={styles.input}
-            value={userData.lastName.value || ''}
-          />
+    <>
+      <SplashScreen>
+        <View style={styles.signUpContainer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              onChangeText={val => onChangeText('firstName', val)}
+              placeholder={'First Name'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              style={styles.input}
+              value={userData.firstName.value || ''}
+            />
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              onChangeText={val => onChangeText('lastName', val)}
+              placeholder={'Last Name'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              style={styles.input}
+              value={userData.lastName.value || ''}
+            />
+          </View>
+
+          <View style={{width: '100%'}}>
+            <Text style={styles.text}>
+              Password must contain at least one uppercase, one digit, and no spaces
+            </Text>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              onChangeText={val => onChangeText('password', val)}
+              placeholder={'Password'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              secureTextEntry={true}
+              style={styles.input}
+              value={userData.password.value || ''}
+            />
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              onChangeText={val => onChangeText('confirmPassword', val)}
+              placeholder={'Confirm Password'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              secureTextEntry={true}
+              style={styles.input}
+              value={userData.confirmPassword.value || ''}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              keyboardType={'email-address'}
+              onChangeText={val => onChangeText('email', val)}
+              placeholder={'Email'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              style={styles.input}
+              value={userData.email.value || ''}
+            />
+          </View>
+
+          {renderButtons()}
         </View>
-        <View style={{width: '100%'}}>
-          <Text style={styles.text}>Password must contain at least one uppercase, one digit, and no spaces</Text>
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            onChangeText={val => onChangeText('password', val)}
-            placeholder={'Password'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            style={styles.input}
-            value={userData.password.value || ''}
-          />
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            onChangeText={val => onChangeText('confirmPassword', val)}
-            placeholder={'Confirm Password'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            secureTextEntry={!userData.password.showPassword}
-            style={styles.input}
-            value={userData.confirmPassword.value || ''}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            onChangeText={val => onChangeText('email', val)}
-            placeholder={'Email'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            style={styles.input}
-            value={userData.email.value || ''}
-          />
-        </View>
-        {renderButtons()}
-      </View>
-      <StatusDialog
-        isVisible={statusDialog}
-        onTouchOutside={() => setStatusDialog(false)}
-        title={statusDialogTitle}
-      >
-        <Text>{statusMessage}</Text>
-      </StatusDialog>
+
+        <ModalWrapper
+          actionTitle={'Got It'}
+          headerTitle={statusDialogTitle}
+          isVisible={statusDialog}
+          onActionPressed={() => setStatusDialog(false)}
+          showCancelButton={false}
+          {...getModalStyles()}
+        >
+          <ScrollView style={{maxHeight: 200}}>
+            <Text style={{
+              fontSize: 16,
+              lineHeight: 24,
+              color: statusType === 'error' ? '#721c24' : '#333',
+            }}>
+              {statusMessage}
+            </Text>
+          </ScrollView>
+        </ModalWrapper>
+      </SplashScreen>
       <Loading isLoading={isLoading}/>
-    </SplashScreen>
+    </>
   );
 };
 

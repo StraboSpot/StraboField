@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList} from 'react-native';
 
-import {ButtonGroup, ListItem, Overlay} from '@rn-vui/base';
+import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {overlayStyles} from './index';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {
   setFeatureTypesOff,
   setGeometryTypesOff,
@@ -21,7 +23,7 @@ import {
 import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
 
-const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
+const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const dispatch = useDispatch();
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
@@ -44,10 +46,23 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
   const renderGeometryTypesList = ({item, index}) => {
     return (
-      <ListItem containerStyle={commonStyles.listItemFormField} key={item}>
+      <ListItem containerStyle={[
+        commonStyles.listItemFormField,
+        SMALL_SCREEN && {
+          // minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]} key={item}>
         <>
           <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>    {getSymbolTitle(item)}</ListItem.Title>
+            <ListItem.Title style={[
+              commonStyles.listItemTitle,
+              SMALL_SCREEN && {
+                fontSize: 16,
+                fontWeight: '500',
+              },
+            ]}>    {getSymbolTitle(item)}</ListItem.Title>
           </ListItem.Content>
           <SwitchWrapper onValueChange={() => toggleGeometryTypesOff(item)} value={!geometryTypesOff.includes(item)}/>
         </>
@@ -57,10 +72,23 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
 
   const renderSymbolsList = ({item, index}) => {
     return (
-      <ListItem containerStyle={commonStyles.listItemFormField} key={item}>
+      <ListItem containerStyle={[
+        commonStyles.listItemFormField,
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]} key={item}>
         <>
           <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>    {getSymbolTitle(item)}</ListItem.Title>
+            <ListItem.Title style={[
+              commonStyles.listItemTitle,
+              SMALL_SCREEN && {
+                fontSize: 16,
+                fontWeight: '500',
+              },
+            ]}>    {getSymbolTitle(item)}</ListItem.Title>
           </ListItem.Content>
           <SwitchWrapper onValueChange={() => toggleFeatureTypesOff(item)} value={!featureTypesOff.includes(item)}/>
         </>
@@ -95,17 +123,17 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+    <ModalWrapper
+      closeModal={onTouchOutside}
+      fullscreen={SMALL_SCREEN}
+      headerTitle={'Map Symbols'}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyle={[overlayStyles.overlayContainer, overlayStyle]}
-      supportedOrientations={['portrait', 'landscape']}
+      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={SMALL_SCREEN}
     >
-      <View style={[overlayStyles.titleContainer]}>
-        <Text style={[overlayStyles.titleText]}>Map Symbols</Text>
-      </View>
       <FlatList
         ListHeaderComponent={
           <>
@@ -218,8 +246,13 @@ const MapSymbolsOverlay = ({onTouchOutside, overlayStyle, visible}) => {
             </ListItem>
           </>
         }
+        contentContainerStyle={{
+          paddingVertical: SMALL_SCREEN ? 20 : 0,
+          flexGrow: SMALL_SCREEN ? 1 : 0,
+        }}
+        style={{width: '100%'}}
       />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

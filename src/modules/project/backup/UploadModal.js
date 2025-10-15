@@ -8,10 +8,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import uploadModalStyles from './uploadModal.styles';
 import {updatedProjectTransferProgress} from '../../../services/connections.slice';
-import {STRABO_APIS} from '../../../services/urls.constants';
 import useUpload from '../../../services/useUpload';
 import useUploadImages from '../../../services/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
+import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
@@ -20,7 +20,7 @@ import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 
-const UploadModal = ({closeModal}) => {
+const UploadModal = ({closeModal, isVisible}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
@@ -30,7 +30,7 @@ const UploadModal = ({closeModal}) => {
   const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
   const [errorMessage, setErrorMesssage] = useState('');
   const [imageUploadStatus, setImageUploadStatus] = useState({});
-  const [modalTitle, setModalTitle] = useState('Overwrite Warning!');
+  const [modalTitle, setModalTitle] = useState('Upload Project');
   const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
   const [uploadState, setUploadState] = useState('not started');
   const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
@@ -52,13 +52,18 @@ const UploadModal = ({closeModal}) => {
   }, [uploadState, currentImage]);
 
   const handleClosePress = () => {
-    setModalTitle('Overwrite Warning!');
+    setModalTitle('Upload Project');
     setUploadState('not started');
     setProjectUploadStatus(false);
     setDatasetUploadStatus(false);
     setUploadImageSuccess(false);
     resetState();
     closeModal();
+  };
+
+  const handleActionPressed = async () => {
+    if (uploadState === 'not started') await initiateUpload();
+    else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
   };
 
   const initiateUpload = async () => {
@@ -154,35 +159,25 @@ const UploadModal = ({closeModal}) => {
 
   const renderInitialUploadView = () => (
     <View>
-      <View>
-        <Text style={overlayStyles.importantText}>Uploading to:</Text>
-        <Text style={overlayStyles.importantText}>
-          {endpoint.isSelected ? endpoint.endpoint : STRABO_APIS.DB}
-        </Text>
-      </View>
-      <Spacer/>
-      <Text style={overlayStyles.contentText}>
-        <Text>
-          {!isEmpty(currentProject) && currentProject.description?.project_name + '\n\n'}
-        </Text>
-        properties and datasets will be uploaded and will
-        <Text style={overlayStyles.importantText}> OVERWRITE</Text> any data already on the server
-        for this project:
+      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
+        {!isEmpty(currentProject) && currentProject.description?.project_name}
       </Text>
-      <View style={overlayStyles.buttonContainer}>
-        {__DEV__ && (
-          <Button
-            onPress={uploadImagesOnly}
-            title={'Images Only (Dev Mode)'}
-            titleStyle={overlayStyles.buttonText}
-            type={'outline'}
-          />
-        )}
+      {endpoint.isSelected ? <Text style={overlayStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
+        : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
+      <Spacer/>
+      <Text style={[overlayStyles.contentText, {textAlign: 'left', padding: 10}]}>
+        - Geologic units, tags, reports and templates will be merged into the project already on the server.{'\n'}
+        - Newer datasets will <Text style={overlayStyles.importantText}>OVERWRITE</Text> older datasets already on the
+        server.{'\n'}
+        - Read Only datasets will not be affected unless they were removed from Read Only status and modified.
+      </Text>
+      {__DEV__ && (
         <Button
-          onPress={() => initiateUpload()}
-          title={'Upload'}
+          onPress={uploadImagesOnly}
+          title={'Upload Images Only (Dev Mode)'}
+          type={'clear'}
         />
-      </View>
+      )}
     </View>
   );
 
@@ -257,27 +252,20 @@ const UploadModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
+      actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
       closeModal={closeModal}
-      title={modalTitle}
+      headerTitle={modalTitle}
+      isVisible={isVisible}
+      onActionPressed={handleActionPressed}
+      onCancelPress={handleClosePress}
+      showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
+      showCancelButton={uploadState === 'not started'}
     >
       {uploadState === 'not started'
         ? renderInitialUploadView()
         : uploadState !== 'error'
           ? renderUploadProgress()
           : renderErrorView()}
-      <View style={overlayStyles.buttonContainer}>
-        {(uploadState === 'complete' || uploadState === 'error')
-          && (
-            <Button
-              // disabled={uploadState !== 'complete'}
-              onPress={handleClosePress}
-              title={'OK'}
-              titleStyle={overlayStyles.buttonText}
-              type={'clear'}
-            />
-          )
-        }
-      </View>
     </ModalWrapper>
   );
 };

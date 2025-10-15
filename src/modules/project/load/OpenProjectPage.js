@@ -12,13 +12,12 @@ import {
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../../home/home.slice';
-import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Open project on device in StraboSpot app directory
-const OpenProjectPage = () => {
+const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
@@ -31,13 +30,14 @@ const OpenProjectPage = () => {
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
-  const confirmOpenProject = (project) => {
+  const confirmOpenProject = async (project) => {
     setProjectToOpen(project);
-    if (isProjectLoadSelectionModalVisible) openProject(project);
+    if (isProjectLoadSelectionModalVisible) await openProject(project);
     else setIsConfirmOverwriteModalVisible(true);
   };
 
   const openProject = async (project) => {
+    closeNotebookPanel();
     closeConfirmOverwriteModal();
     try {
       console.log('Selected Project:', project);
@@ -48,8 +48,8 @@ const OpenProjectPage = () => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setSidePanelVisible({bool: false}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       console.log('Done loading project', res);
+      closeMainMenuPanel();
     }
     catch (err) {
       console.error('Error loading Project.', err);
@@ -73,12 +73,12 @@ const OpenProjectPage = () => {
       </View>
 
       {/* Modal */}
-      {isConfirmOverwriteModalVisible && (
-        <ConfirmOverwriteModal
-          closeModal={closeConfirmOverwriteModal}
-          loadProject={() => openProject(projectToOpen)}
-        />
-      )}
+      <ConfirmOverwriteModal
+        closeModal={closeConfirmOverwriteModal}
+        isVisible={isConfirmOverwriteModalVisible}
+        loadProject={() => openProject(projectToOpen)}
+        project={projectToOpen}
+      />
     </>
   );
 };

@@ -18,7 +18,7 @@
     {
       "type": "select_multiple ph6ma31",
       "name": "based_on",
-      "label": "Based on",
+      "label": "Based On",
       "required": "false"
     },
     {
@@ -26,8 +26,7 @@
       "name": "other_based_on",
       "label": "Other",
       "required": "false",
-      "relevant": "selected(${based_on}, 'other')",
-      "constraint": ". = ''"
+      "relevant": "selected(${based_on}, 'other')"
     },
     {
       "type": "text",
@@ -41,11 +40,6 @@
       "name": "_version",
       "required": "false",
       "calculation": "'vz3ZQiUYMWhSKqG937DgJQ'"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vJbTGjHtsz3UByyUewAiC5'"
     }
   ],
   "choices": [
@@ -58,42 +52,37 @@
       "list_name": "ph6ma31",
       "name": "corona",
       "label": "corona",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "ph6ma31",
       "name": "mineral_degrad",
       "label": "mineral degradation (unhappiness)",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "ph6ma31",
       "name": "pseudomorph",
       "label": "pseudomorph",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "ph6ma31",
       "name": "replacement",
       "label": "replacement or partial replacement",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "ph6ma31",
       "name": "symplectite",
       "label": "symplectite",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "ph6ma31",
       "name": "other",
       "label": "other",
-      "order": "6"
-    }
-  ],
-  "settings": [
-    {
-      "version": "vJbTGjHtsz3UByyUewAiC5"
+      "order": 6
     }
   ]
 }

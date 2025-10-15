@@ -12,23 +12,22 @@ import {
   clearedStatusMessages,
   removedLastStatusMessage,
   setIsErrorMessagesModalVisible,
-  setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../modules/home/home.slice';
 import {useImages} from '../modules/images';
-import {MAIN_MENU_ITEMS} from '../modules/main-menu-panel/mainMenu.constants';
-import {setMenuSelectionPage, setSidePanelVisible} from '../modules/main-menu-panel/mainMenuPanel.slice';
 import {MAP_PROVIDERS} from '../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {
+  addedDataset,
   addedDatasets,
   addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
   setTargetDataset,
 } from '../modules/project/projects.slice';
+import useProject from '../modules/project/useProject';
 import {addedSpotsFromServer} from '../modules/spots/spots.slice';
 import {setUserData} from '../modules/user/userProfile.slice';
 import {isEmpty} from '../shared/Helpers';
@@ -42,12 +41,12 @@ const useDownload = () => {
 
   const dispatch = useDispatch();
   const encodedLogin = useSelector(state => state.user.encoded_login);
-  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const {activeDatasetsIds, project} = useSelector(state => state.project);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
-  const project = useSelector(state => state.project.project);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
+  const {createDataset} = useProject();
   const {clearProject} = useResetState();
   const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
 
@@ -56,9 +55,21 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
-      if ((isEmpty(project) || (!isEmpty(project) && project.id !== selectedProject.id)) && datasets.length >= 1) {
+      let resetDatasets = true;
+      // Don't reset active or target dataset if project is the same and the active datasets still exist
+      if (!isEmpty(project) && project.id === selectedProject.id && !isEmpty(activeDatasetsIds)) {
+        const downloadedDatasetIds = datasets.map(d => d.id);
+        if (activeDatasetsIds.every(id => downloadedDatasetIds.includes(id))) resetDatasets = false;
+      }
+      if (resetDatasets && datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
         dispatch(setTargetDataset(datasets[0].id));
+      }
+      else if (resetDatasets) {
+        const targetDataset = createDataset();
+        dispatch(addedDataset(targetDataset));
+        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
+        dispatch(setTargetDataset(targetDataset.id));
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -218,10 +229,9 @@ const useDownload = () => {
 
   const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
     const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
-    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     dispatch(setStatusMessageModalTitle(projectName));
     dispatch(clearedStatusMessages());
-    if (Platform.OS !== 'web') dispatch(setIsStatusMessagesModalVisible(true));
+    dispatch(setIsStatusMessagesModalVisible(true));
     dispatch(setLoadingStatus({view: 'modal', bool: true}));
     dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
     try {
@@ -233,8 +243,6 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setSidePanelVisible({bool: false}));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
     catch (err) {

@@ -41,7 +41,7 @@
     {
       "type": "text",
       "name": "magmatic_fluid_source",
-      "label": "fluid source",
+      "label": "Fluid Source",
       "required": "false",
       "relevant": "${hydrothermal_alteration} != ''"
     },
@@ -63,11 +63,6 @@
       "label": "Notes",
       "required": "false",
       "appearance": "multiline"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vbdbVAd8hBJtM4NJ7khAGz'"
     }
   ],
   "choices": [
@@ -80,109 +75,109 @@
       "list_name": "uq4ie19",
       "name": "hornfels",
       "label": "hornfels",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "uq4ie19",
       "name": "dolorite_mica_",
       "label": "dolorite/mica replacement",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "uq4ie19",
       "name": "rhodingite",
       "label": "rodingite",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "uq4ie19",
       "name": "carbonatite",
       "label": "carbonatite",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "uq4ie19",
       "name": "chromite_ore",
       "label": "chromite ore",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "uq4ie19",
       "name": "magmatic_hoste",
       "label": "magmatic-hosted ore",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "uq4ie19",
       "name": "pegmatite_host",
       "label": "pegmatite-hosted ore",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "uq4ie19",
       "name": "vein_hosted_or",
       "label": "vein-hosted ore",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "uq4ie19",
       "name": "greisen_ore",
       "label": "greisen ore",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "uq4ie19",
       "name": "carbonate_repl",
       "label": "carbonate-replacement",
-      "order": "10"
+      "order": 10
     },
     {
       "list_name": "uq4ie19",
       "name": "bif",
       "label": "BIF",
-      "order": "11"
+      "order": 11
     },
     {
       "list_name": "uq4ie19",
       "name": "sedimentary_pr",
       "label": "sedimentary precipitated ore",
-      "order": "12"
+      "order": 12
     },
     {
       "list_name": "uq4ie19",
       "name": "sedimentary_ho",
       "label": "sedimentary hosted ore (U)",
-      "order": "13"
+      "order": 13
     },
     {
       "list_name": "uq4ie19",
       "name": "kimberlite",
       "label": "kimberlite",
-      "order": "14"
+      "order": 14
     },
     {
       "list_name": "uq4ie19",
       "name": "komatiites",
       "label": "komatiites",
-      "order": "15"
+      "order": 15
     },
     {
       "list_name": "uq4ie19",
       "name": "placer",
       "label": "placer",
-      "order": "16"
+      "order": 16
     },
     {
       "list_name": "uq4ie19",
       "name": "laterite",
       "label": "laterite",
-      "order": "17"
+      "order": 17
     },
     {
       "list_name": "uq4ie19",
       "name": "other",
       "label": "other",
-      "order": "18"
+      "order": 18
     },
     {
       "list_name": "xa5un89",
@@ -223,11 +218,6 @@
       "list_name": "xa5un89",
       "name": "other",
       "label": "other"
-    }
-  ],
-  "settings": [
-    {
-      "version": "vbdbVAd8hBJtM4NJ7khAGz"
     }
   ]
 }

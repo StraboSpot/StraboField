@@ -22,7 +22,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const BeddingPage = ({page}) => {
+const BeddingPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -108,6 +108,7 @@ const BeddingPage = ({page}) => {
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'sed'}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedAttribute}
       />
@@ -115,14 +116,18 @@ const BeddingPage = ({page}) => {
   };
 
   const renderAttributesMain = () => {
+    const dividerText = 'Beds';
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
         <NotebookPageHeader pageTitle={page.label}/>
         {renderBeddingShared()}
-        <SectionDividerWithRightButton
-          dividerText={'Beds'}
-          onPress={addAttribute}
-        />
+        {isReadOnly ? <SectionDivider dividerText={dividerText}/>
+          : (
+            <SectionDividerWithRightButton
+              dividerText={dividerText}
+              onPress={addAttribute}
+            />
+          )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Beds'}/>}
@@ -171,7 +176,7 @@ const BeddingPage = ({page}) => {
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={false}
                 >
-                  {formProps => <Form {...{...formProps, formName: formName}}/>}
+                  {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
                 </Formik>
               </>
             )
@@ -179,7 +184,6 @@ const BeddingPage = ({page}) => {
           data={formName}
         />
       </View>
-
     );
   };
 

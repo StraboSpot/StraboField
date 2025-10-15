@@ -12,7 +12,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import Spacer from '../../shared/ui/Spacer';
-import uiStyles from '../../shared/ui/ui.styles';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
@@ -71,8 +70,16 @@ const StraboFieldProjects = () => {
             )}
             <FlatListItemSeparator/>
             <MainMenuPanelListItem onPress={onLoadProjectsFromDownloadsFolder} title={'Import'}/>
+            {Platform.OS === 'android' && (
+              <Text style={overlayStyles.statusMessageText}>
+                *The imported project must be a StraboField .zip file in the {importLocationText} folder.
+              </Text>
+            )}
             <Spacer/>
-            <SectionDivider dividerText={'Other Actions with\nLocal Projects on Device'}/>
+            <SectionDivider dividerText={'Other Project Actions'}/>
+            <Text style={overlayStyles.statusMessageText}>
+              Affects locally saved projects only. {'\n'}Current project stays unchanged.
+            </Text>
             <MainMenuPanelListItem onPress={onDeleteLocalCopy} title={'Delete'}/>
             <FlatListItemSeparator/>
             <MainMenuPanelListItem
@@ -81,11 +88,6 @@ const StraboFieldProjects = () => {
             />
             {Platform.OS === 'ios' && (
               <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-                <View style={{padding: 10, alignItems: 'center'}}>
-                  <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
-                    Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
-                  </Text>
-                </View>
                 <Button
                   buttonStyle={commonStyles.standardButton}
                   containerStyle={commonStyles.buttonPadding}
@@ -101,11 +103,6 @@ const StraboFieldProjects = () => {
                   type={'outline'}
                 />
               </View>
-            )}
-            {Platform.OS === 'android' && (
-              <Text style={overlayStyles.statusMessageText}>
-                *The imported project must be a .zip file in the {importLocationText} folder.
-              </Text>
             )}
           </>
         }

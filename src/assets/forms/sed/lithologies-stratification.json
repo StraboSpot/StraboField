@@ -4,258 +4,209 @@
       "type": "select_multiple ve4gq38",
       "name": "stratification",
       "label": "Stratification",
-      "read_only": false,
-      "required": false,
-      "relevant": "",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple lt4wq55",
       "name": "laminae_thickness_i_select_more_than_one",
       "label": "Laminae Thickness (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae')"
     },
     {
       "type": "select_multiple se2xd36",
       "name": "lamination_character",
       "label": "Lamination Character (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae')"
     },
     {
       "type": "select_multiple ht51j49",
       "name": "bedding_thickness",
       "label": "Bedding Thickness (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_multiple co9mo61",
       "name": "bedding_character",
       "label": "Bedding character (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_multiple wj4dz28",
       "name": "package_geometry",
       "label": "Package Geometry",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_one mb8sm92",
       "name": "package_lateral_extent",
       "label": "Package Lateral Extent",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') and selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') and selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_one mf0hv76",
       "name": "package_bedding_trends",
       "label": "Package Bedding Trends",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "text",
       "name": "other_bedding_trend",
       "label": "Other bedding trend",
-      "read_only": false,
-      "required": false,
-      "relevant": "${package_bedding_trends} = 'other'",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "${package_bedding_trends} = 'other'"
     },
     {
       "type": "select_multiple nt45h93",
       "name": "shape_of_lower_contacts",
       "label": "Shape of lower contact(s) (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_multiple bq6ko94",
       "name": "character_of_lower_contacts",
       "label": "Character of lower contact(s) (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "text",
       "name": "lower_contact_relief",
       "label": "Lower contact relief",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_multiple fo9ve04",
       "name": "shape_of_upper_contacts",
       "label": "Shape of upper contact(s) (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "select_multiple rx9bj85",
       "name": "character_of_upper_contacts",
       "label": "Character of upper contact(s) (if variable, select more than one)",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "text",
       "name": "upper_contact_relief",
       "label": "Upper Contact Relief",
-      "read_only": false,
-      "required": false,
-      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')",
-      "calculation": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${stratification}, 'strat_laminae') or selected(${stratification}, 'strat_bedding')"
     },
     {
       "type": "decimal",
       "name": "interbed_proportion",
       "label": "Interbed Relative Proportion (%)",
-      "read_only": "",
-      "required": false,
-      "relevant": "",
-      "calculation": ""
+      "required": "false"
     },
     {
       "type": "select_one jf3we63",
       "name": "interbed_thickness",
       "label": "Interbed Thickness",
-      "read_only": "",
-      "required": false,
-      "relevant": "",
-      "calculation": ""
+      "required": "false"
     },
     {
       "type": "select_one ss8kj53",
       "name": "interbed_proportion_change",
       "label": "Interbed Proportion Change (Up Section)",
-      "read_only": "",
-      "required": false,
-      "relevant": "",
-      "calculation": ""
+      "required": "false"
     },
     {
       "type": "select_one fz4sh15",
       "name": "interbed_thickness_change",
       "label": "Interbed Thickness Change (Up Section)",
-      "read_only": "",
-      "required": false,
-      "relevant": "",
-      "calculation": ""
+      "required": "false"
     },
     {
       "type": "text",
-      "name": "notes",
+      "name": "Notes",
       "label": "Notes",
-      "read_only": false,
-      "required": false,
-      "relevant": "",
-      "calculation": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "read_only": "",
-      "required": "",
-      "relevant": "",
-      "calculation": "'vaUWtzPE9YeiQ75FW6ugNn'"
+      "required": "false",
+      "read_only": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [
     {
       "list_name": "ve4gq38",
       "name": "no_bedding_or_laminae",
-      "label": "no bedding or laminae",
-      "order": ""
+      "label": "no bedding or laminae"
     },
     {
       "list_name": "ve4gq38",
       "name": "strat_laminae",
-      "label": "laminae present",
-      "order": ""
+      "label": "laminae present"
     },
     {
       "list_name": "ve4gq38",
       "name": "strat_bedding",
-      "label": "bedding present",
-      "order": ""
+      "label": "bedding present"
     },
     {
       "list_name": "lt4wq55",
       "name": "v_thin",
-      "label": "very thin (< 0.1 cm)",
-      "order": ""
+      "label": "very thin (< 0.1 cm)"
     },
     {
       "list_name": "lt4wq55",
       "name": "thin",
-      "label": "thin (0.1-0.3 cm)",
-      "order": ""
+      "label": "thin (0.1-0.3 cm)"
     },
     {
       "list_name": "lt4wq55",
       "name": "medium",
-      "label": "medium (0.3-0.6 cm)",
-      "order": ""
+      "label": "medium (0.3-0.6 cm)"
     },
     {
       "list_name": "lt4wq55",
       "name": "thick",
-      "label": "thick (0.6-1 cm)",
-      "order": ""
+      "label": "thick (0.6-1 cm)"
     },
     {
       "list_name": "lt4wq55",
       "name": "v_thick",
-      "label": "variable",
-      "order": ""
+      "label": "variable"
     },
     {
       "list_name": "lt4wq55",
       "name": "thin_upwards",
-      "label": "thin upwards",
-      "order": ""
+      "label": "thin upwards"
     },
     {
       "list_name": "lt4wq55",
       "name": "thicken_upward",
-      "label": "thicken upwards",
-      "order": ""
+      "label": "thicken upwards"
     },
     {
       "list_name": "se2xd36",
       "name": "weak",
-      "label": "weak",
-      "order": 0
+      "label": "weak"
     },
     {
       "list_name": "se2xd36",
@@ -320,8 +271,7 @@
     {
       "list_name": "ht51j49",
       "name": "v_thin",
-      "label": "very thin (1-3 cm)",
-      "order": 0
+      "label": "very thin (1-3 cm)"
     },
     {
       "list_name": "ht51j49",
@@ -368,8 +318,7 @@
     {
       "list_name": "co9mo61",
       "name": "weak",
-      "label": "weak",
-      "order": 0
+      "label": "weak"
     },
     {
       "list_name": "co9mo61",
@@ -428,62 +377,52 @@
     {
       "list_name": "wj4dz28",
       "name": "discontinuous",
-      "label": "discontinuous",
-      "order": ""
+      "label": "discontinuous"
     },
     {
       "list_name": "wj4dz28",
       "name": "tabular_parall",
-      "label": "tabular/parallel",
-      "order": ""
+      "label": "tabular/parallel"
     },
     {
       "list_name": "wj4dz28",
       "name": "lenticular",
-      "label": "lenticular",
-      "order": ""
+      "label": "lenticular"
     },
     {
       "list_name": "wj4dz28",
       "name": "channel_like",
-      "label": "channel-like",
-      "order": ""
+      "label": "channel-like"
     },
     {
       "list_name": "wj4dz28",
       "name": "wedge",
-      "label": "wedge",
-      "order": ""
+      "label": "wedge"
     },
     {
       "list_name": "mb8sm92",
       "name": "meter_scale",
-      "label": "meter-scale",
-      "order": ""
+      "label": "meter-scale"
     },
     {
       "list_name": "mb8sm92",
       "name": "tens_of_meters",
-      "label": "tens of meters",
-      "order": ""
+      "label": "tens of meters"
     },
     {
       "list_name": "mb8sm92",
       "name": "hundreds_of_me",
-      "label": "hundreds of meters",
-      "order": ""
+      "label": "hundreds of meters"
     },
     {
       "list_name": "mb8sm92",
       "name": "kilometer_scal",
-      "label": "kilometer-scale",
-      "order": ""
+      "label": "kilometer-scale"
     },
     {
       "list_name": "mf0hv76",
       "name": "upward_thinning",
-      "label": "upward thinning",
-      "order": 0
+      "label": "upward thinning"
     },
     {
       "list_name": "mf0hv76",
@@ -512,56 +451,47 @@
     {
       "list_name": "nt45h93",
       "name": "flat",
-      "label": "flat",
-      "order": ""
+      "label": "flat"
     },
     {
       "list_name": "nt45h93",
       "name": "undulatory",
-      "label": "undulatory",
-      "order": ""
+      "label": "undulatory"
     },
     {
       "list_name": "nt45h93",
       "name": "curved",
-      "label": "curved",
-      "order": ""
+      "label": "curved"
     },
     {
       "list_name": "nt45h93",
       "name": "concave_up",
-      "label": "concave up",
-      "order": ""
+      "label": "concave up"
     },
     {
       "list_name": "nt45h93",
       "name": "concave_down",
-      "label": "concave down",
-      "order": ""
+      "label": "concave down"
     },
     {
       "list_name": "nt45h93",
       "name": "irregular",
-      "label": "irregular",
-      "order": ""
+      "label": "irregular"
     },
     {
       "list_name": "nt45h93",
       "name": "covered",
-      "label": "covered",
-      "order": ""
+      "label": "covered"
     },
     {
       "list_name": "nt45h93",
       "name": "n_a",
-      "label": "n/a",
-      "order": ""
+      "label": "n/a"
     },
     {
       "list_name": "bq6ko94",
       "name": "flat",
-      "label": "sharp",
-      "order": 0
+      "label": "sharp"
     },
     {
       "list_name": "bq6ko94",
@@ -578,7 +508,7 @@
     {
       "list_name": "bq6ko94",
       "name": "concave_up",
-      "label": "amalgmated",
+      "label": "amalgamated",
       "order": 3
     },
     {
@@ -614,56 +544,47 @@
     {
       "list_name": "fo9ve04",
       "name": "flat",
-      "label": "flat",
-      "order": ""
+      "label": "flat"
     },
     {
       "list_name": "fo9ve04",
       "name": "undulatory",
-      "label": "undulatory",
-      "order": ""
+      "label": "undulatory"
     },
     {
       "list_name": "fo9ve04",
       "name": "curved",
-      "label": "curved",
-      "order": ""
+      "label": "curved"
     },
     {
       "list_name": "fo9ve04",
       "name": "concave_up",
-      "label": "concave up",
-      "order": ""
+      "label": "concave up"
     },
     {
       "list_name": "fo9ve04",
       "name": "concave_down",
-      "label": "concave down",
-      "order": ""
+      "label": "concave down"
     },
     {
       "list_name": "fo9ve04",
       "name": "irregular",
-      "label": "irregular",
-      "order": ""
+      "label": "irregular"
     },
     {
       "list_name": "fo9ve04",
       "name": "covered",
-      "label": "covered",
-      "order": ""
+      "label": "covered"
     },
     {
       "list_name": "fo9ve04",
       "name": "n_a",
-      "label": "n/a",
-      "order": ""
+      "label": "n/a"
     },
     {
       "list_name": "rx9bj85",
       "name": "sharp",
-      "label": "sharp",
-      "order": 0
+      "label": "sharp"
     },
     {
       "list_name": "rx9bj85",
@@ -680,7 +601,7 @@
     {
       "list_name": "rx9bj85",
       "name": "amalgamated",
-      "label": "amalgmated",
+      "label": "amalgamated",
       "order": 3
     },
     {
@@ -710,38 +631,32 @@
     {
       "list_name": "jf3we63",
       "name": "_2_cm",
-      "label": "~2 cm",
-      "order": ""
+      "label": "~2 cm"
     },
     {
       "list_name": "jf3we63",
       "name": "2_5_cm",
-      "label": "2-5 cm",
-      "order": ""
+      "label": "2-5 cm"
     },
     {
       "list_name": "jf3we63",
       "name": "5_10_cm",
-      "label": "5-10 cm",
-      "order": ""
+      "label": "5-10 cm"
     },
     {
       "list_name": "jf3we63",
       "name": "10_30_cm",
-      "label": "10-30 cm",
-      "order": ""
+      "label": "10-30 cm"
     },
     {
       "list_name": "jf3we63",
       "name": "_30_cm",
-      "label": ">30 cm",
-      "order": ""
+      "label": ">30 cm"
     },
     {
       "list_name": "ss8kj53",
       "name": "increase",
-      "label": "increase",
-      "order": 0
+      "label": "increase"
     },
     {
       "list_name": "ss8kj53",
@@ -758,8 +673,7 @@
     {
       "list_name": "fz4sh15",
       "name": "increase",
-      "label": "increase",
-      "order": 0
+      "label": "increase"
     },
     {
       "list_name": "fz4sh15",
@@ -776,8 +690,8 @@
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-11)"
+      "id_string": "awVZhNfrCEPjUTsQeftCdh",
+      "version": "vvgdm4SWA3XhLnBry3foPo"
     }
   ]
 }

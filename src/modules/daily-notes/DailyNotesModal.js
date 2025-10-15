@@ -1,16 +1,14 @@
 import React, {useRef} from 'react';
 import {View} from 'react-native';
 
-import {Button, Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {DateInputField, TextInputField} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
@@ -63,11 +61,12 @@ const DailyNotesModal = () => {
 
   const renderDailyNotesModal = () => {
     return (
-      <ModalWrapper buttonTitleRight={''}>
-        <SaveAndCancelButtons
-          cancel={() => close()}
-          save={() => saveNote(formRef?.current?.values)}
-        />
+      <ModalWrapper
+        onActionPressed={() => saveNote(formRef?.current?.values)}
+        onCancelPress={close}
+        onDeletePress={deleteNoteConfirm}
+        showDeleteButton={!isEmpty(projectDescription?.daily_setup)}
+      >
         <Formik
           enableReinitialize={true}
           initialValues={initialValues}
@@ -100,21 +99,6 @@ const DailyNotesModal = () => {
                   />
                 </ListItem.Content>
               </ListItem>
-              <Button
-                icon={
-                  <Icon
-                    color={'red'}
-                    iconStyle={{paddingRight: 10}}
-                    name={'trash'}
-                    size={20}
-                    type={'font-awesome'}
-                  />
-                }
-                onPress={() => deleteNoteConfirm()}
-                title={'Delete Note'}
-                titleStyle={overlayStyles.importantText}
-                type={'clear'}
-              />
             </View>
           )}
         </Formik>

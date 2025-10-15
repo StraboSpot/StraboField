@@ -51,7 +51,7 @@ const MineralsGlossary = ({addMineral}) => {
           }
           else if (field !== 'Name') {
             return (
-              <Text key={activeMineralInfo.Name + field}>
+              <Text key={activeMineralInfo.Name + field} style={{paddingHorizontal: 10}}>
                 <Text style={{fontWeight: 'bold'}}>{field}:</Text>
                 {value}
               </Text>
@@ -64,7 +64,7 @@ const MineralsGlossary = ({addMineral}) => {
 
   const renderMineralList = () => {
     return (
-      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-evenly'}}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
         {glossaryChunked.map(glossaryChunk => (
           <View key={JSON.stringify(glossaryChunk)} style={{flex: 1}}>
             {glossaryChunk.map(mineralInfo => (
@@ -82,11 +82,9 @@ const MineralsGlossary = ({addMineral}) => {
   };
 
   return (
-    <View style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
-      <FlatList ListHeaderComponent={
-        isEmpty(activeMineralInfo) ? renderMineralList() : renderMineralInfo()
-      }/>
-    </View>
+    <FlatList ListHeaderComponent={
+      isEmpty(activeMineralInfo) ? renderMineralList() : renderMineralInfo()
+    }/>
   );
 };
 

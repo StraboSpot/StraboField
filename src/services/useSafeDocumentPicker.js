@@ -40,7 +40,7 @@ export const useSafeDocumentPicker = () => {
           break;
         case errorCodes.OPERATION_CANCELED:
           console.warn(err.code);
-          toast.show('Nothing was selected. Please select a .zip file to import.', {type: 'warning', placement: 'top'});
+          toast.show('Nothing was selected.', {type: 'warning', placement: 'top'});
           break;
         default:
           console.error(err);

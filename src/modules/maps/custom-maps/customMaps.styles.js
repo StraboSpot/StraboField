@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   loadingMapModalContentText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
   },
   loadingMapModalTitleContainer: {
     flex: 1,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   mapOverviewText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
     padding: 5,
   },
   // mapOverview

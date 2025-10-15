@@ -18,6 +18,7 @@ const ImageCard = ({
                      image,
                      imageThumbnailURIs,
                      index,
+                     isReadOnly,
                      isThumbnailOnly,
                      openImage,
                      setAreImageThumbnailsLoading,
@@ -43,7 +44,7 @@ const ImageCard = ({
   const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id));
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
 
   const handleEditImageName = (value) => {
     if (value && value !== '') setTitle(value);
@@ -106,7 +107,10 @@ const ImageCard = ({
             value={title}
           />
         ) : (
-          <TouchableOpacity onPress={() => setIsEditing(true)} style={imageStyles.cardTitleEditingButton}>
+          <TouchableOpacity
+            disabled={isReadOnly}
+            onPress={() => setIsEditing(true)}
+            style={imageStyles.cardTitleEditingButton}>
             <Text
               ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
               numberOfLines={Platform.OS !== 'web' ? 1 : undefined}

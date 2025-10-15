@@ -1,19 +1,29 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import Notes from './Notes';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import useDeviceOrientation from '../home/useDeviceOrientation';
 
 const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
 
-  const renderNotesShortcutModal = () => {
-    return (
-      <ModalWrapper onPress={onPress}>
-        <Notes zoomToCurrentLocation={zoomToCurrentLocation}/>
-      </ModalWrapper>
-    );
-  };
+  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
 
-  return renderNotesShortcutModal();
+  useEffect(() => {
+    lockToPortrait();
+    return () => unlockOrientation();
+  }, []);
+
+  return (
+    <ModalWrapper
+      onFooterButtonPress={onPress}
+      overlayStyleOverride={{maxHeight: '60%', flex: 1}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
+    >
+      <Notes zoomToCurrentLocation={zoomToCurrentLocation}/>
+    </ModalWrapper>
+  );
 };
 
 export default ShortcutNotesModal;

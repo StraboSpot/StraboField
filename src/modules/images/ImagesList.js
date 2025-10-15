@@ -3,11 +3,19 @@ import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-import {ImageCard, ImageModal, imageStyles, useImageThumbnails} from '.';
+import {ImageCard, ImageInfo, imageStyles, useImageThumbnails} from '.';
 import commonStyles from '../../shared/common.styles';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
-const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, saveImages, saveUpdatedImage}) => {
+const ImagesList = ({
+                      deleteImage,
+                      images,
+                      isReadOnly,
+                      isThumbnailOnly = false,
+                      openImage,
+                      saveImages,
+                      saveUpdatedImage,
+                    }) => {
   const [imageToView, setImageToView] = useState({});
   const [isError, setIsError] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
@@ -48,6 +56,7 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
           image={image}
           imageThumbnailURIs={imageThumbnailURIs}
           index={index}
+          isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
           openImage={openImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
@@ -83,16 +92,16 @@ const ImagesList = ({deleteImage, images, isThumbnailOnly = false, openImage, sa
       <View style={{flex: 1}}>
         {isError ? renderError() : renderImages()}
       </View>
-      {isImageModalVisible && (
-        <ImageModal
-          deleteImage={deleteImage}
-          image={imageToView}
-          saveImages={saveImages}
-          saveUpdatedImage={saveUpdatedImage}
-          setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
-        />
-      )}
+      <ImageInfo
+        deleteImage={deleteImage}
+        image={imageToView}
+        isReadOnly={isReadOnly}
+        isVisible={isImageModalVisible}
+        saveImages={saveImages}
+        saveUpdatedImage={saveUpdatedImage}
+        setImageToView={setImageToView}
+        setIsImageModalVisible={setIsImageModalVisible}
+      />
     </>
   );
 };

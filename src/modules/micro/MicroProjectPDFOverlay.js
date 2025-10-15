@@ -1,21 +1,40 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Platform, View} from 'react-native';
 
-import {Button, Icon, Overlay} from '@rn-vui/base';
+import {Button, Icon} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
-import {useToast} from 'react-native-toast-notifications';
+import Toast from 'react-native-toast-notifications';
 
 import useDevice from '../../services/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
-import {BLACK, POSITIVE_COLOR, WARNING_COLOR, WHITE} from '../../shared/styles.constants';
+import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import Loading from '../../shared/ui/Loading';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   const {exportMicroProjectPDF} = useDevice();
-  const toast = useToast();
+  // const toast = useToast();
+  const toastRef = useRef(null);
+
+  const showToast = (message, type) => {
+    const toastOptions = {
+      type: type,
+      placement: 'top',
+      duration: 2000,
+    };
+    if (Platform.OS === 'web') {
+      // Fallback to alert on web since react-native-toast-notifications may not work
+      alert(message);
+    }
+    else {
+      toastRef.current.show(message, toastOptions);
+    }
+  };
 
   const [wasExported, setWasExported] = useState(false);
   const [isExportError, setIsExportError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setWasExported(false);
@@ -24,81 +43,89 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
 
   const handleExport = async () => {
     try {
+      setLoading(true);
       await exportMicroProjectPDF(doc);
       console.log('Done Exporting Project');
-      toast.show('PDF Exported to Device!', {type: 'success'});
+      showToast('PDF Exported to Device!', 'success');
       setWasExported(true);
+      setLoading(false);
     }
     catch (e) {
       console.error('Error Exporting Project', e);
-      toast.show('Error Exporting PDF Device!', {type: 'danger'});
+      showToast('Error Exporting PDF to Device!', 'danger');
       setIsExportError(true);
+      setLoading(false);
     }
   };
 
   return (
-    <Overlay
+    <ModalWrapper
+      fullscreen
       isVisible={visible}
-      overlayStyle={{height: '100%', width: '100%', backgroundColor: WHITE}}
-      supportedOrientations={['portrait', 'landscape']}
+      showActionButton={false}
+      showCancelButton={false}
     >
-      <View style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
-        {wasExported ? (
-          <Icon
-            color={POSITIVE_COLOR}
-            containerStyle={overlayStyles.closeButton}
-            name={'check-circle-outline'}
-            size={25}
-            type={'material-community'}
-          />
-        ) : isExportError ? (
-          <Icon
-            color={WARNING_COLOR}
-            containerStyle={overlayStyles.closeButton}
-            name={'alert-circle-outline'}
-            size={25}
-            type={'material-community'}
-          />
-        ) : (
-          <Icon
-            color={BLACK}
-            containerStyle={overlayStyles.closeButton}
-            name={'export'}
-            onPress={handleExport}
-            size={25}
-            type={'material-community'}
-          />
-        )}
-        <Button
-          icon={
+      <>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center'}}>
+          {wasExported ? (
+            <Icon
+              color={POSITIVE_COLOR}
+              containerStyle={overlayStyles.closeButton}
+              name={'check-circle-outline'}
+              size={25}
+              type={'material-community'}
+            />
+          ) : isExportError ? (
+            <Icon
+              color={WARNING_COLOR}
+              containerStyle={overlayStyles.closeButton}
+              name={'alert-circle-outline'}
+              size={25}
+              type={'material-community'}
+            />
+          ) : (
             <Icon
               color={BLACK}
-              name={'close-outline'}
-              size={30}
-              type={'ionicon'}
+              containerStyle={overlayStyles.closeButton}
+              name={'export'}
+              onPress={handleExport}
+              size={25}
+              type={'material-community'}
             />
-          }
-          onPress={() => setVisible(!visible)}
-          type={'clear'}
-        />
-      </View>
-      {!isEmpty(doc) && (
-        <Pdf
-          onError={(error) => {
-            console.log(error);
-          }}
-          onLoadComplete={(numberOfPages, filePath) => {
-            console.log(`Number of pages: ${numberOfPages}`);
-          }}
-          onPressLink={async (uri) => {
-            console.log(`Link pressed: ${uri}`);
-            await openUrl(uri);
-          }}
-          source={doc.file}
-          style={{flex: 1}}
-        />
-      )}
-    </Overlay>
+          )}
+          <Button
+            icon={
+              <Icon
+                color={BLACK}
+                name={'close-outline'}
+                size={30}
+                type={'ionicon'}
+              />
+            }
+            onPress={() => setVisible(!visible)}
+            type={'clear'}
+          />
+        </View>
+        {!isEmpty(doc) && (
+          <Pdf
+            onError={(error) => {
+              console.log(error);
+            }}
+            onLoadComplete={(numberOfPages, filePath) => {
+              console.log(`Number of pages: ${numberOfPages}`);
+            }}
+            onPressLink={async (uri) => {
+              console.log(`Link pressed: ${uri}`);
+              await openUrl(uri);
+            }}
+            source={doc.file}
+            style={{flex: 1}}
+          />
+        )}
+        <Loading isLoading={loading} style={{backgroundColor: 'transparent'}}/>
+        <Toast ref={toastRef}/>
+      </>
+    </ModalWrapper>
   );
 };
 

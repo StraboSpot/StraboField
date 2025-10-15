@@ -8,7 +8,8 @@ import compassStyles from '../compass/compass.styles';
 import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 
-const AddManualMeasurements = ({formProps, measurementType}) => {
+const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
+  const {doMeasurementCalculations} = useCompassCalculations();
   const {getSurvey} = useForm();
 
   const [sliderValue, setSliderValue] = useState(6);
@@ -31,8 +32,6 @@ const AddManualMeasurements = ({formProps, measurementType}) => {
 
   const labelField = planarSurvey.find(f => f.name === labelKey);
 
-  const {onMyChange} = useCompassCalculations({formRefCurrent: formProps});
-
   useEffect(() => {
     console.log('UE AddManualMeasurements [sliderValue]', sliderValue);
     const sliderValueString = sliderValue <= 5 ? sliderValue.toString() : undefined;
@@ -41,6 +40,17 @@ const AddManualMeasurements = ({formProps, measurementType}) => {
       formProps.setFieldValue('associated_orientation[0].' + qualityKey, sliderValueString);
     }
   }, [sliderValue]);
+
+  const onMyChange = (name, value) => {
+    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
+      const valueAsFloat = parseFloat(value);
+      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
+        doMeasurementCalculations(name, valueAsFloat, formRefCurrent, formRefCurrent.values, formRefCurrent.values);
+      }
+      else formRefCurrent.setFieldValue(name, undefined);
+    }
+    else formRefCurrent.setFieldValue(name, value);
+  };
 
   return (
     <>

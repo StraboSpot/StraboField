@@ -1,19 +1,17 @@
 import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import moment from 'moment';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
 
-const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
+const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const statusMessages = useSelector(state => state.home.statusMessages);
@@ -25,7 +23,7 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
-  const [modalTitle, setModalTitle] = useState('Confirm or Change Folder Name');
+  const [modalTitle, setModalTitle] = useState('Confirm or Change\nFolder Name');
 
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
   const toast = useToast();
@@ -33,11 +31,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   const fileName = backupFileName.replace(/\s/g, '_');
 
   const getButtonTitle = () => {
-    if (backupAction === 'save') return 'Save';
-    else {
-      if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
-      else return selectedFilename ? 'Export' : 'Save & Export';
+    if (backingUpStatus === '') {
+      if (backupAction === 'save') return 'Save';
+      if (backupAction === 'export') {
+        if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
+        else return selectedFilename ? 'Export' : 'Save & Export';
+      }
     }
+    else if (backingUpStatus === 'complete' || backingUpStatus === 'error') return 'Close';
   };
 
   const exportProject = async () => {
@@ -52,22 +53,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
       await zipAndExportProjectFolder(backupFileName, exportFileName, true);
       setBackingUpStatus('complete');
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS === 'ios') {
-        setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
-        console.log('Project has been saved and zipped!');
-        toast.show('Project has been saved and zipped! Please move zip out of the StraboSpot folder.');
-      }
-      else {
-        setModalTitle(selectedFilename ? 'Project Exported to Zip!' : 'Project Saved and Exported to Zip!');
-        console.log('Project has been saved and exported to the Downloads folder!');
-        toast.show('Project has been exported!');
-      }
+      if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
+      else setModalTitle(selectedFilename ? 'Project Exported to Zip!' : 'Project Saved and Exported to Zip!');
     }
     catch (err) {
       console.error('Error exporting project!', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS === 'ios') toast.show('ZIP FAILED!\n' + err);
-      else toast.show('EXPORT FAILED!\n' + err);
+      setModalTitle(selectedFilename ? 'Export Failed!' : 'Save & Export Failed!');
+      setBackingUpStatus('error');
     }
   };
 
@@ -75,6 +68,14 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
     setBackingUpStatus('');
     setModalTitle('Confirm or Change Folder Name');
     closeModal();
+  };
+
+  const handleActionPressed = async () => {
+    if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
+    else {
+      if (backupAction === 'save') await initiateBackup();
+      else if (backupAction === 'export') await exportProject();
+    }
   };
 
   const initiateBackup = async () => {
@@ -93,48 +94,18 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   const renderBackingUpView = () => (
-    <View>
+    <View style={{padding: 20, alignItems: 'center'}}>
       <LottieAnimations
         doesLoop={backingUpStatus === 'inProgress'}
-        show={backingUpStatus === 'inProgress'}
-        type={backingUpStatus === 'inProgress' ? 'loadingFile' : 'complete'}
+        show
+        type={backingUpStatus === 'inProgress' ? 'loadingFile'
+          : backingUpStatus === 'complete' ? 'complete' : 'error'}
       />
-      <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
-      <View style={overlayStyles.buttonContainer}>
-        <Button
-          disabled={backingUpStatus !== 'complete'}
-          onPress={handleClosePress}
-          title={'OK'}
-          titleStyle={overlayStyles.buttonText}
-          type={'clear'}
-        />
-      </View>
+      <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
+        {statusMessages.join('\n')}
+      </Text>
     </View>
   );
-
-  const renderExportMessage = () => {
-    return (
-      <Text style={overlayStyles.contentText}>
-        {Platform.OS === 'ios' ? (
-          'All project data, images, and offline maps will be saved as a .zip file to the Distribution folder in '
-          + 'the My Files App\\StraboField\\ProjectBackups\\Distribution.\n\nYou may want to export '
-          + 'your zipped project by moving it out of the StraboField Folder using the iOS Files app.\n\n'
-          + 'Zipped project will be saved as:'
-        ) : (
-          'All project data, images, and offline maps will be EXPORTED as a .zip file to the Downloads folder '
-          + 'in the Android My Files app.\n\nZipped project will be exported as:'
-        )}
-      </Text>
-    );
-  };
-
-  const renderSaveMessage = () => {
-    return (
-      <Text style={overlayStyles.contentText}>
-        All datasets will be saved locally, along with any images and custom maps.
-      </Text>
-    );
-  };
 
   const validateFileName = (filenameChanged) => {
     const regexp = /^[a-zA-Z0-9-_]+$/; // Check for alphanumberic characters, a dash or underscore
@@ -146,33 +117,58 @@ const SaveAndExportModal = ({backupAction, closeModal, selectedFilename}) => {
   };
 
   return (
-    <ModalWrapper closeModal={closeModal} title={modalTitle}>
+    <ModalWrapper
+      actionTitle={getButtonTitle()}
+      disabled={backupFileName.trim() === '' || isFileNameError}
+      headerTitle={modalTitle}
+      isVisible={isVisible}
+      onActionPressed={backingUpStatus === 'complete' ? handleClosePress : handleActionPressed}
+      onCancelPress={handleClosePress}
+      showActionButton={backingUpStatus === '' || backingUpStatus === 'complete' || backingUpStatus === 'error'}
+      showCancelButton={backingUpStatus === ''}
+    >
       {backingUpStatus === '' ? (
-          <View>
-            <View style={overlayStyles.overlayContent}>
-              {backupAction === 'save' ? renderSaveMessage() : renderExportMessage()}
-              <TextInput
-                onChangeText={validateFileName}
-                style={[overlayStyles.inputContainer, {width: '100%'}]}
-                value={backupAction === 'save' ? fileName : exportFileName}
-              />
-            </View>
-            {isFileNameError && <Text style={overlayStyles.importantText}>File Name Error!</Text>}
-            <Text style={overlayStyles.statusMessageText}>
-              *File names may not contain spaces or special characters, other than a dash or underscore.
-              Do not use a file extension.
+        <View style={{padding: 16}}>
+          {/* Instruction Text */}
+          <Text style={{fontSize: 16, marginBottom: 12, color: '#444'}}>
+            {backupAction === 'save' ? (
+              'All datasets will be saved locally, along with any images and custom maps.'
+            ) : (
+              Platform.OS === 'ios'
+                ? 'Your project will be saved as a .zip in the Distribution folder.\n\nMove it out of StraboField using the iOS Files app.\n\nZipped project will be saved as:'
+                : 'Your project will be exported as a .zip into the Downloads folder on Android.\n\nZipped project will be exported as:'
+            )}
+          </Text>
+
+          {/* File Name Input */}
+          <Text style={{fontWeight: '600', marginBottom: 6}}>File Name</Text>
+          <TextInput
+            onChangeText={validateFileName}
+            style={[
+              {
+                borderWidth: 1,
+                borderColor: isFileNameError ? 'red' : '#ccc',
+                borderRadius: 8,
+                padding: 10,
+                marginBottom: 8,
+                fontSize: 15,
+                backgroundColor: '#fafafa',
+              },
+            ]}
+            value={backupAction === 'save' ? fileName : exportFileName}
+          />
+          {isFileNameError && (
+            <Text style={{color: 'red', marginBottom: 8, fontSize: 13}}>
+              File Name Error! Only letters, numbers, dashes, or underscores allowed.
             </Text>
-            <View style={overlayStyles.buttonContainer}>
-              <Button
-                disabled={backupFileName.trim() === '' || isFileNameError}
-                onPress={backupAction === 'save' ? initiateBackup : exportProject}
-                title={getButtonTitle()}
-              />
-            </View>
-          </View>
-        )
-        : renderBackingUpView()
-      }
+          )}
+          <Text style={{fontSize: 12, color: '#666', marginBottom: 16}}>
+            *File names cannot contain spaces or special characters. Do not include a file extension.
+          </Text>
+        </View>
+      ) : (
+        renderBackingUpView()
+      )}
     </ModalWrapper>
   );
 };

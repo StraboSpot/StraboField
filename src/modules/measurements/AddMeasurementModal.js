@@ -14,7 +14,7 @@ import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
@@ -227,28 +227,28 @@ const AddMeasurementModal = ({onPress}) => {
               </>
 
             )}
-            {isManualMeasurement ? <AddManualMeasurements formProps={formProps} measurementType={typeKey}/>
-              : (
-                <>
-                  <Compass
-                    formValues={formProps.values}
-                    setMeasurements={setMeasurements}
-                    sliderValue={sliderValue}
+            {isManualMeasurement ? (
+              <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
+            ) : (
+              <>
+                <Compass
+                  formValues={formProps.values}
+                  setMeasurements={setMeasurements}
+                  sliderValue={sliderValue}
+                />
+                <View style={compassStyles.sliderContainer}>
+                  <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
+                  <SliderBar
+                    labels={['Low', '', '', '', 'High', 'N/R']}
+                    maximumValue={6}
+                    minimumValue={1}
+                    onSlidingComplete={setSliderValue}
+                    step={1}
+                    value={sliderValue}
                   />
-                  <View style={compassStyles.sliderContainer}>
-                    <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
-                    <SliderBar
-                      labels={['Low', '', '', '', 'High', 'N/R']}
-                      maximumValue={6}
-                      minimumValue={1}
-                      onSlidingComplete={setSliderValue}
-                      step={1}
-                      value={sliderValue}
-                    />
-                  </View>
-                </>
-              )
-            }
+                </View>
+              </>
+            )}
             {measurementTypeForForm === MEASUREMENT_KEYS.PLANAR
               && getPlanarTemplates(relevantTemplates).length <= 1 && (
                 <>
@@ -286,13 +286,15 @@ const AddMeasurementModal = ({onPress}) => {
   const renderMeasurementModalContent = () => {
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     const formName = [groupKey, measurementTypeForForm];
-    const saveTitle = 'Save ' + typeObj.save_title + (relevantTemplates.length > 1 ? 's' : '');
     return (
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
-        onPress={onPress}
+        onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <>
           {measurementTypeForForm && (
@@ -316,7 +318,7 @@ const AddMeasurementModal = ({onPress}) => {
             />
           )}
           {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <SaveButton onPress={saveMeasurement} title={saveTitle}/>
+            <ActionButton onPress={saveMeasurement}/>
           )}
         </>
       </ModalWrapper>

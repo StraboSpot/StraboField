@@ -1,10 +1,189 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
   <title>RN Web</title>
+  <script>
+    // Global require polyfill - must be loaded before any other scripts
+    console.log('Loading require polyfill...');
+    console.log('Current require status:', typeof require);
+
+    if (typeof require === 'undefined') {
+      console.log('Setting up require polyfill');
+
+      window.require = function (module) {
+        console.warn('require() called for module:', module, 'but require is not available in web environment');
+        console.trace('require() call stack:');
+
+        if (module === 'react') {
+          console.log('Returning React from window');
+          return window.React || {
+            createElement: function (component, props, ...children) {
+              console.warn('React.createElement fallback called');
+              return null;
+            },
+            createContext: function (defaultValue) {
+              console.warn('React.createContext fallback called');
+              return {
+                Consumer: function () {
+                  return null;
+                }, Provider: function () {
+                  return null;
+                },
+              };
+            },
+          };
+        }
+
+        if (module === 'react-native-safe-area-context') {
+          console.log('Returning polyfilled react-native-safe-area-context');
+
+          const React = window.React || {
+            createElement: function (component, props, ...children) {
+              if (typeof component === 'string') {
+                return children[0] || null;
+              }
+              return children[0] || null;
+            },
+            createContext: function (defaultValue) {
+              return {
+                Consumer: function ({children}) {
+                  return children ? children(defaultValue) : null;
+                },
+                Provider: function ({children}) {
+                  return children || null;
+                },
+              };
+            },
+          };
+
+          const mockInsets = {top: 0, right: 0, bottom: 0, left: 0};
+          const mockFrame = {x: 0, y: 0, width: window.innerWidth, height: window.innerHeight};
+
+          const SafeFallbackComponent = function SafeFallbackComponent({children}) {
+            console.warn('Using safe fallback component for undefined export');
+            return children || null;
+          };
+
+          const exports = {
+            SafeAreaProvider: function SafeAreaProvider({children}) {
+              return children || null;
+            },
+            SafeAreaView: function SafeAreaView({children, style, ...props}) {
+              return children || null;
+            },
+            SafeAreaListener: function SafeAreaListener() {
+              return null;
+            },
+            useSafeAreaInsets: function useSafeAreaInsets() {
+              return mockInsets;
+            },
+            useSafeAreaFrame: function useSafeAreaFrame() {
+              return mockFrame;
+            },
+            useSafeArea: function useSafeArea() {
+              return mockInsets;
+            },
+            SafeAreaInsetsContext: React && React.createContext ? React.createContext(mockInsets) : null,
+            SafeAreaFrameContext: React && React.createContext ? React.createContext(mockFrame) : null,
+            SafeAreaContext: React && React.createContext ? React.createContext(mockInsets) : null,
+            SafeAreaConsumer: (function () {
+              if (React && React.createContext) {
+                const context = React.createContext(mockInsets);
+                return context ? context.Consumer : null;
+              }
+              return null;
+            })(),
+            withSafeAreaInsets: function withSafeAreaInsets(WrappedComponent) {
+              return function WithSafeAreaInsets(props) {
+                return WrappedComponent ? WrappedComponent({...props, insets: mockInsets}) : null;
+              };
+            },
+          };
+
+          return new Proxy(exports, {
+            get: function (target, prop) {
+              if (prop in target) {
+                return target[prop];
+              }
+              console.warn('Accessed undefined export:', prop,
+                'from react-native-safe-area-context, returning safe fallback');
+              return SafeFallbackComponent;
+            },
+          });
+        }
+
+        if (module === 'react-native-screens') {
+          console.log('Returning polyfilled react-native-screens');
+
+          const React = window.React || {
+            createElement: function (component, props, ...children) {
+              if (typeof component === 'string') {
+                return children[0] || null;
+              }
+              return children[0] || null;
+            },
+          };
+
+          const ScreenFallbackComponent = function ScreenFallbackComponent({children, ...props}) {
+            return children || null;
+          };
+
+          const exports = {
+            Screen: ScreenFallbackComponent,
+            ScreenContainer: ScreenFallbackComponent,
+            ScreenStack: ScreenFallbackComponent,
+            ScreenStackHeaderConfig: ScreenFallbackComponent,
+            ScreenStackHeaderLeftView: ScreenFallbackComponent,
+            ScreenStackHeaderRightView: ScreenFallbackComponent,
+            ScreenStackHeaderTitleView: ScreenFallbackComponent,
+            ScreenStackHeaderCenterView: ScreenFallbackComponent,
+            NativeScreen: ScreenFallbackComponent,
+            NativeScreenContainer: ScreenFallbackComponent,
+            NativeScreenNavigationContainer: ScreenFallbackComponent,
+            createNativeStackNavigator: function () {
+              return {Navigator: ScreenFallbackComponent, Screen: ScreenFallbackComponent};
+            },
+            enableScreens: function () {
+              console.log('enableScreens called (no-op on web)');
+            },
+            screensEnabled: function () {
+              return false;
+            },
+          };
+
+          return new Proxy(exports, {
+            get: function (target, prop) {
+              if (prop in target) {
+                return target[prop];
+              }
+              console.warn('Accessed undefined export:', prop, 'from react-native-screens, returning screen fallback');
+              return ScreenFallbackComponent;
+            },
+          });
+        }
+
+        console.warn('Returning empty object with proxy for module:', module);
+        return new Proxy({}, {
+          get: function (target, prop) {
+            console.warn('Accessed undefined export:', prop, 'from module:', module, 'returning safe fallback');
+            return function SafeFallbackComponent({children}) {
+              return children || null;
+            };
+          },
+        });
+      };
+
+      global = global || window;
+      global.require = window.require;
+      console.log('Require polyfill setup complete');
+    }
+    else {
+      console.log('require is already defined');
+    }
+  </script>
   <style>
       #app-root {
           display: flex;

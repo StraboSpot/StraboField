@@ -12,6 +12,7 @@ import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -20,6 +21,7 @@ import {useTags} from '../tags';
 const OtherFeatureDetail = ({
                               featureTypes,
                               hideFeatureDetail,
+                              isReadOnly,
                               selectedFeature,
                             }) => {
   const dispatch = useDispatch();
@@ -181,12 +183,14 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              <Button
-                onPress={() => deleteFeatureConfirm()}
-                title={'Delete Feature'}
-                titleStyle={{color: WARNING_COLOR}}
-                type={'clear'}
-              />
+              {!isReadOnly && (
+                <Button
+                  onPress={() => deleteFeatureConfirm()}
+                  title={'Delete Feature'}
+                  titleStyle={{color: WARNING_COLOR}}
+                  type={'clear'}
+                />
+              )}
             </View>
           )}
         </Formik>
@@ -265,10 +269,13 @@ const OtherFeatureDetail = ({
 
   return (
     <>
-      <SaveAndCancelButtons
-        cancel={() => cancelForm()}
-        save={() => saveForm(formRef.current)}
-      />
+      <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={'Other Feature Detail'}/>
+      {!isReadOnly && (
+        <SaveAndCancelButtons
+          cancel={cancelForm}
+          save={() => saveForm(formRef.current)}
+        />
+      )}
       <FlatList ListHeaderComponent={renderForm()}/>
     </>
   );

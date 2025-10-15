@@ -1,31 +1,35 @@
-import React from 'react';
-import {Platform, Text} from 'react-native';
+import React, {useRef} from 'react';
+import {Platform, ScrollView, Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-import StatusDialogBox from './StatusDialogBox';
 import {setIsErrorMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const ErrorModal = ({closeModal, children, isVisible}) => {
+  const scrollView = useRef();
+
   const dispatch = useDispatch();
   const isErrorMessagesModalVisible = useSelector(state => state.home.isErrorMessagesModalVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
 
-  const closeErrorModal = () => {
-    dispatch(setIsErrorMessagesModalVisible(false));
-  };
-
   return (
-    <StatusDialogBox
-      closeModal={closeModal || closeErrorModal}
-      isVisible={isVisible || isErrorMessagesModalVisible}
-      overlayTitleText={overlayStyles.titleTextError}
-      showCancelButton={!(Platform.OS === 'web' && statusMessages.includes('Error loading project!'))}
-      title={'Error!'}
+    <ModalWrapper
+      actionTitle={'Ok'}
+      headerTitle={'Error!'}
+      isVisible={isErrorMessagesModalVisible}
+      onActionPressed={() => dispatch(setIsErrorMessagesModalVisible(false))}
+      showActionButton={!(Platform.OS === 'web' && statusMessages.includes('Error loading project!'))}
+      showCancelButton={false}
     >
-      <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
-    </StatusDialogBox>
+      <ScrollView
+        onContentSizeChange={() => scrollView.current.scrollToEnd({animated: true})}
+        ref={scrollView}
+      >
+        <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
+      </ScrollView>
+    </ModalWrapper>
   );
 };
 

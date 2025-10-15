@@ -4,211 +4,134 @@
       "type": "begin_group",
       "name": "group_ck6ux23",
       "label": "Pedogenic Structures",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false"
     },
     {
       "type": "select_multiple da8ok49",
       "name": "paleosol_horizons",
       "label": "Master Paleosol Horizons",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_horizon",
       "label": "Other Horizon",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'other')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'other')"
     },
     {
       "type": "decimal",
       "name": "o_horizon_thickness_cm",
       "label": "O Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'o')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'o')"
     },
     {
       "type": "decimal",
       "name": "a_horizon_thickness_cm",
       "label": "A Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'a')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'a')"
     },
     {
       "type": "decimal",
       "name": "e_horizon_thickness_cm",
       "label": "E Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'e')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'e')"
     },
     {
       "type": "decimal",
       "name": "b_horizon_thickness_cm",
       "label": "B Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'b')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'b')"
     },
     {
       "type": "decimal",
       "name": "k_horizon_thickness_cm",
       "label": "K Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'k')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'k')"
     },
     {
       "type": "decimal",
       "name": "c_horizon_thickness_cm",
       "label": "C Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'c')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'c')"
     },
     {
       "type": "decimal",
       "name": "r_horizon_thickness_cm",
       "label": "R Horizon thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'r')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'r')"
     },
     {
       "type": "decimal",
       "name": "compound_thickness_cm",
       "label": "Compound thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'compound')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'compound')"
     },
     {
       "type": "decimal",
       "name": "composite_thickness_cm",
       "label": "Composite thickness (cm)",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_horizons}, 'composite')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_horizons}, 'composite')"
     },
     {
       "type": "select_multiple lg4oy98",
       "name": "paleosol_structures",
-      "label": "Paleosol structures",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Paleosol Structures",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_structure",
       "label": "Other Paleosol Structure",
-      "required": false,
-      "read_only": false,
-      "relevant": "selected(${paleosol_structures}, 'other')",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "relevant": "selected(${paleosol_structures}, 'other')"
     },
     {
       "type": "text",
       "name": "additional_modifiers",
-      "label": "Additional modifiers",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Additional Modifiers",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "select_multiple hu6nm09",
       "name": "paleosol_classification",
-      "label": "Paleosol classification (after Soil Survey Staff, 1999; Retallack, 2001)",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "label": "Paleosol Classification (after Soil Survey Staff, 1999; Retallack, 2001)",
+      "required": "false",
+      "read_only": "false"
     },
     {
       "type": "text",
       "name": "notes",
       "label": "Notes",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
+      "required": "false",
+      "read_only": "false",
+      "appearance": "multiline"
     },
     {
-      "type": "end_group",
-      "name": "",
-      "label": "",
-      "required": "",
-      "read_only": "",
-      "relevant": "",
-      "calculation": "",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "'v5hWSTnHxSBfsy5RxjeR57'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "calculation": "'vVRpoaJJ7NVACKq8ssCHcR'",
-      "$given_name": "__version__"
-    },
-    {
-      "type": "calculate",
-      "name": "_version__001",
-      "label": "",
-      "required": "",
-      "read_only": "",
-      "relevant": "",
-      "calculation": "'vBqw7dxiSkhHD4YAcUqiGJ'",
-      "$given_name": "__version__"
+      "type": "end_group"
     }
   ],
   "choices": [
@@ -360,8 +283,7 @@
   ],
   "settings": [
     {
-      "id_string": "SS1 Copy",
-      "version": "2 (2021-1-25)"
+      "version": "vVRpoaJJ7NVACKq8ssCHcR"
     }
   ]
 }

@@ -20,14 +20,19 @@ import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 
-const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddButton, showFeaturesTagButton}) => {
+const NotebookPageHeader = ({
+                              hideBackButton,
+                              onPressAdd,
+                              onPressBack,
+                              pageTitle,
+                              showAddButton,
+                              showFeaturesTagButton,
+                            }) => {
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
 
-  const toggleFeaturesTagButton = () => {
-    dispatch(setMultipleFeaturesTaggingEnabled(!isMultipleFeaturesTaggingEnabled));
-  };
+  const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
 
   const selectTagsForFeatures = () => {
     if (isEmpty(selectedFeaturesForTagging)) {
@@ -36,6 +41,11 @@ const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddB
     }
     else dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.FEATURE_TAGS}));
   };
+
+  const toggleFeaturesTagButton = () => {
+    dispatch(setMultipleFeaturesTaggingEnabled(!isMultipleFeaturesTaggingEnabled));
+  };
+
   return (
     <>
       <View style={{flexDirection: 'row', backgroundColor: PRIMARY_BACKGROUND_COLOR}}>
@@ -44,7 +54,7 @@ const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddB
             <Icon
               iconStyle={mainMenuPanelStyles.buttons}
               name={'arrow-back'}
-              onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+              onPress={onPressBack || returnToOverview}
               size={30}
               type={'ionicon'}
             />
@@ -97,4 +107,4 @@ const ReturnToOverviewButton = ({hideBackButton, onPressAdd, pageTitle, showAddB
   );
 };
 
-export default ReturnToOverviewButton;
+export default NotebookPageHeader;

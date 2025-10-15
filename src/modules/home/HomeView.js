@@ -66,7 +66,6 @@ const HomeView = forwardRef(({
         closeMainMenuPanel={closeMainMenuPanel}
         dialogClickHandler={dialogClickHandler}
         dialogs={dialogs}
-        mapComponentRef={mapComponentRef}
         openMainMenuPanel={openMainMenuPanel}
         toggleDialog={toggleDialog}
       />

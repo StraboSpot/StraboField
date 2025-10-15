@@ -23,6 +23,7 @@ export const PRIMARY_BACKGROUND_COLOR = LIGHTGREY;
 export const SECONDARY_BACKGROUND_COLOR = WHITE;
 
 export const PRIMARY_TEXT_COLOR = BLACK;
+export const SECONDARY_TEXT_COLOR = WHITE;
 
 export const PRIMARY_ACCENT_COLOR = BLUE;
 export const PRIMARY_ACCENT_COLOR_FADED_20 = BLUE_FADED_20;
@@ -37,7 +38,7 @@ export const WARNING_COLOR = RED;
 
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 
-export const TEXT_WEIGHT = '500';
+export const TEXT_WEIGHT_500 = '500';
 export const TEXT_WEIGHT_700 = '700';
 export const PRIMARY_TEXT_SIZE = Platform.OS === 'web' ? 12 : 16;
 export const PRIMARY_HEADER_TEXT_SIZE = Platform.OS === 'web' ? 14 : 20;
@@ -52,6 +53,7 @@ export const MODAL_BORDER_RADIUS = 10;
 
 export const UPDATE_LABEL_WIDTH = 150;
 export const UPDATE_LABEL_HEIGHT = 150;
+export const MODAL_BACKDROP = 'rgba(0, 0, 0, 0.5)';
 
 // Home Menu and Notebook widths
 export const MAIN_MENU_DRAWER_WIDTH = 300;

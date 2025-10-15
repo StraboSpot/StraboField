@@ -12,6 +12,7 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
+import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
@@ -19,6 +20,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   console.log('Rendering ImageGallery...');
 
   const navigate = useNavigation();
+  const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
 
   const dispatch = useDispatch();
@@ -29,7 +31,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
   let sortedSpotsWithImages = [];
 
@@ -40,12 +42,13 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
-  const renderImagesInSpot = (images) => {
-    return <ImagesList images={images} isThumbnailOnly openImage={openImage}/>;
+  const renderImagesInSpot = (images, section) => {
+    const isReadOnly = !isEmpty(section.spot) && isSpotInReadOnlyDataset(section.spot.properties.id);
+    return <ImagesList images={images} isReadOnly={isReadOnly} isThumbnailOnly openImage={openImage}/>;
   };
 
   const renderNoImagesText = () => {
-    return <ListEmptyText text={'No Images in Active Datasets'}/>;
+    return <ListEmptyText text={'No Images in Visible Datasets'}/>;
   };
 
   const renderSectionHeader = ({spot}) => {
@@ -87,13 +90,13 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in active Spots
+            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
           </Text>
           <LittleSpacer/>
           <SectionList
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
             keyExtractor={(item, index) => item + index}
-            renderItem={({item}) => renderImagesInSpot(item)}
+            renderItem={({item, section}) => renderImagesInSpot(item, section)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
             sections={spotsAsSections}
             stickySectionHeadersEnabled={true}

@@ -32,8 +32,8 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
   const FoldGeometryEditButton = () => (
     <Button
       buttonStyle={[formStyles.formButtonSmall, {
-        height: 49,
-        width: 49,
+        // height: 49,
+        // width: 49,
         backgroundColor: SECONDARY_BACKGROUND_COLOR,
         padding: 0,
       }]}

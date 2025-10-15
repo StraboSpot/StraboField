@@ -6,6 +6,7 @@ import uiStyles from './ui.styles';
 import * as themes from '../styles.constants';
 
 const SliderBar = ({
+                     disabled = false,
                      isHideLabels,
                      labels,
                      maximumValue,
@@ -20,6 +21,7 @@ const SliderBar = ({
   return (
     <>
       <Slider
+        disabled={disabled}
         maximumTrackTintColor={themes.MEDIUMGREY}
         maximumValue={maximumValue}
         minimumTrackTintColor={themes.MEDIUMGREY}

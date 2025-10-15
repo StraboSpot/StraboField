@@ -1,17 +1,18 @@
 import React from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, Platform} from 'react-native';
 
-import {ListItem, Overlay} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {overlayStyles} from './index';
 import commonStyles from '../../../shared/common.styles';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const MapActionsOverlay = ({
                              onPress,
                              onTouchOutside,
-                             overlayStyle,
                              visible,
                            }) => {
 
@@ -59,11 +60,24 @@ const MapActionsOverlay = ({
 
     return (
       <ListItem
-        containerStyle={commonStyles.listItem}
+        containerStyle={[
+          commonStyles.listItem,
+          SMALL_SCREEN && {
+            minHeight: 50,
+            paddingVertical: 15,
+            paddingHorizontal: 20,
+          },
+        ]}
         key={item.key}
         onPress={() => onPress(item.key)}
       >
-        <ListItem.Title style={commonStyles.listItemTitle}>
+        <ListItem.Title style={[
+          commonStyles.listItemTitle,
+          SMALL_SCREEN && {
+            fontSize: 16,
+            fontWeight: '500',
+          },
+        ]}>
           {item.title}
         </ListItem.Title>
       </ListItem>
@@ -71,25 +85,30 @@ const MapActionsOverlay = ({
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
-      backdropStyle={{backgroundColor: 'transparent'}}
+    <ModalWrapper
+      closeModal={onTouchOutside}
+      fullscreen={SMALL_SCREEN}
+      headerTitle={'Map Actions'}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyle={[overlayStyles.overlayContainer, overlayStyle]}
-      supportedOrientations={['portrait', 'landscape']}
+      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={SMALL_SCREEN}
     >
-      <View style={[overlayStyles.titleContainer]}>
-        <Text style={[overlayStyles.titleText]}>Map Actions</Text>
-      </View>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        contentContainerStyle={{alignItems: 'center'}}
+        contentContainerStyle={{
+          alignItems: 'center',
+          paddingVertical: SMALL_SCREEN ? 20 : 0,
+          flexGrow: SMALL_SCREEN ? 1 : 0,
+        }}
         data={actions}
         key={'mapActions'}
         renderItem={({item}) => mapActionItem(item)}
+        style={{width: '100%'}}
       />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

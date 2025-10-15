@@ -19,6 +19,7 @@ import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, PAGE_KEYS, SUBPAGES} from '../page/page.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
+import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
@@ -28,13 +29,13 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
-  const recentlyViewedSpotIds = useSelector(state => state.spot.recentViews);
   const spot = useSelector(state => state.spot.selectedSpot);
-  const spots = useSelector(state => state.spot.spots);
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
-  const {getRootSpot, getSpotsSortedReverseChronologically, handleSpotSelected} = useSpots();
+  const {isSpotInReadOnlyDataset} = useProject();
+  const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
 
+  const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const pageVisible = pagesStack.slice(-1)[0];
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const openPage = (key) => {
     dispatch(setNotebookPageVisible(key));
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+    if (SMALL_SCREEN || isReadOnly) dispatch(setModalVisible({modal: null}));
     else if (page.modal_component) {
       const populatedPagesKeys = getPopulatedPagesKeys(spot);
       if (populatedPagesKeys.includes(page.key)) dispatch(setModalVisible({modal: null}));
@@ -65,7 +66,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     let pageKey = isRelevantPage ? pageVisible : PAGE_KEYS.OVERVIEW;
     const page = NOTEBOOK_PAGES.find(p => p.key === pageKey);
     const Page = page?.page_component || Overview;
-    let pageProps = {openMainMenuPanel: openMainMenuPanel, page: page};
+    let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
     return (
       <>
@@ -73,6 +74,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           <NotebookHeader
             closeNotebookPanel={closeNotebookPanel}
             createDefaultGeom={createDefaultGeom}
+            isReadOnly={isReadOnly}
+            openMainMenuPanel={openMainMenuPanel}
             zoomToSpots={zoomToSpots}
           />
         </View>
@@ -117,11 +120,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   };
 
   const renderRecentSpotsList = () => {
-    let spotsList = recentlyViewedSpotIds.reduce((obj, key) => {
-      if (spots?.[key]) obj.push(spots[key]);
-      return obj;
-    }, []);
-    if (isEmpty(spotsList)) spotsList = getSpotsSortedReverseChronologically();
+    let spotsList = getRecentSpots();
+    if (isEmpty(spotsList)) {
+      const activeSpotsObj = getActiveSpotsObj();
+      const activeSpots = Object.values(activeSpotsObj);
+      spotsList = sortSpotsByDateCreated(activeSpots);
+    }
 
     return (
       <View style={notebookStyles.centerContainer}>
@@ -129,7 +133,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         <SectionDivider dividerText={'Recent Spots'}/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
+          ListEmptyComponent={<ListEmptyText text={'No Spots in Visible Datasets'}/>}
           data={spotsList}
           keyExtractor={item => item.properties.id.toString()}
           renderItem={({item}) => (

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Pressable, ScrollView, Text, View} from 'react-native';
+import {Dimensions, FlatList, Pressable, ScrollView, Text, View} from 'react-native';
 
-import {Icon, Overlay} from '@rn-vui/base';
+import {Icon} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
 
 import externalDataStyles from './externalData.styles';
@@ -9,6 +9,7 @@ import {toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 function TablesData({
                       editable,
@@ -41,28 +42,41 @@ function TablesData({
       });
     });
     const cellWidths = cellMaxWidths.map(w => Math.min(w * 20, 150));
+    const totalTableWidth = cellWidths.reduce((sum, width) => sum + width, 0);
 
-    return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed};
+    return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed, totalTableWidth: totalTableWidth};
   };
 
   const renderTable = async () => {
-    const {cellWidths, tableDataTrimmed} = await getTableData();
+    const {cellWidths, tableDataTrimmed, totalTableWidth} = await getTableData();
     const tableName = toTitleCase(selectedTable?.name.replace(/[_-]/g, ' '));
+
+    const screenWidth = Dimensions.get('window').width;
+    const padding = 32; // 16px padding on each side
+    const modalPadding = 20; // Additional modal padding
+    const minModalWidth = 400;
+    const maxModalWidth = screenWidth * 0.9;
+
+    const requiredWidth = totalTableWidth + padding + modalPadding;
+    const dynamicWidth = Math.max(minModalWidth, Math.min(requiredWidth, maxModalWidth));
+
+    const dynamicOverlayStyle = {
+      ...externalDataStyles.overlayContainer,
+      width: dynamicWidth,
+      minWidth: minModalWidth,
+    };
+
     return (
-      <Overlay
+      <ModalWrapper
+        closeModal={closeTable}
+        headerTitle={loading ? 'Loading Table...' : tableName}
         isVisible={isTableVisible}
-        onBackdropPress={() => setIsTableVisible(false)}
-        overlayStyle={loading ? externalDataStyles.loadingContainer : externalDataStyles.overlayContainer}
-        supportedOrientations={['portrait', 'landscape']}
+        overlayStyleOverride={loading ? externalDataStyles.loadingContainer : dynamicOverlayStyle}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <View style={externalDataStyles.modalContent}>
-          <View style={externalDataStyles.modalHeader}>
-            <Text style={externalDataStyles.modalTitle}>{loading ? 'Loading Table...' : tableName}</Text>
-            <Pressable onPress={closeTable}>
-              <Icon color={'#333'} name={'close'} size={30} type={'ionicon'}/>
-            </Pressable>
-          </View>
-
           {loading ? (
             <Loading isLoading={loading} style={{backgroundColor: 'transparent'}}/>
           ) : (
@@ -81,7 +95,7 @@ function TablesData({
             </ScrollView>
           )}
         </View>
-      </Overlay>
+      </ModalWrapper>
     );
   };
 

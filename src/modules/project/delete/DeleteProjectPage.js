@@ -22,6 +22,7 @@ const DeleteProjectPage = () => {
 
   useEffect(() => {
     //  Need to reload page after saved project deleted
+    console.log('doReloadPage: ', doReloadPage);
   }, [doReloadPage]);
 
   const {openURL} = useDevice();
@@ -65,13 +66,14 @@ const DeleteProjectPage = () => {
       </View>
 
       {/* Modal */}
-      {isDeleteProjectModalVisible && (
-        <DeleteProjectModal
-          closeModal={closeDeleteProjectModal}
-          projectToDeleteFilename={projectToDeleteFilename}
-          setDoReloadPage={setDoReloadPage}
-        />
-      )}
+      {/*{isDeleteProjectModalVisible && (*/}
+      <DeleteProjectModal
+        closeModal={closeDeleteProjectModal}
+        isDeleteProjectModalVisible={isDeleteProjectModalVisible}
+        projectToDeleteFilename={projectToDeleteFilename}
+        setDoReloadPage={setDoReloadPage}
+      />
+      {/*)}*/}
     </>
   );
 };

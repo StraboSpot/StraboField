@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import deleteProjectModalStyle from './deleteProjectModalStyle';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import StatusDialogBox from '../../../shared/ui/modals/StatusDialogBox';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 
-const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPage}) => {
+const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
 
   const DELETE_STATUS = {
     IN_PROGRESS: 'in_progress',
@@ -34,21 +33,23 @@ const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPag
     }
   };
 
-  const handleConfirmPress = () => {
-    if (deleteProjectStatus === DELETE_STATUS.PENDING) deleteProjectFromLocalStorage();
-    else closeModal();
+  const handleConfirmPress = async () => {
+    if (deleteProjectStatus === DELETE_STATUS.PENDING) await deleteProjectFromLocalStorage();
+    else {
+      closeModal();
+      setDeleteProjectStatus(DELETE_STATUS.PENDING);
+    }
   };
 
   return (
-    <StatusDialogBox
-      closeModal={closeModal}
-      closeTitle={'Cancel'}
-      confirmText={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
-      isVisible={true}
-      onConfirmPress={handleConfirmPress}
+    <ModalWrapper
+      actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
+      headerTitle={'Delete Locally Saved Project'}
+      isVisible={isDeleteProjectModalVisible}
+      onActionPressed={handleConfirmPress}
+      onCancelPress={closeModal}
+      showActionButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
       showCancelButton={deleteProjectStatus === DELETE_STATUS.PENDING}
-      showConfirmButton={deleteProjectStatus === DELETE_STATUS.PENDING || deleteProjectStatus !== DELETE_STATUS.IN_PROGRESS}
-      title={'Delete Locally Saved Project'}
     >
       <View style={overlayStyles.overlayContent}>
         {deleteProjectStatus === DELETE_STATUS.PENDING ? (
@@ -59,12 +60,13 @@ const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPag
           </Text>
         ) : (
           <>
-            <Text style={deleteProjectModalStyle.contentText}>
+            <Text style={overlayStyles.contentText}>
               {deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'Deleting ' + projectToDeleteFilename
                 : deleteProjectStatus === DELETE_STATUS.SUCCESS ? projectToDeleteFilename + ' has been deleted'
                   : 'Error deleting ' + projectToDeleteFilename}
             </Text>
             <LottieAnimations
+              doesLoop={false}
               type={deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'deleteProject'
                 : deleteProjectStatus === DELETE_STATUS.SUCCESS ? 'complete'
                   : 'error'}
@@ -72,7 +74,7 @@ const DeleteProjectModal = ({closeModal, projectToDeleteFilename, setDoReloadPag
           </>
         )}
       </View>
-    </StatusDialogBox>
+    </ModalWrapper>
   );
 };
 

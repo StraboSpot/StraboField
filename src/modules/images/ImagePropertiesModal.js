@@ -5,10 +5,11 @@ import {Formik} from 'formik';
 
 import {imageStyles} from '.';
 import {SwitchWrapper} from '../../shared/ui';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToView}) => {
+const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
@@ -21,7 +22,7 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
     console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
     return (
       <Formik
-        component={formProps => Form({formName: formName, ...formProps})}
+        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
         initialStatus={{formName: formName}}
         initialValues={image}
         innerRef={formRef}
@@ -50,21 +51,25 @@ const ImagePropertiesModal = ({closeModal, image, saveUpdatedImage, setImageToVi
 
   return (
     <ModalWrapper
-      buttonTitleLeft={'Cancel'}
-      buttonTitleRight={'Save'}
-      cancel={closeModal}
-      closeModal={saveFormAndGo}
-      title={'Image Properties'}
+      closeModal={closeModal}
+      headerTitle={'Image Properties'}
+      isVisible={isVisible}
+      onActionPressed={saveFormAndGo}
+      overlayStylesOverride={{height: '90%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
     >
       <FlatList
         ListFooterComponent={
           <View style={imageStyles.switch}>
             <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
-            <SwitchWrapper onValueChange={setIsAnnotated} value={isAnnotated}/>
+            <SwitchWrapper disabled={isReadOnly} onValueChange={setIsAnnotated} value={isAnnotated}/>
           </View>
         }
         ListHeaderComponent={renderFormFields()}
       />
+      {!isReadOnly && <ActionButton onPress={saveFormAndGo}/>}
     </ModalWrapper>
   );
 };

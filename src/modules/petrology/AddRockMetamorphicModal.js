@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 
 import {isEmpty} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ModalWrapperHeader from '../../shared/ui/modals/ModalWrapperHeader';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
 
@@ -70,21 +69,14 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
   const renderFaciesModal = () => {
     const faciesModalWidth = width > 520 ? 700 : '90%';
     return (
-      <Overlay
-        fullScreen={SMALL_SCREEN}
-        isVisible={true}
-        overlayStyle={SMALL_SCREEN ? overlayStyles.overlayContainerFullScreen : [overlayStyles.overlayContainer, overlayStyles.overlayPosition, {
-          width: faciesModalWidth,
-          left: 20,
-          height: '50%',
-        }]}
-        supportedOrientations={['portrait', 'landscape']}
+      <ModalWrapper
+        actionTitle={'Done'}
+        headerTitle={'Facies'}
+        onActionPressed={() => setIsFaciesModalVisible(false)}
+        overlayStyleOverride={{width: faciesModalWidth, left: 20, height: '50%'}}
+        showActionButton
+        showCancelButton={false}
       >
-        <ModalWrapperHeader
-          buttonTitleRight={'Done'}
-          closeModal={() => setIsFaciesModalVisible(false)}
-          title={'Facies'}
-        />
         <View style={{flex: 1, padding: 10}}>
           <ScrollView contentContainerStyle={{
             flexDirection: 'row',
@@ -160,7 +152,7 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
             </View>
           </View>
         </View>
-      </Overlay>
+      </ModalWrapper>
     );
   };
 

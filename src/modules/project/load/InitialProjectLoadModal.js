@@ -19,7 +19,7 @@ import projectStyles from '../project.styles';
 import OpenProjectPage from './OpenProjectPage';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
-const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
+const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');
 
   const dispatch = useDispatch();
@@ -118,14 +118,14 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
         return (
           <>
             {renderBackButton()}
-            <DownloadProjectPage openMainMenuPanel={openMainMenuPanel}/>
+            <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'deviceProjects':
         return (
           <>
             {renderBackButton()}
-            <OpenProjectPage/>
+            <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'project':
@@ -172,8 +172,10 @@ const InitialProjectLoadModal = ({openMainMenuPanel, visible}) => {
 
   return (
     <ModalWrapper
+      headerTitle={statusMessageModalTitle}
       overlayStyleOverride={{justifyContent: 'center', height: visibleInitialSection === 'none' ? null : '80%'}}
-      title={statusMessageModalTitle}
+      showActionButton={false}
+      showCancelButton={false}
     >
       {visibleInitialSection === 'none' && renderUserProfile()}
       {renderSectionView()}

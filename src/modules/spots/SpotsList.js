@@ -19,7 +19,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [isReverseSort, setIsReverseSort] = useState(false);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
   const renderNoSpotsText = () => <ListEmptyText text={textNoSpots}/>;
 
@@ -36,7 +36,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <SectionDivider
-          dividerText={spotsSearched.length + ' Active ' + (spotsSearched.length === 1 ? 'Spot' : 'Spots')}
+          dividerText={spotsSearched.length + ' Visible ' + (spotsSearched.length === 1 ? 'Spot' : 'Spots')}
         />
         <View style={{flex: 1}}>
           <FlatList

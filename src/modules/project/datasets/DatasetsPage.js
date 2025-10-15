@@ -1,30 +1,19 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import DatasetList from './DatasetList';
-import useDownload from '../../../services/useDownload';
-import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {WarningModal} from '../../../shared/ui/modals';
-import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
-import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setActiveDatasets, setTargetDataset} from '../projects.slice';
-import useProject from '../useProject';
+import DatasetDetail from './DatasetDetail';
+import DatasetsOverview from './DatasetsOverview';
 
-const DatasetsPage = ({setDatasetToView}) => {
-  const {initializeDownload} = useDownload();
-  const {addDataset} = useProject();
+const DatasetsPage = () => {
 
-  const [datasetName, setDatasetName] = useState(null);
-  const [isAddDatasetModalVisible, setIsAddDatasetModalVisible] = useState(false);
-  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+  const [datasetToView, setDatasetToView] = useState(null);
 
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const datasets = useSelector(state => state.project.datasets);
-  const project = useSelector(state => state.project.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   useEffect(() => {
@@ -38,64 +27,10 @@ const DatasetsPage = ({setDatasetToView}) => {
     }
   }, [datasets]);
 
-  const onAddDataset = async () => {
-    const addedDataset = await addDataset(datasetName);
-    console.log(addedDataset);
-    setIsAddDatasetModalVisible(false);
-  };
+  const closeDetailView = () => setDatasetToView(null);
 
-  const confirm = async () => {
-    setIsWarningModalVisible(false);
-    await initializeDownload(project);
-  };
-
-  const renderAddDatasetModal = () => {
-    return (
-      <TextInputModal
-        closeModal={() => setIsAddDatasetModalVisible(false)}
-        dialogTitle={'Add a Dataset'}
-        onChangeText={text => setDatasetName(text)}
-        onPress={onAddDataset}
-        value={datasetName}
-        visible={isAddDatasetModalVisible}
-      />
-    );
-  };
-
-  const renderWarningModal = () => {
-    return (
-      <WarningModal
-        closeModal={() => setIsWarningModalVisible(false)}
-        isVisible={isWarningModalVisible}
-        onConfirmPress={confirm}
-        showCancelButton={true}
-        showConfirmButton={true}
-        title={'Overwrite Warning!'}
-      >
-        <Text>This will OVERWRITE anything that has not been uploaded to the server</Text>
-      </WarningModal>
-    );
-  };
-
-  return (
-    <>
-      <View style={{flex: 1, flexDirection: 'column'}}>
-        <SectionDividerWithRightButton
-          dividerText={'Datasets'}
-          onPress={() => setIsAddDatasetModalVisible(true)}
-        />
-        <DatasetList setDatasetToView={setDatasetToView}/>
-        <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
-          <Text style={commonStyles.standardDescriptionText}>*Starred dataset will be set as the target dataset for new
-            Spots.</Text>
-        </View>
-      </View>
-
-      {/* Modals */}
-      {renderAddDatasetModal()}
-      {renderWarningModal()}
-    </>
-  );
+  return datasetToView ? <DatasetDetail closeDetailView={closeDetailView} dataset={datasetToView}/>
+    : <DatasetsOverview setDatasetToView={setDatasetToView}/>;
 };
 
 export default DatasetsPage;

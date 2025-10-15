@@ -23,7 +23,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const RockPage = ({page}) => {
+const RockPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -199,7 +199,7 @@ const RockPage = ({page}) => {
         return sectionTitle === title ? key : acc;
       },
       '');
-    if (sectionKey) {
+    if (sectionKey && !isReadOnly) {
       return (
         <SectionDividerWithRightButton
           dividerText={sectionTitle}
@@ -248,6 +248,7 @@ const RockPage = ({page}) => {
       <BasicPageDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={groupKey}
+        isReadOnly={isReadOnly}
         page={page}
         selectedFeature={selectedRock}
       />
@@ -258,7 +259,7 @@ const RockPage = ({page}) => {
     return (
       <View style={{flex: 1}}>
         <NotebookPageHeader pageTitle={page.label}/>
-        {renderCopySelect()}
+        {!isReadOnly && renderCopySelect()}
         {renderSections()}
       </View>
     );

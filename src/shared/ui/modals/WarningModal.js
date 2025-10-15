@@ -3,8 +3,8 @@ import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-import StatusDialogBox from './StatusDialogBox';
 import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const WarningModal = ({
@@ -28,20 +28,17 @@ const WarningModal = ({
   };
 
   return (
-    <StatusDialogBox
-      closeModal={closeModal}
-      closeTitle={closeTitle}
-      confirmText={confirmText}
-      confirmTitleStyle={confirmTitleStyle}
+    <ModalWrapper
+      actionTitle={confirmText || 'Ok'}
+      headerTitle={title || 'Warning!'}
       isVisible={isVisible || isWarningModalVisible}
-      onConfirmPress={onConfirmPress || closeWarningModal}
-      overlayTitleText={overlayStyles.titleTextWarning}
+      onActionPressed={onConfirmPress || closeWarningModal}
+      onCancelPress={closeModal}
+      showActionButton={showConfirmButton}
       showCancelButton={showCancelButton}
-      showConfirmButton={showConfirmButton || !showCancelButton}
-      title={title || 'Warning!'}
     >
       <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
-    </StatusDialogBox>
+    </ModalWrapper>
   );
 };
 

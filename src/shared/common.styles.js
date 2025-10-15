@@ -24,7 +24,7 @@ const commonStyles = StyleSheet.create({
   },
   importantText: {
     color: 'red',
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   listItem: {
@@ -70,7 +70,7 @@ const commonStyles = StyleSheet.create({
   },
   standardButtonContainer: {
     paddingBottom: 5,
-    paddingTop: 5,
+    paddingTop: 15,
   },
   standardButtonText: {
     color: themes.PRIMARY_ACCENT_COLOR,
@@ -88,7 +88,7 @@ const commonStyles = StyleSheet.create({
     textAlign: 'center',
   },
   textBold: {
-    fontWeight: themes.TEXT_WEIGHT,
+    fontWeight: themes.TEXT_WEIGHT_500,
   },
   textInput: {
     backgroundColor: 'white',

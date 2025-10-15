@@ -1,7 +1,10 @@
-import {Platform, StyleSheet} from 'react-native';
+import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../styles.constants';
 import {LIGHTGREY, SMALL_SCREEN} from '../../styles.constants';
+
+const platform = Platform.OS === 'ios' ? 'window' : 'screen';
+const {height} = Dimensions.get(platform);
 
 const styles = StyleSheet.create({
   animationContainer: {
@@ -14,12 +17,23 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 10,
     justifyContent: 'flex-end',
+    marginRight: 10,
     paddingTop: 10,
   },
+  buttonStyle: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR,
+    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+  },
   buttonText: {
-    color: themes.PRIMARY_TEXT_COLOR,
+    // color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
+  },
+  clearButtonText: {
+    color: themes.PRIMARY_ACCENT_COLOR,
   },
   closeButton: {
     alignItems: 'flex-end',
@@ -45,7 +59,8 @@ const styles = StyleSheet.create({
   },
   importantText: {
     color: 'red',
-    fontWeight: themes.TEXT_WEIGHT,
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   inputContainer: {
@@ -57,8 +72,8 @@ const styles = StyleSheet.create({
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
-    elevation: 2,
-    maxHeight: '80%',
+    elevation: 5,
+    maxHeight: height * 0.80,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: 300,
@@ -74,16 +89,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   overlayMapMenuPosition: {
-    bottom: SMALL_SCREEN ? 80 : 100,
+    bottom: 100,
     flex: 1,
-    left: SMALL_SCREEN ? 10 : 75,
+    left: 75,
     position: 'absolute',
-  },
-  overlayPosition: {
-    bottom: 60,
-    left: 70,
-    position: 'absolute',
-    zIndex: 1,
   },
   selectGeometryTypeContent: {
     alignItems: 'flex-start',
@@ -95,6 +104,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tagColorPickerColorItem: {
+    borderColor: 'white',
+    borderWidth: 1,
     height: 25,
     width: 25,
   },
@@ -111,7 +122,6 @@ const styles = StyleSheet.create({
   titleText: {
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    paddingBottom: 10,
     textAlign: 'center',
   },
   titleTextError: {

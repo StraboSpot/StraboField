@@ -9,31 +9,34 @@ import {useDispatch, useSelector} from 'react-redux';
 import {PAGE_KEYS} from './page.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
-import NoteForm from '../notes/NoteForm';
+import {overlayStyles} from '../home/overlays';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/IGSNModal';
+import IGSNUploadAndRegister from '../samples/IGSNUploadAndRegister';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
-import DeleteOverlay from './ui/DeleteOverlay';
-import IGSNUploadAndRegister from '../samples/IGSNUploadAndRegister';
+import {messages} from './ui/Messages';
 
 
 const BasicPageDetail = ({
                            closeDetailView,
                            deleteTemplate,
                            groupKey = 'general',
+                           isReadOnly,
                            page,
-                           openModal,
-                           selectedFeature,
                            saveTemplate,
+                           selectedFeature,
                          }) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -74,7 +77,7 @@ const BasicPageDetail = ({
 
   useLayoutEffect(() => {
     console.log('ULE BasicPageDetail []');
-    return () => confirmLeavePage();
+    return () => !isReadOnly && confirmLeavePage();
   }, []);
 
   useEffect(() => {
@@ -164,10 +167,13 @@ const BasicPageDetail = ({
   };
 
   const getIsDisabled = (fieldName) => {
-    return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
-      ? isInternetReachable
-        ? fieldName === 'Sample_IGSN' : true
-      : false;
+    if (isReadOnly) return true;
+    else {
+      return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
+        ? isInternetReachable
+          ? fieldName === 'Sample_IGSN' : true
+        : false;
+    }
   };
 
   const renderIGSNUpload = () => {
@@ -200,7 +206,7 @@ const BasicPageDetail = ({
     const formName = getFormName();
     return (
       <View style={{flex: 1}}>
-        {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && renderIGSNUpload()}
+        {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && renderIGSNUpload()}
         <Formik
           enableReinitialize={true}
           initialStatus={{formName: formName}}
@@ -215,6 +221,7 @@ const BasicPageDetail = ({
               <Form {...{
                 ...formProps,
                 formName: formName,
+                isReadOnly: isReadOnly,
                 onMyChange: page.key === PAGE_KEYS.MINERALS
                   ? ((name, value) => onMineralChange(formRef.current, name, value))
                   : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
@@ -228,29 +235,14 @@ const BasicPageDetail = ({
             </>
           )}
         </Formik>
-        <Button
-          onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          titleStyle={{color: themes.RED}}
-          type={'clear'}
-        />
-      </View>
-    );
-  };
-
-  const renderNotesField = () => {
-    return (
-      <View style={{flex: 1}}>
-        <NoteForm
-          formRef={formRef}
-          initialNotesValues={selectedFeature}
-        />
-        <Button
-          onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
-          title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-          titleStyle={{color: themes.RED}}
-          type={'clear'}
-        />
+        {!isReadOnly && (
+          <Button
+            onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+            title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+            titleStyle={{color: themes.RED}}
+            type={'clear'}
+          />
+        )}
       </View>
     );
   };
@@ -329,29 +321,52 @@ const BasicPageDetail = ({
     <>
       {(isTemplate || !isEmpty(selectedFeature)) && (
         <>
-          <SaveAndCancelButtons
-            cancel={cancelForm}
-            getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
-              && !selectedFeature?.isOnMySesar}
-            save={saveButtonOnPress}
-          />
-          <FlatList
-            ListHeaderComponent={page?.key === PAGE_KEYS.NOTES ? renderNotesField() : renderFormFields()}
-          />
+          <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+          {!isReadOnly && (
+            <SaveAndCancelButtons
+              cancel={cancelForm}
+              getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
+                && !selectedFeature?.isOnMySesar}
+              save={saveButtonOnPress}
+            />
+          )}
+          <FlatList ListHeaderComponent={renderFormFields()}/>
         </>
       )}
-      {isIGSNModalVisible && (
-        <IGSNModal
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-        />
-      )}
-      <DeleteOverlay
-        closeModal={() => setIsDeleteOverlayVisible(false)}
-        deleteSample={deleteFeature}
-        isVisible={isDeleteOverlayVisible}
+      {/*{isIGSNModalVisible && (*/}
+      <IGSNModal
+        isVisible={isIGSNModalVisible}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        onSampleSaved={onSampleSaved}
+        ref={formRef}
+        sampleValues={formRef.current?.values}
       />
+      {/*)}*/}
+      {/*Modal when deleting a sample with an IGSN attached*/}
+      <ModalWrapper
+        actionTitle={'Delete'}
+        headerTitle={'Delete Sample'}
+        isVisible={isDeleteOverlayVisible}
+        onActionPressed={deleteFeature}
+        onCancelPress={() => setIsDeleteOverlayVisible(false)}
+        overlayStyleOverride={{height: '40%'}}
+      >
+        <View style={{
+          flex: 1,
+          paddingVertical: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'yellow',
+        }}>
+          <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
+          <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
+        </View>
+        <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
+          <Text
+            style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
+          </Text>
+        </View>
+      </ModalWrapper>
     </>
   );
 };

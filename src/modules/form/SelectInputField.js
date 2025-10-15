@@ -13,6 +13,7 @@ import {formStyles} from '../form';
 const SelectInputField = ({
                             choices,
                             errors,
+                            isReadOnly,
                             label,
                             name,
                             onMyChange,
@@ -43,6 +44,12 @@ const SelectInputField = ({
     return choiceFound ? choiceFound.label : '';
   };
 
+  const handleChoicePressed = (item) => {
+    if (single) fieldValueChanged([item.value]);
+    else if (value?.includes(item.value)) fieldValueChanged(value.filter(v => v !== item.value));
+    else fieldValueChanged([...value || [], item.value]);
+  };
+
   const renderChoiceItem = (item, isWrapped) => {
     const radioSelected = <Icon color={PRIMARY_ACCENT_COLOR} name={'radiobox-marked'} type={'material-community'}/>;
     const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
@@ -53,12 +60,12 @@ const SelectInputField = ({
             checked={value === item.value}
             checkedIcon={radioSelected}
             containerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0, padding: 1}}
-            onPress={() => fieldValueChanged([item.value])}
+            onPress={() => handleChoicePressed(item)}
             title={item.label}
             uncheckedIcon={radioUnselected}
           />
         ) : (
-          <ListItem containerStyle={commonStyles.listItemFormField}>
+          <ListItem containerStyle={commonStyles.listItemFormField} onPress={() => handleChoicePressed(item)}>
             <ListItem.Content>
               <ListItem.Title style={commonStyles.listItemTitle}>{item.label}</ListItem.Title>
             </ListItem.Content>
@@ -66,15 +73,13 @@ const SelectInputField = ({
               <ListItem.CheckBox
                 checked={value === item.value}
                 checkedIcon={radioSelected}
-                onPress={() => fieldValueChanged([item.value])}
+                onPress={() => handleChoicePressed(item)}
                 uncheckedIcon={radioUnselected}
               />
             ) : (
               <ListItem.CheckBox
                 checked={value?.includes(item.value)}
-                onPress={() => value?.includes(item.value)
-                  ? fieldValueChanged(value.filter(v => v !== item.value))
-                  : fieldValueChanged([...value || [], item.value])}
+                onPress={() => handleChoicePressed(item)}
               />
             )}
           </ListItem>
@@ -145,6 +150,7 @@ const SelectInputField = ({
             styleItemsContainer={formStyles.dropdownItemsContainer}
             tagBorderColor={themes.PRIMARY_TEXT_COLOR}
             tagContainerStyle={formStyles.dropdownTagContainer}
+            tagRemoveIconColor={isReadOnly ? themes.SECONDARY_BACKGROUND_COLOR : themes.WARNING_COLOR}
             tagTextColor={themes.PRIMARY_TEXT_COLOR}
             textColor={themes.PRIMARY_TEXT_COLOR}
             textInputProps={{editable: false}}

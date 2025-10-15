@@ -12,7 +12,7 @@ const straboDB = straboSpotAPI + '/db';
 
 // Images
 const straboImage = straboSpotAPI + '/db/image/';
-const straboProfileImage = straboSpotAPI + '/profileimage/';
+const straboProfileImage = straboSpotAPI + '/db/profileimage/';
 const straboPublicImage = straboSpotAPI + '/pi/';
 const straboPublicImageResized = straboSpotAPI + '/pi_basemap/';
 const straboPublicImageThumbnail = straboSpotAPI + '/pi_thumbnail/';

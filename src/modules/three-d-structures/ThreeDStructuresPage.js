@@ -7,6 +7,7 @@ import ThreeDStructureItem from './ThreeDStructureItem';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -14,7 +15,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const ThreeDStructuresPage = ({page}) => {
+const ThreeDStructuresPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
@@ -74,11 +75,16 @@ const ThreeDStructuresPage = ({page}) => {
     const sectionKey = Object.values(SECTIONS).reduce(
       (acc, {title, key}) => sectionTitle === title ? key : acc, '');
     return (
-      <SectionDividerWithRightButton
-        disabled={isMultipleFeaturesTaggingEnabled}
-        dividerText={sectionTitle}
-        onPress={() => add3dStructure(sectionKey)}
-      />
+      <>
+        {isReadOnly ? <SectionDivider dividerText={sectionTitle}/>
+          : (
+            <SectionDividerWithRightButton
+              disabled={isMultipleFeaturesTaggingEnabled}
+              dividerText={sectionTitle}
+              onPress={() => add3dStructure(sectionKey)}
+            />
+          )}
+      </>
     );
   };
 
@@ -108,13 +114,14 @@ const ThreeDStructuresPage = ({page}) => {
     <>
       {!isDetailView && (
         <View>
-          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton/>
+          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
           {renderSections()}
         </View>
       )}
       {isDetailView && (
         <BasicPageDetail
           closeDetailView={() => setIsDetailView(false)}
+          isReadOnly={isReadOnly}
           page={page}
           selectedFeature={selected3dStructure}
         />

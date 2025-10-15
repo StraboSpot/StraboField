@@ -9,8 +9,8 @@ import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
@@ -74,6 +74,7 @@ const AddMineralModal = ({onPress}) => {
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
     else if (isShowTemplates) setIsShowTemplates(false);
+    else if (!isEmpty(selectedTypeIndex)) setSelectedTypeIndex(null);
     else dispatch(setModalVisible({modal: null}));
   };
 
@@ -114,24 +115,6 @@ const AddMineralModal = ({onPress}) => {
         {selectedTypeIndex === 0 && <MineralsByRockClass addMineral={addMineral}/>}
         {selectedTypeIndex === 1 && <MineralsGlossary addMineral={addMineral}/>}
       </>
-    );
-  };
-
-  const renderAddMineralModalContent = () => {
-    return (
-      <ModalWrapper
-        buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
-        closeModal={onCloseModalPressed}
-        onPress={onPress}
-      >
-        {!choicesViewKey && (
-          <Templates
-            isShowTemplates={isShowTemplates}
-            setIsShowTemplates={bool => setIsShowTemplates(bool)}
-          />
-        )}
-        {!isShowTemplates && renderAddMineral()}
-      </ModalWrapper>
     );
   };
 
@@ -176,7 +159,6 @@ const AddMineralModal = ({onPress}) => {
   };
 
   const renderForms = () => {
-    const saveMineralTitle = 'Save Mineral' + (areMultipleTemplates ? 's' : '');
     return (
       <>
         {!areMultipleTemplates && (
@@ -200,7 +182,7 @@ const AddMineralModal = ({onPress}) => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <SaveButton onPress={saveMineral} title={saveMineralTitle}/>}
+        {!choicesViewKey && <ActionButton onPress={saveMineral}/>}
       </>
     );
   };
@@ -214,9 +196,27 @@ const AddMineralModal = ({onPress}) => {
     if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
     else savePetFeature(petKey, spot, formRef.current);
     formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
-  return renderAddMineralModalContent();
+  return (
+    <ModalWrapper
+      buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
+      closeModal={onCloseModalPressed}
+      headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={!areMultipleTemplates}
+    >
+      {!choicesViewKey && isEmpty(selectedTypeIndex) && (
+        <Templates
+          isShowTemplates={isShowTemplates}
+          setIsShowTemplates={bool => setIsShowTemplates(bool)}
+        />
+      )}
+      {!isShowTemplates && renderAddMineral()}
+    </ModalWrapper>
+  );
 };
 
 export default AddMineralModal;

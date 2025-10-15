@@ -4,6 +4,7 @@ import {
   BLACK,
   GOLD,
   MEDIUM_TEXT_SIZE,
+  MODAL_BACKDROP,
   PRIMARY_ACCENT_COLOR,
   PRIMARY_BACKGROUND_COLOR,
   PRIMARY_HEADER_TEXT_SIZE,
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   backdrop: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: MODAL_BACKDROP,
     height: '100%',
     left: 0,
     position: 'absolute',
@@ -131,15 +132,13 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
-    flexShrink: 1,
     paddingLeft: 10,
-    paddingTop: 10,
+    paddingVertical: 5,
   },
   sectionDividerText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    paddingBottom: 5,
   },
   sectionDividerWithButtonContainer: {
     alignItems: 'flex-end',

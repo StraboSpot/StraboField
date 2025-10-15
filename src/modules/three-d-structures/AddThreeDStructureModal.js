@@ -11,8 +11,8 @@ import AddTensor from './AddTensor';
 import {AddFold, FoldGeometryChoices} from './fold-geometry';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import SaveButton from '../../shared/ui/buttons/SaveButton';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -51,6 +51,8 @@ const AddThreeDStructureModal = ({onPress}) => {
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
   }, [modalValues]);
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const on3DStructureTypePress = (i) => {
     if (i !== selectedTypeIndex) {
@@ -120,8 +122,11 @@ const AddThreeDStructureModal = ({onPress}) => {
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
-        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : dispatch(setModalVisible({modal: null}))}
-        onPress={onPress}
+        closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
+        headerTitle={'Add 3D Structure'}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <FlatList
           ListHeaderComponent={
@@ -143,7 +148,7 @@ const AddThreeDStructureModal = ({onPress}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <SaveButton onPress={save3DStructure} title={'Save 3D Structure'}/>}
+        {!choicesViewKey && <ActionButton onPress={save3DStructure}/>}
       </ModalWrapper>
     );
   };
@@ -173,6 +178,7 @@ const AddThreeDStructureModal = ({onPress}) => {
       edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
+      if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
       console.log('Error submitting form', err);

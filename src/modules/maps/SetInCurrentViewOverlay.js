@@ -1,9 +1,10 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 
 import IconButton from '../../shared/ui/buttons/IconButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 // Modal to prompt the user to select a geometry if no geometry has been set
@@ -28,17 +29,15 @@ const SetInCurrentViewOverlay = ({
   };
 
   return (
-    <Overlay
-      animationType={'slide'}
+    <ModalWrapper
+      closeModal={() => setShowSetInCurrentViewModal(false)}
+      headerTitle={'Set Geometry Type'}
       isVisible={showSetInCurrentViewModal}
-      onBackdropPress={() => setShowSetInCurrentViewModal(false)}
-      overlayStyle={overlayStyles.overlayContainer}
-      supportedOrientations={['portrait', 'landscape']}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
     >
-      <View style={overlayStyles.titleContainer}>
-        <Text style={overlayStyles.titleText}>Select a Geometry Type</Text>
-      </View>
-      <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
+      <View style={overlayStyles.selectGeometryTypeContent}>
         {buttons.map(button =>
           <Button
             buttonStyle={overlayStyles.buttonText}
@@ -56,7 +55,7 @@ const SetInCurrentViewOverlay = ({
           />,
         )}
       </View>
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

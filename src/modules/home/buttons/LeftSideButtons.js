@@ -13,7 +13,6 @@ const LeftSideButtons = ({
                            closeMainMenuPanel,
                            dialogClickHandler,
                            dialogs,
-                           mapComponentRef,
                            openMainMenuPanel,
                            toggleDialog,
                          }) => {
@@ -32,7 +31,6 @@ const LeftSideButtons = ({
         <MapActionButtons
           dialogClickHandler={dialogClickHandler}
           dialogs={dialogs}
-          mapComponentRef={mapComponentRef}
           toggleDialog={toggleDialog}
         />
       </Animated.View>

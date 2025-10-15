@@ -10,9 +10,10 @@ import MeasurementItem from './MeasurementItem';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
@@ -20,6 +21,7 @@ import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/com
 import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -27,6 +29,7 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 const MeasurementDetail = ({
                              closeDetailView,
                              deleteTemplate,
+                             isReadOnly,
                              selectedAttitudes,
                              saveTemplate,
                            }) => {
@@ -35,6 +38,7 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {doMeasurementCalculations} = useCompassCalculations();
   const {showErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
 
@@ -49,12 +53,6 @@ const MeasurementDetail = ({
   const selectedAttitude = selectedAttributes?.length > 0 ? JSON.parse(JSON.stringify(selectedAttributes[0]))
     : isTemplate ? selectedAttitudes[0]
       : {};
-
-  const {onMyChange} = useCompassCalculations({
-    formRefCurrent: formRef.current,
-    selectedAttitude: selectedAttitude,
-    selectedMeasurement: selectedMeasurement,
-  });
 
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
@@ -199,6 +197,17 @@ const MeasurementDetail = ({
     else addAssociatedMeasurement();
   };
 
+  const onMyChange = (name, value) => {
+    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
+      const valueAsFloat = parseFloat(value, 10);
+      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
+        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
+      }
+      else formRef.current.setFieldValue(name, undefined);
+    }
+    else formRef.current.setFieldValue(name, value);
+  };
+
   // Confirm switching the selected measurement
   const onSwitchSelectedMeasurement = (measurement) => {
     if (measurement.id !== selectedMeasurement.id) {
@@ -245,7 +254,7 @@ const MeasurementDetail = ({
 
   const renderAssociatedMeasurements = () => {
     const addButtonText = selectedAttitude && selectedAttitude.type === 'linear_orientation'
-      ? '+ Add Associated Plane' : '+ Add Associated Line';
+      ? 'Add Associated Plane' : 'Add Associated Line';
     console.log('selected id', selectedMeasurement.id);
     return (
       <View>
@@ -278,24 +287,22 @@ const MeasurementDetail = ({
           )}
 
         {/* Button to add an associated measurement */}
-        <Button
-          onPress={() => onAddAssociatedMeasurement()}
-          title={addButtonText}
-          titleStyle={styles.buttonText}
-          type={'clear'}
-        />
+        {!isReadOnly && (
+          <AddButton
+            onPress={onAddAssociatedMeasurement}
+            title={addButtonText}
+          />
+        )}
       </View>
     );
   };
 
   const renderCancelSaveButtons = () => {
     return (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => cancelFormAndGo()}
-          save={() => isTemplate ? saveTemplateForm(formRef.current) : saveFormAndGo()}
-        />
-      </View>
+      <SaveAndCancelButtons
+        cancel={cancelFormAndGo}
+        save={() => isTemplate ? saveTemplateForm(formRef.current) : saveFormAndGo()}
+      />
     );
   };
 
@@ -314,7 +321,14 @@ const MeasurementDetail = ({
             onSubmit={values => console.log('Submitting form...', values)}
             validate={values => validateForm({formName: formName, values: values})}
           >
-            {formProps => <Form {...{...formProps, formName: formName, onMyChange: onMyChange}}/>}
+            {formProps => (
+              <Form {...{
+                ...formProps,
+                formName: formName,
+                isReadOnly: isReadOnly,
+                onMyChange: onMyChange,
+              }}/>
+            )}
           </Formik>
         </View>
       </View>
@@ -500,22 +514,32 @@ const MeasurementDetail = ({
     switchSelectedMeasurement(modifiedMeasurement);
   };
 
+  const getPageTitle = () => {
+    if (selectedMeasurement?.type) {
+      if (selectedMeasurement.type === 'tabular_orientation') return 'Tabular Zone Detail';
+      else return toTitleCase(selectedMeasurement.type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
+    }
+    else return 'Measurement Detail';
+  };
+
   return (
     <>
       {selectedMeasurement && (
         <View style={styles.measurementsContentContainer}>
-          {renderCancelSaveButtons()}
+          <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+          {!isReadOnly && renderCancelSaveButtons()}
           <FlatList
             ListHeaderComponent={
               <View>
                 {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
                 {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
-                {selectedMeasurement && selectedMeasurement.type && (selectedMeasurement.type === 'planar_orientation'
-                  || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+                {!isReadOnly && selectedMeasurement && selectedMeasurement.type
+                  && (selectedMeasurement.type === 'planar_orientation'
+                    || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
                 <View>
                   {!isEmpty(formName) && renderFormFields()}
                 </View>
-                {selectedAttributes.length === 1 && (
+                {selectedAttributes.length === 1 && !isReadOnly && (
                   <Button
                     onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
                     title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}

@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 
-import {Button, Overlay} from '@rn-vui/base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import styles from './documentation.styles';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   const [pickerVisible, setPickerVisible] = useState(false);
@@ -20,7 +20,7 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
     <>
       <View style={styles.headerContainer}>
         {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.jumpButton}>
-          <Text style={styles.jumpText}>Jump</Text>
+          <Text style={styles.jumpText}>Jump to page</Text>
         </TouchableOpacity>}
         <Text style={styles.pageText}>
           Page {currentPage} of {totalPages}
@@ -29,10 +29,14 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
           <Ionicons color={'#333'} name={'close'} size={24}/>
         </TouchableOpacity>
       </View>
-      <Overlay
-        animationType={'fade'}
-        overlayStyle={styles.pickerContainer}
-        visible={pickerVisible}
+      <ModalWrapper
+        closeModal={() => setPickerVisible(false)}
+        headerTitle={'Jump to Page'}
+        isVisible={pickerVisible}
+        overlayStyleOverride={styles.pickerContainer}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
       >
         <View style={styles.pickerOverlay}>
           <FlatList
@@ -43,16 +47,11 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
                 <Text style={styles.pageOptionText}>Page {item}</Text>
               </TouchableOpacity>
             )}
-          />
-          <Button
-            containerStyle={styles.pickerCancelButtonContainer}
-            onPress={() => setPickerVisible(false)}
-            style={styles.cancelButton}
-            title={'Cancel'}
-            type={'clear'}
+            showsVerticalScrollIndicator={true}
+            style={styles.pickerList}
           />
         </View>
-      </Overlay>
+      </ModalWrapper>
     </>
   );
 };

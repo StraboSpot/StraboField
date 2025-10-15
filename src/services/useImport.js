@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import useDevice from './useDevice';
+import useResetState from './useResetState';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../modules/maps/offline-maps/offlineMaps.slice';
@@ -23,6 +24,8 @@ const useImport = () => {
   let neededTiles = 0;
   let notNeededTiles = 0;
   let mapFailures = 0;
+
+  const {clearProject} = useResetState();
 
   const dispatch = useDispatch();
   const project = useSelector(state => state.project.project);
@@ -155,6 +158,7 @@ const useImport = () => {
       const dataFile = await readDeviceJSONFile(selectedProject);
       if (!isEmpty(project) && dataFile) await persistor.purge();
       const {projectDb, spotsDb} = dataFile;
+      if (!isEmpty(project.id) && project.id !== projectDb.project.id) clearProject();
       console.log('DataFile', dataFile);
       dispatch(addedSpotsFromDevice(spotsDb));
       dispatch(addedProject(projectDb.project || projectDb));

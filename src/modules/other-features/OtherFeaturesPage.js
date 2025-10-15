@@ -11,7 +11,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const OtherFeaturesPage = () => {
+const OtherFeaturesPage = ({isReadOnly}) => {
   const [isFeatureDetailVisible, setIsFeatureDetailVisible] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState({});
   const dispatch = useDispatch();
@@ -54,7 +54,12 @@ const OtherFeaturesPage = () => {
     <>
       {!isFeatureDetailVisible && (
         <View>
-          <NotebookPageHeader onPressAdd={addFeature} pageTitle={'Other Features'} showAddButton showFeaturesTagButton/>
+          <NotebookPageHeader
+            onPressAdd={addFeature}
+            pageTitle={'Other Features'}
+            showAddButton={!isReadOnly}
+            showFeaturesTagButton={!isReadOnly}
+          />
           {/*{!isMultipleFeaturesTaggingEnabled && (*/}
           {/*  <SectionDividerWithRightButton*/}
           {/*    dividerText={'Other Features'}*/}
@@ -74,6 +79,7 @@ const OtherFeaturesPage = () => {
         <OtherFeatureDetail
           featureTypes={otherFeatures}
           hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
+          isReadOnly={isReadOnly}
           renderFeature={feature => renderFeature(feature)}
           selectedFeature={selectedFeature}
         />

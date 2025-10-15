@@ -1,37 +1,26 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList} from 'react-native';
 
-import {Button, CheckBox, Overlay} from '@rn-vui/base';
+import {CheckBox} from '@rn-vui/base';
 
-import overlayStyles from './overlay.styles';
+import ModalWrapper from './ModalWrapper';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
-import SectionDivider from '../SectionDivider';
 
 const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelect, value}) => {
-  // const [isPickerVisible, setIsPickerVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(value);
 
   const handleSelect = (item) => {
-    setSelectedValue(item);
     onSelect(item);
-    closePicker();
   };
 
   return (
-    <Overlay
+    <ModalWrapper
+      closeModal={closePicker}
+      headerTitle={dividerText}
       isVisible={isPickerVisible}
-      onBackdropPress={closePicker}
-      overlayStyle={overlayStyles.overlayContainer}
-      supportedOrientations={['portrait', 'landscape']}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
     >
-      <Button
-        containerStyle={{alignItems: 'flex-end'}}
-        onPress={closePicker}
-        title={'X'}
-        titleStyle={{color: 'black'}}
-        type={'clear'}
-      />
-      <SectionDivider dividerText={dividerText}/>
       <FlatList
         data={data}
         renderItem={({item}) => {
@@ -49,7 +38,7 @@ const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelec
           );
         }}
       />
-    </Overlay>
+    </ModalWrapper>
   );
 };
 

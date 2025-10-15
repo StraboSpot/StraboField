@@ -1,27 +1,15 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, Platform, View} from 'react-native';
 
-import {Overlay} from '@rn-vui/base';
-import Pdf from 'react-native-pdf';
-
 import documentationStyles from './documentation.styles';
-import DocumentationModalHeader from './DocumentationModalHeader';
 import SpotDataModelModal from './SpotDataModelModal';
 import UrlLinkButton from './UrlLinkButton';
 import {STRABO_APIS} from '../../services/urls.constants';
-import {isEmpty, openUrl} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
-const Documentation = () => {
-  const ref = useRef(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [doc, setDoc] = useState('');
+const Documentation = ({navigation}) => {
   const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
-  const [visible, setVisible] = useState(false);
 
   const files = [
     {
@@ -50,19 +38,9 @@ const Documentation = () => {
   ];
 
   const handlePress = (document) => {
-    setDoc(document);
-    setVisible(!visible);
+    navigation.navigate('DocumentationScreen', {document});
   };
 
-  const openLink = async (url) => {
-    try {
-      await openUrl(url);
-    }
-    catch (error) {
-      console.error(error);
-      alert(error.message);
-    }
-  };
 
   const renderFAQList = () => {
     let filteredDocs = [];
@@ -80,7 +58,7 @@ const Documentation = () => {
     console.log(filteredDocs);
 
     return (
-      <View style={{maxHeight: '80%'}}>
+      <View>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           data={filteredDocs}
@@ -98,39 +76,6 @@ const Documentation = () => {
     />
   );
 
-  const renderPDF = () => (
-    <Overlay
-      fullScreen
-      isVisible={visible}
-      overlayStyle={documentationStyles.overlayContainer}
-      supportedOrientations={['portrait', 'landscape']}
-    >
-      <DocumentationModalHeader
-        currentPage={currentPage}
-        onClose={() => setVisible(false)}
-        onJumpToPage={page => ref.current.setPage(page)}
-        totalPages={totalPages}
-      />
-      {!isEmpty(doc) && (
-        <Pdf
-          onError={(error) => {
-            console.log(error);
-          }}
-          onLoadComplete={(numberOfPages, filePath) => {
-            setTotalPages(numberOfPages);
-          }}
-          onPageChanged={(page, numberOfPages) => {
-            setCurrentPage(page);
-            console.log(`Number of pages: ${page}/${numberOfPages}`);
-          }}
-          onPressLink={openLink}
-          ref={ref}
-          source={doc.file}
-          style={documentationStyles.pdf}
-        />
-      )}
-    </Overlay>
-  );
 
   return (
     <>
@@ -148,7 +93,6 @@ const Documentation = () => {
       </View>
 
       {/* Modals */}
-      {renderPDF()}
       {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
     </>
   );

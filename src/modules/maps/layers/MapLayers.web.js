@@ -23,6 +23,7 @@ const MapLayers = ({
                      editFeatureVertex,
                      isShowMacrostratOverlay,
                      location,
+                     mapMode,
                      measureFeatures,
                      spotsNotSelected,
                      spotsSelected,
@@ -55,7 +56,7 @@ const MapLayers = ({
       <ImageBasemapLayer/>
 
       {/* Features Layers */}
-      <FeaturesLayers spotsNotSelected={spotsNotSelected} spotsSelected={spotsSelected}/>
+      <FeaturesLayers mapMode={mapMode} spotsNotSelected={spotsNotSelected} spotsSelected={spotsSelected}/>
 
       {/* Draw Layer */}
       <DrawLayers drawFeatures={drawFeatures}/>

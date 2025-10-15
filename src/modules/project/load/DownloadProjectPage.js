@@ -3,14 +3,14 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/useDownload';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
+import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 
 // Download Project
-const DownloadProjectPage = ({openMainMenuPanel}) => {
+const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
@@ -27,16 +27,15 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
 
   const confirmDownloadProject = async (projectSelected) => {
     setProjectToDownload(projectSelected);
-    if (isProjectLoadSelectionModalVisible) {
-      await initializeDownload(projectSelected);
-      openMainMenuPanel();
-    }
+    if (isProjectLoadSelectionModalVisible) await downloadProject(projectSelected);
     else setIsConfirmOverwriteModalVisible(true);
   };
 
-  const downloadProject = async () => {
+  const downloadProject = async (inProjectToDownload) => {
+    closeNotebookPanel();
     closeConfirmOverwriteModal();
-    await initializeDownload(projectToDownload);
+    await initializeDownload(inProjectToDownload);
+    closeMainMenuPanel();
   };
 
   const getTextOverride = () => {
@@ -48,7 +47,7 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
   };
 
   return (
-    <>
+    <View style={{flex: 1}}>
       <View style={{flex: 1}}>
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
@@ -64,11 +63,13 @@ const DownloadProjectPage = ({openMainMenuPanel}) => {
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}
-          loadProject={downloadProject}
+          closeNotebookPanel={closeNotebookPanel}
+          loadProject={() => downloadProject(projectToDownload)}
+          project={projectToDownload}
           textOverride={getTextOverride()}
         />
       )}
-    </>
+    </View>
   );
 };
 

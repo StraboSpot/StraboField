@@ -9,11 +9,11 @@ const CustomOverlayLayers = ({basemap}) => {
   const {customMaps} = useSelector(state => state.map);
 
   return (
-    Object.values(customMaps).map((customMap) => {
-      return customMap.overlay && customMap.isViewable && (
+    Object.values(customMaps)
+      .filter(customMap => customMap && customMap.id && customMap.overlay && customMap.isViewable)
+      .map(customMap => (
         <CustomOverlayLayer basemap={basemap} customMap={customMap} key={customMap.id}/>
-      );
-    })
+      ))
   );
 };
 
