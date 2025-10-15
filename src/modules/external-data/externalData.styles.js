@@ -29,8 +29,8 @@ const externalDataStyles = StyleSheet.create({
   },
   loadingContainer: {
     borderRadius: 15,
-    maxHeight: '20%',
-    maxWidth: '20%',
+    height: '20%',
+    width: '20%',
   },
   loadingSpinner: {
     backgroundColor: 'transparent',

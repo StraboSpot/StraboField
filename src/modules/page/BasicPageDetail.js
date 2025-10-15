@@ -14,9 +14,8 @@ import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {overlayStyles} from '../home/overlays';
-import NoteForm from '../notes/NoteForm';
+import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/IGSNModal';
@@ -350,7 +349,7 @@ const BasicPageDetail = ({
         isVisible={isDeleteOverlayVisible}
         onActionPressed={deleteFeature}
         onCancelPress={() => setIsDeleteOverlayVisible(false)}
-        overlayStyleOverride={{flex: 1, maxHeight: '40%'}}
+        overlayStyleOverride={{height: '40%'}}
       >
         <View style={{
           flex: 1,

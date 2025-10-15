@@ -58,7 +58,7 @@ const Documentation = ({navigation}) => {
     console.log(filteredDocs);
 
     return (
-      <View style={{maxHeight: '80%'}}>
+      <View>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           data={filteredDocs}

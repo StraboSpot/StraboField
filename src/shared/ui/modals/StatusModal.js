@@ -52,8 +52,7 @@ const StatusModal = () => {
     }
     // When loading or showing status messages, use smaller width
     return {
-      maxHeight: '80%',
-      // width: Platform.OS === 'web' ? 400 : '40%',
+      width: Platform.OS === 'web' ? 400 : '30%',
     };
   };
 

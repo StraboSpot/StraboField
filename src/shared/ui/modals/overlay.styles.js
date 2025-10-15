@@ -1,7 +1,10 @@
-import {Platform, StyleSheet} from 'react-native';
+import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../styles.constants';
 import {LIGHTGREY, SMALL_SCREEN} from '../../styles.constants';
+
+const platform = Platform.OS === 'ios' ? 'window' : 'screen';
+const {height} = Dimensions.get(platform);
 
 const styles = StyleSheet.create({
   animationContainer: {
@@ -69,8 +72,8 @@ const styles = StyleSheet.create({
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
-    elevation: 2,
-    maxHeight: '80%',
+    elevation: 5,
+    maxHeight: height * 0.80,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: 300,
@@ -84,7 +87,6 @@ const styles = StyleSheet.create({
   overlayContent: {
     alignItems: 'center',
     marginTop: 5,
-    // backgroundColor: 'green',
   },
   overlayMapMenuPosition: {
     bottom: 100,
