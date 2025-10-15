@@ -78,6 +78,7 @@ const SignIn = ({navigation, route}) => {
       <ErrorModal
         closeModal={() => setIsErrorModalVisible(false)}
         isVisible={isErrorModalVisible}
+        onActionPressed={() => setIsErrorModalVisible(false)}
       >
         <Text style={signInStyles.errorText}>{errorMessage.toString()}</Text>
       </ErrorModal>

@@ -47,12 +47,12 @@ const StatusModal = () => {
     if (isShowingDatasetPreferences) {
       return {
         height: '60%',
-        width: Platform.OS === 'web' ? 600 : '40%',
+        width: Platform.OS === 'web' ? 600 : '60%',
       };
     }
     // When loading or showing status messages, use smaller width
     return {
-      width: Platform.OS === 'web' ? 400 : '30%',
+      width: Platform.OS === 'web' ? 400 : '40%',
     };
   };
 
