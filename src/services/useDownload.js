@@ -12,6 +12,7 @@ import {
   clearedStatusMessages,
   removedLastStatusMessage,
   setIsErrorMessagesModalVisible,
+  setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
   setStatusMessageModalTitle,
@@ -228,6 +229,7 @@ const useDownload = () => {
   };
 
   const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
+    if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
     dispatch(setStatusMessageModalTitle(projectName));
     dispatch(clearedStatusMessages());
