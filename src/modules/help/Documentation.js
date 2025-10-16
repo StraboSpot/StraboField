@@ -14,26 +14,30 @@ const Documentation = ({navigation}) => {
   const files = [
     {
       id: 1,
-      platform: ['ios'],
-      label: 'airdrop',
-      name: 'How to Airdrop backup files to other iPads',
-      file: require('../../assets/documents/Airdrop-from-iPad-to-iPad.pdf'),
+      platform: ['ios', 'android'],
+      label: 'Sharing Between Devices',
+      name: 'How to Share backup files to other devices',
+      file: Platform.OS === 'ios'
+        ? require('../../assets/documents/Updated_Sharing_Projects_Between_Devices.pdf')
+        : {uri: 'bundle-assets://Updated_Sharing_Projects_Between_Devices.pdf'},
     },
     {
       id: 2,
-      platform: ['ios'],
+      platform: ['ios', 'android'],
       label: 'moveFiles',
-      name: 'Moving backups out of StraboSpot 2 folder ',
-      file: Platform.OS === 'ios' && require('../../assets/documents/MovingProjectBackupsOutOfStraboSpot2.pdf'),
+      name: 'Moving backups out of StraboField folder ',
+      file: Platform.OS === 'ios'
+        ? require('../../assets/documents/Updated_Moving_StraboField_Project_Backups.pdf')
+        : {uri: 'bundle-assets://Updated_Moving_StraboField_Project_Backups.pdf'},
     },
     {
       id: 3,
       platform: ['ios', 'android'],
       label: 'helpDocument',
       name: 'Help Guide',
-      file:
-        Platform.OS === 'ios' ? require('../../assets/documents/Strabo_Help_Guide.pdf')
-          : {uri: 'bundle-assets://Strabo_Help_Guide.pdf'},
+      file: Platform.OS === 'ios'
+        ? require('../../assets/documents/StraboField_User_Manual.pdf')
+        : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
     },
   ];
 

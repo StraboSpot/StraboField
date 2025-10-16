@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Platform, Text, TouchableOpacity, View} from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -16,6 +16,8 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
 
   const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
 
+  const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+
   return (
     <>
       <View style={styles.headerContainer}>
@@ -23,7 +25,7 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
           <Text style={styles.jumpText}>Jump to page</Text>
         </TouchableOpacity>}
         <Text style={styles.pageText}>
-          Page {currentPage} of {totalPages}
+          {pageHeader}
         </Text>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <Ionicons color={'#333'} name={'close'} size={24}/>
