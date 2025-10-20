@@ -18,7 +18,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const AddFabricModal = ({onPress}) => {
+const AddFabricModal = () => {
   const dispatch = useDispatch();
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -115,7 +115,6 @@ const AddFabricModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
-        onPress={onPress}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
