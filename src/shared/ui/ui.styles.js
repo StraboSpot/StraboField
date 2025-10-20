@@ -50,10 +50,6 @@ const styles = StyleSheet.create({
   batteryStatusContainer: {
     padding: 5,
   },
-  buttonText: {
-    color: PRIMARY_ACCENT_COLOR,
-    fontSize: PRIMARY_HEADER_TEXT_SIZE,
-  },
   connectionStatusContainer: {
     padding: 5,
   },
@@ -106,20 +102,8 @@ const styles = StyleSheet.create({
     borderColor: PRIMARY_BACKGROUND_COLOR,
     borderTopWidth: 1,
   },
-  leftContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
   littleSpacer: {
     padding: 5,
-  },
-  navButtonsContainer: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   saveAndDeleteButtonContainer: {
     alignItems: 'center',
