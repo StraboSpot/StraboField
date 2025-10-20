@@ -58,6 +58,9 @@ import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureMod
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';
 import ThreeDStructuresPage from '../three-d-structures/ThreeDStructuresPage';
 
+
+// Called in Dialog.js
+
 export const PAGE_KEYS = {
   BEDDING: 'bedding',
   DATA: 'data',
