@@ -226,7 +226,6 @@ export const SECONDARY_PAGES = [
     modal_component: AddEarthquakeModal,
     overview_component: BasicOverviewList,
     action_label: 'Add an Earthquake Feature',
-    testing: true,
   },
 ];
 
