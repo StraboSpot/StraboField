@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Text, TextInput, View} from 'react-native';
+import {FlatList, ScrollView, Text, TextInput, View} from 'react-native';
 
 import {Button, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -180,15 +180,18 @@ const Templates = ({
 
   const renderNotesForm = () => {
     return (
-      <>
-        <View style={{flex: 1}}>
-          <SaveAndCancelButtons
-            cancel={() => setIsShowForm(false)}
-            save={() => saveTemplate(notesTemplateFormRef.current.values)}
-          />
-          <NoteForm formRef={notesTemplateFormRef} initialNotesValues={selectedTemplate.values}/>
-        </View>
-      </>
+      <ScrollView>
+        <SaveAndCancelButtons
+          cancel={() => setIsShowForm(false)}
+          save={() => saveTemplate(notesTemplateFormRef.current.values)}
+        />
+        <NoteForm
+          appearance={'multiline'}
+          customHeight={150}
+          formRef={notesTemplateFormRef}
+          initialNotesValues={selectedTemplate.values}
+        />
+      </ScrollView>
     );
   };
 
