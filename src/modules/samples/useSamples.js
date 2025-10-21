@@ -184,7 +184,7 @@ const useSamples = () => {
       const lineArray = getFirstAndLastElementsOfLineArray();
       console.log('lineArray', lineArray);
       longitudeEndObj = {label: 'Longitude End:', sesarKey: 'longitude_end', value: lineArray[1][0]};
-      latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude', value: lineArray[1][1]};
+      latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1]};
 
     }
     const mappedObj = [
