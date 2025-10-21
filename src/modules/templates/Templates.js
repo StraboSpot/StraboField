@@ -187,7 +187,7 @@ const Templates = ({
         />
         <NoteForm
           appearance={'multiline'}
-          customHeight={150}
+          customHeight={300}
           formRef={notesTemplateFormRef}
           initialNotesValues={selectedTemplate.values}
         />
