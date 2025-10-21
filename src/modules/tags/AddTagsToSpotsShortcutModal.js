@@ -8,8 +8,6 @@ const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
   const renderAddTagsToSpotsShortcutModal = () => {
     return (
       <ModalWrapper
-        // onCancelPress={closeModal}
-        // onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
         showActionButton={false}
         showCancelButton={false}

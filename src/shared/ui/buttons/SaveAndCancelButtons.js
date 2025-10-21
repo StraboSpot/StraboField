@@ -3,30 +3,29 @@ import {View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
-import styles from '../ui.styles';
+import buttonsStyles from './buttons.styles';
+import commonStyles from '../../common.styles';
 
 const SaveAndCancelButtons = ({cancel, save, getIsDisabled}) => {
   return (
-    <View style={styles.navButtonsContainer}>
-      <View style={styles.leftContainer}>
-        {cancel && (
-          <Button
-            onPress={cancel}
-            title={'Cancel'}
-            titleStyle={styles.buttonText}
-            type={'clear'}
-          />
-        )}
-        {save && (
-          <Button
-            disabled={getIsDisabled}
-            onPress={save}
-            title={'Save'}
-            titleStyle={styles.buttonText}
-            type={'clear'}
-          />
-        )}
-      </View>
+    <View style={buttonsStyles.navButtonsContainer}>
+      {cancel && (
+        <Button
+          onPress={cancel}
+          title={'Cancel'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
+        />
+      )}
+      {save && (
+        <Button
+          disabled={getIsDisabled}
+          onPress={save}
+          title={'Save'}
+          titleStyle={commonStyles.standardButtonText}
+          type={'clear'}
+        />
+      )}
     </View>
   );
 };

@@ -12,12 +12,32 @@ const TextInputField = ({
                           appearance,
                           autoCapitalize,
                           autoFocus,
+                          customHeight,
                           editable = true,
                           label,
                           onMyChange,
                           onShowFieldInfo,
                           placeholder,
                         }) => {
+
+  const getInputStyle = () => {
+    let style;
+    if (appearance === 'multiline') {
+      style = {...formStyles.fieldValue, ...formStyles.fieldValueMultiline};
+    }
+    else if (appearance === 'full') {
+      style = {...formStyles.fieldValue, ...formStyles.fieldValueFull};
+    }
+    else {
+      style = formStyles.fieldValue;
+    }
+
+    if (customHeight) {
+      style = {...style, height: customHeight};
+    }
+
+    return style;
+  };
 
   return (
     <>
@@ -43,9 +63,7 @@ const TextInputField = ({
         onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
-        style={appearance === 'multiline' ? {...formStyles.fieldValue, ...formStyles.fieldValueMultiline}
-          : appearance === 'full' ? {...formStyles.fieldValue, ...formStyles.fieldValueFull}
-            : formStyles.fieldValue}
+        style={getInputStyle()}
         value={value || ''}
       />
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}

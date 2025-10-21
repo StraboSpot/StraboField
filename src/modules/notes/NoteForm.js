@@ -6,7 +6,7 @@ import {Field, Formik} from 'formik';
 import commonStyles from '../../shared/common.styles';
 import {TextInputField} from '../form';
 
-const NoteForm = ({formRef, initialNotesValues, isReadOnly}) => {
+const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight}) => {
   return (
     <Formik
       enableReinitialize={true}
@@ -18,9 +18,10 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly}) => {
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field
-              appearance={'full'}
+              appearance={appearance}
               autoFocus={true}
               component={TextInputField}
+              customHeight={customHeight}
               editable={!isReadOnly}
               key={'note'}
               name={'note'}

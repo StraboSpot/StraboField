@@ -39,7 +39,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
 
   useLayoutEffect(() => {
     console.log('ULE Notes [templates]', templates);
-    if (isEmpty(initialNote) && templates.notes && templates.notes.isInUse && !isEmpty(templates.notes.active)) {
+    if (!isReadOnly && isEmpty(initialNote) && templates.notes && templates.notes.isInUse
+      && !isEmpty(templates.notes.active)) {
       const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
@@ -71,7 +72,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     return (
       <View>
         <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
       </View>
     );
   };
@@ -108,7 +109,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
   };
 
-  const saveFormAndGo = async (currentForm = formRef.current) => {
+  const saveFormAndGo = async (currentForm) => {
     try {
       await saveForm(currentForm);
       if (zoomToCurrentLocation) await zoomToCurrentLocation();
@@ -157,7 +158,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
               isReadOnly={isReadOnly}
             />
           </ScrollView>
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && <ActionButton onPress={saveFormAndGo}/>}
+          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
         </>
       )}
     </View>

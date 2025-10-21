@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, Text, TextInput, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, ScrollView, Text, TextInput, View} from 'react-native';
 
 import {Button, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -9,11 +9,14 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {formStyles} from '../form';
 import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
+import NoteForm from '../notes/NoteForm';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {MODAL_KEYS, MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
@@ -37,6 +40,8 @@ const Templates = ({
   const [selectedTemplate, setSelectedTemplate] = useState({values: {}});
   const [templatesForKey, setTemplatesForKey] = useState([]);
   const [templateType, setTemplateType] = useState(null);
+
+  const notesTemplateFormRef = useRef(null);
 
   const measurementKey = 'measurementTemplates';
   let templateKey = page.key || undefined;
@@ -173,6 +178,41 @@ const Templates = ({
     );
   };
 
+  const renderNotesForm = () => {
+    return (
+      <ScrollView>
+        <SaveAndCancelButtons
+          cancel={() => setIsShowForm(false)}
+          save={() => saveTemplate(notesTemplateFormRef.current.values)}
+        />
+        <NoteForm
+          appearance={'multiline'}
+          customHeight={300}
+          formRef={notesTemplateFormRef}
+          initialNotesValues={selectedTemplate.values}
+        />
+      </ScrollView>
+    );
+  };
+
+  const renderNotesTemplateModal = () => {
+    return (
+      <ModalWrapper
+        closeModal={closeTemplates}
+        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes Templates'}
+        onActionPressed={() => isShowForm && saveTemplate(notesTemplateFormRef.current.values)}
+        onCancelPress={() => setIsShowForm(false)}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
+      >
+        {isShowNameInput ? renderTemplateNameInput()
+          : isShowForm ? renderNotesForm()
+            : renderTemplatesList()}
+      </ModalWrapper>
+    );
+  };
+
   const renderTemplateListItem = (template) => {
     const isActive = activeTemplatesForKey.map(t => t.id).includes(template.id);
     return (
@@ -290,13 +330,7 @@ const Templates = ({
       }
       else return renderTemplateSelection(typeKey);
     }
-    else {
-      return (
-        <>
-          {renderTemplateSelection(templateKey)}
-        </>
-      );
-    }
+    else return renderTemplateSelection(templateKey);
   };
 
   const renderTemplateSelection = (type) => {
@@ -334,7 +368,7 @@ const Templates = ({
             keyExtractor={item => item.id.toString()}
             listKey={'templates' + type}
             renderItem={({item}) =>
-              <ListItem containerStyle={{padding: 0, paddingLeft: 10, paddingRight: 10}}>
+              <ListItem containerStyle={{padding: 0, paddingLeft: 10}}>
                 <ListItem.Content>
                   <ListItem.Title style={commonStyles.listItemTitle}>
                     {item.name}
@@ -424,10 +458,11 @@ const Templates = ({
 
   return (
     <>
-      {isShowTemplates && isShowNameInput ? renderTemplateNameInput()
-        : isShowTemplates && isShowForm ? renderFormFields()
-          : isShowTemplates ? renderTemplatesList()
-            : renderTemplateToggle()}
+      {isShowTemplates && templateType === 'notes' ? renderNotesTemplateModal()
+        : isShowTemplates && isShowNameInput ? renderTemplateNameInput()
+          : isShowTemplates && isShowForm ? renderFormFields()
+            : isShowTemplates ? renderTemplatesList()
+              : renderTemplateToggle()}
     </>
   );
 };
