@@ -2,19 +2,19 @@ import React from 'react';
 
 import {Button} from '@rn-vui/base';
 
-import commonStyles from '../../common.styles';
+import buttonStyles from './buttons.styles';
 
 const ClearButton = ({disabled, icon, onPress, size, title, titleProps}) => {
   return (
     <Button
-      buttonStyle={commonStyles.standardButton}
+      buttonStyle={buttonStyles.standardButton}
       disabled={disabled}
       icon={icon}
       onPress={onPress}
       size={size}
       title={title}
       titleProps={titleProps}
-      titleStyle={commonStyles.standardButtonText}
+      titleStyle={buttonStyles.standardButtonText}
       type={'clear'}
     />
   );

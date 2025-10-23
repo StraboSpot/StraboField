@@ -9,6 +9,7 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -230,7 +231,7 @@ const Templates = ({
           <ClearButton
             onPress={() => editTemplate(template)}
             title={'Edit'}
-            titleProps={{style: isActive ? commonStyles.standardButtonTextInverse : commonStyles.standardButtonText}}
+            titleProps={{style: isActive ? buttonsStyles.standardButtonTextInverse : buttonsStyles.standardButtonText}}
             type={'save'}
           />
         </ListItem>

@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from './styles.constants';
+import {PRIMARY_ACCENT_COLOR} from './styles.constants';
 
 const commonStyles = StyleSheet.create({
   alignItemsCenter: {
@@ -17,7 +18,7 @@ const commonStyles = StyleSheet.create({
     borderWidth: 0,
   },
   iconColor: {
-    color: themes.BLUE,
+    color: PRIMARY_ACCENT_COLOR,
   },
   imagePlaceholder: {
     backgroundColor: themes.MEDIUMGREY,
@@ -63,21 +64,6 @@ const commonStyles = StyleSheet.create({
     fontSize: themes.PRIMARY_TEXT_SIZE,
     padding: 10,
     textAlign: 'center',
-  },
-  standardButton: {
-    borderRadius: 10,
-  },
-  standardButtonContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  standardButtonText: {
-    color: themes.PRIMARY_ACCENT_COLOR,
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-  },
-  standardButtonTextInverse: {
-    color: themes.SECONDARY_BACKGROUND_COLOR,
-    fontSize: themes.MEDIUM_TEXT_SIZE,
   },
   standardDescriptionText: {
     color: themes.PRIMARY_TEXT_COLOR,

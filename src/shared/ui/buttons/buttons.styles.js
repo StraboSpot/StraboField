@@ -1,5 +1,7 @@
 import {StyleSheet} from 'react-native';
 
+import {MEDIUM_TEXT_SIZE, PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
+
 const buttonStyles = StyleSheet.create({
   navButtonsContainer: {
     alignItems: 'flex-start',
@@ -10,6 +12,21 @@ const buttonStyles = StyleSheet.create({
     alignItems: 'flex-end',
     // marginHorizontal: 10,
     // marginTop: 10,
+  },
+  standardButton: {
+    borderRadius: 10,
+  },
+  standardButtonContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  standardButtonText: {
+    color: PRIMARY_ACCENT_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
+  },
+  standardButtonTextInverse: {
+    color: SECONDARY_BACKGROUND_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
   },
 });
 
