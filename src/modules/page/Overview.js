@@ -88,22 +88,20 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       initialValues = {...initialValues, 'trace_feature': true};
     }
     return (
-      <View>
+      <View style={{flex: 1}}>
         <NotebookPageHeader hideBackButton pageTitle={pageTitle}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
         <FlatList
           ListHeaderComponent={
-            <View>
-              <Formik
-                component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-                enableReinitialize={true}
-                initialStatus={{formName: formName}}
-                initialValues={initialValues}
-                innerRef={formRef}
-                onSubmit={onSubmitForm}
-                validate={values => validateForm({formName: formName, values: values})}
-              />
-            </View>
+            <Formik
+              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+              enableReinitialize={true}
+              initialStatus={{formName: formName}}
+              initialValues={initialValues}
+              innerRef={formRef}
+              onSubmit={onSubmitForm}
+              validate={values => validateForm({formName: formName, values: values})}
+            />
           }
         />
       </View>
