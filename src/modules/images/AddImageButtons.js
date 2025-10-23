@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import {getImageMetaFromWeb, getSize, resizeFile} from './imageHelpers';
@@ -10,7 +9,7 @@ import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 
@@ -119,49 +118,37 @@ const AddImageButtons = ({saveImages}) => {
             type={'file'}
           />
         ) : (
-          <ButtonRounded
-            buttonStyle={imageStyles.buttonContainer}
-            icon={
-              <Icon
-                color={commonStyles.iconColor.color}
-                iconStyle={imageStyles.icon}
-                name={'camera-outline'}
-                type={'ionicon'}/>
-            }
+          <OutlineButton
+            icon={{
+              color: commonStyles.iconColor.color,
+              iconStyle: imageStyles.icon,
+              name: 'camera-outline',
+              type: 'ionicon',
+            }}
             onPress={takePhoto}
             title={'Take'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
           />
         )}
-        <ButtonRounded
-          buttonStyle={imageStyles.buttonContainer}
-          icon={
-            <Icon
-              color={commonStyles.iconColor.color}
-              iconStyle={imageStyles.icon}
-              name={'images-outline'}
-              type={'ionicon'}/>
-          }
+        <OutlineButton
+          icon={{
+            color: commonStyles.iconColor.color,
+            iconStyle: imageStyles.icon,
+            name: 'enter-outline',
+            type: 'ionicon',
+          }}
           onPress={importImages}
           title={'Import'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'outline'}
         />
         {Platform.OS !== 'web' && (
-          <ButtonRounded
-            buttonStyle={imageStyles.buttonContainer}
-            icon={
-              <Icon
-                color={commonStyles.iconColor.color}
-                iconStyle={imageStyles.icon}
-                name={'images-outline'}
-                type={'ionicon'}/>
-            }
+          <OutlineButton
+            icon={{
+              color: commonStyles.iconColor.color,
+              iconStyle: imageStyles.icon,
+              name: 'images-outline',
+              type: 'ionicon',
+            }}
             onPress={() => setIsSketchModalVisible(true)}
             title={'Sketch'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
           />
         )}
       </View>

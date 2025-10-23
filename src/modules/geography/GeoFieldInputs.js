@@ -1,10 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import {NumberInputField} from '../form';
 import useMapLocation from '../maps/useMapLocation';
 
@@ -51,18 +52,15 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
             </View>
           </View>
           {!isReadOnly && (
-            <View>
-              <Button
-                icon={{
-                  name: 'locate',
-                  type: 'ionicon',
-                  size: 30,
-                  color: commonStyles.iconColor.color,
-                }}
-                onPress={fillWithCurrentLocation}
-                type={'clear'}
-              />
-            </View>
+            <ClearButton
+              icon={{
+                name: 'locate',
+                type: 'ionicon',
+                size: 30,
+                color: commonStyles.iconColor.color,
+              }}
+              onPress={fillWithCurrentLocation}
+            />
           )}
         </View>
       </ListItem.Content>

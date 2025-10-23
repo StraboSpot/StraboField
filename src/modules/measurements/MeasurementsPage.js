@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {SectionList, View} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementDetail from './MeasurementDetail';
@@ -9,8 +8,10 @@ import MeasurementItem from './MeasurementItem';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import {isEmpty} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -161,54 +162,42 @@ const MeasurementsPage = ({isReadOnly, page}) => {
         {!isReadOnly && (
           <View style={styles.measurementsSectionDividerButtonContainer}>
             {multiSelectMode && sectionType === multiSelectMode && (
-              <Button
+              <ClearButton
                 disabled={isMultipleFeaturesTaggingEnabled}
-                onPress={() => onSelectingCancel()}
+                onPress={onSelectingCancel}
                 title={'Cancel'}
-                titleStyle={styles.measurementsSectionDividerButtonText}
-                type={'clear'}
               />
             )}
             {multiSelectMode && selectedFeaturesTemp.length >= 1 && sectionType === multiSelectMode && (
-              <Button
+              <ClearButton
                 disabled={isMultipleFeaturesTaggingEnabled}
-                onPress={() => onSelectingEnd()}
+                onPress={onSelectingEnd}
                 title={'Identify Selected'}
-                titleStyle={styles.measurementsSectionDividerButtonText}
-                type={'clear'}
               />
             )}
             {!multiSelectMode && (
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <>
-                  <Button
+                  <ClearButton
                     disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
                     onPress={() => onIdentifyAll(sectionType, data)}
                     title={'Identify All'}
-                    titleStyle={styles.measurementsSectionDividerButtonText}
-                    type={'clear'}
                   />
-                  <Button
+                  <ClearButton
                     disabled={data.length < 1 || isMultipleFeaturesTaggingEnabled}
                     onPress={() => onSelectingStart(sectionType)}
                     title={'Select'}
-                    titleStyle={styles.measurementsSectionDividerButtonText}
-                    type={'clear'}
                   />
                 </>
                 {!modalVisible && (
-                  <Button
+                  <ClearButton
                     disabled={isMultipleFeaturesTaggingEnabled}
-                    icon={
-                      <Icon
-                        color={PRIMARY_ACCENT_COLOR}
-                        name={'add'}
-                        size={20}
-                        style={{paddingHorizontal: 5}}
-                      />
-                    }
+                    icon={{
+                      color: PRIMARY_ACCENT_COLOR,
+                      name: 'add',
+                      size: 20,
+                    }}
                     onPress={() => addMeasurement(sectionType)}
-                    type={'clear'}
                   />
                 )}
               </View>
@@ -266,11 +255,9 @@ const MeasurementsPage = ({isReadOnly, page}) => {
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>
-            <Button
+            <DeleteButton
               onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
               title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
-              titleStyle={{color: WARNING_COLOR}}
-              type={'clear'}
             />
           </View>
         )}

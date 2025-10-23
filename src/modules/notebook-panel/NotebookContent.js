@@ -1,16 +1,15 @@
 import React, {useEffect} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NotebookFooter from './notebook-footer/NotebookFooter';
 import NotebookHeader from './notebook-header/NotebookHeader';
 import {setNotebookPageVisible} from './notebook.slice';
 import notebookStyles from './notebook.styles';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -145,11 +144,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           )}
         />
         {!SMALL_SCREEN && (
-          <Button
+          <ClearButton
             onPress={closeNotebookPanel}
             title={'Close Notebook'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
           />
         )}
       </View>

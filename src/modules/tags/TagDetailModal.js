@@ -1,33 +1,29 @@
 import React, {useRef} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
 import {useTags} from '../tags';
 
 const TagDetailModal = ({closeModal}) => {
-  const {height} = useWindowSize();
-
-  const formRef = useRef(null);
-
   const dispatch = useDispatch();
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedTag = useSelector(state => state.project.selectedTag);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
   const {deleteTag, saveTag} = useTags();
   const {validateForm, showErrors} = useForm();
+
+  const formRef = useRef(null);
 
   let formName = ['project', 'tags'];
   let initialValues;
@@ -68,17 +64,6 @@ const TagDetailModal = ({closeModal}) => {
     closeModal();
     dispatch(setSidePanelVisible({bool: false}));
     deleteTag(selectedTag);
-  };
-
-  const renderCancelSaveButtons = () => {
-    return (
-      <View>
-        <SaveAndCancelButtons
-          cancel={() => closeModal()}
-          save={() => saveFormAndClose()}
-        />
-      </View>
-    );
   };
 
   const saveFormAndClose = async () => {
@@ -122,14 +107,7 @@ const TagDetailModal = ({closeModal}) => {
                   validate={values => validateForm({formName: formName, values: values})}
                 />
               </View>
-              {isEmpty(modalVisible) && (
-                <Button
-                  onPress={() => confirmDeleteTag()}
-                  title={'Delete Tag'}
-                  titleStyle={{color: themes.RED}}
-                  type={'clear'}
-                />
-              )}
+              {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
             </>
           }
         />

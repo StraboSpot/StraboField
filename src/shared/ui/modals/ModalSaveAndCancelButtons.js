@@ -1,10 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
-
 import {overlayStyles} from '../../../modules/home/overlays';
 import ActionButton from '../buttons/ActionButton';
+import ClearButton from '../buttons/ClearButton';
 import OutlineButton from '../buttons/OutlineButton';
 
 const ModalSaveAndCancelButtons = ({
@@ -26,17 +25,14 @@ const ModalSaveAndCancelButtons = ({
     }}>
       <View style={overlayStyles.buttonContainer}>
         {showDeleteButton && (
-          <Button
-            icon={
-              <Icon
-                color={'red'}
-                name={'trash-outline'}
-                size={25}
-                type={'ionicon'}
-              />
-            }
+          <ClearButton
+            icon={{
+              color: 'red',
+              name: 'trash-outline',
+              size: 25,
+              type: 'ionicon',
+            }}
             onPress={onDeletePress}
-            type={'clear'}
           />
         )}
       </View>

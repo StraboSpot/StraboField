@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import DownloadProjectPage from './DownloadProjectPage';
@@ -9,9 +8,9 @@ import ImportProjectFromZip from './ImportProjectFromZip';
 import LoadProjectButtons from './LoadProjectButtons';
 import NewProjectForm from './NewProjectForm';
 import useResetState from '../../../services/useResetState';
-import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
 import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
@@ -93,22 +92,18 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
 
   const renderBackButton = () => {
     return (
-      <Button
-        containerStyle={{alignItems: 'flex-start'}}
-        icon={
-          <Icon
-            color={'black'}
-            iconStyle={projectStyles.buttons}
-            name={'arrow-back'}
-            size={20}
-            type={'ionicon'}
-          />
-        }
-        onPress={goBackToMain}
-        title={'Back'}
-        titleStyle={commonStyles.standardButtonText}
-        type={'clear'}
-      />
+      <View style={{alignItems: 'flex-start'}}>
+        <ClearButton
+          icon={{
+            iconStyle: projectStyles.buttons,
+            name: 'arrow-back',
+            size: 20,
+            type: 'ionicon',
+          }}
+          onPress={goBackToMain}
+          title={'Back'}
+        />
+      </View>
     );
   };
 
@@ -159,11 +154,9 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
         <View style={userStyles.initialProjectLoadProfileHeaderContainer}>
           <Text style={userStyles.initialProjectLoadProfileHeaderText}>Hello, {displayName}!</Text>
           {user.email && <Text>Signed in as {truncateText(user.email, 15)}</Text>}
-          <Button
+          <ClearButton
             onPress={clearUser}
             title={user.name ? `Not ${user.name}?` : 'Log in?'}
-            titleStyle={{...commonStyles.standardButtonText, fontSize: 10}}
-            type={'clear'}
           />
         </View>
       </View>

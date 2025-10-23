@@ -2,7 +2,6 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, PermissionsAndroid, Platform, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {Base64} from 'js-base64';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -23,6 +22,8 @@ import useUpload from '../../services/useUpload';
 import useUploadImages from '../../services/useUploadImages';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import TextInputModal from '../../shared/ui/TextInputModal';
@@ -200,31 +201,20 @@ const UserProfile = () => {
         <View style={{alignItems: 'center'}}>
           <UserProfileAvatar size={'xlarge'} tempUserProfileImageURI={tempUserProfileImage?.uri}/>
         </View>
-        <Button
-          buttonStyle={{borderRadius: 10}}
-          containerStyle={commonStyles.buttonContainer}
+        <OutlineButton
           onPress={() => pickImageSource('gallery')}
           title={'Gallery'}
-          type={'outline'}
         />
-        <Button
-          buttonStyle={{borderRadius: 10}}
-          containerStyle={commonStyles.buttonContainer}
+        <OutlineButton
           onPress={() => pickImageSource('camera')}
           title={'Camera'}
-          type={'outline'}
         />
-        <Button
-          buttonStyle={{borderRadius: 10}}
-          containerStyle={commonStyles.buttonContainer}
+        <OutlineButton
           loading={isDeletingProfileImage}
           onPress={removeProfileImage}
           title={'Remove Profile Image'}
-          type={'outline'}
         />
-        <Button
-          buttonStyle={{borderRadius: 10}}
-          containerStyle={commonStyles.buttonContainer}
+        <OutlineButton
           disabled={isEmpty(tempUserProfileImage)}
           loading={isUploadingProfileImage}
           onPress={saveImage}
@@ -308,24 +298,15 @@ const UserProfile = () => {
               {isOnline.isInternetReachable && !isEmpty(userData.email) && !isEmpty(userData.encoded_login) ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
-                    <Button
-                      buttonStyle={commonStyles.standardButton}
-                      containerStyle={commonStyles.standardButtonContainer}
+                    <OutlineButton
                       loading={isDownloading}
-                      loadingProps={userStyles.loadingSpinnerProps}
                       onPress={onDownloadUserProfile}
                       title={'Download User Profile'}
-                      titleStyle={commonStyles.standardButtonText}
-                      type={'outline'}
                     />
                   )}
-                  <Button
-                    buttonStyle={commonStyles.standardButton}
-                    containerStyle={commonStyles.standardButtonContainer}
+                  <DeleteButton
                     onPress={() => setDeleteProfileModalVisible(true)}
                     title={'Delete Account'}
-                    titleStyle={userStyles.deleteProfileButtonText}
-                    type={'outline'}
                   />
                 </View>
               ) : (

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {AppState, FlatList, Text, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -11,6 +11,7 @@ import {APP_DIRECTORIES} from '../../services/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
@@ -111,15 +112,10 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={
               <View>
-                {source === 'server' ? (
-                  <Button
-                    buttonStyle={{width: 80, alignSelf: 'center'}}
-                    onPress={() => getAllProjects()}
-                    title={'Retry'}
-                  />
-                ) : (
-                  <ListEmptyText text={'No Projects Available'}/>
-                )}
+                {source === 'server' ? <OutlineButton onPress={getAllProjects} title={'Retry'}/>
+                  : (
+                    <ListEmptyText text={'No Projects Available'}/>
+                  )}
                 {isError && renderErrorMessage()}
               </View>
             }

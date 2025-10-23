@@ -97,13 +97,11 @@ const ExternalData = ({isReadOnly}) => {
               </ListItem.Content>
             </ListItem>
             {error && <Text style={formStyles.fieldError}>Not a valid url</Text>}
-            <View style={{marginHorizontal: 15}}>
-              <OutlineButton
-                disabled={url === ''}
-                onPress={() => saveUrl()}
-                title={'🌐 Add Link'}
-              />
-            </View>
+            <OutlineButton
+              disabled={url === ''}
+              onPress={saveUrl}
+              title={'🌐 Add Link'}
+            />
           </>
         )}
         <View style={{flex: 1}}>
@@ -126,12 +124,10 @@ const ExternalData = ({isReadOnly}) => {
             />
           )}
           {!isReadOnly && (
-            <View style={{marginHorizontal: 15}}>
-              <OutlineButton
-                onPress={importCSVFile}
-                title={'📎  Attach table from a .CSV file'}
-              />
-            </View>
+            <OutlineButton
+              onPress={importCSVFile}
+              title={'📎  Attach table from a .CSV file'}
+            />
           )}
         </View>
         <View style={{flex: 1}}>

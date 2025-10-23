@@ -6,7 +6,7 @@ const modalStyles = StyleSheet.create({
   modalHeaderButtonsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginLeft: 10,
   },
   modalHeaderContainer: {

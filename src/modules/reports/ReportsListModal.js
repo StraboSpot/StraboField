@@ -20,11 +20,7 @@ const ReportsListModal = () => {
 
   return (
     <ModalWrapper>
-      <AddButton
-        onPress={addReport}
-        title={'Create New Report'}
-        type={'outline'}
-      />
+      <AddButton onPress={addReport} title={'Create New Report'}/>
       <ReportsList isCheckedList/>
     </ModalWrapper>
   );

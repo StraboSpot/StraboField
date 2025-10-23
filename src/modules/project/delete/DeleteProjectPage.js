@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import DeleteProjectModal from './DeleteProjectModal';
 import useDevice from '../../../services/useDevice';
-import commonStyles from '../../../shared/common.styles';
 import {BLUE} from '../../../shared/styles.constants';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
@@ -45,24 +44,17 @@ const DeleteProjectPage = () => {
           title={'My StraboField Projects'}
         />
         <ProjectList doRefresh={doReloadPage} onProjectPress={confirmDeleteProject} source={source}/>
-        <View style={{marginBottom: 20}}>
-          {Platform.OS === 'ios' && (
-            <Button
-              buttonStyle={commonStyles.standardButton}
-              containerStyle={commonStyles.buttonPadding}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-              iconContainerStyle={{paddingRight: 10}}
-              onPress={() => openURL('ProjectBackups')}
-              title={'View/Edit Files on Device'}
-              titleStyle={commonStyles.standardButtonText}
-              type={'outline'}
-            />
-          )}
-        </View>
+        {Platform.OS === 'ios' && (
+          <OutlineButton
+            icon={{
+              name: 'file-tray-full-outline',
+              type: 'ionicon',
+              color: BLUE,
+            }}
+            onPress={() => openURL('ProjectBackups')}
+            title={'View/Edit Files on Device'}
+          />
+        )}
       </View>
 
       {/* Modal */}

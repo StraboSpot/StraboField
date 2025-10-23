@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 
-import {Button, Icon, SearchBar} from '@rn-vui/base';
+import {SearchBar} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import {useSpots} from '.';
 import SortingButtons from './SortingButtons';
 import {SORT_ORDER, SORTED_VIEWS} from './spots.constants';
 import {isEmpty} from '../../shared/Helpers';
-import * as themes from '../../shared/styles.constants';
 import {DARKGREY, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 
@@ -117,30 +117,18 @@ const SpotFilters = ({
           platform={'default'}
           value={searchState}
         />
-        <Button
-          icon={(
-            <Icon
-              color={themes.PRIMARY_TEXT_COLOR}
-              name={'sort'}
-              type={'material'}
-            />
-          )}
-          onPress={openPicker}
-          size={'sm'}
-          type={'clear'}
-        />
-        <Button
-          icon={(
-            <Icon
-              color={themes.PRIMARY_TEXT_COLOR}
-              name={'swap-vert'}
-              type={'material'}
-            />
-          )}
-          onPress={toggleReverseSort}
-          size={'sm'}
-          type={'clear'}
-        />
+        <View style={{marginHorizontal: -10}}>
+          <ClearButton
+            icon={{name: 'sort', type: 'material'}}
+            onPress={openPicker}
+          />
+        </View>
+        <View style={{marginHorizontal: -10}}>
+          <ClearButton
+            icon={{name: 'swap-vert', type: 'material'}}
+            onPress={toggleReverseSort}
+          />
+        </View>
       </View>
       <PickerOverlay
         closePicker={closePicker}

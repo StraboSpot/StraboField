@@ -8,8 +8,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import AddButton from '../../shared/ui/buttons/AddButton';
-import SaveButton from '../../shared/ui/buttons/ButtonRounded';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
@@ -198,13 +198,7 @@ const TagsModal = ({
     return (
       <>
         <View style={{flex: 1}}>
-          <View style={modalStyles.textContainer}>
-            <AddButton
-              onPress={addTag}
-              title={`Create New ${toTitleCase(label).slice(0, -1)}`}
-              type={'outline'}
-            />
-          </View>
+          <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
           <View style={modalStyles.textContainer}>
             {tags && !isEmpty(tags)
               ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>
@@ -214,8 +208,7 @@ const TagsModal = ({
           {(!isEmpty(tags)
             && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
             && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
-            <SaveButton
-              buttonStyle={{backgroundColor: 'red'}}
+            <ActionButton
               disabled={isEmpty(checkedTagsTemp)}
               onPress={save}
               title={`Save ${label}`}

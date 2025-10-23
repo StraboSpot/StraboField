@@ -81,14 +81,9 @@ const StatusModal = () => {
         </View>
       )}
       {!isModalLoading && isLoadingProject && !isShowingDatasetPreferences && (
-        <OutlineButton
-          onPress={() => setIsShowingDatasetPreferences(true)}
-          title={'Show Datasets'}
-        />
+        <OutlineButton onPress={() => setIsShowingDatasetPreferences(true)} title={'Show Datasets'}/>
       )}
-      {isShowingDatasetPreferences && isLoadingProject && (
-        <DatasetPreferences/>
-      )}
+      {isShowingDatasetPreferences && isLoadingProject && <DatasetPreferences/>}
     </ModalWrapper>
   );
 };

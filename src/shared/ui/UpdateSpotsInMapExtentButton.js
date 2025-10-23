@@ -1,11 +1,10 @@
 import React from 'react';
 
-import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setIsMapMoved} from '../../modules/maps/maps.slice';
-import commonStyles from '../common.styles';
 import * as themes from '../styles.constants';
+import OutlineButton from './buttons/OutlineButton';
 
 // Update the Spots in the map
 const UpdateSpotsInMapExtentButton = ({title, updateSpotsInMapExtent}) => {
@@ -19,22 +18,17 @@ const UpdateSpotsInMapExtentButton = ({title, updateSpotsInMapExtent}) => {
   };
 
   return (
-    <Button
-      containerStyle={{padding: 5, paddingTop: 0}}
+    <OutlineButton
       disabled={!isMapMoved}
-      icon={
-        <Icon
-          color={isMapMoved ? themes.PRIMARY_ACCENT_COLOR : themes.MEDIUMGREY}
-          containerStyle={{paddingRight: 5}}
-          name={'sync-outline'}
-          size={20}
-          type={'ionicon'}
-        />
-      }
+      icon={{
+        color: isMapMoved ? themes.PRIMARY_ACCENT_COLOR : themes.MEDIUMGREY,
+        containerStyle: {paddingRight: 5},
+        name: 'sync-outline',
+        size: 20,
+        type: 'ionicon',
+      }}
       onPress={onPress}
       title={title}
-      titleStyle={commonStyles.standardButtonText}
-      type={'outline'}
     />
   );
 };

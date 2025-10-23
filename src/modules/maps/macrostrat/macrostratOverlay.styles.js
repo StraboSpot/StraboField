@@ -1,7 +1,7 @@
 import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../../shared/styles.constants';
-import {SMALL_SCREEN} from '../../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 15,
   },
   showButton: {
-    color: 'blue',
+    color: PRIMARY_ACCENT_COLOR,
     marginTop: 10,
     textAlign: 'center',
   },
   urlText: {
-    color: themes.BLUE,
+    color: themes.PRIMARY_ACCENT_COLOR,
   },
 });
 

@@ -9,7 +9,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
 import {isEmpty, toTitleCase} from '../../../shared/Helpers';
-import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -114,13 +115,13 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
 
   const renderCoordsText = () => {
     return (
-      <Button
-        buttonStyle={{justifyContent: 'flex-start', padding: 0, paddingHorizontal: 0}}
-        onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
-        title={getSpotCoordText()}
-        titleStyle={{textAlign: 'left', fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-        type={'clear'}
-      />
+      <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+        <ClearButton
+          onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+          title={getSpotCoordText()}
+          titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
+        />
+      </View>
     );
   };
 
@@ -128,24 +129,22 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return (
       <View style={{flexDirection: 'row'}}>
         {!spot.properties.trace && !spot.properties.surface_feature && (
-          <Button
-            buttonStyle={{padding: 0, paddingRight: 15, paddingLeft: 0}}
-            onPress={setToCurrentLocation}
-            title={'Set To Current Location'}
-            titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-            type={'clear'}
-          />
+          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5, paddingRight: 15}}>
+            <ClearButton
+              onPress={setToCurrentLocation}
+              title={'Set To Current Location'}
+            />
+          </View>
         )}
-        <Button
-          buttonStyle={{padding: 0}}
-          onPress={() => {
-            createDefaultGeom();
-            closeNotebookPanel();
-          }}
-          title={'Set in Current View'}
-          titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-          type={'clear'}
-        />
+        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+          <ClearButton
+            onPress={() => {
+              createDefaultGeom();
+              closeNotebookPanel();
+            }}
+            title={'Set in Current View'}
+          />
+        </View>
       </View>
     );
   };

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import KeepAwake from 'react-native-keep-awake';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,6 +12,7 @@ import useUploadImages from '../../../services/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
@@ -171,13 +171,7 @@ const UploadModal = ({closeModal, isVisible}) => {
         server.{'\n'}
         - Read Only datasets will not be affected unless they were removed from Read Only status and modified.
       </Text>
-      {__DEV__ && (
-        <Button
-          onPress={uploadImagesOnly}
-          title={'Upload Images Only (Dev Mode)'}
-          type={'clear'}
-        />
-      )}
+      {__DEV__ && <ClearButton onPress={uploadImagesOnly} title={'Upload Images Only (Dev Mode)'}/>}
     </View>
   );
 

@@ -65,12 +65,11 @@ const commonStyles = StyleSheet.create({
     textAlign: 'center',
   },
   standardButton: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderRadius: 10,
   },
   standardButtonContainer: {
-    paddingBottom: 5,
-    paddingTop: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   standardButtonText: {
     color: themes.PRIMARY_ACCENT_COLOR,
@@ -94,10 +93,6 @@ const commonStyles = StyleSheet.create({
     backgroundColor: 'white',
     paddingLeft: 20,
     width: 200,
-  },
-  viewMapsButtonText: {
-    color: themes.PRIMARY_ACCENT_COLOR,
-    fontSize: themes.SMALL_TEXT_SIZE,
   },
 });
 
