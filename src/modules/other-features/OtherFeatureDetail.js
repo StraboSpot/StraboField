@@ -183,13 +183,8 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              {!isReadOnly && (
-                <Button
-                  onPress={() => deleteFeatureConfirm()}
-                  title={'Delete Feature'}
-                  titleStyle={{color: WARNING_COLOR}}
-                  type={'clear'}
-                />
+              {!isReadOnly && Object.keys(selectedFeature).length > 1 && (
+                <DeleteButton onPress={() => deleteFeatureConfirm()} title={'Delete Feature'}/>
               )}
             </View>
           )}
