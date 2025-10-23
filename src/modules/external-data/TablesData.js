@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, FlatList, Pressable, ScrollView, Text, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {Rows, Table} from 'react-native-reanimated-table';
 
 import externalDataStyles from './externalData.styles';
 import {toTitleCase} from '../../shared/Helpers';
+import {DARKGREY} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
@@ -108,18 +109,17 @@ function TablesData({
           style={({pressed}) => [externalDataStyles.listItem, {backgroundColor: pressed ? '#b4b6b8' : '#fff'}]}
         >
           <Text>{table.name} (.CSV)</Text>
-          {editable && <Pressable
-            onPress={() => initializeDelete('csv', table)}
-            style={({pressed}) => [{backgroundColor: pressed ? '#b4b6b8' : 'transparent'}]}
-          >
-            <Icon
-              color={'darkgrey'}
-              containerStyle={externalDataStyles.iconContainer}
-              name={'trash'}
-              size={25}
-              type={'font-awesome'}
+          {editable && (
+            <ClearButton
+              icon={{
+                color: DARKGREY,
+                name: 'trash',
+                size: 20,
+                type: 'font-awesome',
+              }}
+              onPress={() => initializeDelete('csv', table)}
             />
-          </Pressable>}
+          )}
         </Pressable>
       </View>
     );

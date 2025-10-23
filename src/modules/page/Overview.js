@@ -1,16 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import usePage from './usePage';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -88,22 +87,20 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       initialValues = {...initialValues, 'trace_feature': true};
     }
     return (
-      <View>
+      <View style={{flex: 1}}>
         <NotebookPageHeader hideBackButton pageTitle={pageTitle}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
         <FlatList
           ListHeaderComponent={
-            <View>
-              <Formik
-                component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-                enableReinitialize={true}
-                initialStatus={{formName: formName}}
-                initialValues={initialValues}
-                innerRef={formRef}
-                onSubmit={onSubmitForm}
-                validate={values => validateForm({formName: formName, values: values})}
-              />
-            </View>
+            <Formik
+              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+              enableReinitialize={true}
+              initialStatus={{formName: formName}}
+              initialValues={initialValues}
+              innerRef={formRef}
+              onSubmit={onSubmitForm}
+              validate={values => validateForm({formName: formName, values: values})}
+            />
           }
         />
       </View>
@@ -217,13 +214,10 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
           </View>
           <View style={{height: 40}}>
             {(isReadOnly || !isTraceSurfaceFeatureEdit) && (
-              <Button
+              <ClearButton
                 disabled={!isTraceSurfaceFeatureEnabled}
-                disabledTitleStyle={notebookStyles.traceSurfaceFeatureDisabledText}
                 onPress={handleToggleShowTraceSurfaceFeatureForm}
                 title={isTraceSurfaceFeatureEdit ? 'Close' : isReadOnly ? 'View' : 'Edit'}
-                titleStyle={{color: PRIMARY_ACCENT_COLOR}}
-                type={'clear'}
               />
             )}
           </View>

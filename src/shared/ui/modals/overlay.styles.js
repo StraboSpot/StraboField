@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
     justifyContent: 'flex-end',
     marginRight: 10,
     paddingTop: 10,

@@ -1,14 +1,14 @@
 import React, {useRef} from 'react';
 import {View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {NumberInputField, SelectInputField, useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';
@@ -218,12 +218,7 @@ const AddImageOverlayModal = ({
           )}
         </Formik>
         {!isEmpty(image) && !isReadOnly && (
-          <Button
-            onPress={deleteImageOverlayConfirm}
-            title={'Remove Image Overlay'}
-            titleStyle={{color: WARNING_COLOR}}
-            type={'clear'}
-          />
+          <DeleteButton onPress={deleteImageOverlayConfirm} title={'Remove Image Overlay'}/>
         )}
       </ModalWrapper>
     );

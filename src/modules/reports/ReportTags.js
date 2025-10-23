@@ -1,13 +1,12 @@
 import React, {useState} from 'react';
 import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -36,23 +35,19 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
       <View>
         <SectionDivider dividerText={'Tags'}/>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
-          <ButtonRounded
-            buttonStyle={imageStyles.buttonContainer}
-            icon={
-              <Icon
-                color={commonStyles.iconColor.color}
-                iconStyle={imageStyles.icon}
-                name={'plus-minus'}
-                type={'material-community'}/>
-            }
+          <OutlineButton
+            icon={{
+              color: commonStyles.iconColor.color,
+              iconStyle: imageStyles.icon,
+              name: 'plus-minus',
+              type: 'material-community',
+            }}
             onPress={addAssociatedSpots}
             title={'Add/Remove Tags'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
           />
         </View>
 
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5, paddingTop: 15}}>
+        <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5}}>
           {isEmpty(checkedTags) && <ListEmptyText text={'No Tags'}/>}
           {checkedTags.map(t => (
             <TouchableOpacity
@@ -81,9 +76,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
             </ScrollView>
           ) : (
             <FlatList
-              ListHeaderComponent={
-                <TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
-              }
+              ListHeaderComponent={<TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>}
             />
           )}
         </ModalWrapper>

@@ -1,19 +1,15 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import modalStyles from './modal.styles';
 import {setModalVisible} from '../../../modules/home/home.slice';
 import {MODALS} from '../../../modules/page/page.constants';
-import * as themes from '../../styles.constants';
-import {BLACK} from '../../styles.constants';
+import CloseButton from '../buttons/CloseButton';
 
 const ModalWrapperHeader = ({
-                              buttonTitleLeft,
                               buttonTitleRight,
-                              cancel,
                               closeModal,
                               showCloseButton = false,
                               headerTitle,
@@ -28,23 +24,14 @@ const ModalWrapperHeader = ({
   return (
     <View style={modalStyles.modalTop}>
       <View style={modalStyles.modalHeaderContainer}>
-        <View style={modalStyles.modalHeaderButtonsContainer}>
-          <Button
-            buttonStyle={{padding: 0}}
-            onPress={cancel}
-            title={buttonTitleLeft}
-            titleStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: 16}}
-            type={'clear'}
-          />
-          {showCloseButton && (
-            <Button
+        {showCloseButton && (
+          <View style={modalStyles.modalHeaderButtonsContainer}>
+            <CloseButton
               onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
-              title={buttonTitleRight === '' ? '' : buttonTitleRight || 'X'}
-              titleStyle={{color: BLACK, fontSize: 18}}
-              type={'clear'}
+              title={buttonTitleRight}
             />
-          )}
-        </View>
+          </View>
+        )}
         <Text style={modalStyles.modalTitle}>{headerTitle || getTitle()}</Text>
       </View>
     </View>

@@ -90,8 +90,8 @@ const NotebookPageHeader = ({
         </View>
       </View>
       {isMultipleFeaturesTaggingEnabled && (
-        <View style={{paddingHorizontal: 10, backgroundColor: PRIMARY_BACKGROUND_COLOR}}>
-          <Text style={commonStyles.standardDescriptionText}>
+        <View style={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}>
+          <Text style={[commonStyles.standardDescriptionText, {paddingHorizontal: 10}]}>
             1. Select feature(s) to tag below.{'\n'}
             2. Hit 'Choose Tags to Apply button.{'\n'}
             *If features with different tags are selected, only common tags will appear selected.

@@ -1,14 +1,12 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {PAGE_KEYS} from './page.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import * as themes from '../../shared/styles.constants';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -27,6 +25,7 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 
 
 const BasicPageDetail = ({
@@ -236,11 +235,9 @@ const BasicPageDetail = ({
           )}
         </Formik>
         {!isReadOnly && (
-          <Button
+          <DeleteButton
             onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
             title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-            titleStyle={{color: themes.RED}}
-            type={'clear'}
           />
         )}
       </View>

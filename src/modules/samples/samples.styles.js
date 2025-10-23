@@ -18,6 +18,7 @@ const sampleStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   logoDisplayContainer: {
+    borderRadius: 10,
     marginRight: 20,
   },
   mySesarUpdateDisclaimer: {

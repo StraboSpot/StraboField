@@ -186,6 +186,13 @@
       "label": "Map of Area",
       "hint": "Upload any maps or other files related to the summary",
       "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "breifing_notes",
+      "label": "Breifing Notes",
+      "required": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [

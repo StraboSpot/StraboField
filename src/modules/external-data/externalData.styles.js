@@ -9,10 +9,6 @@ const externalDataStyles = StyleSheet.create({
     paddingVertical: 6,
     textAlign: 'center',
   },
-  iconContainer: {
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
   listItem: {
     alignItems: 'center',
     backgroundColor: '#fff',

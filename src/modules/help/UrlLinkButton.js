@@ -1,7 +1,6 @@
 import React from 'react';
 import {Linking} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
@@ -24,25 +23,21 @@ const UrlLinkButton = ({icon, title, url}) => {
     }
   };
 
-  return (
-    <>
-      {isOnline && (
-        <OutlineButton
-          icon={
-            <Icon
-              color={PRIMARY_ACCENT_COLOR}
-              iconStyle={{paddingHorizontal: 10}}
-              name={icon}
-              size={20}
-              type={'ionicon'}
-            />
-          }
-          onPress={openLink}
-          title={title}
-        />
-      )}
-    </>
-  );
+  if (isOnline) {
+    return (
+      <OutlineButton
+        icon={{
+          color: PRIMARY_ACCENT_COLOR,
+          iconStyle: {paddingRight: 10},
+          name: icon,
+          size: 20,
+          type: 'ionicon',
+        }}
+        onPress={openLink}
+        title={title}
+      />
+    );
+  }
 };
 
 export default UrlLinkButton;

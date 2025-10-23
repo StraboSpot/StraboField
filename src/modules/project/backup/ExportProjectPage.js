@@ -1,16 +1,15 @@
 import React, {useState} from 'react';
 import {Platform, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import useDevice from '../../../services/useDevice';
-import commonStyles from '../../../shared/common.styles';
-import {BLUE} from '../../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 import SaveAndExportModal from './SaveAndExportModal';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 
 // Export a saved project on device in StraboSpot app directory
 const ExportProjectPage = () => {
@@ -37,24 +36,17 @@ const ExportProjectPage = () => {
           title={'My StraboField Projects'}
         />
         <ProjectList onProjectPress={onSelectedProjectForExport} source={source}/>
-        <View style={{marginBottom: 20}}>
-          {Platform.OS === 'ios' && (
-            <Button
-              buttonStyle={commonStyles.standardButton}
-              containerStyle={commonStyles.buttonPadding}
-              icon={{
-                name: 'file-tray-full-outline',
-                type: 'ionicon',
-                color: BLUE,
-              }}
-              iconContainerStyle={{paddingRight: 10}}
-              onPress={() => openURL('ProjectBackups')}
-              title={'View/Edit Files on Device'}
-              titleStyle={commonStyles.standardButtonText}
-              type={'outline'}
-            />
-          )}
-        </View>
+        {Platform.OS === 'ios' && (
+          <OutlineButton
+            icon={{
+              name: 'file-tray-full-outline',
+              type: 'ionicon',
+              color: PRIMARY_ACCENT_COLOR,
+            }}
+            onPress={() => openURL('ProjectBackups')}
+            title={'View/Edit Files on Device'}
+          />
+        )}
       </View>
 
       {/* Modal */}

@@ -1,35 +1,36 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
-
 import SectionDivider from './SectionDivider';
 import styles from '../../shared/ui/ui.styles';
-import commonStyles from '../common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
+import ClearButton from './buttons/ClearButton';
 
-const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, iconType, iconSize, onPress}) => {
+const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, onPress}) => {
   return (
     <View style={styles.sectionDividerWithButtonContainer}>
       <SectionDivider dividerText={dividerText}/>
-      <Button
-        disabled={disabled}
-        icon={!buttonTitle && (
-          <Icon
-            color={PRIMARY_ACCENT_COLOR}
-            name={iconName || 'add'}
-            onPress={onPress}
-            size={iconSize || 20}
-            style={{paddingHorizontal: 5}}
-            type={iconType || 'ionicon'}
-          />
-        )}
-        onPress={onPress}
-        size={'sm'}
-        title={buttonTitle}
-        titleStyle={commonStyles.standardButtonText}
-        type={'clear'}
-      />
+      {buttonTitle ? (
+        <ClearButton
+          disabled={disabled}
+          onPress={onPress}
+          size={'sm'}
+          title={buttonTitle}
+        />
+      ) : (
+        <ClearButton
+          disabled={disabled}
+          icon={{
+            color: PRIMARY_ACCENT_COLOR,
+            name: iconName || 'add',
+            onPress: onPress,
+            size: 20,
+            type: 'ionicon',
+          }}
+          onPress={onPress}
+          size={'sm'}
+        />
+      )}
     </View>
   );
 };

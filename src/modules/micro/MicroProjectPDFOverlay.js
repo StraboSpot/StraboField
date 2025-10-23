@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
-import {Button, Icon} from '@rn-vui/base';
+import {Icon} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 import Toast from 'react-native-toast-notifications';
 
 import useDevice from '../../services/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import CloseButton from '../../shared/ui/buttons/CloseButton';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -23,13 +24,9 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
       placement: 'top',
       duration: 2000,
     };
-    if (Platform.OS === 'web') {
-      // Fallback to alert on web since react-native-toast-notifications may not work
-      alert(message);
-    }
-    else {
-      toastRef.current.show(message, toastOptions);
-    }
+    // Fallback to alert on web since react-native-toast-notifications may not work
+    if (Platform.OS === 'web') alert(message);
+    else toastRef.current.show(message, toastOptions);
   };
 
   const [wasExported, setWasExported] = useState(false);
@@ -93,18 +90,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
               type={'material-community'}
             />
           )}
-          <Button
-            icon={
-              <Icon
-                color={BLACK}
-                name={'close-outline'}
-                size={30}
-                type={'ionicon'}
-              />
-            }
-            onPress={() => setVisible(!visible)}
-            type={'clear'}
-          />
+          <CloseButton onPress={() => setVisible(!visible)}/>
         </View>
         {!isEmpty(doc) && (
           <Pdf

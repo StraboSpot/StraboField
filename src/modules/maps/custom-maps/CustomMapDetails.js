@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button, Icon, Input, ListItem} from '@rn-vui/base';
+import {Icon, Input, ListItem} from '@rn-vui/base';
 import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,9 +9,11 @@ import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {BLUE, DARKGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
+import ActionButton from '../../../shared/ui/buttons/ActionButton';
+import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -340,23 +342,15 @@ const CustomMapDetails = () => {
           && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
             || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
-                editableCustomMapData.id)
-              || editableCustomMapData.source === 'map_warper')}
-            onPress={() => saveMap()}
+          <ActionButton
+            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title)
+              || isEmpty(editableCustomMapData.id) || editableCustomMapData.source === 'map_warper')}
+            onPress={saveMap}
             title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-            type={'outline'}
           />
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            onPress={() => confirmDeleteMap()}
+          <DeleteButton
+            onPress={confirmDeleteMap}
             title={'Delete Map'}
-            titleStyle={{color: WARNING_COLOR}}
-            type={'outline'}
           />
         </View>
       </View>

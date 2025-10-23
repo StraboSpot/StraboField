@@ -1,13 +1,12 @@
 import React, {useState} from 'react';
 import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ButtonRounded from '../../shared/ui/buttons/ButtonRounded';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -36,37 +35,19 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
       <View>
         <SectionDivider dividerText={'Associated Spots'}/>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
-          <ButtonRounded
-            buttonStyle={imageStyles.buttonContainer}
-            icon={
-              <Icon
-                color={commonStyles.iconColor.color}
-                iconStyle={imageStyles.icon}
-                name={'plus-minus'}
-                type={'material-community'}/>
-            }
+          <OutlineButton
+            icon={{
+              color: commonStyles.iconColor.color,
+              iconStyle: imageStyles.icon,
+              name: 'plus-minus',
+              type: 'material-community',
+            }}
             onPress={addAssociatedSpots}
             title={'Add/Remove Spots'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
           />
-          {/*<ButtonRounded*/}
-          {/*  icon={*/}
-          {/*    <Icon*/}
-          {/*      name={'lasso'}*/}
-          {/*      type={'material-community'}*/}
-          {/*      iconStyle={imageStyles.icon}*/}
-          {/*      color={commonStyles.iconColor.color}/>*/}
-          {/*  }*/}
-          {/*  title={'Add Spots with Lasso'}*/}
-          {/*  titleStyle={commonStyles.standardButtonText}*/}
-          {/*  buttonStyle={imageStyles.buttonContainer}*/}
-          {/*  type={'outline'}*/}
-          {/*  onPress={addAssociatedSpots}*/}
-          {/*/>*/}
         </View>
 
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5, paddingTop: 15}}>
+        <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5}}>
           {isEmpty(checkedSpots) && <ListEmptyText text={'No Associated Spots'}/>}
           {checkedSpots.map(d => (
             <TouchableOpacity

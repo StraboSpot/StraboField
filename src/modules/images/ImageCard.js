@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
-import {Button, Card, Icon} from '@rn-vui/base';
+import {Card} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImages} from '.';
@@ -9,6 +9,7 @@ import useDevice from '../../services/useDevice';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -143,7 +144,7 @@ const ImageCard = ({
       </View>
 
       {!isThumbnailOnly && (
-        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5, alignItems: 'center'}}>
           <SwitchWrapper
             disabled={getIsSwitchDisabled()}
             onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
@@ -152,19 +153,18 @@ const ImageCard = ({
           <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'center', paddingHorizontal: 5}}>
             Use Image as{'\n'}a Basemap?
           </Text>
-          <Button
-            disabled={!image.annotated}
-            icon={
-              <Icon
-                color={image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY}
-                name={'map-outline'}
-                size={20}
-                type={'ionicon'}
-              />
-            }
-            onPress={() => getImageBasemap(image)}
-            type={'clear'}
-          />
+          <View style={{margin: -5}}>
+            <ClearButton
+              disabled={!image.annotated}
+              icon={{
+                color: image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY,
+                name: 'map-outline',
+                size: 20,
+                type: 'ionicon',
+              }}
+              onPress={() => getImageBasemap(image)}
+            />
+          </View>
         </View>
       )}
     </Card>

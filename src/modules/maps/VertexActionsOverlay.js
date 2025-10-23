@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
-
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -59,8 +58,7 @@ const VertexActionsOverlay = ({
             return (
               ((vertexActionValues.vertexSelected && button !== 'Add Vertex')
                 || (!vertexActionValues.vertexSelected && button !== 'Delete Vertex')) && (
-                <Button
-                  buttonStyle={overlayStyles.buttonText}
+                <ClearButton
                   icon={
                     <IconButton
                       onPress={() => handleActionPressed(button)}
@@ -71,7 +69,6 @@ const VertexActionsOverlay = ({
                   key={button}
                   onPress={() => handleActionPressed(button)}
                   title={button}
-                  type={'clear'}
                 />
               )
             );

@@ -105,15 +105,6 @@ const styles = StyleSheet.create({
   littleSpacer: {
     padding: 5,
   },
-  saveAndDeleteButtonContainer: {
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  saveAndDeleteButtonStyles: {
-    borderRadius: 15,
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
     paddingLeft: 10,

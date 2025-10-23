@@ -1,7 +1,7 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button, ButtonGroup, ListItem} from '@rn-vui/base';
+import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -11,9 +11,10 @@ import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
@@ -287,12 +288,7 @@ const MeasurementDetail = ({
           )}
 
         {/* Button to add an associated measurement */}
-        {!isReadOnly && (
-          <AddButton
-            onPress={onAddAssociatedMeasurement}
-            title={addButtonText}
-          />
-        )}
+        {!isReadOnly && <AddButton onPress={onAddAssociatedMeasurement} title={addButtonText}/>}
       </View>
     );
   };
@@ -540,11 +536,9 @@ const MeasurementDetail = ({
                   {!isEmpty(formName) && renderFormFields()}
                 </View>
                 {selectedAttributes.length === 1 && !isReadOnly && (
-                  <Button
+                  <DeleteButton
                     onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
                     title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
-                    titleStyle={{color: WARNING_COLOR}}
-                    type={'clear'}
                   />
                 )}
               </View>

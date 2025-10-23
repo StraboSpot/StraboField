@@ -5,7 +5,7 @@ import {MEDIUM_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.
 
 const imageStyles = StyleSheet.create({
   buttonContainer: {
-    backgroundColor: 'white',
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
     borderColor: 'grey',
     borderWidth: 1,
     margin: 5,

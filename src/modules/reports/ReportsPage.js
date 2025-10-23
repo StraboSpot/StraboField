@@ -30,11 +30,7 @@ const ReportsPage = () => {
   return (
     <View style={{flex: 1}}>
       <NotebookPageHeader pageTitle={'Reports'}/>
-      <AddButton
-        onPress={addReport}
-        title={'Create New Report with this Spot'}
-        type={'outline'}
-      />
+      <AddButton onPress={addReport} title={'Create New Report with this Spot'}/>
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
         Reports referencing this Spot:
       </Text>

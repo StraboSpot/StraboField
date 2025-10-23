@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
-
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -39,19 +38,17 @@ const SetInCurrentViewOverlay = ({
     >
       <View style={overlayStyles.selectGeometryTypeContent}>
         {buttons.map(button =>
-          <Button
-            buttonStyle={overlayStyles.buttonText}
+          <ClearButton
             icon={
               <IconButton
                 onPress={() => updateDefaultGeomType(button)}
                 source={buttonIcon(button)}
-                style={{paddingRight: 15}}
+                style={{paddingRight: 10}}
               />
             }
             key={button}
             onPress={() => updateDefaultGeomType(button)}
             title={button}
-            type={'clear'}
           />,
         )}
       </View>

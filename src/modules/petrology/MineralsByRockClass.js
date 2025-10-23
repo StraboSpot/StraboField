@@ -1,9 +1,8 @@
 import React from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
-
 import {MINERALS_BY_CLASS} from './petrology.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const MineralsByRockClass = ({addMineral}) => {
@@ -14,24 +13,22 @@ const MineralsByRockClass = ({addMineral}) => {
           <View style={{flex: 1, alignItems: 'flex-start'}}>
             <SectionDivider dividerText={'Plutonic'}/>
             {MINERALS_BY_CLASS.plutonic.map(mineral => (
-              <Button
+              <ClearButton
                 key={mineral.Name}
                 onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
-                type={'clear'}
               />
             ))}
           </View>
           <View style={{flex: 1, alignItems: 'flex-start'}}>
             <SectionDivider dividerText={'Metamorphic'}/>
             {MINERALS_BY_CLASS.metamorphic.map(mineral => (
-              <Button
+              <ClearButton
                 key={mineral.Name}
                 onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
-                type={'clear'}
               />
             ))}
           </View>
@@ -40,24 +37,22 @@ const MineralsByRockClass = ({addMineral}) => {
           <View style={{flex: 1, alignItems: 'flex-start'}}>
             <SectionDivider dividerText={'Volcanic'}/>
             {MINERALS_BY_CLASS.volcanic.map(mineral => (
-              <Button
+              <ClearButton
                 key={mineral.Name}
                 onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
-                type={'clear'}
               />
             ))}
           </View>
           <View style={{flex: 1, alignItems: 'flex-start'}}>
             <SectionDivider dividerText={'Alteration, Ore'}/>
             {MINERALS_BY_CLASS.alteration_ore.map(mineral => (
-              <Button
+              <ClearButton
                 key={mineral.Name}
                 onPress={() => addMineral(mineral)}
                 title={'+ ' + mineral.Label}
                 titleProps={{numberOfLines: 1}}
-                type={'clear'}
               />
             ))}
           </View>

@@ -1,15 +1,15 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Text, TextInput, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import {WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
@@ -183,13 +183,8 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              {!isReadOnly && (
-                <Button
-                  onPress={() => deleteFeatureConfirm()}
-                  title={'Delete Feature'}
-                  titleStyle={{color: WARNING_COLOR}}
-                  type={'clear'}
-                />
+              {!isReadOnly && Object.keys(selectedFeature).length > 1 && (
+                <DeleteButton onPress={() => deleteFeatureConfirm()} title={'Delete Feature'}/>
               )}
             </View>
           )}

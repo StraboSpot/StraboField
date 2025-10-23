@@ -64,11 +64,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
           )}
         </>
       )}
-      <AddButton
-        onPress={addTag}
-        title={`Create New ${toTitleCase(label).slice(0, -1)}`}
-        type={'outline'}
-      />
+      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>

@@ -20,11 +20,7 @@ const ReportsMenu = ({}) => {
 
   return (
     <View style={{flex: 1}}>
-      <AddButton
-        onPress={addReport}
-        title={'Create New Report'}
-        type={'outline'}
-      />
+      <AddButton onPress={addReport} title={'Create New Report'}/>
       <ReportsList/>
     </View>
   );

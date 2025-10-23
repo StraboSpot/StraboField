@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Button, Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
-import externalDataStyles from './externalData.styles';
 import useExternalData from './useExternalData';
 import useDevice from '../../services/useDevice';
 import commonStyles from '../../shared/common.styles';
 import {truncateText, urlValidator} from '../../shared/Helpers';
-import {BLUE} from '../../shared/styles.constants';
+import {BLUE, DARKGREY} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import TextInputModal from '../../shared/ui/TextInputModal';
@@ -63,36 +63,28 @@ const UrlData = ({
             {truncateText(urlItem, 33)}
           </ListItem.Title>
 
-          {editable && <View style={{flexDirection: 'row'}}>
-            <Button
-              buttonStyle={externalDataStyles.iconButton}
-              icon={
-                <Icon
-                  color={'darkgrey'}
-                  containerStyle={externalDataStyles.iconContainer}
-                  name={'edit'}
-                  size={20}
-                  type={'material'}
-                />
-              }
-              onPress={() => editUrl(urlItem, i)}
-              type={'clear'}
-            />
-            <Button
-              buttonStyle={externalDataStyles.iconButton}
-              icon={
-                <Icon
-                  color={'darkgrey'}
-                  containerStyle={externalDataStyles.iconContainer}
-                  name={'trash'}
-                  size={25}
-                  type={'font-awesome'}
-                />
-              }
-              onPress={() => initializeDelete('url', urlItem)}
-              type={'clear'}
-            />
-          </View>}
+          {editable && (
+            <View style={{flexDirection: 'row'}}>
+              <ClearButton
+                icon={{
+                  color: DARKGREY,
+                  name: 'edit',
+                  size: 20,
+                  type: 'material',
+                }}
+                onPress={() => editUrl(urlItem, i)}
+              />
+              <ClearButton
+                icon={{
+                  color: DARKGREY,
+                  name: 'trash',
+                  size: 20,
+                  type: 'font-awesome',
+                }}
+                onPress={() => initializeDelete('url', urlItem)}
+              />
+            </View>
+          )}
         </ListItem.Content>
       </ListItem>
     );

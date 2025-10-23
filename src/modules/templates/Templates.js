@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, ScrollView, Text, TextInput, View} from 'react-native';
 
-import {Button, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
@@ -9,6 +9,8 @@ import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -226,10 +228,10 @@ const Templates = ({
               {template.name}
             </ListItem.Title>
           </ListItem.Content>
-          <Button
+          <ClearButton
             onPress={() => editTemplate(template)}
             title={'Edit'}
-            titleStyle={isActive ? commonStyles.standardButtonTextInverse : commonStyles.standardButtonText}
+            titleProps={{style: isActive ? buttonsStyles.standardButtonTextInverse : buttonsStyles.standardButtonText}}
             type={'save'}
           />
         </ListItem>
@@ -261,26 +263,9 @@ const Templates = ({
           listKey={JSON.stringify(relevantTemplates)}
           renderItem={({item}) => renderTemplateListItem(item)}
         />
-        <Button
-          onPress={closeTemplates}
-          title={'Done'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'clear'}
-        />
-        {!isEmpty(relevantTemplates) && (
-          <Button
-            onPress={clearTemplate}
-            title={'Clear Selected Template'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
-          />
-        )}
-        <Button
-          onPress={createNewTemplate}
-          title={'Define New ' + label + ' Template'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'clear'}
-        />
+        <ClearButton onPress={closeTemplates} title={'Done'}/>
+        {!isEmpty(relevantTemplates) && <ClearButton onPress={clearTemplate} title={'Clear Selected Template'}/>}
+        <ClearButton onPress={createNewTemplate} title={'Define New ' + label + ' Template'}/>
       </>
     );
   };
@@ -289,19 +274,8 @@ const Templates = ({
     return (
       <>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Button
-            onPress={() => setIsShowNameInput(false)}
-            title={'Cancel'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
-          />
-          <Button
-            disabled={isEmpty(name)}
-            onPress={() => continueToTemplateForm()}
-            title={'Continue'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
-          />
+          <ClearButton onPress={() => setIsShowNameInput(false)} title={'Cancel'}/>
+          <ClearButton disabled={isEmpty(name)} onPress={() => continueToTemplateForm()} title={'Continue'}/>
         </View>
         <View style={[commonStyles.listItemFormField, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}>
           <View style={formStyles.fieldLabelContainer}>
@@ -352,14 +326,12 @@ const Templates = ({
       <View>
         {isEmpty(activeTemplates) ? (
           <ListItem containerStyle={{padding: 0, width: '100%', justifyContent: 'center'}}>
-            <Button
+            <ClearButton
               onPress={() => {
                 setIsShowTemplates(true);
                 setTemplateType(type);
               }}
               title={title}
-              titleStyle={commonStyles.standardButtonText}
-              type={'clear'}
             />
           </ListItem>
         ) : (
@@ -374,14 +346,12 @@ const Templates = ({
                     {item.name}
                   </ListItem.Title>
                 </ListItem.Content>
-                <Button
+                <ClearButton
                   onPress={() => {
                     setIsShowTemplates(true);
                     setTemplateType(type);
                   }}
                   title={'Change'}
-                  titleStyle={commonStyles.standardButtonText}
-                  type={'clear'}
                 />
               </ListItem>
             }
