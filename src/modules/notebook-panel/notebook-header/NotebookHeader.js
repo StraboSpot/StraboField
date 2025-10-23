@@ -8,9 +8,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
+import {getLatLngText, isEmpty, toFixedIfNecessary, toTitleCase} from '../../../shared/Helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
-import {getLatLngText, isEmpty, toFixedIfNecessary, toTitleCase} from '../../../shared/Helpers';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
