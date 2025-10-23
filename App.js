@@ -13,7 +13,7 @@ import Routes from './src/routes/Routes';
 import ConnectionStatus from './src/services/ConnectionStatus';
 import {RELEASE_NAME} from './src/shared/app.constants';
 import {SMALL_SCREEN} from './src/shared/styles.constants';
-import Toast from './src/shared/ui/Toast';
+import ToastWrapper from './src/shared/ui/ToastWrapper';
 import uiStyles from './src/shared/ui/ui.styles';
 import {persistor, store} from './src/store/ConfigureStore';
 import config from './src/utils/config';
@@ -91,7 +91,7 @@ const App = () => {
     <SafeAreaProvider>
       <SafeAreaView style={uiStyles.container}>
         <Provider store={store}>
-          <Toast>
+          <ToastWrapper>
             <PersistGate loading={null} persistor={persistor}>
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
@@ -101,7 +101,7 @@ const App = () => {
               </NavigationContainer>
               {/*</Sentry.TouchEventBoundary>*/}
             </PersistGate>
-          </Toast>
+          </ToastWrapper>
         </Provider>
       </SafeAreaView>
     </SafeAreaProvider>

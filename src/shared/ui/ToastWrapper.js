@@ -6,7 +6,7 @@ import {ToastProvider} from 'react-native-toast-notifications';
 
 import styles from './ui.styles';
 
-const ToastPopup = ({children, onToastRef}) => {
+const ToastWrapper = ({children}) => {
   return (
     <ToastProvider
       animationDuration={500}
@@ -56,4 +56,4 @@ const ToastPopup = ({children, onToastRef}) => {
   );
 };
 
-export default ToastPopup;
+export default ToastWrapper;
