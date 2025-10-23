@@ -13,9 +13,8 @@ import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {updatedKey} from '../user/userProfile.slice';
 
-const IGNSModal = forwardRef(({
+const IGSNModal = forwardRef(({
                                 isVisible,
-                                sampleValues,
                                 onModalCancel,
                                 onSampleSaved,
                               }, formRef) => {
@@ -29,9 +28,7 @@ const IGNSModal = forwardRef(({
   const {sesar} = useSelector(state => state.user);
 
   const formValues = formRef.current?.values || {};
-  const [commonFields, setCommonFields] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [checkSesarAuth, setCheckSesarAuth] = useState(true);
   const [errorView, setErrorView] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
@@ -114,7 +111,7 @@ const IGNSModal = forwardRef(({
     return (
       <View style={IGSNModalStyles.errorContainer}>
         <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
-        {errorMessages.map((msg, index) => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
+        {errorMessages.map(msg => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
       </View>
     );
   };
@@ -205,4 +202,4 @@ const IGNSModal = forwardRef(({
   );
 });
 
-export default IGNSModal;
+export default IGSNModal;

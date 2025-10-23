@@ -4,7 +4,7 @@ import {Layer, Source} from 'react-map-gl';
 
 import useMapURL from '../useMapURL';
 
-const CustomMapLayer = ({basemap, customMap}) => {
+const CustomOverlayLayer = ({customMap}) => {
 
   const {buildTileURL} = useMapURL();
 
@@ -42,4 +42,4 @@ const CustomMapLayer = ({basemap, customMap}) => {
   );
 };
 
-export default memo(CustomMapLayer);
+export default memo(CustomOverlayLayer);

@@ -8,7 +8,7 @@ import {Form, useForm} from '../form';
 import {PAGE_KEYS} from '../page/page.constants';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {
-  const {getChoices, getRelevantFields, getSurvey, validateForm} = useForm();
+  const {getRelevantFields, getSurvey, validateForm} = useForm();
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
 

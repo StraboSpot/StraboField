@@ -26,7 +26,6 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   const [modalTitle, setModalTitle] = useState('Confirm or Change\nFolder Name');
 
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
-  const toast = useToast();
 
   const fileName = backupFileName.replace(/\s/g, '_');
 

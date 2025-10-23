@@ -16,9 +16,7 @@ import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import {setLoadingStatus} from '../home/home.slice';
 import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
 
-
-const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selectedFeature}) => {
-
+const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
   const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
   const toast = useToast();
   const {getSesarToken, getOrcidToken} = useServerRequests();

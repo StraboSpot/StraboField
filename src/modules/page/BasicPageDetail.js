@@ -45,8 +45,6 @@ const BasicPageDetail = ({
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-  const [isPickerVisible, setIsPickerVisible] = useState(false);
-  const [sampleFormRef, setSelectedSample] = useState({});
 
   const {showErrors, validateForm} = useForm();
   const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
@@ -182,7 +180,6 @@ const BasicPageDetail = ({
           <IGSNUploadAndRegister
             handleIGSNChecked={handleIGSNChecked}
             isIGSNChecked={isIGSNChecked}
-            page={page}
             selectedFeature={selectedFeature}
           />
         ) : (

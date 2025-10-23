@@ -63,10 +63,7 @@ const SamplesPage = ({isReadOnly, page}) => {
           pageTitle={page.label}
           showAddButton={!isReadOnly}
         />
-        <SamplesList
-          onPress={editSample}
-          page={page}
-        />
+        <SamplesList onPress={editSample}/>
       </View>
     );
   };

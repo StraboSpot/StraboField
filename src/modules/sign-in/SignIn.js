@@ -16,7 +16,7 @@ import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 import {login} from '../user/userProfile.slice';
 
-const SignIn = ({navigation, route}) => {
+const SignIn = ({navigation}) => {
 
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
@@ -82,7 +82,6 @@ const SignIn = ({navigation, route}) => {
   const renderErrorModal = () => {
     return (
       <ErrorModal
-        closeModal={() => setIsErrorModalVisible(false)}
         isVisible={isErrorModalVisible}
         onActionPressed={() => setIsErrorModalVisible(false)}
       >

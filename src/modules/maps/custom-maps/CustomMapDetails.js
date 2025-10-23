@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Icon, Input, ListItem} from '@rn-vui/base';
-import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
 import {useDispatch, useSelector} from 'react-redux';
 
 import customMapStyles from './customMaps.styles';
@@ -21,7 +20,6 @@ import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SliderBar from '../../../shared/ui/SliderBar';
 import {formStyles} from '../../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
@@ -31,18 +29,15 @@ import {selectedCustomMapToEdit} from '../maps.slice';
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 
 const CustomMapDetails = () => {
-  let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
 
-  const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
   const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
   const [message, setMessage] = useState('Starting...');
-  const [bboxMessage, setBboxMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
 
@@ -189,43 +184,6 @@ const CustomMapDetails = () => {
         && <Text style={customMapStyles.requiredMessage}>Map type is required</Text>}
     </View>
   );
-
-  const getBboxData = (bboxCoords) => {
-    try {
-      if (!isEmpty(bboxCoords)) {
-        const bboxArr = bboxCoords.split(',');
-        setBboxCoords([[bboxArr[0], bboxArr[1]], [bboxArr[2], bboxArr[3]]]);
-      }
-      else setBboxCoords(defaultBbox);
-    }
-    catch (err) {
-      console.error('Error getting bbox coords', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n'
-        + 'Please pan to the map manually.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
-  };
-
-  const bboxCoordsLayout = () => {
-    return (
-      <View style={customMapStyles.bboxCoordsContainers}>
-        <Table style={{}}>
-          <Row data={['', 'Longitude', 'Latitude']} flexArr={[1, 2, 2]} style={customMapStyles.bboxTableHead}
-               textStyle={customMapStyles.bboxText}/>
-          <TableWrapper style={{flexDirection: 'row'}}>
-            <Col data={['SW', 'NE']} heightArr={[25, 25]} style={customMapStyles.bboxColumnContainer}
-                 textStyle={customMapStyles.bboxText}/>
-            <Rows data={bboxCoords} flexArr={[2, 2]} style={customMapStyles.bboxRowContainer}
-                  textStyle={customMapStyles.bboxText}/>
-          </TableWrapper>
-          <View style={customMapStyles.bboxCoordsContainers}>
-            <Text style={customMapStyles.bboxMessageText}>{bboxMessage}</Text>
-          </View>
-        </Table>
-      </View>
-    );
-  };
 
   const renderMapTypeOverview = () => {
     return (

@@ -33,8 +33,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const initialNamePrefix = preferences.sample_prefix || '';
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [collectionDate, setCollectionDate] = useState(null);
-  const [currentLocation, setCurrentLocation] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [namePostfix, setNamePostfix] = useState(null);
   const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
@@ -235,7 +233,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       await currentForm.resetForm();
 
       if (newSample.sample_id_name) {
-        const foundDuplicateName = await checkSampleName(newSample.sample_id_name, toastRef);
+        const foundDuplicateName = await checkSampleName(newSample.sample_id_name);
         if (foundDuplicateName) {
           const toastMsg = 'Warning! Sample Name has Already Been Used.';
           const toastOptions = {duration: 2000, type: 'warning'};

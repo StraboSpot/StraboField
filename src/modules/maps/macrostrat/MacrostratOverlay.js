@@ -17,11 +17,8 @@ const MacrostratOverlay = ({
                              location,
                            }) => {
 
-  // let ref = useRef(null);
-  const [expandedGeologicMap, setExpandedGeologicMap] = useState(true);
   const [dataObject, setDataObject] = useState({});
   const [showMore, setShowMore] = useState(false);
-  const [showMapRef, setShowMapRef] = useState(false);
 
   const {getMacrostratData} = useServerRequests();
 

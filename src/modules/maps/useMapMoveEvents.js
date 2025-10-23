@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {useRef} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -15,8 +15,6 @@ const useMapMoveEvents = ({mapRef}) => {
 
   const {setMapView} = useMapView();
 
-  const [zoomText, setZoomText] = useState();
-
   // Update spots in extent and saved view (center and zoom)
   const handleMapMoved = async (e) => {
     // console.log('Event onMapMoved Timestamp difference', e.timestamp - cameraChangedTimestampRef.current);
@@ -29,7 +27,6 @@ const useMapMoveEvents = ({mapRef}) => {
         const newCenter = await mapRef.current.getCenter();
         const newZoom = await mapRef.current.getZoom();
         dispatch(setZoom(newZoom));
-        // setZoomText(newZoom);   // Update scale bar and zoom text
         setMapView(newCenter, newZoom);
       }
     }
@@ -37,7 +34,6 @@ const useMapMoveEvents = ({mapRef}) => {
 
   return {
     handleMapMoved: handleMapMoved,
-    // zoomText: zoomText,
   };
 
 };

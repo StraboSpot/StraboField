@@ -23,7 +23,6 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   const isOnline = useSelector(state => state.connections.isOnline);
 
   const [filteredMaps, setFilteredMaps] = useState([]);
-  const [customEndpoint, setCustomEndpoint] = useState([]);
 
   const {getCustomMapDetails, updateMap} = useCustomMap();
   const {setBasemap} = useMap();

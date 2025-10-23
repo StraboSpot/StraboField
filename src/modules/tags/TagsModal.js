@@ -25,7 +25,6 @@ const TagsModal = ({
                      checkedTagsIds,
                      handleTagChecked,
                      isFeatureLevelTagging,
-                     onPress,
                      zoomToCurrentLocation,
                    }) => {
   const toast = useToast();

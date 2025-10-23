@@ -6,10 +6,7 @@ import {isEmpty} from '../../shared/Helpers';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {TagsModal} from '../tags';
 
-const TagsNotebookModal = ({
-                             isFeatureLevelTagging,
-                             onPress,
-                           }) => {
+const TagsNotebookModal = ({isFeatureLevelTagging}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const handleDonePress = () => {

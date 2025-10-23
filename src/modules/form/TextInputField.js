@@ -8,10 +8,9 @@ import {formStyles} from '../form';
 
 const TextInputField = ({
                           field: {name, onBlur, onChange, value},
-                          form: {errors, touched},
+                          form: {errors},
                           appearance,
                           autoCapitalize,
-                          autoFocus,
                           customHeight,
                           editable = true,
                           label,

@@ -7,7 +7,7 @@ import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
 import {setIsErrorMessagesModalVisible} from '../../../modules/home/home.slice';
 
-const ErrorModal = ({children, isVisible, closeModal, onActionPressed}) => {
+const ErrorModal = ({children, isVisible, onActionPressed}) => {
   const scrollView = useRef();
 
   const dispatch = useDispatch();

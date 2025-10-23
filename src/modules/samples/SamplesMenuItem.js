@@ -72,7 +72,7 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
             keyExtractor={(item, index) => item + index}
-            renderItem={({item, i, section}) => renderSample(item, section.spot)}
+            renderItem={({item, section}) => renderSample(item, section.spot)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
             sections={dataSectioned}
             stickySectionHeadersEnabled={true}

@@ -19,7 +19,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const AddThreeDStructureModal = ({onPress}) => {
+const AddThreeDStructureModal = () => {
   const dispatch = useDispatch();
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);

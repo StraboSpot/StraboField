@@ -14,7 +14,7 @@ import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 
-const AddReactionTextureModal = ({onPress}) => {
+const AddReactionTextureModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 

@@ -10,7 +10,7 @@ import {formStyles} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
 const DateInputField = ({
-                          field: {name, onBlur, onChange, value},
+                          field: {name, value},
                           form: {errors, values},
                           isDisplayOnly,
                           isShowTime,

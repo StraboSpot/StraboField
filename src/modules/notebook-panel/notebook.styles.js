@@ -61,9 +61,6 @@ const notebookStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  traceSurfaceFeatureDisabledText: {
-    color: themes.PRIMARY_BACKGROUND_COLOR,
-  },
   traceSurfaceFeatureToggleContainer: {
     alignItems: 'center',
     flexDirection: 'row',

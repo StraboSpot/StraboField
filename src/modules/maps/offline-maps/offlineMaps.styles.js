@@ -1,8 +1,6 @@
-import {Platform, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 import * as themes from '../../../shared/styles.constants';
-
-const platform = Platform.OS;
 
 const styles = StyleSheet.create({
   button: {
@@ -46,14 +44,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 15,
   },
-  pickerAndroid: {
-    // flex: 1,
-    // width: '50%',
-  },
-  saveModalContainer: {
-    minHeight: platform === 'ios' ? 300 : 275,
-  },
-
 });
 
 export default styles;

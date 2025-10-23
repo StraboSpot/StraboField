@@ -8,11 +8,6 @@ const buttonStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  outlineButtonContainer: {
-    alignItems: 'flex-end',
-    // marginHorizontal: 10,
-    // marginTop: 10,
-  },
   standardButton: {
     borderRadius: 10,
   },

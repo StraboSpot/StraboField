@@ -44,7 +44,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
 
   const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
 
-  const renderGeometryTypesList = ({item, index}) => {
+  const renderGeometryTypesList = ({item}) => {
     return (
       <ListItem containerStyle={[
         commonStyles.listItemFormField,
@@ -70,7 +70,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
     );
   };
 
-  const renderSymbolsList = ({item, index}) => {
+  const renderSymbolsList = ({item}) => {
     return (
       <ListItem containerStyle={[
         commonStyles.listItemFormField,

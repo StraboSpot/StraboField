@@ -39,7 +39,6 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
-  const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
 
   const currentMapName = currentBasemap && currentBasemap.title;

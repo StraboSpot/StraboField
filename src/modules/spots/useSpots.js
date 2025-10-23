@@ -64,7 +64,7 @@ const useSpots = () => {
   };
 
   // Show toast warning if duplicate Sample name used
-  const checkSampleName = async (name, toastRef) => {
+  const checkSampleName = async (name) => {
     if (preferences.warn_on_dupe_sample_name) {
       const sampleNames = Object.values(spots).reduce((acc, spot) => {
         const spotSampleNames = spot.properties.samples?.map(sample => sample.sample_id_name);

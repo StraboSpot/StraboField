@@ -40,7 +40,7 @@ const DocumentationScreen = ({route, navigation}) => {
       {!isEmpty(document) && (
         <Pdf
           onError={error => console.log(error)}
-          onLoadComplete={(numberOfPages, filePath) => setTotalPages(numberOfPages)}
+          onLoadComplete={numberOfPages => setTotalPages(numberOfPages)}
           onPageChanged={(page, numberOfPages) => {
             setCurrentPage(page);
             console.log(`Number of pages: ${page}/${numberOfPages}`);

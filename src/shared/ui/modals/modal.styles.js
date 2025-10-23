@@ -27,12 +27,6 @@ const modalStyles = StyleSheet.create({
     borderRadius: themes.MODAL_BORDER_RADIUS,
     flexDirection: 'row',
   },
-  sideModalPosition: {
-    borderRadius: 20,
-    bottom: 20,
-    left: 100,
-    position: 'absolute',
-  },
   textContainer: {
     alignItems: 'center',
   },

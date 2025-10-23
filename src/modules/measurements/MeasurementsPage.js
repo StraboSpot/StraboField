@@ -221,7 +221,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
       <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item, i, section}) => (
+        renderItem={({item, section}) => (
           <MeasurementItem
             item={item}
             onPress={() => onMeasurementPressed(item, section.title)}

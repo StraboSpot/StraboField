@@ -22,7 +22,7 @@ import {PAGE_KEYS} from '../page/page.constants';
 import useSed from '../sed/useSed';
 import Templates from '../templates/Templates';
 
-const AddRockModal = ({modalKey, onPress}) => {
+const AddRockModal = ({modalKey}) => {
   const dispatch = useDispatch();
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);

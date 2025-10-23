@@ -274,7 +274,7 @@ const MeasurementDetail = ({
 
         {/* Associated measurements */}
         {selectedMeasurement && selectedAttitude && selectedAttitude.associated_orientation
-          && (selectedAttitude.associated_orientation.map((item, i) =>
+          && (selectedAttitude.associated_orientation.map(item =>
               <React.Fragment key={item.id + 'Outer'}>
                 <MeasurementItem
                   item={item}

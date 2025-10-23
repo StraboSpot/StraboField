@@ -94,12 +94,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
         </View>
         {!isEmpty(doc) && (
           <Pdf
-            onError={(error) => {
-              console.log(error);
-            }}
-            onLoadComplete={(numberOfPages, filePath) => {
-              console.log(`Number of pages: ${numberOfPages}`);
-            }}
+            onError={error => console.log(error)}
+            onLoadComplete={numberOfPages => console.log(`Number of pages: ${numberOfPages}`)}
             onPressLink={async (uri) => {
               console.log(`Link pressed: ${uri}`);
               await openUrl(uri);
