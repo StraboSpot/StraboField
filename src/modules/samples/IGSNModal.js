@@ -28,6 +28,7 @@ const IGNSModal = forwardRef(({
   } = useSamples();
   const {sesar} = useSelector(state => state.user);
 
+  const formValues = formRef.current?.values || {};
   const [commonFields, setCommonFields] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [checkSesarAuth, setCheckSesarAuth] = useState(true);
@@ -36,12 +37,15 @@ const IGNSModal = forwardRef(({
   const [isUploaded, setIsUploaded] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [modalPage, setModalPage] = useState(null);
+  const [mappedSesarValues, setMappedSesarValues] = useState({});
 
   useEffect(() => {
     setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
     // const sesarUserCode = !formRef.current.values.isOnMySesar ? sesar.selectedUserCode : formRef.current.values.sesarUserCode;
     // formRef.current.setValues({...formRef.current.values, sesarUserCode: sesarUserCode}).then(
     //   () => console.log('FORMREF.CURRENT.VALUES', formRef.current.values));
+    const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
+    setMappedSesarValues(sesarMappedObj);
 
     if (!sesar) {
       dispatch(updatedKey({
@@ -55,7 +59,7 @@ const IGNSModal = forwardRef(({
         },
       }));
     }
-  }, []);
+  }, [formValues]);
 
   const handleConfirmOnPress = () => {
     if (formRef.current) onSampleSaved(formRef.current);
@@ -67,7 +71,8 @@ const IGNSModal = forwardRef(({
       const formValues = formRef.current?.values || {};
       console.log('Updated FormRef', formRef.current?.values);
       setIsLoading(true);
-      const res = formValues.isOnMySesar ? await updateSampleIsSesar(formValues) : await uploadSample(formValues);
+      const res = formValues.isOnMySesar ? await updateSampleIsSesar(mappedSesarValues) : await uploadSample(
+        mappedSesarValues);
       if (res.error && res.error.length > 0) {
         console.log(res.error[0]);
         setModalPage('error');
@@ -115,7 +120,8 @@ const IGNSModal = forwardRef(({
   };
 
   const formatContentItems = (item) => {
-    if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude') {
+    if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude'
+      || item.sesarKey === 'longitude_end' || item.sesarKey === 'latitude_end') {
       return item.value;
     }
     if (item.sesarKey === 'collection_start_date') {
@@ -130,14 +136,14 @@ const IGNSModal = forwardRef(({
   };
 
   const renderContentItems = () => {
-    const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
+    // const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
     return (
       <View style={{
         alignItems: 'flex-start',
         justifyContent: 'center',
       }}>
         <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
-        {!isUploaded && sesarMappedObj.map((item) => {
+        {!isUploaded && isVisible && mappedSesarValues.map((item) => {
           if (item.sesarKey === 'user_code' && formRef.current?.values?.isOnMySesar) return null;
           if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
           return (

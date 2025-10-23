@@ -37,6 +37,8 @@ const useSamples = () => {
            ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
            <longitude>${data.longitude}</longitude>
            <latitude>${data.latitude}</latitude>
+           ${data.longitude_end ? `<longitude_end>${data.longitude_end}</longitude_end>` : ''}
+           ${data.latitude_end ? `<latitude_end>${data.latitude_end}</latitude_end>` : ''}
            ${isEmpty(
       data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
            <purpose>${data.purpose}</purpose>
@@ -137,7 +139,7 @@ const useSamples = () => {
     return json;
   };
 
-  const postSampleToSesar = async (xmlSchema, sample, isUpdating) => {
+  const postSampleToSesar = async (xmlSchema, isUpdating) => {
     const response = isUpdating ? await updateSampleWithSesar(xmlSchema) : await postToSesar(xmlSchema);
     const resText = await response.text();
     const json = parseXML(resText);
@@ -175,17 +177,24 @@ const useSamples = () => {
   const straboSesarMapping = (sampleValue) => {
     console.log('sampleValue', sampleValue);
     const geometryType = selectedSpot?.geometry?.type;
-    const longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0] : 'No coordinates assigned';
-    const latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1] : 'No coordinates assigned';
+    let longitude;
+    let latitude;
     let longitudeEndObj = {};
     let latitudeEndObj = {};
     if (geometryType === 'LineString' && selectedSpot.geometry.coordinates.length > 1) {
       console.log('LineString spot', selectedSpot);
       const lineArray = getFirstAndLastElementsOfLineArray();
       console.log('lineArray', lineArray);
-      longitudeEndObj = {label: 'Longitude End:', sesarKey: 'longitude_end', value: lineArray[1][0]};
-      latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1]};
-
+      longitude = lineArray[0][0].toFixed(6);
+      latitude = lineArray[0][1].toFixed(6);
+      longitudeEndObj = {label: 'Longitude End:', sesarKey: 'longitude_end', value: lineArray[1][0].toFixed(6)};
+      latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1].toFixed(6)};
+    }
+    else {
+      longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0].toFixed(
+        6) : 'No coordinates assigned';
+      latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1].toFixed(
+        6) : 'No coordinates assigned';
     }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
@@ -211,20 +220,20 @@ const useSamples = () => {
     return date.slice(0, date.indexOf('.')) + 'Z';
   };
 
-  const updateSampleIsSesar = async (updatedSample) => {
-    console.log('Update sample', updatedSample);
-    const mappedArray = straboSesarMapping(updatedSample);
-    console.log(mappedArray);
+  const updateSampleIsSesar = async (mappedArray) => {
+    // console.log('Update sample', updatedSample);
+    // const mappedArray = straboSesarMapping(updatedSample);
+    // console.log(mappedArray);
     const xmlSchema = convertAndBuildSchema(mappedArray, true);
-    return await postSampleToSesar(xmlSchema, updatedSample, true);
+    return await postSampleToSesar(xmlSchema, true);
   };
 
-  const uploadSample = async (sample) => {
+  const uploadSample = async (mappedArray) => {
     // setSampleValue(sample);
-    const mappedArray = straboSesarMapping(sample);
-    console.log('Register sample', mappedArray);
+    // const mappedArray = straboSesarMapping(sample);
+    // console.log('Register sample', mappedArray);
     const xmlSchema = convertAndBuildSchema(mappedArray, false);
-    return await postSampleToSesar(xmlSchema, sample);
+    return await postSampleToSesar(xmlSchema);
   };
 
   return {
