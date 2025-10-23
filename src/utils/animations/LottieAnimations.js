@@ -5,8 +5,6 @@ import LottieView from 'lottie-react-native';
 import useAnimations from '../../shared/ui/useAnimations';
 
 const LottieAnimation = ({animationStyle, type, doesLoop}) => {
-  // console.log('LOOPS IN RN', doesLoop);
-
   const {getAnimationType} = useAnimations();
 
   return (

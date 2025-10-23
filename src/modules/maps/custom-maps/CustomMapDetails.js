@@ -29,17 +29,14 @@ import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
-// const {State: TextInputState} = TextInput;
 
 const CustomMapDetails = () => {
   let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
-  // const {getMyMapsBboxCoords} = useMapCoords();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  // const isOnline = useSelector(state => state.connections.isOnline);
 
   const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
@@ -61,14 +58,6 @@ const CustomMapDetails = () => {
         key: MBAccessToken,
       });
     }
-    // if (customMapToEdit && isEmpty(customMapToEdit?.bbox && isOnline.isConnected)) {
-    //   getMyMapsBboxCoords(customMapToEdit)
-    //     .then((bboxCoords) => {
-    //       getBboxData(bboxCoords);
-    //       updateMap({...customMapToEdit, bbox: bboxCoords});
-    //     });
-    // }
-    // else getBboxData(customMapToEdit.bbox);
   }, [customMapToEdit]);
 
   const saveMap = async () => {
@@ -115,14 +104,6 @@ const CustomMapDetails = () => {
       {cancelable: false},
     );
   };
-
-  // const getBoundingBox = async () => {
-  //   setIsLoading(true);
-  //   const bbox = await useMapCoords.getMyMapsBboxCoords(customMapToEdit);
-  //   setEditableCustomMapData(prevState => ({...prevState, bbox: bbox}));
-  //   setIsLoading(false);
-  //   setBboxMessage('Be sure to UPDATE map to save bounding box.');
-  // };
 
   const handlePress = () => {
     setIsLoadingModalVisible(false);
@@ -255,7 +236,6 @@ const CustomMapDetails = () => {
           {/*<Text style={customMapStyles.mapOverviewText}>Source: {customMapToEdit?.url[0]}</Text>*/}
           <Text style={customMapStyles.mapOverviewText}>Id: {customMapToEdit.id}</Text>
         </View>
-        {/*{isOnline.isConnected && bboxCoordsLayout()}*/}
       </View>
     );
   };
