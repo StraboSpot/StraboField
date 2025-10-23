@@ -138,6 +138,14 @@ export const getFontSizeByWindowWidth = (window, fontSize) => {
   return PixelRatio.roundToNearestPixel(fontSize * (width / baseWidth));
 };
 
+export const getLatLngText = (lat, lng) => {
+  const degreeSymbol = '\u00B0';
+  let latitudeCardinal = Math.sign(lat) >= 0 ? 'N' : 'S';
+  let longitudeCardinal = Math.sign(lng) >= 0 ? 'E' : 'W';
+  return toFixedInteger(lng, 6) + degreeSymbol + ' ' + longitudeCardinal + ', '
+    + toFixedInteger(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
+};
+
 function getOrientation(window) {
   return window.width < window.height ? 'portrait' : 'landscape';
 }
@@ -228,6 +236,11 @@ export const readDataUrl = (file, callback) => {
 
 export const sleep = (delay) => {
   return new Promise(resolve => setTimeout(resolve, delay));
+};
+
+export const toFixedInteger = (value, dp) => {
+  // Returns an integer instead of a string
+  return +parseFloat(value).toFixed(dp);
 };
 
 export const unixToDateTime = (unixTimestamp) => {

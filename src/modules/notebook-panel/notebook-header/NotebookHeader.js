@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
-import {isEmpty, toTitleCase} from '../../../shared/Helpers';
+import {getLatLngText, isEmpty, toFixedIfNecessary, toTitleCase} from '../../../shared/Helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
@@ -70,14 +70,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       return spot.geometry.type;
     }
     else return undefined;
-  };
-
-  const getLatLngText = (lat, lng) => {
-    const degreeSymbol = '\u00B0';
-    let latitudeCardinal = Math.sign(lat) >= 0 ? 'N' : 'S';
-    let longitudeCardinal = Math.sign(lng) >= 0 ? 'E' : 'W';
-    return toFixedIfNecessary(lng, 6) + degreeSymbol + ' ' + longitudeCardinal + ', '
-      + toFixedIfNecessary(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
   };
 
   const getTraceText = () => {
@@ -161,9 +153,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     dispatch(setSelectedSpot(editedSpot));
   };
 
-  const toFixedIfNecessary = (value, dp) => {
-    return +parseFloat(value).toFixed(dp);
-  };
 
   const goToDatasetsPage = () => {
     toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
