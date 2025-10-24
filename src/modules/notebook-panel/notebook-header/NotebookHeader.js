@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
-import {getLatLngText, isEmpty, toFixedIfNecessary, toTitleCase} from '../../../shared/Helpers';
+import {getLatLngText, isEmpty, toFixedInterger, toTitleCase} from '../../../shared/Helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
@@ -40,7 +40,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
         let lng = spot.geometry.coordinates[0];
         let lat = spot.geometry.coordinates[1];
         if (spot.properties.image_basemap || spot.properties.strat_section_id) {
-          let pixelDetails = toFixedIfNecessary(lng, 6) + ' X, ' + toFixedIfNecessary(lat, 6) + ' Y';
+          let pixelDetails = toFixedInterger(lng, 6) + ' X, ' + toFixedInterger(lat, 6) + ' Y';
           if (isEmpty(spot.properties.lat) || isEmpty(spot.properties.lng)) {
             const rootSpot = spot.properties.image_basemap ? getRootSpot(spot.properties.image_basemap)
               : getSpotWithThisStratSection(spot.properties.strat_section_id);
