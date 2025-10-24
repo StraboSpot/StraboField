@@ -1,3 +1,5 @@
+import {Platform} from 'react-native';
+
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -181,7 +183,7 @@ const useProject = () => {
         dispatch(setActiveDatasets({bool: true, dataset: datasetToSelect.id}));
         dispatch(setTargetDataset(datasetToSelect.id));
       }
-      else {
+      else if (!__DEV__ && Platform.OS !== 'web') {
         alert('No Target Dataset. Creating a new Default Dataset.');
         targetDataset = createDataset();
         dispatch(addedDataset(targetDataset));
