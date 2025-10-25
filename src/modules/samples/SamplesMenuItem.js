@@ -5,12 +5,13 @@ import {ListItem} from '@rn-vui/base';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import LittleSpacer from '../../shared/ui/LittleSpacer';
+import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
-import {useSpots} from '../spots';
+import {SpotsListItem, useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
@@ -20,7 +21,6 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const activeSpots = Object.values(activeSpotsObj);
 
   const [isReverseSort, setIsReverseSort] = useState(false);
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
@@ -29,44 +29,70 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderSample = (sample, spot) => {
-    return (
-      <ListItem
-        containerStyle={commonStyles.listItem}
-        key={sample.id}
-        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])}
-      >
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>
-        </ListItem.Content>
-        <ListItem.Chevron/>
-      </ListItem>
-    );
+    if (spot) {
+      return (
+        <ListItem
+          containerStyle={commonStyles.listItem}
+          key={sample.id}
+          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])}
+        >
+          <AvatarWrapper
+            size={20}
+            source={require('../../assets/icons/Sample_pressed.png')}
+          />
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>
+          </ListItem.Content>
+          <ListItem.Chevron/>
+        </ListItem>
+      );
+    }
+    else {
+      return (
+        <SpotsListItem
+          doShowTags={true}
+          onPress={openSpotInNotebook}
+          spot={sample}
+        />
+      );
+    }
   };
 
   const renderSamplesList = () => {
     let sortedSpotsWithSamples = spotsSorted.filter(spot => !isEmpty(spot.properties.samples));
+    const activeSampleSpots = spotsSorted.filter(spot => !isEmpty(spot.properties.isSample));
+    sortedSpotsWithSamples = sortedSpotsWithSamples.filter((spot) => {
+      const activeSampleSpotsIds = activeSampleSpots.map(ss => ss.properties.id);
+      return !activeSampleSpotsIds.includes(spot.properties.id);
+    });
     if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
     let count = 0;
-    const dataSectioned = sortedSpotsWithSamples.map((s) => {
+    let dataSectioned = sortedSpotsWithSamples.map((s) => {
       count += s.properties.samples.length;
       return {title: s.properties.name, data: s.properties.samples, spot: s};
     });
+    let sampleSpotsCount = 0;
+    if (!isEmpty(activeSampleSpots)) {
+      dataSectioned = [{data: isReverseSort ? activeSampleSpots.reverse() : activeSampleSpots}, ...dataSectioned];
+      sampleSpotsCount = activeSampleSpots.length;
+    }
+    const totalSamplesCount = count + sampleSpotsCount;
 
     return (
       <View style={{flex: 1}}>
         <SpotFilters
           activeSpots={activeSpots}
+          doSearchSubSamples={true}
           setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
           setSpotsSorted={setSpotsSorted}
           setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={{flex: 1}}>
-          <LittleSpacer/>
-          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' sample' : ' samples')} in visible Spots
+          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
+            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample: ' : ' samples: ')}
+            {sampleSpotsCount} principal {(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}
+            and {count + (count === 1 ? ' sample' : ' samples')} within Spots
           </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -83,13 +109,16 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderSectionHeader = ({title, spot}) => {
-    return (
-      <SectionDividerWithRightButton
-        buttonTitle={'View In Spot'}
-        dividerText={title}
-        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
-      />
-    );
+    if (title && spot) {
+      return (
+        <SectionDividerWithRightButton
+          buttonTitle={'View In Spot'}
+          dividerText={title}
+          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
+        />
+      );
+    }
+    else return <SectionDivider dividerText={'Samples'}/>;
   };
 
   return (

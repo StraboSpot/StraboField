@@ -23,6 +23,11 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
         ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.EDIT.ICON_PRESSED : DRAW_ACTION_IMAGES.EDIT.BUTTON_PRESSED
         : SMALL_SCREEN ? DRAW_ACTION_IMAGES.EDIT.ICON : DRAW_ACTION_IMAGES.EDIT.BUTTON;
     }
+    else if (type === MAP_MODES.DRAW.SAMPLE) {
+      return mapMode === MAP_MODES.DRAW.SAMPLE
+        ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.SAMPLE.ICON_PRESSED : DRAW_ACTION_IMAGES.SAMPLE.BUTTON_POINT_PRESSED
+        : SMALL_SCREEN ? DRAW_ACTION_IMAGES.SAMPLE.POINT_ICON : DRAW_ACTION_IMAGES.SAMPLE.BUTTON_POINT;
+    }
     switch (drawTypes[type]) {
       case MAP_MODES.DRAW.POINT:
         return mapMode === MAP_MODES.DRAW.POINT
@@ -97,6 +102,8 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     }
   };
 
+  const handlePointSamplePressed = () => clickHandler(MAP_MODES.DRAW.SAMPLE);
+
   const handlePolygonPressed = () => {
     if (drawTypes.polygon === MAP_MODES.DRAW.POLYGON) clickHandler(MAP_MODES.DRAW.POLYGON);
     else clickHandler(MAP_MODES.DRAW.FREEHANDPOLYGON);
@@ -109,6 +116,7 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     handleLinePressed: handleLinePressed,
     handlePointLongPressed: handlePointLongPressed,
     handlePointPressed: handlePointPressed,
+    handlePointSamplePressed: handlePointSamplePressed,
     handlePolygonLongPressed: handlePolygonLongPressed,
     handlePolygonPressed: handlePolygonPressed,
   };

@@ -71,6 +71,7 @@ const homeStyles = StyleSheet.create({
     right: '40%',
   },
   drawToolsContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
   },
   homeIconContainer: {
@@ -83,7 +84,7 @@ const homeStyles = StyleSheet.create({
   },
   iconSizeSmallScreen: {
     height: 40,
-    marginHorizontal: -2,
+    marginHorizontal: -4,
   },
   imageSliderContainer: {
     alignItems: 'center',

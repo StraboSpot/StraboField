@@ -4,7 +4,7 @@ import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
+import {NOTEBOOK_PAGES, PAGE_KEYS, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.constants';
 import usePage from './usePage';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {SwitchWrapper} from '../../shared/ui';
@@ -34,7 +34,12 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const {showErrors, validateForm} = useForm();
   const {getPopulatedPagesKeys} = usePage();
 
-  const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
+  const getDefaultSamplesPages = NOTEBOOK_PAGES.reduce((acc1, p) => {
+    return SAMPLES_OVERVIEW_SECTIONS.includes(p.key) ? [p, ...acc1] : acc1;
+  }, []);
+
+  const defaultPages = spot.properties?.isSample ? getDefaultSamplesPages : PRIMARY_PAGES;
+  const visiblePagesKeys = [...new Set([...defaultPages.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
   const sections = visiblePagesKeys.reduce((acc, key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     if (page.overview_component) {
@@ -108,9 +113,10 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   };
 
   const renderSectionHeader = (page) => {
+    const dividerText = page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Sample Metadata' : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
+        <SectionDivider dividerText={dividerText}/>
       </Pressable>
     );
   };
@@ -118,7 +124,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <NotebookPageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Sample Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
           keyExtractor={(item, index) => item + index}

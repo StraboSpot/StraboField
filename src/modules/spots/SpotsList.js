@@ -11,12 +11,10 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
   // console.log('Rendering SpotsList...');
 
-  const {getActiveSpotsObj} = useSpots();
+  const {getVisibleSpots} = useSpots();
 
-  const activeSpotsObj = getActiveSpotsObj();
-  const activeSpots = Object.values(activeSpotsObj);
+  const activeSpots = getVisibleSpots();
 
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
@@ -24,25 +22,24 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
   const renderNoSpotsText = () => <ListEmptyText text={textNoSpots}/>;
 
   const renderSpotsList = () => {
+    const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
     return (
       <View style={{flex: 1}}>
         <SpotFilters
-          activeSpots={activeSpots}
+          activeSpots={spotsNoSamples}
           setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
           setSpotsSorted={setSpotsSorted}
           setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <SectionDivider
-          dividerText={spotsSearched.length + ' Visible ' + (spotsSearched.length === 1 ? 'Spot' : 'Spots')}
+          dividerText={spotsNoSamples.length + ' Visible ' + (spotsNoSamples.length === 1 ? 'Spot' : 'Spots')}
         />
         <View style={{flex: 1}}>
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' found'}/>}
-            data={isReverseSort ? [...spotsSorted].reverse() : spotsSorted}
+            data={isReverseSort ? [...spotsNoSamples].reverse() : spotsNoSamples}
             keyExtractor={spot => spot.properties.id.toString()}
             renderItem={({item}) => (
               <SpotsListItem

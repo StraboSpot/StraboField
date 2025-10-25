@@ -29,7 +29,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const activeSpots = Object.values(activeSpotsObj);
 
   const [isReverseSort, setIsReverseSort] = useState(false);
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
@@ -54,7 +53,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const renderSectionHeader = ({spot}) => {
     return (
       <SectionDividerWithRightButton
-        buttonTitle={'View In Spot'}
+        buttonTitle={spot.properties?.isSample ? 'View in Sample' : 'View In Spot'}
         dividerText={spot.properties.name}
         onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
       />
@@ -81,16 +80,14 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <SpotFilters
           activeSpots={activeSpots}
           setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
           setSpotsSorted={setSpotsSorted}
           setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
+            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots and Samples
           </Text>
           <LittleSpacer/>
           <SectionList

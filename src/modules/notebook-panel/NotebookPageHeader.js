@@ -34,6 +34,8 @@ const NotebookPageHeader = ({
 
   const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
 
+  const headerText = pageTitle === 'Sample Detail' ? 'Sample Metadata' : pageTitle;
+
   const selectTagsForFeatures = () => {
     if (isEmpty(selectedFeaturesForTagging)) {
       alert('No Features!', 'No features have been selected.');
@@ -61,7 +63,7 @@ const NotebookPageHeader = ({
           )}
         </View>
         <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-          <Text style={{fontSize: PRIMARY_HEADER_TEXT_SIZE, fontWeight: 'bold'}}>{pageTitle}</Text>
+          <Text style={{fontSize: PRIMARY_HEADER_TEXT_SIZE, fontWeight: 'bold'}}>{headerText}</Text>
         </View>
         <View style={{alignItems: 'center', flexDirection: 'row', height: 40, justifyContent: 'flex-end', width: 70}}>
           <View>

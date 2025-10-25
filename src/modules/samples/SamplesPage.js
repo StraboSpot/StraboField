@@ -6,8 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/Helpers';
 import {setModalVisible} from '../home/home.slice';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import {PAGE_KEYS} from '../page/page.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page}) => {
@@ -26,12 +28,22 @@ const SamplesPage = ({isReadOnly, page}) => {
 
   useEffect(() => {
     console.log('UE SamplesPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedSample({});
+    if (spot.properties?.isSample && spot.properties?.samples?.length > 0) {
+      setSelectedSample(spot.properties.samples[0]);
+      setIsDetailView(true);
+    }
+    else if (isEmpty(selectedAttributes)) setSelectedSample({});
     else {
       setSelectedSample(selectedAttributes[0]);
       setIsDetailView(true);
     }
   }, [selectedAttributes, spot]);
+
+  const closeDetailView = () => {
+    if (spot.properties?.isSample) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    console.log('closeDetailView');
+    setIsDetailView(false);
+  };
 
   const editSample = (sample) => {
     setIsDetailView(true);
@@ -43,10 +55,7 @@ const SamplesPage = ({isReadOnly, page}) => {
     return (
       <>
         <BasicPageDetail
-          closeDetailView={() => {
-            console.log('closeDetailView');
-            setIsDetailView(false);
-          }}
+          closeDetailView={closeDetailView}
           isReadOnly={isReadOnly}
           page={page}
           selectedFeature={selectedSample}

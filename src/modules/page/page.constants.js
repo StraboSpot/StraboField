@@ -58,7 +58,6 @@ import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureMod
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';
 import ThreeDStructuresPage from '../three-d-structures/ThreeDStructuresPage';
 
-
 // Called in Dialog.js
 
 export const PAGE_KEYS = {
@@ -507,3 +506,7 @@ const OTHER_MODALS = [
 ];
 
 export const MODALS = [...NOTEBOOK_MODELS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
+
+export const SAMPLES_OVERVIEW_SECTIONS = [PAGE_KEYS.SAMPLES, PAGE_KEYS.NOTES, PAGE_KEYS.IMAGES, PAGE_KEYS.TAGS];
+
+export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.STRAT_SECTION, PAGE_KEYS.INTERVAL, PAGE_KEYS.INTERPRETATIONS];

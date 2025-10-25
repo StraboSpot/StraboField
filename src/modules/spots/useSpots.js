@@ -154,6 +154,11 @@ const useSpots = () => {
     newSpot.properties.modified_timestamp = Date.now();
 
     // Set spot name
+    if (newSpot.properties?.isSample) {
+      const initialNamePrefix = preferences.sample_prefix || '';
+      const startingNumber = preferences.starting_sample_number;
+      newSpot.properties.name = initialNamePrefix + (startingNumber < 10 ? '0' + startingNumber : startingNumber);
+    }
     if (!newSpot.properties.name) {
       const {spotName, spotNumber} = getNewSpotNameObj(newSpot);
       newSpot.properties.name = spotName;
@@ -383,7 +388,10 @@ const useSpots = () => {
   };
 
   const getSpotGeometryIconSource = (spot) => {
-    if (spot?.geometry?.type === 'Point') {
+    if (spot?.properties?.isSample) {
+      return require('../../assets/icons/Sample_pressed.png');
+    }
+    else if (spot?.geometry?.type === 'Point') {
       if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePoint_pressed.png');
       else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratPoint_pressed.png');
       else return require('../../assets/icons/Point_pressed.png');
@@ -448,7 +456,8 @@ const useSpots = () => {
   };
 
   const getSpotsWithSamples = () => {
-    return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties.samples));
+    return Object.values(getActiveSpotsObj()).filter(
+      spot => spot.properties?.isSample || !isEmpty(spot.properties.samples));
   };
 
   // Get all active Spots that contain a strat section
@@ -460,6 +469,10 @@ const useSpots = () => {
     const spot = getSpotWithThisStratSection(stratSectionId);
     return spot && spot.properties && spot.properties.sed
     && spot.properties.sed.strat_section ? spot.properties.sed.strat_section : undefined;
+  };
+
+  const getVisibleSpots = () => {
+    return Object.values(getActiveSpotsObj()).filter(spot => !spot.properties?.isSample);
   };
 
   const handleSpotSelected = (spot) => {
@@ -566,6 +579,7 @@ const useSpots = () => {
     getSpotsWithKey: getSpotsWithKey,
     getSpotsWithSamples: getSpotsWithSamples,
     getSpotsWithStratSection: getSpotsWithStratSection,
+    getVisibleSpots: getVisibleSpots,
     handleSpotSelected: handleSpotSelected,
     isOnGeoMap: isOnGeoMap,
     isOnImageBasemap: isOnImageBasemap,

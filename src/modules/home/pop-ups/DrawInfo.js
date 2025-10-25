@@ -27,7 +27,7 @@ const DrawInfo = ({
   return (
     !isEmpty(targetDatasetId)
     && [MAP_MODES.DRAW.POINT, MAP_MODES.DRAW.LINE, MAP_MODES.DRAW.FREEHANDLINE, MAP_MODES.DRAW.FREEHANDPOLYGON,
-      MAP_MODES.DRAW.POLYGON, MAP_MODES.DRAW.MEASURE, MAP_MODES.EDIT].includes(mapMode)
+      MAP_MODES.DRAW.POLYGON, MAP_MODES.DRAW.MEASURE, MAP_MODES.EDIT, MAP_MODES.DRAW.SAMPLE].includes(mapMode)
     && (
       <View style={homeStyles.targetDatasetContainer}>
         {mapMode === MAP_MODES.DRAW.MEASURE ? (
@@ -43,27 +43,34 @@ const DrawInfo = ({
         )}
         <View>
           {mapMode === MAP_MODES.EDIT ? <EditCancelSaveButtons clickHandler={clickHandler}/>
-            : mapMode === MAP_MODES.DRAW.POINT ? (
+            : mapMode === MAP_MODES.DRAW.SAMPLE ? (
                 <View>
-                  <Text style={{textAlign: 'center'}}>Place a point </Text>
+                  <Text style={{textAlign: 'center'}}>Place a sample</Text>
                   <Text style={{textAlign: 'center'}}>on the map</Text>
                 </View>
               )
-              : mapMode === MAP_MODES.DRAW.MEASURE ? <ActionButton onPress={endMeasurement} title={'End Measurement'}/>
-                : (
-                  <>
-                    <View style={{marginBottom: -10}}>
-                      <ActionButton
-                        onPress={onEndDrawPressed}
-                        title={selectingMode ? 'Set Area' : 'Save New Spot'}
+              : mapMode === MAP_MODES.DRAW.POINT ? (
+                  <View>
+                    <Text style={{textAlign: 'center'}}>Place a point </Text>
+                    <Text style={{textAlign: 'center'}}>on the map</Text>
+                  </View>
+                )
+                : mapMode === MAP_MODES.DRAW.MEASURE
+                  ? <ActionButton onPress={endMeasurement} title={'End Measurement'}/>
+                  : (
+                    <>
+                      <View style={{marginBottom: -10}}>
+                        <ActionButton
+                          onPress={onEndDrawPressed}
+                          title={selectingMode ? 'Set Area' : 'Save New Spot'}
+                        />
+                      </View>
+                      <OutlineButton
+                        onPress={onCancel}
+                        title={'Cancel'}
                       />
-                    </View>
-                    <OutlineButton
-                      onPress={onCancel}
-                      title={'Cancel'}
-                    />
-                  </>
-                )}
+                    </>
+                  )}
         </View>
       </View>
     )

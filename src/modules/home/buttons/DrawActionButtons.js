@@ -16,12 +16,19 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
     handleLinePressed,
     handlePointLongPressed,
     handlePointPressed,
+    handlePointSamplePressed,
     handlePolygonLongPressed,
     handlePolygonPressed,
   } = useDrawActionButtons({clickHandler, mapMode});
 
   return (
     <View style={homeStyles.drawToolsContainer}>
+      <IconButton
+        imageStyle={SMALL_SCREEN && [homeStyles.iconSizeSmallScreen, {height: 30}]}
+        // onLongPress={handlePointLongPressed}
+        onPress={handlePointSamplePressed}
+        source={getImageSource(MAP_MODES.DRAW.SAMPLE)}
+      />
       <IconButton
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onLongPress={handlePointLongPressed}

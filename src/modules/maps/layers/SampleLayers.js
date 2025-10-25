@@ -12,7 +12,9 @@ const SampleLayers = ({features}) => {
   const {getMapSymbology} = useMapSymbology();
 
   const featuresWithSamples = features.reduce((acc, feature) => {
-    return feature.properties?.samples && feature.properties.samples.length >= 1 ? [...acc, feature] : acc;
+    return feature.properties?.isSample || (feature.properties?.samples && feature.properties.samples.length >= 1)
+      ? [...acc, feature]
+      : acc;
   }, []);
 
   if (isShowSamplesOn) {

@@ -15,7 +15,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setModalVisible} from '../home/home.slice';
 import Overview from '../page/Overview';
-import {NOTEBOOK_PAGES, PAGE_KEYS, SUBPAGES} from '../page/page.constants';
+import {MODAL_KEYS, NOTEBOOK_MODELS, NOTEBOOK_PAGES, PAGE_KEYS, SUBPAGES} from '../page/page.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import useProject from '../project/useProject';
@@ -27,6 +27,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -40,6 +41,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
+    if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
+      dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
+    }
   }, [pageVisible, spot]);
 
   const openPage = (key) => {
@@ -67,6 +71,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     const Page = page?.page_component || Overview;
     let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
+
     return (
       <>
         <View style={notebookStyles.headerContainer}>

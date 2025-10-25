@@ -65,13 +65,13 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   useEffect(() => {
     console.log('UE SampleModal [spot]', spot);
-    if (preferences.prepend_spot_name_sample_name) {
+    if (preferences.prepend_spot_name_sample_name && !spot.properties?.isSample) {
       const spotName = modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE || !spot ? getNewSpotName()
         : spot?.properties?.name;
       setNamePrefix(spotName + initialNamePrefix);
     }
 
-    if (preferences.sample_postfix_letter) {
+    if (preferences.sample_postfix_letter && !spot.properties?.isSample) {
       let postfixLetter = 'a';
       if (spot?.properties?.samples && !isEmpty(spot?.properties?.samples)) {
         postfixLetter = numToLetter(spot.properties.samples.length + 1);
@@ -79,7 +79,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       }
       setNamePostfix(postfixLetter);
     }
-    else if (preferences.restart_sample_num_each_spot) {
+    else if (preferences.restart_sample_num_each_spot && !spot.properties?.isSample) {
       let postfixNumber = 1;
       if (spot?.properties?.samples && !isEmpty(spot?.properties?.samples)) {
         postfixNumber = spot.properties?.samples?.length + 1;
@@ -288,6 +288,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
+      headerTitle={spot.properties?.isSample ? 'Add Sample Metadata' : 'Add a Sample'}
       onFooterButtonPress={onPress}
       showActionButton={false}
       showCancelButton={false}

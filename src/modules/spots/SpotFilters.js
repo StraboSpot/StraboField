@@ -15,11 +15,10 @@ import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtent
 
 const SpotFilters = ({
                        activeSpots,
+                       doSearchSubSamples,
                        setIsReverseSort,
-                       setSpotsSearched,
                        setSpotsSorted,
                        setTextNoSpots,
-                       spotsSearched,
                        updateSpotsInMapExtent,
                      }) => {
   const {
@@ -73,14 +72,17 @@ const SpotFilters = ({
     let gotSpotsSearched;
     if (isEmpty(search)) gotSpotsSearched = spotsToSearch;
     else {
-      gotSpotsSearched = spotsToSearch.filter(
-        spot => spot.properties?.name?.toLowerCase().includes(search.toLowerCase()));
+      gotSpotsSearched = spotsToSearch.filter((spot) => {
+        return spot.properties?.name?.toLowerCase().includes(search.toLowerCase())
+          || (doSearchSubSamples
+            && !isEmpty(spot.properties.samples?.filter(
+              smpl => smpl.sample_id_name?.toLowerCase().includes(search.toLowerCase()))));
+      });
     }
-    setSpotsSearched(gotSpotsSearched);
     updateSort(undefined, gotSpotsSearched);
   };
 
-  const updateSort = (sort = sortOrder, spotsToSort = spotsSearched) => {
+  const updateSort = (sort = sortOrder, spotsToSort) => {
     setSortOrder(sort);
     let gotSpotsSorted = [...spotsToSort];
     if (sort === SORT_ORDER.ALPHABETICAL) gotSpotsSorted = sortSpotsAlphabetically(gotSpotsSorted);
@@ -112,7 +114,7 @@ const SpotFilters = ({
           inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
           inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
           onChangeText={updateSearch}
-          placeholder={'Search Spot Names'}
+          placeholder={doSearchSubSamples ? 'Search Spot & \nSample Names' : 'Search Spot Names'}
           placeholderTextColor={DARKGREY}
           platform={'default'}
           value={searchState}
