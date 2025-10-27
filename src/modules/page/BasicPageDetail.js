@@ -93,6 +93,14 @@ const BasicPageDetail = ({
     closeDetailView();
   };
 
+  const checkIfIsDisabled = () => {
+    if (isInternetReachable && isIGSNChecked) {
+      if (!selectedFeature.isOnMySesar || isEmpty(sesar.selectedUserCode)) return true;
+      // else if () return true;
+    }
+    else return true;
+  };
+
   const confirmLeavePage = () => {
     const description = isIGSNChecked
       ? 'Would you like to save your data before continuing? \n\n This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
@@ -319,8 +327,7 @@ const BasicPageDetail = ({
           {!isReadOnly && (
             <SaveAndCancelButtons
               cancel={cancelForm}
-              getIsDisabled={isInternetReachable && isIGSNChecked && isEmpty(sesar?.selectedUserCode)
-                && !selectedFeature?.isOnMySesar}
+              getIsDisabled={checkIfIsDisabled()}
               save={saveButtonOnPress}
             />
           )}

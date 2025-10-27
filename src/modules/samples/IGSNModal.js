@@ -86,7 +86,7 @@ const IGSNModal = forwardRef(({
     catch (err) {
       console.error(err);
       setIsLoading(false);
-      setErrorMessages('Something went wrong.');
+      setErrorMessages(err || ['Something went wrong.']);
       setModalPage('error');
       setIsUploaded(false);
     }
