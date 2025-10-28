@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -12,14 +12,12 @@ const DatasetList = ({setDatasetToView}) => {
   const datasets = useSelector(state => state.project.datasets) || {};
 
   return (
-    <View>
-      <FlatList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        data={Object.values(datasets)}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
-      />
-    </View>
+    <FlatList
+      ItemSeparatorComponent={FlatListItemSeparator}
+      data={Object.values(datasets)}
+      keyExtractor={item => item.id}
+      renderItem={({item}) => <DatasetListItem dataset={item} setDatasetToView={setDatasetToView}/>}
+    />
   );
 };
 
