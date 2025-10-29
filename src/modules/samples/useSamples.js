@@ -191,10 +191,12 @@ const useSamples = () => {
       latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1].toFixed(6)};
     }
     else {
-      longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0].toFixed(
-        6) : 'No coordinates assigned';
-      latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1].toFixed(
-        6) : 'No coordinates assigned';
+      longitude = selectedSpot?.geometry?.coordinates
+        ? selectedSpot?.geometry?.coordinates?.[0]?.toFixed(6)
+        : 'No coordinates assigned';
+      latitude = selectedSpot?.geometry?.coordinates
+        ? selectedSpot?.geometry?.coordinates?.[1]?.toFixed(6)
+        : 'No coordinates assigned';
     }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample

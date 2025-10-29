@@ -7,6 +7,17 @@ const lodashIsEqual = require('lodash.isequal');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 
+// Check if an array, object, string or number is empty and if so return true
+export const isEmpty = (value) => {
+  if (value === null || value === undefined) return true;
+  if (Array.isArray(value)) return value.length === 0;
+  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
+  else if (typeof value === 'string') return value.length === 0;
+  else if (typeof value === 'number') return false;
+  else if (!value) return true;
+  return false;
+};
+
 // Parsing CSV Strings With Javascript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
 export const csvToArray = (strData, strDelimiter) => {
@@ -190,17 +201,6 @@ export const toRadians = (deg) => {
 export const truncateText = (str, maxLength) => {
   if (str?.length > maxLength) return str.substring(0, maxLength) + '...';
   else return str;
-};
-
-// Check if an array, object, string or number is empty and if so return true
-export const isEmpty = (value) => {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value)) return value.length === 0;
-  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
-  else if (typeof value === 'string') return value.length === 0;
-  else if (typeof value === 'number') return false;
-  else if (!value) return true;
-  return false;
 };
 
 export const isEqual = (a, b) => {
