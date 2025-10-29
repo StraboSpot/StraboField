@@ -11,6 +11,7 @@ import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import {PAGE_KEYS} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
 
@@ -20,6 +21,7 @@ const MorePagesMenu = ({
                        }) => {
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
+  const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
@@ -52,7 +54,9 @@ const MorePagesMenu = ({
               size={20}
               source={page.icon_src}
             />
-            <ListItem.Title style={footerStyles.morePagesListItemTitle}>{page.label}</ListItem.Title>
+            <ListItem.Title style={footerStyles.morePagesListItemTitle}>
+              {page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Sample Metadata' : page.label}
+            </ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
             <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>

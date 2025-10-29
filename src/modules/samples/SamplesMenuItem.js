@@ -100,8 +100,8 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={{flex: 1}}>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
             Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample: ' : ' samples: ')}
-            {sampleSpotsCount} principal {(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}
-            and {count + (count === 1 ? ' sample' : ' samples')} within Spots
+            {sampleSpotsCount} independent{(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}
+            and {count + (count === 1 ? ' sample' : ' samples')} embedded within Spots
           </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -127,7 +127,7 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
       );
     }
-    else return <SectionDivider dividerText={'Samples'}/>;
+    else return <SectionDivider dividerText={'Independent Samples'}/>;
   };
 
   return (

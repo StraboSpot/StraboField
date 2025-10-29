@@ -113,7 +113,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   };
 
   const renderSectionHeader = (page) => {
-    const dividerText = page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Sample Metadata' : page.label;
+    const dividerText = page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Metadata' : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={dividerText}/>
