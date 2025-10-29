@@ -63,13 +63,14 @@ const styles = StyleSheet.create({
   customEndpointSwitchContainer: {
     alignItems: 'center',
     flexDirection: 'row',
+    justifyContent: 'center',
     padding: 10,
     width: '75%',
   },
   customEndpointText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,
-    marginEnd: 30,
+    marginEnd: 20,
     textAlign: 'center',
   },
   customEndpointVerifyButtonContainer: {

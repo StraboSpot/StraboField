@@ -1,15 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Text} from 'react-native';
 
-import {Input, ListItem} from '@rn-vui/base';
+import {Input} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import commonStyles from '../../shared/common.styles';
+import TestingMode from './TestingMode';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
@@ -23,7 +22,7 @@ import {setTestingMode} from '../project/projects.slice';
 
 const Miscellaneous = () => {
   const dispatch = useDispatch();
-  const isTestingMode = useSelector(state => state.project.isTestingMode);
+  // const isTestingMode = useSelector(state => state.project.isTestingMode);
   const {endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
   const [isErrorMessage, setIsErrorMessage] = useState(false);
@@ -119,17 +118,26 @@ const Miscellaneous = () => {
     </ModalWrapper>
   );
 
-  const renderTestingModeField = () => (
-    <>
-      <SectionDivider dividerText={'Testing Mode'}/>
-      <ListItem containerStyle={commonStyles.listItem}>
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>Use Testing Mode?</ListItem.Title>
-        </ListItem.Content>
-        <SwitchWrapper onValueChange={onTestingSwitchChange} value={isTestingMode}/>
-      </ListItem>
-    </>
-  );
+  const renderPreferences = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Preferences'}/>
+        <TestingMode onTestingSwitchChange={onTestingSwitchChange}/>
+      </>
+    );
+  };
+
+  // const renderTestingModeField = () => (
+  //   <>
+  //     {/*<SectionDivider dividerText={'Testing Mode'}/>*/}
+  //     <ListItem containerStyle={commonStyles.listItem}>
+  //       <ListItem.Content>
+  //         <ListItem.Title style={commonStyles.listItemTitle}>Use Testing Mode?</ListItem.Title>
+  //       </ListItem.Content>
+  //       <SwitchWrapper onValueChange={onTestingSwitchChange} value={isTestingMode}/>
+  //     </ListItem>
+  //   </>
+  // );
 
   const verifyPassword = () => {
     if (password === testingModePassword) {
@@ -148,9 +156,11 @@ const Miscellaneous = () => {
         onSubmit={values => console.log('Submitting Form', values)}
       >
         <>
+          {renderPreferences()}
+          {/*{renderTestingModeField()}*/}
+          {/*{isTestingMode && renderGenerateRandomSpotsSection()}*/}
           {renderCustomEndpoint()}
-          {renderTestingModeField()}
-          {isTestingMode && renderGenerateRandomSpotsSection()}
+
           {renderPrompt()}
         </>
       </Formik>
