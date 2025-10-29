@@ -33,7 +33,9 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     else if (spot.geometry?.type === 'LineString') {
       return require('../../assets/icons/Sample_in_line_pressed_round.png');
     }
-    else if (spot.geometry?.type === 'Polygon') return require('../../assets/icons/Sample_in_point_pressed_round.png');
+    else if (spot.geometry?.type === 'Polygon') {
+      return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
+    }
     else return require('../../assets/icons/SampleSpot_pressed_round.png');
   };
 
