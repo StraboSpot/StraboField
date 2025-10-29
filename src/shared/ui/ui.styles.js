@@ -108,6 +108,10 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingVertical: 5,
   },
+  sectionDividerSubtitle: {
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
+  },
   sectionDividerText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,

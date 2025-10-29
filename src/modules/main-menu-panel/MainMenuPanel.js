@@ -19,8 +19,9 @@ import ImageBasemapsList from '../maps/ImageBasemapsList';
 import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
+import AddingNewSpotsPage from '../preferences/AddingNewSpotsPage';
 import Miscellaneous from '../preferences/Miscellaneous';
-import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
+import ShortcutMenu from '../preferences/ShortcutsList';
 import BackupProjectPage from '../project/backup/BackupProjectPage';
 import ExportProjectPage from '../project/backup/ExportProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
@@ -149,7 +150,7 @@ const MainMenuPanel = forwardRef(({
 
       // App Settings
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS:
-        return <ShortcutMenu/>;
+        return <AddingNewSpotsPage/>;
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS:
         return <Miscellaneous/>;
 
