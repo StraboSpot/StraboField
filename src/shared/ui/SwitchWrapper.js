@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Switch} from 'react-native';
+import {Platform, Switch, View} from 'react-native';
 
 import {
   LIGHTGREY,
@@ -26,12 +26,16 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
   }
   else if (Platform.OS === 'ios') {
     return (
-      <Switch
-        disabled={disabled}
-        onValueChange={onValueChange}
-        trackColor={{false: MEDIUMGREY, true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
-        value={value}
-      />
+
+      <View style={{transform: [{scaleX: 0.7}, {scaleY: 0.8}], marginRight: 5}}>
+        <Switch
+          disabled={disabled}
+          onValueChange={onValueChange}
+          // style={{transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
+          trackColor={{false: MEDIUMGREY, true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
+          value={value}
+        />
+      </View>
     );
   }
   else {

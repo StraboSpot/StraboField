@@ -1,6 +1,3 @@
-import {useState} from 'react';
-import {Platform} from 'react-native';
-
 import {useSelector} from 'react-redux';
 
 import {DRAW_ACTION_IMAGES} from './drawActionButtons.constants';
@@ -9,13 +6,8 @@ import {MAP_MODES} from '../../maps/maps.constants';
 
 const useDrawActionButtons = ({clickHandler, mapMode}) => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const drawGeometries = useSelector(state => state.map.drawGeometries);
   const stratSection = useSelector(state => state.map.stratSection);
-
-  const [drawTypes, setDrawTypes] = useState({
-    point: MAP_MODES.DRAW.POINT,
-    line: MAP_MODES.DRAW.LINE,
-    polygon: MAP_MODES.DRAW.POLYGON,
-  });
 
   const getImageSource = (type) => {
     if (type === MAP_MODES.EDIT) {
@@ -28,7 +20,7 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
         ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.SAMPLE.ICON_PRESSED : DRAW_ACTION_IMAGES.SAMPLE.BUTTON_POINT_PRESSED
         : SMALL_SCREEN ? DRAW_ACTION_IMAGES.SAMPLE.POINT_ICON : DRAW_ACTION_IMAGES.SAMPLE.BUTTON_POINT;
     }
-    switch (drawTypes[type]) {
+    switch (drawGeometries[type]) {
       case MAP_MODES.DRAW.POINT:
         return mapMode === MAP_MODES.DRAW.POINT
           ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.POINT.ICON_PRESSED : DRAW_ACTION_IMAGES.POINT.BUTTON_PRESSED
@@ -61,63 +53,31 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     else clickHandler('startEditing');
   };
 
-  const handleLineLongPressed = () => {
-    if (Platform.OS !== 'web') {
-      setDrawTypes(prevState => ({
-          ...prevState,
-          line: drawTypes.line === MAP_MODES.DRAW.LINE ? MAP_MODES.DRAW.FREEHANDLINE : MAP_MODES.DRAW.LINE,
-        }),
-      );
-    }
-  };
-
   const handleLinePressed = () => {
-    if (drawTypes.line === MAP_MODES.DRAW.LINE) clickHandler(MAP_MODES.DRAW.LINE);
+    if (drawGeometries.line === MAP_MODES.DRAW.LINE) clickHandler(MAP_MODES.DRAW.LINE);
     else clickHandler(MAP_MODES.DRAW.FREEHANDLINE);
   };
 
-  const handlePointLongPressed = () => {
-    if (!currentImageBasemap && !stratSection && Platform.OS !== 'web') {
-      setDrawTypes(prevState => ({
-        ...prevState,
-        point: drawTypes.point === MAP_MODES.DRAW.POINT ? MAP_MODES.DRAW.POINTLOCATION : MAP_MODES.DRAW.POINT,
-      }));
-    }
-  };
-
   const handlePointPressed = () => {
-    if (currentImageBasemap || stratSection || drawTypes.point === MAP_MODES.DRAW.POINT) {
+    if (currentImageBasemap || stratSection || drawGeometries.point === MAP_MODES.DRAW.POINT) {
       clickHandler(MAP_MODES.DRAW.POINT);
     }
     else clickHandler(MAP_MODES.DRAW.POINTLOCATION);
   };
 
-  const handlePolygonLongPressed = () => {
-    if (Platform.OS !== 'web') {
-      setDrawTypes(prevState => ({
-          ...prevState,
-          polygon: drawTypes.polygon === MAP_MODES.DRAW.POLYGON ? MAP_MODES.DRAW.FREEHANDPOLYGON : MAP_MODES.DRAW.POLYGON,
-        }),
-      );
-    }
-  };
-
   const handlePointSamplePressed = () => clickHandler(MAP_MODES.DRAW.SAMPLE);
 
   const handlePolygonPressed = () => {
-    if (drawTypes.polygon === MAP_MODES.DRAW.POLYGON) clickHandler(MAP_MODES.DRAW.POLYGON);
+    if (drawGeometries.polygon === MAP_MODES.DRAW.POLYGON) clickHandler(MAP_MODES.DRAW.POLYGON);
     else clickHandler(MAP_MODES.DRAW.FREEHANDPOLYGON);
   };
 
   return {
     getImageSource: getImageSource,
     handleEditShapePressed: handleEditShapePressed,
-    handleLineLongPressed: handleLineLongPressed,
     handleLinePressed: handleLinePressed,
-    handlePointLongPressed: handlePointLongPressed,
     handlePointPressed: handlePointPressed,
     handlePointSamplePressed: handlePointSamplePressed,
-    handlePolygonLongPressed: handlePolygonLongPressed,
     handlePolygonPressed: handlePolygonPressed,
   };
 };

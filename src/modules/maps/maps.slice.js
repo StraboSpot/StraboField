@@ -1,12 +1,17 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-import {LATITUDE, LONGITUDE, ZOOM} from './maps.constants';
+import {LATITUDE, LONGITUDE, MAP_MODES, ZOOM} from './maps.constants';
 
 const initialMapsState = {
   center: [LONGITUDE, LATITUDE || [0, 0]],
   currentBasemap: null,
   currentImageBasemap: undefined,
   customMaps: {},
+  drawGeometries: {
+    point: MAP_MODES.DRAW.POINT,
+    line: MAP_MODES.DRAW.LINE,
+    polygon: MAP_MODES.DRAW.POLYGON,
+  },
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
@@ -69,6 +74,9 @@ const mapsSlice = createSlice({
     setCurrentImageBasemap(state, action) {
       state.stratSection = undefined;
       state.currentImageBasemap = action.payload;
+    },
+    setDrawGeometries(state, action) {
+      state.drawGeometries = {...state.drawGeometries, ...action.payload};
     },
     setFeatureTypesOff(state, action) {
       // console.log('Map Feature Types Off', action.payload);
@@ -137,6 +145,7 @@ export const {
   setCenter,
   setCurrentBasemap,
   setCurrentImageBasemap,
+  setDrawGeometries,
   setFeatureTypesOff,
   setFreehandFeatureCoords,
   setGeometryTypesOff,

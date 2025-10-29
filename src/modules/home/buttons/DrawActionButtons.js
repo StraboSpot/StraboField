@@ -6,29 +6,22 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
 import useDrawActionButtons from './useDrawActionButtons';
+import useDrawGeometryToggle from './useDrawGeometryToggle';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
 
   const {
     getImageSource,
     handleEditShapePressed,
-    handleLineLongPressed,
     handleLinePressed,
-    handlePointLongPressed,
     handlePointPressed,
     handlePointSamplePressed,
-    handlePolygonLongPressed,
     handlePolygonPressed,
   } = useDrawActionButtons({clickHandler, mapMode});
+  const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
   return (
     <View style={homeStyles.drawToolsContainer}>
-      <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-        // onLongPress={handlePointLongPressed}
-        onPress={handlePointSamplePressed}
-        source={getImageSource(MAP_MODES.DRAW.SAMPLE)}
-      />
       <IconButton
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onLongPress={handlePointLongPressed}
@@ -46,6 +39,12 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
         onLongPress={handlePolygonLongPressed}
         onPress={handlePolygonPressed}
         source={getImageSource(MAP_MODES.DRAW.POLYGON)}
+      />
+      <IconButton
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+        // onLongPress={handlePointLongPressed}
+        onPress={handlePointSamplePressed}
+        source={getImageSource(MAP_MODES.DRAW.SAMPLE)}
       />
       <IconButton
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
