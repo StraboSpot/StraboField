@@ -13,7 +13,7 @@ const useSamples = () => {
 
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
-  const {name} = useSelector(state => state.user);
+  const {name, sesar} = useSelector(state => state.user);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const authenticateWithSesar = async (sesarTokens) => {
@@ -200,7 +200,7 @@ const useSamples = () => {
     }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
-      {label: 'User Code', sesarKey: 'user_code', value: sampleValue.sesarUserCode}, //required
+      {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
       {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, formName)}, //required
       {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
       {label: 'Material:', sesarKey: 'material', value: getMaterialName(sampleValue?.material_type)}, //required

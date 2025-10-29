@@ -41,7 +41,8 @@ const IGSNModal = forwardRef(({
     // const sesarUserCode = !formRef.current.values.isOnMySesar ? sesar.selectedUserCode : formRef.current.values.sesarUserCode;
     // formRef.current.setValues({...formRef.current.values, sesarUserCode: sesarUserCode}).then(
     //   () => console.log('FORMREF.CURRENT.VALUES', formRef.current.values));
-    const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
+    console.log('FORM VALUES', formValues);
+    const sesarMappedObj = straboSesarMapping(formValues);
     setMappedSesarValues(sesarMappedObj);
 
     if (!sesar) {
@@ -56,7 +57,7 @@ const IGSNModal = forwardRef(({
         },
       }));
     }
-  }, [formValues]);
+  }, [formValues, sesar]);
 
   const handleConfirmOnPress = () => {
     if (formRef.current) onSampleSaved(formRef.current);
