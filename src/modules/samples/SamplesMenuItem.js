@@ -28,6 +28,15 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
   };
 
+  const getEmbeddedSampleAvatarSource = (spot) => {
+    if (spot.geometry?.type === 'Point') return require('../../assets/icons/Sample_in_point_pressed_round.png');
+    else if (spot.geometry?.type === 'LineString') {
+      return require('../../assets/icons/Sample_in_line_pressed_round.png');
+    }
+    else if (spot.geometry?.type === 'Polygon') return require('../../assets/icons/Sample_in_point_pressed_round.png');
+    else return require('../../assets/icons/SampleSpot_pressed_round.png');
+  };
+
   const renderSample = (sample, spot) => {
     if (spot) {
       return (
@@ -38,7 +47,7 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         >
           <AvatarWrapper
             size={20}
-            source={require('../../assets/icons/Sample_pressed.png')}
+            source={getEmbeddedSampleAvatarSource(spot)}
           />
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>

@@ -388,9 +388,7 @@ const useSpots = () => {
   };
 
   const getSpotGeometryIconSource = (spot) => {
-    if (spot?.properties?.isSample) {
-      return require('../../assets/icons/Sample_pressed.png');
-    }
+    if (spot?.properties?.isSample) return require('../../assets/icons/SampleSpot_pressed_round.png');
     else if (spot?.geometry?.type === 'Point') {
       if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePoint_pressed.png');
       else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratPoint_pressed.png');

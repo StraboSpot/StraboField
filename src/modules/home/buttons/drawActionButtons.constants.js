@@ -36,9 +36,9 @@ export const DRAW_ACTION_IMAGES = {
     ICON_PRESSED: require('../../../assets/icons/EditShape_pressed.png'),
   },
   SAMPLE: {
-    BUTTON_POINT: require('../../../assets/icons/Sample.png'),
-    BUTTON_POINT_PRESSED: require('../../../assets/icons/Sample_pressed.png'),
-    POINT_ICON: require('../../../assets/icons/Sample.png'),
-    ICON_PRESSED: require('../../../assets/icons/Sample_pressed.png'),
+    BUTTON_POINT: require('../../../assets/icons/SampleSpotButton.png'),
+    BUTTON_POINT_PRESSED: require('../../../assets/icons/SampleSpotButton_pressed.png'),
+    POINT_ICON: require('../../../assets/icons/SampleSpot.png'),
+    ICON_PRESSED: require('../../../assets/icons/SampleSpot_pressed.png'),
   },
 };

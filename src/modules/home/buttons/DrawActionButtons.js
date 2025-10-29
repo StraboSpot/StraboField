@@ -24,7 +24,7 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
   return (
     <View style={homeStyles.drawToolsContainer}>
       <IconButton
-        imageStyle={SMALL_SCREEN && [homeStyles.iconSizeSmallScreen, {height: 30}]}
+        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         // onLongPress={handlePointLongPressed}
         onPress={handlePointSamplePressed}
         source={getImageSource(MAP_MODES.DRAW.SAMPLE)}
