@@ -221,7 +221,7 @@ const BasicPageDetail = ({
       const formName = getFormName();
       return (
         <View style={{flex: 1}}>
-          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && renderIGSNUpload()}
+          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
           <Formik
             enableReinitialize={true}
             initialStatus={{formName: formName}}
