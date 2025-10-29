@@ -112,7 +112,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     dispatch(setInitialSesarState());
     console.log('Sesar credentials have beed reset');
     toast.show('Sesar credentials have beed reset', {type: 'success'});
-    handleIGSNChecked(false);
+    // handleIGSNChecked(false);
   };
 
   const onUserCodeSelect = async (userCode) => {
@@ -130,8 +130,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <CheckBox
                 checked={isIGSNChecked}
-                // checkedTitle={selectedFeature.isOnMySesar && 'On SESAR and IGSN assigned'}
-                disabled={selectedFeature.isOnMySesar || !isInternetReachable}
+                disabled={!isInternetReachable}
                 onPress={handlePress}
                 title={'Upload to SESAR'}
               />
