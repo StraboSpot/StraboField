@@ -60,8 +60,6 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     else clickHandler(MAP_MODES.DRAW.POINTLOCATION);
   };
 
-  const handlePointSamplePressed = () => clickHandler(MAP_MODES.DRAW.SAMPLE);
-
   const handlePolygonPressed = () => {
     if (drawGeometries.polygon === MAP_MODES.DRAW.POLYGON) clickHandler(MAP_MODES.DRAW.POLYGON);
     else clickHandler(MAP_MODES.DRAW.FREEHANDPOLYGON);
@@ -72,7 +70,6 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     handleEditShapePressed: handleEditShapePressed,
     handleLinePressed: handleLinePressed,
     handlePointPressed: handlePointPressed,
-    handlePointSamplePressed: handlePointSamplePressed,
     handlePolygonPressed: handlePolygonPressed,
   };
 };
