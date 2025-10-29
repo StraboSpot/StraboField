@@ -190,7 +190,7 @@ const useSamples = () => {
       longitudeEndObj = {label: 'Longitude End:', sesarKey: 'longitude_end', value: lineArray[1][0].toFixed(6)};
       latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1].toFixed(6)};
     }
-    else {
+    else if (geometryType === 'Point') {
       longitude = selectedSpot?.geometry?.coordinates
         ? selectedSpot?.geometry?.coordinates?.[0]?.toFixed(6)
         : 'No coordinates assigned';
