@@ -11,10 +11,8 @@ import {truncateText} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
-const SamplesList = ({onPress, page, openModal}) => {
+const SamplesList = ({onPress}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [selectedItem, setSelectedItem] = useState(null);
 
   const samples = spot?.properties?.samples || [];
   const renderSamplesListItem = (item) => {
@@ -37,7 +35,7 @@ const SamplesList = ({onPress, page, openModal}) => {
               </ListItem.Subtitle>
             </View>
             <View>
-              <IGSNDisplay item={item} openModal={openModal}/>
+              <IGSNDisplay item={item}/>
             </View>
           </ListItem.Content>
           <ListItem.Chevron/>

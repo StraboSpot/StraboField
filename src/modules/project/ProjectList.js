@@ -107,19 +107,22 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
   const renderProjectsList = () => {
     if (!isEmpty(userData)) {
       return (
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={
-            <View>
-              {source === 'server' ? <OutlineButton onPress={getAllProjects} title={'Retry'}/>
-                : <ListEmptyText text={'No Projects Available'}/>}
-              {isError && renderErrorMessage()}
-            </View>
-          }
-          data={projectsArr.projects}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderProjectItem(item)}
-        />
+        <View style={{flex: 1}}>
+          <FlatList
+            ItemSeparatorComponent={FlatListItemSeparator}
+            ListEmptyComponent={
+              <View>
+                {source === 'server' ? <OutlineButton onPress={getAllProjects} title={'Retry'}/>
+                  : (
+                    <ListEmptyText text={'No Projects Available'}/>
+                  )}
+                {isError && renderErrorMessage()}
+              </View>
+            }
+            data={projectsArr.projects}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderProjectItem(item)}/>
+        </View>
       );
     }
   };

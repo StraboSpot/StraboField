@@ -17,7 +17,7 @@ import {PAGE_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const AddEarthquakeModal = ({onPress}) => {
+const AddEarthquakeModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -196,8 +196,9 @@ const AddEarthquakeModal = ({onPress}) => {
       await formRef.current.submitForm();
       const editedEarthquakeData = showErrors(formRef.current);
       console.log('Saving earthquake data to Spot ...');
-      let editedEarthquakesData = spot.properties.earthquakes ? JSON.parse(
-        JSON.stringify(spot.properties.earthquakes)) : [];
+      let editedEarthquakesData = spot.properties.earthquakes
+        ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
+        : [];
       editedEarthquakesData.push({...editedEarthquakeData, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedEarthquakesData}));

@@ -60,12 +60,6 @@ const OtherFeaturesPage = ({isReadOnly}) => {
             showAddButton={!isReadOnly}
             showFeaturesTagButton={!isReadOnly}
           />
-          {/*{!isMultipleFeaturesTaggingEnabled && (*/}
-          {/*  <SectionDividerWithRightButton*/}
-          {/*    dividerText={'Other Features'}*/}
-          {/*    onPress={addFeature}*/}
-          {/*  />*/}
-          {/*)}*/}
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}

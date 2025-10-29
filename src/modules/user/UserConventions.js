@@ -1,7 +1,6 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,6 +11,7 @@ import useDownload from '../../services/useDownload';
 import useUpload from '../../services/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
@@ -107,15 +107,11 @@ const UserProfile = () => {
     return (
       <>
         <SectionDivider dividerText={'Convert Measurements'}/>
+        <OutlineButton
+          onPress={convertStrikeDipDirection}
+          title={'Convert Strike <-> Dip Direction'}
+        />
         <View style={{paddingHorizontal: 10}}>
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            onPress={convertStrikeDipDirection}
-            title={'Convert Strike <-> Dip Direction'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'outline'}
-          />
           <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
             *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
             updated.
@@ -165,15 +161,10 @@ const UserProfile = () => {
               {isOnline.isInternetReachable ? (
                 <View style={userStyles.saveButtonContainer}>
                   {Platform.OS !== 'web' && (
-                    <Button
-                      buttonStyle={commonStyles.standardButton}
-                      containerStyle={commonStyles.standardButtonContainer}
+                    <OutlineButton
                       loading={isDownloading}
-                      loadingProps={userStyles.loadingSpinnerProps}
                       onPress={onDownloadUserProfile}
                       title={'Download User Conventions'}
-                      titleStyle={commonStyles.standardButtonText}
-                      type={'outline'}
                     />
                   )}
                 </View>

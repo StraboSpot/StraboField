@@ -244,10 +244,6 @@ const Compass = ({
     }
   };
 
-  const toggleSwitch = () => {
-    setShowCompassRawDataView(previousState => !previousState);
-  };
-
   const unsubscribeFromCalibrationStatus = () => {
     if (Platform.OS === 'ios') {
       try {
@@ -278,14 +274,6 @@ const Compass = ({
         compassMeasurementTypes={compassMeasurementTypes}
         grabMeasurements={grabMeasurements}
       />
-      {/*<View style={compassStyles.matrixDataButtonContainer}>*/}
-      {/*  <View style={compassStyles.matrixDataButtonContainer}>*/}
-      {/*    <Text style={compassStyles.switchText}>Display Raw Data</Text>*/}
-      {/*    <SwitchWrapper onValueChange={toggleSwitch} value={showCompassRawDataView}/>*/}
-      {/*  </View>*/}
-
-
-      {/*</View>*/}
       {showCompassRawDataView && <CompassDebug
         compassData={compassData}
         matrixRotation={matrixRawData?.current}

@@ -22,7 +22,11 @@ const MainMenuPanelListItem = ({onPress, title}) => {
   const getTitle = () => {
     let subtitle;
     if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS) {
-      const targetDatasetName = isEmpty(currentProjectId) ? '' : getTargetDatasetFromId().name;
+      let targetDatasetName = '';
+      if (!isEmpty(currentProjectId)) {
+        const targetDataset = getTargetDatasetFromId();
+        if (targetDataset?.name) targetDatasetName = targetDataset?.name;
+      }
       subtitle = '  (Target: ' + truncateText(targetDatasetName, 25) + ')';
     }
 

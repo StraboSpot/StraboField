@@ -21,8 +21,8 @@ const ImageInfo = ({
                      saveImages,
                      saveUpdatedImage,
                      setImageToView,
-                     setIsImageModalVisible
-}) => {
+                     setIsImageModalVisible,
+                   }) => {
   console.log('Rendering ImageInfo...');
 
   const {width, height} = useWindowSize();

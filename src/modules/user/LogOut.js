@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -50,7 +50,7 @@ const LogOut = () => {
 
   const renderLogInOrOutButton = () => {
     return (
-      <View style={{paddingHorizontal: 10}}>
+      <>
         <OutlineButton
           onPress={() => isEmpty(userData.name) ? dispatch(logout()) : setIsLogoutModalVisible(true)}
           title={isEmpty(userData.name) ? 'Log In' : 'Log Out'}
@@ -61,7 +61,7 @@ const LogOut = () => {
             title={isEmpty(userData.name) && 'Delete Data & Return to Log In'}
           />
         )}
-      </View>
+      </>
     );
   };
 
@@ -74,15 +74,11 @@ const LogOut = () => {
         showCancelButton={false}
         showCloseButton
       >
-        <View>
-          <Text style={[overlayStyles.importantText, {padding: 5, paddingTop: 20}]}>
-            Please make sure to backup your{'\n'}project before logging out.
-          </Text>
-          <View style={{padding: 10}}>
-            <ActionButton onPress={clearUser} title={'Log Out'}/>
-            <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
-          </View>
-        </View>
+        <Text style={[overlayStyles.importantText, {paddingVertical: 20}]}>
+          Please make sure to backup your{'\n'}project before logging out.
+        </Text>
+        <ActionButton onPress={clearUser} title={'Log Out'}/>
+        <OutlineButton onPress={goToBackupPage} title={'Go to Backup Page'}/>
       </ModalWrapper>
     );
   };

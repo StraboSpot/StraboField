@@ -1,12 +1,14 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import MorePagesMenu from './MorePagesMenu';
 import footerStyle from './notebookFooter.styles';
 import {isEmpty} from '../../../shared/Helpers';
+import * as themes from '../../../shared/styles.constants';
+import {BLACK} from '../../../shared/styles.constants';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
@@ -40,13 +42,10 @@ const NotebookFooter = ({openPage}) => {
             source={getPageIcon(key)}
           />
         ))}
-        <Button
-          buttonStyle={{padding: 15}}
-          containerStyle={{alignSelf: 'center'}}
+        <ClearButton
           onPress={() => setIsMorePagesMenuVisible(true)}
           title={'MORE'}
-          titleStyle={footerStyle.morePagesButton}
-          type={'clear'}
+          titleProps={{style: {color: BLACK, fontSize: themes.MEDIUM_TEXT_SIZE}}}
         />
       </View>
       <MorePagesMenu

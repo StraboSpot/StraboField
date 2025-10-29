@@ -284,7 +284,6 @@ const AddMeasurementModal = ({onPress}) => {
   };
 
   const renderMeasurementModalContent = () => {
-    const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     const formName = [groupKey, measurementTypeForForm];
     return (
       <ModalWrapper

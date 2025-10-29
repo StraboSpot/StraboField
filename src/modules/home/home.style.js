@@ -70,20 +70,8 @@ const homeStyles = StyleSheet.create({
     position: 'absolute',
     right: '40%',
   },
-  drawToolsButtons: {
-    backgroundColor: themes.BLUE,
-    borderColor: themes.LIST_BORDER_COLOR,
-    borderRadius: 30,
-    borderWidth: 1,
-    paddingBottom: 3,
-    paddingTop: 3,
-  },
   drawToolsContainer: {
     flexDirection: 'row',
-  },
-  drawToolsTitle: {
-    color: 'white',
-    fontSize: themes.PRIMARY_TEXT_SIZE,
   },
   homeIconContainer: {
     left: 10,
@@ -175,7 +163,6 @@ const homeStyles = StyleSheet.create({
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderRadius: 10,
     elevation: 2,
-    padding: 15,
     shadowColor: 'black',
     shadowOpacity: 0.3,
     shadowRadius: 4,

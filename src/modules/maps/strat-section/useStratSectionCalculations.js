@@ -249,7 +249,7 @@ const useStratSectionCalculations = () => {
     const spots = getSpotsMappedOnGivenStratSection(stratSectionId);
     let spotsFiltered = spots.filter(spot => excludedSpotId && spot.properties.id !== excludedSpotId);
     let movedSpots = [];
-    spotsFiltered.map((spot, h) => {
+    spotsFiltered.map((spot) => {
       const extent = turf.bbox(spot); //bbox extent in minX, minY, maxX, maxY order
       if (extent[1] >= cutoff) movedSpots.push(moveSpotByPixels(spot, pixels));
     });

@@ -1,12 +1,14 @@
 import React, {useMemo, useState} from 'react';
 import {ActivityIndicator, Platform, View} from 'react-native';
 
-import {Button, Icon, Image} from '@rn-vui/base';
+import {Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageSliderStyles, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {isEmpty} from '../../shared/Helpers';
+import {MEDIUMGREY} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -111,29 +113,23 @@ const ImageSlider = ({route, navigation}) => {
           source={imageURI && {uri: imageURI}}
         />
         <View style={imageSliderStyles.navButtonsContainer}>
-          <Button
-            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
-            icon={
-              <Icon
-                name={'chevron-back'}
-                size={36}
-                type={'ionicon'}
-              />
-            }
+          <ClearButton
+            icon={{
+              containerStyle: {borderRadius: 50, borderWidth: 1, backgroundColor: MEDIUMGREY},
+              name: 'chevron-back',
+              size: 40,
+              type: 'ionicon',
+            }}
             onPress={onPressPrevious}
-            type={'clear'}
           />
-          <Button
-            containerStyle={{borderRadius: 50, borderWidth: 1, backgroundColor: '#cccaca'}}
-            icon={
-              <Icon
-                name={'chevron-forward'}
-                size={36}
-                type={'ionicon'}
-              />
-            }
+          <ClearButton
+            icon={{
+              containerStyle: {borderRadius: 50, borderWidth: 1, backgroundColor: MEDIUMGREY},
+              name: 'chevron-forward',
+              size: 40,
+              type: 'ionicon',
+            }}
             onPress={onPressNext}
-            type={'clear'}
           />
         </View>
       </View>

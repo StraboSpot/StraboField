@@ -18,7 +18,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 import Templates from '../templates/Templates';
 
-const AddMineralModal = ({onPress}) => {
+const AddMineralModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};

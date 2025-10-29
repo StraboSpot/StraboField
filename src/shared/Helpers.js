@@ -7,6 +7,17 @@ const lodashIsEqual = require('lodash.isequal');
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 
+// Check if an array, object, string or number is empty and if so return true
+export const isEmpty = (value) => {
+  if (value === null || value === undefined) return true;
+  if (Array.isArray(value)) return value.length === 0;
+  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
+  else if (typeof value === 'string') return value.length === 0;
+  else if (typeof value === 'number') return false;
+  else if (!value) return true;
+  return false;
+};
+
 // Parsing CSV Strings With Javascript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
 export const csvToArray = (strData, strDelimiter) => {
@@ -138,6 +149,14 @@ export const getFontSizeByWindowWidth = (window, fontSize) => {
   return PixelRatio.roundToNearestPixel(fontSize * (width / baseWidth));
 };
 
+export const getLatLngText = (lat, lng) => {
+  const degreeSymbol = '\u00B0';
+  let latitudeCardinal = Math.sign(lat) >= 0 ? 'N' : 'S';
+  let longitudeCardinal = Math.sign(lng) >= 0 ? 'E' : 'W';
+  return toFixedInteger(lng, 6) + degreeSymbol + ' ' + longitudeCardinal + ', '
+    + toFixedInteger(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
+};
+
 function getOrientation(window) {
   return window.width < window.height ? 'portrait' : 'landscape';
 }
@@ -184,17 +203,6 @@ export const truncateText = (str, maxLength) => {
   else return str;
 };
 
-// Check if an array, object, string or number is empty and if so return true
-export const isEmpty = (value) => {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value)) return value.length === 0;
-  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
-  else if (typeof value === 'string') return value.length === 0;
-  else if (typeof value === 'number') return false;
-  else if (!value) return true;
-  return false;
-};
-
 export const isEqual = (a, b) => {
   const isEqual = lodashIsEqual(a, b);
   // console.log('isEqual' isEqual);
@@ -228,6 +236,11 @@ export const readDataUrl = (file, callback) => {
 
 export const sleep = (delay) => {
   return new Promise(resolve => setTimeout(resolve, delay));
+};
+
+export const toFixedInteger = (value, dp) => {
+  // Returns an integer instead of a string
+  return +parseFloat(value).toFixed(dp);
 };
 
 export const unixToDateTime = (unixTimestamp) => {

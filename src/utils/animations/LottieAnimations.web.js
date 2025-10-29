@@ -3,9 +3,7 @@ import {ActivityIndicator, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-const LottieAnimation = ({doesLoop, show, error}) => {
-  // console.log('LOOPS', doesLoop);
-  // console.log('SHOW', show);
+const LottieAnimation = ({show, error}) => {
 
   return (
     <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 30}}>

@@ -28,7 +28,6 @@ const AddTephraModal = ({onPress}) => {
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
-  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
 
   const formRef = useRef(null);
   const {validateForm} = useForm();
@@ -59,7 +58,7 @@ const AddTephraModal = ({onPress}) => {
           onChange={setTabIndex}
           value={tabIndex}
         >
-          {Object.values(subpages).map((subpage, i) => (
+          {Object.values(subpages).map(subpage => (
             <Tab.Item
               buttonStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, padding: 0}}
               containerStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}

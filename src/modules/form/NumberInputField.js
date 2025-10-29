@@ -9,7 +9,7 @@ import {formStyles} from '../form';
 
 const NumberInputField = ({
                             field: {name, onBlur, onChange, value},
-                            form: {errors, touched},
+                            form: {errors},
                             editable = true, label, onMyChange, onShowFieldInfo, placeholder,
                           }) => {
 

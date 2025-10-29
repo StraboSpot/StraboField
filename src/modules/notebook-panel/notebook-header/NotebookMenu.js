@@ -114,7 +114,6 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
       <WarningModal
         closeModal={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
-        confirmTitleStyle={overlayStyles.importantText}
         isVisible={isDeleteSpotModalVisible}
         onConfirmPress={continueDeleteSelectedSpot}
         showCancelButton={!errorMessage}

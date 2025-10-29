@@ -8,8 +8,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
-import {isEmpty, toTitleCase} from '../../../shared/Helpers';
-import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shared/Helpers';
+import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
@@ -39,7 +40,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
         let lng = spot.geometry.coordinates[0];
         let lat = spot.geometry.coordinates[1];
         if (spot.properties.image_basemap || spot.properties.strat_section_id) {
-          let pixelDetails = toFixedIfNecessary(lng, 6) + ' X, ' + toFixedIfNecessary(lat, 6) + ' Y';
+          let pixelDetails = toFixedInteger(lng, 6) + ' X, ' + toFixedInteger(lat, 6) + ' Y';
           if (isEmpty(spot.properties.lat) || isEmpty(spot.properties.lng)) {
             const rootSpot = spot.properties.image_basemap ? getRootSpot(spot.properties.image_basemap)
               : getSpotWithThisStratSection(spot.properties.strat_section_id);
@@ -70,14 +71,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       return spot.geometry.type;
     }
     else return undefined;
-  };
-
-  const getLatLngText = (lat, lng) => {
-    const degreeSymbol = '\u00B0';
-    let latitudeCardinal = Math.sign(lat) >= 0 ? 'N' : 'S';
-    let longitudeCardinal = Math.sign(lng) >= 0 ? 'E' : 'W';
-    return toFixedIfNecessary(lng, 6) + degreeSymbol + ' ' + longitudeCardinal + ', '
-      + toFixedIfNecessary(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
   };
 
   const getTraceText = () => {
@@ -114,13 +107,13 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
 
   const renderCoordsText = () => {
     return (
-      <Button
-        buttonStyle={{justifyContent: 'flex-start', padding: 0, paddingHorizontal: 0}}
-        onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
-        title={getSpotCoordText()}
-        titleStyle={{textAlign: 'left', fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-        type={'clear'}
-      />
+      <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+        <ClearButton
+          onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+          title={getSpotCoordText()}
+          titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
+        />
+      </View>
     );
   };
 
@@ -128,24 +121,22 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return (
       <View style={{flexDirection: 'row'}}>
         {!spot.properties.trace && !spot.properties.surface_feature && (
-          <Button
-            buttonStyle={{padding: 0, paddingRight: 15, paddingLeft: 0}}
-            onPress={setToCurrentLocation}
-            title={'Set To Current Location'}
-            titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-            type={'clear'}
-          />
+          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5, paddingRight: 15}}>
+            <ClearButton
+              onPress={setToCurrentLocation}
+              title={'Set To Current Location'}
+            />
+          </View>
         )}
-        <Button
-          buttonStyle={{padding: 0}}
-          onPress={() => {
-            createDefaultGeom();
-            closeNotebookPanel();
-          }}
-          title={'Set in Current View'}
-          titleStyle={{fontSize: SMALL_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}
-          type={'clear'}
-        />
+        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+          <ClearButton
+            onPress={() => {
+              createDefaultGeom();
+              closeNotebookPanel();
+            }}
+            title={'Set in Current View'}
+          />
+        </View>
       </View>
     );
   };
@@ -161,9 +152,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     dispatch(setSelectedSpot(editedSpot));
   };
 
-  const toFixedIfNecessary = (value, dp) => {
-    return +parseFloat(value).toFixed(dp);
-  };
 
   const goToDatasetsPage = () => {
     toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',

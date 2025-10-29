@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Button, ButtonGroup} from '@rn-vui/base';
+import {ButtonGroup} from '@rn-vui/base';
 import DraggableFlatList, {ShadowDecorator} from 'react-native-draggable-flatlist';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -10,6 +10,7 @@ import tephraStyles from './tephra.styles';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalVisible} from '../home/home.slice';
@@ -115,14 +116,7 @@ const TephraPage = ({isReadOnly, page}) => {
               Bottom
             </Text>
           )}
-          {isReorderingActive && (
-            <Button
-              onPress={updateOrder}
-              title={'Done Reordering ' + page.label}
-              titleStyle={commonStyles.standardButtonText}
-              type={'clear'}
-            />
-          )}
+          {isReorderingActive && <ClearButton onPress={updateOrder} title={'Done Reordering ' + page.label}/>}
         </View>
       </View>
     );

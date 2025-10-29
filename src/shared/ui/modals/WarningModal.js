@@ -10,9 +10,7 @@ import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice
 const WarningModal = ({
                         children,
                         closeModal,
-                        closeTitle,
                         confirmText,
-                        confirmTitleStyle,
                         isVisible,
                         onConfirmPress,
                         showCancelButton,

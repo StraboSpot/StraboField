@@ -9,15 +9,15 @@ import sampleStyles from './samples.styles';
 import useSamples from './useSamples';
 import useServerRequests from '../../services/useServerRequests';
 import {isEmpty} from '../../shared/Helpers';
-import * as themes from '../../shared/styles.constants';
+import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import {setLoadingStatus} from '../home/home.slice';
 import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
 
-
-const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selectedFeature}) => {
-
+const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
   const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
   const toast = useToast();
   const {getSesarToken, getOrcidToken} = useServerRequests();
@@ -112,7 +112,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
     dispatch(setInitialSesarState());
     console.log('Sesar credentials have beed reset');
     toast.show('Sesar credentials have beed reset', {type: 'success'});
-    handleIGSNChecked(false);
+    // handleIGSNChecked(false);
   };
 
   const onUserCodeSelect = async (userCode) => {
@@ -122,29 +122,32 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
   const renderIGSNUploadCheckbox = () => {
     return (
       <View style={{justifyContent: 'flex-start', alignItems: 'center'}}>
-        {!selectedFeature.isOnMySesar
-          && (
-            <Text style={sampleStyles.mySesarUpdateDisclaimer}>To upload to your SESAR account and obtain an IGSN
-              check below:</Text>
-          )
-        }
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <CheckBox
-            checked={isIGSNChecked}
-            checkedTitle={selectedFeature.isOnMySesar && 'On SESAR and IGSN assigned'}
-            disabled={selectedFeature.isOnMySesar || !isInternetReachable}
-            onPress={handlePress}
-            title={'Upload to SESAR'}
-          />
-          {isIGSNChecked && isEmpty(selectedUserCode) && !selectedFeature.isOnMySesar && <Icon
-            color={'red'}
-            name={'warning-outline'}
-            onPress={() => alert('SESAR Code Required')}
-            reverse
-            size={10}
-            type={'ionicon'}
-          />}
-        </View>
+        {!selectedFeature.isOnMySesar && (
+          <>
+            <Text style={sampleStyles.mySesarUpdateDisclaimer}>
+              To upload to your SESAR account and obtain an IGSN check below:
+            </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <CheckBox
+                checked={isIGSNChecked}
+                disabled={!isInternetReachable}
+                onPress={handlePress}
+                title={'Upload to SESAR'}
+              />
+              {isIGSNChecked && isEmpty(selectedUserCode) && !selectedFeature.isOnMySesar && (
+                <Icon
+                  color={WARNING_COLOR}
+                  name={'warning-outline'}
+                  onPress={() => alert('SESAR Code Required')}
+                  reverse
+                  size={10}
+                  type={'ionicon'}
+                />
+              )}
+            </View>
+          </>
+        )}
+
       </View>
     );
   };
@@ -154,66 +157,59 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
       <View style={{padding: 10, marginLeft: 20}}>
         {/*{!isEmpty(userCodes)*/}
         {/*  && (*/}
-        {selectedFeature.Sample_IGSN && selectedFeature.sesarUserCode
-          ? (
-            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User
-                Code: {selectedFeature.sesarUserCode}</Text>
-            </View>
-          ) : (
-            <>
-              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'}}>
-                <Text style={{fontSize: themes.MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User Code:</Text>
-                <Button
-                  containerStyle={sampleStyles.userCodeButtonContainer}
-                  disabled={selectedFeature.isOnMySesar}
-                  disabledTitleStyle={{color: themes.BLACK}}
-                  icon={<Icon
-                    containerStyle={{paddingLeft: 5}}
-                    name={'chevron-down-outline'}
-                    type={'ionicon'}
-                  />
-                  }
-                  iconRight
-                  onPress={openPicker}
-                  raised
-                  title={selectedUserCode || 'Select User Code'}
-                  titleStyle={{fontSize: themes.MEDIUM_TEXT_SIZE, color: themes.BLACK}}
-                  type={'outline'}
-                />
-              </View>
-              <PickerOverlay
-                closePicker={closePicker}
-                data={userCodes}
-                dividerText={'Select User Code'}
-                isPickerVisible={isPickerVisible}
-                onSelect={onUserCodeSelect}
-                value={selectedUserCode}
+        {selectedFeature.Sample_IGSN ? (
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+            {/*<Text style={{fontSize: MEDIUM_TEXT_SIZE, marginRight: 20}}>*/}
+            {/*  SESAR User Code: {selectedFeature.sesarUserCode}*/}
+            {/*</Text>*/}
+          </View>
+        ) : (
+          <>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'}}>
+              <Text style={{fontSize: MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User Code:</Text>
+              <Button
+                disabled={selectedFeature.isOnMySesar}
+                disabledTitleStyle={{color: BLACK}}
+                icon={{
+                  containerStyle: {paddingLeft: 5},
+                  name: 'chevron-down-outline',
+                  type: 'ionicon',
+                }}
+                iconRight
+                onPress={openPicker}
+                raised
+                title={selectedUserCode || 'Select User Code'}
+                titleStyle={{fontSize: MEDIUM_TEXT_SIZE, color: BLACK}}
+                type={'outline'}
               />
-            </>
-          )}
+            </View>
+            <PickerOverlay
+              closePicker={closePicker}
+              data={[...userCodes, undefined]}
+              dividerText={'Select User Code'}
+              isPickerVisible={isPickerVisible}
+              onSelect={onUserCodeSelect}
+              value={selectedUserCode}
+            />
+          </>
+        )}
       </View>
     );
   };
 
   const renderOrcidSignInButton = () => (
     <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 20}}>
-      <Text style={sampleStyles.mySesarUpdateDisclaimer}>Authenticate your SESAR account to upload a sample. You may
-        be
-        redirected to the ORCID login page.</Text>
-      <Button
-        containerStyle={{padding: 5}}
-        onPress={orcidAuthentication}
-        title={'Authenticate With SESAR'}
-        type={'clear'}
-      />
+      <OutlineButton onPress={orcidAuthentication} title={'Sign into MySESAR'}/>
+      <Text style={sampleStyles.mySesarUpdateDisclaimer}>
+        ⚠️ Authenticate your SESAR account to upload a sample.
+      </Text>
     </View>
   );
 
   const renderSesarUploadDisclosure = () => {
     if (!isInternetReachable) {
       return (
-        <View style={{padding: 20}}>
+        <View style={{padding: 10}}>
           <Text style={sampleStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
             account with an IGSN number and needs to sync. You will need to be online make any updates.</Text>
         </View>
@@ -221,39 +217,28 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, page, selected
     }
     else {
       return (
-        <View style={{padding: 20}}>
+        <View style={{padding: 10}}>
           <Text style={sampleStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
-            account. Any changes will be automatically updated. You may be prompted to sign into your MySesar
-            account.</Text>
+            account. Any changes will be automatically updated.</Text>
         </View>
       );
     }
   };
 
   return (
-    <React.Fragment>
+    <>
       <View>
         {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
         {renderIGSNUploadCheckbox()}
-
-        {isIGSNChecked
-          && <View>
+        {isIGSNChecked && (
+          <View>
             {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
-
-            {
-              !isEmpty(sesarToken?.access)
-              && renderIGSNUserCodePicker()
-            }
-            {!isEmpty(sesarToken?.access) && <Button
-              onPress={onReset}
-              title='Reset SESAR Credentials'
-              titleStyle={{fontSize: themes.SMALL_TEXT_SIZE}}
-              type={'clear'}
-            />}
+            {!isEmpty(sesarToken?.access) && renderIGSNUserCodePicker()}
+            {!isEmpty(sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
           </View>
-        }
+        )}
       </View>
-    </React.Fragment>
+    </>
   );
 };
 

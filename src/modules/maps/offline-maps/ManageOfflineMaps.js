@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Animated, FlatList, Platform, Text, View} from 'react-native';
 
-import {Button, Icon, ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {editedOfflineMap, setOfflineMapVisible} from './offlineMaps.slice';
@@ -11,6 +11,8 @@ import useDevice from '../../../services/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
@@ -98,6 +100,11 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     else return name;
   };
 
+  const handDownloadMapTilesPressed = () => {
+    closeMainMenuPanel();
+    dispatch(setIsOfflineMapsModalVisible(true));
+  };
+
   const renderEditMapModal = () => {
     return (
       <TextInputModal
@@ -158,33 +165,24 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
               </Animated.View>
             )}
             {isOnline.isInternetReachable && (
-              <Button
-                containerStyle={{marginRight: 20}}
+              <ClearButton
                 disabled={item.count === 0}
-                icon={<Icon
-                  name={item.isOfflineMapVisible ? 'eye-off-outline' : item.count === 0 ? 'No tiles to view' : 'eye-outline'}
-                  size={20}
-                  type={'ionicon'}
-                />}
+                icon={{
+                  name: item.isOfflineMapVisible ? 'eye-off-outline' : item.count === 0 ? 'No tiles to view' : 'eye-outline',
+                  size: 20,
+                  type: 'ionicon',
+                }}
                 onPress={() => toggleOfflineMap(item)}
-                titleStyle={commonStyles.viewMapsButtonText}
-                type={'clear'}
               />
             )}
-            {item.id !== 'mapbox.outdoors' && item.id !== 'mapbox.satellite' && item.id !== 'osm' && item.id !== 'macrostrat'
-              && <Button
-                icon={
-                  <Icon
-                    name={'edit'}
-                    size={15}
-                    type={'material'}
-                  />
-                }
-                onPress={() => editMap(item)}
-                type={'clear'}
-              />}
+            {item.id !== 'mapbox.outdoors' && item.id !== 'mapbox.satellite' && item.id !== 'osm'
+              && item.id !== 'macrostrat' && (
+                <ClearButton
+                  icon={{name: 'edit', size: 18, type: 'material'}}
+                  onPress={() => editMap(item)}
+                />
+              )}
           </View>
-          {/*</View>*/}
         </ListItem.Content>
       </ListItem>
     );
@@ -232,26 +230,20 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
 
   return (
     <>
-      <Button
-        buttonStyle={commonStyles.standardButton}
-        containerStyle={styles.buttonContainer}
+      <OutlineButton
         disabled={(!isOnline.isInternetReachable && !isOnline.isConnected) || isSelected
           || Object.values(offlineMaps).some(map => map.isOfflineMapVisible === true)}
-        onPress={() => {
-          closeMainMenuPanel();
-          dispatch(setIsOfflineMapsModalVisible(true));
-        }}
-        title={'Download tiles of current map'}
-        titleStyle={commonStyles.standardButtonText}
+        onPress={handDownloadMapTilesPressed}
+        title={'Download Tiles of Current Map'}
       />
       <SectionDividerWithRightButton
         dividerText={'Offline Maps'}
         iconName={'reload-outline'}
-        iconSize={20}
-        iconType={'ionicon'}
-        onPress={() => updateMapsFromDevice()}
+        onPress={updateMapsFromDevice}
       />
       {!loading && renderMapsList()}
+
+      {/* Modals */}
       {renderEditMapModal()}
       {renderWarningModal()}
       <Loading

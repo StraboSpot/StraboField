@@ -21,9 +21,6 @@ const UserStyles = StyleSheet.create({
   deleteProfileButtonContainer: {
     marginBottom: 15,
   },
-  deleteProfileButtonText: {
-    color: themes.RED,
-  },
   deleteProfileText: {
     fontWeight: '600',
     lineHeight: 25,
@@ -43,10 +40,6 @@ const UserStyles = StyleSheet.create({
     fontSize: themes.LARGE_TEXT_SIZE,
     margin: 10,
   },
-  loadingSpinnerProps: {
-    color: '#999999',
-    size: 'large',
-  },
   profileNameAndImageContainer: {
     alignItems: 'center',
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
@@ -59,7 +52,6 @@ const UserStyles = StyleSheet.create({
     borderWidth: 7,
   },
   saveButtonContainer: {
-    paddingHorizontal: 10,
     paddingVertical: 20,
   },
 });

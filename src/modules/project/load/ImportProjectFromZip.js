@@ -1,13 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import useDevice from '../../../services/useDevice';
-import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
@@ -92,13 +90,7 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
           </Text>
         </View>
         <View style={{alignItems: 'center'}}>
-          <Button
-            containerStyle={{alignItems: 'flex-start'}}
-            onPress={goToSavedProjects}
-            title={'Go to saved projects'}
-            titleStyle={commonStyles.standardButtonText}
-            type={'clear'}
-          />
+          <OutlineButton onPress={goToSavedProjects} title={'Go to saved projects'}/>
         </View>
       </View>
     );
@@ -173,10 +165,7 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
             <Text style={{fontWeight: 'bold'}}>Selected Project to Import:{'\n'}{'\n'}</Text>
             {importedProject.name}
           </Text>
-          <OutlineButton
-            onPress={() => verifyFileExistence('data')}
-            title={'Unzip and Save'}
-          />
+          <OutlineButton onPress={() => verifyFileExistence('data')} title={'Unzip and Save'}/>
         </View>
       )}
     </View>

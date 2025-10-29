@@ -31,7 +31,7 @@ const MicroProjectsList = () => {
   const [projectsUpdateAvailableArr, setProjectsUpdateAvailableArr] = useState([]);
   const [visible, setVisible] = useState(false);
 
-  const {doesMicroProjectPDFExist, deleteFromDevice, getSavedMicroProjectModifiedTimestamp} = useDevice();
+  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
   const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
   const {
     clearStatus,

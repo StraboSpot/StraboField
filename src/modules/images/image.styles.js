@@ -5,7 +5,7 @@ import {MEDIUM_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.
 
 const imageStyles = StyleSheet.create({
   buttonContainer: {
-    backgroundColor: 'white',
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
     borderColor: 'grey',
     borderWidth: 1,
     margin: 5,
@@ -39,12 +39,6 @@ const imageStyles = StyleSheet.create({
   cardTitleEditingButton: {
     alignItems: 'center',
     flex: 1,
-  },
-  closeButtonContainer: {
-    position: 'absolute',
-    right: 100,
-    top: 40,
-    zIndex: 1,
   },
   closeButtonStyle: {
     height: 40,

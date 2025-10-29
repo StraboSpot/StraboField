@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import {ScrollView, Text, TextInput, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import styles from './signUp.styles';
 import useServerRequests from '../../services/useServerRequests';
 import {validate} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SplashScreen from '../splash-screen/SplashScreen';
@@ -176,16 +178,13 @@ const SignUp = ({navigation}) => {
   const renderButtons = () => {
     return (
       <>
-        <Button
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainer}
+        <ActionButton
           disabled={!isOnline.isInternetReachable}
           onPress={signUp}
           title={'Register'}
         />
-        <Button
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainer}
+        <OutlineButton
+          backgroundColor={SECONDARY_BACKGROUND_COLOR}
           onPress={() => navigation.goBack()}
           title={'Back to Log In'}
         />

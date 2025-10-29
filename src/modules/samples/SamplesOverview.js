@@ -15,10 +15,7 @@ const SamplesOverview = ({page}) => {
   };
 
   return (
-    <SamplesList
-      onPress={onPressed}
-      page={page}
-    />
+    <SamplesList onPress={onPressed}/>
   );
 };
 

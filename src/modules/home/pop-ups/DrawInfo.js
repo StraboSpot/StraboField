@@ -1,11 +1,11 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import {isEmpty, truncateText} from '../../../shared/Helpers';
-import {PRIMARY_TEXT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import ActionButton from '../../../shared/ui/buttons/ActionButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import useProject from '../../project/useProject';
 import EditCancelSaveButtons from '../buttons/EditCancelSaveButtons';
@@ -31,15 +31,15 @@ const DrawInfo = ({
     && (
       <View style={homeStyles.targetDatasetContainer}>
         {mapMode === MAP_MODES.DRAW.MEASURE ? (
-            <Text style={{textAlign: 'center'}}>Total Distance: {distance.toFixed(3)}km</Text>
+            <Text style={{textAlign: 'center', paddingTop: 10}}>Total Distance: {distance.toFixed(3)}km</Text>
           )
           : mapMode !== MAP_MODES.EDIT && !selectingMode && (
-          <>
+          <View style={{paddingTop: 10}}>
             <Text style={{textAlign: 'center'}}>Target Dataset:</Text>
             <Text style={{textAlign: 'center', fontWeight: 'bold'}}>
               {truncateText(getTargetDatasetFromId().name, 20)}
             </Text>
-          </>
+          </View>
         )}
         <View>
           {mapMode === MAP_MODES.EDIT ? <EditCancelSaveButtons clickHandler={clickHandler}/>
@@ -49,36 +49,21 @@ const DrawInfo = ({
                   <Text style={{textAlign: 'center'}}>on the map</Text>
                 </View>
               )
-              : mapMode === MAP_MODES.DRAW.MEASURE ? (
-                <Button
-                  buttonStyle={homeStyles.drawToolsButtons}
-                  containerStyle={{alignContent: 'center'}}
-                  onPress={endMeasurement}
-                  title={'End Measurement'}
-                  titleStyle={homeStyles.drawToolsTitle}
-                  type={'clear'}
-                />
-              ) : (
-                <>
-                  <Button
-                    buttonStyle={homeStyles.drawToolsButtons}
-                    containerStyle={{alignContent: 'center'}}
-                    disabledStyle={{backgroundColor: 'grey'}}
-                    onPress={onEndDrawPressed}
-                    title={selectingMode ? 'Set Area' : 'Save New Spot'}
-                    titleStyle={homeStyles.drawToolsTitle}
-                    type={'clear'}
-                  />
-                  <Button
-                    buttonStyle={{...homeStyles.drawToolsButtons, backgroundColor: SECONDARY_BACKGROUND_COLOR}}
-                    containerStyle={{alignContent: 'center', paddingTop: 5}}
-                    onPress={onCancel}
-                    title={'Cancel'}
-                    titleStyle={{...homeStyles.drawToolsTitle, color: PRIMARY_TEXT_COLOR}}
-                    type={'clear'}
-                  />
-                </>
-              )}
+              : mapMode === MAP_MODES.DRAW.MEASURE ? <ActionButton onPress={endMeasurement} title={'End Measurement'}/>
+                : (
+                  <>
+                    <View style={{marginBottom: -10}}>
+                      <ActionButton
+                        onPress={onEndDrawPressed}
+                        title={selectingMode ? 'Set Area' : 'Save New Spot'}
+                      />
+                    </View>
+                    <OutlineButton
+                      onPress={onCancel}
+                      title={'Cancel'}
+                    />
+                  </>
+                )}
         </View>
       </View>
     )

@@ -48,7 +48,7 @@ const userProfileSlice = createSlice({
     updatedKey(state, action) {
       Object.assign(state, action.payload);
     },
-    setInitialSesarState(state, action) {
+    setInitialSesarState(state) {
       state.sesar = initialUserState.sesar;
     },
   },

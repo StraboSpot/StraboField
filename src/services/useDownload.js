@@ -221,7 +221,7 @@ const useDownload = () => {
       // console.log('Starting Dataset Spots Download!');
 
       // Synchronous download
-      await datasets.reduce(async (previousPromise, dataset, i) => {
+      await datasets.reduce(async (previousPromise, dataset) => {
         await previousPromise;
         await downloadSpots(dataset, encodedLoginScoped);
       }, Promise.resolve());

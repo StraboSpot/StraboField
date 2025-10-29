@@ -10,7 +10,7 @@ import MainMenuPanelList from './MainMenuPanelList';
 import DailyNotesPage from '../daily-notes/DailyNotesPage';
 import About from '../help/About';
 import Documentation from '../help/Documentation';
-import IssuesAndReqests from '../help/IssuesAndReqests';
+import IssuesAndRequests from '../help/IssuesAndRequests';
 import {ImageGallery} from '../images';
 import MenuSearch from './MenuSearch';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
@@ -159,7 +159,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.HELP.DOCUMENTATION:
         return <Documentation navigation={navigation}/>;
       case MAIN_MENU_ITEMS.HELP.ISSUES:
-        return <IssuesAndReqests/>;
+        return <IssuesAndRequests/>;
 
       default:
         return (

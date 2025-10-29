@@ -10,27 +10,9 @@ const styles = StyleSheet.create({
     color: themes.PRIMARY_ACCENT_COLOR,
     fontSize: 16,
   },
-  compassContainer: {
-    // backgroundColor: 'red',
-  },
-  compassDataCol1: {
-    flex: 1,
-  },
-  compassDataCol2: {
-    borderWidth: 1,
-    flex: 1,
-  },
-  compassDataCol3: {
-    flex: 1,
-  },
   compassDataDirectionTextContainer: {
     flex: 1,
-
-    // flexDirection: 'row',
-    // justifyContent: 'space-evenly',
     marginHorizontal: 'auto',
-    // paddingBottom: 10,
-    // paddingLeft: 10,
   },
   compassDataGridContainer: {
     flex: 1,
@@ -40,10 +22,6 @@ const styles = StyleSheet.create({
   compassDataGridRow: {
     alignItems: 'center',
     flexDirection: 'row',
-  },
-  compassDataModalPosition: {
-    position: 'absolute',
-    // top: 20,
   },
   compassImage: {
     height: 175,

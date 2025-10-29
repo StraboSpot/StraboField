@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Text} from 'react-native';
 
-import {Button, Input, ListItem} from '@rn-vui/base';
+import {Input, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -11,6 +11,7 @@ import * as themes from '../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
@@ -89,8 +90,7 @@ const Miscellaneous = () => {
           placeholder={JSON.stringify(numRandomSpots)}
           placeholderTextColor={themes.MEDIUMGREY}
         />
-        <Button
-          containerStyle={{paddingHorizontal: 10}}
+        <ActionButton
           onPress={generateRandomSpots}
           title={'Generate'}
         />

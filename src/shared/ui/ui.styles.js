@@ -5,9 +5,7 @@ import {
   GOLD,
   MEDIUM_TEXT_SIZE,
   MODAL_BACKDROP,
-  PRIMARY_ACCENT_COLOR,
   PRIMARY_BACKGROUND_COLOR,
-  PRIMARY_HEADER_TEXT_SIZE,
   PRIMARY_TEXT_COLOR,
   SECONDARY_BACKGROUND_COLOR,
   SMALL_TEXT_SIZE,
@@ -104,15 +102,6 @@ const styles = StyleSheet.create({
   },
   littleSpacer: {
     padding: 5,
-  },
-  saveAndDeleteButtonContainer: {
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  saveAndDeleteButtonStyles: {
-    borderRadius: 15,
-    paddingLeft: 20,
-    paddingRight: 20,
   },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,

@@ -13,7 +13,7 @@ const useSamples = () => {
 
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
-  const {name} = useSelector(state => state.user);
+  const {name, sesar} = useSelector(state => state.user);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const authenticateWithSesar = async (sesarTokens) => {
@@ -37,7 +37,10 @@ const useSamples = () => {
            ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
            <longitude>${data.longitude}</longitude>
            <latitude>${data.latitude}</latitude>
-           ${isEmpty(data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
+           ${data.longitude_end ? `<longitude_end>${data.longitude_end}</longitude_end>` : ''}
+           ${data.latitude_end ? `<latitude_end>${data.latitude_end}</latitude_end>` : ''}
+           ${isEmpty(
+      data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
            <purpose>${data.purpose}</purpose>
            <description>${data.description}</description>
            <material>${data.material}</material>
@@ -50,9 +53,10 @@ const useSamples = () => {
   const convertAndBuildSchema = (mappedArray, isUpdating) => {
     const jsonData = convertToJSON(mappedArray);
     console.log(jsonData);
-    const collectionDate = !isEmpty(jsonData.collection_start_date) ? truncateDateISOString(jsonData.collection_start_date)
+    const collectionDate = !isEmpty(jsonData.collection_start_date) ? truncateDateISOString(
+        jsonData.collection_start_date)
       : null;
-      const updatedJsonData = {...jsonData, collection_start_date: collectionDate};
+    const updatedJsonData = {...jsonData, collection_start_date: collectionDate};
     const xmlSchema = buildSesarXmlSchema(updatedJsonData, isUpdating);
     console.log('SESAR SCHEMA', xmlSchema);
     return xmlSchema;
@@ -77,6 +81,15 @@ const useSamples = () => {
       const newTokens = await getValidToken(sesarTokens);
       return await getAndSaveSesarCode(newTokens);
     }
+  };
+
+  const getFirstAndLastElementsOfLineArray = () => {
+    if (selectedSpot.geometry.type === 'LineString' && selectedSpot.geometry.coordinates.length > 1) {
+      const firstElement = selectedSpot.geometry.coordinates[0];
+      const lastElement = selectedSpot.geometry.coordinates[selectedSpot.geometry.coordinates.length - 1];
+      return [firstElement, lastElement];
+    }
+    return [];
   };
 
   const getMaterialName = (materialType) => {
@@ -126,7 +139,7 @@ const useSamples = () => {
     return json;
   };
 
-  const postSampleToSesar = async (xmlSchema, sample, isUpdating) => {
+  const postSampleToSesar = async (xmlSchema, isUpdating) => {
     const response = isUpdating ? await updateSampleWithSesar(xmlSchema) : await postToSesar(xmlSchema);
     const resText = await response.text();
     const json = parseXML(resText);
@@ -162,11 +175,32 @@ const useSamples = () => {
   };
 
   const straboSesarMapping = (sampleValue) => {
-    const longitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[0] : 'No coordinates assigned';
-    const latitude = selectedSpot?.geometry?.coordinates ? selectedSpot?.geometry?.coordinates[1] : 'No coordinates assigned';
+    console.log('sampleValue', sampleValue);
+    const geometryType = selectedSpot?.geometry?.type;
+    let longitude;
+    let latitude;
+    let longitudeEndObj = {};
+    let latitudeEndObj = {};
+    if (geometryType === 'LineString' && selectedSpot.geometry.coordinates.length > 1) {
+      console.log('LineString spot', selectedSpot);
+      const lineArray = getFirstAndLastElementsOfLineArray();
+      console.log('lineArray', lineArray);
+      longitude = lineArray[0][0].toFixed(6);
+      latitude = lineArray[0][1].toFixed(6);
+      longitudeEndObj = {label: 'Longitude End:', sesarKey: 'longitude_end', value: lineArray[1][0].toFixed(6)};
+      latitudeEndObj = {label: 'Latitude End:', sesarKey: 'latitude_end', value: lineArray[1][1].toFixed(6)};
+    }
+    else if (geometryType === 'Point') {
+      longitude = selectedSpot?.geometry?.coordinates
+        ? selectedSpot?.geometry?.coordinates?.[0]?.toFixed(6)
+        : 'No coordinates assigned';
+      latitude = selectedSpot?.geometry?.coordinates
+        ? selectedSpot?.geometry?.coordinates?.[1]?.toFixed(6)
+        : 'No coordinates assigned';
+    }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
-      {label: 'User Code', sesarKey: 'user_code', value: sampleValue.sesarUserCode}, //required
+      {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
       {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, formName)}, //required
       {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
       {label: 'Material:', sesarKey: 'material', value: getMaterialName(sampleValue?.material_type)}, //required
@@ -177,6 +211,8 @@ const useSamples = () => {
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
       {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
       {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
+      ...(geometryType !== 'Point' ? [longitudeEndObj] : []),
+      ...(geometryType !== 'Point' ? [latitudeEndObj] : []),
       {label: 'Collector:', sesarKey: 'collector', value: name},
     ];
     return mappedObj;
@@ -186,20 +222,20 @@ const useSamples = () => {
     return date.slice(0, date.indexOf('.')) + 'Z';
   };
 
-  const updateSampleIsSesar = async (updatedSample) => {
-    console.log('Update sample', updatedSample);
-    const mappedArray = straboSesarMapping(updatedSample);
-    console.log(mappedArray);
+  const updateSampleIsSesar = async (mappedArray) => {
+    // console.log('Update sample', updatedSample);
+    // const mappedArray = straboSesarMapping(updatedSample);
+    // console.log(mappedArray);
     const xmlSchema = convertAndBuildSchema(mappedArray, true);
-    return await postSampleToSesar(xmlSchema, updatedSample, true);
+    return await postSampleToSesar(xmlSchema, true);
   };
 
-  const uploadSample = async (sample) => {
+  const uploadSample = async (mappedArray) => {
     // setSampleValue(sample);
-    const mappedArray = straboSesarMapping(sample);
-    console.log('Register sample', mappedArray);
+    // const mappedArray = straboSesarMapping(sample);
+    // console.log('Register sample', mappedArray);
     const xmlSchema = convertAndBuildSchema(mappedArray, false);
-    return await postSampleToSesar(xmlSchema, sample);
+    return await postSampleToSesar(xmlSchema);
   };
 
   return {

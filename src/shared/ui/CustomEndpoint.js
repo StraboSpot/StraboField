@@ -16,15 +16,10 @@ import commonStyles from '../common.styles';
 const CustomEndpoint = ({
                           containerStyles,
                           textStyles,
-                          route,
                         }) => {
     const dispatch = useDispatch();
     const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
     const customMaps = useSelector(state => state.map.customMaps);
-
-    const [isLoadingEndpoint, setIsLoadingEndpoint] = useState(false);
-    const [isVerified, setIsVerified] = useState(null);
-    const [verifiedButtonTitle, setVerifiedButtonTitle] = useState('Test Endpoint');
 
     const {setBasemap} = useMap();
 

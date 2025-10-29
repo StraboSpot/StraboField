@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
-import {Button, Icon, ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
-import {MEDIUMGREY, POSITIVE_COLOR, RED, WARNING_COLOR} from '../../../shared/styles.constants';
+import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
+import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
@@ -89,21 +90,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const renderDeleteDatasetButton = () => {
     return (
       <View style={{paddingBottom: 10}}>
-        <Button
-          disabled={isDisabled(dataset.id)}
-          icon={
-            <Icon
-              color={isDisabled(dataset.id) ? MEDIUMGREY : RED}
-              iconStyle={{paddingRight: 10}}
-              name={'trash'}
-              size={20}
-              type={'font-awesome'}
-            />
-          }
+        <DeleteButton
+          disabled={!isDisabled(dataset.id)}
           onPress={handleDeletePressed}
           title={'Delete Dataset'}
-          titleStyle={overlayStyles.importantText}
-          type={'clear'}
         />
         {isDisabled(dataset.id) && (
           <Text style={[overlayStyles.importantText, {paddingHorizontal: 30}]}>

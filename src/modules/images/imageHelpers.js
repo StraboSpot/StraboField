@@ -7,7 +7,7 @@ export const getImageMetaFromWeb = async (imageFile) => {
   const localUrl = URL.createObjectURL(imageFile);
 
   const getImageParams = async (file) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         let image = new Image();

@@ -6,7 +6,7 @@ const modalStyles = StyleSheet.create({
   modalHeaderButtonsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginLeft: 10,
   },
   modalHeaderContainer: {
@@ -26,12 +26,6 @@ const modalStyles = StyleSheet.create({
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     flexDirection: 'row',
-  },
-  sideModalPosition: {
-    borderRadius: 20,
-    bottom: 20,
-    left: 100,
-    position: 'absolute',
   },
   textContainer: {
     alignItems: 'center',

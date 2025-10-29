@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button, Icon, Input, ListItem} from '@rn-vui/base';
-import {Col, Row, Rows, Table, TableWrapper} from 'react-native-reanimated-table';
+import {Icon, Input, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/Helpers';
-import {BLUE, DARKGREY, MEDIUMGREY, WARNING_COLOR} from '../../../shared/styles.constants';
+import {BLUE, DARKGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
+import ActionButton from '../../../shared/ui/buttons/ActionButton';
+import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -19,7 +20,6 @@ import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SliderBar from '../../../shared/ui/SliderBar';
 import {formStyles} from '../../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
@@ -27,23 +27,17 @@ import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
-// const {State: TextInputState} = TextInput;
 
 const CustomMapDetails = () => {
-  let defaultBbox = [['N/A', 'N/A'], ['N/A', 'N/A']];
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
-  // const {getMyMapsBboxCoords} = useMapCoords();
 
   const dispatch = useDispatch();
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  // const isOnline = useSelector(state => state.connections.isOnline);
 
-  const [bboxCoords, setBboxCoords] = useState(defaultBbox);
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
   const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
   const [message, setMessage] = useState('Starting...');
-  const [bboxMessage, setBboxMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
 
@@ -59,14 +53,6 @@ const CustomMapDetails = () => {
         key: MBAccessToken,
       });
     }
-    // if (customMapToEdit && isEmpty(customMapToEdit?.bbox && isOnline.isConnected)) {
-    //   getMyMapsBboxCoords(customMapToEdit)
-    //     .then((bboxCoords) => {
-    //       getBboxData(bboxCoords);
-    //       updateMap({...customMapToEdit, bbox: bboxCoords});
-    //     });
-    // }
-    // else getBboxData(customMapToEdit.bbox);
   }, [customMapToEdit]);
 
   const saveMap = async () => {
@@ -113,14 +99,6 @@ const CustomMapDetails = () => {
       {cancelable: false},
     );
   };
-
-  // const getBoundingBox = async () => {
-  //   setIsLoading(true);
-  //   const bbox = await useMapCoords.getMyMapsBboxCoords(customMapToEdit);
-  //   setEditableCustomMapData(prevState => ({...prevState, bbox: bbox}));
-  //   setIsLoading(false);
-  //   setBboxMessage('Be sure to UPDATE map to save bounding box.');
-  // };
 
   const handlePress = () => {
     setIsLoadingModalVisible(false);
@@ -207,43 +185,6 @@ const CustomMapDetails = () => {
     </View>
   );
 
-  const getBboxData = (bboxCoords) => {
-    try {
-      if (!isEmpty(bboxCoords)) {
-        const bboxArr = bboxCoords.split(',');
-        setBboxCoords([[bboxArr[0], bboxArr[1]], [bboxArr[2], bboxArr[3]]]);
-      }
-      else setBboxCoords(defaultBbox);
-    }
-    catch (err) {
-      console.error('Error getting bbox coords', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There was an error getting the bounding box coordinates of the custom map.\n'
-        + 'Please pan to the map manually.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
-  };
-
-  const bboxCoordsLayout = () => {
-    return (
-      <View style={customMapStyles.bboxCoordsContainers}>
-        <Table style={{}}>
-          <Row data={['', 'Longitude', 'Latitude']} flexArr={[1, 2, 2]} style={customMapStyles.bboxTableHead}
-               textStyle={customMapStyles.bboxText}/>
-          <TableWrapper style={{flexDirection: 'row'}}>
-            <Col data={['SW', 'NE']} heightArr={[25, 25]} style={customMapStyles.bboxColumnContainer}
-                 textStyle={customMapStyles.bboxText}/>
-            <Rows data={bboxCoords} flexArr={[2, 2]} style={customMapStyles.bboxRowContainer}
-                  textStyle={customMapStyles.bboxText}/>
-          </TableWrapper>
-          <View style={customMapStyles.bboxCoordsContainers}>
-            <Text style={customMapStyles.bboxMessageText}>{bboxMessage}</Text>
-          </View>
-        </Table>
-      </View>
-    );
-  };
-
   const renderMapTypeOverview = () => {
     return (
       <View style={{paddingTop: 10}}>
@@ -253,7 +194,6 @@ const CustomMapDetails = () => {
           {/*<Text style={customMapStyles.mapOverviewText}>Source: {customMapToEdit?.url[0]}</Text>*/}
           <Text style={customMapStyles.mapOverviewText}>Id: {customMapToEdit.id}</Text>
         </View>
-        {/*{isOnline.isConnected && bboxCoordsLayout()}*/}
       </View>
     );
   };
@@ -340,23 +280,15 @@ const CustomMapDetails = () => {
           && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
             || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title) || isEmpty(
-                editableCustomMapData.id)
-              || editableCustomMapData.source === 'map_warper')}
-            onPress={() => saveMap()}
+          <ActionButton
+            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title)
+              || isEmpty(editableCustomMapData.id) || editableCustomMapData.source === 'map_warper')}
+            onPress={saveMap}
             title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-            type={'outline'}
           />
-          <Button
-            buttonStyle={commonStyles.standardButton}
-            containerStyle={commonStyles.standardButtonContainer}
-            onPress={() => confirmDeleteMap()}
+          <DeleteButton
+            onPress={confirmDeleteMap}
             title={'Delete Map'}
-            titleStyle={{color: WARNING_COLOR}}
-            type={'outline'}
           />
         </View>
       </View>

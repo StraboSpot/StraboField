@@ -120,7 +120,7 @@ const useMapFeatures = () => {
         && !isEmpty(spot.properties.orientation_data)) {
         const measurements = isShowOnly1stMeas ? [spot.properties.orientation_data[0]]
           : spot.properties.orientation_data;
-        measurements.map((orientation, i) => {
+        measurements.map((orientation) => {
           if (!isEmpty(orientation)) {
             const feature = JSON.parse(JSON.stringify(spot));
             delete feature.properties.orientation_data;

@@ -1,27 +1,25 @@
 import React from 'react';
 
-import {Button, Icon} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 
-import commonStyles from '../../common.styles';
-import {WARNING_COLOR} from '../../styles.constants';
+import buttonStyles from './buttons.styles';
+import {MEDIUMGREY, WARNING_COLOR} from '../../styles.constants';
 
-const DeleteButton = ({onPress, title}) => {
+const DeleteButton = ({disabled, onPress, title}) => {
   return (
     <Button
-      buttonStyle={commonStyles.standardButton}
-      containerStyle={commonStyles.standardButtonContainer}
-      icon={
-        <Icon
-          color={'red'}
-          name={'trash-outline'}
-          size={25}
-          type={'ionicon'}
-        />
-      }
+      buttonStyle={buttonStyles.standardButton}
+      disabled={disabled}
+      icon={{
+        color: disabled ? MEDIUMGREY : WARNING_COLOR,
+        name: 'trash-outline',
+        size: 20,
+        type: 'ionicon',
+      }}
       iconContainerStyle={{paddingRight: 5}}
       onPress={onPress}
       title={title}
-      titleStyle={[commonStyles.standardButtonText, {color: WARNING_COLOR}]}
+      titleStyle={[buttonStyles.standardButtonText, {color: disabled ? MEDIUMGREY : WARNING_COLOR}]}
       type={'clear'}
     />
   );

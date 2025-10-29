@@ -14,9 +14,7 @@ import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 const ModalWrapper = ({
                         actionTitle,
-                        buttonTitleLeft,
                         buttonTitleRight,
-                        cancel,
                         cancelTitle,
                         children,
                         closeModal,
@@ -79,9 +77,7 @@ const ModalWrapper = ({
       supportedOrientations={['portrait', 'landscape']}
     >
       <ModalWrapperHeader
-        buttonTitleLeft={buttonTitleLeft}
         buttonTitleRight={buttonTitleRight}
-        cancel={cancel}
         closeModal={closeModal}
         headerTitle={headerTitle}
         showCloseButton={showCloseButton}

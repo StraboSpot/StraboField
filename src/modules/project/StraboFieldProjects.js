@@ -1,13 +1,12 @@
 import React from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDevice from '../../services/useDevice';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {BLUE} from '../../shared/styles.constants';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -88,19 +87,14 @@ const StraboFieldProjects = () => {
             />
             {Platform.OS === 'ios' && (
               <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
-                <Button
-                  buttonStyle={commonStyles.standardButton}
-                  containerStyle={commonStyles.buttonPadding}
+                <OutlineButton
                   icon={{
                     name: 'file-tray-full-outline',
                     type: 'ionicon',
                     color: BLUE,
                   }}
-                  iconContainerStyle={{paddingRight: 10}}
                   onPress={() => openURL('ProjectBackups')}
                   title={'View/Edit Files on Device'}
-                  titleStyle={commonStyles.standardButtonText}
-                  type={'outline'}
                 />
               </View>
             )}

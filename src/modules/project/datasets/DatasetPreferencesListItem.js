@@ -23,7 +23,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const {makeDatasetCurrent, setSwitchValue} = useProject();
 
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
-  const [downloadedImages, setDownloadedImages] = useState(0);
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;

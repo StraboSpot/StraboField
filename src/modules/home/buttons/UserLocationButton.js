@@ -33,7 +33,7 @@ const UserLocationButton = ({clickHandler}) => {
     timeout = setTimeout(() => {
       // console.log(timeout);
       clearLocationTimer();
-    }, 60000);
+    }, 180000);
   };
 
   if (!currentImageBasemap && !stratSection) {

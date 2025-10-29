@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {Platform, ScrollView, Text, View} from 'react-native';
 
-import {Button} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {formStyles, useForm} from '.';
+import {useForm} from '.';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {WARNING_COLOR} from '../../shared/styles.constants';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Spacer from '../../shared/ui/Spacer';
@@ -73,12 +73,9 @@ const MeasurementModal = ({
     >
       <ScrollView>
         {Platform.OS === 'ios' && (
-          <Button
-            buttonStyle={formStyles.formButtonSmall}
+          <OutlineButton
             onPress={() => setIsManualMeasurement(!isManualMeasurement)}
             title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
-            titleProps={formStyles.formButtonTitle}
-            type={'clear'}
           />
         )}
         {isManualMeasurement ? (
@@ -111,11 +108,9 @@ const MeasurementModal = ({
           </>
         )}
       </ScrollView>
-      <Button
+      <ClearButton
         onPress={() => setMeasurements({})}
         title={'Clear Measurement'}
-        titleStyle={{color: WARNING_COLOR}}
-        type={'clear'}
       />
     </ModalWrapper>
   );

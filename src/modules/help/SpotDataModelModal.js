@@ -2,12 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import {Button} from '@rn-vui/base';
 import JSONTree from 'react-native-json-tree';
 
 import forms from '../../assets/forms';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const SpotDataModelModal = ({close}) => {
@@ -181,11 +180,9 @@ const SpotDataModelModal = ({close}) => {
       showCloseButton={true}
     >
       <ScrollView>
-        <Button
+        <ClearButton
           onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}
           title={'Copy JSON to Clipboard'}
-          titleStyle={commonStyles.standardButtonText}
-          type={'clear'}
         />
         <JSONTree data={spotDataModel} hideRoot shouldExpandNode={shouldExpandNode}/>
       </ScrollView>

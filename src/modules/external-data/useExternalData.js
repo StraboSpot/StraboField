@@ -65,7 +65,7 @@ const useExternalData = () => {
         if (dataFile) {
           CSVFile = dataFile;
           const getCSVData = () => {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
               const fileReader = new FileReader();
 
               fileReader.onload = async (event) => {

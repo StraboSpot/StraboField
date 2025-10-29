@@ -1,18 +1,11 @@
 import React from 'react';
 
-import {Button} from '@rn-vui/base';
-
+import OutlineButton from './OutlineButton';
 import commonStyles from '../../common.styles';
 
-const AddButton = ({
-                     onPress,
-                     title,
-                     type,
-                   }) => {
+const AddButton = ({onPress, title}) => {
   return (
-    <Button
-      buttonStyle={commonStyles.standardButton}
-      containerStyle={commonStyles.buttonPadding}
+    <OutlineButton
       icon={{
         name: 'add',
         type: 'ionicon',
@@ -21,8 +14,6 @@ const AddButton = ({
       }}
       onPress={onPress}
       title={title}
-      titleStyle={commonStyles.standardButtonText}
-      type={type}
     />
   );
 };

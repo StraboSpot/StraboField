@@ -81,7 +81,7 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
             };
           }}
           strokeComponent={color => <View style={[{backgroundColor: color}, styles.strokeColorButton]}/>}
-          strokeSelectedComponent={(color, index, changed) => {
+          strokeSelectedComponent={(color) => {
             return <View style={[{backgroundColor: color, borderWidth: 2}, styles.strokeColorButton]}/>;
           }}
           strokeWidthComponent={(w) => {

@@ -7,6 +7,7 @@ import signInStyles from './signIn.styles';
 import useSignIn from './useSignIn';
 import {PASSWORD_TEST, USERNAME_TEST} from '../../../dev-test-logins';
 import * as themes from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
@@ -15,7 +16,7 @@ import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 import {login} from '../user/userProfile.slice';
 
-const SignIn = ({navigation, route}) => {
+const SignIn = ({navigation}) => {
 
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
@@ -59,10 +60,15 @@ const SignIn = ({navigation, route}) => {
               title={'Log In'}
             />
           )}
-          <View style={{flexDirection: 'row', gap: 10}}>
-            <OutlineButton onPress={handleGuestSignIn} title={'Continue as Guest'}/>
+          <View style={{flexDirection: 'row'}}>
+            <OutlineButton
+              backgroundColor={SECONDARY_BACKGROUND_COLOR}
+              onPress={handleGuestSignIn}
+              title={'Continue as Guest'}
+            />
             {isOnline.isConnected && !isEndpointSelected && (
               <OutlineButton
+                backgroundColor={SECONDARY_BACKGROUND_COLOR}
                 onPress={handleRegister}
                 title={'Register'}
               />
@@ -76,7 +82,6 @@ const SignIn = ({navigation, route}) => {
   const renderErrorModal = () => {
     return (
       <ErrorModal
-        closeModal={() => setIsErrorModalVisible(false)}
         isVisible={isErrorModalVisible}
         onActionPressed={() => setIsErrorModalVisible(false)}
       >

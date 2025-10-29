@@ -32,7 +32,6 @@ const documentationStyles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 10,
   },
   headerContainer: {
     alignItems: 'center',
