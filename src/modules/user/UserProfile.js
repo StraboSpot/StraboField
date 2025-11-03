@@ -27,6 +27,7 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import TextInputModal from '../../shared/ui/TextInputModal';
+import {persistor} from '../../store/ConfigureStore';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
@@ -269,6 +270,11 @@ const UserProfile = () => {
     }
   };
 
+  const purgeRedux = async () => {
+    await persistor.purge(); // Use this to clear persistStore completely
+    console.log('Redux store purged');
+  };
+
   return (
     <>
       <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
@@ -308,6 +314,10 @@ const UserProfile = () => {
                     onPress={() => setDeleteProfileModalVisible(true)}
                     title={'Delete Account'}
                   />
+                  {__DEV__ && <OutlineButton
+                    onPress={purgeRedux}
+                    title={'Purge Redux Store'}
+                  />}
                 </View>
               ) : (
                 <Text style={commonStyles.noValueText}>
