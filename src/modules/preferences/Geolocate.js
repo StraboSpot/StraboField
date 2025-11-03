@@ -5,6 +5,8 @@ import {Image, Slider} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import styles from './preferences.styles';
+import commonStyles from '../../shared/common.styles';
+import {convertMillisecondsToTime, convertSliderValueToMilliseconds} from '../../shared/Helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
@@ -42,42 +44,6 @@ const Geolocate = (props) => {
     return `rgb(${r},${g},${b})`;
   };
 
-  const convertSliderValueToMilliseconds = (sliderValue) => {
-    const timeMap = {
-      0: 2 * 60 * 1000,     // 2 min = 120,000 ms
-      1: 5 * 60 * 1000,     // 5 min = 300,000 ms
-      2: 20 * 60 * 1000,    // 20 min = 1,200,000 ms
-      3: 40 * 60 * 1000,    // 40 min = 2,400,000 ms
-      4: null,              // 'ON' = no timeout
-    };
-
-    return timeMap[sliderValue];
-  };
-
-  const convertSliderValueToMillisecondsTest = (sliderValue) => {
-    const timeMap = {
-      0: 5000,    // 5 sec
-      1: 20000,   // 20 sec
-      2: 30000,   // 30 sec
-      3: 40000,   // 40 sec
-      4: null,    // 'ON' = no timeout
-    };
-
-    return timeMap[sliderValue];
-  };
-
-  const convertMillisecondsToTime = (milliseconds) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(milliseconds / (1000 * 60));
-
-    if (minutes >= 1) {
-      return `${minutes} min`;
-    }
-    else {
-      return `${seconds} sec`;
-    }
-  };
-
   const interpolate = (start, end) => {
     let k = (value - 0) / 4; // 0 =>min  && 4 => MAX
     return Math.ceil((1 - k) * end + k * start) % 256;
@@ -85,7 +51,7 @@ const Geolocate = (props) => {
 
   const onSliderChange = (value) => {
     console.log('SLIDER CHANGE', value);
-    const timeout = convertSliderValueToMillisecondsTest(value);
+    const timeout = convertSliderValueToMilliseconds(value);
     console.log('TIMEOUT', timeout);
     dispatch(setGeolocationTimeout(timeout));
   };
@@ -95,7 +61,7 @@ const Geolocate = (props) => {
       <View style={styles.rowContainer}>
         <OutlineButton
           onPress={() => setIsGeolocationVisible(!isGeolocationVisible)}
-          title={'Geolocation options...'}
+          title={`Geolocation Timeout (${convertMillisecondsToTime(currentTimeout)})`}
         />
       </View>
 
@@ -108,7 +74,6 @@ const Geolocate = (props) => {
         showCancelButton={false}
         showCloseButton
       >
-        <Text>Current timeout set to {convertMillisecondsToTime(currentTimeout)}</Text>
         <View style={{padding: 10}}>
           <Slider
             allowTouchTrack
@@ -156,6 +121,9 @@ const Geolocate = (props) => {
               );
             })}
           </View>
+          <Text style={{marginTop: 30}}>
+            <Text style={{...commonStyles.importantText, textAlign: 'left'}}>Note: </Text>
+            Longer time limits can reduce battery life. Remember to turn off when not in use.</Text>
         </View>
       </ModalWrapper>
     </React.Fragment>
