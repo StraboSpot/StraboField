@@ -51,12 +51,16 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     );
   };
 
-  const saveTemplateAndGo = () => {
-    console.log('saving', templateType, templateName, formRef.current.values);
-    const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
-    || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
-    saveTemplate(formRef.current.values, templateKey, template, templateName);
-    goBack();
+  const saveTemplateAndGo = async () => {
+    console.log('Saving', templateType, templateName, formRef.current.values);
+    try {
+      const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
+      || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
+      await saveTemplate(formRef.current, templateKey, template, templateName);
+      goBack();
+    }
+    catch (error) {
+    }
   };
 
   return (
@@ -72,12 +76,12 @@ const TemplateDetail = ({goBack, template, templateType}) => {
         />
       ) : (
         <Formik
-          enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
+          enableReinitialize={false}  // Update values if preferences change while form open, like when number incremented
           initialValues={template.values}
           innerRef={formRef}
           onSubmit={values => console.log('Submitting form...', values)}
           validate={values => validateForm({formName: formName, values: values})}
-          validateOnChange={false}
+          validateOnChange={true}
         >
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>
