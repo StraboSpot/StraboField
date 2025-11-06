@@ -19,8 +19,8 @@ import ImageBasemapsList from '../maps/ImageBasemapsList';
 import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
+import AddingNewSpotsPage from '../preferences/AddingNewSpotsPage';
 import Miscellaneous from '../preferences/Miscellaneous';
-import ShortcutMenu from '../preferences/shortcuts-menu/ShortcutsMenu';
 import BackupProjectPage from '../project/backup/BackupProjectPage';
 import ExportProjectPage from '../project/backup/ExportProjectPage';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
@@ -38,6 +38,7 @@ import {ReportsMenu} from '../reports';
 import SamplesMenuItem from '../samples/SamplesMenuItem';
 import {SpotsList} from '../spots';
 import {AddRemoveTagFeatures, AddRemoveTagSpots, TagDetailSidePanel, Tags} from '../tags';
+import TemplatesPage from '../templates/TemplatesPage';
 import UserConventions from '../user/UserConventions';
 import UserProfile from '../user/UserProfile';
 
@@ -65,7 +66,8 @@ const MainMenuPanel = forwardRef(({
       <>
         {!isSidePanelVisible
           && (!mainMenuPageVisible
-            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS))
+            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
+              && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
           && <MainMenuPanelHeader/>
         }
         {renderMainMenuList()}
@@ -88,6 +90,8 @@ const MainMenuPanel = forwardRef(({
       // Customize & Preset
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:
         return <NamingConventions/>;
+      case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES:
+        return <TemplatesPage/>;
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.CUSTOM_FEATURE_TYPES:
         return <CustomFeatureTypes/>;
 
@@ -149,7 +153,7 @@ const MainMenuPanel = forwardRef(({
 
       // App Settings
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS:
-        return <ShortcutMenu/>;
+        return <AddingNewSpotsPage/>;
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS:
         return <Miscellaneous/>;
 

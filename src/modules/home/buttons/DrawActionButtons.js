@@ -6,19 +6,18 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
 import useDrawActionButtons from './useDrawActionButtons';
+import useDrawGeometryToggle from './useDrawGeometryToggle';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
 
   const {
     getImageSource,
     handleEditShapePressed,
-    handleLineLongPressed,
     handleLinePressed,
-    handlePointLongPressed,
     handlePointPressed,
-    handlePolygonLongPressed,
     handlePolygonPressed,
   } = useDrawActionButtons({clickHandler, mapMode});
+  const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
   return (
     <View style={homeStyles.drawToolsContainer}>

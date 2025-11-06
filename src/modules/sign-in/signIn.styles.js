@@ -27,12 +27,7 @@ const styles = StyleSheet.create({
     // width: '65%',
   },
   customEndpointText: {
-    color: themes.WHITE,
-    flexWrap: 'wrap',
-    fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    marginEnd: 30,
-    textAlign: 'center',
   },
   errorText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,

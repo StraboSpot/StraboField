@@ -1,7 +1,7 @@
 import React, {forwardRef, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import {Map as ReactMapGL} from 'react-map-gl';
+import {Map as ReactMapGL, NavigationControl} from 'react-map-gl';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MapLayers} from './layers';
@@ -97,8 +97,8 @@ const Map = ({
       dragPan={allowMapViewMove}
       dragRotate={false}
       id={currentMapId}
-      key={`web-map-${mapKey}-${currentMapId}`}
       interactiveLayerIds={[...layerIdsNotSelected, ...layerIdsSelected]}
+      key={`web-map-${mapKey}-${currentMapId}`}
       mapStyle={currentImageBasemap || stratSection ? BACKGROUND : basemap}
       mapboxAccessToken={MAPBOX_TOKEN}
       onClick={handleMapPress}
@@ -113,6 +113,12 @@ const Map = ({
       touchPitch={false}
       touchZoomRotate={false}
     >
+      <NavigationControl
+        position={'bottom-left'}
+        showCompass={false}
+        style={{bottom: 75, left: 10, position: 'absolute'}}
+        visualizePitch={false}
+      />
       <MapLayers
         basemap={basemap}
         drawFeatures={drawFeatures}

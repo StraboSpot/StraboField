@@ -63,14 +63,10 @@ const styles = StyleSheet.create({
   customEndpointSwitchContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 10,
-    width: '75%',
   },
   customEndpointText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,
-    marginEnd: 30,
-    textAlign: 'center',
   },
   customEndpointVerifyButtonContainer: {
     alignItems: 'center',
@@ -84,7 +80,7 @@ const styles = StyleSheet.create({
   customEndpointVerifyInputContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '70%',
+    width: '80%',
   },
   headerContainer: {
     alignItems: 'center',
@@ -107,6 +103,10 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
     paddingLeft: 10,
     paddingVertical: 5,
+  },
+  sectionDividerSubtitle: {
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
   },
   sectionDividerText: {
     color: PRIMARY_TEXT_COLOR,

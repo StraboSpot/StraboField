@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Input} from '@rn-vui/base';
@@ -11,7 +11,6 @@ import useMap from '../../modules/maps/useMap';
 import signInStyles from '../../modules/sign-in/signIn.styles';
 import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../services/connections.slice';
 import {STRABO_APIS} from '../../services/urls.constants';
-import commonStyles from '../common.styles';
 
 const CustomEndpoint = ({
                           containerStyles,
@@ -36,32 +35,32 @@ const CustomEndpoint = ({
     };
 
     return (
-      <View style={[uiStyles.customEndpointContainer, containerStyles]}>
-        <View style={uiStyles.customEndpointSwitchContainer}>
+      <View style={[containerStyles]}>
+        <View style={[uiStyles.customEndpointSwitchContainer]}>
           <Text style={[uiStyles.customEndpointText, textStyles]}>Use Custom Database Endpoint?</Text>
           <SwitchWrapper onValueChange={handleEndpointSwitchValue} value={isSelected}/>
         </View>
-        {/*{isSelected && (*/}
-        <View style={uiStyles.customEndpointVerifyInputContainer}>
-          <Input
-            autoCapitalize={'none'}
-            containerStyle={signInStyles.customEndpointInputContainer}
-            defaultValue={endpoint}
-            inputContainerStyle={{borderBottomWidth: 0}}
-            inputStyle={signInStyles.customEndpointInput}
-            label={'Enter endpoint IP address'}
-            labelStyle={{fontSize: 10}}
-            onChangeText={value => handleEndpointTextValues(value)}
-            placeholder={'http://192.168.xxx/db'}
-            returnKeyType={'send'}
-          />
-          <Text style={[commonStyles.noValueText, {paddingTop: 0, fontStyle: 'italic'}, textStyles]}>
-            *If using StraboSpot Offline make sure that the endpoint address contains
-            <Text style={{fontWeight: 'bold'}}> &ldquo;http://&ldquo; and a trailing &ldquo;/db&ldquo;</Text>.{'\n'}
-            Otherwise use the proper path associated with your endpoint address.
-          </Text>
-        </View>
-        {/*)}*/}
+        {isSelected && (
+          <View style={uiStyles.customEndpointVerifyInputContainer}>
+            <Input
+              autoCapitalize={'none'}
+              containerStyle={signInStyles.customEndpointInputContainer}
+              defaultValue={endpoint}
+              inputContainerStyle={{borderBottomWidth: 0}}
+              inputStyle={signInStyles.customEndpointInput}
+              label={'Enter endpoint IP address'}
+              labelStyle={{fontSize: 10}}
+              onChangeText={value => handleEndpointTextValues(value)}
+              placeholder={'http://192.168.xxx/db'}
+              returnKeyType={'send'}
+            />
+            <Text style={[uiStyles.customEndpointText, {fontStyle: 'italic'}, textStyles]}>
+              *If using StraboSpot Offline make sure that the endpoint address contains
+              <Text style={{fontWeight: 'bold'}}> &ldquo;http://&ldquo; and a trailing &ldquo;/db&ldquo;</Text>.{'\n'}
+              Otherwise use the proper path associated with your endpoint address.
+            </Text>
+          </View>
+        )}
       </View>
     );
   }

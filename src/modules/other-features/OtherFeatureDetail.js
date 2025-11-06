@@ -263,7 +263,7 @@ const OtherFeatureDetail = ({
   };
 
   return (
-    <>
+    <View style={{flex: 1}}>
       <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={'Other Feature Detail'}/>
       {!isReadOnly && (
         <SaveAndCancelButtons
@@ -271,8 +271,11 @@ const OtherFeatureDetail = ({
           save={() => saveForm(formRef.current)}
         />
       )}
-      <FlatList ListHeaderComponent={renderForm()}/>
-    </>
+      <FlatList
+        ListHeaderComponent={renderForm()}
+        contentContainerStyle={{paddingBottom: 300}}
+      />
+    </View>
   );
 };
 

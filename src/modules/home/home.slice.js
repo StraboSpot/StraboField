@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialHomeState = {
   statusMessages: [],
+  geolocationTimeout: 120000,
   imageProgress: {
     imagesDownloadedCount: 0,
     neededImageIds: 0,
@@ -60,6 +61,9 @@ const homeSlice = createSlice({
     setIsErrorMessagesModalVisible(state, action) {
       state.isErrorMessagesModalVisible = action.payload;
     },
+    setGeolocationTimeout(state, action) {
+      state.geolocationTimeout = action.payload;
+    },
     setIsMainMenuPanelVisible(state, action) {
       state.isMainMenuPanelVisible = action.payload;
     },
@@ -117,6 +121,7 @@ export const {
   resetHomeState,
   setIsBackupModalVisible,
   setIsErrorMessagesModalVisible,
+  setGeolocationTimeout,
   setIsMainMenuPanelVisible,
   setIsOfflineMapsModalVisible,
   setIsProgressModalVisible,

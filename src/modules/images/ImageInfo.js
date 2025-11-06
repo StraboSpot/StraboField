@@ -4,8 +4,10 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import {Image} from '@rn-vui/base';
 
 import {ImagePropertiesModal, imageStyles, useImages} from '.';
+import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
 import {WarningModal} from '../../shared/ui/modals';
@@ -72,28 +74,33 @@ const ImageInfo = ({
     <ModalWrapper
       closeModal={() => setIsImageModalVisible(false)}
       fullscreen
+      headerTitle={image.title || 'Untitled'}
       isVisible={isVisible}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
-      <View style={{flex: 1, backgroundColor: 'black', justifyContent: 'center', alignContent: 'center'}}>
-        <Image
-          PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
-            : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
-          onError={() => {
-            if (!isImageLoaded) setIsImageLoaded(true);
-          }}
-          onLoadEnd={() => {
-            if (!isImageLoaded) setIsImageLoaded(true);
-          }}
-          placeholderStyle={commonStyles.imagePlaceholder}
-          resizeMode={'contain'}
-          source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
-            : {uri: getLocalImageURI(image.id)}}
-          style={Platform.OS === 'web' ? {width: width, height: height}
-            : {width: '100%', height: '100%'}}
-        />
+      <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
+        <View style={{flex: 1}}>
+          <ImageZoomAndPanWrapper>
+            <Image
+              PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
+                : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
+              onError={() => {
+                if (!isImageLoaded) setIsImageLoaded(true);
+              }}
+              onLoadEnd={() => {
+                if (!isImageLoaded) setIsImageLoaded(true);
+              }}
+              placeholderStyle={commonStyles.imagePlaceholder}
+              resizeMode={'contain'}
+              source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
+                : {uri: getLocalImageURI(image.id)}}
+              style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
+                : {width: '100%', height: '100%'}}
+            />
+          </ImageZoomAndPanWrapper>
+        </View>
         <View style={imageStyles.rightsideIcons}>
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}
