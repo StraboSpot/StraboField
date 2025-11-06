@@ -6,7 +6,10 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 const drawGeometryTogglesStyles = StyleSheet.create({
   buttonGroupText: {
     color: PRIMARY_ACCENT_COLOR,
-    paddingHorizontal: 5,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+    fontSize: 12,
+    paddingHorizontal: 3,
     textAlign: 'center',
   },
   drawGeometryRow: {
@@ -18,7 +21,7 @@ const drawGeometryTogglesStyles = StyleSheet.create({
     borderColor: themes.PRIMARY_ACCENT_COLOR,
     borderRadius: 10,
     flex: 1,
-    height: Platform.OS === 'web' ? 30 : 40,
+    height: Platform.OS === 'web' ? 35 : 45,
   },
   selectedButton: {
     backgroundColor: PRIMARY_ACCENT_COLOR,
