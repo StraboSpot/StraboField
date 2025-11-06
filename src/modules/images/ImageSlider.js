@@ -5,6 +5,7 @@ import {Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageSliderStyles, imageStyles, useImages} from '.';
+import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
@@ -97,21 +98,23 @@ const ImageSlider = ({route, navigation}) => {
             style={imageStyles.imageInfoButtons}
           />
         </View>
-        <Image
-          PlaceholderContent={isImageLoading ? <ActivityIndicator/>
-            : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
-          containerStyle={[imageStyles.thumbnailImageContainer, Platform.OS === 'web' ? {width: width, height: height}
-            : {width: '100%', height: '100%'}]}
-          onError={() => {
-            if (imageURI) setIsImageLoading(false);
-          }}
-          onLoadEnd={() => {
-            if (imageURI) setIsImageLoading(false);
-          }}
-          placeholderStyle={imageStyles.placeholderImage}
-          resizeMode={'contain'}
-          source={imageURI && {uri: imageURI}}
-        />
+        <ImageZoomAndPanWrapper>
+          <Image
+            PlaceholderContent={isImageLoading ? <ActivityIndicator/>
+              : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
+            containerStyle={[imageStyles.thumbnailImageContainer, Platform.OS === 'web' ? {width: width, height: height}
+              : {width: '100%', height: '100%'}]}
+            onError={() => {
+              if (imageURI) setIsImageLoading(false);
+            }}
+            onLoadEnd={() => {
+              if (imageURI) setIsImageLoading(false);
+            }}
+            placeholderStyle={imageStyles.placeholderImage}
+            resizeMode={'contain'}
+            source={imageURI && {uri: imageURI}}
+          />
+        </ImageZoomAndPanWrapper>
         <View style={imageSliderStyles.navButtonsContainer}>
           <ClearButton
             icon={{
