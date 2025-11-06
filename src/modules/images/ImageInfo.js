@@ -6,6 +6,7 @@ import {Image} from '@rn-vui/base';
 import {ImagePropertiesModal, imageStyles, useImages} from '.';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
+import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
 import {WarningModal} from '../../shared/ui/modals';
@@ -72,12 +73,18 @@ const ImageInfo = ({
     <ModalWrapper
       closeModal={() => setIsImageModalVisible(false)}
       fullscreen
+      headerTitle={image.title || 'Untitled'}
       isVisible={isVisible}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
-      <View style={{flex: 1, backgroundColor: 'black', justifyContent: 'center', alignContent: 'center'}}>
+      <View style={{
+        flex: 1,
+        backgroundColor: SECONDARY_BACKGROUND_COLOR,
+        justifyContent: 'center',
+        alignContent: 'center',
+      }}>
         <Image
           PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
             : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
@@ -91,7 +98,7 @@ const ImageInfo = ({
           resizeMode={'contain'}
           source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
             : {uri: getLocalImageURI(image.id)}}
-          style={Platform.OS === 'web' ? {width: width, height: height}
+          style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
             : {width: '100%', height: '100%'}}
         />
         <View style={imageStyles.rightsideIcons}>
