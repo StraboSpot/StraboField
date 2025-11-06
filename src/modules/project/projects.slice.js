@@ -185,6 +185,27 @@ const projectSlice = createSlice({
         state.project.modified_timestamp = Date.now();
       }
     },
+    deletedTemplate(state, action) {
+      const {key, template} = action.payload;
+      if (key === 'measurementTemplates') {
+        state.project.templates.measurementTemplates
+          = state.project.templates.measurementTemplates.filter(t => t.id !== template.id);
+        state.project.templates.activeMeasurementTemplates
+          = state.project.templates.activeMeasurementTemplates.filter(t => t.id !== template.id);
+        if (state.project.templates.useMeasurementTemplates
+          && isEmpty(state.project.templates.activeMeasurementTemplates)) {
+          state.project.templates.useMeasurementTemplates = false;
+        }
+      }
+      else {
+        state.project.templates[key].templates
+          = state.project.templates[key].templates.filter(t => t.id !== template.id);
+        state.project.templates[key].active = state.project.templates[key].active.filter(t => t.id !== template.id);
+        if (state.project.templates[key].isInUse && isEmpty(state.project.templates[key].active)) {
+          state.project.templates[key].isInUse = false;
+        }
+      }
+    },
     doesBackupDirectoryExist(state, action) {
       state.deviceBackUpDirectoryExists = action.payload;
     },
@@ -324,6 +345,7 @@ export const {
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
   deletedTagIdFromReports,
+  deletedTemplate,
   doesBackupDirectoryExist,
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
@@ -332,8 +354,8 @@ export const {
   setActiveTemplates,
   setBackupFileName,
   setIsImageTransferring,
-  setReadOnlyDatasetsIds,
   setMultipleFeaturesTaggingEnabled,
+  setReadOnlyDatasetsIds,
   setSelectedProject,
   setSelectedTag,
   setTargetDataset,

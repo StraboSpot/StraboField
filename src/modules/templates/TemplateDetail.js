@@ -3,16 +3,22 @@ import {Text, TextInput, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, useForm} from '../form';
 import useTemplates from './useTemplates';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import NoteForm from '../notes/NoteForm';
 import {PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {deletedTemplate} from '../project/projects.slice';
 
 const TemplateDetail = ({goBack, template, templateType}) => {
+  const dispatch = useDispatch();
 
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [templateName, setTemplateName] = useState(template.name);
 
   const {validateForm} = useForm();
@@ -24,8 +30,31 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     p => p.key === templateType) || templateType === 'plutonic' || templateType === 'volcanic';
   const isSed = SED_PAGES.find(p => p.key === templateType);
   const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
+  const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
+  || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
 
   const formName = template.values.type ? ['measurement', template.values.type] : [groupKey, templateType];
+
+  const deleteTemplate = () => {
+    dispatch(deletedTemplate({key: templateKey, template: template}));
+    goBack();
+    setIsDeleteConfirmModalVisible(false);
+  };
+
+  const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
+
+  const renderDeleteConfirmationModal = () => {
+    return (
+      <DeleteConformationDialogBox
+        headerTitle={'Confirm Delete!'}
+        isVisible={isDeleteConfirmModalVisible}
+        onActionPressed={deleteTemplate}
+        onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
+      >
+        <Text style={{textAlign: 'center'}}>Are you sure you want to delete Template {templateName}?</Text>
+      </DeleteConformationDialogBox>
+    );
+  };
 
   // Template Name Field
   const renderNameField = () => {
@@ -54,8 +83,6 @@ const TemplateDetail = ({goBack, template, templateType}) => {
   const saveTemplateAndGo = async () => {
     console.log('Saving', templateType, templateName, formRef.current.values);
     try {
-      const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
-      || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
       await saveTemplate(formRef.current, templateKey, template, templateName);
       goBack();
     }
@@ -86,6 +113,13 @@ const TemplateDetail = ({goBack, template, templateType}) => {
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>
       )}
+      <DeleteButton
+        onPress={handleDeletePressed}
+        title={'Delete Template'}
+      />
+
+      {/* Child Modal */}
+      {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );
 };
