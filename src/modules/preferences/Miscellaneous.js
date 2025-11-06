@@ -9,6 +9,7 @@ import Geolocate from './Geolocate';
 import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import uiStyles from '../../shared/ui/ui.styles';
 
 const Miscellaneous = () => {
   const isTestingMode = useSelector(state => state.project.isTestingMode);
@@ -33,13 +34,26 @@ const Miscellaneous = () => {
 
   const renderPreferences = () => {
     return (
-      <>
-        <View style={{}}>
-          <TestingMode isTestingMode={isTestingMode}/>
-          <Geolocate/>
-          <GenerateRandomSpots isTestingMode={isTestingMode}/>
-        </View>
-      </>
+      <View style={{padding: 10}}>
+        <TestingMode
+          isTestingMode={isTestingMode}
+          textStyles={{
+            flexWrap: 'wrap',
+            flexShrink: 1,
+            margin: 10,
+          }}
+        />
+        <CustomEndpoint
+          containerStyles={{...uiStyles.customEndpointContainer}}
+          textStyles={{
+            flexWrap: 'wrap',
+            flexShrink: 1,
+            margin: 10,
+          }}
+        />
+        <Geolocate/>
+        <GenerateRandomSpots isTestingMode={isTestingMode}/>
+      </View>
     );
   };
 
@@ -55,7 +69,7 @@ const Miscellaneous = () => {
         <>
           <ScrollView style={{flex: 1}}>
             {renderPreferences()}
-            {renderCustomEndpoint()}
+            {/*{renderCustomEndpoint()}*/}
           </ScrollView>
         </>
       </Formik>
