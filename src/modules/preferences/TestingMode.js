@@ -13,7 +13,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {setTestingMode} from '../project/projects.slice';
 
-const TestingMode = ({isTestingMode}) => {
+const TestingMode = ({isTestingMode, textStyles}) => {
   const dispatch = useDispatch();
 
   // const testingModePassword = 'Strab0R0cks';
@@ -76,11 +76,9 @@ const TestingMode = ({isTestingMode}) => {
   return (
     <>
       <View style={styles.rowContainer}>
-        <View style={styles.labelContainer}>
-          <Text style={commonStyles.listItemTitle}>
-            Use Testing Mode?
-          </Text>
-        </View>
+        <Text style={[commonStyles.listItemTitle, textStyles]}>
+          Use Testing Mode?
+        </Text>
         <SwitchWrapper
           onValueChange={onTestingSwitchChange}
           value={isTestingMode}
