@@ -27,7 +27,8 @@ const TemplatesPage = () => {
   getNewTemplatesList();
 
   const templateSections = Object.entries(templates).reduce((acc, [key, value]) => {
-    if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
+    if (isEmpty(value) || (value.templates && isEmpty(value.templates))) return acc;
+    else if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
     else if (key === 'measurementTemplates') {
       // Split measurement templates into planar, tabular and linear
       const measurementsGroupedByType = value.reduce((acc1, v) => {
@@ -51,6 +52,7 @@ const TemplatesPage = () => {
   const handleBackPressed = () => {
     setTemplateVisible(null);
     setIsNewTemplateListVisible(false);
+    // getNewTemplatesList();
   };
 
   const handleNewTemplatePressed = (templateTypePressed, section) => {

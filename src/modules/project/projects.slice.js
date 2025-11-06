@@ -190,19 +190,26 @@ const projectSlice = createSlice({
       if (key === 'measurementTemplates') {
         state.project.templates.measurementTemplates
           = state.project.templates.measurementTemplates.filter(t => t.id !== template.id);
+        if (isEmpty(state.project.templates.measurementTemplates)) delete state.project.templates.measurementTemplates;
+
         state.project.templates.activeMeasurementTemplates
           = state.project.templates.activeMeasurementTemplates.filter(t => t.id !== template.id);
-        if (state.project.templates.useMeasurementTemplates
-          && isEmpty(state.project.templates.activeMeasurementTemplates)) {
-          state.project.templates.useMeasurementTemplates = false;
+        if (isEmpty(
+          state.project.templates.activeMeasurementTemplates)) delete state.project.templates.activeMeasurementTemplates;
+
+        if (state.project.templates.useMeasurementTemplates && !state.project.templates.activeMeasurementTemplates) {
+          delete state.project.templates.useMeasurementTemplates;
         }
       }
       else {
         state.project.templates[key].templates
           = state.project.templates[key].templates.filter(t => t.id !== template.id);
-        state.project.templates[key].active = state.project.templates[key].active.filter(t => t.id !== template.id);
-        if (state.project.templates[key].isInUse && isEmpty(state.project.templates[key].active)) {
-          state.project.templates[key].isInUse = false;
+        if (isEmpty(state.project.templates[key].templates)) delete state.project.templates[key];
+        else {
+          state.project.templates[key].active = state.project.templates[key].active.filter(t => t.id !== template.id);
+          if (state.project.templates[key].isInUse && isEmpty(state.project.templates[key].active)) {
+            state.project.templates[key].isInUse = false;
+          }
         }
       }
     },
