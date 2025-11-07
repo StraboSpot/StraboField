@@ -85,6 +85,15 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 
+sentry {
+    autoUploadProguardMapping = enableProguardInReleaseBuilds
+    uploadNativeSymbols = true
+    includeNativeSources = true
+    tracingInstrumentation {
+        enabled = true
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
