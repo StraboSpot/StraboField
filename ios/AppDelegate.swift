@@ -3,6 +3,7 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import IQKeyboardManagerSwift
+import EXUpdates
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -55,7 +56,8 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 #if DEBUG
     RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
 #else
-    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+    // Use EAS Updates in production
+    return EXUpdatesAppController.sharedInstance().launchAssetURL() ?? Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
   }
 }

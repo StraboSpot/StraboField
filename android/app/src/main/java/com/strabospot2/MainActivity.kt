@@ -12,6 +12,7 @@ import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.orientationdirector.implementation.ConfigurationChangedBroadcastReceiver
+import expo.modules.ReactActivityDelegateWrapper
 
 class MainActivity : ReactActivity() {
   /**
@@ -23,9 +24,10 @@ class MainActivity : ReactActivity() {
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
+   * Wrapped with ReactActivityDelegateWrapper for Expo modules support (including EAS Updates)
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+      ReactActivityDelegateWrapper(this, DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled))
 
   /**
    * Will hide the bottom Android navigation bar when app is focused. User can swipe up from the bottom to reveal the bar and it will dismiss after ~3 seconds.

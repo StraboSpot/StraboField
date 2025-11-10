@@ -25,7 +25,12 @@ if linkage != nil
 end
 
 target 'StraboSpot2' do
-    pod 'Sentry', '~> 8.57.0'
+  # Expo modules autolinking (must be before use_native_modules!)
+  require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+  use_expo_modules!
+
+  pod 'Sentry', '~> 8.57.0'
+
   config = use_native_modules!
 
   use_react_native!(

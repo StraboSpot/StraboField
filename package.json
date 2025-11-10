@@ -26,6 +26,10 @@
     "bump-major": "npm version major --no-git-tag-version && bundle exec fastlane bump && npm run create-changelog",
     "commit-and-push": "git add . && git commit -m \"chore: bump version to $(node -p \\\"require('./package.json').version\\\")\" && git push origin master",
     "deploy-beta": "bundle exec fastlane beta",
+    "ota:update:production": "eas update --branch production --message \"$(git log -1 --pretty=%B)\"",
+    "ota:update:preview": "eas update --branch preview --message \"$(git log -1 --pretty=%B)\"",
+    "ota:update:development": "eas update --branch development --message \"$(git log -1 --pretty=%B)\"",
+    "ota:update": "npm run ota:update:production",
     "create-changelog": "changelog generate-changelog",
     "web": "webpack serve --mode development -d inline-source-map --config webpack.config.js --hot --color",
     "web-deploy": "webpack --mode production --config webpack.config.js",
@@ -33,6 +37,7 @@
     "remove:packages": "rm -rf node_modules ios/Pods ios/Podfile.lock"
   },
   "scriptComments": {
+    "uploading-sourcemaps": "Follow the instructions in ./README-Files/SourceMaps.md",
     "bundle:android": "Must be run with every build for android before deploying to PlayStore. Removed the --assets flag because of duplicates.",
     "deploy:android": "creates a .aab file in app/build/outputs/bundle/release"
   },
@@ -57,6 +62,8 @@
     "@sentry/react-native": "^7.4.0",
     "@sentry/tracing": "7.120.3",
     "@turf/turf": "7.2.0",
+    "expo": "^54.0.23",
+    "expo-updates": "^29.0.12",
     "fast-xml-parser": "5.0.7",
     "formik": "2.4.6",
     "geomagnetism": "0.2.0",

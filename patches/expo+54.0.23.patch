@@ -1,0 +1,24 @@
+diff --git a/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift b/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
++++ b/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
+@@ -14,13 +14,9 @@ public class ExpoReactNativeFactory: RCTReactNativeFactory, ExpoReactNativeFact
+   // TODO: Remove check when react-native-macos 0.81 is released
+   #if !os(macOS)
+   @objc public override init(delegate: any RCTReactNativeFactoryDelegate) {
+-    let releaseLevel = (Bundle.main.object(forInfoDictionaryKey: "ReactNativeReleaseLevel") as? String)
+-      .flatMap { [
+-        "canary": RCTReleaseLevel.Canary,
+-        "experimental": RCTReleaseLevel.Experimental,
+-        "stable": RCTReleaseLevel.Stable
+-      ][$0.lowercased()]
+-      }
+-    ?? RCTReleaseLevel.Stable
+-
+-    super.init(delegate: delegate, releaseLevel: releaseLevel)
++    // RCTReleaseLevel has been removed in React Native 0.79+
++    // Using basic init without releaseLevel parameter
++    super.init(delegate: delegate)
+   }
+   #endif
+ 

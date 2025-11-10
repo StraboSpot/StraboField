@@ -1,4 +1,31 @@
 {
   "name": "StraboSpot2",
-  "displayName": "StraboSpot2"
+  "displayName": "StraboSpot2",
+  "expo": {
+    "name": "StraboSpot2",
+    "slug": "strabospot2",
+    "owner": "strabospot",
+    "version": "2.23.6",
+    "orientation": "default",
+    "icon": "./src/assets/icons/splash_screen_logo.png",
+    "scheme": "strabofield",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "ios": {
+      "bundleIdentifier": "org.StraboSpot2",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "org.StraboSpot2",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/icons/splash_screen_logo.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
 }

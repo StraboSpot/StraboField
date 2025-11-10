@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "version": ">= 16.1.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "channel": "development",
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "default"
+      }
+    },
+    "preview": {
+      "channel": "preview",
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "default"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "ios": {
+        "resourceClass": "default"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
