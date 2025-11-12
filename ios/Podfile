@@ -5,6 +5,8 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+project 'StraboSpot2.xcodeproj'
+
   source 'https://github.com/CocoaPods/Specs.git'
   source 'https://github.com/getsentry/sentry-cocoa.git'
 

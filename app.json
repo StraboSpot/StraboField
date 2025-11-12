@@ -1,9 +1,9 @@
 {
-  "name": "StraboSpot2",
-  "displayName": "StraboSpot2",
+  "name": "StraboField",
+  "displayName": "StraboField",
   "expo": {
-    "name": "StraboSpot2",
-    "slug": "strabospot2",
+    "name": "StraboField",
+    "slug": "strabofield",
     "owner": "strabospot",
     "version": "2.23.6",
     "orientation": "default",
