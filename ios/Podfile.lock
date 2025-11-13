@@ -2607,6 +2607,7 @@ DEPENDENCIES:
   - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
+  - Sentry (~> 8.57.0)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -2990,4 +2991,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c0e5aa64611a76b5f799687e9edadb5b9a95261b
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.13.0
