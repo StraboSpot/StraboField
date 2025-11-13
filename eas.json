@@ -10,17 +10,25 @@
       "distribution": "internal",
       "ios": {
         "resourceClass": "default"
-      }
+      },
+      "node": "22.16.0"
     },
     "preview": {
       "channel": "preview",
       "distribution": "internal",
+      "env": {
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
+      },
       "ios": {
-        "resourceClass": "default"
+        "resourceClass": "default",
+        "cache": {
+          "paths": ["ios/Pods"]
+        }
       },
       "android": {
         "buildType": "apk"
-      }
+      },
+      "node": "22.16.0"
     },
     "production": {
       "channel": "production",

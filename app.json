@@ -1,6 +1,4 @@
 {
-  "name": "StraboField",
-  "displayName": "StraboField",
   "expo": {
     "name": "StraboField",
     "slug": "strabofield",
@@ -24,8 +22,17 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/21b380cb-2cd0-48a9-b147-9f44668281c9"
+    },
+    "runtimeVersion": "2.23.6",
+    "extra": {
+      "eas": {
+        "projectId": "21b380cb-2cd0-48a9-b147-9f44668281c9"
+      }
     }
   }
 }
