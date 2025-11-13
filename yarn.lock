@@ -17,7 +17,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@StraboSpot/react-native-sketch-canvas@https://github.com/StraboSpot/react-native-sketch-canvas.git#commit=d0eac854dfd3120303944dda08e13abf08684b27":
+"@StraboSpot/react-native-sketch-canvas@https://github.com/StraboSpot/react-native-sketch-canvas.git#d0eac854dfd3120303944dda08e13abf08684b27":
   version: 0.8.0
   resolution: "@StraboSpot/react-native-sketch-canvas@https://github.com/StraboSpot/react-native-sketch-canvas.git#commit=d0eac854dfd3120303944dda08e13abf08684b27"
   checksum: 10c0/b2e737bd3957a34a1f0b4b5f038f6f8c1bc81fe6681f2c962357caabe45c39b40d512e1fa9912d6807fb6d5b2f1676399bf3a16b398098f68c50e97536fa7105
@@ -17268,11 +17268,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strabospot2@workspace:.":
+"strabofield@workspace:.":
   version: 0.0.0-use.local
-  resolution: "strabospot2@workspace:."
+  resolution: "strabofield@workspace:."
   dependencies:
-    "@StraboSpot/react-native-sketch-canvas": "https://github.com/StraboSpot/react-native-sketch-canvas.git#commit=d0eac854dfd3120303944dda08e13abf08684b27"
+    "@StraboSpot/react-native-sketch-canvas": "https://github.com/StraboSpot/react-native-sketch-canvas.git#d0eac854dfd3120303944dda08e13abf08684b27"
     "@babel/core": "npm:^7.25.2"
     "@babel/plugin-proposal-export-namespace-from": "npm:^7.18.9"
     "@babel/preset-env": "npm:^7.25.3"

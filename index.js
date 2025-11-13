@@ -8,7 +8,8 @@ import {
 } from 'react-native-reanimated';
 
 import App from './App';
-import {name as appName} from './app.json';
+
+const appName = 'StraboField';
 
 const isWeb = Platform.select({
   native: 'Battery state `unknown` and monitoring disabled, this is normal for simulators and tvOS.',
