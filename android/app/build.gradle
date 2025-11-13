@@ -85,17 +85,6 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
-
-sentry {
-    autoUploadProguardMapping = enableProguardInReleaseBuilds
-    uploadNativeSymbols = true
-    includeNativeSources = true
-    tracingInstrumentation {
-        enabled = true
-    }
-}
-
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -158,3 +147,18 @@ dependencies {
 }
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+// Apply Sentry Gradle plugin
+// Temporarily commented out due to compatibility issues with current setup
+// This can be re-enabled once Sentry configuration is updated
+// apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
+
+// Configure Sentry
+// sentry {
+//     autoUploadProguardMapping = enableProguardInReleaseBuilds
+//     uploadNativeSymbols = true
+//     includeNativeSources = true
+//     tracingInstrumentation {
+//         enabled = true
+//     }
+// }
