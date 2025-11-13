@@ -2484,9 +2484,6 @@ PODS:
   - RNZipArchive/Core (7.0.1):
     - React-Core
     - SSZipArchive (~> 2.5.5)
-  - Sentry (8.57.0):
-    - Sentry/Core (= 8.57.0)
-  - Sentry/Core (8.57.0)
   - Sentry/HybridSDK (8.57.0)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.5.5)
@@ -2610,7 +2607,6 @@ DEPENDENCIES:
   - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
-  - Sentry (~> 8.57.0)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -2992,6 +2988,6 @@ SPEC CHECKSUMS:
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: fee373fb83c58550e84555a4e6bdafc34b4c5790
 
-PODFILE CHECKSUM: 850d393ba1a0ca4faaae82e258f39793eb148cf2
+PODFILE CHECKSUM: c0e5aa64611a76b5f799687e9edadb5b9a95261b
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.13.0

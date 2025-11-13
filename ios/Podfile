@@ -31,7 +31,8 @@ target 'StraboSpot2' do
   require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
   use_expo_modules!
 
-  pod 'Sentry', '~> 8.57.0'
+  # Sentry is automatically linked via @sentry/react-native autolinking
+  # pod 'Sentry', '~> 8.57.0'
 
   config = use_native_modules!
 
