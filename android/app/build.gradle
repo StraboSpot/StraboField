@@ -80,8 +80,10 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 // Initializes a new Properties() object called keystoreProperties.
 def keystoreProperties = new Properties()
-// Loads the keystore.properties file into the keystoreProperties object.
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+// Loads the keystore.properties file into the keystoreProperties object (only if it exists).
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 
@@ -115,10 +117,18 @@ android {
             keyPassword 'android'
         }
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            } else {
+                // Fallback to debug keystore if release keystore is not configured
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
          }
     }
     buildTypes {
