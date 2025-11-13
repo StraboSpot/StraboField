@@ -12,7 +12,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setGeolocationTimeout} from '../home/home.slice';
 
-const Geolocate = (props) => {
+const Geolocate = () => {
   const batteryImg = require('../../assets/icons/battery-full-outline.png');
   const dispatch = useDispatch();
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
@@ -29,7 +29,6 @@ const Geolocate = (props) => {
   };
 
   const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
-  const [vertValue, setVertValue] = useState(0);
   const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
 
   useEffect(() => {
@@ -49,21 +48,19 @@ const Geolocate = (props) => {
     return Math.ceil((1 - k) * end + k * start) % 256;
   };
 
-  const onSliderChange = (value) => {
-    console.log('SLIDER CHANGE', value);
-    const timeout = convertSliderValueToMilliseconds(value);
+  const onSliderChange = (sliderValue) => {
+    console.log('SLIDER CHANGE', sliderValue);
+    const timeout = convertSliderValueToMilliseconds(sliderValue);
     console.log('TIMEOUT', timeout);
     dispatch(setGeolocationTimeout(timeout));
   };
 
   return (
-    <React.Fragment>
-      <View style={styles.rowContainer}>
-        <OutlineButton
-          onPress={() => setIsGeolocationVisible(!isGeolocationVisible)}
-          title={`Geolocation Timeout (${convertMillisecondsToTime(currentTimeout)})`}
-        />
-      </View>
+    <>
+      <OutlineButton
+        onPress={() => setIsGeolocationVisible(!isGeolocationVisible)}
+        title={`Geolocation Timeout (${convertMillisecondsToTime(currentTimeout)})`}
+      />
 
       <ModalWrapper
         closeModal={() => setIsGeolocationVisible(false)}
@@ -88,13 +85,7 @@ const Geolocate = (props) => {
             thumbProps={{
               children: (
                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                  <Image
-                    source={batteryImg}
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
-                  />
+                  <Image source={batteryImg} style={{width: 30, height: 30}}/>
                 </View>
               ),
             }}
@@ -126,9 +117,8 @@ const Geolocate = (props) => {
             Longer time limits can reduce battery life. Remember to turn off when not in use.</Text>
         </View>
       </ModalWrapper>
-    </React.Fragment>
-  )
-    ;
+    </>
+  );
 };
 
 export default Geolocate;

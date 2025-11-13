@@ -119,7 +119,7 @@ const SignIn = ({navigation}) => {
           />
           {renderButtons()}
           <CustomEndpoint
-            containerStyles={{...uiStyles.customEndpointContainer}}
+            containerStyles={{width: '80%'}}
             textStyles={{color: WHITE, fontSize: 14, textAlign: 'center'}}
           />
         </View>

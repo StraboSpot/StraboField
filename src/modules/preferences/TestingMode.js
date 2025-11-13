@@ -75,7 +75,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
 
   return (
     <>
-      <View style={styles.rowContainer}>
+      <View style={[styles.rowContainer, {paddingHorizontal: 10, paddingVertical: 5}]}>
         <Text style={[commonStyles.listItemTitle, textStyles]}>
           Use Testing Mode?
         </Text>

@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
 
 import {Input} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -13,7 +12,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import formStyles from '../form/form.styles';
 import useMapLocation from '../maps/useMapLocation';
 
-const GenerateRandomSpots = ({setLoadingStatus}) => {
+const GenerateRandomSpots = () => {
   const toast = useToast();
 
   const [numRandomSpots, setNumRandomSpots] = useState(100);
@@ -22,33 +21,24 @@ const GenerateRandomSpots = ({setLoadingStatus}) => {
 
   const {generateRandomsSpotsAroundCurrentLocation} = useMapLocation();
 
-
   const generateRandomSpots = async () => {
     const numRandomSpotsInt = parseInt(numRandomSpots, 10);
     if (numRandomSpotsInt) {
       setNumRandomSpots(numRandomSpotsInt);
-      // dispatch(setLoadingStatus({view: 'home', bool: true}));
       setLoading(true);
       await generateRandomsSpotsAroundCurrentLocation(numRandomSpotsInt);
-      // dispatch(setLoadingStatus({view: 'home', bool: false}));
       setLoading(false);
       toast.show(`${numRandomSpotsInt} Random Spots Generated`, {});
     }
     else alert('Error Generating Random Spots', 'The number of Spots must be an integer.');
   };
 
-  const setSwitchValue = (value) => {
-    setIsSpotGeneratorVisible(value);
-  };
-
   return (
     <>
-      <View style={styles.rowContainer}>
-        <OutlineButton
-          onPress={() => setIsSpotGeneratorVisible(!isSpotGeneratorVisible)}
-          title={'Generate Random Spots...'}
-        />
-      </View>
+      <OutlineButton
+        onPress={() => setIsSpotGeneratorVisible(!isSpotGeneratorVisible)}
+        title={'Generate Random Spots...'}
+      />
 
       {isSpotGeneratorVisible && (
         <ModalWrapper

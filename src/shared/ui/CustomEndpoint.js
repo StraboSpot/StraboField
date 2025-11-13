@@ -12,10 +12,7 @@ import signInStyles from '../../modules/sign-in/signIn.styles';
 import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../services/connections.slice';
 import {STRABO_APIS} from '../../services/urls.constants';
 
-const CustomEndpoint = ({
-                          containerStyles,
-                          textStyles,
-                        }) => {
+const CustomEndpoint = ({containerStyles, textStyles}) => {
     const dispatch = useDispatch();
     const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
     const customMaps = useSelector(state => state.map.customMaps);
@@ -35,8 +32,8 @@ const CustomEndpoint = ({
     };
 
     return (
-      <View style={[containerStyles]}>
-        <View style={[uiStyles.customEndpointSwitchContainer]}>
+      <View style={[uiStyles.customEndpointContainer, containerStyles]}>
+        <View style={uiStyles.customEndpointSwitchContainer}>
           <Text style={[uiStyles.customEndpointText, textStyles]}>Use Custom Database Endpoint?</Text>
           <SwitchWrapper onValueChange={handleEndpointSwitchValue} value={isSelected}/>
         </View>
