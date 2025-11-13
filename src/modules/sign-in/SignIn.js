@@ -12,7 +12,7 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import {ErrorModal} from '../../shared/ui/modals';
-import uiStyles, {login} from '../../shared/ui/ui.styles';
+import uiStyles from '../../shared/ui/ui.styles';
 import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
@@ -43,7 +43,7 @@ const SignIn = ({navigation}) => {
 
   const handleGuestSignIn = async () => {
     await guestSignIn();
-    dispatch(login());
+    console.log('GUEST SIGN IN');
   };
 
   const handleRegister = () => navigation.navigate('SignUp');
