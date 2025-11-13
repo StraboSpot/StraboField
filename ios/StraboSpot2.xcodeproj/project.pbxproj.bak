@@ -44,7 +44,7 @@
 		D6E5C2AF2ABE2715005F243A /* Moving-Project-Backups-Out-of-StraboSpot2.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Moving-Project-Backups-Out-of-StraboSpot2.pdf"; sourceTree = "<group>"; };
 		D6E5C2B82ABE2774005F243A /* Airdrop-from-iPad-to-iPad.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Airdrop-from-iPad-to-iPad.pdf"; sourceTree = "<group>"; };
 		D6E5C2BA2ABE277D005F243A /* Compass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StraboSpot2/Compass.swift; sourceTree = "<group>"; };
-		D6E5C2BC2ABE281C005F243A /* Dummy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StraboSpot2/Dummy.swift; sourceTree = "<group>"; };
+		D6E5C2BC2ABE281C005F243A /* Dummy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dummy.swift; sourceTree = "<group>"; };
 		D6E5C2BD2ABE281C005F243A /* Compass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Compass.m; sourceTree = "<group>"; };
 		D6E5C2C02ABE282A005F243A /* StraboSpot2-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "StraboSpot2-Bridging-Header.h"; sourceTree = "<group>"; };
 		D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = compass_button_click.mp3; path = "../../../Strabo Resources/UI Animations and sounds/compass_button_click.mp3"; sourceTree = "<group>"; };
