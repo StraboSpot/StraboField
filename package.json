@@ -42,7 +42,7 @@
     "deploy:android": "creates a .aab file in app/build/outputs/bundle/release"
   },
   "dependencies": {
-    "@StraboSpot/react-native-sketch-canvas": "https://github.com/StraboSpot/react-native-sketch-canvas.git#commit=d0eac854dfd3120303944dda08e13abf08684b27",
+    "@StraboSpot/react-native-sketch-canvas": "https://github.com/StraboSpot/react-native-sketch-canvas.git#d0eac854dfd3120303944dda08e13abf08684b27",
     "@react-native-async-storage/async-storage": "2.1.0",
     "@react-native-clipboard/clipboard": "1.16.2",
     "@react-native-community/datetimepicker": "8.3.0",

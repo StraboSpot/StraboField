@@ -1,8 +1,8 @@
 diff --git a/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift b/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
-index 1234567..abcdefg 100644
+index ce8b1d7..707ef1e 100644
 --- a/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
 +++ b/node_modules/expo/ios/AppDelegates/ExpoReactNativeFactory.swift
-@@ -14,13 +14,9 @@ public class ExpoReactNativeFactory: RCTReactNativeFactory, ExpoReactNativeFact
+@@ -14,16 +14,9 @@ public class ExpoReactNativeFactory: RCTReactNativeFactory, ExpoReactNativeFacto
    // TODO: Remove check when react-native-macos 0.81 is released
    #if !os(macOS)
    @objc public override init(delegate: any RCTReactNativeFactoryDelegate) {
