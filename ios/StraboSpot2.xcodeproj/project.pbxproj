@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		AC34B4C32D7727629AD2474B /* libPods-StraboSpot2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 317ADAF98ABCCAE64129A0DC /* libPods-StraboSpot2.a */; };
 		D6C43B482DBC40DE0086A202 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C43B472DBC40DE0086A202 /* AppDelegate.swift */; };
 		D6E5C2B22ABE2716005F243A /* Moving-Project-Backups-Out-of-StraboSpot2.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D6E5C2AF2ABE2715005F243A /* Moving-Project-Backups-Out-of-StraboSpot2.pdf */; };
 		D6E5C2B92ABE2774005F243A /* Airdrop-from-iPad-to-iPad.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D6E5C2B82ABE2774005F243A /* Airdrop-from-iPad-to-iPad.pdf */; };
@@ -17,7 +18,6 @@
 		D6E5C2BF2ABE281C005F243A /* Compass.m in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C2BD2ABE281C005F243A /* Compass.m */; };
 		D6E5C2C22ABE2CA2005F243A /* compass_button_click.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */; };
 		D6EAF5652BCD8C2400AF6566 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D6EAF5642BCD8C2400AF6566 /* PrivacyInfo.xcprivacy */; };
-		F416280923E9E923B68F0739 /* libPods-StraboSpot2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB412E2BB18BCEB77033CE1 /* libPods-StraboSpot2.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +35,10 @@
 		13B07F961A680F5B00A75B9A /* StraboSpot2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StraboSpot2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = StraboSpot2/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = StraboSpot2/Info.plist; sourceTree = "<group>"; };
-		372AB2C6CEC3FAE6F91A40AC /* Pods-StraboSpot2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StraboSpot2.debug.xcconfig"; path = "Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2.debug.xcconfig"; sourceTree = "<group>"; };
+		317ADAF98ABCCAE64129A0DC /* libPods-StraboSpot2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StraboSpot2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B1DB2211426F2D916B49795 /* Pods-StraboSpot2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StraboSpot2.debug.xcconfig"; path = "Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2.debug.xcconfig"; sourceTree = "<group>"; };
+		66CF872C97A44EF3B4E5D6ED /* Pods-StraboSpot2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StraboSpot2.release.xcconfig"; path = "Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = StraboSpot2/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		91E3F738E1A0851DECA3D350 /* Pods-StraboSpot2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StraboSpot2.release.xcconfig"; path = "Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2.release.xcconfig"; sourceTree = "<group>"; };
 		D6C43B472DBC40DE0086A202 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D6E5C2AF2ABE2715005F243A /* Moving-Project-Backups-Out-of-StraboSpot2.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Moving-Project-Backups-Out-of-StraboSpot2.pdf"; sourceTree = "<group>"; };
 		D6E5C2B82ABE2774005F243A /* Airdrop-from-iPad-to-iPad.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Airdrop-from-iPad-to-iPad.pdf"; sourceTree = "<group>"; };
@@ -48,7 +49,6 @@
 		D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = compass_button_click.mp3; path = "../../../Strabo Resources/UI Animations and sounds/compass_button_click.mp3"; sourceTree = "<group>"; };
 		D6EAF5642BCD8C2400AF6566 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FDB412E2BB18BCEB77033CE1 /* libPods-StraboSpot2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StraboSpot2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F416280923E9E923B68F0739 /* libPods-StraboSpot2.a in Frameworks */,
+				AC34B4C32D7727629AD2474B /* libPods-StraboSpot2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				FDB412E2BB18BCEB77033CE1 /* libPods-StraboSpot2.a */,
+				317ADAF98ABCCAE64129A0DC /* libPods-StraboSpot2.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -147,8 +147,8 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				372AB2C6CEC3FAE6F91A40AC /* Pods-StraboSpot2.debug.xcconfig */,
-				91E3F738E1A0851DECA3D350 /* Pods-StraboSpot2.release.xcconfig */,
+				3B1DB2211426F2D916B49795 /* Pods-StraboSpot2.debug.xcconfig */,
+				66CF872C97A44EF3B4E5D6ED /* Pods-StraboSpot2.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -178,14 +178,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "StraboSpot2" */;
 			buildPhases = (
-				C7AE15AD2C8B3C150D9660AA /* [CP] Check Pods Manifest.lock */,
+				9D1BE46934410DBDF8CA21E6 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				F12C4C3BB30749F99C2AD43A /* Upload Debug Symbols to Sentry */,
-				44A04C76625C75A742155AF4 /* [CP] Embed Pods Frameworks */,
-				98F9E05C0E38617707AAEB3E /* [CP] Copy Pods Resources */,
+				56FC821983D09DB02D4C4427 /* [CP] Embed Pods Frameworks */,
+				EF564B27513D76AF75116808 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -273,7 +273,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n# export EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport SENTRY_DISABLE_AUTO_UPLOAD=true  \n\nset -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\nSENTRY_XCODE=\"../node_modules/@sentry/react-native/scripts/sentry-xcode.sh\"\nBUNDLE_REACT_NATIVE=\"/bin/sh $SENTRY_XCODE $REACT_NATIVE_XCODE\"\n\n# RN 0.69+\n/bin/sh -c \"$WITH_ENVIRONMENT \\\"$BUNDLE_REACT_NATIVE\\\"\"\n\n# RN 0.46 – 0.68\n# /bin/sh -c \"$BUNDLE_REACT_NATIVE\"\n\n/bin/sh ../node_modules/@sentry/react-native/scripts/sentry-xcode-debug-files.sh\n";
 		};
-		44A04C76625C75A742155AF4 /* [CP] Embed Pods Frameworks */ = {
+		56FC821983D09DB02D4C4427 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -290,24 +290,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		98F9E05C0E38617707AAEB3E /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C7AE15AD2C8B3C150D9660AA /* [CP] Check Pods Manifest.lock */ = {
+		9D1BE46934410DBDF8CA21E6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -327,6 +310,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EF564B27513D76AF75116808 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StraboSpot2/Pods-StraboSpot2-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F12C4C3BB30749F99C2AD43A /* Upload Debug Symbols to Sentry */ = {
@@ -428,7 +428,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 372AB2C6CEC3FAE6F91A40AC /* Pods-StraboSpot2.debug.xcconfig */;
+			baseConfigurationReference = 3B1DB2211426F2D916B49795 /* Pods-StraboSpot2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -465,7 +465,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 91E3F738E1A0851DECA3D350 /* Pods-StraboSpot2.release.xcconfig */;
+			baseConfigurationReference = 66CF872C97A44EF3B4E5D6ED /* Pods-StraboSpot2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

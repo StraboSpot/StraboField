@@ -8,7 +8,6 @@ require Pod::Executable.execute_command('node', ['-p',
 project 'StraboSpot2.xcodeproj'
 
 source 'https://github.com/CocoaPods/Specs.git'
-source 'https://github.com/getsentry/sentry-cocoa.git'
 
 MIN_IOS_OVERRIDE = '15.5'
 if Gem::Version.new(MIN_IOS_OVERRIDE) > Gem::Version.new(min_ios_version_supported)
@@ -27,7 +26,6 @@ if linkage != nil
 end
 
 target 'StraboSpot2' do
-    pod 'Sentry', '~> 8.57.0'
   config = use_native_modules!
 
   use_react_native!(
