@@ -7,7 +7,7 @@ import {setActiveDatasets, setTargetDataset} from '../projects.slice';
 import DatasetDetail from './DatasetDetail';
 import DatasetsOverview from './DatasetsOverview';
 
-const DatasetsPage = () => {
+const Datasets = () => {
 
   const [datasetToView, setDatasetToView] = useState(null);
 
@@ -33,4 +33,4 @@ const DatasetsPage = () => {
     : <DatasetsOverview setDatasetToView={setDatasetToView}/>;
 };
 
-export default DatasetsPage;
+export default Datasets;

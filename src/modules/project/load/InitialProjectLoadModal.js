@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import DownloadProjectPage from './DownloadProjectPage';
+import DownloadProject from './DownloadProject';
 import ImportProjectFromZip from './ImportProjectFromZip';
 import LoadProjectButtons from './LoadProjectButtons';
 import NewProjectForm from './NewProjectForm';
@@ -15,7 +15,7 @@ import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
 import projectStyles from '../project.styles';
-import OpenProjectPage from './OpenProjectPage';
+import OpenProject from './OpenProject';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
@@ -113,14 +113,14 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
         return (
           <>
             {renderBackButton()}
-            <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
+            <DownloadProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'deviceProjects':
         return (
           <>
             {renderBackButton()}
-            <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
+            <OpenProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
           </>
         );
       case 'project':

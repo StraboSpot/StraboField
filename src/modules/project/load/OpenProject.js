@@ -17,7 +17,7 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Open project on device in StraboSpot app directory
-const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
+const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
@@ -83,4 +83,4 @@ const OpenProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   );
 };
 
-export default OpenProjectPage;
+export default OpenProject;

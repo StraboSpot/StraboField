@@ -8,7 +8,7 @@ import NewProjectForm from './NewProjectForm';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
-const NewProjectPage = ({closeNotebookPanel}) => {
+const NewProject = ({closeNotebookPanel}) => {
   const dispatch = useDispatch();
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(true);
@@ -43,4 +43,4 @@ const NewProjectPage = ({closeNotebookPanel}) => {
   );
 };
 
-export default NewProjectPage;
+export default NewProject;

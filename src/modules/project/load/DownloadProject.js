@@ -10,7 +10,7 @@ import ProjectList from '../ProjectList';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 
 // Download Project
-const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
+const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
@@ -73,4 +73,4 @@ const DownloadProjectPage = ({closeMainMenuPanel, closeNotebookPanel}) => {
   );
 };
 
-export default DownloadProjectPage;
+export default DownloadProject;

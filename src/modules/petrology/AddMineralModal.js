@@ -16,7 +16,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
-import Templates from '../templates/Templates';
+import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const AddMineralModal = () => {
   const dispatch = useDispatch();
@@ -209,7 +209,7 @@ const AddMineralModal = () => {
       showCloseButton={!areMultipleTemplates}
     >
       {!choicesViewKey && isEmpty(selectedTypeIndex) && (
-        <Templates
+        <TemplatesNotebook
           isShowTemplates={isShowTemplates}
           setIsShowTemplates={bool => setIsShowTemplates(bool)}
         />

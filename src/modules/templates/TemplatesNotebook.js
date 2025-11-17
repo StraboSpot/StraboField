@@ -23,13 +23,13 @@ import BasicPageDetail from '../page/BasicPageDetail';
 import {MODAL_KEYS, MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
-const Templates = ({
-                     isShowTemplates,
-                     page = {},
-                     rockKey,
-                     setIsShowTemplates,
-                     typeKey,
-                   }) => {
+const TemplatesNotebook = ({
+                             isShowTemplates,
+                             page = {},
+                             rockKey,
+                             setIsShowTemplates,
+                             typeKey,
+                           }) => {
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const templates = useSelector(state => state.project.project?.templates);
@@ -58,7 +58,7 @@ const Templates = ({
   }
 
   useEffect(() => {
-    console.log('UE Templates [templates, templateKey, typeKey]', templates, templateKey, typeKey);
+    console.log('UE TemplatesNotebook [templates, templateKey, typeKey]', templates, templateKey, typeKey);
     if (templateKey === measurementKey) {
       setIsTemplateInUse(templates.useMeasurementTemplates || false);
       let activeTemplatesTemp = templates.activeMeasurementTemplates || [];
@@ -201,7 +201,7 @@ const Templates = ({
     return (
       <ModalWrapper
         closeModal={closeTemplates}
-        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes Templates'}
+        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes TemplatesNotebook'}
         onActionPressed={() => isShowForm && saveTemplate(notesTemplateFormRef.current.values)}
         onCancelPress={() => setIsShowForm(false)}
         showActionButton={false}
@@ -437,4 +437,4 @@ const Templates = ({
   );
 };
 
-export default Templates;
+export default TemplatesNotebook;

@@ -113,10 +113,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
           {formProps => <Form {...{...formProps, formName: formName}}/>}
         </Formik>
       )}
-      {template?.id && <DeleteButton
-        onPress={handleDeletePressed}
-        title={'Delete Template'}
-      />}
+      {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
 
       {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}

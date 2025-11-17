@@ -4,7 +4,7 @@ import {FlatList, Platform} from 'react-native';
 import DrawGeometryToggles from './DrawGeometryToggles';
 import ShortcutsList from './ShortcutsList';
 
-const AddingNewSpotsPage = () => {
+const AddingNewSpots = () => {
   return (
     <FlatList
       ListHeaderComponent={
@@ -17,4 +17,4 @@ const AddingNewSpotsPage = () => {
   );
 };
 
-export default AddingNewSpotsPage;
+export default AddingNewSpots;
