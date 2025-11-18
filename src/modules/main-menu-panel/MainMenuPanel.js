@@ -38,7 +38,7 @@ import {ReportsMenu} from '../reports';
 import Samples from '../samples/Samples';
 import {SpotsList} from '../spots';
 import {AddRemoveTagFeatures, AddRemoveTagSpots, TagDetailSidePanel, Tags} from '../tags';
-import TemplatesPage from '../templates/TemplatesPage';
+import Templates from '../templates/Templates';
 import UserConventions from '../user/UserConventions';
 import UserProfile from '../user/UserProfile';
 
@@ -91,7 +91,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:
         return <NamingConventions/>;
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES:
-        return <TemplatesPage/>;
+        return <Templates/>;
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.CUSTOM_FEATURE_TYPES:
         return <CustomFeatureTypes/>;
 

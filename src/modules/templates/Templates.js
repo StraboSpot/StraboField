@@ -9,7 +9,7 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
-const TemplatesPage = () => {
+const Templates = () => {
 
   const [isNewTemplateListVisible, setIsNewTemplateListVisible] = useState(false);
   const [templateType, setTemplateType] = useState(null);
@@ -83,4 +83,4 @@ const TemplatesPage = () => {
   );
 };
 
-export default TemplatesPage;
+export default Templates;

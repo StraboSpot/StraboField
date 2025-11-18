@@ -9,7 +9,7 @@ export const MAIN_MENU_ITEMS = {
   },
   CUSTOMIZE_AND_PRESET: {
     NAMING_CONVENTIONS: 'Naming Conventions',
-    TEMPLATES: 'TemplatesNotebook',
+    TEMPLATES: 'Templates',
     CUSTOM_FEATURE_TYPES: 'Custom Feature Types',
     // FORMS_PAGES: 'Forms/Pages',
   },
