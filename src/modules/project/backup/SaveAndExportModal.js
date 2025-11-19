@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
 import moment from 'moment';
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useExport from '../../../services/useExport';
@@ -18,7 +17,6 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   const defaultFileName = selectedFilename || (moment(new Date()).format(
     'YYYY-MM-DD_hmma') + '_' + currentProject.description.project_name).replace(/\s/g, '');
-  const exportFileName = `${defaultFileName}_(EXP-${moment(new Date()).format('YYYY-MM-DD_hmma')})`;
 
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
@@ -42,14 +40,14 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   const exportProject = async () => {
     try {
-      console.log('FileName', exportFileName);
+      console.log('FileName', backupFileName);
       setBackingUpStatus('inProgress');
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Zipping Project' : 'Saving & Zipping Project');
       else setModalTitle(selectedFilename ? 'Exporting Project' : 'Saving & Exporting Project');
       if (!selectedFilename) await initializeBackup(backupFileName);  // Save first
       dispatch(clearedStatusMessages());
-      await zipAndExportProjectFolder(backupFileName, exportFileName, true);
+      await zipAndExportProjectFolder(backupFileName, true);
       setBackingUpStatus('complete');
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
@@ -107,12 +105,11 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   );
 
   const validateFileName = (filenameChanged) => {
-    const regexp = /^[a-zA-Z0-9-_]+$/; // Check for alphanumberic characters, a dash or underscore
-    if (fileName.search(regexp) === -1) setIsFileNameError(true);
-    else {
-      setIsFileNameError(false);
-      setBackupFileName(filenameChanged);
-    }
+    const regexp = /^[a-zA-Z0-9-_]*$/; // Check for alphanumeric characters, a dash or underscore (allow empty)
+    const fileNameWithUnderscores = filenameChanged.replace(/\s/g, '_');
+    if (fileNameWithUnderscores.search(regexp) === -1) setIsFileNameError(true);
+    else setIsFileNameError(false);
+    setBackupFileName(filenameChanged);
   };
 
   return (
@@ -154,7 +151,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
                 backgroundColor: '#fafafa',
               },
             ]}
-            value={backupAction === 'save' ? fileName : exportFileName}
+            value={fileName}
           />
           {isFileNameError && (
             <Text style={{color: 'red', marginBottom: 8, fontSize: 13}}>

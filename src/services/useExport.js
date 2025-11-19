@@ -240,7 +240,7 @@ const useExport = () => {
     }
   };
 
-  const zipAndExportProjectFolder = async (selectedBackupFile, exportedFilename, isBeingExported) => {
+  const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported) => {
     // try {
     // dispatch(setLoadingStatus({view: 'modal', bool: true}));
     await makeDirectory(appExportDirectory + selectedBackupFile);
@@ -266,7 +266,7 @@ const useExport = () => {
     await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
     const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
     const path = await zip(appExportDirectory + selectedBackupFile,
-      zipPath + exportedFilename + '.zip');
+      zipPath + selectedBackupFile + '.zip');
 
     const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
     console.log('Folder', deleteTempFolder);
