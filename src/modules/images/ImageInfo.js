@@ -57,7 +57,7 @@ const ImageInfo = ({
     return (
       <WarningModal
         closeModal={() => setIsImageDeleteModalVisible(false)}
-        confirmText={'Delete'}
+        confirmText={'Delete Image'}
         isVisible={isImageDeleteModalVisible}
         onConfirmPress={onDeleteImage}
         showCancelButton
