@@ -14,7 +14,7 @@ const ActionButton = ({
   return (
     <Button
       buttonStyle={[buttonStyles.standardButton, {
-        backgroundColor: title.includes('Delete') ? WARNING_COLOR : PRIMARY_ACCENT_COLOR,
+        backgroundColor: title?.includes('Delete') ? WARNING_COLOR : PRIMARY_ACCENT_COLOR,
       }]}
       containerStyle={buttonStyles.standardButtonContainer}
       disabled={disabled}
