@@ -1,5 +1,6 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -219,27 +220,6 @@ const useExport = () => {
     }
   };
 
-  const requestWriteDirectoryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: 'Need permission to read Downloads Folder',
-          message:
-            'StraboField needs permission to access your Downloads Folder to save backups,',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) console.log('You can read the folder');
-      else console.log('Folder read permission denied');
-    }
-    catch (err) {
-      console.warn(err);
-    }
-  };
-
   const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported) => {
     // try {
     // dispatch(setLoadingStatus({view: 'modal', bool: true}));
@@ -251,7 +231,6 @@ const useExport = () => {
     // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
     const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
     const destination = appExportDirectory + selectedBackupFile;
-    Platform.OS === 'android' && await requestWriteDirectoryPermission();
     console.log(selectedBackupFile);
 
     const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
@@ -264,13 +243,39 @@ const useExport = () => {
     await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
     console.log('Map tiles copied to:', destination);
     await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
-    const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
-    const path = await zip(appExportDirectory + selectedBackupFile,
-      zipPath + selectedBackupFile + '.zip');
 
-    const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
+    const zipFileName = selectedBackupFile + '.zip';
+
+    if (Platform.OS === 'ios') {
+      // iOS: Zip directly to Distribution folder
+      const zipPath = APP_DIRECTORIES.EXPORT_FILES_IOS;
+      const path = await zip(appExportDirectory + selectedBackupFile, zipPath + zipFileName);
+      console.log(`zip completed at ${path}`);
+    }
+    else {
+      // Android: Zip to private directory first, then copy to Downloads via MediaStore
+      const tempZipPath = appExportDirectory + zipFileName;
+      await zip(appExportDirectory + selectedBackupFile, tempZipPath);
+      console.log(`zip completed at ${tempZipPath}`);
+
+      // Copy to Downloads folder using MediaStore (required for Android 11+)
+      const result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+        {
+          name: zipFileName,
+          parentFolder: 'StraboSpot2/Backups',
+          mimeType: 'application/zip',
+        },
+        'Download',
+        tempZipPath,
+      );
+      console.log('File copied to Downloads:', result);
+
+      // Clean up temp zip file
+      await deleteFromDevice(appExportDirectory, zipFileName);
+    }
+
+    const deleteTempFolder = await deleteFromDevice(appExportDirectory, selectedBackupFile);
     console.log('Folder', deleteTempFolder);
-    console.log(`zip completed at ${path}`);
     console.log('All Done Exporting');
     dispatch(clearedStatusMessages());
     // throw Error('This is an ERROR YEEHAW');
