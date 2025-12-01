@@ -109,6 +109,8 @@ module.exports = (env, argv) => {
         'react-native$': 'react-native-web',
         'react-native-web': path.resolve('node_modules/react-native-web'),
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
+        '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
+          'src/modules/images/react-native-image-resizer.web.js'),
       },
     },
     module: {
