@@ -15,6 +15,6 @@ module.exports = {
     },
   },
   plugins: [
-    '@babel/plugin-proposal-export-namespace-from',
+    '@babel/plugin-transform-export-namespace-from',
   ],
 };
