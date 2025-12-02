@@ -19,7 +19,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
-import Templates from '../templates/Templates';
+import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -130,7 +130,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
               <Text>a new spot.</Text>
             </View>
           )}
-          <Templates
+          <TemplatesNotebook
             isShowTemplates={isShowTemplates}
             page={page}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
@@ -140,7 +140,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
         <>
           {!isShowTemplates && renderCancelSaveButtons()}
           {!isReadOnly && (
-            <Templates
+            <TemplatesNotebook
               isShowTemplates={isShowTemplates}
               page={page}
               setIsShowTemplates={bool => setIsShowTemplates(bool)}

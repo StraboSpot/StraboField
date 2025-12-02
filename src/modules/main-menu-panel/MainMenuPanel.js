@@ -7,7 +7,7 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
-import DailyNotesPage from '../daily-notes/DailyNotesPage';
+import DailyNotes from '../daily-notes/DailyNotes';
 import About from '../help/About';
 import Documentation from '../help/Documentation';
 import IssuesAndRequests from '../help/IssuesAndRequests';
@@ -19,26 +19,26 @@ import ImageBasemapsList from '../maps/ImageBasemapsList';
 import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
-import AddingNewSpotsPage from '../preferences/AddingNewSpotsPage';
+import AddingNewSpots from '../preferences/AddingNewSpots';
 import Miscellaneous from '../preferences/Miscellaneous';
-import ShortcutMenu from '../preferences/ShortcutsList';
-import BackupProjectPage from '../project/backup/BackupProjectPage';
-import ExportProjectPage from '../project/backup/ExportProjectPage';
+import BackupProject from '../project/backup/BackupProject';
+import ExportProject from '../project/backup/ExportProject';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
-import DatasetsPage from '../project/datasets/DatasetsPage';
-import DeleteProjectPage from '../project/delete/DeleteProjectPage';
-import DownloadProjectPage from '../project/load/DownloadProjectPage';
+import Datasets from '../project/datasets/Datasets';
+import DeleteProject from '../project/delete/DeleteProject';
+import DownloadProject from '../project/load/DownloadProject';
 import ImportProjectFromZip from '../project/load/ImportProjectFromZip';
-import NewProjectPage from '../project/load/NewProjectPage';
-import OpenProjectPage from '../project/load/OpenProjectPage';
+import NewProject from '../project/load/NewProject';
+import OpenProject from '../project/load/OpenProject';
 import NamingConventions from '../project/NamingConventions';
 import ProjectDescription from '../project/ProjectDescription';
-import ProjectPrivacyPage from '../project/ProjectPrivacyPage';
+import ProjectPrivacy from '../project/ProjectPrivacy';
 import StraboFieldProjects from '../project/StraboFieldProjects';
 import {ReportsMenu} from '../reports';
-import SamplesMenuItem from '../samples/SamplesMenuItem';
+import Samples from '../samples/Samples';
 import {SpotsList} from '../spots';
 import {AddRemoveTagFeatures, AddRemoveTagSpots, TagDetailSidePanel, Tags} from '../tags';
+import Templates from '../templates/Templates';
 import UserConventions from '../user/UserConventions';
 import UserProfile from '../user/UserProfile';
 
@@ -66,7 +66,8 @@ const MainMenuPanel = forwardRef(({
       <>
         {!isSidePanelVisible
           && (!mainMenuPageVisible
-            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS))
+            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
+              && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
           && <MainMenuPanelHeader/>
         }
         {renderMainMenuList()}
@@ -78,17 +79,19 @@ const MainMenuPanel = forwardRef(({
     switch (mainMenuPageVisible) {
       // Manage Project
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS:
-        return <DatasetsPage/>;
+        return <Datasets/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP:
-        return <BackupProjectPage closeMainMenuPanel={closeMainMenuPanel}/>;
+        return <BackupProject closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
         return <ProjectDescription/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
-        return <ProjectPrivacyPage/>;
+        return <ProjectPrivacy/>;
 
       // Customize & Preset
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:
         return <NamingConventions/>;
+      case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES:
+        return <Templates/>;
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.CUSTOM_FEATURE_TYPES:
         return <CustomFeatureTypes/>;
 
@@ -109,7 +112,7 @@ const MainMenuPanel = forwardRef(({
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.SAMPLES:
         return (
-          <SamplesMenuItem
+          <Samples
             openSpotInNotebook={openSpotInNotebook}
             updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
           />
@@ -123,7 +126,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
         return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
-        return <DailyNotesPage/>;
+        return <DailyNotes/>;
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
@@ -150,7 +153,7 @@ const MainMenuPanel = forwardRef(({
 
       // App Settings
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS:
-        return <AddingNewSpotsPage/>;
+        return <AddingNewSpots/>;
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS:
         return <Miscellaneous/>;
 
@@ -175,19 +178,19 @@ const MainMenuPanel = forwardRef(({
   const renderSidePanelContent = () => {
     switch (sidePanelView) {
       case SIDE_PANEL_VIEWS.DELETE_PROJECT:
-        return <DeleteProjectPage/>;
+        return <DeleteProject/>;
       case SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT:
-        return <DownloadProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
+        return <DownloadProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.EXPORT_PROJECT:
-        return <ExportProjectPage/>;
+        return <ExportProject/>;
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
         return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
-        return <NewProjectPage closeNotebookPanel={closeNotebookPanel}/>;
+        return <NewProject closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
-        return <OpenProjectPage closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
+        return <OpenProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:

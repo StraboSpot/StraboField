@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Dimensions, FlatList, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -26,6 +26,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   const {setOfflineMapTiles} = useMapsOffline();
 
   const [dialogTitle, setDialogTitle] = useState('Map Layers');
+  const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customEndpoint = useSelector(state => state.connections.databaseEndpoint);
@@ -35,6 +36,14 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   useEffect(() => {
     if (customEndpoint.isSelected) setDialogTitle(`Map Layers - ${customEndpoint.endpoint}`);
+  }, [customEndpoint.isSelected, customEndpoint.endpoint]);
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({window}) => {
+      setDimensions(window);
+    });
+
+    return () => subscription?.remove();
   }, []);
 
   const isValidSource = map => map.source === 'mapbox_styles' || map.source === 'strabospot_mymaps';
@@ -289,6 +298,11 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     else return [renderOfflineCustomMapsList(), renderOfflineCustomOverlaysList()];
   };
 
+  const overlayStyle = useMemo(() => ({
+    ...overlayStyles.overlayMapMenuPosition,
+    maxHeight: dimensions.height * 0.80,
+  }), [dimensions.height]);
+
   return (
     <ModalWrapper
       closeModal={onTouchOutside}
@@ -296,7 +310,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
       headerTitle={dialogTitle}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
+      overlayStyleOverride={overlayStyle}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}

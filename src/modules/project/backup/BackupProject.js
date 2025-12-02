@@ -15,8 +15,8 @@ import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisibl
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
 import {setSelectedProject} from '../projects.slice';
 
-const BackupProjectPage = () => {
-  console.log('Rendering BackupProjectPage...');
+const BackupProject = () => {
+  console.log('Rendering BackupProject...');
 
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
@@ -106,4 +106,4 @@ const BackupProjectPage = () => {
   );
 };
 
-export default BackupProjectPage;
+export default BackupProject;

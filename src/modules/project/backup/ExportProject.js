@@ -12,7 +12,7 @@ import SaveAndExportModal from './SaveAndExportModal';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 
 // Export a saved project on device in StraboSpot app directory
-const ExportProjectPage = () => {
+const ExportProject = () => {
   const dispatch = useDispatch();
 
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
@@ -61,4 +61,4 @@ const ExportProjectPage = () => {
   );
 };
 
-export default ExportProjectPage;
+export default ExportProject;

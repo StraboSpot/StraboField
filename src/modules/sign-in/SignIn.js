@@ -7,14 +7,14 @@ import signInStyles from './signIn.styles';
 import useSignIn from './useSignIn';
 import {PASSWORD_TEST, USERNAME_TEST} from '../../../dev-test-logins';
 import * as themes from '../../shared/styles.constants';
-import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR, WHITE} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import {ErrorModal} from '../../shared/ui/modals';
+import uiStyles from '../../shared/ui/ui.styles';
 import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
-import {login} from '../user/userProfile.slice';
 
 const SignIn = ({navigation}) => {
 
@@ -43,7 +43,7 @@ const SignIn = ({navigation}) => {
 
   const handleGuestSignIn = async () => {
     await guestSignIn();
-    dispatch(login());
+    console.log('GUEST SIGN IN');
   };
 
   const handleRegister = () => navigation.navigate('SignUp');
@@ -119,8 +119,9 @@ const SignIn = ({navigation}) => {
           />
           {renderButtons()}
           <CustomEndpoint
-            containerStyles={{width: '70%'}}
-            textStyles={signInStyles.customEndpointText}/>
+            containerStyles={{width: '80%'}}
+            textStyles={{color: WHITE, fontSize: 14, textAlign: 'center'}}
+          />
         </View>
         {renderErrorModal()}
       </View>

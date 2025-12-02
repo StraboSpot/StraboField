@@ -1,13 +1,12 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, PermissionsAndroid, Platform, Text, View} from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
 import {Formik} from 'formik';
-import {Base64} from 'js-base64';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import DeleteProfileModal from './DeleteProfileModal';
 import LogOut from './LogOut';
 import userStyles from './user.styles';
 import {setUserData} from './userProfile.slice';
@@ -16,7 +15,6 @@ import {APP_DIRECTORIES} from '../../services/directories.constants';
 import useDevice from '../../services/useDevice';
 import useDownload from '../../services/useDownload';
 import usePermissions from '../../services/usePermissions';
-import useResetState from '../../services/useResetState';
 import useServerRequests from '../../services/useServerRequests';
 import useUpload from '../../services/useUpload';
 import useUploadImages from '../../services/useUploadImages';
@@ -25,8 +23,7 @@ import {isEmpty} from '../../shared/Helpers';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
-import TextInputModal from '../../shared/ui/TextInputModal';
+import {persistor} from '../../store/ConfigureStore';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
@@ -38,8 +35,6 @@ const UserProfile = () => {
   const userData = useSelector(state => state.user);
   const userEncodedLogin = useSelector(state => state.user.encoded_login);
 
-  const [deleteProfileInputValue, setDeleteProfileInputValue] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteProfileModalVisible, setDeleteProfileModalVisible] = useState(false);
   const [isDeletingProfileImage, setIsDeletingProfileImage] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -48,11 +43,9 @@ const UserProfile = () => {
   const [shouldUpdateImage, setShouldUpdateImage] = useState(false);
   const [tempUserProfileImage, setTempUserProfileImage] = useState(null);
 
-  const navigation = useNavigation();
   const toast = useToast();
-  const {authenticateUser, deleteAccount, deleteProfileImage} = useServerRequests();
+  const {deleteProfileImage} = useServerRequests();
   const {checkPermission} = usePermissions();
-  const {clearUser} = useResetState();
   const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
@@ -75,39 +68,6 @@ const UserProfile = () => {
   };
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
-
-  const handleOnChange = (text) => {
-    if (!isEmpty(errorMessage)) setErrorMessage('');
-    setDeleteProfileInputValue(text);
-  };
-
-  const handleDeleteModalClose = () => {
-    setDeleteProfileModalVisible(false);
-    setDeleteProfileInputValue('');
-    setErrorMessage('');
-  };
-
-  const onDeleteProfile = async () => {
-    console.log(deleteProfileInputValue);
-    if (!isEmpty(deleteProfileInputValue)) {
-      const isAuthenticated = await authenticateUser(userData.email, deleteProfileInputValue);
-      if (isAuthenticated.valid === 'true') {
-        const encodedLogin = Base64.encode(`${userData.email}:${deleteProfileInputValue}`);
-        console.log(encodedLogin);
-        const res = await deleteAccount(encodedLogin);
-        console.log('ACCOUNT DELETED!', res);
-        setDeleteProfileModalVisible(false);
-        clearUser();
-        toast.show('Account Successfully Deleted!', {type: 'success', duration: 2000});
-        setTimeout(() => navigation.navigate('SignIn'), 200);
-      }
-      else {
-        setErrorMessage('Wrong password');
-        setDeleteProfileInputValue('');
-      }
-    }
-    else setErrorMessage('Need to enter your password');
-  };
 
   const onDownloadUserProfile = async () => {
     setIsDownloading(true);
@@ -158,34 +118,6 @@ const UserProfile = () => {
       setIsDeletingProfileImage(false);
       closeProfileImageModal();
     }
-  };
-
-  const renderDeleteProfileModal = () => {
-    const deleteModalText = (
-      <View>
-        <Text style={userStyles.deleteProfileText}>
-          Deleting your account will<Text style={overlayStyles.importantText}> PERMANENTLY </Text>
-          remove all data for user{'\n'}{userData.email}{'\n'}from StraboSpot!
-        </Text>
-        <Text style={userStyles.deleteProfileText}>Enter password to delete:</Text>
-      </View>
-    );
-    const offlineText = <Text style={userStyles.deleteProfileText}>You must be online in order to delete your
-      account.</Text>;
-
-    return (
-      <TextInputModal
-        buttonText={'DELETE'}
-        dialogTitle={'DANGER!'}
-        errorMessage={errorMessage}
-        onActionPressed={onDeleteProfile}
-        onCancelPress={handleDeleteModalClose}
-        onChangeText={text => handleOnChange(text)}
-        textAboveInput={isOnline.isInternetReachable ? deleteModalText : offlineText}
-        value={deleteProfileInputValue}
-        visible={isDeleteProfileModalVisible}
-      />
-    );
   };
 
   const renderProfileImageModal = () => {
@@ -269,6 +201,11 @@ const UserProfile = () => {
     }
   };
 
+  const purgeRedux = async () => {
+    await persistor.purge(); // Use this to clear persistStore completely
+    console.log('Redux store purged');
+  };
+
   return (
     <>
       <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
@@ -308,6 +245,10 @@ const UserProfile = () => {
                     onPress={() => setDeleteProfileModalVisible(true)}
                     title={'Delete Account'}
                   />
+                  {__DEV__ && <OutlineButton
+                    onPress={purgeRedux}
+                    title={'Purge Redux Store'}
+                  />}
                 </View>
               ) : (
                 <Text style={commonStyles.noValueText}>
@@ -315,7 +256,12 @@ const UserProfile = () => {
                 </Text>
               )}
               {renderProfileImageModal()}
-              {renderDeleteProfileModal()}
+              <DeleteProfileModal
+                email={userData.email}
+                isDeleteProfileModalVisible={isDeleteProfileModalVisible}
+                isOnline={isOnline}
+                setDeleteProfileModalVisible={val => setDeleteProfileModalVisible(val)}
+              />
             </>
           }
         />

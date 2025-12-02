@@ -20,7 +20,7 @@ import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 import useSed from '../sed/useSed';
-import Templates from '../templates/Templates';
+import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const AddRockModal = ({modalKey}) => {
   const dispatch = useDispatch();
@@ -145,7 +145,7 @@ const AddRockModal = ({modalKey}) => {
           />
         )}
         {!choicesViewKey && (
-          <Templates
+          <TemplatesNotebook
             isShowTemplates={isShowTemplates}
             rockKey={rockKey}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}

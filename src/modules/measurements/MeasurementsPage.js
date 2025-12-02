@@ -251,7 +251,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const renderMeasurementsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
+        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>

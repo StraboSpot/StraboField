@@ -4,6 +4,7 @@ import {Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {tagsStyles} from './index';
+import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
 import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
@@ -245,11 +246,9 @@ const useTags = () => {
   const renderTagInfo = () => {
     let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
     if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
-    const subtypeFields = ['other_concept_type', 'other_documentation_type', 'concept_type', 'documentation_type'];
-    const subTypeField = subtypeFields.find(subtype => selectedTag[subtype]);
+    const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
     const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
-    const rockUnitFields = ['unit_label_abbreviation', 'map_unit_name', 'member_name', 'rock_type'];
-    let rockUnitString = rockUnitFields.reduce((acc, field) => {
+    let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
       if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
       else return acc;
     }, []);

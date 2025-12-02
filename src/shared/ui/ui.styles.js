@@ -57,20 +57,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   customEndpointContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   customEndpointSwitchContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 10,
-    width: '75%',
+    justifyContent: 'space-between',
   },
   customEndpointText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: MEDIUM_TEXT_SIZE,
-    marginEnd: 30,
-    textAlign: 'center',
   },
   customEndpointVerifyButtonContainer: {
     alignItems: 'center',
@@ -84,7 +81,6 @@ const styles = StyleSheet.create({
   customEndpointVerifyInputContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '70%',
   },
   headerContainer: {
     alignItems: 'center',

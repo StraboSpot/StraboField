@@ -14,7 +14,7 @@ import {PAGE_KEYS} from '../page/page.constants';
 import {SpotsListItem, useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
-const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
 
   const activeSpotsObj = getActiveSpotsObj();
@@ -139,4 +139,4 @@ const SamplesMenuItem = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   );
 };
 
-export default SamplesMenuItem;
+export default Samples;

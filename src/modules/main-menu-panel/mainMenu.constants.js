@@ -9,8 +9,8 @@ export const MAIN_MENU_ITEMS = {
   },
   CUSTOMIZE_AND_PRESET: {
     NAMING_CONVENTIONS: 'Naming Conventions',
+    TEMPLATES: 'Templates',
     CUSTOM_FEATURE_TYPES: 'Custom Feature Types',
-    // TEMPLATES: 'Templates',
     // FORMS_PAGES: 'Forms/Pages',
   },
   PROJECT_DATA: {

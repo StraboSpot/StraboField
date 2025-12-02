@@ -12,7 +12,7 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 // Delete a project on device in StraboSpot app directory
-const DeleteProjectPage = () => {
+const DeleteProject = () => {
   const dispatch = useDispatch();
 
   const [doReloadPage, setDoReloadPage] = useState(false);
@@ -70,4 +70,4 @@ const DeleteProjectPage = () => {
   );
 };
 
-export default DeleteProjectPage;
+export default DeleteProject;

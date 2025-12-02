@@ -5,6 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
+import {TAG_SECTIONS} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -28,14 +29,8 @@ const TagsList = ({type, selectedIndex}) => {
   const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
-  const SECTIONS = type === PAGE_KEYS.GEOLOGIC_UNITS ? [{title: 'Geologic Units', key: 'geologic_unit'}] : [
-    {title: 'Concepts', key: 'concept'},
-    {title: 'Documentation', key: 'documentation'},
-    {title: 'Rosetta', key: 'rosetta'},
-    {title: 'Experimental Apparatus', key: 'experimental_apparatus'},
-    {title: 'Other', key: 'other'},
-    {title: 'No Type Specified', key: undefined},
-  ];
+  const SECTIONS = type === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_SECTIONS.GEOLOGIC_UNITS
+    : TAG_SECTIONS.DEFAULT;
 
   const getTagTitle = tag => tag.name || '';
 

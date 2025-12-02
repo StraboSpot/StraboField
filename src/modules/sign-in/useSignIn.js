@@ -22,6 +22,7 @@ const useSignIn = () => {
     Sentry.setUser({'id': 'GUEST'});
     if (!isEmpty(userEmail)) clearUser();
     console.log('Loading user: GUEST');
+    dispatch(login());
     setTimeout(() => isEmpty(currentProjectId) && dispatch(setIsProjectLoadSelectionModalVisible(true)), 500);
   };
 

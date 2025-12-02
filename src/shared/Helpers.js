@@ -18,6 +18,34 @@ export const isEmpty = (value) => {
   return false;
 };
 
+export const convertSliderValueToMilliseconds = (sliderValue) => {
+  const timeMap = {
+    0: 2 * 60 * 1000,     // 2 min = 120,000 ms
+    1: 5 * 60 * 1000,     // 5 min = 300,000 ms
+    2: 20 * 60 * 1000,    // 20 min = 1,200,000 ms
+    3: 40 * 60 * 1000,    // 40 min = 2,400,000 ms
+    4: null,              // 'ON' = no timeout
+  };
+
+  return timeMap[sliderValue];
+};
+
+export const convertMillisecondsToTime = (milliseconds) => {
+  const seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(milliseconds / (1000 * 60));
+
+  if (minutes >= 1) {
+    return `${minutes} min`;
+  }
+  else if (seconds >= 1) {
+    return `${seconds} sec`;
+  }
+  else {
+    return 'No Limit';
+  }
+};
+
+
 // Parsing CSV Strings With Javascript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
 export const csvToArray = (strData, strDelimiter) => {

@@ -27,7 +27,7 @@ import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
-import Templates from '../templates/Templates';
+import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const AddMeasurementModal = ({onPress}) => {
   const dispatch = useDispatch();
@@ -209,7 +209,7 @@ const AddMeasurementModal = ({onPress}) => {
           />
         )}
         {!isSelectedAttitude && (
-          <Templates
+          <TemplatesNotebook
             isShowTemplates={isShowTemplates}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
             typeKey={typeKey}

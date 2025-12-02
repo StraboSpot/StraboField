@@ -342,7 +342,10 @@ const BasicPageDetail = ({
                 save={saveButtonOnPress}
               />
             )}
-            <FlatList ListHeaderComponent={renderFormFields()}/>
+            <FlatList
+              ListHeaderComponent={renderFormFields()}
+              contentContainerStyle={{paddingBottom: 200}}
+            />
           </>
         )}
         {/*{isIGSNModalVisible && (*/}

@@ -1,20 +1,20 @@
 import React from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Platform} from 'react-native';
 
 import DrawGeometryToggles from './DrawGeometryToggles';
 import ShortcutsList from './ShortcutsList';
 
-const AddingNewSpotsPage = () => {
+const AddingNewSpots = () => {
   return (
     <FlatList
       ListHeaderComponent={
         <>
           <ShortcutsList/>
-          <DrawGeometryToggles/>
+          {Platform.OS !== 'web' && <DrawGeometryToggles/>}
         </>
       }
     />
   );
 };
 
-export default AddingNewSpotsPage;
+export default AddingNewSpots;

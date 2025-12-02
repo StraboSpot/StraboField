@@ -12,7 +12,7 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 
-const DailyNotesPage = () => {
+const DailyNotes = () => {
   const dispatch = useDispatch();
 
   const dailyNotes = useSelector(state => state.project.project?.description?.daily_setup) || [];
@@ -61,4 +61,4 @@ const DailyNotesPage = () => {
   );
 };
 
-export default DailyNotesPage;
+export default DailyNotes;

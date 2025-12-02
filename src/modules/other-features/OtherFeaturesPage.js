@@ -50,26 +50,29 @@ const OtherFeaturesPage = ({isReadOnly}) => {
     );
   };
 
-  return (
-    <>
-      {!isFeatureDetailVisible && (
-        <View>
-          <NotebookPageHeader
-            onPressAdd={addFeature}
-            pageTitle={'Other Features'}
-            showAddButton={!isReadOnly}
-            showFeaturesTagButton={!isReadOnly}
-          />
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
-            data={spot.properties.other_features}
-            keyExtractor={item => item.id.toString()}
-            renderItem={item => renderFeature(item.item)}
-          />
-        </View>
-      )}
-      {isFeatureDetailVisible && (
+  const renderFeaturesList = () => {
+    return (
+      <View style={{flex: 1}}>
+        <NotebookPageHeader
+          onPressAdd={addFeature}
+          pageTitle={'Other Features'}
+          showAddButton={!isReadOnly}
+          showFeaturesTagButton={!isReadOnly}
+        />
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
+          data={spot.properties.other_features}
+          keyExtractor={item => item.id.toString()}
+          renderItem={item => renderFeature(item.item)}
+        />
+      </View>
+    );
+  };
+
+  const renderFeatureDetail = () => {
+    return (
+      <>
         <OtherFeatureDetail
           featureTypes={otherFeatures}
           hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
@@ -77,7 +80,13 @@ const OtherFeaturesPage = ({isReadOnly}) => {
           renderFeature={feature => renderFeature(feature)}
           selectedFeature={selectedFeature}
         />
-      )}
+      </>
+    );
+  };
+
+  return (
+    <>
+      {isFeatureDetailVisible ? renderFeatureDetail() : renderFeaturesList()}
     </>
   );
 };

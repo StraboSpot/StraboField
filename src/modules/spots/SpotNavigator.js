@@ -13,7 +13,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import styles from '../../shared/ui/ui.styles';
 import {ImageGallery} from '../images';
 import {ReportsList} from '../reports';
-import SamplesMenuItem from '../samples/SamplesMenuItem';
+import Samples from '../samples/Samples';
 
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {
   console.log('Rendering SpotsNavigator...');
@@ -57,7 +57,7 @@ const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebo
       {pickerKey === pickerKeys.SPOTS && <SpotsList onPress={openSpotInNotebook}/>}
       {pickerKey === pickerKeys.IMAGES && <ImageGallery openSpotInNotebook={openSpotInNotebook}/>}
       {pickerKey === pickerKeys.SAMPLES && (
-        <SamplesMenuItem
+        <Samples
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebookFromNavigator}
         />
