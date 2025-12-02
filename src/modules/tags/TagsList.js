@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
-import {TAG_SECTIONS} from './tags.constants';
+import {TAG_SECTIONS, TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -77,7 +77,7 @@ const TagsList = ({type, selectedIndex}) => {
     else {
       tagsInMapExtent = tags.filter((tag) => {
         return tag.spots && !isEmpty(tag.spots.find(spotId => spotsInMapExtentIds?.includes(spotId)))
-          && tag.type !== 'geologic_unit';
+          && tag.type !== TAG_TYPES.GEOLOGIC_UNIT;
       });
     }
     console.log('tagsInMapExtent', tagsInMapExtent);

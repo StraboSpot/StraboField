@@ -25,3 +25,43 @@ export const TAG_ROCK_UNIT_FIELDS = [
   'member_name',
   'rock_type',
 ];
+
+// Tag Types
+export const TAG_TYPES = {
+  GEOLOGIC_UNIT: 'geologic_unit',
+  CONCEPT: 'concept',
+};
+
+// Form Names
+export const TAG_FORM_NAMES = {
+  GEOLOGIC_UNIT: ['project', 'geologic_unit'],
+  TAGS: ['project', 'tags'],
+};
+
+// Export/Import Messages
+export const TAG_EXPORT_MESSAGES = {
+  TITLE: {
+    GEOLOGIC_UNITS: 'Geologic Units',
+    TAGS: 'Tags',
+  },
+  STATUS: {
+    ZIPPING: 'Zipping ',
+    EXPORTING: 'Exporting ',
+    ZIPPED: ' Zipped',
+    EXPORTED: ' Exported to Zip!',
+    FAILED: 'Export Failed!',
+  },
+};
+
+// Backup Actions
+export const TAG_BACKUP_ACTIONS = {
+  EXPORT_GEOLOGIC_UNITS: 'exportGeologicUnits',
+  EXPORT_TAGS: 'exportTags',
+};
+
+// Backup Status
+export const TAG_BACKUP_STATUS = {
+  IN_PROGRESS: 'inProgress',
+  COMPLETE: 'complete',
+  ERROR: 'error',
+};

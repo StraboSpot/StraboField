@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 import RNFS from 'react-native-fs';
 
 const devicePath = RNFS.DocumentDirectoryPath;
-const exportPath =  Platform.OS === 'ios' ? devicePath : RNFS.DownloadDirectoryPath + '/StraboSpot2';
+const exportPath = Platform.OS === 'ios' ? devicePath : RNFS.DownloadDirectoryPath + '/StraboSpot2';
 const androidDownloadsPath = RNFS.DownloadDirectoryPath + '/StraboSpot2/Backups/'; //Android Only
 const androidExportPath = devicePath + '/AndroidExportFiles/';
 // const appDirectoryForDistributedBackups = Platform.OS === 'ios' ? devicePath + /ProjectBackups/ : androidBackupPath + '/StraboSpot2/ProjectBackups/';
