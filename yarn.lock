@@ -3676,9 +3676,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.1.39":
-  version: 10.1.39
-  resolution: "@rnmapbox/maps@npm:10.1.39"
+"@rnmapbox/maps@npm:10.1.45":
+  version: 10.1.45
+  resolution: "@rnmapbox/maps@npm:10.1.45"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -3686,7 +3686,7 @@ __metadata:
     "@turf/length": "npm:6.5.0"
     "@turf/nearest-point-on-line": "npm:6.5.0"
     "@types/geojson": "npm:^7946.0.7"
-    debounce: "npm:^1.2.0"
+    debounce: "npm:^2.2.0"
   peerDependencies:
     expo: ">=47.0.0"
     mapbox-gl: ^2.9.0
@@ -3700,7 +3700,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/3f4d78f90f43e1d6477ebcd543ee23d301ab7aed82c99902102837945063e6338ad09bfbaf5a402c939d97b5fa55201bb81ff64f738ce4bed6678a2cb213bca5
+  checksum: 10c0/2905268614836f772bc5be3bdf49082f390237f13ad9ebe07ddb8c30d7e2d83edf4afe9aee03e39f2d40104117401ea193dd36054fa966475fb90b87f470b8ee
   languageName: node
   linkType: hard
 
@@ -8478,10 +8478,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debounce@npm:^1.2.0":
-  version: 1.2.1
-  resolution: "debounce@npm:1.2.1"
-  checksum: 10c0/6c9320aa0973fc42050814621a7a8a78146c1975799b5b3cc1becf1f77ba9a5aa583987884230da0842a03f385def452fad5d60db97c3d1c8b824e38a8edf500
+"debounce@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "debounce@npm:2.2.0"
+  checksum: 10c0/684536fe9a04c9eea46cf02f119f69aa4071813ba25b9b43370e1503ea60b34fd38d694c7145fa2be504f9d40e7e39354cb9ed155c70954a0eefa391aefe271c
   languageName: node
   linkType: hard
 
@@ -15657,7 +15657,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:2.7.0"
     "@rn-vui/base": "npm:5.1.3"
     "@rn-vui/themed": "npm:5.1.3"
-    "@rnmapbox/maps": "npm:10.1.39"
+    "@rnmapbox/maps": "npm:10.1.45"
     "@sentry/cli": "npm:2.41.1"
     "@sentry/react-native": "npm:^7.4.0"
     "@sentry/tracing": "npm:7.120.3"
