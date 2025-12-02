@@ -80,9 +80,7 @@ const useMapFeaturesDraw = ({
 
   useEffect(() => {
     // console.log('UE useMapFeaturesDraw [drawFeatures]');
-    if ((mapMode === MAP_MODES.DRAW.POINT || mapMode === MAP_MODES.DRAW.SAMPLE) && drawFeatures.length === 1) {
-      onEndDrawPressed();
-    }
+    if ((mapMode === MAP_MODES.DRAW.POINT) && drawFeatures.length === 1) onEndDrawPressed();
   }, [drawFeatures]);
 
   useEffect(() => {
@@ -494,7 +492,6 @@ const useMapFeaturesDraw = ({
       else if (selectingMode === 'stereonet') await getStereonetForFeature(newFeature);
       else if (selectingMode === 'tag') selectSpotsForTagging(newFeature);
       else {
-        if (mapMode === MAP_MODES.DRAW.SAMPLE) newFeature.properties.isSample = true;
         newOrEditedSpot = await createSpot(newFeature);
         dispatch(setSelectedSpot(newOrEditedSpot));
       }

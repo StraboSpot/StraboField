@@ -35,10 +35,4 @@ export const DRAW_ACTION_IMAGES = {
     ICON: require('../../../assets/icons/EditShape.png'),
     ICON_PRESSED: require('../../../assets/icons/EditShape_pressed.png'),
   },
-  SAMPLE: {
-    BUTTON_POINT: require('../../../assets/icons/SampleSpotButton.png'),
-    BUTTON_POINT_PRESSED: require('../../../assets/icons/SampleSpotButton_pressed.png'),
-    POINT_ICON: require('../../../assets/icons/SampleSpot.png'),
-    ICON_PRESSED: require('../../../assets/icons/SampleSpot_pressed.png'),
-  },
 };

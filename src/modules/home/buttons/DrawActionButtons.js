@@ -15,7 +15,6 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
     handleEditShapePressed,
     handleLinePressed,
     handlePointPressed,
-    handlePointSamplePressed,
     handlePolygonPressed,
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
@@ -39,12 +38,6 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
         onLongPress={handlePolygonLongPressed}
         onPress={handlePolygonPressed}
         source={getImageSource(MAP_MODES.DRAW.POLYGON)}
-      />
-      <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-        // onLongPress={handlePointLongPressed}
-        onPress={handlePointSamplePressed}
-        source={getImageSource(MAP_MODES.DRAW.SAMPLE)}
       />
       <IconButton
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}

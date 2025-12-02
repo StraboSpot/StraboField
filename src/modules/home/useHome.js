@@ -54,7 +54,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
       case MAP_MODES.DRAW.FREEHANDPOLYGON:
       case MAP_MODES.DRAW.FREEHANDLINE:
       case MAP_MODES.DRAW.POINTLOCATION:
-      case MAP_MODES.DRAW.SAMPLE:
         setSelectingMode(null);
         dispatch(clearedSelectedSpots());
         const targetDataset = getTargetDatasetFromId();
