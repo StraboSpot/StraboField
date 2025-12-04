@@ -13,7 +13,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 
-const NotebookFooter = ({openPage}) => {
+const NotebookFooter = ({openPage, isSample}) => {
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
@@ -22,7 +22,8 @@ const NotebookFooter = ({openPage}) => {
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
   const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
-  const pagesToShow = [...getRelevantGeneralPages(), ...getRelevantPetPages(), ...getRelevantSedPages()];
+  const pagesToShow = [...getRelevantGeneralPages(isSample), ...getRelevantPetPages(isSample), ...getRelevantSedPages(
+    isSample)];
   const notebookPagesValidOn = notebookPagesOn.filter(i => pagesToShow.find(p => p.key === i));
 
   const getPageIcon = (key) => {
@@ -50,6 +51,7 @@ const NotebookFooter = ({openPage}) => {
       </View>
       <MorePagesMenu
         closeMorePagesMenu={() => setIsMorePagesMenuVisible(false)}
+        isSample={isSample}
         visible={isMorePagesMenuVisible}
       />
     </>

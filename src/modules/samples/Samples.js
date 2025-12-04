@@ -2,19 +2,21 @@ import React, {useState} from 'react';
 import {SectionList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
+import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
 import {SpotsListItem, useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+  const spots = useSelector(state => state.spot.spots);
+
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
 
   const activeSpotsObj = getActiveSpotsObj();
@@ -41,18 +43,23 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const renderSample = (sample, spot) => {
     if (spot) {
+      let sampleName = sample.sample_id_name || 'Unknown';
+      const samp = spots[sample.id];
+      if (!isEmpty(samp) && samp.properties?.name) sampleName = samp.properties.name;
+
       return (
         <ListItem
           containerStyle={commonStyles.listItem}
           key={sample.id}
-          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])}
+          onPress={() => isEmpty(samp) ? openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])
+            : openSpotInNotebook(samp, PAGE_KEYS.OVERVIEW, [sample])}
         >
           <AvatarWrapper
             size={20}
             source={getEmbeddedSampleAvatarSource(spot)}
           />
           <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>
+            <ListItem.Title style={commonStyles.listItemTitle}>{sampleName}</ListItem.Title>
           </ListItem.Content>
           <ListItem.Chevron/>
         </ListItem>
@@ -70,12 +77,13 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderSamplesList = () => {
-    let sortedSpotsWithSamples = spotsSorted.filter(spot => !isEmpty(spot.properties.samples));
-    const activeSampleSpots = spotsSorted.filter(spot => !isEmpty(spot.properties.isSample));
-    sortedSpotsWithSamples = sortedSpotsWithSamples.filter((spot) => {
-      const activeSampleSpotsIds = activeSampleSpots.map(ss => ss.properties.id);
-      return !activeSampleSpotsIds.includes(spot.properties.id);
-    });
+    let sortedSpotsWithSamples = spotsSorted.filter(
+      spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
+    // const activeSampleSpots = spotsSorted.filter(spot => !isEmpty(spot.properties.isSample));
+    // sortedSpotsWithSamples = sortedSpotsWithSamples.filter((spot) => {
+    //   const activeSampleSpotsIds = activeSampleSpots.map(ss => ss.properties.id);
+    //   return !activeSampleSpotsIds.includes(spot.properties.id);
+    // });
     if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
     let count = 0;
     let dataSectioned = sortedSpotsWithSamples.map((s) => {
@@ -83,10 +91,10 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       return {title: s.properties.name, data: s.properties.samples, spot: s};
     });
     let sampleSpotsCount = 0;
-    if (!isEmpty(activeSampleSpots)) {
-      dataSectioned = [{data: isReverseSort ? activeSampleSpots.reverse() : activeSampleSpots}, ...dataSectioned];
-      sampleSpotsCount = activeSampleSpots.length;
-    }
+    // if (!isEmpty(activeSampleSpots)) {
+    //   dataSectioned = [{data: isReverseSort ? activeSampleSpots.reverse() : activeSampleSpots}, ...dataSectioned];
+    //   sampleSpotsCount = activeSampleSpots.length;
+    // }
     const totalSamplesCount = count + sampleSpotsCount;
 
     return (
@@ -101,9 +109,9 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
         <View style={{flex: 1}}>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample: ' : ' samples: ')}
-            {sampleSpotsCount} independent{(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}
-            and {count + (count === 1 ? ' sample' : ' samples')} embedded within Spots
+            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample ' : ' samples ')}
+            {/*{sampleSpotsCount} independent{(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}*/}
+            {/*and {count + (count === 1 ? ' sample' : ' samples')} embedded within Spots*/}
           </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -129,7 +137,7 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
       );
     }
-    else return <SectionDivider dividerText={'Independent Samples'}/>;
+    // else return <SectionDivider dividerText={'Independent Samples'}/>;
   };
 
   return (

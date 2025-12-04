@@ -387,9 +387,22 @@ const useSpots = () => {
     });
   };
 
+  const getSampleSpotGeometryIconSource = (spot) => {
+    if (spot?.geometry?.type === 'Point') {
+      return require('../../assets/icons/Sample_in_point_pressed_round.png');
+    }
+    else if (spot?.geometry?.type === 'LineString') {
+      return require('../../assets/icons/Sample_in_line_pressed_round.png');
+    }
+    else if (spot?.geometry?.type === 'Polygon' || spot?.geometry?.type === 'GeometryCollection') {
+      return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
+    }
+    else return require('../../assets/icons/QuestionMark_pressed.png');
+  };
+
+
   const getSpotGeometryIconSource = (spot) => {
-    if (spot?.properties?.isSample) return require('../../assets/icons/SampleSpot_pressed_round.png');
-    else if (spot?.geometry?.type === 'Point') {
+    if (spot?.geometry?.type === 'Point') {
       if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePoint_pressed.png');
       else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratPoint_pressed.png');
       else return require('../../assets/icons/Point_pressed.png');
@@ -412,6 +425,11 @@ const useSpots = () => {
       const spotFound = spot.properties?.images?.find(image => image.id === imageBasemapId);
       return spotFound ? spot : undefined;
     });
+  };
+
+  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
+  const getSpotWithThisSample = (sampleId) => {
+    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
   };
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
@@ -555,19 +573,21 @@ const useSpots = () => {
     createRandomSpots: createRandomSpots,
     createSpot: createSpot,
     deleteSpot: deleteSpot,
+    getActiveImageBasemaps: getActiveImageBasemaps,
     getActiveSpotsObj: getActiveSpotsObj,
     getAllFeaturesFromSpot: getAllFeaturesFromSpot,
     getImageBasemapBySpot: getImageBasemapBySpot,
-    getActiveImageBasemaps: getActiveImageBasemaps,
     getIntervalSpotsThisStratSection: getIntervalSpotsThisStratSection,
     getMappableSpots: getMappableSpots,
     getNewSpotName: getNewSpotName,
     getRecentSpots: getRecentSpots,
     getRootSpot: getRootSpot,
+    getSampleSpotGeometryIconSource: getSampleSpotGeometryIconSource,
     getSpotById: getSpotById,
     getSpotByImageId: getSpotByImageId,
     getSpotGeometryIconSource: getSpotGeometryIconSource,
     getSpotWithThisImageBasemap: getSpotWithThisImageBasemap,
+    getSpotWithThisSample: getSpotWithThisSample,
     getSpotWithThisStratSection: getSpotWithThisStratSection,
     getSpotsByIds: getSpotsByIds,
     getSpotsInMapExtent: getSpotsInMapExtent,

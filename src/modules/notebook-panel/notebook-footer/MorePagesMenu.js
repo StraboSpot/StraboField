@@ -17,17 +17,17 @@ import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from
 
 const MorePagesMenu = ({
                          closeMorePagesMenu,
+                         isSample,
                          visible,
                        }) => {
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
-  const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
-  const generalPagesToShow = getRelevantGeneralPages();
-  const petPagesToShow = getRelevantPetPages();
-  const sedPagesToShow = getRelevantSedPages();
+  const generalPagesToShow = getRelevantGeneralPages(isSample);
+  const petPagesToShow = getRelevantPetPages(isSample);
+  const sedPagesToShow = getRelevantSedPages(isSample);
 
   const switchPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -55,7 +55,7 @@ const MorePagesMenu = ({
               source={page.icon_src}
             />
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>
-              {page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Sample Metadata' : page.label}
+              {page.key === PAGE_KEYS.SAMPLES && isSample ? 'Sample Metadata' : page.label}
             </ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
@@ -69,7 +69,7 @@ const MorePagesMenu = ({
   return (
     <ModalWrapper
       closeModal={closeMorePagesMenu}
-      headerTitle={'More Pages'}
+      headerTitle={isSample ? 'More Sample Pages' : 'More Pages'}
       isVisible={visible}
       onBackdropPress={closeMorePagesMenu}
       overlayStyleOverride={footerStyles.morePagesDialog}

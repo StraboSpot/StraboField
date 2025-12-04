@@ -3,6 +3,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import useServerRequests from '../../services/useServerRequests';
 import {isEmpty} from '../../shared/Helpers';
 import useForm from '../form/useForm';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {PAGE_KEYS} from '../page/page.constants';
+import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import useProject from '../project/useProject';
+import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 import {setSesarToken} from '../user/userProfile.slice';
 
 const parseString = require('react-native-xml2js').parseString;
@@ -11,6 +16,7 @@ const useSamples = () => {
   const formName = ['general', 'samples'];
   const dispatch = useDispatch();
 
+  const {getTargetDatasetFromId} = useProject();
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
   const {name, sesar} = useSelector(state => state.user);
@@ -69,6 +75,43 @@ const useSamples = () => {
       }
       return acc;
     }, {});
+  };
+
+  // Create new Sample Spot
+  const createEnrichedSample = async (spot, selectedSample) => {
+    let d = new Date(Date.now());
+    d.setMilliseconds(0);
+    const newEnrichedSample = {
+      geometry: spot.geometry,
+      properties: {
+        date: d.toISOString(),
+        id: selectedSample.id,
+        isSample: true,
+        modified_timestamp: Date.now(),
+        name: selectedSample.sample_id_name,
+        samples: [selectedSample],
+        time: d.toISOString(),
+      },
+      type: 'Feature',
+    };
+
+    console.log('Creating new Enriched Sample:', newEnrichedSample);
+    const targetDataset = getTargetDatasetFromId();
+    dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
+    dispatch(editedOrCreatedSpot(newEnrichedSample));
+
+    // Modify current sample in Spot object to only have id of new Sample Spot
+    let editedSample = {id: selectedSample.id};
+    let samplesCopy = JSON.parse(JSON.stringify(spot.properties[PAGE_KEYS.SAMPLES]));
+    console.log('Saving Sample data', editedSample, 'to Spot samples:', samplesCopy);
+    samplesCopy = samplesCopy.filter(f => f.id !== selectedSample.id);
+    samplesCopy.push(editedSample);
+    const spotId = spot.properties.id;
+    dispatch(updatedModifiedTimestampsBySpotsIds([newEnrichedSample.properties.id, spotId]));
+    dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samplesCopy, spotId: spotId}));
+
+    dispatch(setSelectedSpot(newEnrichedSample));
+    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
   const getAndSaveSesarCode = async (sesarTokens) => {
@@ -240,6 +283,7 @@ const useSamples = () => {
 
   return {
     authenticateWithSesar: authenticateWithSesar,
+    createEnrichedSample: createEnrichedSample,
     getAndSaveSesarCode: getAndSaveSesarCode,
     onSampleFormChange: onSampleFormChange,
     straboSesarMapping: straboSesarMapping,

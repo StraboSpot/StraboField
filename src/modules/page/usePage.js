@@ -98,29 +98,26 @@ const usePage = () => {
     return populatedPagesKeys;
   };
 
-  const getRelevantGeneralPages = () => {
+  const getRelevantGeneralPages = (isSample) => {
     return [...PRIMARY_PAGES, ...SECONDARY_PAGES].reduce((acc, page) => {
       return ((!page.testing || (isTestingMode && page?.testing))
-        && (!selectedSpot.properties?.isSample
-          || (selectedSpot.properties?.isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
     }, []);
   };
 
-  const getRelevantPetPages = () => {
+  const getRelevantPetPages = (isSample) => {
     const petPagesWithSedRocks = [...PET_PAGES.slice(0, 3), SED_PAGES[0], ...PET_PAGES.slice(3, PET_PAGES.length)];
     return petPagesWithSedRocks.reduce((acc, page) => {
       return ((!page.testing || (isTestingMode && page?.testing))
-        && (!selectedSpot.properties?.isSample
-          || (selectedSpot.properties?.isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
     }, []);
   };
 
-  const getRelevantSedPages = () => {
+  const getRelevantSedPages = (isSample) => {
     const sedPagesWithoutSedRocks = [...SED_PAGES.slice(1, SED_PAGES.length)];
     return sedPagesWithoutSedRocks.reduce((acc, page) => {
       if ((!page.testing || (isTestingMode && page?.testing))
-        && (!selectedSpot.properties?.isSample
-          || (selectedSpot.properties?.isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))
         && (page.key !== PAGE_KEYS.STRAT_SECTION
           || (page.key === PAGE_KEYS.STRAT_SECTION
             && selectedSpot.properties?.surface_feature?.surface_feature_type !== 'strat_interval'

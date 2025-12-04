@@ -4,22 +4,23 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SamplesList from './SamplesList';
+import useSamples from './useSamples';
 import {isEmpty} from '../../shared/Helpers';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import Overview from '../page/Overview';
 import {PAGE_KEYS} from '../page/page.constants';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
-const SamplesPage = ({isReadOnly, page}) => {
+const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedSample, setSelectedSample] = useState({});
+  const {createEnrichedSample} = useSamples();
 
   useEffect(() => {
     console.log('UE SamplesPage []');
@@ -30,38 +31,54 @@ const SamplesPage = ({isReadOnly, page}) => {
     console.log('UE SamplesPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (spot.properties?.isSample && spot.properties?.samples?.length > 0) {
       setSelectedSample(spot.properties.samples[0]);
-      setIsDetailView(true);
     }
     else if (isEmpty(selectedAttributes)) setSelectedSample({});
     else {
       setSelectedSample(selectedAttributes[0]);
-      setIsDetailView(true);
     }
   }, [selectedAttributes, spot]);
 
   const closeDetailView = () => {
     if (spot.properties?.isSample) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     console.log('closeDetailView');
-    setIsDetailView(false);
+    setSelectedSample({});
   };
 
-  const editSample = (sample) => {
-    setIsDetailView(true);
-    setSelectedSample(sample);
-    dispatch(setModalVisible({modal: null}));
+  const editSample = (sampleToEdit) => {
+    if (sampleToEdit.properties?.isSample) {
+      dispatch(setSelectedSpot(sampleToEdit));
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    else {
+      setSelectedSample(sampleToEdit);
+      dispatch(setModalVisible({modal: null}));
+    }
   };
 
-  const renderSamplesDetail = () => {
-    return (
-      <>
-        <BasicPageDetail
-          closeDetailView={closeDetailView}
-          isReadOnly={isReadOnly}
-          page={page}
-          selectedFeature={selectedSample}
-        />
-      </>
-    );
+  const handleAddMoreDetailPressed = () => {
+    createEnrichedSample(spot, selectedSample);
+  };
+
+  const renderSampleDetail = () => {
+    if (spot.properties?.isSample && !selectedSample) return <Overview/>;
+    else {
+      return (
+        <>
+          {!spot.properties.isSample && (
+            <OutlineButton
+              onPress={handleAddMoreDetailPressed}
+              title={'Add More Detail to Sample\n(Images, Tags, Measurements, Rocks, etc.)'}
+            />
+          )}
+          <BasicPageDetail
+            closeDetailView={closeDetailView}
+            isReadOnly={isReadOnly}
+            page={page}
+            selectedFeature={selectedSample}
+          />
+        </>
+      );
+    }
   };
 
   const renderSamplesMain = () => {
@@ -79,7 +96,7 @@ const SamplesPage = ({isReadOnly, page}) => {
 
   return (
     <>
-      {isDetailView ? renderSamplesDetail() : renderSamplesMain()}
+      {isEmpty(selectedSample) ? renderSamplesMain() : renderSampleDetail()}
     </>
   );
 };

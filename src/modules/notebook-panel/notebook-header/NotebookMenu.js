@@ -17,7 +17,7 @@ import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, isSample, zoomToSpots}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -29,9 +29,9 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
   const {deleteInterval} = useStratSection();
 
   const actions = [
-    {key: 'copy', title: spot.properties?.isSample ? 'Copy this Sample' : 'Copy this Spot'},
-    {key: 'zoom', title: spot.properties?.isSample ? 'Zoom to this Sample' : 'Zoom to this Spot'},
-    {key: 'delete', title: spot.properties?.isSample ? 'Delete this Sample' : 'Delete this Spot'},
+    {key: 'copy', title: isSample ? 'Copy this Sample' : 'Copy this Spot'},
+    {key: 'zoom', title: isSample ? 'Zoom to this Sample' : 'Zoom to this Spot'},
+    {key: 'delete', title: isSample ? 'Delete this Sample' : 'Delete this Spot'},
     {key: 'nesting', title: 'Show Nesting'},
   ];
 
@@ -88,7 +88,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
       errorMessage ? <Text>Unable to delete spot.{'\n'}{errorMessage}</Text>
         : (
           <Text>
-            Are you sure you want to delete {spot.properties?.isSample ? 'Sample' : 'Spot'}: {spot.properties.name}?
+            Are you sure you want to delete {isSample ? 'Sample' : 'Spot'}: {spot.properties.name}?
           </Text>
         )
     );
@@ -98,7 +98,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
     <>
       <ModalWrapper
         closeModal={closeNotebookMenu}
-        headerTitle={spot.properties?.isSample ? 'Sample Actions' : 'Spot Actions'}
+        headerTitle={isSample ? 'Sample Actions' : 'Spot Actions'}
         isVisible={isNotebookMenuVisible}
         onBackdropPress={closeNotebookMenu}
         overlayStyleOverride={notebookStyles.dialogContainer}
@@ -120,7 +120,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
         isVisible={isDeleteSpotModalVisible}
         onConfirmPress={continueDeleteSelectedSpot}
         showCancelButton={!errorMessage}
-        title={spot.properties?.isSample ? 'Delete Sample?' : 'Delete Spot?'}
+        title={isSample ? 'Delete Sample?' : 'Delete Spot?'}
       >
         {renderDeleteMessage()}
       </WarningModal>
