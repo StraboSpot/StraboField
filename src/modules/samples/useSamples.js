@@ -78,7 +78,7 @@ const useSamples = () => {
   };
 
   // Create new Sample Spot
-  const createEnrichedSample = async (spot, selectedSample) => {
+  const createRichSample = (spot, selectedSample) => {
     let d = new Date(Date.now());
     d.setMilliseconds(0);
     const newEnrichedSample = {
@@ -102,7 +102,7 @@ const useSamples = () => {
 
     // Modify current sample in Spot object to only have id of new Sample Spot
     let editedSample = {id: selectedSample.id};
-    let samplesCopy = JSON.parse(JSON.stringify(spot.properties[PAGE_KEYS.SAMPLES]));
+    let samplesCopy = JSON.parse(JSON.stringify(spot.properties[PAGE_KEYS.SAMPLES] || []));
     console.log('Saving Sample data', editedSample, 'to Spot samples:', samplesCopy);
     samplesCopy = samplesCopy.filter(f => f.id !== selectedSample.id);
     samplesCopy.push(editedSample);
@@ -283,7 +283,7 @@ const useSamples = () => {
 
   return {
     authenticateWithSesar: authenticateWithSesar,
-    createEnrichedSample: createEnrichedSample,
+    createRichSample: createRichSample,
     getAndSaveSesarCode: getAndSaveSesarCode,
     onSampleFormChange: onSampleFormChange,
     straboSesarMapping: straboSesarMapping,

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -20,7 +20,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {createEnrichedSample} = useSamples();
+  const {createRichSample} = useSamples();
 
   useEffect(() => {
     console.log('UE SamplesPage []');
@@ -56,7 +56,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   };
 
   const handleAddMoreDetailPressed = () => {
-    createEnrichedSample(spot, selectedSample);
+    createRichSample(spot, selectedSample);
   };
 
   const renderSampleDetail = () => {

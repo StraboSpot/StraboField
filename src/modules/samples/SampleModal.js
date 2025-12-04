@@ -6,6 +6,7 @@ import {Formik} from 'formik';
 import Toast, {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import useSamples from './useSamples';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
@@ -15,9 +16,8 @@ import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
-import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/projects.slice';
+import {updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
-import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -26,9 +26,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const toast = useToast();
-  const {setPointAtCurrentLocation} = useMapLocation();
 
   const initialNamePrefix = preferences.sample_prefix || '';
 
@@ -203,8 +204,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation.properties[samples] = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
-        dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
+        createRichSample(pointSetAtCurrentLocation, newSample);
         const toastMsg = 'Sample Saved!';
         const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
         toastRef.current?.show(toastMsg, toastOptions);
@@ -214,11 +214,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       else {
         Keyboard.dismiss();
         dispatch(setModalVisible({modal: null}));
-        const samples = spot.properties?.samples
-          ? [...spot.properties.samples, newSample]
-          : [newSample];
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'samples', value: samples}));
+        createRichSample(spot, newSample);
         const updatedPreferences = {
           ...preferences,
           starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,

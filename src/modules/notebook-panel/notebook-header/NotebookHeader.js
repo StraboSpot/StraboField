@@ -210,7 +210,8 @@ const NotebookHeader = ({
             onChangeText={text => onSpotEdit('name', text)}
             style={notebookHeaderStyles.headerSpotName}
             textAlign={'left'}
-            value={isEmpty(selectedSample) ? spot.properties.name || '' : selectedSample.sample_id_name}
+            value={isEmpty(selectedSample) ? spot.properties.name || 'Unknown'
+              : selectedSample.sample_id_name || 'Unknown'}
           />
           {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
         </View>
