@@ -52,8 +52,6 @@ const NotebookHeader = ({
 
   const isSample = !isEmpty(selectedSample) || spot.properties.isSample;
 
-  const getSampleIGSNText = selectedSample.Sample_IGSN || 'No Sample IGSN';
-
   const getParentSpotName = () => {
     const parentSpot = getSpotWithThisSample(spot.properties.id);
     return parentSpot.properties.name;
@@ -153,7 +151,7 @@ const NotebookHeader = ({
       <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
         <ClearButton
           onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
-          title={isSample ? getSampleIGSNText : getSpotCoordText()}
+          title={getSpotCoordText()}
           titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
         />
       </View>
@@ -264,7 +262,7 @@ const NotebookHeader = ({
               title={spot.properties.isSample ? getParentSpotName() : spot.properties.name || ''}
             />
           </View>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{alignItems: 'center', flexDirection: 'row'}}>
             {renderNotebookHeaderContent()}
           </View>
         </View>
