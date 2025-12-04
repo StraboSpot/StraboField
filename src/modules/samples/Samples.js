@@ -1,17 +1,16 @@
 import React, {useState} from 'react';
 import {SectionList, Text, View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import SampleListItem from './SampleListItem';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
-import {SpotsListItem, useSpots} from '../spots';
+import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
@@ -30,60 +29,20 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
   };
 
-  const getEmbeddedSampleAvatarSource = (spot) => {
-    if (spot.geometry?.type === 'Point') return require('../../assets/icons/Sample_in_point_pressed_round.png');
-    else if (spot.geometry?.type === 'LineString') {
-      return require('../../assets/icons/Sample_in_line_pressed_round.png');
-    }
-    else if (spot.geometry?.type === 'Polygon') {
-      return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
-    }
-    else return require('../../assets/icons/SampleSpot_pressed_round.png');
+  const handleSamplePress = (sample, parentSpot) => {
+    if (sample.properties?.isSample) openSpotInNotebook(sample, PAGE_KEYS.OVERVIEW, [sample]);
+    else openSpotInNotebook(parentSpot, PAGE_KEYS.SAMPLES, [sample]);
   };
 
-  const renderSample = (sample, spot) => {
-    if (spot) {
-      let sampleName = sample.sample_id_name || 'Unknown';
-      const samp = spots[sample.id];
-      if (!isEmpty(samp) && samp.properties?.name) sampleName = samp.properties.name;
-
-      return (
-        <ListItem
-          containerStyle={commonStyles.listItem}
-          key={sample.id}
-          onPress={() => isEmpty(samp) ? openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])
-            : openSpotInNotebook(samp, PAGE_KEYS.OVERVIEW, [sample])}
-        >
-          <AvatarWrapper
-            size={20}
-            source={getEmbeddedSampleAvatarSource(spot)}
-          />
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>{sampleName}</ListItem.Title>
-          </ListItem.Content>
-          <ListItem.Chevron/>
-        </ListItem>
-      );
-    }
-    else {
-      return (
-        <SpotsListItem
-          doShowTags={true}
-          onPress={openSpotInNotebook}
-          spot={sample}
-        />
-      );
-    }
+  const renderSampleListItem = (sample, parentSpot) => {
+    const richSample = spots[sample.id];
+    sample = isEmpty(richSample) ? sample : richSample;
+    return <SampleListItem isShowAvatar onPress={() => handleSamplePress(sample, parentSpot)} sample={sample}/>;
   };
 
   const renderSamplesList = () => {
     let sortedSpotsWithSamples = spotsSorted.filter(
       spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
-    // const activeSampleSpots = spotsSorted.filter(spot => !isEmpty(spot.properties.isSample));
-    // sortedSpotsWithSamples = sortedSpotsWithSamples.filter((spot) => {
-    //   const activeSampleSpotsIds = activeSampleSpots.map(ss => ss.properties.id);
-    //   return !activeSampleSpotsIds.includes(spot.properties.id);
-    // });
     if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
     let count = 0;
     let dataSectioned = sortedSpotsWithSamples.map((s) => {
@@ -91,10 +50,6 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       return {title: s.properties.name, data: s.properties.samples, spot: s};
     });
     let sampleSpotsCount = 0;
-    // if (!isEmpty(activeSampleSpots)) {
-    //   dataSectioned = [{data: isReverseSort ? activeSampleSpots.reverse() : activeSampleSpots}, ...dataSectioned];
-    //   sampleSpotsCount = activeSampleSpots.length;
-    // }
     const totalSamplesCount = count + sampleSpotsCount;
 
     return (
@@ -109,15 +64,13 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
         <View style={{flex: 1}}>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample ' : ' samples ')}
-            {/*{sampleSpotsCount} independent{(sampleSpotsCount === 1 ? ' sample ' : ' samples ')}*/}
-            {/*and {count + (count === 1 ? ' sample' : ' samples')} embedded within Spots*/}
+            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample' : ' samples')}
           </Text>
           <SectionList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
             keyExtractor={(item, index) => item + index}
-            renderItem={({item, section}) => renderSample(item, section.spot)}
+            renderItem={({item, section}) => renderSampleListItem(item, section.spot)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
             sections={dataSectioned}
             stickySectionHeadersEnabled={true}
@@ -137,7 +90,6 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         />
       );
     }
-    // else return <SectionDivider dividerText={'Independent Samples'}/>;
   };
 
   return (
