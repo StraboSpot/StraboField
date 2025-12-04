@@ -1393,7 +1393,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-document-picker (10.1.2):
+  - react-native-document-picker (10.1.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2042,7 +2042,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNCClipboard (1.16.2):
+  - RNCClipboard (1.16.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2793,7 +2793,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 8df5296f9d9a61f980d293b55026cfebcd8dfb0a
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
   react-native-blob-util: f6fbaf3935531be0b3c4bcaf46f7bff2802fd93b
-  react-native-document-picker: f4460210c70534fc155e4e0520468bcdce16d2f7
+  react-native-document-picker: 52817f2ac5174b08fb218dedb00440787e315936
   react-native-geolocation: d43962eb0be1b0056ba5c1f95e94fb7907494268
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-image-picker: fba7ab3cefce56618bc646269f22f02df3fcc375
@@ -2838,7 +2838,7 @@ SPEC CHECKSUMS:
   ReactCommon: aa48e4fddbc6a0afa19dca39a1b6016c150b5db4
   ReactNativeKeyboardManager: 5abe57da962b386508945888c75abee4b93f382d
   RNCAsyncStorage: 1bd66eadc70cb3a16229e6562f83e25ce5dea54b
-  RNCClipboard: 37de6995ef72dc869422879e51a46a520d3f08b3
+  RNCClipboard: ea6045252d5c0753cf17f62290f647dc0096f6ac
   RNCPicker: e51a9eb07c7dfbfba3d6c6cc567e083376c717cc
   RNDateTimePicker: 43ee3de2bc639bc0d9b77564961060a54dfc7111
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
