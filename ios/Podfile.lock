@@ -1643,7 +1643,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-slider (4.5.6):
+  - react-native-slider (4.5.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1658,7 +1658,7 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-slider/common (= 4.5.6)
+    - react-native-slider/common (= 4.5.7)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1668,7 +1668,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-slider/common (4.5.6):
+  - react-native-slider/common (4.5.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2066,7 +2066,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNCPicker (2.11.0):
+  - RNCPicker (2.11.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2400,11 +2400,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNZipArchive (7.0.1):
+  - RNZipArchive (7.0.2):
     - React-Core
-    - RNZipArchive/Core (= 7.0.1)
+    - RNZipArchive/Core (= 7.0.2)
     - SSZipArchive (~> 2.5.5)
-  - RNZipArchive/Core (7.0.1):
+  - RNZipArchive/Core (7.0.2):
     - React-Core
     - SSZipArchive (~> 2.5.5)
   - Sentry/HybridSDK (8.57.0)
@@ -2804,7 +2804,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: f238ed7fb53458bd03366944a33686f067c83e9a
   react-native-pdf: 36118ab1926ea47ea8de8b1b8f681b69e3afc7d3
   react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
-  react-native-slider: 78ccabe016aef7418b1a846b31115b4165c4dde6
+  react-native-slider: bbaef403486de7d0ecb35ea7d4f3f236609c15c7
   React-NativeModulesApple: 8a465be9a58afc56f48c1322331ffbdecd3d4877
   React-oscompat: 74eb4badd12e93899f37a5dbb03d8a638011a292
   React-perflogger: dba4ffef10c54537fa33cb2580cf6d4c48458d36
@@ -2839,7 +2839,7 @@ SPEC CHECKSUMS:
   ReactNativeKeyboardManager: 5abe57da962b386508945888c75abee4b93f382d
   RNCAsyncStorage: 1bd66eadc70cb3a16229e6562f83e25ce5dea54b
   RNCClipboard: ea6045252d5c0753cf17f62290f647dc0096f6ac
-  RNCPicker: e51a9eb07c7dfbfba3d6c6cc567e083376c717cc
+  RNCPicker: 28c076ae12a1056269ec0305fe35fac3086c477d
   RNDateTimePicker: 43ee3de2bc639bc0d9b77564961060a54dfc7111
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
@@ -2852,7 +2852,7 @@ SPEC CHECKSUMS:
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 941a39b5d3b9d8cf8ac2e2fc09b07bfafbcf9796
-  RNZipArchive: f4a5af907d1581e995c879e34799be35c6bc3e21
+  RNZipArchive: 4304f5100eab004eeb7349adc51997b3a28deb76
   Sentry: e1b49e5f49367ff211b25c431a60e2bd83b792aa
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
