@@ -96,11 +96,11 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         <View style={{...notebookStyles.centerContainer}}>
           <Page {...pageProps}/>
         </View>
-        {(isEmpty(selectedSample) || (!isEmpty(selectedSample) && spot.properties.isSample)) && (
-          <View style={notebookStyles.footerContainer}>
-            <NotebookFooter isSample={spot.properties.isSample} openPage={openPage}/>
-          </View>
-        )}
+        <NotebookFooter
+          isRichSample={spot.properties.isSample}
+          openPage={openPage}
+          selectedSample={selectedSample}
+        />
       </>
     );
   };

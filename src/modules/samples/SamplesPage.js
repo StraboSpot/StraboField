@@ -4,9 +4,7 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SamplesList from './SamplesList';
-import useSamples from './useSamples';
 import {isEmpty} from '../../shared/Helpers';
-import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
@@ -20,8 +18,6 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {createRichSample} = useSamples();
-
   useEffect(() => {
     console.log('UE SamplesPage []');
     return () => dispatch(setSelectedAttributes([]));
@@ -33,9 +29,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
       setSelectedSample(spot.properties.samples[0]);
     }
     else if (isEmpty(selectedAttributes)) setSelectedSample({});
-    else {
-      setSelectedSample(selectedAttributes[0]);
-    }
+    else setSelectedSample(selectedAttributes[0]);
   }, [selectedAttributes, spot]);
 
   const closeDetailView = () => {
@@ -55,28 +49,16 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
     }
   };
 
-  const handleAddMoreDetailPressed = () => {
-    createRichSample(spot, selectedSample);
-  };
-
   const renderSampleDetail = () => {
     if (spot.properties?.isSample && !selectedSample) return <Overview/>;
     else {
       return (
-        <>
-          {!spot.properties.isSample && (
-            <OutlineButton
-              onPress={handleAddMoreDetailPressed}
-              title={'Add More Detail to Sample\n(Images, Tags, Measurements, Rocks, etc.)'}
-            />
-          )}
-          <BasicPageDetail
-            closeDetailView={closeDetailView}
-            isReadOnly={isReadOnly}
-            page={page}
-            selectedFeature={selectedSample}
-          />
-        </>
+        <BasicPageDetail
+          closeDetailView={closeDetailView}
+          isReadOnly={isReadOnly}
+          page={page}
+          selectedFeature={selectedSample}
+        />
       );
     }
   };

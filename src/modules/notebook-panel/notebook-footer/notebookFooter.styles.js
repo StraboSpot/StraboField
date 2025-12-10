@@ -4,6 +4,11 @@ import * as themes from '../../../shared/styles.constants';
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 
 const notebookFooterStyles = StyleSheet.create({
+  footerContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderTopColor: themes.MEDIUMGREY,
+    borderTopWidth: 0.5,
+  },
   footerIconContainer: {
     alignItems: 'center',
     flexDirection: 'row',

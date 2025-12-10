@@ -29,11 +29,6 @@ const notebookStyles = StyleSheet.create({
   dialogTitle: {
     backgroundColor: themes.PRIMARY_ACCENT_COLOR,
   },
-  footerContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-    borderTopColor: themes.MEDIUMGREY,
-    borderTopWidth: 0.5,
-  },
   headerContainer: {
     alignItems: 'center',
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
