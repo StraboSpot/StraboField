@@ -241,6 +241,11 @@ const projectSlice = createSlice({
       if (bool) state.activeDatasetsIds = [...new Set([...state.activeDatasetsIds, dataset])];
       else state.activeDatasetsIds = state.activeDatasetsIds.filter(id => id !== dataset);
     },
+    setActiveDatasetsMultiple(state, action) {
+      const datasetIds = action.payload;
+      state.activeDatasetsIds = datasetIds;
+      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = datasetIds[0];
+    },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
       if (key === 'measurementTemplates') {
@@ -358,6 +363,7 @@ export const {
   movedSpotIdBetweenDatasets,
   resetProjectState,
   setActiveDatasets,
+  setActiveDatasetsMultiple,
   setActiveTemplates,
   setBackupFileName,
   setIsImageTransferring,
