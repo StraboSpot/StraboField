@@ -26,6 +26,7 @@ import {
   addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
+  setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../modules/project/projects.slice';
 import useProject from '../modules/project/useProject';
@@ -42,7 +43,7 @@ const useDownload = () => {
 
   const dispatch = useDispatch();
   const encodedLogin = useSelector(state => state.user.encoded_login);
-  const {activeDatasetsIds, project} = useSelector(state => state.project);
+  const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
@@ -51,22 +52,29 @@ const useDownload = () => {
   const {clearProject} = useResetState();
   const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
 
+  let tempActiveDatasetsIds, tempTargetDatasetId;
+
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
-      let resetDatasets = true;
-      // Don't reset active or target dataset if project is the same and the active datasets still exist
-      if (!isEmpty(project) && project.id === selectedProject.id && !isEmpty(activeDatasetsIds)) {
-        const downloadedDatasetIds = datasets.map(d => d.id);
-        if (activeDatasetsIds.every(id => downloadedDatasetIds.includes(id))) resetDatasets = false;
+      if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
+        // If same project set active and target dataset to same as before if they still exist
+        const newDatasetIds = datasets.map(d => d.id);
+        const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
+          return newDatasetIds.contains(tempActiveDatasetId) ? [acc, tempActiveDatasetId] : acc;
+        }, []);
+        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
+        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+        if (newDatasetIds.contains(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
+        else dispatch(setTargetDataset(datasets[0].id));
       }
-      if (resetDatasets && datasets.length >= 1) {
+      else if (datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
         dispatch(setTargetDataset(datasets[0].id));
       }
-      else if (resetDatasets) {
+      else {
         const targetDataset = createDataset();
         dispatch(addedDataset(targetDataset));
         dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
@@ -91,7 +99,13 @@ const useDownload = () => {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
-      if (!isEmpty(project) && project.id !== selectedProject.id) clearProject();
+      if (!isEmpty(project)) {
+        if (project.id === selectedProject.id) {
+          if (!isEmpty(activeDatasetsIds)) tempActiveDatasetsIds = activeDatasetsIds;
+          if (targetDatasetId) tempTargetDatasetId = targetDatasetId;
+        }
+        clearProject();
+      }
       dispatch(addedProject(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
