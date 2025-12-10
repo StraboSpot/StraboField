@@ -63,11 +63,12 @@ const useDownload = () => {
         // If same project set active and target dataset to same as before if they still exist
         const newDatasetIds = datasets.map(d => d.id);
         const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
-          return newDatasetIds.contains(tempActiveDatasetId) ? [acc, tempActiveDatasetId] : acc;
+          console.log('Checking if active dataset still exists:', tempActiveDatasetId);
+          return newDatasetIds.includes(tempActiveDatasetId) ? [...acc, tempActiveDatasetId] : acc;
         }, []);
         if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
         else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.contains(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
+        if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
         else dispatch(setTargetDataset(datasets[0].id));
       }
       else if (datasets.length >= 1) {
