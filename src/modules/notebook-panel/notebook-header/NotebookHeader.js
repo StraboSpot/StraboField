@@ -143,6 +143,12 @@ const NotebookHeader = ({
   const onSpotEdit = async (field, value) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: field, value: value}));
+    if (spot.properties?.isSample) {
+      const sampleMetadataCopy = isEmpty(spot.properties?.samples?.[0]) ? {id: spot.properties.id}
+        : JSON.parse(JSON.stringify(spot.properties.samples[0]));
+      sampleMetadataCopy.sample_id_name = value;
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [sampleMetadataCopy]}));
+    }
     await checkSpotName(value);
   };
 
@@ -210,8 +216,7 @@ const NotebookHeader = ({
             onChangeText={text => onSpotEdit('name', text)}
             style={notebookHeaderStyles.headerSpotName}
             textAlign={'left'}
-            value={isEmpty(selectedSample) ? spot.properties.name || 'Unknown'
-              : selectedSample.sample_id_name || 'Unknown'}
+            value={spot.properties.name || 'Unknown'}
           />
           {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
         </View>
@@ -260,7 +265,7 @@ const NotebookHeader = ({
                 type: 'ionicon',
               }}
               onPress={goBackToParentSpot}
-              title={spot.properties.isSample ? getParentSpotName() : spot.properties.name || ''}
+              title={parentSpot?.properties?.name || spot.properties.name || ''}
             />
           </View>
           <View style={{alignItems: 'center', flexDirection: 'row'}}>

@@ -68,7 +68,8 @@ const BasicPageDetail = ({
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
-      : page.label_singular || toTitleCase(page.label).slice(0, -1);
+      : spot.properties?.isSample && pageKey === PAGE_KEYS.SAMPLES ? 'Metadata'
+        : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
     const isTemplate = saveTemplate;
 
@@ -284,6 +285,9 @@ const BasicPageDetail = ({
         dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
 
         if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
+          if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
+            dispatch(editedSpotProperties({field: 'name', value: editedFeatureData.sample_id_name, spotId: spotId}));
+          }
           await checkSampleName(editedFeatureData.sample_id_name);
         }
       }
