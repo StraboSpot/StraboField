@@ -13,17 +13,19 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/page.constants';
+import useSamples from '../../samples/useSamples';
 import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, isSample, zoomToSpots}) => {
+const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, isSample, parentSpot, zoomToSpots}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const {deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const navigation = useNavigation();
   const {deleteInterval} = useStratSection();
@@ -40,8 +42,9 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, isS
       setErrorMessage('');
       setIsDeleteSpotModalVisible(false);
     }
+    else if (spot.properties?.isSample) deleteRichSample(spot, parentSpot);
     else if (isStratInterval(spot)) deleteInterval(spot);
-    else deleteSpot(spot.properties.id);
+    else deleteSpot(spot);
   };
 
   const deleteSelectedSpot = () => {

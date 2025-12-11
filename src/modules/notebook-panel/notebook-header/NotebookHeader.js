@@ -49,13 +49,8 @@ const NotebookHeader = ({
   const {getCurrentLocation} = useMapLocation();
   const toast = useToast();
 
-
   const isSample = !isEmpty(selectedSample) || spot.properties.isSample;
-
-  const getParentSpotName = () => {
-    const parentSpot = getSpotWithThisSample(spot.properties.id);
-    return parentSpot.properties.name;
-  };
+  const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id) : null;
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -125,7 +120,6 @@ const NotebookHeader = ({
 
   const goBackToParentSpot = () => {
     setSelectedSample({});
-    const parentSpot = getSpotWithThisSample(spot.properties.id);
     if (spot.properties.isSample && !isEmpty(parentSpot)) {
       dispatch(setSelectedSpot(parentSpot));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
@@ -246,6 +240,7 @@ const NotebookHeader = ({
           isReadOnly={isReadOnly}
           isSample={isSample}
           overlayStyle={notebookStyles.dialogBoxPosition}
+          parentSpot={parentSpot}
           zoomToSpots={zoomToSpots}
         />
       </>

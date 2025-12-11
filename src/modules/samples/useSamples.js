@@ -7,7 +7,8 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
+import {useSpots} from '../spots';
+import {clearedSelectedSpots, editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 import {setSesarToken} from '../user/userProfile.slice';
 
 const parseString = require('react-native-xml2js').parseString;
@@ -16,9 +17,11 @@ const useSamples = () => {
   const formName = ['general', 'samples'];
   const dispatch = useDispatch();
 
-  const {getTargetDatasetFromId} = useProject();
   const {getLabel} = useForm();
+  const {getTargetDatasetFromId} = useProject();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
+  const {deleteSpot} = useSpots();
+
   const {name, sesar} = useSelector(state => state.user);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
@@ -112,6 +115,27 @@ const useSamples = () => {
 
     dispatch(setSelectedSpot(newEnrichedSample));
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  };
+
+  const deleteRichSample = (sampleToDelete, parentSpot) => {
+    console.log('Deleteing Sample', sampleToDelete, 'from Spot', parentSpot);
+    if (parentSpot) {
+      const updatedSamples = parentSpot.properties?.samples?.filter(s => s.id !== sampleToDelete.properties.id);
+      let updatedParentSpot = JSON.parse(JSON.stringify(parentSpot));
+      if (isEmpty(updatedSamples)) delete updatedParentSpot.properties[PAGE_KEYS.SAMPLES];
+      else updatedParentSpot.properties[PAGE_KEYS.SAMPLES] = updatedSamples;
+      dispatch(
+        editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: updatedSamples, spotId: parentSpot.properties.id}));
+      deleteSpot(sampleToDelete);
+
+      dispatch(setSelectedSpot(updatedParentSpot));
+      if (isEmpty(updatedSamples)) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+      else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    else {
+      deleteSpot(sampleToDelete);
+      dispatch(clearedSelectedSpots());
+    }
   };
 
   const getAndSaveSesarCode = async (sesarTokens) => {
@@ -284,6 +308,7 @@ const useSamples = () => {
   return {
     authenticateWithSesar: authenticateWithSesar,
     createRichSample: createRichSample,
+    deleteRichSample: deleteRichSample,
     getAndSaveSesarCode: getAndSaveSesarCode,
     onSampleFormChange: onSampleFormChange,
     straboSesarMapping: straboSesarMapping,

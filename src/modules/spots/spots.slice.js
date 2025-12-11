@@ -109,7 +109,8 @@ const spotSlice = createSlice({
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
-        spotToEdit.properties[field] = value;
+        if (isEmpty(value)) delete spotToEdit.properties[field];
+        else spotToEdit.properties[field] = value;
         spotToEdit.properties.modified_timestamp = Date.now();
         if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
         if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;

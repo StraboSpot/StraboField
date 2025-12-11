@@ -198,8 +198,19 @@ const useSpots = () => {
     return newSpot;
   };
 
-  const deleteSpot = (spotId) => {
+  const deleteRichSamples = (spotToDelete) => {
+    spotToDelete.properties?.samples?.map((sample) => {
+      if (sample.id !== spotToDelete.properties.id) {
+        const sampleSpot = spots[sample.id];
+        if (sampleSpot) deleteSpot(sampleSpot);
+      }
+    });
+  };
+
+  const deleteSpot = (spotToDelete) => {
+    const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
+    deleteRichSamples(spotToDelete);
     dispatch(deletedSpotIdFromReports(spotId));
     dispatch(deletedSpotIdFromTags(spotId));
     dispatch(deletedSpotIdFromDatasets(spotId));
