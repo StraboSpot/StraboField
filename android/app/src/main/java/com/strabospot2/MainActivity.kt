@@ -30,9 +30,13 @@ class MainActivity : ReactActivity() {
   /**
    * Will hide the bottom Android navigation bar when app is focused. User can swipe up from the bottom to reveal the bar and it will dismiss after ~3 seconds.
    * https://developer.android.com/develop/ui/views/layout/immersive
+   *
+   * IMPORTANT: Pass null to super.onCreate() to prevent react-native-screens fragments from being restored.
+   * This prevents crashes when the app is restored from background.
+   * See: https://github.com/software-mansion/react-native-screens/issues/17
    */
   override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    super.onCreate(null)
     enterImmersiveMode()
   }
 
