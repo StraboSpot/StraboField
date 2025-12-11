@@ -142,6 +142,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       const activeSpotsObj = getActiveSpotsObj();
       const activeSpots = Object.values(activeSpotsObj);
       spotsList = sortSpotsByDateCreated(activeSpots);
+      spotsList = spotsList.reduce((acc, s) => s.properties?.isSample ? acc : [...acc, s], []);
     }
 
     return (
