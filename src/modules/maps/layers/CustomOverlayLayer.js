@@ -9,12 +9,13 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
   const {buildTileURL} = useMapURL();
 
   useEffect(() => {
+    console.log('CustomOverlayLayer mounted/updated for map:', customMap.id, 'isViewable:', customMap.isViewable);
     return () => {
       // Cleanup: When component unmounts, the layer should be automatically removed by React
       // But we can add explicit cleanup if needed
       console.log('CustomOverlayLayer unmounting for map:', customMap.id);
     };
-  }, [customMap.id]);
+  }, [customMap.id, customMap.isViewable]);
 
   // Defensive checks to ensure customMap and basemap are valid
   if (!customMap || !customMap.id) {
@@ -49,4 +50,14 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
   );
 };
 
-export default memo(CustomOverlayLayer);
+// Custom comparison function to ensure re-renders when relevant props change
+const areEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.customMap.id === nextProps.customMap.id &&
+    prevProps.customMap.isViewable === nextProps.customMap.isViewable &&
+    prevProps.customMap.opacity === nextProps.customMap.opacity &&
+    prevProps.basemap.id === nextProps.basemap.id
+  );
+};
+
+export default memo(CustomOverlayLayer, areEqual);

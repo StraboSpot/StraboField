@@ -1,6 +1,6 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
-import {errorCodes, isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
+import {isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -11,12 +11,12 @@ import {setLoadingStatus} from '../modules/home/home.slice';
 import {deletedOfflineMap} from '../modules/maps/offline-maps/offlineMaps.slice';
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../modules/project/projects.slice';
 import usePermissions from '../services/usePermissions';
-import {useSafeDocumentPicker} from '../services/useSafeDocumentPicker';
+import useSafeDocumentPicker from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
   const {checkPermission} = usePermissions();
-  const {safePick} = useSafeDocumentPicker();
+  const {handleError, safePick} = useSafeDocumentPicker();
 
   const dispatch = useDispatch();
 
@@ -271,7 +271,15 @@ const useDevice = () => {
 
   const getExternalProjectData = async () => {
     try {
-      const [{name, uri}] = await safePick({type: [types.zip]});
+      const result = await safePick({type: [types.zip]});
+      // Check if user canceled the picker
+      if (!result) {
+        console.log('User canceled file selection');
+        dispatch(setLoadingStatus({bool: false, view: 'home'}));
+        return null;
+      }
+
+      const [{name, uri}] = result;
       if (name && uri) {
         console.log('Picked ZIP File:', name, uri);
         const [localCopy] = await keepLocalCopy({
@@ -320,7 +328,10 @@ const useDevice = () => {
   };
 
   const isPickDocumentCanceled = (err) => {
-    return isErrorWithCode(err) && err.code === errorCodes.OPERATION_CANCELED;
+    console.log('Checking if pick was canceled:', err);
+    const wasCanceled = handleError(err);
+    console.log('Is Pick Document Canceled?', wasCanceled);
+    return wasCanceled;
   };
 
   const makeDirectory = async (directory) => {
@@ -358,7 +369,10 @@ const useDevice = () => {
   };
 
   const pickCSV = async () => {
-    const [res] = await safePick({type: [types.csv]});
+    const result = await safePick({type: [types.csv]});
+    // Return null if user canceled
+    if (!result) return null;
+    const [res] = result;
     return res;
   };
 

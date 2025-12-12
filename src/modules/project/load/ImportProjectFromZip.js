@@ -67,7 +67,7 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     if (isEmpty(res)) {
       if (isProjectLoadSelectionModalVisible) goBackToMain();
       else dispatch(setSidePanelVisible({bool: false}));
-      toast.show('Error getting file to import.', {type: 'danger'});
+      toast.show('Nothing was selected.', {type: 'warning'});
     }
     else setImportedProject(res);
   };

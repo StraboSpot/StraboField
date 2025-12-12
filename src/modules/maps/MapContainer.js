@@ -368,7 +368,7 @@ const MapContainer = forwardRef(({
 
   return (
     <View style={{flex: 1, zIndex: -1}}>
-      {currentBasemap && (
+      {currentBasemap ? (
         <Map
           allowMapViewMove={allowMapViewMove}
           basemap={currentBasemap}
@@ -385,6 +385,8 @@ const MapContainer = forwardRef(({
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}
         />
+      ) : (
+        <View style={{flex: 1, backgroundColor: '#E8E8E8'}}/>
       )}
       {currentBasemap?.source === 'macrostrat' && isOnline && (
         <MacrostratOverlay
