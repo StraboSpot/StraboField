@@ -11,7 +11,7 @@ import useProject from '../project/useProject';
 import {useTags} from '../tags';
 import SpotDataIcons from './SpotDataIcons';
 
-const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
+const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
   const {isSpotInReadOnlyDataset} = useProject();
@@ -20,6 +20,7 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
   const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
 
   const selectedTag = useSelector(state => state.project.selectedTag);
+  const spots = useSelector(state => state.spot.spots);
 
   const handleCheckBoxPressed = () => {
     return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
@@ -46,7 +47,14 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
     );
   };
 
-  const renderTags = () => {
+  const renderSamplesText = () => {
+    const sampleNames = spot.properties?.samples?.reduce(
+      (acc, s) => spots[s.id] ? [...acc, spots[s.id].properties.name] : [...acc, s.sample_id_name], []);
+    const samplesString = sampleNames?.sort()?.join(', ');
+    return !isEmpty(samplesString) && <ListItem.Subtitle>{samplesString}</ListItem.Subtitle>;
+  };
+
+  const renderTagsText = () => {
     const tags = getTagsAtSpot(spot.properties.id);
     const tagsString = tags.map(tag => tag.name).sort().join(', ');
     return !isEmpty(tagsString) && <ListItem.Subtitle>{tagsString}</ListItem.Subtitle>;
@@ -61,7 +69,8 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
       <SpotGeometryAvatar spot={spot}/>
       <ListItem.Content>
         <ListItem.Title style={commonStyles.listItemTitle}>{spot?.properties?.name}</ListItem.Title>
-        {doShowTags && spot && renderTags()}
+        {doShowTags && spot && renderTagsText()}
+        {doShowSamples && spot && renderSamplesText()}
       </ListItem.Content>
       {isCheckedList ? renderCheckboxes() : (
         <>

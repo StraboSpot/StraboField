@@ -85,9 +85,10 @@ const useNesting = () => {
       childrenSpots.push(nonGeomChildrenSpots);
     }
     childrenSpots = childrenSpots.flat();
-    // Find active children spots based on geometry *Only polygon features can have children
+    // Find active children spots (not Samples) based on geometry *Only polygon features can have children
     if (thisSpot.geometry?.type === 'Polygon' || thisSpot.geometry?.type === 'MultiPolygon') {
-      const otherSpots = activeSpots.filter(spot => spot.geometry && spot.properties.id !== thisSpot.properties.id);
+      const otherSpots = activeSpots.filter(
+        spot => spot.geometry && spot.properties.id !== thisSpot.properties.id && !spot.properties?.isSample);
       otherSpots.forEach((spot) => {
         if (((isOnGeoMap(thisSpot) && isOnGeoMap(spot)) || isOnSameImageBasemap(thisSpot, spot)
           || isOnSameStratSection(thisSpot, spot)) && isWithin(spot, thisSpot)) childrenSpots.push(spot);
@@ -96,12 +97,14 @@ const useNesting = () => {
     return childrenSpots;
   }
 
-  // Get the children of an array of Spots
+  // Get the children (not Samples) of an array of Spots
   function getChildrenOfSpots(spots1, activeSpots) {
     let allChildrenSpots = [];
     spots1.forEach((spot) => {
-      const childrenSpots = getChildrenSpots(spot, activeSpots);
-      if (!isEmpty(childrenSpots)) allChildrenSpots.push(childrenSpots);
+      if (!spot.properties?.isSample) {
+        const childrenSpots = getChildrenSpots(spot, activeSpots);
+        if (!isEmpty(childrenSpots)) allChildrenSpots.push(childrenSpots);
+      }
     });
     return allChildrenSpots.flat();
   }
@@ -160,24 +163,27 @@ const useNesting = () => {
       spot => spot.properties.nesting && spot.properties.nesting.includes(thisSpot.properties.id));
     if (!isEmpty(parentNonGeomSpot)) parentSpots.push(parentNonGeomSpot);
     parentSpots = parentSpots.flat();
-    // Find active parent spots based on geometry *The parent must be a polygon
+    // Find active parent spots (not Samples) based on geometry *The parent must be a polygon
     if (thisSpot.geometry) {
-      const otherSpots = activeSpots.filter(spot => spot.geometry && spot.properties.id !== thisSpot.properties.id);
+      const otherSpots = activeSpots.filter(
+        spot => spot.geometry && spot.properties.id !== thisSpot.properties.id && !spot.properties?.isSample);
       otherSpots.forEach((spot) => {
         if ((spot.geometry?.type === 'Polygon' || spot.geometry?.type === 'MultiPolygon')
           && ((isOnGeoMap(thisSpot) && isOnGeoMap(spot)) || isOnSameImageBasemap(thisSpot, spot)
-          || isOnSameStratSection(thisSpot, spot)) && isWithin(thisSpot, spot)) parentSpots.push(spot);
+            || isOnSameStratSection(thisSpot, spot)) && isWithin(thisSpot, spot)) parentSpots.push(spot);
       });
     }
     return parentSpots;
   }
 
-  // Get the parents of an array of Spots
+  // Get the parents (not Samples) of an array of Spots
   function getParentsOfSpots(spots1, activeSpots) {
     let allParentSpots = [];
     spots1.forEach((spot) => {
-      const parentSpots = getParentSpots(spot, activeSpots);
-      if (!isEmpty(parentSpots)) allParentSpots.push(parentSpots);
+      if (!spot.properties?.isSample) {
+        const parentSpots = getParentSpots(spot, activeSpots);
+        if (!isEmpty(parentSpots)) allParentSpots.push(parentSpots);
+      }
     });
     return allParentSpots.flat();
   }

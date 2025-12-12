@@ -28,8 +28,8 @@ const NotebookHeader = ({
                           closeNotebookPanel,
                           createDefaultGeom,
                           isReadOnly,
+                          isSample,
                           openMainMenuPanel,
-                          selectedSample,
                           setSelectedSample,
                           zoomToSpots,
                         }) => {
@@ -49,7 +49,6 @@ const NotebookHeader = ({
   const {getCurrentLocation} = useMapLocation();
   const toast = useToast();
 
-  const isSample = !isEmpty(selectedSample) || spot.properties.isSample;
   const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id) : null;
 
   const getSpotCoordText = () => {
@@ -228,11 +227,13 @@ const NotebookHeader = ({
               onPress={goToDatasetsPage}
             />
           )}
-          <IconButton
-            onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
-            source={require('../../../assets/icons/MapActions.png')}
-            style={notebookHeaderStyles.threeDotMenu}
-          />
+          {!isSample && (
+            <IconButton
+              onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
+              source={require('../../../assets/icons/MapActions.png')}
+              style={notebookHeaderStyles.threeDotMenu}
+            />
+          )}
         </View>
         <NotebookMenu
           closeNotebookMenu={() => setIsNotebookMenuVisible(false)}

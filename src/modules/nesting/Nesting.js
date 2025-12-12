@@ -76,6 +76,7 @@ const Nesting = () => {
   const renderName = (spot) => {
     return (
       <SpotsListItem
+        doShowSamples
         onPress={() => handleSpotSelected(spot)}
         spot={spot}
       />

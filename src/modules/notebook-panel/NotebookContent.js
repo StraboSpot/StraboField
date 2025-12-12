@@ -38,6 +38,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const [selectedSample, setSelectedSample] = useState({});
 
   const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
+  const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     let pageKey = isRelevantPage ? pageVisible : PAGE_KEYS.OVERVIEW;
     const page = NOTEBOOK_PAGES.find(p => p.key === pageKey);
     const Page = page?.page_component || Overview;
-    let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
+    let pageProps = {isReadOnly: isReadOnly, isSample: isSample, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page.key === PAGE_KEYS.SAMPLES) {
       pageProps = {
         ...pageProps,
@@ -87,8 +88,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             closeNotebookPanel={closeNotebookPanel}
             createDefaultGeom={createDefaultGeom}
             isReadOnly={isReadOnly}
+            isSample={isSample}
             openMainMenuPanel={openMainMenuPanel}
-            selectedSample={selectedSample}
             setSelectedSample={setSelectedSample}
             zoomToSpots={zoomToSpots}
           />
@@ -97,7 +98,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           <Page {...pageProps}/>
         </View>
         <NotebookFooter
-          isRichSample={spot.properties.isSample}
+          isRichSample={spot.properties?.isSample}
           openPage={openPage}
           selectedSample={selectedSample}
         />

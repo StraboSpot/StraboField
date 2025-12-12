@@ -22,7 +22,7 @@ import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const Overview = ({isReadOnly, openMainMenuPanel}) => {
+const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -202,7 +202,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   return (
     <View style={{flex: 1}}>
-      {spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
+      {!isSample && spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
         || spot.geometry.type === 'MultiLineString' || spot.geometry.type === 'Polygon'
         || spot.geometry.type === 'MultiPolygon' || spot.geometry.type === 'GeometryCollection') && (
         <View style={notebookStyles.traceSurfaceFeatureContainer}>
