@@ -3664,11 +3664,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rn-vui/base@npm:5.1.3":
-  version: 5.1.3
-  resolution: "@rn-vui/base@npm:5.1.3"
+"@rn-vui/base@npm:5.1.10":
+  version: 5.1.10
+  resolution: "@rn-vui/base@npm:5.1.10"
   dependencies:
-    "@rn-vui/ratings": "npm:^0.4.3"
+    "@rn-vui/ratings": "npm:^0.5.0"
     "@types/react-native-vector-icons": "npm:^6.4.10"
     color: "npm:^3.2.1"
     deepmerge: "npm:^4.2.2"
@@ -3677,26 +3677,26 @@ __metadata:
   peerDependencies:
     react-native-safe-area-context: ">= 3.0.0"
     react-native-vector-icons: ">7.0.0"
-  checksum: 10c0/4d30ad112b5527bbe2b9f5824c89825983a8ea1f01852d87e6f080dc2f9fbc831b05e8a3d9f550aa6cde583660b19e1a1ac57112bcf75a387cf9b73d24d16322
+  checksum: 10c0/29cf58b17828d852a5a78e6bdebf6525bf991f7d3ac1722079be6390efab8e8c3f96d575e4296c05ccc629bd4a21b0b0746977361c62c150b537f9491cbc6d1b
   languageName: node
   linkType: hard
 
-"@rn-vui/ratings@npm:^0.4.3":
-  version: 0.4.3
-  resolution: "@rn-vui/ratings@npm:0.4.3"
+"@rn-vui/ratings@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@rn-vui/ratings@npm:0.5.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/d00d409ab201f1d74a8e76f651ed9bf91478e6195ea0520906a1a299115e9180d7618eef80535cef3e1380feb56a5c695ede14f3daa273d59929d85ccd379482
+  checksum: 10c0/01f74acb0cac0e96a046694416118fe0cbe6e6ad6a82c4b8f63759ef466f8d1e4d98c6788ed5de993a1a6e6ec3bce50d8833142674d4d2fa761a2dbae646f4f6
   languageName: node
   linkType: hard
 
-"@rn-vui/themed@npm:5.1.3":
-  version: 5.1.3
-  resolution: "@rn-vui/themed@npm:5.1.3"
+"@rn-vui/themed@npm:5.1.10":
+  version: 5.1.10
+  resolution: "@rn-vui/themed@npm:5.1.10"
   peerDependencies:
-    "@rn-vui/base": 5.1.3
-  checksum: 10c0/51d979808968e48e4be91e57e85f87435035967b96a2edf1949f634a420991c2b7712a9b754b19508d00944ed601ae09608eed66de54dc2b6267d34f45868934
+    "@rn-vui/base": 5.1.10
+  checksum: 10c0/707029644b9429643a87d5744db8d756d96e8de713f23bcd43807eaede291da9fc374c185f0d118ec34cffe5759b084fe0e775ff86ad5cc52f6f41db3e764100
   languageName: node
   linkType: hard
 
@@ -3773,14 +3773,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry-internal/tracing@npm:7.120.3":
-  version: 7.120.3
-  resolution: "@sentry-internal/tracing@npm:7.120.3"
+"@sentry-internal/tracing@npm:7.120.4":
+  version: 7.120.4
+  resolution: "@sentry-internal/tracing@npm:7.120.4"
   dependencies:
-    "@sentry/core": "npm:7.120.3"
-    "@sentry/types": "npm:7.120.3"
-    "@sentry/utils": "npm:7.120.3"
-  checksum: 10c0/97d640121bb137efba6deeecbc80a61cc34b526c89d39a43efc2b8be4be159c1536951d1121503bd5171a7c5e1ef225bc632f3ef35248d6c478865abf7330cf3
+    "@sentry/core": "npm:7.120.4"
+    "@sentry/types": "npm:7.120.4"
+    "@sentry/utils": "npm:7.120.4"
+  checksum: 10c0/da2d8a3e8ccad4525d27794f157800fdc8c4bf694c6e2ef86f1aa9ae0f6a9ea5eb062e2e08b55bb8ecfc399e8a2aec458886d6e53d687d7a26bae6d257dc8031
   languageName: node
   linkType: hard
 
@@ -3993,13 +3993,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:7.120.3":
-  version: 7.120.3
-  resolution: "@sentry/core@npm:7.120.3"
+"@sentry/core@npm:7.120.4":
+  version: 7.120.4
+  resolution: "@sentry/core@npm:7.120.4"
   dependencies:
-    "@sentry/types": "npm:7.120.3"
-    "@sentry/utils": "npm:7.120.3"
-  checksum: 10c0/97bcfd423ee9583fae8dc995cefb4839eb59c9d38334ebd1b22398626692aa4df322a5386e3b25a7a96b596155f802169c4ec04e63c1835ea9794955d27ba54a
+    "@sentry/types": "npm:7.120.4"
+    "@sentry/utils": "npm:7.120.4"
+  checksum: 10c0/bc1f5bc41cade04c8ce8361ec67d87e415a7bc7fb2e965c3084ec1b634969c5abed7f247ba6311722e5c0ce487509079acd64bd78dfa7ca56f3c0b32c4800011
   languageName: node
   linkType: hard
 
@@ -4039,12 +4039,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/tracing@npm:7.120.3":
-  version: 7.120.3
-  resolution: "@sentry/tracing@npm:7.120.3"
+"@sentry/tracing@npm:7.120.4":
+  version: 7.120.4
+  resolution: "@sentry/tracing@npm:7.120.4"
   dependencies:
-    "@sentry-internal/tracing": "npm:7.120.3"
-  checksum: 10c0/181f7414f61286f4af54b56d750957a1b70dd424d119e2623e45ac9358d0c82c31fdb291ebdf8ee10b8211493b711f5ef5e82ca4b2eff680b38cbeb3ce09d402
+    "@sentry-internal/tracing": "npm:7.120.4"
+  checksum: 10c0/d2a85d896acb229ca40ace559b65087f9b0a41f7596b5a015c4ac4533d4344410d858b1723c0eebffb0d6acdf01be558dfb4d85258652d3e1cdac8c207612319
   languageName: node
   linkType: hard
 
@@ -4057,19 +4057,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:7.120.3":
-  version: 7.120.3
-  resolution: "@sentry/types@npm:7.120.3"
-  checksum: 10c0/f7c4a46c72dd66a88053d579ad5a0137eaf6882dfe5e942828e750ad80fd8fe98ceec1a6328dfcf31f5a56849dda8ee27f7419125f905f19751119b9662dbdcb
+"@sentry/types@npm:7.120.4":
+  version: 7.120.4
+  resolution: "@sentry/types@npm:7.120.4"
+  checksum: 10c0/7d286b2b849f00a8a3370926203e5aa5fb66f39bb6dec89442f81da799d06cd2b0d2bb38176d31bbbc7b14b082172ee531258085e03eb4a9c4c99443bc53f52f
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:7.120.3":
-  version: 7.120.3
-  resolution: "@sentry/utils@npm:7.120.3"
+"@sentry/utils@npm:7.120.4":
+  version: 7.120.4
+  resolution: "@sentry/utils@npm:7.120.4"
   dependencies:
-    "@sentry/types": "npm:7.120.3"
-  checksum: 10c0/15a1e0a0d29aae668023f68f4b3e4b3bd5353b5f033874d2bf51264206f05036e68b8d6d88078cf807fbb051c20244b1ac73b19a875da76a97e635a38b9fd180
+    "@sentry/types": "npm:7.120.4"
+  checksum: 10c0/0a7e7b9bf1cd89c7106010d40f9d298d614865c5b5bafc3aace9591a629c62119026a085cefcf21f0fd936ee4136bbf6bb6b881c65aa9ccf562482f178602f71
   languageName: node
   linkType: hard
 
@@ -6194,7 +6194,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.5.13":
+"@types/jest@npm:^29.5.14":
   version: 29.5.14
   resolution: "@types/jest@npm:29.5.14"
   dependencies:
@@ -15652,14 +15652,14 @@ __metadata:
     "@react-navigation/native": "npm:7.1.6"
     "@react-navigation/stack": "npm:7.2.10"
     "@reduxjs/toolkit": "npm:2.7.0"
-    "@rn-vui/base": "npm:5.1.3"
-    "@rn-vui/themed": "npm:5.1.3"
+    "@rn-vui/base": "npm:5.1.10"
+    "@rn-vui/themed": "npm:5.1.10"
     "@rnmapbox/maps": "npm:10.1.45"
     "@sentry/cli": "npm:2.41.1"
     "@sentry/react-native": "npm:^7.4.0"
-    "@sentry/tracing": "npm:7.120.3"
+    "@sentry/tracing": "npm:7.120.4"
     "@turf/turf": "npm:7.2.0"
-    "@types/jest": "npm:^29.5.13"
+    "@types/jest": "npm:^29.5.14"
     "@types/react": "npm:^19.0.0"
     "@types/react-dom": "npm:^19"
     "@types/react-test-renderer": "npm:^19.0.0"
