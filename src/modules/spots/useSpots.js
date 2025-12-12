@@ -290,16 +290,19 @@ const useSpots = () => {
     });
   };
 
-  // Get Active Spots with Valid Geometry
+  // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
     const allSpotsCopy = JSON.parse(JSON.stringify(Object.values(getActiveSpotsObj())));
     const allSpotsCopyFiltered = allSpotsCopy.filter((spot) => {
+      if (spot.properties.isSample) return false;
       const geometries = spot.geometry?.geometries || [spot.geometry] || [];
       let hasValidGeometry = true;
       geometries.forEach((g) => {
         const coordsFlat = g?.coordinates?.flat(Infinity) || [];
         const coordsFlatValid = coordsFlat.filter(c => c !== null && c !== undefined && !Number.isNaN(c));
-        if (!hasValidGeometry || isEmpty(coordsFlat) || !isEqual(coordsFlat, coordsFlatValid)) hasValidGeometry = false;
+        if (!hasValidGeometry || isEmpty(coordsFlat) || !isEqual(coordsFlat, coordsFlatValid)) {
+          hasValidGeometry = false;
+        }
       });
       if (spot.geometry && !hasValidGeometry) {
         alert('Invalid Geometry', 'Found a Spot with invalid geometry. Unable to map this Spot.'
