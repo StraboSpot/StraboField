@@ -1369,7 +1369,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-blob-util (0.21.2):
+  - react-native-blob-util (0.21.3):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2792,7 +2792,7 @@ SPEC CHECKSUMS:
   React-logger: cc55ca6e50aeb31216c0a9dec30871cac776ef9a
   React-Mapbuffer: 8df5296f9d9a61f980d293b55026cfebcd8dfb0a
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
-  react-native-blob-util: f6fbaf3935531be0b3c4bcaf46f7bff2802fd93b
+  react-native-blob-util: 242d3d47f561408236a260ff2e9cc47971458791
   react-native-document-picker: 52817f2ac5174b08fb218dedb00440787e315936
   react-native-geolocation: d43962eb0be1b0056ba5c1f95e94fb7907494268
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
