@@ -217,7 +217,11 @@ const useTags = () => {
     return validSpots.reduce((acc, spotId) => acc + tag.features[spotId].length, 0);
   };
 
-  const getTagSpotsCount = (tag) => {
+  const getSamplesWithThisTag = (tag) => {
+    return isEmpty(tag.spots) ? [] : tag.spots.filter(spotId => spots[spotId] && spots[spotId].properties?.isSample);
+  };
+
+  const getSpotsWithThisTagCount = (tag) => {
     const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
     return validSpots.length;
   };
@@ -319,9 +323,10 @@ const useTags = () => {
     getGeologicUnitTagsAtSpot: getGeologicUnitTagsAtSpot,
     getNonGeologicUnitFeatureTagsAtSpot: getNonGeologicUnitFeatureTagsAtSpot,
     getNonGeologicUnitTagsAtSpot: getNonGeologicUnitTagsAtSpot,
+    getSamplesWithThisTag: getSamplesWithThisTag,
+    getSpotsWithThisTagCount: getSpotsWithThisTagCount,
     getTagFeaturesCount: getTagFeaturesCount,
     getTagLabel: getTagLabel,
-    getTagSpotsCount: getTagSpotsCount,
     getTagsAtFeature: getTagsAtFeature,
     getTagsAtSpot: getTagsAtSpot,
     renderTagInfo: renderTagInfo,

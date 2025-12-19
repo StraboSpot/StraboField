@@ -12,17 +12,20 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
 import useProject from '../project/useProject';
+import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
 import {useTags} from '../tags';
 
 const TagDetail = ({
                      addRemoveFeatures,
+                     addRemoveSampleSpots,
                      addRemoveSpots,
                      openFeatureDetail,
                      openSpot,
+                     openSpotInNotebook,
                      setIsDetailModalVisible,
                    }) => {
-  const {getSpotById} = useSpots();
+  const {getSpotById, getSpotWithThisSample} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
 
   const selectedTag = useSelector(state => state.project.selectedTag);
@@ -74,13 +77,35 @@ const TagDetail = ({
     }
   };
 
-  const renderSpotItem = (id) => {
-    const spot = getSpotById(id);
+  const renderSpotItem = ({item}) => {
+    const spot = getSpotById(item);
+    if (!isEmpty(spot)) return <SpotsListItem doShowTags={true} onPress={openSpot} spot={spot}/>;
+  };
+
+  const renderSamples = () => {
+    const sampleSpotsWithParentSpots = selectedTag.spots?.reduce((acc, spotId) => {
+      if (spots[spotId] && spots[spotId].properties.isSample) {
+        const parentSpot = getSpotWithThisSample(spotId);
+        if (acc[parentSpot.properties.id]) {
+          return {...acc, [parentSpot.properties.id]: [...acc[parentSpot.properties.id], spots[spotId]]};
+        }
+        else return {...acc, [parentSpot.properties.id]: [spots[spotId]]};
+      }
+      else return acc;
+    }, {});
+
+    let dataSectioned = [];
+    if (!isEmpty(sampleSpotsWithParentSpots)) {
+      dataSectioned = Object.keys(sampleSpotsWithParentSpots).map((parentId) => {
+        const parentSpot = spots[parentId];
+        return {title: parentSpot.properties.name, data: sampleSpotsWithParentSpots[parentId], spot: parentSpot};
+      });
+    }
     return (
-      <SpotsListItem
-        doShowTags={true}
-        onPress={openSpot}
-        spot={spot}
+      <SamplesSectionList
+        dataSectioned={dataSectioned}
+        listEmptyText={'No Samples'}
+        openSpotInNotebook={openSpotInNotebook}
       />
     );
   };
@@ -108,6 +133,8 @@ const TagDetail = ({
             onPress={setIsDetailModalVisible}
           />
           {selectedTag && renderTagInfo()}
+
+          {/* Spots with this Tag */}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots W/Geologic Unit' : 'Tagged Spots'}
@@ -116,11 +143,22 @@ const TagDetail = ({
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No Spots'}/>}
-            data={selectedTag.spots && selectedTag.spots.filter(spotId => spots[spotId])}
+            data={selectedTag.spots && selectedTag.spots.filter(
+              spotId => spots[spotId] && !spots[spotId].properties.isSample)}
             keyExtractor={item => 'Spot' + item.toString()}
             listKey={'spots'}
-            renderItem={({item}) => renderSpotItem(item)}
+            renderItem={renderSpotItem}
           />
+
+          {/* Samples with this Tag */}
+          <SectionDividerWithRightButton
+            buttonTitle={'Add/Remove'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Samples W/Geologic Unit' : 'Tagged Samples'}
+            onPress={addRemoveSampleSpots}
+          />
+          {renderSamples()}
+
+          {/* Features with this Tag */}
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
               <SectionDividerWithRightButton

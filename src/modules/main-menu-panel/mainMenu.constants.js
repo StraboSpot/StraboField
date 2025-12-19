@@ -76,6 +76,7 @@ export const SIDE_PANEL_VIEWS = {
   NEW_PROJECT: 'New Project',
   OPEN_PROJECT: 'Open Project',
   TAG_ADD_REMOVE_FEATURES: 'add remove tag features',
+  TAG_ADD_REMOVE_SAMPLE_SPOTS: 'add remove tag sample spots',
   TAG_ADD_REMOVE_SPOTS: 'add remove tag spots',
   TAG_DETAIL: 'tag detail',
 };

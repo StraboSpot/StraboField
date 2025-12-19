@@ -1,15 +1,15 @@
 import React from 'react';
 
-import {Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import {MEDIUMGREY} from '../../shared/styles.constants';
 import {SpotGeometryAvatar} from '../../shared/ui/avatars';
 import useProject from '../project/useProject';
 import {useTags} from '../tags';
 import SpotDataIcons from './SpotDataIcons';
+import CheckboxList from '../../shared/ui/CheckboxList';
 
 const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
@@ -24,27 +24,6 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
 
   const handleCheckBoxPressed = () => {
     return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
-  };
-
-  const renderCheckboxes = () => {
-    return (
-      <>
-        {isReadOnly && (
-          <Icon
-            color={MEDIUMGREY}
-            containerStyle={{justifyContent: 'center', paddingRight: 5}}
-            name={'lock-closed'}
-            size={20}
-            type={'ionicon'}
-          />
-        )}
-        <ListItem.CheckBox
-          checked={isItemChecked}
-          disabled={isReadOnly}
-          onPress={handleCheckBoxPressed}
-        />
-      </>
-    );
   };
 
   const renderSamplesText = () => {
@@ -72,7 +51,13 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
         {doShowTags && spot && renderTagsText()}
         {doShowSamples && spot && renderSamplesText()}
       </ListItem.Content>
-      {isCheckedList ? renderCheckboxes() : (
+      {isCheckedList ? (
+        <CheckboxList
+          handleCheckBoxPressed={handleCheckBoxPressed}
+          isItemChecked={isItemChecked}
+          isReadOnly={isReadOnly}
+        />
+      ) : (
         <>
           {spot && <SpotDataIcons isReadOnly={isReadOnly} spot={spot}/>}
           {spot && <ListItem.Chevron/>}

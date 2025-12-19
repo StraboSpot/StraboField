@@ -1,21 +1,14 @@
 import React, {useState} from 'react';
-import {SectionList, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
-import {useSelector} from 'react-redux';
-
-import SampleListItem from './SampleListItem';
+import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
-const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-  const spots = useSelector(state => state.spot.spots);
-
+const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
 
   const activeSpotsObj = getActiveSpotsObj();
@@ -29,18 +22,7 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
   };
 
-  const handleSamplePress = (sample, parentSpot) => {
-    if (sample.properties?.isSample) openSpotInNotebook(sample, PAGE_KEYS.OVERVIEW, [sample]);
-    else openSpotInNotebook(parentSpot, PAGE_KEYS.SAMPLES, [sample]);
-  };
-
-  const renderSampleListItem = (sample, parentSpot) => {
-    const richSample = spots[sample.id];
-    sample = isEmpty(richSample) ? sample : richSample;
-    return <SampleListItem isShowAvatar onPress={() => handleSamplePress(sample, parentSpot)} sample={sample}/>;
-  };
-
-  const renderSamplesList = () => {
+  const renderSamples = () => {
     let sortedSpotsWithSamples = spotsSorted.filter(
       spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
     if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
@@ -66,35 +48,22 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
             Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample' : ' samples')}
           </Text>
-          <SectionList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({item, section}) => renderSampleListItem(item, section.spot)}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            sections={dataSectioned}
-            stickySectionHeadersEnabled={true}
+          <SamplesSectionList
+            checkedItems={checkedItems}
+            dataSectioned={dataSectioned}
+            handleSpotChecked={handleSpotChecked}
+            isCheckedList={isCheckedList}
+            listEmptyText={textNoSpots + ' with samples found'}
+            openSpotInNotebook={openSpotInNotebook}
           />
         </View>
       </View>
     );
   };
 
-  const renderSectionHeader = ({title, spot}) => {
-    if (title && spot) {
-      return (
-        <SectionDividerWithRightButton
-          buttonTitle={'View In Spot'}
-          dividerText={title}
-          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
-        />
-      );
-    }
-  };
-
   return (
     <>
-      {isEmpty(getSpotsWithSamples()) ? renderNoSamplesText() : renderSamplesList()}
+      {isEmpty(getSpotsWithSamples()) ? renderNoSamplesText() : renderSamples()}
     </>
   );
 };

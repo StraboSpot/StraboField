@@ -2,19 +2,25 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
+import {useSelector} from 'react-redux';
 
 import IGSNDisplay from './IGSNDisplay';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/Helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
+import CheckboxList from '../../shared/ui/CheckboxList';
 import useProject from '../project/useProject';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
+import {useTags} from '../tags';
 
-const SampleListItem = ({onPress, sample, isShowAvatar, isShowSubtitle}) => {
+const SampleListItem = ({isCheckedList, isItemChecked, isShowAvatar, isShowSubtitle, onChecked, onPress, sample}) => {
   const {isSpotInReadOnlyDataset} = useProject();
   const {getSpotWithThisSample} = useSpots();
+  const {addRemoveSpotFromTag} = useTags();
+
+  const selectedTag = useSelector(state => state.project.selectedTag);
 
   const spot = sample.properties?.isSample ? sample : getSpotWithThisSample(sample.id);
   const isReadOnly = isSpotInReadOnlyDataset(spot.properties?.id);
@@ -31,6 +37,10 @@ const SampleListItem = ({onPress, sample, isShowAvatar, isShowSubtitle}) => {
       return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
     }
     else return require('../../assets/icons/SampleSpot_pressed_round.png');
+  };
+
+  const handleCheckBoxPressed = () => {
+    return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
   };
 
   return (
@@ -61,8 +71,18 @@ const SampleListItem = ({onPress, sample, isShowAvatar, isShowSubtitle}) => {
           <IGSNDisplay item={sampleMetadata}/>
         </View>
       </ListItem.Content>
-      <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample && sample}/>
-      <ListItem.Chevron/>
+      {isCheckedList ? (
+        <CheckboxList
+          handleCheckBoxPressed={handleCheckBoxPressed}
+          isItemChecked={isItemChecked}
+          isReadOnly={isReadOnly}
+        />
+      ) : (
+        <>
+          <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample && sample}/>
+          <ListItem.Chevron/>
+        </>
+      )}
     </ListItem>
   );
 };

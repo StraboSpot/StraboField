@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, SectionList, View} from 'react-native';
+import {FlatList, SectionList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -24,7 +24,7 @@ const TagsList = ({type, selectedIndex}) => {
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
-  const {getTagFeaturesCount, getTagSpotsCount, toggleContinuousTagging} = useTags();
+  const {getTagFeaturesCount, getSamplesWithThisTag, getSpotsWithThisTagCount, toggleContinuousTagging} = useTags();
 
   const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
@@ -37,10 +37,11 @@ const TagsList = ({type, selectedIndex}) => {
   const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 
   const renderTag = (tag) => {
-    const tagSpotCount = getTagSpotsCount(tag);
+    const tagSpotCount = getSpotsWithThisTagCount(tag);
     const tagFeatureCount = getTagFeaturesCount(tag);
+    let taggedSamplesCount = getSamplesWithThisTag(tag).length;
     const title = type === PAGE_KEYS.GEOLOGIC_UNITS ? tagSpotCount
-      : '(' + tagSpotCount + ') (' + tagFeatureCount + ')';
+      : tagSpotCount + ' / ' + taggedSamplesCount + ' / ' + tagFeatureCount;
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
@@ -122,11 +123,16 @@ const TagsList = ({type, selectedIndex}) => {
   if (isEmpty(tags)) return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
   else {
     return (
-      <View style={{flex: 1}}>
-        {selectedIndex === 0 && renderTagsListByType()}
-        {selectedIndex === 1 && renderTagsListByMapExtent()}
-        {selectedIndex === 2 && renderTagsListByRecentlyUsed()}
-      </View>
+      <>
+        <View style={{alignItems: 'flex-end', paddingHorizontal: 10}}>
+          <Text style={commonStyles.standardDescriptionText}># Tagged Spots / Samples / Features</Text>
+        </View>
+        <View style={{flex: 1}}>
+          {selectedIndex === 0 && renderTagsListByType()}
+          {selectedIndex === 1 && renderTagsListByMapExtent()}
+          {selectedIndex === 2 && renderTagsListByRecentlyUsed()}
+        </View>
+      </>
     );
   }
 };
