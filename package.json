@@ -31,7 +31,7 @@
     "web-release": "webpack serve --mode production --config webpack.config.js --color",
     "web-deploy": "webpack --mode production --config webpack.config.js",
     "postinstall": "patch-package",
-    "remove:packages": "rm -rf node_modules ios/Pods ios/Podfile.lock"
+    "remove:packages-ios": "rm -rf node_modules ios/Pods ios/Podfile.lock"
   },
   "scriptComments": {
     "bundle:android": "Must be run with every build for android before deploying to PlayStore. Removed the --assets flag because of duplicates.",
@@ -56,7 +56,7 @@
     "@rn-vui/themed": "5.1.10",
     "@rnmapbox/maps": "10.1.45",
     "@sentry/cli": "2.41.1",
-    "@sentry/react-native": "^7.4.0",
+    "@sentry/react-native": "^7.8.0",
     "@sentry/tracing": "7.120.4",
     "@turf/turf": "7.2.0",
     "fast-deep-equal": "^3.1.3",
