@@ -3,20 +3,19 @@ import {Platform, StatusBar} from 'react-native';
 
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import * as Sentry from '@sentry/react-native';
 import KeyboardManager from 'react-native-keyboard-manager';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
 import Routes from './src/routes/Routes';
 import ConnectionStatus from './src/services/ConnectionStatus';
-import {RELEASE_NAME} from './src/shared/app.constants';
 import {SMALL_SCREEN} from './src/shared/styles.constants';
 import ToastWrapper from './src/shared/ui/ToastWrapper';
-import uiStyles from './src/shared/ui/ui.styles';
 import {persistor, store} from './src/store/ConfigureStore';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import config from './src/utils/config';
+import * as Sentry from '@sentry/react-native';
+import {RELEASE_NAME} from './src/shared/app.constants';
 
 let didInit = false;
 
@@ -89,21 +88,21 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={uiStyles.container}>
-        <Provider store={store}>
-          <ToastWrapper>
-            <PersistGate loading={null} persistor={persistor}>
-              {/*<Sentry.TouchEventBoundary>*/}
-              {!SMALL_SCREEN && <StatusBar hidden/>}
-              <ConnectionStatus/>
-              <NavigationContainer linking={linking}>
-                <Routes/>
-              </NavigationContainer>
-              {/*</Sentry.TouchEventBoundary>*/}
-            </PersistGate>
-          </ToastWrapper>
-        </Provider>
-      </SafeAreaView>
+      {/*<SafeAreaView style={uiStyles.container}>*/}
+      <Provider store={store}>
+        <ToastWrapper>
+          <PersistGate loading={null} persistor={persistor}>
+            {/*<Sentry.TouchEventBoundary>*/}
+            {!SMALL_SCREEN && <StatusBar hidden/>}
+            <ConnectionStatus/>
+            <NavigationContainer linking={linking}>
+              <Routes/>
+            </NavigationContainer>
+            {/*</Sentry.TouchEventBoundary>*/}
+          </PersistGate>
+        </ToastWrapper>
+      </Provider>
+      {/*</SafeAreaView>*/}
     </SafeAreaProvider>
   );
 };
