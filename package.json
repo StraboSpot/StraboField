@@ -40,7 +40,7 @@
   "dependencies": {
     "@StraboSpot/react-native-sketch-canvas": "https://github.com/StraboSpot/react-native-sketch-canvas.git#commit=d0eac854dfd3120303944dda08e13abf08684b27",
     "@bam.tech/react-native-image-resizer": "^3.0.11",
-    "@react-native-async-storage/async-storage": "2.1.0",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-clipboard/clipboard": "1.16.3",
     "@react-native-community/datetimepicker": "8.3.0",
     "@react-native-community/geolocation": "3.4.0",

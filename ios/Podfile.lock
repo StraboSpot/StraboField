@@ -2869,7 +2869,7 @@ PODS:
     - IQKeyboardManagerSwift (= 6.5.16)
     - React-Core
     - React-RCTText
-  - RNCAsyncStorage (2.1.0):
+  - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3817,7 +3817,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 3d48510bcef445f6403c0004047d4d9cbb915435
   ReactCommon: ac934cb340aee91282ecd6f273a26d24d4c55cae
   ReactNativeKeyboardManager: 5abe57da962b386508945888c75abee4b93f382d
-  RNCAsyncStorage: 6757c835a7c3368c3506dd50606d21f34ec28d7c
+  RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNCClipboard: 4b58c780f63676367640f23c8e114e9bd0cf86ac
   RNCPicker: bf95ec4b2483e2ab256047130bc536b437cd916c
   RNDateTimePicker: eae40568517137565dd984b17b4cbeaa5c5d792b
