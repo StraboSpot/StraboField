@@ -12,6 +12,7 @@ const compileNodeModules = [
   // Add every react-native package that needs compiling
   '@StraboSpot/react-native-sketch-canvas',
   '@react-native',
+  '@react-native-async-storage/async-storage',
   '@react-native-community/netinfo',
   '@rnmapbox/maps',
   '@sentry/react-native',
@@ -111,6 +112,8 @@ module.exports = (env, argv) => {
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
         '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
           'src/modules/images/react-native-image-resizer.web.js'),
+        '@react-native-async-storage/async-storage': path.resolve(__dirname,
+          'node_modules/@react-native-async-storage/async-storage/src/index.ts'),
       },
     },
     module: {
