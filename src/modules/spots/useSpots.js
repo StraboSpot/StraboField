@@ -390,6 +390,8 @@ const useSpots = () => {
     return rootSpot;
   };
 
+  const getSampleSpotIconSource = () => require('../../assets/icons/SampleRound.png');
+
   const getSpotById = (spotId) => {
     if (spots[spotId]) return spots[spotId];
     else Sentry.captureMessage(`Missing Spot ${spotId}`);
@@ -400,20 +402,6 @@ const useSpots = () => {
       return spot.properties.images && spot.properties.images.find(image => image.id === imageId);
     });
   };
-
-  const getSampleSpotGeometryIconSource = (spot) => {
-    if (spot?.geometry?.type === 'Point') {
-      return require('../../assets/icons/Sample_in_point_pressed_round.png');
-    }
-    else if (spot?.geometry?.type === 'LineString') {
-      return require('../../assets/icons/Sample_in_line_pressed_round.png');
-    }
-    else if (spot?.geometry?.type === 'Polygon' || spot?.geometry?.type === 'GeometryCollection') {
-      return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
-    }
-    else return require('../../assets/icons/QuestionMark_pressed.png');
-  };
-
 
   const getSpotGeometryIconSource = (spot) => {
     if (spot?.geometry?.type === 'Point') {
@@ -596,7 +584,7 @@ const useSpots = () => {
     getNewSpotName: getNewSpotName,
     getRecentSpots: getRecentSpots,
     getRootSpot: getRootSpot,
-    getSampleSpotGeometryIconSource: getSampleSpotGeometryIconSource,
+    getSampleSpotIconSource: getSampleSpotIconSource,
     getSpotById: getSpotById,
     getSpotByImageId: getSpotByImageId,
     getSpotGeometryIconSource: getSpotGeometryIconSource,
