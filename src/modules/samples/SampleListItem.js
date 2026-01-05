@@ -17,7 +17,7 @@ import {useTags} from '../tags';
 
 const SampleListItem = ({isCheckedList, isItemChecked, isShowAvatar, isShowSubtitle, onChecked, onPress, sample}) => {
   const {isSpotInReadOnlyDataset} = useProject();
-  const {getSpotWithThisSample} = useSpots();
+  const {getSampleSpotIconSource, getSpotWithThisSample} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
   const selectedTag = useSelector(state => state.project.selectedTag);
@@ -27,17 +27,6 @@ const SampleListItem = ({isCheckedList, isItemChecked, isShowAvatar, isShowSubti
 
   const sampleMetadata = sample.properties?.isSample ? sample.properties.samples[0] : sample;
   let oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
-
-  const getEmbeddedSampleAvatarSource = () => {
-    if (spot.geometry?.type === 'Point') return require('../../assets/icons/Sample_in_point_pressed_round.png');
-    else if (spot.geometry?.type === 'LineString') {
-      return require('../../assets/icons/Sample_in_line_pressed_round.png');
-    }
-    else if (spot.geometry?.type === 'Polygon') {
-      return require('../../assets/icons/Sample_in_polygon_pressed_round.png');
-    }
-    else return require('../../assets/icons/SampleSpot_pressed_round.png');
-  };
 
   const handleCheckBoxPressed = () => {
     return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
@@ -52,7 +41,7 @@ const SampleListItem = ({isCheckedList, isItemChecked, isShowAvatar, isShowSubti
       {isShowAvatar && (
         <AvatarWrapper
           size={20}
-          source={getEmbeddedSampleAvatarSource(spot)}
+          source={getSampleSpotIconSource()}
         />
       )}
       <ListItem.Content style={sampleStyles.listContentContainer}>

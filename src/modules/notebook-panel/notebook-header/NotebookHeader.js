@@ -41,7 +41,7 @@ const NotebookHeader = ({
   const {
     checkSpotName,
     getRootSpot,
-    getSampleSpotGeometryIconSource,
+    getSampleSpotIconSource,
     getSpotGeometryIconSource,
     getSpotWithThisSample,
     getSpotWithThisStratSection,
@@ -198,7 +198,7 @@ const NotebookHeader = ({
         <Image
           onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
           resizeMode={'contain'}
-          source={isSample ? getSampleSpotGeometryIconSource(spot) : getSpotGeometryIconSource(spot)}
+          source={isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
           style={notebookHeaderStyles.headerImage}
         />
         <View
