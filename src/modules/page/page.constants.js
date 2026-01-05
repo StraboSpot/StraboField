@@ -146,7 +146,7 @@ export const PRIMARY_PAGES = [
     overview_component: TagsAtSpotList,
     page_component: TagsNotebook,
     modal_component: TagsNotebookModal,
-    action_label: 'Add Spot Tags',
+    action_label: 'Add Tags',
   }, {
     key: PAGE_KEYS.SAMPLES,
     label: 'Samples',
