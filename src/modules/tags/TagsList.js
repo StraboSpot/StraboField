@@ -40,7 +40,7 @@ const TagsList = ({type, selectedIndex}) => {
     const tagSpotCount = getSpotsWithThisTagCount(tag);
     const tagFeatureCount = getTagFeaturesCount(tag);
     let taggedSamplesCount = getSamplesWithThisTag(tag).length;
-    const title = type === PAGE_KEYS.GEOLOGIC_UNITS ? tagSpotCount
+    const title = type === PAGE_KEYS.GEOLOGIC_UNITS ? tagSpotCount + ' | ' + taggedSamplesCount
       : tagSpotCount + ' | ' + taggedSamplesCount + ' | ' + tagFeatureCount;
     return (
       <ListItem
@@ -125,7 +125,9 @@ const TagsList = ({type, selectedIndex}) => {
     return (
       <>
         <View style={{alignItems: 'flex-end', paddingHorizontal: 10}}>
-          <Text style={commonStyles.standardDescriptionText}># Tagged Spots | Samples | Features</Text>
+          <Text style={commonStyles.standardDescriptionText}>
+            {pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? '# Tagged Spots | Samples' : '# Tagged Spots | Samples | Features'}
+          </Text>
         </View>
         <View style={{flex: 1}}>
           {selectedIndex === 0 && renderTagsListByType()}
