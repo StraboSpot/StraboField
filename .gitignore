@@ -85,4 +85,5 @@ fastlane/.env.secret
 dev-test-logins.js
 CHANGELOG.md
 env.json
+/android/keystore.properties
 /android/app/src/main/assets/modules.json
