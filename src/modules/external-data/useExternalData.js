@@ -1,16 +1,12 @@
 import {Platform} from 'react-native';
 
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDevice from '../../services/useDevice';
 import {csvToArray, getNewUUID, urlValidator} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -18,7 +14,8 @@ const useExternalData = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {isPickDocumentCanceled, pickCSV, readFile} = useDevice();
+  const {pickCSV, readFile} = useDevice();
+  const toast = useToast();
 
   let csvObject = {};
   let CSVData = '';
@@ -58,6 +55,12 @@ const useExternalData = () => {
 
       if (Platform.OS !== 'web') {
         CSVFile = await pickCSV();
+        // Check if user canceled the picker
+        if (!CSVFile) {
+          console.log('User canceled file selection');
+          dispatch(setLoadingStatus({view: 'home', bool: false}));
+          return;
+        }
         console.log({uri: CSVFile.uri, type: CSVFile.type, name: CSVFile.name, size: CSVFile.size});
         CSVData = await readFile(CSVFile.uri);
       }
@@ -89,20 +92,9 @@ const useExternalData = () => {
       }
     }
     catch (err) {
-      if (isPickDocumentCanceled(err)) {
-        console.log('User canceled', err);
-        dispatch(setLoadingStatus({view: 'home', bool: false}));
-        // User cancelled the picker, exit any dialogs or menus and move on
-      }
-      else {
-        dispatch(setLoadingStatus({view: 'home', bool: false}));
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage(`Something went wrong opening ${csvObject.name}!`));
-        if (err === 'Error reading file') dispatch(addedStatusMessage('Error reading file'));
-        else dispatch(addedStatusMessage('No such file or directory!'));
-        dispatch(setIsErrorMessagesModalVisible(true));
-        throw err;
-      }
+      console.log('ERR', err);
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      console.error('Error reading .CSV file', err);
     }
   };
 
@@ -120,6 +112,7 @@ const useExternalData = () => {
     }
     catch (err) {
       console.error('Error saving .CSV file');
+      toast.show('Error saving .CSV file', {type: 'warning', placement: 'top'});
     }
   };
 

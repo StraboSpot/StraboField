@@ -45,18 +45,24 @@ const DateInputField = ({
   };
 
   const saveDate = async (event, selectedDate) => {
-    // console.log('Change Date', name, event, selectedDate);
+    console.log('Change Date', name, event, selectedDate);
     if (Platform.OS === 'ios') {
       selectedDate = selectedDate.toISOString();
       if (onMyChange && typeof onMyChange === 'function') onMyChange(name, selectedDate);
     }
     else {
-      // setIsDatePickerModalVisible(false);
+      setIsDatePickerModalVisible(false);
       if (event.type === 'neutralButtonPressed') selectedDate = undefined; else if (event.type === 'set') {
         setDate(selectedDate);
         selectedDate = selectedDate.toISOString();
       }
+      else {
+        // User dismissed the picker without selecting (e.g., by tapping outside)
+        return;
+      }
     }
+
+    // Validate start_date against end_date if both will exist
     if (selectedDate && name === 'start_date' && values.end_date) {
       if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate); else {
         dispatch(clearedStatusMessages());
@@ -64,6 +70,7 @@ const DateInputField = ({
         dispatch(setIsErrorMessagesModalVisible(true));
       }
     }
+    // Validate end_date against start_date if both will exist
     else if (selectedDate && name === 'end_date' && values.start_date) {
       if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate); else {
         dispatch(clearedStatusMessages());
@@ -71,7 +78,9 @@ const DateInputField = ({
         dispatch(setIsErrorMessagesModalVisible(true));
       }
     }
+    // No validation needed, just set the value
     else setFieldValue(name, selectedDate);
+    console.log('After setFieldValue, name:', name, 'selectedDate:', selectedDate);
   };
 
   const renderDatePicker = () => {
