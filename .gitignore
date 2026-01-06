@@ -67,6 +67,9 @@ yarn-error.log
 # testing
 /coverage
 
+# Sentry configuration file
+sentry.properties
+
 # Yarn
 .yarn/*
 !.yarn/patches
