@@ -188,7 +188,6 @@ export const SECONDARY_PAGES = [
     page_component: FabricsPage,
     modal_component: AddFabricModal,
     action_label: 'Add a Fabric',
-    testing: true,
   }, {
     key: PAGE_KEYS.OTHER_FEATURES,
     label: 'Other Features',

@@ -6,11 +6,37 @@ import {useDispatch} from 'react-redux';
 
 import {setLoadingStatus} from '../modules/home/home.slice';
 
-export const useSafeDocumentPicker = () => {
+const useSafeDocumentPicker = () => {
   const dispatch = useDispatch();
   const toast = useToast();
 
   const [isPicking, setIsPicking] = useState(false);
+
+  const handleError = useCallback((err) => {
+    console.log(isErrorWithCode(err));
+    if (isErrorWithCode(err)) {
+      switch (err.code) {
+        case errorCodes.IN_PROGRESS:
+          console.warn('user attempted to present a picker, but a previous one was already presented');
+          // toast.show('Getting project.', {placement: 'top'});
+          return false;
+        case errorCodes.UNABLE_TO_OPEN_FILE_TYPE:
+          toast.show('Unable to open the selected file.', {type: 'warning', placement: 'top'});
+          return false;
+        case errorCodes.OPERATION_CANCELED:
+          console.warn('User canceled document selection');
+          // toast.show('Nothing was selected.', {type: 'warning', placement: 'top'});
+          return true;
+        default:
+          console.error(err);
+          return false;
+      }
+    }
+    else {
+      console.error(err);
+      return false;
+    }
+  }, [toast]);
 
   const safePick = useCallback(async (options) => {
     if (isPicking) return null;
@@ -22,37 +48,19 @@ export const useSafeDocumentPicker = () => {
     catch (error) {
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
       handleError(error);
+      // Return null on cancellation or error
+      return null;
     }
     finally {
       setIsPicking(false);
     }
-  }, [isPicking]);
-
-  const handleError = (err) => {
-    console.log(isErrorWithCode(err));
-    if (isErrorWithCode(err)) {
-      switch (err.code) {
-        // case errorCodes.IN_PROGRESS:
-        //   toast.show('Getting project.', { placement: 'top'});
-        //   break;
-        case errorCodes.UNABLE_TO_OPEN_FILE_TYPE:
-          toast.show('Unable to open the selected file.', {type: 'warning', placement: 'top'});
-          break;
-        case errorCodes.OPERATION_CANCELED:
-          console.warn(err.code);
-          toast.show('Nothing was selected.', {type: 'warning', placement: 'top'});
-          break;
-        default:
-          console.error(err);
-      }
-    }
-    else {
-      console.error(err);
-    }
-  };
+  }, [isPicking, dispatch, handleError]);
 
   return {
     isPicking,
+    handleError: handleError,
     safePick: safePick,
   };
 };
+
+export default useSafeDocumentPicker;
