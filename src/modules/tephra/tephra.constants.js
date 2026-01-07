@@ -1,4 +1,4 @@
 export const TEPHRA_SUBPAGES = {
-  DESCRIPTION: 'interval_description',
-  COMPOSITION: 'interval_composition',
+  BASIC: 'interval_basic',
+  ADDITIONAL: 'interval_additional',
 };

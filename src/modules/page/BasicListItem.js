@@ -46,7 +46,8 @@ const BasicListItem = ({
       case PAGE_KEYS.INTERPRETATIONS:
         return 'Lithology ' + (index + 1);
       case PAGE_KEYS.TEPHRA:
-        return (index + 1) + '. ' + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_description']);
+        return (item?.layer_id || (index + 1)) + ' - '
+          + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_basic']);
       case PAGE_KEYS.EARTHQUAKES:
         return getLabel(item?.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
       default:
