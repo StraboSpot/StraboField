@@ -13961,12 +13961,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-device-info@npm:14.0.4":
-  version: 14.0.4
-  resolution: "react-native-device-info@npm:14.0.4"
+"react-native-device-info@npm:14.1.1":
+  version: 14.1.1
+  resolution: "react-native-device-info@npm:14.1.1"
   peerDependencies:
     react-native: "*"
-  checksum: 10c0/3d89519b4e9f9f130b352f5243282f8b807aba0f55ccc0e1dc9f15b285215949751491ef2f11f1984a55f0f5e0ae76cd16620d2cdfcc118e2ca5f39d300d5524
+  checksum: 10c0/38ae82b2364b8af5b5cfdd142842bb7dd53b2e37b7225b375ac2f5ebf9272c5250fec2fb08cb58af494339c2341de617393717fc5488c575a5b9d817237d7f54
   languageName: node
   linkType: hard
 
@@ -14031,13 +14031,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-image-picker@npm:8.2.0":
-  version: 8.2.0
-  resolution: "react-native-image-picker@npm:8.2.0"
+"react-native-image-picker@npm:8.2.1":
+  version: 8.2.1
+  resolution: "react-native-image-picker@npm:8.2.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/2e475e930e41de3071899bf2fa2548c1b657b6f5a978843219fe1e0dc1b9678ceb58b5c3410c56c5ca85bd927b1de96ddc958b31f065418b200fc651e039bdf0
+  checksum: 10c0/82b6c51ece8d16806975aff7675d26280fdd2391c05ca9415620195cc6643ca0db4601d3b24e117d7f5331c2e55ba7c03090d276e55b3b5687a636245428a047
   languageName: node
   linkType: hard
 
@@ -15664,13 +15664,13 @@ __metadata:
     react-native: "npm:0.83.1"
     react-native-blob-util: "npm:0.21.3"
     react-native-check-version: "npm:1.4.0"
-    react-native-device-info: "npm:14.0.4"
+    react-native-device-info: "npm:14.1.1"
     react-native-devsettings: "npm:^1.0.5"
     react-native-draggable-flatlist: "npm:4.0.3"
     react-native-fs: "npm:2.20.0"
     react-native-gesture-handler: "npm:2.30.0"
     react-native-get-random-values: "npm:1.11.0"
-    react-native-image-picker: "npm:8.2.0"
+    react-native-image-picker: "npm:8.2.1"
     react-native-indicators: "npm:0.17.0"
     react-native-json-tree: "npm:1.5.0"
     react-native-keep-awake: "npm:4.0.0"
