@@ -104,10 +104,20 @@ module.exports = (env, argv) => {
     },
     mode,
     devtool: false, // disables source maps
+    ignoreWarnings: [
+      {
+        module: /node_modules\/react-datepicker/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+      {
+        message: /require\(\) called for module: react-native-screens but require is not available in web environment/,
+      },
+    ],
     resolve: {
       extensions: ['.web.js', '.js', '.web.ts', '.ts', '.web.jsx', '.jsx', '.web.tsx', '.tsx', '.css', '.json'],
       alias: {
         'react-native$': 'react-native-web',
+        'react-native-screens': false,
         'react-native-web': path.resolve('node_modules/react-native-web'),
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
         '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
