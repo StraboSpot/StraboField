@@ -10,8 +10,8 @@
     },
     {
       "type": "text",
-      "name": "layer_id",
-      "label": "Layer ID",
+      "name": "label",
+      "label": "Layer Label",
       "required": "false"
     },
     {
