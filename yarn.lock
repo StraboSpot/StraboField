@@ -14121,13 +14121,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-pager-view@npm:6.7.1":
-  version: 6.7.1
-  resolution: "react-native-pager-view@npm:6.7.1"
+"react-native-pager-view@npm:6.9.1":
+  version: 6.9.1
+  resolution: "react-native-pager-view@npm:6.9.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/1459f3c487d50b1ecba41a4b24c51ab9ad17026b30e66c109dd1df32afe7cc6726d8fcae8a3495f93a240e5781bbae7653c7d56d53e724e929312b30234616e9
+  checksum: 10c0/c5229d230734ad9dad0b1e296168f0eebc5cff1b4b63201266ee7d5ecadc2e9c584b426b4ef146718c2e581dfcf63914174133b3ed1657294ccd437c22dbbc05
   languageName: node
   linkType: hard
 
@@ -14180,13 +14180,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:5.5.2":
-  version: 5.5.2
-  resolution: "react-native-safe-area-context@npm:5.5.2"
+"react-native-safe-area-context@npm:5.6.2":
+  version: 5.6.2
+  resolution: "react-native-safe-area-context@npm:5.6.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/529cafcafbc1d994f6d9c9be41ae4f78768b7c103a22265d3fe5223a930249e0a07a934b5ec358ce510622061f339a20c2147b620bd15032366b12b4258c2ce5
+  checksum: 10c0/3c8df21a1dbac83116b9c9bd5d20b7c1bb7649ecef44a111af6fb6b237241f5f4d692189eec30a69f5701b857249257da3621b9e17165460a2bb71faac7b92ae
   languageName: node
   linkType: hard
 
@@ -14231,20 +14231,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-tab-view@npm:4.0.5":
-  version: 4.0.5
-  resolution: "react-native-tab-view@npm:4.0.5"
-  dependencies:
-    use-latest-callback: "npm:^0.2.1"
-  peerDependencies:
-    react: ">= 18.2.0"
-    react-native: "*"
-    react-native-pager-view: ">= 6.0.0"
-  checksum: 10c0/8eade6c916df4aaf5c2729ab245428e3db9128a4477d74ba488cbfefb86ad203ec1416344f579eb48fd765fe92b28f319f45c16e37d7f32f5ad3090749ca5e43
-  languageName: node
-  linkType: hard
-
-"react-native-tab-view@npm:^4.2.2":
+"react-native-tab-view@npm:4.2.2, react-native-tab-view@npm:^4.2.2":
   version: 4.2.2
   resolution: "react-native-tab-view@npm:4.2.2"
   dependencies:
@@ -14267,9 +14254,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-vector-icons@npm:10.2.0":
-  version: 10.2.0
-  resolution: "react-native-vector-icons@npm:10.2.0"
+"react-native-vector-icons@npm:10.3.0":
+  version: 10.3.0
+  resolution: "react-native-vector-icons@npm:10.3.0"
   dependencies:
     prop-types: "npm:^15.7.2"
     yargs: "npm:^16.1.1"
@@ -14278,7 +14265,7 @@ __metadata:
     fa5-upgrade: bin/fa5-upgrade.sh
     fa6-upgrade: bin/fa6-upgrade.sh
     generate-icon: bin/generate-icon.js
-  checksum: 10c0/76a7f327b40b29e567f48a49ebc3ad87b755d4e431d66fec3566dfe5e673084cee9b1663f10903a6572aab31c7bcec45100172afb1d46055dfacbbe46b92b348
+  checksum: 10c0/247804affcf74906062ed088d755c3d4632e3f2b62c38226ccb05e2a8dc42414c2378040a4acb474704bed09cd06cb285770c765ffff67fb2d3b896cd46e76ca
   languageName: node
   linkType: hard
 
@@ -15690,18 +15677,18 @@ __metadata:
     react-native-keyboard-manager: "npm:6.5.16-0"
     react-native-multiple-select: "npm:0.5.12"
     react-native-orientation-director: "npm:2.6.5"
-    react-native-pager-view: "npm:6.7.1"
+    react-native-pager-view: "npm:6.9.1"
     react-native-pdf: "npm:6.7.7"
     react-native-progress: "npm:5.0.1"
     react-native-reanimated: "npm:4.2.1"
     react-native-reanimated-table: "npm:0.0.2"
-    react-native-safe-area-context: "npm:5.5.2"
+    react-native-safe-area-context: "npm:5.6.2"
     react-native-screens: "npm:4.19.0"
     react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
-    react-native-tab-view: "npm:4.0.5"
+    react-native-tab-view: "npm:4.2.2"
     react-native-toast-notifications: "npm:3.4.0"
-    react-native-vector-icons: "npm:10.2.0"
+    react-native-vector-icons: "npm:10.3.0"
     react-native-web: "npm:0.21.2"
     react-native-worklets: "npm:^0.7.1"
     react-native-xml2js: "npm:1.0.3"
@@ -16567,15 +16554,6 @@ __metadata:
     file-loader:
       optional: true
   checksum: 10c0/71b6300e02ce26c70625eae1a2297c0737635038c62691bb3007ac33e85c0130efc74bfb444baf5c6b3bad5953491159d31d66498967d1417865d0c7e7cd1a64
-  languageName: node
-  linkType: hard
-
-"use-latest-callback@npm:^0.2.1":
-  version: 0.2.3
-  resolution: "use-latest-callback@npm:0.2.3"
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 10c0/dc87503f6279ce2980f78e1019231ba20d7509e9d17adac05285babe4d6ba6f68c52f4ef7b5ad777cbc2af9fbaaa09d7adb664ca556da0aebab9f020022880be
   languageName: node
   linkType: hard
 

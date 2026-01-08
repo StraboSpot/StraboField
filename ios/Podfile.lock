@@ -2108,7 +2108,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-pager-view (6.7.1):
+  - react-native-pager-view (6.9.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -2164,7 +2164,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context (5.5.2):
+  - react-native-safe-area-context (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2182,8 +2182,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.5.2)
-    - react-native-safe-area-context/fabric (= 5.5.2)
+    - react-native-safe-area-context/common (= 5.6.2)
+    - react-native-safe-area-context/fabric (= 5.6.2)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -2194,7 +2194,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/common (5.5.2):
+  - react-native-safe-area-context/common (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2222,7 +2222,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-safe-area-context/fabric (5.5.2):
+  - react-native-safe-area-context/fabric (5.6.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -3232,7 +3232,7 @@ PODS:
     - React
   - RNSoundPlayer (0.14.5):
     - React-Core
-  - RNVectorIcons (10.2.0):
+  - RNVectorIcons (10.3.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3779,9 +3779,9 @@ SPEC CHECKSUMS:
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-orientation-director: 41be3fde00c83a7528c3741c4a21adb1fd3586af
-  react-native-pager-view: 4669cb3244c99fec52997f8906dd92f44b6ae17e
+  react-native-pager-view: a0516effb17ca5120ac2113bfd21b91130ad5748
   react-native-pdf: c586da0d19c14e6d859e62bf957851687fba0f25
-  react-native-safe-area-context: 84a754cad3fbb25117482cde6b8defca6c6f6a53
+  react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-slider: 3492743c54a83913920aa81bb949de57a915125c
   React-NativeModulesApple: a2c3d2cbec893956a5b3e4060322db2984fff75b
   React-networking: 3f98bd96893a294376e7e03730947a08d474c380
@@ -3831,7 +3831,7 @@ SPEC CHECKSUMS:
   RNSentry: fdb39d5f294e492aa2f08ad80e510310dc223772
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
-  RNVectorIcons: c13cc1db346e960ecd0aafcdd5d0bb458133b9c1
+  RNVectorIcons: 791f13226ec4a3fd13062eda9e892159f0981fae
   RNWorklets: 69f7239afaf3a156f7f9549eeb0ae8d02adc095f
   RNZipArchive: 4304f5100eab004eeb7349adc51997b3a28deb76
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6

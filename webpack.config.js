@@ -20,6 +20,7 @@ const compileNodeModules = [
   'react-native-gesture-handler',
   'react-native-image-picker',
   'react-native-reanimated',
+  'react-native-tab-view',
   'react-native-vector-icons',
 ].map(moduleName => path.resolve(__dirname, `node_modules/${moduleName}`));
 
@@ -124,6 +125,8 @@ module.exports = (env, argv) => {
           'src/modules/images/react-native-image-resizer.web.js'),
         '@react-native-async-storage/async-storage': path.resolve(__dirname,
           'node_modules/@react-native-async-storage/async-storage/src/index.ts'),
+        'react-native-tab-view': path.resolve(__dirname,
+          'node_modules/react-native-tab-view/src/index.tsx'),
       },
     },
     module: {
