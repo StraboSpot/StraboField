@@ -2080,7 +2080,7 @@ PODS:
     - React
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-orientation-director (2.5.0):
+  - react-native-orientation-director (2.6.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -3778,7 +3778,7 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 290b045c34c69db7574e4d08aadfc4abe1ff5a99
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
-  react-native-orientation-director: d2f4b4b745cb5445f294f52ec9ba89a9eaf45bc5
+  react-native-orientation-director: 41be3fde00c83a7528c3741c4a21adb1fd3586af
   react-native-pager-view: 4669cb3244c99fec52997f8906dd92f44b6ae17e
   react-native-pdf: c586da0d19c14e6d859e62bf957851687fba0f25
   react-native-safe-area-context: 84a754cad3fbb25117482cde6b8defca6c6f6a53
