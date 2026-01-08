@@ -13627,13 +13627,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:2.15.0":
-  version: 2.15.0
-  resolution: "proj4@npm:2.15.0"
+"proj4@npm:2.20.2":
+  version: 2.20.2
+  resolution: "proj4@npm:2.20.2"
   dependencies:
     mgrs: "npm:1.0.0"
-    wkt-parser: "npm:^1.4.0"
-  checksum: 10c0/01c0ef831247e08f4e0fce3193033913ca07be0301522bdefddabe1bb783b947bf731425f0aa6b14a01ee546f90cd6301a3eefed859afad3345884d1d01ec8f4
+    wkt-parser: "npm:^1.5.1"
+  checksum: 10c0/7b65fcb12a896a110779f6a0e28e947c4c208ccb4a2e381052f1b7c8bad5306d4315a1dac7b4d6316687a48cfbce63d6ff6017c9946c5ef12f440cbf67d8f0e5
   languageName: node
   linkType: hard
 
@@ -14002,9 +14002,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:2.29.1":
-  version: 2.29.1
-  resolution: "react-native-gesture-handler@npm:2.29.1"
+"react-native-gesture-handler@npm:2.30.0":
+  version: 2.30.0
+  resolution: "react-native-gesture-handler@npm:2.30.0"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     hoist-non-react-statics: "npm:^3.3.0"
@@ -14012,7 +14012,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/63de75098fb5733a4a24d3359c307ee2295939c48dc0808cf0efd6a50948834370e6b32a165b908fcbd7bc186e7bb4db3afbcd66b3fde3cbccca6f6b47f1b400
+  checksum: 10c0/26b94b0f97433fc6fb5b1c196ef29fce4f5a66c77fabb1bc33db91099357fbd44a5220783fcbb91d42700bcd578f2fd114314029d9e0d4674878767d9b7f5df6
   languageName: node
   linkType: hard
 
@@ -14162,9 +14162,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:4.2.0":
-  version: 4.2.0
-  resolution: "react-native-reanimated@npm:4.2.0"
+"react-native-reanimated@npm:4.2.1":
+  version: 4.2.1
+  resolution: "react-native-reanimated@npm:4.2.1"
   dependencies:
     react-native-is-edge-to-edge: "npm:1.2.1"
     semver: "npm:7.7.3"
@@ -14172,7 +14172,7 @@ __metadata:
     react: "*"
     react-native: "*"
     react-native-worklets: ">=0.7.0"
-  checksum: 10c0/29b9bbcf58c0801947357abcf8ecff2ec1e87a73854ccf390e26c20d23f0b4b5f99d524a74bb6c104c7b94127db60533797fdaa78bb602df7e91a042ce2b4d6e
+  checksum: 10c0/1458fb634d374125931c5815b2b0941e12b1a880ba12b4ff6bba12b6c101e0ce1f5c32a2226034ae762558e38077ae112d8498eb2c8af6bd967524c7e7f87c6b
   languageName: node
   linkType: hard
 
@@ -15663,7 +15663,7 @@ __metadata:
     password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
     prettier: "npm:2.8.8"
-    proj4: "npm:2.15.0"
+    proj4: "npm:2.20.2"
     prop-types: "npm:15.8.1"
     react: "npm:19.2.3"
     react-datepicker: "npm:8.3.0"
@@ -15677,7 +15677,7 @@ __metadata:
     react-native-devsettings: "npm:^1.0.5"
     react-native-draggable-flatlist: "npm:4.0.3"
     react-native-fs: "npm:2.20.0"
-    react-native-gesture-handler: "npm:2.29.1"
+    react-native-gesture-handler: "npm:2.30.0"
     react-native-get-random-values: "npm:1.11.0"
     react-native-image-picker: "npm:8.2.0"
     react-native-indicators: "npm:0.17.0"
@@ -15689,7 +15689,7 @@ __metadata:
     react-native-pager-view: "npm:6.7.1"
     react-native-pdf: "npm:6.7.7"
     react-native-progress: "npm:5.0.1"
-    react-native-reanimated: "npm:4.2.0"
+    react-native-reanimated: "npm:4.2.1"
     react-native-reanimated-table: "npm:0.0.2"
     react-native-safe-area-context: "npm:5.5.2"
     react-native-screens: "npm:4.19.0"
@@ -17016,10 +17016,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wkt-parser@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "wkt-parser@npm:1.4.0"
-  checksum: 10c0/4046fd355ddc626e6ea71f5a05e670bd3d6dc65dc0f8b10f2e9381ea6bd61cb90379389b0fb52337de9330788405dd0590b57e01b2c85f6f471acc794713243b
+"wkt-parser@npm:^1.5.1":
+  version: 1.5.2
+  resolution: "wkt-parser@npm:1.5.2"
+  checksum: 10c0/0522173da6e4e2dddc735d7899a74847c6e448b5bdc1b7994d86e1d193e81c704d39629ed9be456cd1ded564a1d5ac7c2a5686c1838ff6dc4ef1e58ad768144b
   languageName: node
   linkType: hard
 
