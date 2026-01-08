@@ -64,15 +64,17 @@ const TephraPage = ({isReadOnly, page}) => {
     const subpages = TEPHRA_SUBPAGES;
     return (
       <>
-        <ButtonGroup
-          buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
-          containerStyle={tephraStyles.buttonGroupContainer}
-          onPress={i => setSelectedTypeIndex(i)}
-          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-          selectedIndex={selectedTypeIndex}
-          textStyle={{color: PRIMARY_TEXT_COLOR}}
-        />
         <BasicPageDetail
+          PageTabsComponent={
+            <ButtonGroup
+              buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
+              containerStyle={tephraStyles.buttonGroupContainer}
+              onPress={i => setSelectedTypeIndex(i)}
+              selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+              selectedIndex={selectedTypeIndex}
+              textStyle={{color: PRIMARY_TEXT_COLOR}}
+            />
+          }
           closeDetailView={() => setIsDetailView(false)}
           isReadOnly={isReadOnly}
           page={{...page, key: 'tephra', subkey: Object.values(subpages)[selectedTypeIndex]}}

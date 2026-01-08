@@ -29,6 +29,7 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 
 
 const BasicPageDetail = ({
+                           PageTabsComponent,
                            closeDetailView,
                            deleteTemplate,
                            groupKey = 'general',
@@ -335,6 +336,7 @@ const BasicPageDetail = ({
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
             <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+            {PageTabsComponent && PageTabsComponent}
             {!isReadOnly && (
               <SaveAndCancelButtons
                 cancel={cancelForm}
