@@ -61,7 +61,7 @@ const BasicListItem = ({
       delayLongPress={500}
       key={item.id}
       onLongPress={drag}
-      onPress={() => !isReorderingActive && editItem(item)}
+      onPress={() => !isReorderingActive && editItem(item, index)}
     >
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>{getTitle()}</ListItem.Title>

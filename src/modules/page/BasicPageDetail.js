@@ -278,8 +278,9 @@ const BasicPageDetail = ({
         const editedFeatureData = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
         console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
         let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
-        editedPageData = editedPageData.filter(f => f.id !== editedFeatureData.id);
-        editedPageData.push(editedFeatureData);
+        const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
+        if (i === -1) editedPageData.push(editedFeatureData);
+        else editedPageData.splice(i, 1, editedFeatureData);
         const spotId = spot.properties.id;
         dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
