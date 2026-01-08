@@ -46,8 +46,8 @@ import sedStructuresPhysical from './sed/structures-physical.json';
 import siteSafety from './site-safety.json';
 import surfaceFeature from './surface-feature.json';
 import tags from './tags.json';
-import tephraIntervalAdditional from './tephra/additional.json';
-import tephraIntervalBasic from './tephra/basic.json';
+import tephraAdditional from './tephra/additional.json';
+import tephraBasic from './tephra/basic.json';
 import fabric from './three-d-structures/fabric.json';
 import fault from './three-d-structures/fault.json';
 import fold from './three-d-structures/fold.json';
@@ -163,8 +163,8 @@ const forms = {
     texture: sedLithologiesTexture,
   },
   tephra: {
-    interval_additional: tephraIntervalAdditional,
-    interval_basic: tephraIntervalBasic,
+    additional: tephraAdditional,
+    basic: tephraBasic,
   },
 };
 
