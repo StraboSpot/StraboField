@@ -39,15 +39,14 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - MapboxCommon (23.11.4)
-  - MapboxCoreMaps (10.19.2):
-    - MapboxCommon (~> 23.11)
-  - MapboxMaps (10.19.4):
-    - MapboxCommon (= 23.11.4)
-    - MapboxCoreMaps (= 10.19.2)
-    - MapboxMobileEvents (= 2.0.0)
-    - Turf (= 2.8.0)
-  - MapboxMobileEvents (2.0.0)
+  - MapboxCommon (24.16.6):
+    - Turf (= 4.0.0)
+  - MapboxCoreMaps (11.16.6):
+    - MapboxCommon (= 24.16.6)
+  - MapboxMaps (11.16.6):
+    - MapboxCommon (= 24.16.6)
+    - MapboxCoreMaps (= 11.16.6)
+    - Turf (= 4.0.0)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1933,7 +1932,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
-  - react-native-blob-util (0.21.3):
+  - react-native-blob-util (0.24.6):
     - boost
     - DoubleConversion
     - fast_float
@@ -3013,19 +3012,19 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - rnmapbox-maps (10.1.45):
-    - MapboxMaps (~> 10.19.0)
+  - rnmapbox-maps (10.2.10):
+    - MapboxMaps (~> 11.16.2)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.1.45)
+    - rnmapbox-maps/DynamicLibrary (= 10.2.10)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.1.45):
+  - rnmapbox-maps/DynamicLibrary (10.2.10):
     - boost
     - DoubleConversion
     - fast_float
     - fmt
     - hermes-engine
-    - MapboxMaps (~> 10.19.0)
+    - MapboxMaps (~> 11.16.2)
     - RCT-Folly
     - RCT-Folly/Fabric
     - RCTRequired
@@ -3359,7 +3358,7 @@ PODS:
   - Sentry/HybridSDK (8.57.3)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.5.5)
-  - Turf (2.8.0)
+  - Turf (4.0.0)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -3482,7 +3481,6 @@ SPEC REPOS:
     - MapboxCommon
     - MapboxCoreMaps
     - MapboxMaps
-    - MapboxMobileEvents
     - React-Codegen
     - Sentry
     - SocketRocket
@@ -3729,10 +3727,9 @@ SPEC CHECKSUMS:
   IQKeyboardManagerSwift: 90ba81812fbbd6694924a95a271fa3affdf04a14
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
   lottie-react-native: 86fa7488b1476563f41071244aa73d5b738faf19
-  MapboxCommon: cc47fafe3fe5408ca49240aa80fa64f27f275711
-  MapboxCoreMaps: 35685edba03e44468aed57c3dfd7f8795edafda8
-  MapboxMaps: f87023cf0d72b180b40ea0b6fb4b2d7db6b73b71
-  MapboxMobileEvents: d044b9edbe0ec7df60f6c2c9634fe9a7f449266b
+  MapboxCommon: 10cbf74edb23c9abcfe2424899d804f288a47334
+  MapboxCoreMaps: f19680d20681797067268284b2292349de861730
+  MapboxMaps: 04c7bf46d66265ad0f4b98484a251777a926c423
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
   RCTRequired: 7be34aabb0b77c3cefe644528df0fa0afad4e4d0
@@ -3770,7 +3767,7 @@ SPEC CHECKSUMS:
   React-logger: b8483fa08e0d62e430c76d864309d90576ca2f68
   React-Mapbuffer: 7b72a669e94662359dad4f42b5af005eb24b4e83
   React-microtasksnativemodule: cdc02da075f2857803ed63f24f5f72fc40e094c0
-  react-native-blob-util: de951f2f5a4498587595cff560bd146f59fcef01
+  react-native-blob-util: 04189c38b188b2b76ee453be34765241c552547f
   react-native-document-picker: 1734eb0aa3dbd1cd7bf1b105936f9b55031ae616
   react-native-geolocation: 95e48fe2687e5a8280103085372fa62c2297c5d6
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
@@ -3824,7 +3821,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: cd4be101cfa17ea6bbd438710caa02e286a84381
-  rnmapbox-maps: 6347eb0fad185f6cfdba3ee5e116f5eb9b796a3e
+  rnmapbox-maps: 3d1e47317c5ca1763a120120c207825ab3728836
   RNReanimated: 292cd58688552a22b3fc1cefcfbc49b336dfed68
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
   RNSensors: 111159597ac51505df10413c61b28bcd28e88983
@@ -3837,7 +3834,7 @@ SPEC CHECKSUMS:
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
-  Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
+  Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   Yoga: 5bd0956bf9cb16f75101e78b5e852c7577bc5a45
 
 PODFILE CHECKSUM: 3f616a3451c89dfaeb25ef8ade39393bcebb44ae

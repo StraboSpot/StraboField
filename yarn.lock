@@ -3762,9 +3762,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.1.45":
-  version: 10.1.45
-  resolution: "@rnmapbox/maps@npm:10.1.45"
+"@rnmapbox/maps@npm:10.2.10":
+  version: 10.2.10
+  resolution: "@rnmapbox/maps@npm:10.2.10"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -3776,9 +3776,9 @@ __metadata:
   peerDependencies:
     expo: ">=47.0.0"
     mapbox-gl: ^2.9.0
-    react: ">=16.6.1"
+    react: ">=17.0.0"
     react-dom: ">= 17.0.0"
-    react-native: ">=0.59.9"
+    react-native: ">=0.69"
   peerDependenciesMeta:
     expo:
       optional: true
@@ -3786,7 +3786,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/2905268614836f772bc5be3bdf49082f390237f13ad9ebe07ddb8c30d7e2d83edf4afe9aee03e39f2d40104117401ea193dd36054fa966475fb90b87f470b8ee
+  checksum: 10c0/d6429851904d098571a3f448157824dd5729856ca2cdcdea13912743d1dc37b88552418f26a0d6dcec22dbba1aa0ff77cb269961501d379e30fbe1083d136117
   languageName: node
   linkType: hard
 
@@ -15673,7 +15673,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:2.11.2"
     "@rn-vui/base": "npm:5.1.10"
     "@rn-vui/themed": "npm:5.1.10"
-    "@rnmapbox/maps": "npm:10.1.45"
+    "@rnmapbox/maps": "npm:10.2.10"
     "@sentry/cli": "npm:2.58.4"
     "@sentry/react-native": "npm:^7.8.0"
     "@sentry/tracing": "npm:7.120.4"
