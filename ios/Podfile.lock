@@ -2162,7 +2162,7 @@ PODS:
     - SocketRocket
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
-  - react-native-pdf (6.7.7):
+  - react-native-pdf (7.0.3):
     - boost
     - DoubleConversion
     - fast_float
@@ -3806,7 +3806,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-orientation-director: 41be3fde00c83a7528c3741c4a21adb1fd3586af
   react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
-  react-native-pdf: c586da0d19c14e6d859e62bf957851687fba0f25
+  react-native-pdf: edc236298f13f1609e42d41e45b8b6ea88ed10f9
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-slider: 3492743c54a83913920aa81bb949de57a915125c
   React-NativeModulesApple: a2c3d2cbec893956a5b3e4060322db2984fff75b
