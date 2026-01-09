@@ -2133,7 +2133,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-pager-view (6.9.1):
+  - react-native-pager-view (8.0.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2160,6 +2160,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - SocketRocket
+    - SwiftUIIntrospect (~> 1.0)
     - Yoga
   - react-native-pdf (6.7.7):
     - boost
@@ -3384,6 +3385,7 @@ PODS:
   - Sentry/HybridSDK (8.57.3)
   - SocketRocket (0.7.1)
   - SSZipArchive (2.5.5)
+  - SwiftUIIntrospect (1.3.0)
   - Turf (4.0.0)
   - Yoga (0.0.0)
 
@@ -3511,6 +3513,7 @@ SPEC REPOS:
     - Sentry
     - SocketRocket
     - SSZipArchive
+    - SwiftUIIntrospect
     - Turf
 
 EXTERNAL SOURCES:
@@ -3802,7 +3805,7 @@ SPEC CHECKSUMS:
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-orientation-director: 41be3fde00c83a7528c3741c4a21adb1fd3586af
-  react-native-pager-view: a0516effb17ca5120ac2113bfd21b91130ad5748
+  react-native-pager-view: d7d2aa47f54343bf55fdcee3973503dd27c2bd37
   react-native-pdf: c586da0d19c14e6d859e62bf957851687fba0f25
   react-native-safe-area-context: c00143b4823773bba23f2f19f85663ae89ceb460
   react-native-slider: 3492743c54a83913920aa81bb949de57a915125c
@@ -3860,6 +3863,7 @@ SPEC CHECKSUMS:
   Sentry: c643eb180df401dd8c734c5036ddd9dd9218daa6
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
+  SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   Yoga: 5bd0956bf9cb16f75101e78b5e852c7577bc5a45
 
