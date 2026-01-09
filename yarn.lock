@@ -12835,9 +12835,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lottie-react-native@npm:7.3.4":
-  version: 7.3.4
-  resolution: "lottie-react-native@npm:7.3.4"
+"lottie-react-native@npm:7.3.5":
+  version: 7.3.5
+  resolution: "lottie-react-native@npm:7.3.5"
   peerDependencies:
     "@lottiefiles/dotlottie-react": ^0.13.5
     react: "*"
@@ -12848,7 +12848,7 @@ __metadata:
       optional: true
     react-native-windows:
       optional: true
-  checksum: 10c0/e91e24e3ff36200db068de1d8f14757adc412e0ce71209cde29f1f594b50307ff28342dcfb5b5995d509e0a9f78b9e6a1ab0e414b27bba94e6d99b175658168c
+  checksum: 10c0/db84e188b25d15c7b92b15104e18b7f925e31ac0a0293d2e3ad9ee70a4834220e57e7e4535a493cd89ba9a008e41a555b40d9f88fccd8216d22c106b76d71174
   languageName: node
   linkType: hard
 
@@ -14337,12 +14337,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.8.8":
-  version: 2.8.8
-  resolution: "prettier@npm:2.8.8"
+"prettier@npm:3.7.4":
+  version: 3.7.4
+  resolution: "prettier@npm:3.7.4"
   bin:
-    prettier: bin-prettier.js
-  checksum: 10c0/463ea8f9a0946cd5b828d8cf27bd8b567345cf02f56562d5ecde198b91f47a76b7ac9eae0facd247ace70e927143af6135e8cf411986b8cb8478784a4d6d724a
+    prettier: bin/prettier.cjs
+  checksum: 10c0/9675d2cd08eacb1faf1d1a2dbfe24bfab6a912b059fc9defdb380a408893d88213e794a40a2700bd29b140eb3172e0b07c852853f6e22f16f3374659a1a13389
   languageName: node
   linkType: hard
 
@@ -14740,12 +14740,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-device-info@npm:14.1.1":
-  version: 14.1.1
-  resolution: "react-native-device-info@npm:14.1.1"
+"react-native-device-info@npm:15.0.1":
+  version: 15.0.1
+  resolution: "react-native-device-info@npm:15.0.1"
   peerDependencies:
     react-native: "*"
-  checksum: 10c0/38ae82b2364b8af5b5cfdd142842bb7dd53b2e37b7225b375ac2f5ebf9272c5250fec2fb08cb58af494339c2341de617393717fc5488c575a5b9d817237d7f54
+  checksum: 10c0/f33a28b44bc9a67939f2c837ea55c6f59f3096323b5ccc834093bece941d343bad3d86b0faa9340004c2e657abe47fac6cee539d9274f5fabfb5745bfdc77c92
   languageName: node
   linkType: hard
 
@@ -14799,14 +14799,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-get-random-values@npm:1.11.0":
-  version: 1.11.0
-  resolution: "react-native-get-random-values@npm:1.11.0"
+"react-native-get-random-values@npm:2.0.0":
+  version: 2.0.0
+  resolution: "react-native-get-random-values@npm:2.0.0"
   dependencies:
     fast-base64-decode: "npm:^1.0.0"
   peerDependencies:
-    react-native: ">=0.56"
-  checksum: 10c0/2ce71f1ab7f5b36d4a9dd59cc80b4aa75526f047c6680a7f1a388fa8b9a62efdacaf7b7de3be593c73e882773b2eee74916b00f7c8b158e40b46388998218586
+    react-native: ">=0.81"
+  checksum: 10c0/fd2e10ab3bca54bff8f5844e3314b797e02822e86663bc2dafe00a511b8a8e1c05d96aa0b8dc1ffad428387d44bbf458ce770a429858433d36f58a16e6e52986
   languageName: node
   linkType: hard
 
@@ -16427,12 +16427,12 @@ __metadata:
     html-webpack-plugin: "npm:^5.6.5"
     jest: "npm:^30.2.0"
     js-base64: "npm:3.7.8"
-    lottie-react-native: "npm:7.3.4"
+    lottie-react-native: "npm:7.3.5"
     mapbox-gl: "npm:3.17.0"
     moment: "npm:2.30.1"
     password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
-    prettier: "npm:2.8.8"
+    prettier: "npm:3.7.4"
     proj4: "npm:2.20.2"
     prop-types: "npm:15.8.1"
     react: "npm:19.2.3"
@@ -16443,12 +16443,12 @@ __metadata:
     react-native: "npm:0.83.1"
     react-native-blob-util: "npm:0.24.6"
     react-native-check-version: "npm:1.4.0"
-    react-native-device-info: "npm:14.1.1"
+    react-native-device-info: "npm:15.0.1"
     react-native-devsettings: "npm:^1.0.5"
     react-native-draggable-flatlist: "npm:4.0.3"
     react-native-fs: "npm:2.20.0"
     react-native-gesture-handler: "npm:2.30.0"
-    react-native-get-random-values: "npm:1.11.0"
+    react-native-get-random-values: "npm:2.0.0"
     react-native-image-picker: "npm:8.2.1"
     react-native-indicators: "npm:0.17.0"
     react-native-json-tree: "npm:1.5.0"
