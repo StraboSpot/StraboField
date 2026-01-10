@@ -164,5 +164,5 @@
       "react": "~18.3.1"
     }
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.12.0"
 }
