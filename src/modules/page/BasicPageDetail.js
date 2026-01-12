@@ -29,6 +29,7 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 
 
 const BasicPageDetail = ({
+                           PageTabsComponent,
                            closeDetailView,
                            deleteTemplate,
                            groupKey = 'general',
@@ -277,8 +278,9 @@ const BasicPageDetail = ({
         const editedFeatureData = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
         console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
         let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
-        editedPageData = editedPageData.filter(f => f.id !== editedFeatureData.id);
-        editedPageData.push(editedFeatureData);
+        const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
+        if (i === -1) editedPageData.push(editedFeatureData);
+        else editedPageData.splice(i, 1, editedFeatureData);
         const spotId = spot.properties.id;
         dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
@@ -335,6 +337,7 @@ const BasicPageDetail = ({
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
             <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+            {PageTabsComponent && PageTabsComponent}
             {!isReadOnly && (
               <SaveAndCancelButtons
                 cancel={cancelForm}

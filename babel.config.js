@@ -9,12 +9,13 @@ module.exports = {
     },
     development: {
       plugins: [
-        ['@babel/plugin-transform-react-jsx', { runtime: 'classic' }],
+        ['@babel/plugin-transform-react-jsx', {runtime: 'classic'}],
         'react-native-reanimated/plugin',
       ],
     },
   },
   plugins: [
-    '@babel/plugin-proposal-export-namespace-from',
+    '@babel/plugin-transform-export-namespace-from',
+    ['react-native-worklets/plugin'],
   ],
 };

@@ -60,10 +60,12 @@ const useMapFeaturesCalculated = (mapRef) => {
         screenCoords = Platform.OS === 'web' ? mapRef.current.project(eachFeature.geometry.coordinates)
           : await mapRef.current.getPointInView(eachFeature.geometry.coordinates);
         if (Platform.OS === 'web') screenCoords = [screenCoords.x, screenCoords.y];
-        else if (Platform.OS === 'android') {
-          const pixelRatio = PixelRatio.get();
-          screenCoords = [screenCoords[0] / pixelRatio, screenCoords[1] / pixelRatio];
-        }
+        // getPointInView seems to include pixel ratio adjustment for Android
+        // now after updating @rnmapbox/maps from v10.1.39 to v10.2.10
+        // else if (Platform.OS === 'android') {
+        //   const pixelRatio = PixelRatio.get();
+        //   screenCoords = [screenCoords[0] / pixelRatio, screenCoords[1] / pixelRatio];
+        // }
         eachFeature.geometry.coordinates = screenCoords;
         distances[i] = turf.distance(dummyFeature, eachFeature);
       }

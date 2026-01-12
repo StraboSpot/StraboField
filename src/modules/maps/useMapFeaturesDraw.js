@@ -817,9 +817,11 @@ const useMapFeaturesDraw = ({
     let vertexScreenCoords = Platform.OS === 'web' ? mapRef.current.project(vertexGeoCoords)
       : await mapRef.current.getPointInView(vertexGeoCoords);
     if (Platform.OS === 'web') vertexScreenCoords = [vertexScreenCoords.x, vertexScreenCoords.y];
-    else if (Platform.OS === 'android') {
-      vertexScreenCoords = [vertexScreenCoords[0] / PixelRatio.get(), vertexScreenCoords[1] / PixelRatio.get()];
-    }
+    // getPointInView seems to include pixel ratio adjustment for Android
+    // now after updating @rnmapbox/maps from v10.1.39 to v10.2.10
+    // else if (Platform.OS === 'android') {
+    //   vertexScreenCoords = [vertexScreenCoords[0] / PixelRatio.get(), vertexScreenCoords[1] / PixelRatio.get()];
+    // }
     dispatch(setVertexStartCoords(vertexScreenCoords));
   };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as turf from '@turf/turf';
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import useMapSymbology from '../symbology/useMapSymbology';

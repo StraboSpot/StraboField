@@ -46,7 +46,8 @@ const BasicListItem = ({
       case PAGE_KEYS.INTERPRETATIONS:
         return 'Lithology ' + (index + 1);
       case PAGE_KEYS.TEPHRA:
-        return (index + 1) + '. ' + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_description']);
+        return (item?.label || (index + 1)) + ' - '
+          + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_basic']);
       case PAGE_KEYS.EARTHQUAKES:
         return getLabel(item?.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
       default:
@@ -60,7 +61,7 @@ const BasicListItem = ({
       delayLongPress={500}
       key={item.id}
       onLongPress={drag}
-      onPress={() => !isReorderingActive && editItem(item)}
+      onPress={() => !isReorderingActive && editItem(item, index)}
     >
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>{getTitle()}</ListItem.Title>

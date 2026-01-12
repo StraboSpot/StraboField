@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/Helpers';

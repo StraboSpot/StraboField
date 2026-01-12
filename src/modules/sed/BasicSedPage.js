@@ -64,16 +64,18 @@ const BasicSedPage = ({isReadOnly, page}) => {
     if (subpages) {
       return (
         <>
-          <ButtonGroup
-            buttonStyle={{padding: 5}}
-            buttons={Object.values(subpages).map(
-              v => ({element: () => <TruncatedText title={toTitleCase(v.replace(/_/g, ' '))}/>}))}
-            containerStyle={{height: 40, borderRadius: 10}}
-            onPress={i => setSelectedTypeIndex(i)}
-            selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-            selectedIndex={selectedTypeIndex}
-          />
           <BasicPageDetail
+            PageTabsComponent={
+              <ButtonGroup
+                buttonStyle={{padding: 5}}
+                buttons={Object.values(subpages).map(
+                  v => ({element: () => <TruncatedText title={toTitleCase(v.replace(/_/g, ' '))}/>}))}
+                containerStyle={{height: 40, borderRadius: 10}}
+                onPress={i => setSelectedTypeIndex(i)}
+                selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+                selectedIndex={selectedTypeIndex}
+              />
+            }
             closeDetailView={() => setIsDetailView(false)}
             groupKey={'sed'}
             isReadOnly={isReadOnly}
