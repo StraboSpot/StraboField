@@ -1,7 +1,7 @@
 import React, {forwardRef, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import {Map as ReactMapGL, NavigationControl} from 'react-map-gl';
+import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MapLayers} from './layers';

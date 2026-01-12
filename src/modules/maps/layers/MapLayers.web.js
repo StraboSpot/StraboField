@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ScaleControl} from 'react-map-gl';
+import {ScaleControl} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import {

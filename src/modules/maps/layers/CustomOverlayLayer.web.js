@@ -1,6 +1,6 @@
 import React, {useEffect, memo} from 'react';
 
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 
 import useMapURL from '../useMapURL';
 
