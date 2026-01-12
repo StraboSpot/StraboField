@@ -4169,9 +4169,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-darwin@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-darwin@npm:3.0.3"
+"@sentry/cli-darwin@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-darwin@npm:3.1.0"
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -4183,9 +4183,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm64@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-linux-arm64@npm:3.0.3"
+"@sentry/cli-linux-arm64@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-linux-arm64@npm:3.1.0"
   conditions: (os=linux | os=freebsd | os=android) & cpu=arm64
   languageName: node
   linkType: hard
@@ -4197,9 +4197,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-arm@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-linux-arm@npm:3.0.3"
+"@sentry/cli-linux-arm@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-linux-arm@npm:3.1.0"
   conditions: (os=linux | os=freebsd | os=android) & cpu=arm
   languageName: node
   linkType: hard
@@ -4211,9 +4211,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-i686@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-linux-i686@npm:3.0.3"
+"@sentry/cli-linux-i686@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-linux-i686@npm:3.1.0"
   conditions: (os=linux | os=freebsd | os=android) & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
@@ -4225,9 +4225,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-linux-x64@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-linux-x64@npm:3.0.3"
+"@sentry/cli-linux-x64@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-linux-x64@npm:3.1.0"
   conditions: (os=linux | os=freebsd | os=android) & cpu=x64
   languageName: node
   linkType: hard
@@ -4239,9 +4239,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-arm64@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-win32-arm64@npm:3.0.3"
+"@sentry/cli-win32-arm64@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-win32-arm64@npm:3.1.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
@@ -4253,9 +4253,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-i686@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-win32-i686@npm:3.0.3"
+"@sentry/cli-win32-i686@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-win32-i686@npm:3.1.0"
   conditions: os=win32 & (cpu=x86 | cpu=ia32)
   languageName: node
   linkType: hard
@@ -4267,9 +4267,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli-win32-x64@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli-win32-x64@npm:3.0.3"
+"@sentry/cli-win32-x64@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli-win32-x64@npm:3.1.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -4314,18 +4314,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/cli@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@sentry/cli@npm:3.0.3"
+"@sentry/cli@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@sentry/cli@npm:3.1.0"
   dependencies:
-    "@sentry/cli-darwin": "npm:3.0.3"
-    "@sentry/cli-linux-arm": "npm:3.0.3"
-    "@sentry/cli-linux-arm64": "npm:3.0.3"
-    "@sentry/cli-linux-i686": "npm:3.0.3"
-    "@sentry/cli-linux-x64": "npm:3.0.3"
-    "@sentry/cli-win32-arm64": "npm:3.0.3"
-    "@sentry/cli-win32-i686": "npm:3.0.3"
-    "@sentry/cli-win32-x64": "npm:3.0.3"
+    "@sentry/cli-darwin": "npm:3.1.0"
+    "@sentry/cli-linux-arm": "npm:3.1.0"
+    "@sentry/cli-linux-arm64": "npm:3.1.0"
+    "@sentry/cli-linux-i686": "npm:3.1.0"
+    "@sentry/cli-linux-x64": "npm:3.1.0"
+    "@sentry/cli-win32-arm64": "npm:3.1.0"
+    "@sentry/cli-win32-i686": "npm:3.1.0"
+    "@sentry/cli-win32-x64": "npm:3.1.0"
     progress: "npm:^2.0.3"
     proxy-from-env: "npm:^1.1.0"
     undici: "npm:^6.22.0"
@@ -4349,7 +4349,7 @@ __metadata:
       optional: true
   bin:
     sentry-cli: bin/sentry-cli
-  checksum: 10c0/db97019f3e91c72efa23f5159da881ada61890745a36f4eac8a5865a92bdac38d6130e6e05969f39ef0798166817092480289c413fa414cea15677a5c7bb6d54
+  checksum: 10c0/38c97b2253c13c7e2c15e56560478639f976b286bd0c6cd8d833ec8ce856c1bdbd305362dbcdb10ddea1d1abea59e107a680e25e0a3b92fcd83c7f9ce0c7b72e
   languageName: node
   linkType: hard
 
@@ -16929,7 +16929,7 @@ __metadata:
     "@rn-vui/base": "npm:5.1.10"
     "@rn-vui/themed": "npm:5.1.10"
     "@rnmapbox/maps": "npm:10.2.10"
-    "@sentry/cli": "npm:3.0.3"
+    "@sentry/cli": "npm:3.1.0"
     "@sentry/react-native": "npm:7.8.0"
     "@sentry/tracing": "npm:7.120.4"
     "@turf/turf": "npm:7.3.1"

@@ -55,7 +55,7 @@
     "@rn-vui/base": "5.1.10",
     "@rn-vui/themed": "5.1.10",
     "@rnmapbox/maps": "10.2.10",
-    "@sentry/cli": "3.0.3",
+    "@sentry/cli": "3.1.0",
     "@sentry/react-native": "7.8.0",
     "@sentry/tracing": "7.120.4",
     "@turf/turf": "7.3.1",
