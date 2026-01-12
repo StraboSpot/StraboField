@@ -3768,46 +3768,46 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.9.3":
-  version: 2.9.3
-  resolution: "@react-navigation/elements@npm:2.9.3"
+"@react-navigation/elements@npm:^2.9.4":
+  version: 2.9.4
+  resolution: "@react-navigation/elements@npm:2.9.4"
   dependencies:
     color: "npm:^4.2.3"
     use-latest-callback: "npm:^0.2.4"
     use-sync-external-store: "npm:^1.5.0"
   peerDependencies:
     "@react-native-masked-view/masked-view": ">= 0.2.0"
-    "@react-navigation/native": ^7.1.26
+    "@react-navigation/native": ^7.1.27
     react: ">= 18.2.0"
     react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
   peerDependenciesMeta:
     "@react-native-masked-view/masked-view":
       optional: true
-  checksum: 10c0/50c30366507ca420e65b1a232edca8d64fbac1420d90d0a9aa16ec84d8c63719b9c626a24095943fd63283b4116c0ec888f6ccc6cb2317a4cba4d1b1c2c5021a
+  checksum: 10c0/822d8cbf079520e943c05b37fbcd48b7f574db421b764fa6c6200dc77223720da83fa7361d7c42e15104883e13d1a5349dd2bc2de2538f7f05502dd79101e38f
   languageName: node
   linkType: hard
 
-"@react-navigation/material-top-tabs@npm:7.4.11":
-  version: 7.4.11
-  resolution: "@react-navigation/material-top-tabs@npm:7.4.11"
+"@react-navigation/material-top-tabs@npm:7.4.12":
+  version: 7.4.12
+  resolution: "@react-navigation/material-top-tabs@npm:7.4.12"
   dependencies:
-    "@react-navigation/elements": "npm:^2.9.3"
+    "@react-navigation/elements": "npm:^2.9.4"
     color: "npm:^4.2.3"
     react-native-tab-view: "npm:^4.2.2"
   peerDependencies:
-    "@react-navigation/native": ^7.1.26
+    "@react-navigation/native": ^7.1.27
     react: ">= 18.2.0"
     react-native: "*"
     react-native-pager-view: ">= 6.0.0"
     react-native-safe-area-context: ">= 4.0.0"
-  checksum: 10c0/20dd99926e381ed0ffc84ba465527c2473b1047440bc3722770c974d7a0ba56c913033cec84995b2d37b745d696bc13d2079b683e330aa9e4715c6546e26cf3f
+  checksum: 10c0/3a0a4bb8f99d06c9d3d5db7e5b79d9db1efeaf2401b70b3934e9b660bac2cd19141dde1dfb6ec89269bd5cd069539344ae454598a8263b21af565f0233a2da65
   languageName: node
   linkType: hard
 
-"@react-navigation/native@npm:7.1.26":
-  version: 7.1.26
-  resolution: "@react-navigation/native@npm:7.1.26"
+"@react-navigation/native@npm:7.1.27":
+  version: 7.1.27
+  resolution: "@react-navigation/native@npm:7.1.27"
   dependencies:
     "@react-navigation/core": "npm:^7.13.7"
     escape-string-regexp: "npm:^4.0.0"
@@ -3817,7 +3817,7 @@ __metadata:
   peerDependencies:
     react: ">= 18.2.0"
     react-native: "*"
-  checksum: 10c0/7aa1e3ff40b36fb13f615412465d48eaa115f95c9b4278c67c616f8aa3d86bab68656b2528827307dbdba1cd2f30b3614837a042cc19b4316baf78ec0ff3f4c8
+  checksum: 10c0/57ce15c61fe7c966b881704d3b31daa047333093f9484c4e4118ccc6878a20ec72d9a8884c6a79a7fce8b53d51481289871e6eb03a9ec27f14e8eb2aa0d96c37
   languageName: node
   linkType: hard
 
@@ -3830,21 +3830,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/stack@npm:7.6.13":
-  version: 7.6.13
-  resolution: "@react-navigation/stack@npm:7.6.13"
+"@react-navigation/stack@npm:7.6.14":
+  version: 7.6.14
+  resolution: "@react-navigation/stack@npm:7.6.14"
   dependencies:
-    "@react-navigation/elements": "npm:^2.9.3"
+    "@react-navigation/elements": "npm:^2.9.4"
     color: "npm:^4.2.3"
     use-latest-callback: "npm:^0.2.4"
   peerDependencies:
-    "@react-navigation/native": ^7.1.26
+    "@react-navigation/native": ^7.1.27
     react: ">= 18.2.0"
     react-native: "*"
     react-native-gesture-handler: ">= 2.0.0"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: 10c0/2c6b7c8783a981c8316d79f3ac5dc563c6cdca3e15e8d5dcb4ef8f58f40e0d26c0a7c0903cc3793b73bfcfd03261045f5a848a54d34f11379f045c0fd723a307
+  checksum: 10c0/8b54a80cd73f44db14e0edd6103722124733b5ca0617b44ea5767c857d4aadc101558d4349956d1ba447926dc224ff72043b95fed7152c139ce6f2f902cc5668
   languageName: node
   linkType: hard
 
@@ -16393,9 +16393,9 @@ __metadata:
     "@react-native/eslint-config": "npm:0.83.1"
     "@react-native/metro-config": "npm:0.83.1"
     "@react-native/typescript-config": "npm:0.83.1"
-    "@react-navigation/material-top-tabs": "npm:7.4.11"
-    "@react-navigation/native": "npm:7.1.26"
-    "@react-navigation/stack": "npm:7.6.13"
+    "@react-navigation/material-top-tabs": "npm:7.4.12"
+    "@react-navigation/native": "npm:7.1.27"
+    "@react-navigation/stack": "npm:7.6.14"
     "@reduxjs/toolkit": "npm:2.11.2"
     "@rn-vui/base": "npm:5.1.10"
     "@rn-vui/themed": "npm:5.1.10"
