@@ -28,6 +28,9 @@ bundle exec pod install
 # 2. dev-test-logins.js at project root:
 export const USERNAME_TEST = 'your username/email';
 export const PASSWORD_TEST = 'your password';
+
+# 3. Generate Sentry properties files (auto-generated from env.json):
+npm run setup-sentry
 ```
 
 ### Running the App

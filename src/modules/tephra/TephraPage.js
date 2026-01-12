@@ -25,7 +25,7 @@ const TephraPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [data, setData] = useState([]);
+  const [data1, setData] = useState([]);
   const [isDetailView, setIsDetailView] = useState(false);
   const [isReorderingActive, setIsReorderingActive] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
@@ -64,15 +64,17 @@ const TephraPage = ({isReadOnly, page}) => {
     const subpages = TEPHRA_SUBPAGES;
     return (
       <>
-        <ButtonGroup
-          buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
-          containerStyle={tephraStyles.buttonGroupContainer}
-          onPress={i => setSelectedTypeIndex(i)}
-          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-          selectedIndex={selectedTypeIndex}
-          textStyle={{color: PRIMARY_TEXT_COLOR}}
-        />
         <BasicPageDetail
+          PageTabsComponent={
+            <ButtonGroup
+              buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
+              containerStyle={tephraStyles.buttonGroupContainer}
+              onPress={i => setSelectedTypeIndex(i)}
+              selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+              selectedIndex={selectedTypeIndex}
+              textStyle={{color: PRIMARY_TEXT_COLOR}}
+            />
+          }
           closeDetailView={() => setIsDetailView(false)}
           isReadOnly={isReadOnly}
           page={{...page, key: 'tephra', subkey: Object.values(subpages)[selectedTypeIndex]}}
@@ -87,14 +89,15 @@ const TephraPage = ({isReadOnly, page}) => {
       <View style={tephraStyles.mainAttributesContainer}>
         <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <View style={tephraStyles.draggableListContainer}>
-          {data.length > 1 && (
-            <Text
-              style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
+          {data1.length > 1 && (
+            <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>
+              Top
+            </Text>
           )}
           <DraggableFlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
-            data={data}
+            data={data1}
             keyExtractor={item => item.id}
             onDragBegin={() => setIsReorderingActive(true)}
             onDragEnd={({data}) => setData(data)}
@@ -111,7 +114,7 @@ const TephraPage = ({isReadOnly, page}) => {
               </ShadowDecorator>
             )}
           />
-          {data.length > 1 && (
+          {data1.length > 1 && (
             <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>
               Bottom
             </Text>
@@ -125,7 +128,7 @@ const TephraPage = ({isReadOnly, page}) => {
   const updateOrder = () => {
     setIsReorderingActive(false);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'tephra', value: data}));
+    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
   };
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();

@@ -32,6 +32,7 @@ const AddTephraModal = ({onPress}) => {
   const formRef = useRef(null);
   const {validateForm} = useForm();
 
+  const initialValues = {label: spot.properties.name + ' ' + ((spot.properties?.tephra?.length || 0) + 1)};
   const pageKey = PAGE_KEYS.TEPHRA;
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const AddTephraModal = ({onPress}) => {
           ListHeaderComponent={
             <View style={{flex: 1}}>
               <Formik
-                initialValues={{}}
+                initialValues={initialValues}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: formName, values: values})}

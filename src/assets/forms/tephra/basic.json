@@ -9,10 +9,22 @@
       "name": "end"
     },
     {
+      "type": "text",
+      "name": "label",
+      "label": "Layer Label",
+      "required": "false"
+    },
+    {
       "type": "select_one ou9ax73",
       "name": "layer_type",
       "label": "Layer Type",
       "required": "true"
+    },
+    {
+      "type": "text",
+      "name": "layer_color",
+      "label": "Layer Color",
+      "required": "false"
     },
     {
       "type": "select_one ay7bp40",
@@ -40,15 +52,9 @@
       "required": "${thickness_typical} = '' and ${thickness_minimum} = ''"
     },
     {
-      "type": "select_one uu5sd70",
-      "name": "contact_bottom",
-      "label": "Bottom Contact",
-      "required": "false"
-    },
-    {
-      "type": "select_one tv9gx70",
-      "name": "contact_top",
-      "label": "Top Contact",
+      "type": "select_one gg1yf28",
+      "name": "grading",
+      "label": "Grading",
       "required": "false"
     },
     {
@@ -64,15 +70,9 @@
       "required": "false"
     },
     {
-      "type": "select_one gg1yf28",
-      "name": "grading",
-      "label": "Grading",
-      "required": "false"
-    },
-    {
-      "type": "text",
-      "name": "grainsize_maximum",
-      "label": "Maximum Grainsize",
+      "type": "select_one qr36o66",
+      "name": "layer_sorting",
+      "label": "Sorting",
       "required": "false"
     }
   ],
@@ -222,218 +222,18 @@
     },
     {
       "list_name": "ay7bp40",
-      "name": "millimeters",
+      "name": "mm",
       "label": "mm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "centimeters",
+      "name": "cm",
       "label": "cm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "meters",
+      "name": "m",
       "label": "m"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "sharp",
-      "label": "sharp"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "gradational",
-      "label": "gradational"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "reworked",
-      "label": "reworked"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "erosional",
-      "label": "erosional"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "bioturbated",
-      "label": "bioturbated"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "cross_bedded",
-      "label": "cross-bedded"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "planar_parallel",
-      "label": "planar parallel"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "sharp",
-      "label": "sharp"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "gradational",
-      "label": "gradational"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "reworked",
-      "label": "reworked"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "erosional",
-      "label": "erosional"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "bioturbated",
-      "label": "bioturbated"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "cross_bedded",
-      "label": "cross-bedded"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "planar_parallel",
-      "label": "planar parallel"
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "clay",
-      "label": "clay  (<1/256 mm)"
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "silt",
-      "label": "silt (1/256-1/16 mm)",
-      "order": 1
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "very_fine_ash_sand",
-      "label": "very fine ash/sand (<1/8 mm)",
-      "order": 2
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "fine_ash_sand",
-      "label": "fine ash/sand (1/8-1/4 mm)",
-      "order": 3
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "medium_ash_sand",
-      "label": "medium ash/sand (1/4-1/2 mm)",
-      "order": 4
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "coarse_ash_sand",
-      "label": "coarse ash/sand (1/2-1 mm)",
-      "order": 5
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "very_coarse_ash_sand",
-      "label": "very coarse ash/sand (1-2 mm)",
-      "order": 6
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "fine_lapilli_granule",
-      "label": "fine lapilli / granule (2-4 mm)",
-      "order": 7
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "medium_lapilli_pebble",
-      "label": "medium lapilli /  pebble (4-16 mm)",
-      "order": 8
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "coarse_lapilli_cobble",
-      "label": "coarse lapilli / cobble (1.6-6.4 cm)",
-      "order": 9
-    },
-    {
-      "list_name": "lv1et65",
-      "name": "block_bomb_boulder",
-      "label": "block-bomb / boulder (>6.4 cm)",
-      "order": 10
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "clay",
-      "label": "clay  (<1/256 mm)"
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "silt",
-      "label": "silt (1/256-1/16 mm)",
-      "order": 1
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "very_fine_ash_sand",
-      "label": "very fine ash/sand (<1/8 mm)",
-      "order": 2
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "fine_ash_sand",
-      "label": "fine ash/sand (1/8-1/4 mm)",
-      "order": 3
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "medium_ash_sand",
-      "label": "medium ash/sand (1/4-1/2 mm)",
-      "order": 4
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "coarse_ash_sand",
-      "label": "coarse ash/sand (1/2-1 mm)",
-      "order": 5
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "very_coarse_ash_sand",
-      "label": "very coarse ash/sand (1-2 mm)",
-      "order": 6
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "fine_lapilli_granule",
-      "label": "fine lapilli / granule (2-4 mm)",
-      "order": 7
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "medium_lapilli_pebble",
-      "label": "medium lapilli /  pebble (4-16 mm)",
-      "order": 8
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "coarse_lapilli_cobble",
-      "label": "coarse lapilli / cobble (1.6-6.4 cm)",
-      "order": 9
-    },
-    {
-      "list_name": "fn8fy99",
-      "name": "block_bomb_boulder",
-      "label": "block-bomb / boulder (>6.4 cm)",
-      "order": 10
     },
     {
       "list_name": "gg1yf28",
@@ -475,6 +275,161 @@
       "name": "density_grading",
       "label": "Density grading",
       "order": 6
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "clay",
+      "label": "clay  (<1/256 mm)"
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "silt",
+      "label": "silt (1/256-1/16 mm)",
+      "order": 1
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "very_fine_ash_sand",
+      "label": "very fine ash/sand (<1/8 mm)",
+      "order": 2
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "fine_ash_sand",
+      "label": "fine ash/sand (1/8-1/4 mm)",
+      "order": 3
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "medium_ash_sand",
+      "label": "medium ash/sand (1/4-1/2 mm)",
+      "order": 4
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "coarse_ash_sand",
+      "label": "coarse ash/sand (1/2-1 mm)",
+      "order": 5
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "very_coarse_ash_sand",
+      "label": "very coarse ash/sand (1-2 mm)",
+      "order": 6
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "fine_lapilli_granule",
+      "label": "fine lapilli / granule (2-4 mm)",
+      "order": 7
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "medium_lapilli_pebble",
+      "label": "medium lapilli /  pebble (4-16 mm)",
+      "order": 8
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "coarse_lapilli_cobble",
+      "label": "coarse lapilli / cobble (1.6-6.4 cm)",
+      "order": 9
+    },
+    {
+      "list_name": "lv1et65",
+      "name": "block_bomb_boulder",
+      "label": "block-bomb / boulder (>6.4 cm)",
+      "order": 10
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "clay",
+      "label": "clay  (<1/256 mm)"
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "silt",
+      "label": "silt (1/256-1/16 mm)",
+      "order": 1
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "very_fine_ash_sand",
+      "label": "very fine ash/sand (<1/8 mm)",
+      "order": 2
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "fine_ash_sand",
+      "label": "fine ash/sand (1/8-1/4 mm)",
+      "order": 3
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "medium_ash_sand",
+      "label": "medium ash/sand (1/4-1/2 mm)",
+      "order": 4
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "coarse_ash_sand",
+      "label": "coarse ash/sand (1/2-1 mm)",
+      "order": 5
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "very_coarse_ash_sand",
+      "label": "very coarse ash/sand (1-2 mm)",
+      "order": 6
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "fine_lapilli_granule",
+      "label": "fine lapilli / granule (2-4 mm)",
+      "order": 7
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "medium_lapilli_pebble",
+      "label": "medium lapilli /  pebble (4-16 mm)",
+      "order": 8
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "coarse_lapilli_cobble",
+      "label": "coarse lapilli / cobble (1.6-6.4 cm)",
+      "order": 9
+    },
+    {
+      "list_name": "fn8fy99",
+      "name": "block_bomb_boulder",
+      "label": "block-bomb / boulder (>6.4 cm)",
+      "order": 10
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "very_well_sorted",
+      "label": "very well sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "well_sorted",
+      "label": "well sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "poorly_sorted",
+      "label": "poorly sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "very_poorly_sorted",
+      "label": "very poorly sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "unsorted",
+      "label": "unsorted"
     }
   ]
 }
