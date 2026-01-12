@@ -3,11 +3,11 @@ module.exports = {
 
   // Default Rules
   // arrowParens: 'avoid',
-  bracketSameLine: true,
-  bracketSpacing: false,
   singleQuote: true,
   trailingComma: 'all',
 
   // StraboSpot2 Rules
   quoteProps: 'consistent',
-}
+  bracketSameLine: true,
+  bracketSpacing: false,
+};

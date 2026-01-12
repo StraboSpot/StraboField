@@ -12,6 +12,7 @@ const compileNodeModules = [
   // Add every react-native package that needs compiling
   '@StraboSpot/react-native-sketch-canvas',
   '@react-native',
+  '@react-native-async-storage/async-storage',
   '@react-native-community/netinfo',
   '@rnmapbox/maps',
   '@sentry/react-native',
@@ -19,6 +20,7 @@ const compileNodeModules = [
   'react-native-gesture-handler',
   'react-native-image-picker',
   'react-native-reanimated',
+  'react-native-tab-view',
   'react-native-vector-icons',
 ].map(moduleName => path.resolve(__dirname, `node_modules/${moduleName}`));
 
@@ -103,12 +105,28 @@ module.exports = (env, argv) => {
     },
     mode,
     devtool: false, // disables source maps
+    ignoreWarnings: [
+      {
+        module: /node_modules\/react-datepicker/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+      {
+        message: /require\(\) called for module: react-native-screens but require is not available in web environment/,
+      },
+    ],
     resolve: {
       extensions: ['.web.js', '.js', '.web.ts', '.ts', '.web.jsx', '.jsx', '.web.tsx', '.tsx', '.css', '.json'],
       alias: {
         'react-native$': 'react-native-web',
+        'react-native-screens': false,
         'react-native-web': path.resolve('node_modules/react-native-web'),
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
+        '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
+          'src/modules/images/react-native-image-resizer.web.js'),
+        '@react-native-async-storage/async-storage': path.resolve(__dirname,
+          'node_modules/@react-native-async-storage/async-storage/src/index.ts'),
+        'react-native-tab-view': path.resolve(__dirname,
+          'node_modules/react-native-tab-view/src/index.tsx'),
       },
     },
     module: {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 
 import useYAxis from './useYAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
