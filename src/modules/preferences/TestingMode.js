@@ -16,8 +16,7 @@ import {setTestingMode} from '../project/projects.slice';
 const TestingMode = ({isTestingMode, textStyles}) => {
   const dispatch = useDispatch();
 
-  // const testingModePassword = 'Strab0R0cks';
-  const testingModePassword = '12345';
+  const testingModePassword = 'Strab0R0cks';
   const errorMessage = 'Wrong Password!';
 
   const [password, setPassword] = useState('');
