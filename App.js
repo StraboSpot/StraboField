@@ -33,12 +33,12 @@ if (Platform.OS !== 'web') {
     tracesSampleRate: 0.30,
     _experiments: {
       profilesSampleRate: 0.50,
-      replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
-      replaysOnErrorSampleRate: 1.0,
+      // replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
+      // replaysOnErrorSampleRate: 1.0,
     },
-    integrations: [
-      Sentry.mobileReplayIntegration(),
-    ],
+    // integrations: [
+    //   Sentry.mobileReplayIntegration(),
+    // ],
   });
 }
 else console.log('SENTRY NOT RUNNING');
