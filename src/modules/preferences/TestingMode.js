@@ -19,7 +19,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
   const testingModePassword = 'Strab0R0cks';
   const errorMessage = 'Wrong Password!';
 
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(__DEV__ ? testingModePassword : '');
   const [isTestingModalVisible, setIsTestingModalVisible] = useState(false);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
 
@@ -62,7 +62,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.
       </Text>
       <Input
-        defaultValue={''}
+        defaultValue={__DEV__ ? testingModePassword : ''}
         errorMessage={isErrorMessage && errorMessage}
         onChangeText={userEntry}
         placeholder={'Password'}
