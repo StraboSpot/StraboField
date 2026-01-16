@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {updatedProjectTransferProgress} from './connections.slice';
 import {MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import alert from '../shared/ui/alert';
+import {userAgent} from './userAgent';
 
 const useServerRequests = () => {
   const dispatch = useDispatch();
@@ -32,10 +33,9 @@ const useServerRequests = () => {
           // TODO: ?? does not work when Accept is uncommented ??
           // Accept: 'application/json; charset=UTF-8',
           'Content-Type': 'application/json',
+          'User-Agent': userAgent,
         },
-        body: JSON.stringify(
-          {email: username, password: password},
-        ),
+        body: JSON.stringify({email: username, password: password}),
       },
     ));
     return handleResponse(response);
@@ -54,6 +54,7 @@ const useServerRequests = () => {
           headers: {
             'Authorization': 'Basic ' + login,
             'Content-Type': 'application/json',
+            'User-Agent': userAgent,
           },
         });
       return handleResponse(response);
@@ -73,6 +74,7 @@ const useServerRequests = () => {
           headers: {
             'Authorization': 'Basic ' + login,
             'Content-Type': 'application/json',
+            'User-Agent': userAgent,
           },
         });
       return handleResponse(response);
@@ -92,6 +94,7 @@ const useServerRequests = () => {
   //         headers: {
   //           'Authorization': 'Basic ' + encoded_login,
   //           'Content-Type': 'application/json',
+  //           'User-Agent': userAgent,
   //         },
   //       },
   //     );
@@ -131,6 +134,7 @@ const useServerRequests = () => {
       headers: {
         'Authorization': 'Basic ' + encoded_login,
         'Accept': 'application/json',
+        'User-Agent': userAgent,
       },
     });
   };
@@ -149,6 +153,7 @@ const useServerRequests = () => {
     console.log(url);
     const response = await fetch(url, {
       method: 'GET',
+      headers: {'User-Agent': userAgent},
     });
     return handleResponse(response);
   };
@@ -185,6 +190,7 @@ const useServerRequests = () => {
         headers: {
           'Authorization': 'Basic ' + encodedLogin + '/',
           'Content-Type': 'application/json',
+          'User-Agent': userAgent,
         },
       },
     ));
@@ -198,7 +204,8 @@ const useServerRequests = () => {
         method: 'GET',
         responseType: 'blob',
         headers: {
-          Authorization: 'Basic ' + encodedLogin,
+          'Authorization': 'Basic ' + encodedLogin,
+          'User-Agent': userAgent,
         },
       });
       if (imageResponse.status === 200) imageBlob = imageResponse.blob();
@@ -230,6 +237,7 @@ const useServerRequests = () => {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
+        'User-Agent': userAgent,
       },
       // body: JSON.stringify({connection: 'strabospot', orcid_id_token: orcidToken}),
       body: formData,
@@ -250,6 +258,7 @@ const useServerRequests = () => {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
+        'User-Agent': userAgent,
       },
     });
     return userCodeXmlRes.text();
@@ -272,6 +281,7 @@ const useServerRequests = () => {
       const myHeaders = new Headers();
       myHeaders.append('Authorization', `Bearer ${sesar.sesarToken.access}`);
       myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+      myHeaders.append('User-Agent', userAgent);
 
       const requestOptions = {
         method: 'POST',
@@ -295,6 +305,7 @@ const useServerRequests = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': userAgent,
       },
       body: formData,
     });
@@ -306,6 +317,7 @@ const useServerRequests = () => {
       const myHeaders = new Headers();
       myHeaders.append('Authorization', `Bearer ${sesar.sesarToken.access}`);
       myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+      myHeaders.append('User-Agent', userAgent);
 
       const requestOptions = {
         method: 'POST',
@@ -386,6 +398,7 @@ const useServerRequests = () => {
         headers: {
           'Authorization': 'Basic ' + login,
           'Content-Type': 'application/json',
+          'User-Agent': userAgent,
         },
       });
       return handleResponse(response);
@@ -403,6 +416,7 @@ const useServerRequests = () => {
         headers: {
           'Authorization': 'Basic ' + login + '/',
           'Content-Type': 'application/json',
+          'User-Agent': userAgent,
         },
         // body: JSON.stringify({data: data}),
         ...otherParams,
@@ -424,6 +438,7 @@ const useServerRequests = () => {
           headers: {
             'Authorization': 'Basic ' + login,
             'Content-Type': 'application/json',
+            'User-Agent': userAgent,
           },
         });
       };
@@ -457,6 +472,7 @@ const useServerRequests = () => {
       body: newAccount,
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': userAgent,
       },
     });
     return handleResponse(response);
@@ -540,6 +556,7 @@ const useServerRequests = () => {
       else xhr.open('POST', baseUrl + '/image');
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', 'Basic ' + encoded_login);
+      xhr.setRequestHeader('User-Agent', userAgent);
       xhr.send(formdata);
     });
   };
@@ -550,6 +567,7 @@ const useServerRequests = () => {
       headers: {
         // 'Content-Type': 'multipart/form-data',
         'Authorization': 'Basic ' + encoded_login,
+        'User-Agent': userAgent,
       },
       body: formData,
     });
@@ -574,6 +592,7 @@ const useServerRequests = () => {
       headers: {
         'Authorization': 'Basic ' + encoded_login + '/',
         'Content-Type': 'application/json',
+        'User-Agent': userAgent,
       },
       body: JSON.stringify(imageIdsArray),
     }));
