@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import {Animated, Easing, Platform} from 'react-native';
 
 import {useDispatch} from 'react-redux';
@@ -19,6 +19,17 @@ const useHomeAnimations = ({navigation}) => {
   const animatedValueNotebookDrawer = useRef(new Animated.Value(NOTEBOOK_DRAWER_WIDTH)).current;
   const animatedValueRightSide = useRef(new Animated.Value(0)).current;
   const animatedValueTextInputs = useRef(new Animated.Value(0)).current;
+
+  // Cleanup: Stop all animations when component unmounts to prevent KERN_PROTECTION_FAILURE crashes
+  useEffect(() => {
+    return () => {
+      animatedValueLeftSide.stopAnimation();
+      animatedValueMainMenuDrawer.stopAnimation();
+      animatedValueNotebookDrawer.stopAnimation();
+      animatedValueRightSide.stopAnimation();
+      animatedValueTextInputs.stopAnimation();
+    };
+  }, []);
 
   const animateLeftSide = {transform: [{translateX: animatedValueLeftSide}]};
   const animateMainMenuDrawer = {transform: [{translateX: animatedValueMainMenuDrawer}]};
