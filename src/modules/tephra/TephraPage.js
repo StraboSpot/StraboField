@@ -42,6 +42,13 @@ const TephraPage = ({isReadOnly, page}) => {
     setData(attributes);
   }, [selectedAttributes, spot]);
 
+  // Cleanup animations when component unmounts to prevent memory corruption
+  useEffect(() => {
+    return () => {
+      setIsReorderingActive(false);
+    };
+  }, []);
+
   const addAttribute = () => {
     setIsReorderingActive(false);
     dispatch(setModalVisible({modal: page.key}));
