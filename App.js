@@ -24,21 +24,23 @@ if (Platform.OS !== 'web') {
   Sentry.init({
     dsn: config.get('Error_reporting_DSN'),
     enableNative: Platform.OS !== 'web',
-    enableAppHangTracking: true,
+    enableAppHangTracking: false,
     debug: false,
     release: RELEASE_NAME,
     dist: RELEASE_NAME,
     autoSessionTracking: true,
     environment: __DEV__ ? 'development' : 'production',
-    tracesSampleRate: 0.30,
-    _experiments: {
-      profilesSampleRate: 0.50,
-      // replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
-      // replaysOnErrorSampleRate: 1.0,
-    },
-    // integrations: [
-    //   Sentry.mobileReplayIntegration(),
-    // ],
+    tracesSampleRate: 0,
+    enableAutoPerformanceTracing: false,
+    enableAutoSessionTracking: false,
+    // _experiments: {
+    //   profilesSampleRate: 0.50,
+    //   replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
+    //   replaysOnErrorSampleRate: 1.0,
+    // },
+    integrations: [
+      //   Sentry.mobileReplayIntegration(),
+    ],
   });
 }
 else console.log('SENTRY NOT RUNNING');
