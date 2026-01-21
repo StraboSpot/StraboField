@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   overlayContainer: {
+    flex: 1,
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
