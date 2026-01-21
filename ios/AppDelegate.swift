@@ -32,7 +32,7 @@ import UIKit
     }
 
     func application(_ app: UIApplication,
-    openurl: URL,
+    open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         return RCTLinkingManager.application(app, open: url, options: options)
     }
@@ -40,7 +40,7 @@ import UIKit
 
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
-    override func sourceURL(forbridge: RCTBridge) -> URL? {
+    override func sourceURL(for bridge: RCTBridge) -> URL? {
         self.bundleURL()
     }
 
