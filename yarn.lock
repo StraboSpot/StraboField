@@ -15334,15 +15334,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keyboard-manager@npm:6.5.16-0":
-  version: 6.5.16-0
-  resolution: "react-native-keyboard-manager@npm:6.5.16-0"
-  peerDependencies:
-    react-native: ">=0.60"
-  checksum: 10c0/1167b41245415761b42514a79198341aece2b92f311dcb1259413966d72893e20a3a10c98360a802b16b035d33c47b67503d4cf6562a1d03e5444d357ef76e7b
-  languageName: node
-  linkType: hard
-
 "react-native-multiple-select@npm:0.5.12":
   version: 0.5.12
   resolution: "react-native-multiple-select@npm:0.5.12"
@@ -16982,7 +16973,6 @@ __metadata:
     react-native-indicators: "npm:0.17.0"
     react-native-json-tree: "npm:1.5.0"
     react-native-keep-awake: "npm:4.0.0"
-    react-native-keyboard-manager: "npm:6.5.16-0"
     react-native-multiple-select: "npm:0.5.12"
     react-native-orientation-director: "npm:2.6.5"
     react-native-pager-view: "npm:8.0.0"

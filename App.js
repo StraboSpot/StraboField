@@ -1,9 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Platform, StatusBar} from 'react-native';
 
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import KeyboardManager from 'react-native-keyboard-manager';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
@@ -17,6 +16,7 @@ import config from './src/utils/config';
 import * as Sentry from '@sentry/react-native';
 import {RELEASE_NAME} from './src/shared/app.constants';
 import uiStyles from './src/shared/ui/ui.styles';
+// import KeyboardManager from 'react-native-keyboard-manager';
 
 let didInit = false;
 
@@ -71,16 +71,6 @@ const linking = Platform.OS !== 'web' && {
 
 
 const App = () => {
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      KeyboardManager.setEnable(true);
-      KeyboardManager.setEnableAutoToolbar(true);
-      KeyboardManager.setToolbarDoneBarButtonItemText('Done');
-      KeyboardManager.setToolbarPreviousNextButtonEnable(true);
-      KeyboardManager.setShouldResignOnTouchOutside(true);
-      KeyboardManager.setKeyboardDistanceFromTextField(10);
-    }
-  }, []);
 
   if (Platform.OS === 'web' && !didInit) {
     console.count('Rendering App...');

@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Keyboard, Platform, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -212,7 +212,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         await zoomToCurrentLocation();
       }
       else {
-        Keyboard.dismiss();
         dispatch(setModalVisible({modal: null}));
         const samples = spot.properties?.samples
           ? [...spot.properties.samples, newSample]
