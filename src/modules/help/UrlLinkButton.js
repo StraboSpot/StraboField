@@ -7,7 +7,7 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 
-const UrlLinkButton = ({icon, title, url}) => {
+const UrlLinkButton = ({color, icon, title, url}) => {
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
@@ -27,8 +27,7 @@ const UrlLinkButton = ({icon, title, url}) => {
     return (
       <OutlineButton
         icon={{
-          color: PRIMARY_ACCENT_COLOR,
-          iconStyle: {paddingRight: 10},
+          color: color || PRIMARY_ACCENT_COLOR,
           name: icon,
           size: 20,
           type: 'ionicon',

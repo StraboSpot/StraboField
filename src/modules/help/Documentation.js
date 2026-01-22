@@ -1,43 +1,67 @@
 import React, {useState} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {Platform, ScrollView, View} from 'react-native';
 
-import documentationStyles from './documentation.styles';
 import SpotDataModelModal from './SpotDataModelModal';
 import UrlLinkButton from './UrlLinkButton';
 import {STRABO_APIS} from '../../services/urls.constants';
+import {BLACK, BLUE} from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
+import SectionDivider from '../../shared/ui/SectionDivider';
+import {useSelector} from 'react-redux';
 
 const Documentation = ({navigation}) => {
+
+  const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
+
   const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);
 
   const files = [
     {
       id: 1,
       platform: ['ios', 'android'],
-      label: 'Sharing Between Devices',
-      name: 'How to Share backup files to other devices',
+      label: 'userGuide',
+      name: 'User Guide',
+      icon: 'book-outline',
+      file: Platform.OS === 'ios'
+        ? require('../../assets/documents/StraboField_User_Manual.pdf')
+        : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
+    },
+    {
+      id: 2,
+      platform: ['ios', 'android'],
+      label: 'sharingProjects',
+      name: 'Sharing Projects \nBetween Devices',
+      icon: 'share-outline',
       file: Platform.OS === 'ios'
         ? require('../../assets/documents/Updated_Sharing_Projects_Between_Devices.pdf')
         : {uri: 'bundle-assets://Updated_Sharing_Projects_Between_Devices.pdf'},
     },
     {
-      id: 2,
+      id: 3,
       platform: ['ios', 'android'],
       label: 'moveFiles',
-      name: 'Moving backups out of StraboField folder ',
+      name: 'Exporting Project \nBackups',
+      icon: 'share-outline',
       file: Platform.OS === 'ios'
         ? require('../../assets/documents/Updated_Moving_StraboField_Project_Backups.pdf')
         : {uri: 'bundle-assets://Updated_Moving_StraboField_Project_Backups.pdf'},
     },
+  ];
+
+  const links = [
     {
-      id: 3,
-      platform: ['ios', 'android'],
-      label: 'helpDocument',
-      name: 'Help Guide',
-      file: Platform.OS === 'ios'
-        ? require('../../assets/documents/StraboField_User_Manual.pdf')
-        : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
+      id: 1,
+      title: 'Online Help Page',
+      url: STRABO_APIS.STRABO + '/help',
+      icon: 'globe-outline',
+      color: BLUE,
+    },
+    {
+      id: 2,
+      title: 'YouTube Tutorials',
+      url: 'https://youtube.com/playlist?list=PL3jEmSMv6rzHysg-mEVx_yhaXStgK8MV5&si=sv_i9YayDdv_LfYf',
+      icon: 'logo-youtube',
+      color: 'red',
     },
   ];
 
@@ -45,60 +69,64 @@ const Documentation = ({navigation}) => {
     navigation.navigate('DocumentationScreen', {document});
   };
 
-
-  const renderFAQList = () => {
-    let filteredDocs = [];
-    files.forEach((file) => {
-      if (Platform.OS === 'ios' && file.platform.includes('ios')) {
-        filteredDocs.push(file);
-      }
-      else if (
-        Platform.OS === 'android'
-        && file.platform.includes('android')
-      ) {
-        filteredDocs.push(file);
-      }
-    });
-    console.log(filteredDocs);
-
-    return (
-      <View>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          data={filteredDocs}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => renderFAQListItem(item)}
-        />
-      </View>
-    );
-  };
-
-  const renderFAQListItem = item => (
+  const renderDocumentButton = (item) => (
     <OutlineButton
+      key={item.id}
+      icon={{
+        color: BLACK,
+        iconStyle: {paddingRight: 10},
+        name: item.icon,
+        size: 20,
+        type: 'ionicon',
+      }}
       onPress={() => handlePress(item)}
       title={item.name}
     />
   );
 
+  const renderLinkButton = (item) => (
+    <UrlLinkButton
+      key={item.id}
+      icon={item.icon}
+      title={item.title}
+      url={item.url}
+      color={item.color}
+    />
+  );
 
   return (
-    <>
-      <View style={documentationStyles.container}>
-        <UrlLinkButton
-          icon={'globe-outline'}
-          title={'Online Help Page'}
-          url={STRABO_APIS.STRABO + '/help'}
-        />
-        {renderFAQList()}
-        <OutlineButton
-          onPress={() => setIsSpotDataModelModalVisible(true)}
-          title={'Spot Data Model'}
-        />
-      </View>
+    <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
+        <SectionDivider dividerText={'PDF Guides'}/>
+        <View>
+          {files.map(renderDocumentButton)}
+        </View>
+        {isOnline && (
+          <>
+            <SectionDivider dividerText={'Online Resources'}/>
+            <View>
+              {links.map(renderLinkButton)}
+            </View>
+          </>
+        )}
+        <SectionDivider dividerText={'Developer Resources'}/>
+        <View>
+          <OutlineButton
+            icon={{
+              color: BLACK,
+              iconStyle: {paddingRight: 10},
+              name: 'code-slash-outline',
+              size: 20,
+              type: 'ionicon',
+            }}
+            onPress={() => setIsSpotDataModelModalVisible(true)}
+            title={'Spot Data Model'}
+          />
+        </View>
+      </ScrollView>
 
-      {/* Modals */}
       {isSpotDataModelModalVisible && <SpotDataModelModal close={() => setIsSpotDataModelModalVisible(false)}/>}
-    </>
+    </View>
   );
 };
 
