@@ -96,6 +96,8 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     }
   }, [spot]);
 
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
   const confirmLeavePage = () => {
     if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
       const formCurrent = formRef.current;
@@ -119,7 +121,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else dispatch(setModalVisible({modal: null}));
+    else closeModal();
   };
 
   const onOrientedButtonPress = (i) => {
@@ -212,7 +214,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         await zoomToCurrentLocation();
       }
       else {
-        dispatch(setModalVisible({modal: null}));
         const samples = spot.properties?.samples
           ? [...spot.properties.samples, newSample]
           : [newSample];
@@ -230,6 +231,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       await currentForm.resetForm();
+      if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
 
       if (newSample.sample_id_name) {
         const foundDuplicateName = await checkSampleName(newSample.sample_id_name);
