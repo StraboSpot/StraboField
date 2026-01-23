@@ -20,10 +20,10 @@ const useMap = () => {
 
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildStyleURL} = useMapURL();
-  const {getTilehostUrl} = useServerRequests();
+  const {getTileBaseUrl} = useServerRequests();
 
   const getExtentAndZoomCall = (extentString, zoomLevel) => {
-    let url = getTilehostUrl();
+    let url = getTileBaseUrl();
     url = customDatabaseEndpoint.isSelected ? url + '/zipcount' : STRABO_APIS.TILE_COUNT;
     console.log(url + '?extent=' + extentString + '&zoom=' + zoomLevel);
     return url + '?extent=' + extentString + '&zoom=' + zoomLevel;

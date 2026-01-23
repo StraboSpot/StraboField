@@ -39,7 +39,7 @@ const useMapsOffline = () => {
     readDirectoryForMapTiles,
   } = useDevice();
   const {buildStyleURL} = useMapURL();
-  const {getMapTilesFromHost, getTilehostUrl, zipURLStatus} = useServerRequests();
+  const {getTileBaseUrl, getTilesFromHost, zipURLStatus} = useServerRequests();
 
   //INTERNAL
   const adjustTileCount = async (files) => {
@@ -230,7 +230,7 @@ const useMapsOffline = () => {
       let mapKey = currentBasemap.id;
       const layerSource = currentBasemap.source;
       const tilehost = STRABO_APIS.TILE_HOST;
-      const endpointTilehost = customDatabaseEndpoint.isSelected ? getTilehostUrl() : tilehost;
+      const endpointTilehost = customDatabaseEndpoint.isSelected ? getTileBaseUrl() : tilehost;
 
       if (layerSource === 'map_warper' || layerSource === 'mapbox_styles' || layerSource === 'strabospot_mymaps') {
         //configure advanced URL for custom map types here.
@@ -347,7 +347,7 @@ const useMapsOffline = () => {
 
   const saveZipMap = async (startZipURL) => {
     try {
-      const tileJson = await getMapTilesFromHost(startZipURL);
+      const tileJson = await getTilesFromHost(startZipURL);
       zipUID = tileJson.id;
       // if (zipUID) return;
     }

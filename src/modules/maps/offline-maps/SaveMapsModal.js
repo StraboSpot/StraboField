@@ -34,7 +34,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     moveTile,
     updateMapTileCountWhenSaving,
   } = useMapsOffline();
-  const {getTilehostUrl} = useServerRequests();
+  const {getTileBaseUrl} = useServerRequests();
 
   const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
@@ -121,7 +121,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
 
   const downloadZip = async (zipUID) => {
     try {
-      const tilehost = getTilehostUrl();
+      const tilehost = getTileBaseUrl();
       const downloadZipURL = tilehost + '/ziptemp/' + zipUID + '/' + zipUID + '.zip';
       const downloadOptions = {
         fromUrl: downloadZipURL,

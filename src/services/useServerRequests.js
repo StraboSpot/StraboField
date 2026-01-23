@@ -1,116 +1,76 @@
 import {Linking} from 'react-native';
-
 import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProjectTransferProgress} from './connections.slice';
-import {handleResponse, post, request, requestMicro, timeoutPromise} from './serverRequestHelpers';
+import {deleteRequest, getRequest, handleResponse, postRequest, timeoutPromise} from './serverRequestHelpers';
 import {MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
-import alert from '../shared/ui/alert';
 import {userAgent} from './userAgent';
+import alert from '../shared/ui/alert';
 
 const useServerRequests = () => {
   const dispatch = useDispatch();
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const {encoded_login, sesar} = useSelector(state => state.user);
 
+  // URL Helpers
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;
   const domain = endpoint && isSelected ? endpoint : STRABO_APIS.STRABO;
   const tilehost = STRABO_APIS.TILE_HOST;
-  const {SESAR_API, GET_TOKEN, GET_USER_CODE, REFRESH_TOKEN} = SESAR_PATHS;
-  const {ORCID, AUTH, SCOPE, REDIRECT_URL} = ORCID_PATHS;
+  const getImageBaseUrl = () => isSelected ? baseUrl.replace('/db', '/pi/') : `${STRABO_APIS.STRABO}/pi/`;
+  const getTileBaseUrl = () => isSelected ? endpoint.replace('/db', '/strabotiles') : tilehost;
 
-  const {encoded_login, sesar} = useSelector(state => state.user);
+  // Auth Helpers
+  const basicAuth = (token = encoded_login) => ({type: 'basic', token});
+  const bearerAuth = (token) => ({type: 'bearer', token});
 
-  const addDatasetToProject = (projectId, datasetId) => {
-    return post(baseUrl, `/projectDatasets/${projectId}`, encoded_login, {id: datasetId});
-  };
-
-  const authenticateUser = async (username, password) => {
-    const authenticationBaseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/'));
-    const response = await timeoutPromise(60000, fetch(`${authenticationBaseUrl}/userAuthenticate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify({email: username, password: password}),
-    }));
-    return handleResponse(response);
-  };
-
-  const deleteAccount = async (login) => {
+  // SESAR Helper
+  const sendToSesar = async (data, path) => {
     try {
-      const response = await fetch(`${baseUrl}${STRABO_APIS.ACCOUNT}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Basic ${login}`,
-          'Content-Type': 'application/json',
-          'User-Agent': userAgent,
-        },
-      });
-      return handleResponse(response);
+      return await postRequest(`${SESAR_PATHS.SESAR_API}${path}`, data, bearerAuth(sesar.sesarToken.access),
+        {'Content-Type': 'application/x-www-form-urlencoded'});
     }
     catch (err) {
-      console.error('Error Deleting Account', err);
-      alert('Error', `${err.toString()}`);
+      console.error('Error Posting to SESAR', err);
+      alert('Error Posting to SESAR', err.toString());
     }
   };
 
-  const deleteAllSpotsInDataset = (datasetId) => {
-    return request(baseUrl, 'DELETE', `/datasetSpots/${datasetId}`, encoded_login);
+  // API Methods
+
+  const addDatasetToProject = (projectId, datasetId) =>
+    postRequest(`${baseUrl}/projectDatasets/${projectId}`, {id: datasetId}, basicAuth());
+
+  const authenticateUser = (username, password) => {
+    const authUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/'));
+    return postRequest(`${authUrl}/userAuthenticate`, {email: username, password: password}, null);
   };
 
-  const deleteProfileImage = async (login) => {
+  const deleteAccount = (login) => deleteRequest(`${baseUrl}${STRABO_APIS.ACCOUNT}`, basicAuth(login));
+
+  const deleteAllSpotsInDataset = (datasetId) => deleteRequest(`${baseUrl}/datasetSpots/${datasetId}`, basicAuth());
+
+  const deleteProfileImage = (login) => deleteRequest(`${baseUrl}/profileimage`, basicAuth(login));
+
+  const getDatasets = (projectId, encodedLogin) =>
+    getRequest(`${baseUrl}/projectDatasets/${projectId}`, basicAuth(encodedLogin));
+
+  const getDatasetSpots = (datasetId, encodedLogin) =>
+    getRequest(`${baseUrl}/datasetSpots/${datasetId}`, basicAuth(encodedLogin));
+
+  const getImage = async (imageId) => {
     try {
-      const response = await fetch(`${baseUrl}/profileimage`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Basic ${login}`,
-          'Content-Type': 'application/json',
-          'User-Agent': userAgent,
-        },
-      });
-      return handleResponse(response);
+      const response = await getRequest(`${getImageBaseUrl()}${imageId}`, basicAuth(), {responseType: 'blob'});
+      return response.status === 200 ? response.blob() : null;
     }
     catch (err) {
-      console.error('Error Deleting Profile Image', err);
-      alert('Error', `${err.toString()}`);
+      console.error('Error Getting Image', err);
+      return null;
     }
   };
 
-  const getDatasets = (projectId, encodedLogin) => {
-    return request(baseUrl, 'GET', `/projectDatasets/${projectId}`, encodedLogin);
-  };
-
-  const getDatasetSpots = (datasetId, encodedLogin) => {
-    return request(baseUrl, 'GET', `/datasetSpots/${datasetId}`, encodedLogin);
-  };
-
-  const getImage = (imageId) => {
-    const imageUrl = isSelected ? baseUrl.replace('/db', '/pi/') : `${STRABO_APIS.STRABO}/pi/`;
-    return fetch(`${imageUrl}${imageId}`, {
-      method: 'GET',
-      responseType: 'blob',
-      headers: {
-        'Authorization': `Basic ${encoded_login}`,
-        'Accept': 'application/json',
-        'User-Agent': userAgent,
-      },
-    });
-  };
-
-  const getMacrostratData = async (location) => {
+  const getMacrostratData = (location) => {
     const params = {lng: location.coords[0].toFixed(4), lat: location.coords[1].toFixed(4)};
-    const url = `https://macrostrat.org/api/v2/mobile/point?${new URLSearchParams(params).toString()}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {'User-Agent': userAgent},
-    });
-    return handleResponse(response);
-  };
-
-  const getMapTilesFromHost = async (zipUrl) => {
-    const response = await timeoutPromise(60000, fetch(zipUrl));
-    return response.json();
+    return getRequest(`https://macrostrat.org/api/v2/mobile/point?${new URLSearchParams(params).toString()}`, null);
   };
 
   const getMyMapsBbox = async (mapUrl) => {
@@ -118,206 +78,119 @@ const useServerRequests = () => {
     return handleResponse(response);
   };
 
-  const getMyMicroProjects = () => {
-    return requestMicro(domain, 'GET', MICRO_PATHS.MY_PROJECTS, encoded_login);
-  };
+  const getMyMicroProjects = () => getRequest(`${domain}${MICRO_PATHS.MY_PROJECTS}`, basicAuth());
 
-  const getMyProjects = () => {
-    return request(baseUrl, 'GET', '/myProjects', encoded_login);
-  };
+  const getMyProjects = () => getRequest(`${baseUrl}/myProjects`, basicAuth());
 
   const getOrcidToken = async () => {
     try {
-      const url = `${ORCID}${AUTH}${SCOPE}${REDIRECT_URL}${encodeURIComponent(encoded_login)}`;
-      await Linking.openURL(url);
+      const {ORCID, AUTH, SCOPE, REDIRECT_URL} = ORCID_PATHS;
+      await Linking.openURL(`${ORCID}${AUTH}${SCOPE}${REDIRECT_URL}${encodeURIComponent(encoded_login)}`);
     }
     catch (err) {
       console.error('Error Getting ORCID Token', err);
-      alert('Error Getting ORCID Token', `${err.toString()}`);
+      alert('Error Getting ORCID Token', err.toString());
     }
   };
 
-  const getProfile = async (encodedLogin) => {
-    const response = await timeoutPromise(10000, fetch(`${baseUrl}/profile`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Basic ${encodedLogin}/`,
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-      },
-    }));
-    return handleResponse(response);
-  };
+  const getProfile = (encodedLogin) => getRequest(`${baseUrl}/profile`, basicAuth(encodedLogin));
 
   const getProfileImage = async (encodedLogin) => {
     try {
-      const imageResponse = await fetch(`${baseUrl}/profileimage`, {
-        method: 'GET',
-        responseType: 'blob',
-        headers: {
-          'Authorization': `Basic ${encodedLogin}`,
-          'User-Agent': userAgent,
-        },
-      });
-      if (imageResponse.status === 200) return imageResponse.blob();
-      return null;
+      const response = await getRequest(`${baseUrl}/profileimage`, basicAuth(encodedLogin), {responseType: 'blob'});
+      return response.status === 200 ? response.blob() : null;
     }
-    catch (error) {
-      console.error('Error Getting Profile Image', error);
+    catch (err) {
+      console.error('Error Getting Profile Image', err);
       return null;
     }
   };
 
   const getProfileImageURL = () => `${baseUrl}/profileimage`;
 
-  const getProject = (projectId, encodedLogin) => {
-    return request(baseUrl, 'GET', `/project/${projectId}`, encodedLogin);
-  };
+  const getProject = (projectId, encodedLogin) =>
+    getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
 
   const getSesarToken = async (orcidToken) => {
     const formData = new FormData();
     formData.append('connection', 'strabospot');
     formData.append('orcid_id_token', orcidToken);
-    const res = await fetch(`${SESAR_API}${GET_TOKEN}`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': userAgent,
-      },
-      body: formData,
-    });
-    const sesarJson = await res.json();
-    if (sesarJson.error) {
-      console.error('SESAR Token Error', sesarJson.error);
-      throw Error(sesarJson.error);
+    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_TOKEN}`, formData, null,
+      {'Accept': 'application/json'});
+    const json = await response.json();
+    if (json.error) {
+      console.error('SESAR Token Error', json.error);
+      throw Error(json.error);
     }
-    return sesarJson;
+    return json;
   };
 
   const getSesarUserCode = async (accessToken) => {
-    const userCodeXmlRes = await fetch(`${SESAR_API}${GET_USER_CODE}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'User-Agent': userAgent,
-      },
-    });
-    return userCodeXmlRes.text();
+    const response = await getRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_USER_CODE}`,
+      bearerAuth(accessToken), {responseType: 'text'});
+    return response.text();
   };
 
-  const getTileCountFromHost = async (url) => {
-    const response = await timeoutPromise(10000, fetch(url));
+  const getTilesFromHost = async (url) => {
+    const response = await timeoutPromise(fetch(url));
     return response.json();
   };
 
-  const getTilehostUrl = () => isSelected ? baseUrl.replace('/db', '/strabotiles') : tilehost;
-
-  const postToSesar = async (xmlData) => {
-    return sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
-  };
+  const postToSesar = (xmlData) => sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
 
   const refreshSesarToken = async (accessToken) => {
     const formData = new FormData();
     formData.append('refresh', accessToken);
-    const res = await fetch(`${SESAR_API}${REFRESH_TOKEN}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': userAgent,
-      },
-      body: formData,
-    });
-    return res.json();
+    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.REFRESH_TOKEN}`, formData, null,
+      {'Content-Type': 'application/x-www-form-urlencoded'});
+    return response.json();
   };
 
-  const registerUser = async (newAccountInfo) => {
-    const newAccount = JSON.stringify({
+  const registerUser = (newAccountInfo) => {
+    const registerUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/'));
+    return postRequest(`${registerUrl}/userRegister`, {
       first_name: newAccountInfo.firstName.value,
       last_name: newAccountInfo.lastName.value,
       email: newAccountInfo.email.value,
       password: newAccountInfo.password.value,
       confirm_password: newAccountInfo.confirmPassword.value,
-    });
-    const modifiedBaseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/'));
-    const response = await fetch(`${modifiedBaseUrl}/userRegister`, {
-      method: 'POST',
-      body: newAccount,
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-      },
-    });
-    return handleResponse(response);
-  };
-
-  const sendToSesar = async (xmlData, sesarPath) => {
-    try {
-      return await fetch(`${SESAR_API}${sesarPath}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${sesar.sesarToken.access}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': userAgent,
-        },
-        body: xmlData,
-      });
-    }
-    catch (err) {
-      console.error('Error Posting to SESAR', err);
-      alert('Error Posting to SESAR', `${err.toString()}`);
-    }
+    }, null);
   };
 
   const testCustomMapUrl = async (mapURL) => {
     try {
-      const res = await fetch(mapURL);
-      return res.ok;
+      const response = await fetch(mapURL);
+      return response.ok;
     }
-    catch (e) {
-      console.error('Error Testing Custom Map URL', e);
+    catch (err) {
+      console.error('Error Testing Custom Map URL', err);
       return false;
     }
   };
 
-  const updateDataset = (dataset) => {
-    return post(baseUrl, '/dataset', encoded_login, dataset);
-  };
+  const updateDataset = (dataset) => postRequest(`${baseUrl}/dataset`, dataset, basicAuth());
 
-  const updateDatasetSpots = (datasetId, spotCollection) => {
-    return post(baseUrl, `/datasetspots/${datasetId}`, encoded_login, spotCollection);
-  };
+  const updateDatasetSpots = (datasetId, spotCollection) =>
+    postRequest(`${baseUrl}/datasetspots/${datasetId}`, spotCollection, basicAuth());
 
-  const updateProfile = (data) => {
-    return post(baseUrl, '/profile', encoded_login, data);
-  };
+  const updateProfile = (data) => postRequest(`${baseUrl}/profile`, data, basicAuth());
 
-  const updateProject = (project) => {
-    return post(baseUrl, '/project', encoded_login, project);
-  };
+  const updateProject = (project) => postRequest(`${baseUrl}/project`, project, basicAuth());
 
-  const updateSampleWithSesar = async (xmlData) => {
-    return sendToSesar(xmlData, SESAR_PATHS.UPDATE);
-  };
+  const updateSampleWithSesar = (xmlData) => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
 
   const uploadImage = (formdata, isProfileImage) => {
-    const uploadProgress = (event) => {
-      const percentage = Math.floor((event.loaded / event.total) * 100);
-      console.log(`UPLOAD IS ${percentage}% DONE!`);
-      dispatch(updatedProjectTransferProgress(event.loaded / event.total));
-    };
-
-    const xhr = new XMLHttpRequest();
     return new Promise((resolve, reject) => {
-      xhr.upload.addEventListener('progress', uploadProgress);
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 404) reject(false);
-        else resolve(xhr.response);
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener('progress', (event) => {
+        console.log(`UPLOAD IS ${Math.floor((event.loaded / event.total) * 100)}% DONE!`);
+        dispatch(updatedProjectTransferProgress(event.loaded / event.total));
       });
-      xhr.addEventListener('error', (e) => {
-        console.error('Error Uploading Image', e);
+      xhr.addEventListener('load', () => xhr.status === 404 ? reject(false) : resolve(xhr.response));
+      xhr.addEventListener('error', (err) => {
+        console.error('Error Uploading Image', err);
         reject(false);
       });
-
       xhr.open('POST', `${baseUrl}${isProfileImage ? '/profileImage' : '/image'}`);
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', `Basic ${encoded_login}`);
@@ -326,38 +199,16 @@ const useServerRequests = () => {
     });
   };
 
-  const uploadWebImage = async (formData) => {
-    const response = await fetch(`${baseUrl}/image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${encoded_login}`,
-        'User-Agent': userAgent,
-      },
-      body: formData,
-    });
-    return handleResponse(response);
-  };
+  const uploadWebImage = (formData) => postRequest(`${baseUrl}/image`, formData, basicAuth());
 
-  const verifyImagesExistence = async (imageIdsArray) => {
-    const response = await timeoutPromise(60000, fetch(`${baseUrl}/verifyImages/`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${encoded_login}/`,
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify(imageIdsArray),
-    }));
-    return handleResponse(response);
-  };
+  const verifyImagesExistence = (imageIdsArray) => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
 
   const zipURLStatus = async (zipId) => {
     try {
-      const myMapsEndpoint = isSelected ? endpoint.replace('/db', '/strabotiles') : tilehost;
-      const response = await timeoutPromise(60000, fetch(`${myMapsEndpoint}/asyncstatus/${zipId}`));
-      const responseJson = await response.json();
-      if (responseJson.error) throw Error(responseJson.error);
-      return responseJson;
+      const response = await timeoutPromise(fetch(`${getTileBaseUrl()}/asyncstatus/${zipId}`));
+      const json = await response.json();
+      if (json.error) throw Error(json.error);
+      return json;
     }
     catch (err) {
       console.error('Error in zipURLStatus', err);
@@ -375,7 +226,6 @@ const useServerRequests = () => {
     getDatasetSpots,
     getImage,
     getMacrostratData,
-    getMapTilesFromHost,
     getMyMapsBbox,
     getMyMicroProjects,
     getMyProjects,
@@ -386,8 +236,8 @@ const useServerRequests = () => {
     getProject,
     getSesarToken,
     getSesarUserCode,
-    getTileCountFromHost,
-    getTilehostUrl,
+    getTileBaseUrl,
+    getTilesFromHost,
     postToSesar,
     refreshSesarToken,
     registerUser,
