@@ -51,7 +51,13 @@ const TephraPage = ({isReadOnly, page}) => {
 
   const addAttribute = () => {
     setIsReorderingActive(false);
-    dispatch(setModalVisible({modal: page.key}));
+    const initialValues = {
+      label: spot.properties.name + '-' + ((spot.properties?.tephra?.length || 0) + 1),
+      id: getNewUUID(),
+    };
+    setSelectedAttribute(initialValues);
+    setIsDetailView(true);
+    dispatch(setModalVisible({modal: null}));
   };
 
   const editAttribute = (attribute, i) => {
