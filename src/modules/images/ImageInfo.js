@@ -10,10 +10,10 @@ import commonStyles from '../../shared/common.styles';
 import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
-import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 
 const ImageInfo = ({
                      deleteImage,
@@ -55,18 +55,16 @@ const ImageInfo = ({
 
   const renderDeleteImageModal = () => {
     return (
-      <WarningModal
-        closeModal={() => setIsImageDeleteModalVisible(false)}
-        confirmText={'Delete Image'}
+      <DeleteConformationDialogBox
+        overlayStyleOverride={{maxHeight: '25%'}}
+        headerTitle={`Delete Image`}
         isVisible={isImageDeleteModalVisible}
-        onConfirmPress={onDeleteImage}
-        showCancelButton
-        showConfirmButton
-        title={'Delete Image?'}
+        onActionPressed={onDeleteImage}
+        onCancelPress={() => setIsImageDeleteModalVisible(false)}
       >
-        <Text>Are you sure you want to delete image:{'\n'}</Text>
-        <Text>{image.title || image.id}</Text>
-      </WarningModal>
+        <Text>Are you sure you want to delete</Text>
+        <Text>{image.title || image.id}?</Text>
+      </DeleteConformationDialogBox>
     );
   };
 
