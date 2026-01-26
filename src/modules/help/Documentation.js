@@ -71,6 +71,7 @@ const Documentation = ({navigation}) => {
 
   const renderDocumentButton = (item) => (
     <OutlineButton
+      iconContainerStyle={{position: 'absolute', left: 15}}
       key={item.id}
       icon={{
         color: BLACK,
@@ -112,6 +113,7 @@ const Documentation = ({navigation}) => {
         <SectionDivider dividerText={'Developer Resources'}/>
         <View>
           <OutlineButton
+            iconContainerStyle={{position: 'absolute', left: 15}}
             icon={{
               color: BLACK,
               iconStyle: {paddingRight: 10},

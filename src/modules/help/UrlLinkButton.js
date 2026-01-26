@@ -26,6 +26,7 @@ const UrlLinkButton = ({color, icon, title, url}) => {
   if (isOnline) {
     return (
       <OutlineButton
+        iconContainerStyle={{position: 'absolute', left: 15}}
         icon={{
           color: color || PRIMARY_ACCENT_COLOR,
           name: icon,

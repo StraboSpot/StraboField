@@ -11,7 +11,7 @@ import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
-import {KeyboardAvoidingView} from 'react-native';
+import {KeyboardAvoidingView, View} from 'react-native';
 
 const ModalWrapper = ({
                         actionTitle,
@@ -79,7 +79,7 @@ const ModalWrapper = ({
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0} // Adjust offset as needed
+        // keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
         style={{flex: 1}} // Important for padding behavior
       >
         <ModalWrapperHeader
@@ -88,21 +88,24 @@ const ModalWrapper = ({
           headerTitle={headerTitle}
           showCloseButton={showCloseButton}
         />
-        {children}
+
+        <View style={{flex: 1}}>
+          {children}
+        </View>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
-        <ModalSaveAndCancelButtons
-          actionTitle={actionTitle}
-          cancelTitle={cancelTitle}
-          disabled={disabled}
-          isLoading={isLoading}
-          onActionPressed={onActionPressed}
-          onCancelPress={onCancelPress}
-          onDeletePress={onDeletePress}
-          showActionButton={showActionButton}
-          showCancelButton={showCancelButton}
-          showDeleteButton={showDeleteButton}
-        />
       </KeyboardAvoidingView>
+      <ModalSaveAndCancelButtons
+        actionTitle={actionTitle}
+        cancelTitle={cancelTitle}
+        disabled={disabled}
+        isLoading={isLoading}
+        onActionPressed={onActionPressed}
+        onCancelPress={onCancelPress}
+        onDeletePress={onDeletePress}
+        showActionButton={showActionButton}
+        showCancelButton={showCancelButton}
+        showDeleteButton={showDeleteButton}
+      />
     </Overlay>
   );
 };
