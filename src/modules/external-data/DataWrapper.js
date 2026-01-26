@@ -30,6 +30,7 @@ function DataWrapper({
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
     return (
       <DeleteConformationDialogBox
+        overlayStyleOverride={{maxHeight: '25%'}}
         headerTitle={`Delete ${itemToDelete.type.toUpperCase()}?`}
         isVisible={isDeleteConfirmModalVisible}
         onActionPressed={() => deleteSelection()}

@@ -100,11 +100,11 @@ const DateInputField = ({
 
   const renderDatePickerDialogBox = () => {
     return (<ModalWrapper
-      actionTitle={'Choose'}
+      actionTitle={'Set Date'}
       headerTitle={'Pick ' + label}
       isVisible={isDatePickerModalVisible}
       onActionPressed={onSavePressed}
-      overlayStyleOverride={{width: '30%'}}
+      overlayStyleOverride={{width: 350, maxHeight: 350}}
       showCancelButton={false}
     >
       {renderDatePicker()}
