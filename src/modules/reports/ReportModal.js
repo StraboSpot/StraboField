@@ -48,7 +48,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} ref={formRef}/> \\ Not used yet
+              <ReportForm initialValues={initialValues} ref={formRef}/>
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
               <ReportSpots
