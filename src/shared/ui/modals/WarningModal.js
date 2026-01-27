@@ -8,10 +8,12 @@ import overlayStyles from './overlay.styles';
 import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const WarningModal = ({
+                        cancelTitle,
                         children,
                         closeModal,
                         confirmText,
                         isVisible,
+                        onCancelPress,
                         onConfirmPress,
                         showCancelButton,
                         showConfirmButton,
@@ -27,13 +29,18 @@ const WarningModal = ({
 
   return (
     <ModalWrapper
+      backdropStyle={{opacity: 0.5, backgroundColor: 'black'}}
+      overlayStyleOverride={{maxHeight: '25%'}}
       actionTitle={confirmText || 'Ok'}
+      cancelTitle={cancelTitle || 'Cancel'}
       headerTitle={title || 'Warning!'}
       isVisible={isVisible || isWarningModalVisible}
       onActionPressed={onConfirmPress || closeWarningModal}
-      onCancelPress={closeModal}
+      onCancelPress={onCancelPress}
       showActionButton={showConfirmButton}
       showCancelButton={showCancelButton}
+      showCloseButton
+      closeModal={closeModal}
     >
       <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
     </ModalWrapper>

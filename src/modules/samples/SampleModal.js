@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -8,7 +8,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
@@ -18,12 +17,15 @@ import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
+import {WarningModal} from '../../shared/ui/modals';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {checkSampleName, getNewSpotName} = useSpots();
@@ -37,6 +39,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const [namePostfix, setNamePostfix] = useState(null);
   const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
   const [startingNumber, setStartingNumber] = useState(null);
+  const [currentForm, setCurrentForm] = useState(null);
 
   const formRef = useRef(null);
   const toastRef = useRef(null);
@@ -101,27 +104,40 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const confirmLeavePage = () => {
     if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
       const formCurrent = formRef.current;
-      alert(
-        'Unsaved Changes',
-        'Would you like to save your sample before continuing?',
-        [
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => saveForm(formCurrent),
-          },
-        ],
-        {cancelable: false},
-      );
+      setCurrentForm(formCurrent);
+      setIsWarningModalVisible(true);
+
+      // return (
+      //   <WarningModal
+      //     isVisible={isWarningModalVisible}
+      //     onConfirmPress={() => saveForm(formCurrent)}
+      //     closeModal={closeModal}
+      //     confirmText={'Save Changes'}
+      //     title={'Would you like to save your sample before continuing?'}
+      //   />
+      // );
+      // alert(
+      //   'Unsaved Changes',
+      //   'Would you like to save your sample before continuing?',
+      //   [
+      //     {
+      //       text: 'No',
+      //       style: 'cancel',
+      //     },
+      //     {
+      //       text: 'Yes',
+      //       onPress: () => saveForm(formCurrent),
+      //     },
+      //   ],
+      //   {cancelable: false},
+      // );
     }
+    else closeModal();
   };
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else closeModal();
+    else confirmLeavePage();
   };
 
   const onOrientedButtonPress = (i) => {
@@ -296,6 +312,17 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
+      <WarningModal
+        closeModal={() => setIsWarningModalVisible(false)}
+        isVisible={isWarningModalVisible}
+        onConfirmPress={() => saveForm(currentForm)}
+        onCancelPress={() => dispatch(setModalVisible({modal: null}))}
+        confirmText={'Save Changes'}
+        cancelTitle={'No'}
+        title={'Unsaved Changes'}
+      >
+        <Text style={{flexWrap: 'wrap'}}>Would you like to save your sample before continuing?</Text>
+      </WarningModal>
     </ModalWrapper>
   );
 };

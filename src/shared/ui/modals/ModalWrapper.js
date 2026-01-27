@@ -15,6 +15,7 @@ import {KeyboardAvoidingView, View} from 'react-native';
 
 const ModalWrapper = ({
                         actionTitle,
+                        backdropStyle,
                         buttonTitleRight,
                         cancelTitle,
                         children,
@@ -70,7 +71,7 @@ const ModalWrapper = ({
   return (
     <Overlay
       animationType={'fade'}
-      backdropStyle={overlayStyles.backdropStyles}
+      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
       fullScreen={fullscreen || SMALL_SCREEN}
       isVisible={isVisible}
       onBackdropPress={onBackdropPress}
