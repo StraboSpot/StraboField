@@ -62,6 +62,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
       </View>
       {isSpotsListModalVisible && (
         <ModalWrapper
+          overlayStyleOverride={{maxHeight: '60%', flex: 1}}
           closeModal={() => setIsSpotsListModalVisible(false)}
           headerTitle={'Add/Remove Spots'}
           showActionButton={false}

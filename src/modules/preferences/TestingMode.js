@@ -52,6 +52,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
 
   const renderPrompt = () => (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       actionTitle={'Ok'}
       headerTitle={'Enter Password'}
       isVisible={isTestingModalVisible}

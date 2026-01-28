@@ -82,6 +82,7 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
 
   return (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       actionTitle={'Delete Account'}
       cancelTitle={confirmDeleteMessageVisible ? 'Back' : 'Close'}
       headerTitle={'DANGER!'}

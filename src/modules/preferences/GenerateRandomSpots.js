@@ -42,6 +42,7 @@ const GenerateRandomSpots = () => {
 
       {isSpotGeneratorVisible && (
         <ModalWrapper
+          overlayStyleOverride={{height: 'auto'}}
           actionTitle={'Generate'}
           closeModal={() => setIsSpotGeneratorVisible(false)}
           headerTitle={'Generate Random Spots'}

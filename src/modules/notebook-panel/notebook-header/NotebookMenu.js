@@ -10,7 +10,6 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../../shared/ui/modals';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/page.constants';
@@ -112,7 +111,7 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
         />
       </ModalWrapper>
       <WarningModal
-        closeModal={() => setIsDeleteSpotModalVisible(false)}
+        onCancelPress={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
         isVisible={isDeleteSpotModalVisible}
         onConfirmPress={continueDeleteSelectedSpot}

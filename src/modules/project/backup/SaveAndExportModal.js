@@ -89,6 +89,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   return (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       actionTitle={getButtonTitle()}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}

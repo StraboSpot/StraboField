@@ -20,6 +20,7 @@ const MicroProjectsStatusOverlay = ({
                                     }) => {
   return (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       actionTitle={'OK'}
       headerTitle={'StraboMicro Project'}
       isVisible={showLoadingBar || isError || showComplete}

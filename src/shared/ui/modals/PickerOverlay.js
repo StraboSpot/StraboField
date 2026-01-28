@@ -14,6 +14,7 @@ const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelec
 
   return (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       closeModal={closePicker}
       headerTitle={dividerText}
       isVisible={isPickerVisible}

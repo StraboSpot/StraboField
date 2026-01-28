@@ -62,6 +62,7 @@ const DailyNotesModal = () => {
   const renderDailyNotesModal = () => {
     return (
       <ModalWrapper
+        overlayStyleOverride={{height: 'auto'}}
         onActionPressed={() => saveNote(formRef?.current?.values)}
         onCancelPress={close}
         onDeletePress={deleteNoteConfirm}

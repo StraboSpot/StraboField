@@ -1,11 +1,17 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Dimensions, Platform, ScrollView, Text} from 'react-native';
 
+import {Overlay} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ModalWrapper from './ModalWrapper';
+import ModalSaveAndCancelButtons from './ModalSaveAndCancelButtons';
+import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
 import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice';
+import * as themes from '../../styles.constants';
+
+const platform = Platform.OS === 'ios' ? 'window' : 'screen';
+const {height} = Dimensions.get(platform);
 
 const WarningModal = ({
                         cancelTitle,
@@ -16,6 +22,7 @@ const WarningModal = ({
                         onCancelPress,
                         onConfirmPress,
                         showCancelButton,
+                        showCloseButton,
                         showConfirmButton,
                         title,
                       }) => {
@@ -28,22 +35,40 @@ const WarningModal = ({
   };
 
   return (
-    <ModalWrapper
+    <Overlay
+      animationType={'fade'}
       backdropStyle={{opacity: 0.5, backgroundColor: 'black'}}
-      overlayStyleOverride={{maxHeight: '25%'}}
-      actionTitle={confirmText || 'Ok'}
-      cancelTitle={cancelTitle || 'Cancel'}
-      headerTitle={title || 'Warning!'}
       isVisible={isVisible || isWarningModalVisible}
-      onActionPressed={onConfirmPress || closeWarningModal}
-      onCancelPress={onCancelPress}
-      showActionButton={showConfirmButton}
-      showCancelButton={showCancelButton}
-      showCloseButton
-      closeModal={closeModal}
+      overlayStyle={{
+        backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+        borderColor: themes.MEDIUMGREY,
+        borderRadius: themes.MODAL_BORDER_RADIUS,
+        borderWidth: 0.5,
+        elevation: 5,
+        maxHeight: height * 0.8,
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        width: 300,
+      }}
+      supportedOrientations={['portrait', 'landscape']}
     >
-      <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
-    </ModalWrapper>
+      <ModalWrapperHeader
+        closeModal={closeModal || closeWarningModal}
+        headerTitle={title || 'Warning!'}
+        showCloseButton={showCloseButton}
+      />
+      <ScrollView>
+        <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
+      </ScrollView>
+      <ModalSaveAndCancelButtons
+        actionTitle={confirmText || 'Ok'}
+        cancelTitle={cancelTitle || 'Cancel'}
+        onActionPressed={onConfirmPress || closeWarningModal}
+        onCancelPress={onCancelPress}
+        showActionButton={showConfirmButton}
+        showCancelButton={showCancelButton}
+      />
+    </Overlay>
   );
 };
 

@@ -11,7 +11,7 @@ import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
-import {KeyboardAvoidingView, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
 const ModalWrapper = ({
                         actionTitle,
@@ -40,6 +40,8 @@ const ModalWrapper = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  const isAutoHeight = overlayStyleOverride?.height === 'auto';
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
@@ -81,7 +83,7 @@ const ModalWrapper = ({
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         // keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
-        style={{flex: 1}} // Important for padding behavior
+        style={isAutoHeight ? undefined : {flex: 1}}
       >
         <ModalWrapperHeader
           buttonTitleRight={buttonTitleRight}
@@ -90,7 +92,7 @@ const ModalWrapper = ({
           showCloseButton={showCloseButton}
         />
 
-        <View style={{flex: 1}}>
+        <View style={isAutoHeight ? undefined : {flex: 1}}>
           {children}
         </View>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}

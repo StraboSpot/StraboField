@@ -232,6 +232,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
 
   return (
     <ModalWrapper
+      overlayStyleOverride={{height: 'auto'}}
       actionTitle={`Download ${tileCount} Tiles`}
       cancelTitle={showMainMenu ? 'Cancel' : 'Close'}
       headerTitle={currentMapName}

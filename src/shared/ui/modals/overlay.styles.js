@@ -67,13 +67,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   overlayContainer: {
-    flex: 1,
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 5,
-    maxHeight: height * 0.80,
+    height: height * 0.80,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: 300,
@@ -90,8 +89,9 @@ const styles = StyleSheet.create({
   },
   overlayMapMenuPosition: {
     bottom: 100,
-    flex: 1,
+    height: undefined,
     left: 75,
+    maxHeight: height * 0.80,
     position: 'absolute',
   },
   selectGeometryTypeContent: {

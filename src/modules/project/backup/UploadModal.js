@@ -215,7 +215,7 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   const renderUploadProgress = () => {
     return (
-      <View style={{minHeight: 150}}>
+      <View>
         <View style={uploadModalStyles.messageContainer}>
           <Text style={uploadModalStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
         </View>
@@ -252,6 +252,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       isVisible={isVisible}
       onActionPressed={handleActionPressed}
       onCancelPress={handleClosePress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
       showCancelButton={uploadState === 'not started'}
     >

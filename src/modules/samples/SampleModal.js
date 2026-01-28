@@ -309,6 +309,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
+      overlayStyleOverride={{height: '80%'}}
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}

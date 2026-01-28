@@ -62,6 +62,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
 
       {isTagsListModalVisible && (
         <ModalWrapper
+          overlayStyleOverride={{maxHeight: '60%', flex: 1}}
           buttonTitleRight={'Done'}
           closeModal={() => setIsTagsListModalVisible(false)}
           headerTitle={'Add/Remove Tags'}
