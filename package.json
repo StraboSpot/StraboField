@@ -112,7 +112,8 @@
     "uuid": "13.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@babel/core": "^7.28.6",
+    "@babel/eslint-parser": "^7.28.6",
     "@babel/plugin-transform-export-namespace-from": "^7.27.1",
     "@babel/preset-env": "^7.28.5",
     "@babel/runtime": "^7.28.4",
@@ -136,6 +137,7 @@
     "concurrently": "^9.2.1",
     "css-loader": "^7.1.2",
     "eslint": "^8.57.1",
+    "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-native": "^5.0.0",
     "generate-changelog": "1.8.0",
