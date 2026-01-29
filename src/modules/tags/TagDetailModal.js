@@ -25,6 +25,8 @@ const TagDetailModal = ({closeModal}) => {
 
   const formRef = useRef(null);
 
+  const modalHeight = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+
   let formName = ['project', 'tags'];
   let initialValues;
   if (modalVisible) {
@@ -92,7 +94,7 @@ const TagDetailModal = ({closeModal}) => {
       headerTitle={'Create New Tag'}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
-      overlayStyleOverride={{height: 'auto'}}
+      overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
     >
       <>
         <FlatList
