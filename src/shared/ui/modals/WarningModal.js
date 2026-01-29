@@ -1,8 +1,10 @@
 import React from 'react';
 import {Dimensions, Platform, Text} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import overlayStyles from './overlay.styles';
+
+import {useSelector} from 'react-redux';
+
 import ModalWrapper from './ModalWrapper';
+import overlayStyles from './overlay.styles';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
@@ -20,23 +22,22 @@ const WarningModal = ({
                         showConfirmButton,
                         title,
                       }) => {
-  const dispatch = useDispatch();
   const statusMessages = useSelector(state => state.home.statusMessages);
 
   return (
     <ModalWrapper
-      backdropStyle={{backgroundColor: 'rgba(0, 0, 0, 0.5)', height: height}}
-      showCloseButton={showCloseButton}
-      closeModal={closeModal}
-      cancelTitle={cancelTitle || 'Cancel'}
       actionTitle={confirmText || 'Ok'}
+      backdropStyle={{backgroundColor: 'rgba(0, 0, 0, 0.5)', height: height}}
+      cancelTitle={cancelTitle || 'Cancel'}
+      closeModal={closeModal}
       headerTitle={title || 'Warning!'}
       isVisible={isVisible}
       onActionPressed={onConfirmPress}
       onCancelPress={onCancelPress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={showConfirmButton}
       showCancelButton={showCancelButton}
-      overlayStyleOverride={{height: 'auto'}}
+      showCloseButton={showCloseButton}
     >
       <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
     </ModalWrapper>

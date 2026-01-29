@@ -88,11 +88,11 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       backdropStyle={{backgroundColor: 'rgba(0,0,0,0.5)'}}
       headerTitle={'Create New Tag'}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
+      overlayStyleOverride={{height: 'auto'}}
     >
       <>
         <FlatList

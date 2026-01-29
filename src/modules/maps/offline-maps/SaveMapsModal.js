@@ -206,18 +206,18 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   const updateCount = async () => {
-    getTileCount(downloadZoom).then((tileCount) => {
-      if (tileCount.count) {
+    getTileCount(downloadZoom).then((tc) => {
+      if (tc.count) {
         console.log('downloadZoom from updateCount: ', downloadZoom);
-        console.log('downloadZoom tileCount: ', tileCount.count);
-        setTileCount(tileCount.count);
+        console.log('downloadZoom tc: ', tc.count);
+        setTileCount(tc.count);
         setIsLoadingCircle(false);
-        console.log('return_from_mapview_getTileCount: ', tileCount.count);
+        console.log('return_from_mapview_getTileCount: ', tc.count);
       }
-      else if (tileCount.message) {
+      else if (tc.message) {
         setShowMainMenu(false);
-        if (tileCount.message.includes('Invalid extent')) {
-          console.error(tileCount.message);
+        if (tc.message.includes('Invalid extent')) {
+          console.error(tc.message);
           setErrorMessage('\n\nPlease zoom to level 5 or greater to get a more accurate tiles with features.');
         }
         setIsError(true);
@@ -227,7 +227,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   const updatePicker = async (zoomValue) => {
-    await setDownloadZoom(zoomValue);
+    setDownloadZoom(zoomValue);
   };
 
   return (

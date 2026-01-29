@@ -14,12 +14,12 @@ const notebookStyles = StyleSheet.create({
     top: 10,
   },
   dialogContainer: {
-    height: 'auto',
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 2,
+    height: 'auto',
     position: SMALL_SCREEN ? 'null' : 'absolute',
     right: SMALL_SCREEN ? 0 : 30,
     shadowOpacity: 0.3,

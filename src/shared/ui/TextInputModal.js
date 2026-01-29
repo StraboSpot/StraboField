@@ -29,13 +29,13 @@ const TextInputModal = ({
                         }) => {
   return (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       actionTitle={buttonText || 'Save'}
       headerTitle={dialogTitle}
       isVisible={visible}
       onActionPressed={onActionPressed}
       onCancelPress={onCancelPress}
       onDeletePress={onDeletePress}
+      overlayStyleOverride={{height: 'auto'}}
       shouldShowButtons
       showDeleteButton={showDeleteButton}
     >

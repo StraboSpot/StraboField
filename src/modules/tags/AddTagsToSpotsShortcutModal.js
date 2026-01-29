@@ -1,6 +1,7 @@
 import React from 'react';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+
 import {TagsModal} from './index';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
 
