@@ -107,6 +107,11 @@ const useSpots = () => {
       ...properties
     } = selectedSpot.properties;
     copiedSpot.properties = properties;
+    // Omit strat_section from copied properties
+    if (copiedSpot.properties?.sed?.strat_section) {
+      const {strat_section, ...restSed} = copiedSpot.properties.sed;
+      copiedSpot.properties = {...copiedSpot.properties, sed: restSed};
+    }
     const newSpot = await createSpot(copiedSpot);
     dispatch(setSelectedSpot(newSpot));
     console.log('Spot Copied. New Spot', newSpot);
