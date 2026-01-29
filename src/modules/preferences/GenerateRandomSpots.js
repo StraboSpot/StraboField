@@ -42,13 +42,13 @@ const GenerateRandomSpots = () => {
 
       {isSpotGeneratorVisible && (
         <ModalWrapper
-          overlayStyleOverride={{height: 'auto'}}
           actionTitle={'Generate'}
           closeModal={() => setIsSpotGeneratorVisible(false)}
           headerTitle={'Generate Random Spots'}
           isLoading={loading}
           isVisible={isSpotGeneratorVisible}
           onActionPressed={generateRandomSpots}
+          overlayStyleOverride={{height: 'auto'}}
           showCancelButton={false}
           showCloseButton
         >

@@ -111,9 +111,9 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
         />
       </ModalWrapper>
       <WarningModal
-        onCancelPress={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
         isVisible={isDeleteSpotModalVisible}
+        onCancelPress={() => setIsDeleteSpotModalVisible(false)}
         onConfirmPress={continueDeleteSelectedSpot}
         showCancelButton={!errorMessage}
         title={errorMessage ? 'Can\'t Delete Spot' : 'Delete Spot?'}

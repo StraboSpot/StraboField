@@ -1,4 +1,5 @@
 import {Linking} from 'react-native';
+
 import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProjectTransferProgress} from './connections.slice';
@@ -21,7 +22,7 @@ const useServerRequests = () => {
 
   // Auth Helpers
   const basicAuth = (token = encoded_login) => ({type: 'basic', token});
-  const bearerAuth = (token) => ({type: 'bearer', token});
+  const bearerAuth = token => ({type: 'bearer', token});
 
   // SESAR Helper
   const sendToSesar = async (data, path) => {
@@ -45,11 +46,11 @@ const useServerRequests = () => {
     return postRequest(`${authUrl}/userAuthenticate`, {email: username, password: password}, null);
   };
 
-  const deleteAccount = (login) => deleteRequest(`${baseUrl}${STRABO_APIS.ACCOUNT}`, basicAuth(login));
+  const deleteAccount = login => deleteRequest(`${baseUrl}${STRABO_APIS.ACCOUNT}`, basicAuth(login));
 
-  const deleteAllSpotsInDataset = (datasetId) => deleteRequest(`${baseUrl}/datasetSpots/${datasetId}`, basicAuth());
+  const deleteAllSpotsInDataset = datasetId => deleteRequest(`${baseUrl}/datasetSpots/${datasetId}`, basicAuth());
 
-  const deleteProfileImage = (login) => deleteRequest(`${baseUrl}/profileimage`, basicAuth(login));
+  const deleteProfileImage = login => deleteRequest(`${baseUrl}/profileimage`, basicAuth(login));
 
   const getDatasets = (projectId, encodedLogin) =>
     getRequest(`${baseUrl}/projectDatasets/${projectId}`, basicAuth(encodedLogin));
@@ -93,7 +94,7 @@ const useServerRequests = () => {
     }
   };
 
-  const getProfile = (encodedLogin) => getRequest(`${baseUrl}/profile`, basicAuth(encodedLogin));
+  const getProfile = encodedLogin => getRequest(`${baseUrl}/profile`, basicAuth(encodedLogin));
 
   const getProfileImage = async (encodedLogin) => {
     try {
@@ -136,7 +137,7 @@ const useServerRequests = () => {
     return response.json();
   };
 
-  const postToSesar = (xmlData) => sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
+  const postToSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
 
   const refreshSesarToken = async (accessToken) => {
     const formData = new FormData();
@@ -168,16 +169,16 @@ const useServerRequests = () => {
     }
   };
 
-  const updateDataset = (dataset) => postRequest(`${baseUrl}/dataset`, dataset, basicAuth());
+  const updateDataset = dataset => postRequest(`${baseUrl}/dataset`, dataset, basicAuth());
 
   const updateDatasetSpots = (datasetId, spotCollection) =>
     postRequest(`${baseUrl}/datasetspots/${datasetId}`, spotCollection, basicAuth());
 
-  const updateProfile = (data) => postRequest(`${baseUrl}/profile`, data, basicAuth());
+  const updateProfile = data => postRequest(`${baseUrl}/profile`, data, basicAuth());
 
-  const updateProject = (project) => postRequest(`${baseUrl}/project`, project, basicAuth());
+  const updateProject = project => postRequest(`${baseUrl}/project`, project, basicAuth());
 
-  const updateSampleWithSesar = (xmlData) => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
+  const updateSampleWithSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
 
   const uploadImage = (formdata, isProfileImage) => {
     return new Promise((resolve, reject) => {
@@ -199,9 +200,9 @@ const useServerRequests = () => {
     });
   };
 
-  const uploadWebImage = (formData) => postRequest(`${baseUrl}/image`, formData, basicAuth());
+  const uploadWebImage = formData => postRequest(`${baseUrl}/image`, formData, basicAuth());
 
-  const verifyImagesExistence = (imageIdsArray) => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
+  const verifyImagesExistence = imageIdsArray => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
 
   const zipURLStatus = async (zipId) => {
     try {

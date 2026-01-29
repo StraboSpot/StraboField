@@ -9,6 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
+import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
@@ -17,7 +18,6 @@ import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
-import {WarningModal} from '../../shared/ui/modals';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -281,22 +281,22 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
       onFooterButtonPress={onPress}
+      overlayStyleOverride={{height: '80%'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
-      overlayStyleOverride={{height: '80%'}}
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
       <WarningModal
-        closeModal={() => setIsWarningModalVisible(false)}
-        isVisible={isWarningModalVisible}
-        onConfirmPress={() => saveForm(currentForm)}
-        onCancelPress={() => dispatch(setModalVisible({modal: null}))}
-        confirmText={'Save Changes'}
         cancelTitle={'No'}
-        title={'Unsaved Changes'}
+        closeModal={() => setIsWarningModalVisible(false)}
+        confirmText={'Save Changes'}
+        isVisible={isWarningModalVisible}
+        onCancelPress={() => dispatch(setModalVisible({modal: null}))}
+        onConfirmPress={() => saveForm(currentForm)}
         showCloseButton
+        title={'Unsaved Changes'}
       >
         <Text style={{flexWrap: 'wrap'}}>Would you like to save your sample before continuing?</Text>
       </WarningModal>

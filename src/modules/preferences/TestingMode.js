@@ -52,12 +52,12 @@ const TestingMode = ({isTestingMode, textStyles}) => {
 
   const renderPrompt = () => (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       actionTitle={'Ok'}
       headerTitle={'Enter Password'}
       isVisible={isTestingModalVisible}
       onActionPressed={verifyPassword}
       onCancelPress={closeModal}
+      overlayStyleOverride={{height: 'auto'}}
     >
       <Text style={overlayStyles.importantText}>
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.

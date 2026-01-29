@@ -123,10 +123,10 @@ const UserProfile = () => {
   const renderProfileImageModal = () => {
     return (
       <ModalWrapper
-        overlayStyleOverride={{height: 'auto'}}
         closeModal={closeProfileImageModal}
         headerTitle={'Edit Profile Image'}
         isVisible={isImageDialogVisible}
+        overlayStyleOverride={{height: 'auto'}}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton

@@ -10,10 +10,10 @@ import commonStyles from '../../shared/common.styles';
 import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
+import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
-import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 
 const ImageInfo = ({
                      deleteImage,
@@ -56,11 +56,11 @@ const ImageInfo = ({
   const renderDeleteImageModal = () => {
     return (
       <DeleteConformationDialogBox
-        overlayStyleOverride={{maxHeight: '25%'}}
-        headerTitle={`Delete Image`}
+        headerTitle={'Delete Image'}
         isVisible={isImageDeleteModalVisible}
         onActionPressed={onDeleteImage}
         onCancelPress={() => setIsImageDeleteModalVisible(false)}
+        overlayStyleOverride={{maxHeight: '25%'}}
       >
         <Text>Are you sure you want to delete</Text>
         <Text>{image.title || image.id}?</Text>

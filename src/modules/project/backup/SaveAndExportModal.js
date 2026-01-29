@@ -89,13 +89,13 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   return (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       actionTitle={getButtonTitle()}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
       isVisible={isVisible}
       onActionPressed={backingUpStatus === 'complete' ? handleClosePress : handleActionPressed}
       onCancelPress={handleClosePress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={backingUpStatus === '' || backingUpStatus === 'complete' || backingUpStatus === 'error'}
       showCancelButton={backingUpStatus === ''}
     >

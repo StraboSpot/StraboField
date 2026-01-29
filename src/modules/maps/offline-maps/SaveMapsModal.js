@@ -232,12 +232,12 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
 
   return (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       actionTitle={`Download ${tileCount} Tiles`}
       cancelTitle={showMainMenu ? 'Cancel' : 'Close'}
       headerTitle={currentMapName}
       onActionPressed={saveMap}
       onCancelPress={() => dispatch(setIsOfflineMapsModalVisible(false))}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={showMainMenu}
       showCancelButton={showMainMenu || showComplete || isError}
     >

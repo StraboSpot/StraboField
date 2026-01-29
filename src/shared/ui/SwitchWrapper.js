@@ -26,7 +26,6 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
   }
   else if (Platform.OS === 'ios') {
     return (
-
       <View style={{transform: [{scaleX: 0.7}, {scaleY: 0.8}], marginRight: 5}}>
         <Switch
           disabled={disabled}
