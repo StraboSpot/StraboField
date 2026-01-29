@@ -1,20 +1,32 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {Pressable, View} from 'react-native';
 
+import {ListItem} from '@rn-vui/base';
+import {Field, Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
+import commonStyles from './common.styles';
+import {isEmpty} from './Helpers';
+import {BLACK, WHITE} from './styles.constants';
+import {TextInputField} from '../modules/form';
+import ActionButton from './ui/buttons/ActionButton';
 import overlayStyles from './ui/modals/overlay.styles';
 import Spacer from './ui/Spacer';
 import {useTags} from '../modules/tags';
 import ClearButton from './ui/buttons/ClearButton';
 import ModalWrapper from './ui/modals/ModalWrapper';
 
-const ColorPickerModal = ({
-                            closeModal,
-                            isVisible,
-                          }) => {
-  const {saveTag} = useTags();
+
+const ColorPickerModal = ({closeModal}) => {
+
   const selectedTag = useSelector(state => state.project.selectedTag);
+
+  const [hexColor, setHexColor] = useState(selectedTag.color || undefined);
+
+  const {saveTag} = useTags();
+
+  const formRef = useRef(null);
+
   const COLOR_CHOICES = [
     ['#330000', '#331900', '#333300', '#193300', '#003300', '#003319', '#003333', '#001933', '#000033', '#190033', '#330033', '#330019', '#000000'],
     ['#660000', '#663300', '#666600', '#336600', '#006600', '#006633', '#006666', '#003366', '#000066', '#330066', '#660066', '#660033', '#202020'],
@@ -34,8 +46,83 @@ const ColorPickerModal = ({
     closeModal();
   };
 
-  const setColor = (color) => {
-    saveTag({...selectedTag, color: color});
+  const componentToHex = (c) => {
+    const hex = c.toString(16);
+    return hex.length == 1 ? '0' + hex : hex;
+  };
+
+  const getRGBString = (hex) => {
+    if (hex) {
+      const {r, g, b} = hexToRgb(hex);
+      return `${r}, ${g}, ${b}`;
+    }
+  };
+
+  const handleColorChanged = (field, value) => {
+    if (field === 'rgb') {
+      formRef.current.setFieldValue('rgb', value);
+      const [r, g, b] = value.replaceAll(' ', '').split(',');
+      const hexToTest = rgbToHex(parseInt(r), parseInt(g), parseInt(b));
+      if (isValidHexColor(hexToTest)) {
+        formRef.current.setFieldValue('hex', hexToTest);
+        setHexColor(hexToTest);
+      }
+      else {
+        formRef.current.setFieldValue('hex', undefined);
+        setHexColor(undefined);
+      }
+    }
+    else if (field === 'hex') {
+      formRef.current.setFieldValue('hex', value);
+      if (isValidHexColor(value)) {
+        formRef.current.setFieldValue('rgb', getRGBString(value));
+        setHexColor(value);
+      }
+      else {
+        formRef.current.setFieldValue('rgb', undefined);
+        setHexColor(undefined);
+      }
+    }
+  };
+
+  const hexToRgb = (hex) => {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    return result ? {
+      r: parseInt(result[1], 16), // Convert the red component to an integer
+      g: parseInt(result[2], 16), // Convert the green component to an integer
+      b: parseInt(result[3], 16),  // Convert the blue component to an integer
+    } : null;
+  };
+
+  const isValidHexColor = (str) => {
+    // Regex explanation:
+    // ^      -> Start of the string
+    // #?     -> Optional '#' symbol
+    // (      -> Start of a capturing group
+    // [0-9a-fA-F]{6} -> Match exactly 6 hex characters
+    // |      -> OR
+    // [0-9a-fA-F]{3} -> Match exactly 3 hex characters
+    // )      -> End of the capturing group
+    // $      -> End of the string
+    // /i     -> Case-insensitive flag
+
+    const hexRegex = /^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/;
+    return hexRegex.test(str);
+  };
+
+  const rgbToHex = (r, g, b) => {
+    return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  };
+
+  const setColor = () => {
+    saveTag({...selectedTag, color: hexColor});
     closeModal();
   };
 
@@ -43,7 +130,7 @@ const ColorPickerModal = ({
     <ModalWrapper
       closeModal={closeModal}
       headerTitle={'Select a Custom Color'}
-      isVisible={isVisible}
+      isVisible
       overlayStyleOverride={{width: 400}}
       showActionButton={false}
       showCancelButton={false}
@@ -57,14 +144,57 @@ const ColorPickerModal = ({
                 return (
                   <Pressable
                     key={colorChoice}
-                    onPress={() => setColor(colorChoice)}
-                    style={{...overlayStyles.tagColorPickerColorItem, backgroundColor: colorChoice}}
+                    onPress={() => handleColorChanged('hex', colorChoice)}
+                    style={{
+                      ...overlayStyles.tagColorPickerColorItem,
+                      backgroundColor: colorChoice,
+                      borderColor: hexColor?.toUpperCase() === colorChoice?.toUpperCase() ? BLACK : WHITE,
+                    }}
                   />
                 );
               })}
             </View>
           );
         })}
+        <Spacer/>
+        <Formik
+          initialValues={{hex: hexColor, rgb: getRGBString(hexColor)}}
+          innerRef={formRef}
+          onSubmit={() => console.log('Submitting form...')}
+        >
+          {() => (
+            <View>
+              <ListItem containerStyle={commonStyles.listItemFormField}>
+                <ListItem.Content>
+                  <Field
+                    component={TextInputField}
+                    key={'hex'}
+                    label={'Hex'}
+                    name={'hex'}
+                    onMyChange={handleColorChanged}
+                  />
+                </ListItem.Content>
+              </ListItem>
+              <ListItem containerStyle={commonStyles.listItemFormField}>
+                <ListItem.Content>
+                  <Field
+                    component={TextInputField}
+                    key={'rgb'}
+                    label={'RGB'}
+                    name={'rgb'}
+                    onMyChange={handleColorChanged}
+                  />
+                </ListItem.Content>
+              </ListItem>
+            </View>
+          )}
+        </Formik>
+        <Spacer/>
+        <ActionButton
+          disabled={isEmpty(hexColor)}
+          onPress={setColor}
+          title={'Set Color'}
+        />
         <Spacer/>
         <ClearButton
           onPress={clearColor}
