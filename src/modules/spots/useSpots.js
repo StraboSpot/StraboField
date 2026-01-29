@@ -286,8 +286,9 @@ const useSpots = () => {
         if (!hasValidGeometry || isEmpty(coordsFlat) || !isEqual(coordsFlat, coordsFlatValid)) hasValidGeometry = false;
       });
       if (spot.geometry && !hasValidGeometry) {
-        alert('Invalid Geometry', 'Found a Spot with invalid geometry. Unable to map this Spot.'
-          + '\nSpot Name: ' + spot.properties.name);
+        alert('Invalid Geometry',
+          'Spot ' + spot.properties.name + ' has invalid geometry. Please edit the geometry of this Spot'
+          + ' or delete the Spot.');
         console.error('INVALID Geometry! Spot:', spot);
       }
       return hasValidGeometry;
