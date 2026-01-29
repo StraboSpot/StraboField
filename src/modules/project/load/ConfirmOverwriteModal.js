@@ -42,11 +42,11 @@ const ConfirmOverwriteModal = ({
 
   return (
     <ModalWrapper
-      overlayStyleOverride={{height: 'auto'}}
       actionTitle={'Cancel'}
       closeModal={closeModal}
       headerTitle={headerTitle()}
       isVisible={isVisible}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton

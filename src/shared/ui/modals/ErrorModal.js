@@ -16,15 +16,15 @@ const ErrorModal = ({children, headerTitle, isVisible, onActionPressed}) => {
 
   return (
     <ModalWrapper
+      actionTitle={'Ok'}
+      headerTitle={headerTitle || 'Error!'}
+      isVisible={isVisible || isErrorMessagesModalVisible}
+      onActionPressed={onActionPressed || dispatch(setIsErrorMessagesModalVisible(false))}
       overlayStyleOverride={{
         paddingHorizontal: 0, // Set to 0 so the inner container controls spacing
         // Limits the total height of the white box
         maxHeight: 300,
       }}
-      actionTitle={'Ok'}
-      headerTitle={headerTitle || 'Error!'}
-      isVisible={isVisible || isErrorMessagesModalVisible}
-      onActionPressed={onActionPressed || dispatch(setIsErrorMessagesModalVisible(false))}
       showActionButton={!(Platform.OS === 'web' && statusMessages.includes('Error loading project!'))}
       showCancelButton={false}
     >
@@ -35,9 +35,9 @@ const ErrorModal = ({children, headerTitle, isVisible, onActionPressed}) => {
         flexGrow: 0,
       }}>
         <ScrollView
-          style={{flexGrow: 0}}
           onContentSizeChange={() => scrollView.current.scrollToEnd({animated: true})}
           ref={scrollView}
+          style={{flexGrow: 0}}
         >
           <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
         </ScrollView>

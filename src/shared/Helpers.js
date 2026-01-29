@@ -1,8 +1,9 @@
 import {Linking, PixelRatio} from 'react-native';
 
 import 'react-native-get-random-values';
-import {v4 as uuidv4} from 'uuid';
 import isEqual from 'fast-deep-equal';
+import {v4 as uuidv4} from 'uuid';
+
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 

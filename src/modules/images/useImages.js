@@ -1,8 +1,8 @@
 import {Image, PermissionsAndroid, Platform} from 'react-native';
 
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 

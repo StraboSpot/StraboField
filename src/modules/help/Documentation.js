@@ -1,13 +1,14 @@
 import React, {useState} from 'react';
 import {Platform, ScrollView, View} from 'react-native';
 
+import {useSelector} from 'react-redux';
+
 import SpotDataModelModal from './SpotDataModelModal';
 import UrlLinkButton from './UrlLinkButton';
 import {STRABO_APIS} from '../../services/urls.constants';
 import {BLACK, BLUE} from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {useSelector} from 'react-redux';
 
 const Documentation = ({navigation}) => {
 
@@ -69,10 +70,8 @@ const Documentation = ({navigation}) => {
     navigation.navigate('DocumentationScreen', {document});
   };
 
-  const renderDocumentButton = (item) => (
+  const renderDocumentButton = item => (
     <OutlineButton
-      iconContainerStyle={{position: 'absolute', left: 15}}
-      key={item.id}
       icon={{
         color: BLACK,
         iconStyle: {paddingRight: 10},
@@ -80,18 +79,20 @@ const Documentation = ({navigation}) => {
         size: 20,
         type: 'ionicon',
       }}
+      iconContainerStyle={{position: 'absolute', left: 15}}
+      key={item.id}
       onPress={() => handlePress(item)}
       title={item.name}
     />
   );
 
-  const renderLinkButton = (item) => (
+  const renderLinkButton = item => (
     <UrlLinkButton
-      key={item.id}
+      color={item.color}
       icon={item.icon}
+      key={item.id}
       title={item.title}
       url={item.url}
-      color={item.color}
     />
   );
 
@@ -113,7 +114,6 @@ const Documentation = ({navigation}) => {
         <SectionDivider dividerText={'Developer Resources'}/>
         <View>
           <OutlineButton
-            iconContainerStyle={{position: 'absolute', left: 15}}
             icon={{
               color: BLACK,
               iconStyle: {paddingRight: 10},
@@ -121,6 +121,7 @@ const Documentation = ({navigation}) => {
               size: 20,
               type: 'ionicon',
             }}
+            iconContainerStyle={{position: 'absolute', left: 15}}
             onPress={() => setIsSpotDataModelModalVisible(true)}
             title={'Spot Data Model'}
           />

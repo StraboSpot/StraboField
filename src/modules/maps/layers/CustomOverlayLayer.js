@@ -53,10 +53,10 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
 // Custom comparison function to ensure re-renders when relevant props change
 const areEqual = (prevProps, nextProps) => {
   return (
-    prevProps.customMap.id === nextProps.customMap.id &&
-    prevProps.customMap.isViewable === nextProps.customMap.isViewable &&
-    prevProps.customMap.opacity === nextProps.customMap.opacity &&
-    prevProps.basemap.id === nextProps.basemap.id
+    prevProps.customMap.id === nextProps.customMap.id
+    && prevProps.customMap.isViewable === nextProps.customMap.isViewable
+    && prevProps.customMap.opacity === nextProps.customMap.opacity
+    && prevProps.basemap.id === nextProps.basemap.id
   );
 };
 

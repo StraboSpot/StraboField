@@ -1,4 +1,5 @@
 import React from 'react';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -11,7 +12,6 @@ import {isEmpty} from '../../Helpers';
 import {SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
-import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
 const ModalWrapper = ({
                         actionTitle,
