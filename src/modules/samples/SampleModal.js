@@ -106,31 +106,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       const formCurrent = formRef.current;
       setCurrentForm(formCurrent);
       setIsWarningModalVisible(true);
-
-      // return (
-      //   <WarningModal
-      //     isVisible={isWarningModalVisible}
-      //     onConfirmPress={() => saveForm(formCurrent)}
-      //     closeModal={closeModal}
-      //     confirmText={'Save Changes'}
-      //     title={'Would you like to save your sample before continuing?'}
-      //   />
-      // );
-      // alert(
-      //   'Unsaved Changes',
-      //   'Would you like to save your sample before continuing?',
-      //   [
-      //     {
-      //       text: 'No',
-      //       style: 'cancel',
-      //     },
-      //     {
-      //       text: 'Yes',
-      //       onPress: () => saveForm(formCurrent),
-      //     },
-      //   ],
-      //   {cancelable: false},
-      // );
     }
     else closeModal();
   };
@@ -321,6 +296,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         confirmText={'Save Changes'}
         cancelTitle={'No'}
         title={'Unsaved Changes'}
+        showCloseButton
       >
         <Text style={{flexWrap: 'wrap'}}>Would you like to save your sample before continuing?</Text>
       </WarningModal>

@@ -5,7 +5,8 @@ import TablesData from './TablesData';
 import UrlData from './URLData';
 import useExternalData from './useExternalData';
 import {isEmpty} from '../../shared/Helpers';
-import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
+import {WarningModal} from '../../shared/ui/modals';
+import commonStyles from '../../shared/common.styles';
 
 function DataWrapper({
                        editable,
@@ -29,16 +30,17 @@ function DataWrapper({
   const renderDeleteConformation = () => {
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
     return (
-      <DeleteConformationDialogBox
-        overlayStyleOverride={{maxHeight: '25%'}}
-        headerTitle={`Delete ${itemToDelete.type.toUpperCase()}?`}
+      <WarningModal
+        title={'Delete .CSV?'}
+        confirmText={'Delete'}
         isVisible={isDeleteConfirmModalVisible}
-        onActionPressed={() => deleteSelection()}
+        onConfirmPress={deleteSelection}
         onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
       >
-        <Text>Are you sure you want to delete</Text>
-        <Text>{title}?</Text>
-      </DeleteConformationDialogBox>
+        <Text>Are you sure you want to delete {`\n`}
+          <Text style={commonStyles.textBold}>{title}?</Text>
+        </Text>
+      </WarningModal>
     );
   };
 

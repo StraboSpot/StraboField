@@ -193,6 +193,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
       <WarningModal
         isVisible={isWarningModalVisible}
         title={'Map Not Available!'}
+        onConfirmPress={() => setIsWarningModalVisible(false)}
+        showCancelButton={false}
       >
         <Text>Selected map is not available for offline use. Switching to first available map: {selectedMap.name}</Text>
       </WarningModal>

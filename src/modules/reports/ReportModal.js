@@ -3,8 +3,8 @@ import {FlatList, Text, View} from 'react-native';
 
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
-import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import {WarningModal} from '../../shared/ui/modals';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
@@ -68,18 +68,19 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           }
           bounces={false}
         />
-
-        <DeleteConformationDialogBox
-          headerTitle={'Delete Report?'}
+        <WarningModal
+          cancelTitle={errorMessage ? 'Ok' : 'Cancel'}
+          overlayStyleOverride={{height: '30%'}}
+          title={'Delete Report?'}
           isVisible={isDeleteReportModalVisible}
-          onActionPressed={deleteReport}
+          onConfirmPress={deleteReport}
           onCancelPress={() => setIsDeleteReportModalVisible(false)}
-          showActionButton={isDeleteReportModalVisible && !errorMessage}
+          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
           showCancelButton={true}
         >
           {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
             : <Text>Are you sure you want to delete this report?</Text>}
-        </DeleteConformationDialogBox>
+        </WarningModal>
       </ModalWrapper>
 
     </>
