@@ -20,6 +20,7 @@ import {
   setIsOfflineMapsModalVisible,
 } from '../../home/home.slice';
 import {MAP_PROVIDERS} from '../maps.constants';
+import {calculateScaleRatio} from './scale';
 
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   // console.log('Rendering SaveMapsModal...');
@@ -99,26 +100,6 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     shouldDownload().catch(err => console.error('Error in SaveMapsModal shouldDownload()', err));
   }, [downloadZoom]);
 
-  const shouldDownload = async () => {
-    if (downloadZoom > 0) {
-      setIsLoadingCircle(true);
-      updateCount().then(() => {
-        console.log('TileCount', tileCount);
-      });
-    }
-  };
-
-  const unzip = async () => {
-    try {
-      setIsLoadingWave(true);
-      setPercentDone(0);
-      await doUnzip();
-    }
-    catch (err) {
-      console.error('Unzip Error:', err);
-    }
-  };
-
   const downloadZip = async (zipUID) => {
     try {
       const tilehost = getTileBaseUrl();
@@ -151,6 +132,19 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     catch (err) {
       console.error('Server error in downloadZipUrl', err);
       throw Error(err);
+    }
+  };
+
+  const getScale = (z) => {
+    try {
+      const [minX, minY, maxX, maxY] = extentString.split(',');
+      const lat = (parseFloat(minY) + parseFloat(maxY)) / 2;   // Get the latitude of the center of extent
+      const scaleN = calculateScaleRatio(lat, z);
+      return '   (1:' + scaleN.toLocaleString() + ')';
+    }
+    catch (e) {
+      console.log('Error finding scale', e);
+      return '';
     }
   };
 
@@ -193,6 +187,15 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     }
   };
 
+  const shouldDownload = async () => {
+    if (downloadZoom > 0) {
+      setIsLoadingCircle(true);
+      updateCount().then(() => {
+        console.log('TileCount', tileCount);
+      });
+    }
+  };
+
   const tileMove = async (tilearray) => {
     setIsLoadingWave(false);
     dispatch(removedLastStatusMessage());
@@ -202,6 +205,17 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
       setPercentDone(progress[0] / tilearray.length);
       setInstalledTiles(progress[2]);
       setTilesToInstall(progress[1]);
+    }
+  };
+
+  const unzip = async () => {
+    try {
+      setIsLoadingWave(true);
+      setPercentDone(0);
+      await doUnzip();
+    }
+    catch (err) {
+      console.error('Unzip Error:', err);
     }
   };
 
@@ -226,9 +240,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     });
   };
 
-  const updatePicker = async (zoomValue) => {
-    setDownloadZoom(zoomValue);
-  };
+  const updatePicker = async zoomValue => setDownloadZoom(zoomValue);
 
   return (
     <ModalWrapper
@@ -260,7 +272,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
                     return (
                       <Picker.Item
                         key={zoom}
-                        label={zoom.toString()}
+                        label={zoom.toString() + getScale(zoom)}
                         style={{width: 100}}
                         value={zoom}
                       />
