@@ -59,7 +59,6 @@ const homeConfig = {
     'isStatusMessagesModalVisible',
     'isUploadModalVisible',
     'isUploadProgressModalVisible',
-    'isWarningMessagesModalVisible',
     'loading',
     'modalValues',
     'modalVisible',
