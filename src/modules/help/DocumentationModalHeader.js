@@ -21,15 +21,13 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
   return (
     <>
       <View style={styles.headerContainer}>
-        {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.jumpButton}>
+        <TouchableOpacity onPress={onClose} style={styles.closeButtonContainer}>
+          <Ionicons color={'#333'} name={'arrow-back-outline'} size={24}/>
+        </TouchableOpacity>
+        <Text style={styles.pageText}>{pageHeader}</Text>
+        {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)}>
           <Text style={styles.jumpText}>Jump to page</Text>
         </TouchableOpacity>}
-        <Text style={styles.pageText}>
-          {pageHeader}
-        </Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons color={'#333'} name={'close'} size={24}/>
-        </TouchableOpacity>
       </View>
       <ModalWrapper
         closeModal={() => setPickerVisible(false)}

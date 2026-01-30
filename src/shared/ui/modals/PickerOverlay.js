@@ -17,6 +17,7 @@ const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelec
       closeModal={closePicker}
       headerTitle={dividerText}
       isVisible={isPickerVisible}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}

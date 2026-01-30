@@ -52,7 +52,6 @@ import {
   TagsNotebookModal,
   TagsShortcutModal,
 } from '../tags';
-import AddTephraModal from '../tephra/AddTephraModal';
 import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';
@@ -214,7 +213,6 @@ export const SECONDARY_PAGES = [
     icon_src: require('../../assets/icons/Tephra.png'),
     icon_pressed_src: require('../../assets/icons/Tephra_pressed.png'),
     page_component: TephraPage,
-    modal_component: AddTephraModal,
     overview_component: BasicOverviewList,
     action_label: 'Add a Tephra Layer',
     testing: true,

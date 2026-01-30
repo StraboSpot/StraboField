@@ -4,8 +4,9 @@ import {Text, View} from 'react-native';
 import TablesData from './TablesData';
 import UrlData from './URLData';
 import useExternalData from './useExternalData';
+import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
+import {WarningModal} from '../../shared/ui/modals';
 
 function DataWrapper({
                        editable,
@@ -29,15 +30,17 @@ function DataWrapper({
   const renderDeleteConformation = () => {
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
     return (
-      <DeleteConformationDialogBox
-        headerTitle={`Delete ${itemToDelete.type.toUpperCase()}?`}
+      <WarningModal
+        confirmText={'Delete'}
         isVisible={isDeleteConfirmModalVisible}
-        onActionPressed={() => deleteSelection()}
         onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
+        onConfirmPress={deleteSelection}
+        title={'Delete .CSV?'}
       >
-        <Text>Are you sure you want to delete</Text>
-        <Text>{title}?</Text>
-      </DeleteConformationDialogBox>
+        <Text>Are you sure you want to delete {'\n'}
+          <Text style={commonStyles.textBold}>{title}?</Text>
+        </Text>
+      </WarningModal>
     );
   };
 

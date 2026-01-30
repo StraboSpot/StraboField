@@ -35,6 +35,7 @@ const TextInputModal = ({
       onActionPressed={onActionPressed}
       onCancelPress={onCancelPress}
       onDeletePress={onDeletePress}
+      overlayStyleOverride={{height: 'auto'}}
       shouldShowButtons
       showDeleteButton={showDeleteButton}
     >

@@ -137,7 +137,7 @@ const TagDetail = ({
           {/* Spots with this Tag */}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots W/Geologic Unit' : 'Tagged Spots'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}
             onPress={addRemoveSpots}
           />
           <FlatList

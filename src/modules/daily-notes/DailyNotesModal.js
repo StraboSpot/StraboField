@@ -65,6 +65,7 @@ const DailyNotesModal = () => {
         onActionPressed={() => saveNote(formRef?.current?.values)}
         onCancelPress={close}
         onDeletePress={deleteNoteConfirm}
+        overlayStyleOverride={{height: 'auto'}}
         showDeleteButton={!isEmpty(projectDescription?.daily_setup)}
       >
         <Formik

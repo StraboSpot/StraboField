@@ -88,10 +88,12 @@ const useStratSection = () => {
 
   // Move intervals and Spots in column down to close gap after target interval deleted
   const deleteInterval = (targetInterval) => {
-    const targetIntervalExtent = turf.bbox(targetInterval);
-    const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
-    moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[3],
-      -targetIntervalHeight, targetInterval.properties.id);
+    if (turf.getGeom(targetInterval)) {
+      const targetIntervalExtent = turf.bbox(targetInterval);
+      const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
+      moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[3],
+        -targetIntervalHeight, targetInterval.properties.id);
+    }
     deleteSpot(targetInterval.properties.id);
   };
 

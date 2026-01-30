@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, KeyboardAvoidingView, Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -338,57 +338,63 @@ const BasicPageDetail = ({
 
     return (
       <>
-        {(isTemplate || !isEmpty(selectedFeature)) && (
-          <>
-            <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
-            {PageTabsComponent && PageTabsComponent}
-            {!isReadOnly && (
-              <SaveAndCancelButtons
-                cancel={cancelForm}
-                getIsDisabled={checkIfIsDisabled()}
-                save={saveButtonOnPress}
-              />
-            )}
-            <FlatList
-              ListHeaderComponent={renderFormFields()}
-              contentContainerStyle={{paddingBottom: 200}}
-            />
-          </>
-        )}
-        {/*{isIGSNModalVisible && (*/}
-        <IGSNModal
-          isVisible={isIGSNModalVisible}
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-          sampleValues={formRef.current?.values}
-        />
-        {/*)}*/}
-        {/*Modal when deleting a sample with an IGSN attached*/}
-        <ModalWrapper
-          actionTitle={'Delete'}
-          headerTitle={'Delete Sample'}
-          isVisible={isDeleteOverlayVisible}
-          onActionPressed={deleteFeature}
-          onCancelPress={() => setIsDeleteOverlayVisible(false)}
-          overlayStyleOverride={{height: '40%'}}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Adjust offset as needed
+          style={{flex: 1}} // Important for padding behavior
         >
-          <View style={{
-            flex: 1,
-            paddingVertical: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'yellow',
-          }}>
-            <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
-            <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
-          </View>
-          <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
-            </Text>
-          </View>
-        </ModalWrapper>
+          {(isTemplate || !isEmpty(selectedFeature)) && (
+            <>
+              <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+              {PageTabsComponent && PageTabsComponent}
+              {!isReadOnly && (
+                <SaveAndCancelButtons
+                  cancel={cancelForm}
+                  getIsDisabled={checkIfIsDisabled()}
+                  save={saveButtonOnPress}
+                />
+              )}
+              <FlatList
+                ListHeaderComponent={renderFormFields()}
+                contentContainerStyle={{paddingBottom: 200}}
+              />
+            </>
+          )}
+          {/*{isIGSNModalVisible && (*/}
+          <IGSNModal
+            isVisible={isIGSNModalVisible}
+            onModalCancel={() => setIsIGSNModalVisible(false)}
+            onSampleSaved={onSampleSaved}
+            ref={formRef}
+            sampleValues={formRef.current?.values}
+          />
+          {/*)}*/}
+          {/*Modal when deleting a sample with an IGSN attached*/}
+          <ModalWrapper
+            actionTitle={'Delete'}
+            headerTitle={'Delete Sample'}
+            isVisible={isDeleteOverlayVisible}
+            onActionPressed={deleteFeature}
+            onCancelPress={() => setIsDeleteOverlayVisible(false)}
+            overlayStyleOverride={{height: '40%'}}
+          >
+            <View style={{
+              flex: 1,
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'yellow',
+            }}>
+              <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
+              <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
+            </View>
+            <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
+              <Text
+                style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
+              </Text>
+            </View>
+          </ModalWrapper>
+        </KeyboardAvoidingView>
       </>
     );
   }

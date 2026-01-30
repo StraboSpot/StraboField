@@ -26,9 +26,10 @@ const documentationStyles = StyleSheet.create({
     color: WHITE,
     fontSize: MEDIUM_TEXT_SIZE,
   },
-  closeButton: {
-    alignItems: 'flex-end',
-    width: 24,
+  closeButtonContainer: {
+    paddingHorizontal: 10,
+    // alignItems: 'flex-end',
+    // width: 24,
   },
   container: {
     flex: 1,
@@ -40,10 +41,7 @@ const documentationStyles = StyleSheet.create({
     flexDirection: 'row',
     height: 50,
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-  jumpButton: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 25,
   },
   jumpText: {
     color: '#007AFF',

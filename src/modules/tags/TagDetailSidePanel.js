@@ -78,10 +78,7 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
         />
       </View>
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
-      <ColorPickerModal
-        closeModal={() => setIsColorPickerModalVisible(false)}
-        isVisible={isColorPickerModalVisible}
-      />
+      {isColorPickerModalVisible && <ColorPickerModal closeModal={() => setIsColorPickerModalVisible(false)}/>}
     </View>
   );
 };

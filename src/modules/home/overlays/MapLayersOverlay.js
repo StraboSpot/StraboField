@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions, FlatList, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
@@ -298,10 +298,10 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     else return [renderOfflineCustomMapsList(), renderOfflineCustomOverlaysList()];
   };
 
-  const overlayStyle = useMemo(() => ({
+  const overlayStyle = {
     ...overlayStyles.overlayMapMenuPosition,
-    maxHeight: dimensions.height * 0.80,
-  }), [dimensions.height]);
+    height: '80%',
+  };
 
   return (
     <ModalWrapper

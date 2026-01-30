@@ -43,7 +43,6 @@ const UrlData = ({
       <TextInputModal
         dialogTitle={'Edit Url'}
         keyboardType={'url'}
-        multiline={true}
         onActionPressed={onSaveEdits}
         onCancelPress={() => setIsEditModalVisible(false)}
         onChangeText={text => setUrlToEdit({...urlToEdit, url: text})}

@@ -107,6 +107,11 @@ const useSpots = () => {
       ...properties
     } = selectedSpot.properties;
     copiedSpot.properties = properties;
+    // Omit strat_section from copied properties
+    if (copiedSpot.properties?.sed?.strat_section) {
+      const {strat_section, ...restSed} = copiedSpot.properties.sed;
+      copiedSpot.properties = {...copiedSpot.properties, sed: restSed};
+    }
     const newSpot = await createSpot(copiedSpot);
     dispatch(setSelectedSpot(newSpot));
     console.log('Spot Copied. New Spot', newSpot);
@@ -305,8 +310,9 @@ const useSpots = () => {
         }
       });
       if (spot.geometry && !hasValidGeometry) {
-        alert('Invalid Geometry', 'Found a Spot with invalid geometry. Unable to map this Spot.'
-          + '\nSpot Name: ' + spot.properties.name);
+        alert('Invalid Geometry',
+          'Spot ' + spot.properties.name + ' has invalid geometry. Please edit the geometry of this Spot'
+          + ' or delete the Spot.');
         console.error('INVALID Geometry! Spot:', spot);
       }
       return hasValidGeometry;

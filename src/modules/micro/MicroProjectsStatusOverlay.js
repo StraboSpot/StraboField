@@ -24,6 +24,7 @@ const MicroProjectsStatusOverlay = ({
       headerTitle={'StraboMicro Project'}
       isVisible={showLoadingBar || isError || showComplete}
       onActionPressed={closeStatusOverlay}
+      overlayStyleOverride={{height: 'auto'}}
       showCancelButton={false}
     >
       <View>

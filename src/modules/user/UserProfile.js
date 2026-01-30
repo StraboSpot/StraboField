@@ -126,6 +126,7 @@ const UserProfile = () => {
         closeModal={closeProfileImageModal}
         headerTitle={'Edit Profile Image'}
         isVisible={isImageDialogVisible}
+        overlayStyleOverride={{height: 'auto'}}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton

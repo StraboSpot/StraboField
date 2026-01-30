@@ -95,6 +95,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
       isVisible={isVisible}
       onActionPressed={backingUpStatus === 'complete' ? handleClosePress : handleActionPressed}
       onCancelPress={handleClosePress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={backingUpStatus === '' || backingUpStatus === 'complete' || backingUpStatus === 'error'}
       showCancelButton={backingUpStatus === ''}
     >

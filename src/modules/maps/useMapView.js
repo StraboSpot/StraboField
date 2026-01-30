@@ -34,7 +34,8 @@ const useMapView = () => {
     // console.log('Getting initial map center...', center);
     if (currentImageBasemap || stratSection) {
       if ((selectedSpot?.properties?.image_basemap && selectedSpot?.properties.image_basemap === currentImageBasemap?.id)
-        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id)) {
+        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id)
+        && selectedSpot.geometry?.coordinates) {
         return proj4(PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION, turf.centroid(selectedSpot).geometry.coordinates);
       }
       if (currentImageBasemap && currentImageBasemap.width && currentImageBasemap.height) {

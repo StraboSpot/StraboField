@@ -88,6 +88,7 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
       isVisible={isDeleteProfileModalVisible}
       onActionPressed={authenticate}
       onCancelPress={confirmDeleteMessageVisible ? goBack : handleDeleteModalClose}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={!confirmDeleteMessageVisible}
     >
       {!confirmDeleteMessageVisible ? <View>

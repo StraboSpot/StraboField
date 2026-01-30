@@ -70,6 +70,7 @@ const LogOut = () => {
       <ModalWrapper
         closeModal={() => setIsLogoutModalVisible(false)}
         headerTitle={'Log Out?'}
+        overlayStyleOverride={{maxHeight: '35%'}}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton

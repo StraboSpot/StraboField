@@ -5,6 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
+import TagColorIcon from './TagColorIcon';
 import {TAG_SECTIONS} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
@@ -50,6 +51,7 @@ const TagsList = ({type, selectedIndex}) => {
           dispatch(setSelectedTag(tag));
         }}
       >
+        <TagColorIcon color={tag.color}/>
         {useContinuousTagging && (
           <ListItem.CheckBox
             checked={tag.continuousTagging}

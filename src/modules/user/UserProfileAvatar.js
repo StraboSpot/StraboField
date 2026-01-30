@@ -52,7 +52,7 @@ const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage
       titleStyle={userStyles.avatarPlaceholderTitleStyle}
     >
       {isEditable && isOnline.isInternetReachable && Platform.OS !== 'web' && (
-        <View style={{position: 'relative', right: 15, bottom: 15}}>
+        <View>
           <AvatarAccessoryWrapper
             color={'grey'}
             iconStyle={{color: 'white'}}

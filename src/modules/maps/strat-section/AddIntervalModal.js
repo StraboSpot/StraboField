@@ -23,7 +23,6 @@ const AddIntervalModal = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const [initialFormValues, setInitialFormValues] = useState({});
   const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
@@ -72,7 +71,7 @@ const AddIntervalModal = () => {
      initialValues.avg_thickness = 5;
      initialValues.avg_thickness_1 = 8;*/
 
-    setInitialFormValues(initialValues);
+    formRef.current.setValues(initialValues);
   }, []);
 
   const close = () => {
@@ -87,7 +86,7 @@ const AddIntervalModal = () => {
       const sedData = JSON.parse(JSON.stringify(copyInterval.properties.sed));
       let copiedData = extractAddIntervalData(sedData);
       delete copiedData.interval_thickness;
-      setInitialFormValues(copiedData);
+      formRef.current.setValues(copiedData);
     }
     else setIntervalToCopy(null);
   };
@@ -153,7 +152,6 @@ const AddIntervalModal = () => {
     const intervalsForInsert = [...orderedIntervals, {properties: {name: '-- Bottom --', id: 1}}];
     return (
       <Formik
-        enableReinitialize={false}
         initialValues={initialIntervalName}
         innerRef={preFormRef}
         onSubmit={() => console.log('Submitting form...')}
@@ -209,12 +207,12 @@ const AddIntervalModal = () => {
   const renderAddIntervalFormFields = () => {
     return (
       <Formik
-        enableReinitialize={true}
         initialStatus={{formName: formName}}
-        initialValues={initialFormValues}
+        initialValues={{}}
         innerRef={formRef}
         onSubmit={() => console.log('Submitting form...')}
         validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={true}
       >
         {formProps => <Form {...{...formProps, formName: formName}}/>}
       </Formik>

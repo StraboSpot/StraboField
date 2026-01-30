@@ -48,6 +48,7 @@ const GenerateRandomSpots = () => {
           isLoading={loading}
           isVisible={isSpotGeneratorVisible}
           onActionPressed={generateRandomSpots}
+          overlayStyleOverride={{height: 'auto'}}
           showCancelButton={false}
           showCloseButton
         >

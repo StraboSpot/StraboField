@@ -117,7 +117,7 @@ const MapContainer = forwardRef(({
   const {getCurrentLocation} = useMapLocation();
   const {setMapView, zoomToSpotsNow} = useMapView();
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
-  const {getTileCountFromHost} = useServerRequests();
+  const {getTilesFromHost} = useServerRequests();
 
   useEffect(() => {
     // console.log('UE MapContainer [featuresSelected, featuresUnselected]');
@@ -227,7 +227,7 @@ const MapContainer = forwardRef(({
       console.log('sending this extent to server: ', extentString);
       console.log('sending zoom to server: ', zoomLevel);
       const tileCallURL = getExtentAndZoomCall(extentString, zoomLevel);
-      const tileCountThisScope = await getTileCountFromHost(tileCallURL);
+      const tileCountThisScope = await getTilesFromHost(tileCallURL);
       console.log('got count from server: ', tileCountThisScope);
       return tileCountThisScope;
     }

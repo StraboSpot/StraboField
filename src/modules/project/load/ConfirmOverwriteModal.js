@@ -46,6 +46,7 @@ const ConfirmOverwriteModal = ({
       closeModal={closeModal}
       headerTitle={headerTitle()}
       isVisible={isVisible}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton

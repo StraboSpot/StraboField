@@ -63,15 +63,16 @@ const Geolocate = () => {
       />
 
       <ModalWrapper
+
         closeModal={() => setIsGeolocationVisible(false)}
         headerTitle={'Geolocation Options'}
         isVisible={isGeolocationVisible}
-        overlayStyleOverride={{width: 350}}
+        overlayStyleOverride={{width: 350, height: 'auto'}}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
       >
-        <View style={{padding: 10}}>
+        <View style={{padding: 20}}>
           <Slider
             allowTouchTrack
             labelStyle={{marginLeft: 0}}
