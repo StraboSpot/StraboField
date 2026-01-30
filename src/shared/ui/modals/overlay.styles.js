@@ -88,10 +88,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   overlayMapMenuPosition: {
-    bottom: 100,
-    height: undefined,
     left: 75,
-    maxHeight: height * 0.80,
     position: 'absolute',
   },
   selectGeometryTypeContent: {

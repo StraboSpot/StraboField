@@ -129,7 +129,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
       headerTitle={'Map Symbols'}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={overlayStyles.overlayMapMenuPosition}
+      overlayStyleOverride={{...overlayStyles.overlayMapMenuPosition, height: 'auto'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
