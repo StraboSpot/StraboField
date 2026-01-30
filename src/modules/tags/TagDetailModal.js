@@ -25,7 +25,7 @@ const TagDetailModal = ({closeModal}) => {
 
   const formRef = useRef(null);
 
-  const modalHeight = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+  const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
 
   let formName = ['project', 'tags'];
   let initialValues;
@@ -90,7 +90,6 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      backdropStyle={{backgroundColor: 'rgba(0,0,0,0.5)'}}
       headerTitle={'Create New Tag'}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}

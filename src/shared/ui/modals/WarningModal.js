@@ -27,7 +27,6 @@ const WarningModal = ({
   return (
     <ModalWrapper
       actionTitle={confirmText || 'Ok'}
-      backdropStyle={{backgroundColor: 'rgba(0, 0, 0, 0.5)', height: height}}
       cancelTitle={cancelTitle || 'Cancel'}
       closeModal={closeModal}
       headerTitle={title || 'Warning!'}
