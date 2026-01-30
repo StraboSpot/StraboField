@@ -1,3 +1,5 @@
+import {Platform} from 'react-native';
+
 import {
   getApplicationName,
   getDeviceId,
