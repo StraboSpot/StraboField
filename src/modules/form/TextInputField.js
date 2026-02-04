@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
@@ -14,10 +14,13 @@ const TextInputField = ({
                           customHeight,
                           editable = true,
                           label,
+                          onFocus,
+                          onBlur: onBlurProp,
                           onMyChange,
                           onShowFieldInfo,
                           placeholder,
                         }) => {
+  const [isFocused, setIsFocused] = useState(false);
 
   const getInputStyle = () => {
     let style;
@@ -55,13 +58,21 @@ const TextInputField = ({
       )}
       <TextInput
         autoCapitalize={autoCapitalize}
-        // autoFocus={autoFocus}
         editable={editable}
         multiline={appearance === 'multiline' || appearance === 'full'}
-        onBlur={onBlur(name)}
+        onBlur={(e) => {
+          setIsFocused(false);
+          onBlur(name)(e);
+          onBlurProp && onBlurProp(e);
+        }}
         onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        onFocus={(e) => {
+          setIsFocused(true);
+          onFocus && onFocus(e);
+        }}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
+        scrollEnabled={appearance !== 'full' || isFocused}
         style={getInputStyle()}
         value={value || ''}
       />
