@@ -42,14 +42,14 @@ const SpotFilters = ({
 
   useEffect(() => {
     let gotSpotsFiltered = activeSpots;
-    setTextNoSpots('No Spots in Visible Datasets');
+    setTextNoSpots('No Spots in Active Datasets');
     if (sortedView === SORTED_VIEWS.MAP_EXTENT) {
       gotSpotsFiltered = getSpotsInMapExtent();
-      setTextNoSpots('No visible Spots in current map extent');
+      setTextNoSpots('No Active Spots in Current Map Extent');
     }
     else if (sortedView === SORTED_VIEWS.RECENT_VIEWS) {
       gotSpotsFiltered = getRecentSpots();
-      setTextNoSpots('No recently viewed visible Spots');
+      setTextNoSpots('No Recently Viewed Active Spots');
     }
     setSpotsFiltered(gotSpotsFiltered);
     updateSearch(undefined, gotSpotsFiltered);

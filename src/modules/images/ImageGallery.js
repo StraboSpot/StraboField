@@ -30,7 +30,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
   let sortedSpotsWithImages = [];
 
@@ -47,7 +47,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   const renderNoImagesText = () => {
-    return <ListEmptyText text={'No Images in Visible Datasets'}/>;
+    return <ListEmptyText text={'No Images in Active Datasets'}/>;
   };
 
   const renderSectionHeader = ({spot}) => {
@@ -87,11 +87,11 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots and Samples
+            Found {count + (count === 1 ? ' Image' : ' Images')} in Active Spots and Samples
           </Text>
           <LittleSpacer/>
           <SectionList
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
+            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with Images Found'}/>}
             keyExtractor={(item, index) => item + index}
             renderItem={({item, section}) => renderImagesInSpot(item, section)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}

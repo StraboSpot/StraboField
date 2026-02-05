@@ -19,7 +19,7 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
   const renderNoSamplesText = () => {
-    return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
+    return <ListEmptyText text={'No Samples in Active Datasets'}/>;
   };
 
   const renderSamples = () => {
@@ -46,7 +46,8 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
         />
         <View style={{flex: 1}}>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' sample' : ' samples')}
+            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' Sample' : ' Samples')}
+            {isCheckedList ? ' in Project' : ' in Active Datasets'}
           </Text>
           <SamplesSectionList
             checkedItems={checkedItems}
