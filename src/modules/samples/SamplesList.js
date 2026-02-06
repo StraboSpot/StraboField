@@ -12,17 +12,13 @@ const SamplesList = ({onPress}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  let samples = spot?.properties?.samples || [];
-  if (!spot.properties?.isSample) {
-    samples = samples.map((sample) => {
-      const richSample = spots[sample.id];
-      return isEmpty(richSample) ? sample : richSample;
-    });
-  }
+  let samples = spot?.properties?.samples?.map((sample) => {
+    const richSample = spots[sample.id];
+    return isEmpty(richSample) ? sample : richSample;
+  }) || [];
   const samplesSorted = samples.slice().sort(
     (a, b) => (a.sample_id_name || a.properties?.name || 'Unknown').localeCompare(
       (b.sample_id_name || b.properties?.name || 'Unknown')));
-  console.log('Samples at this Spot', samplesSorted);
 
   return (
     <FlatList
@@ -30,7 +26,7 @@ const SamplesList = ({onPress}) => {
       ListEmptyComponent={<ListEmptyText text={'No Samples'}/>}
       data={samplesSorted}
       keyExtractor={item => 'Sample' + (item.id || item.properties.id)}
-      renderItem={({item}) => <SampleListItem isShowSubtitle onPress={onPress} sample={item}/>}
+      renderItem={({item}) => <SampleListItem isShowSubtitle onPress={onPress} parentSpot={spot} sample={item}/>}
     />
   );
 };

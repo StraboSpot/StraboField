@@ -15,7 +15,7 @@ import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtent
 
 const SpotFilters = ({
                        activeSpots,
-                       doSearchSubSamples,
+                       isSamplesSearch,
                        setIsReverseSort,
                        setSpotsSorted,
                        setTextNoSpots,
@@ -73,10 +73,14 @@ const SpotFilters = ({
     if (isEmpty(search)) gotSpotsSearched = spotsToSearch;
     else {
       gotSpotsSearched = spotsToSearch.filter((spot) => {
-        return spot.properties?.name?.toLowerCase().includes(search.toLowerCase())
-          || (doSearchSubSamples
-            && !isEmpty(spot.properties.samples?.filter(
-              smpl => smpl.sample_id_name?.toLowerCase().includes(search.toLowerCase()))));
+        if (isSamplesSearch) {
+          return (spot.properties?.isSample && spot.properties?.name?.toLowerCase().includes(search.toLowerCase()))
+            || !isEmpty(spot.properties.samples?.filter(
+              smpl => smpl.sample_id_name?.toLowerCase().includes(search.toLowerCase())
+                || spots[smpl.id]?.properties?.samples[0]?.sample_id_name?.toLowerCase().includes(
+                  search.toLowerCase())));
+        }
+        return spot.properties?.name?.toLowerCase().includes(search.toLowerCase());
       });
     }
     updateSort(undefined, gotSpotsSearched);
@@ -114,7 +118,7 @@ const SpotFilters = ({
           inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
           inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
           onChangeText={updateSearch}
-          placeholder={doSearchSubSamples ? 'Search Samples' : 'Search Spots'}
+          placeholder={isSamplesSearch ? 'Search Samples' : 'Search Spots'}
           placeholderTextColor={DARKGREY}
           platform={'default'}
           value={searchState}

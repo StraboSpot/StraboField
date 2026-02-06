@@ -9,15 +9,10 @@ import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 import Samples from '../samples/Samples';
-import {useTags} from '../tags';
 
 const AddRemoveTagSampleSpots = ({updateSpotsInMapExtent}) => {
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
-
-  const {addRemoveSpotFromTag} = useTags();
-
-  const handleSpotChecked = spot => addRemoveSpotFromTag(spot.properties.id, selectedTag);
 
   return (
     <View style={{flex: 1}}>
@@ -29,7 +24,6 @@ const AddRemoveTagSampleSpots = ({updateSpotsInMapExtent}) => {
       <View style={{...commonStyles.buttonContainer, flex: 1}}>
         <Samples
           checkedItems={selectedTag?.spots || []}
-          handleSpotChecked={handleSpotChecked}
           isCheckedList
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />

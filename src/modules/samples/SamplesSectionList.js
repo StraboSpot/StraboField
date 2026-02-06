@@ -11,14 +11,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
 
-const SamplesSectionList = ({
-                              checkedItems,
-                              dataSectioned,
-                              isCheckedList,
-                              handleSpotChecked,
-                              listEmptyText,
-                              openSpotInNotebook,
-                            }) => {
+const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmptyText, openSpotInNotebook}) => {
   const spots = useSelector(state => state.spot.spots);
 
   const handleSamplePress = (sample, parentSpot) => {
@@ -31,12 +24,11 @@ const SamplesSectionList = ({
     sample = isEmpty(richSample) ? sample : richSample;
     return (
       <SampleListItem
-        checkedItems={checkedItems}
-        handleSpotChecked={handleSpotChecked}
         isCheckedList={isCheckedList}
-        isItemChecked={checkedItems && checkedItems.find(i => i === sample?.properties?.id)}
+        isItemChecked={checkedItems?.find(i => i === sample?.properties?.id || i === parentSpot?.properties?.id)}
         isShowAvatar
         onPress={() => handleSamplePress(sample, parentSpot)}
+        parentSpot={parentSpot}
         sample={sample}
       />
     );

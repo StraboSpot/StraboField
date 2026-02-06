@@ -480,8 +480,7 @@ const useSpots = () => {
   };
 
   const getSpotsWithSamples = () => {
-    return Object.values(getActiveSpotsObj()).filter(
-      spot => spot.properties?.isSample || !isEmpty(spot.properties.samples));
+    return Object.values(spots).filter(spot => !spot.properties?.isSample && !isEmpty(spot.properties.samples));
   };
 
   // Get all active Spots that contain a strat section
@@ -603,7 +602,6 @@ const useSpots = () => {
     getSpotsMappedOnGivenStratSection: getSpotsMappedOnGivenStratSection,
     getSpotsWithImages: getSpotsWithImages,
     getSpotsWithKey: getSpotsWithKey,
-    getSpotsWithSamples: getSpotsWithSamples,
     getSpotsWithStratSection: getSpotsWithStratSection,
     getVisibleSpots: getVisibleSpots,
     handleSpotSelected: handleSpotSelected,

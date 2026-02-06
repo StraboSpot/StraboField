@@ -8,27 +8,28 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
-const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
-  const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
+const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
+  const {getActiveSpotsObj} = useSpots();
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
+  const spotsWithSamples = activeSpots.filter(spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
 
   const [isReverseSort, setIsReverseSort] = useState(false);
-  const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+  const [spotsWithSamplesSorted, setSpotsWithSamplesSorted] = useState(spotsWithSamples);
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
   const renderNoSamplesText = () => {
     return <ListEmptyText text={'No Samples in Active Datasets'}/>;
   };
 
   const renderSamples = () => {
-    let sortedSpotsWithSamples = spotsSorted.filter(
-      spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
-    if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
+    const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
     let count = 0;
-    let dataSectioned = sortedSpotsWithSamples.map((s) => {
+    let samples = [];
+    let dataSectioned = sampleSpotsSorted.map((s) => {
       count += s.properties.samples.length;
+      samples = [...samples, ...s.properties.samples];
       return {title: s.properties.name, data: s.properties.samples, spot: s};
     });
     let sampleSpotsCount = 0;
@@ -37,10 +38,10 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
     return (
       <View style={{flex: 1}}>
         <SpotFilters
-          activeSpots={activeSpots}
-          doSearchSubSamples={true}
+          activeSpots={spotsWithSamplesSorted}
+          isSamplesSearch={true}
           setIsReverseSort={setIsReverseSort}
-          setSpotsSorted={setSpotsSorted}
+          setSpotsSorted={setSpotsWithSamplesSorted}
           setTextNoSpots={setTextNoSpots}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
@@ -51,7 +52,6 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
           <SamplesSectionList
             checkedItems={checkedItems}
             dataSectioned={dataSectioned}
-            handleSpotChecked={handleSpotChecked}
             isCheckedList={isCheckedList}
             listEmptyText={textNoSpots + ' with samples found'}
             openSpotInNotebook={openSpotInNotebook}
@@ -63,7 +63,7 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
 
   return (
     <>
-      {isEmpty(getSpotsWithSamples()) ? renderNoSamplesText() : renderSamples()}
+      {isEmpty(spotsWithSamplesSorted) ? renderNoSamplesText() : renderSamples()}
     </>
   );
 };
