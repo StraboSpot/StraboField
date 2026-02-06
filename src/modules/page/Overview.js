@@ -113,9 +113,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   };
 
   const renderSectionHeader = (page) => {
-    const dividerText = spot.properties.isSample ? page.key === PAGE_KEYS.SAMPLES ? 'Sample Detail '
-        : 'Sample ' + page.label
-      : page.label;
+    if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return;
+    const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={dividerText}/>

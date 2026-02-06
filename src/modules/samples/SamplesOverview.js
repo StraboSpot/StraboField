@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import SampleDetailOverview from './SampleDetailOverview';
 import SamplesList from './SamplesList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/page.constants';
@@ -23,7 +24,9 @@ const SamplesOverview = ({page}) => {
   };
 
   return (
-    <SamplesList onPress={onPressed}/>
+    <>
+      {spot.properties?.isSample ? <SampleDetailOverview/> : <SamplesList onPress={onPressed}/>}
+    </>
   );
 };
 

@@ -359,6 +359,7 @@ const BasicPageDetail = ({
               />
             </>
           )}
+
           {/*{isIGSNModalVisible && (*/}
           <IGSNModal
             isVisible={isIGSNModalVisible}
@@ -368,6 +369,7 @@ const BasicPageDetail = ({
             sampleValues={formRef.current?.values}
           />
           {/*)}*/}
+
           {/*Modal when deleting a sample with an IGSN attached*/}
           <ModalWrapper
             actionTitle={'Delete'}
