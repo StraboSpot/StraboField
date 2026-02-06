@@ -218,11 +218,13 @@ const useTags = () => {
   };
 
   const getSamplesWithThisTag = (tag) => {
-    return isEmpty(tag.spots) ? [] : tag.spots.filter(spotId => spots[spotId] && spots[spotId].properties?.isSample);
+    return isEmpty(tag.spots) ? []
+      : tag.spots.filter(spotId => spots[spotId] && !isEmpty(spots[spotId].properties.samples));
   };
 
   const getSpotsWithThisTagCount = (tag) => {
-    const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
+    const validSpots = isEmpty(tag.spots) ? []
+      : tag.spots.filter(spotId => spots[spotId] && !spots[spotId].properties?.isSample);
     return validSpots.length;
   };
 
