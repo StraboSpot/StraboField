@@ -31,7 +31,9 @@ const NotebookPageHeader = ({
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
+  const spot = useSelector(state => state.spot.selectedSpot);
 
+  const isRichSample = spot.properties?.isSample;
   const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
 
   const selectTagsForFeatures = () => {
@@ -61,7 +63,9 @@ const NotebookPageHeader = ({
           )}
         </View>
         <View style={{alignItems: 'center', flex: 1, justifyContent: 'center'}}>
-          <Text style={{fontSize: PRIMARY_HEADER_TEXT_SIZE, fontWeight: 'bold'}}>{pageTitle}</Text>
+          <Text style={{fontSize: PRIMARY_HEADER_TEXT_SIZE, fontWeight: 'bold'}}>
+            {isRichSample && !pageTitle.startsWith('Sample') ? 'Sample ' + pageTitle : pageTitle}
+          </Text>
         </View>
         <View style={{alignItems: 'center', flexDirection: 'row', height: 40, justifyContent: 'flex-end', width: 70}}>
           <View>

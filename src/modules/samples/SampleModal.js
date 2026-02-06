@@ -277,7 +277,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
-      headerTitle={spot.properties?.isSample ? 'Add Sample Metadata' : 'Add a Sample'}
       onFooterButtonPress={onPress}
       overlayStyleOverride={{height: '80%'}}
       showActionButton={false}

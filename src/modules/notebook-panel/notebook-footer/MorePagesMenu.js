@@ -55,7 +55,7 @@ const MorePagesMenu = ({
               source={page.icon_src}
             />
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>
-              {page.key === PAGE_KEYS.SAMPLES && isRichSample ? 'Sample Metadata' : page.label}
+              {page.label}
             </ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>

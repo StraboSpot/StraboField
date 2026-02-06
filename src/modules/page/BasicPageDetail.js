@@ -69,8 +69,7 @@ const BasicPageDetail = ({
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
-      : spot.properties?.isSample && pageKey === PAGE_KEYS.SAMPLES ? 'Metadata'
-        : page.label_singular || toTitleCase(page.label).slice(0, -1);
+      : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
     const isTemplate = saveTemplate;
 

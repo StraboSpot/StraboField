@@ -113,7 +113,9 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   };
 
   const renderSectionHeader = (page) => {
-    const dividerText = page.key === PAGE_KEYS.SAMPLES && spot.properties.isSample ? 'Metadata' : page.label;
+    const dividerText = spot.properties.isSample ? page.key === PAGE_KEYS.SAMPLES ? 'Sample Detail '
+        : 'Sample ' + page.label
+      : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={dividerText}/>
@@ -124,7 +126,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Sample Overview' : 'Spot Overview'}/>
+        <NotebookPageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
           keyExtractor={(item, index) => item + index}
