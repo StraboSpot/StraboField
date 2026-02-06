@@ -35,7 +35,6 @@ export const NEGATIVE_COLOR = RED;
 export const NEUTRAL_COLOR = PRIMARY_ACCENT_COLOR;
 export const WARNING_COLOR = RED;
 
-
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 
 export const TEXT_WEIGHT_500 = '500';
@@ -62,3 +61,6 @@ export const NOTEBOOK_DRAWER_WIDTH = 400;
 export const SMALL_SCREEN = width < 600;
 export const MEDIUM_SCREEN = (width >= 600 && width < 840) || (height >= 480 && height < 900);
 export const LARGE_SCREEN = width > 840 || height > 900;
+
+export const SAMPLES_COLOR = GOLD;
+export const SAMPLES_BORDER_WIDTH = 7.5;
