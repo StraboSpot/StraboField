@@ -45,6 +45,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
     }
     else {
       setSelectedSample(sampleToEdit);
+      dispatch(setSelectedAttributes([sampleToEdit]));
       dispatch(setModalVisible({modal: null}));
     }
   };

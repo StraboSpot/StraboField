@@ -34,6 +34,7 @@ const NotebookHeader = ({
                           zoomToSpots,
                         }) => {
   const dispatch = useDispatch();
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
@@ -49,6 +50,8 @@ const NotebookHeader = ({
   const {getCurrentLocation} = useMapLocation();
   const toast = useToast();
 
+  const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
+  const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
   const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id) : null;
 
   const getSpotCoordText = () => {
@@ -149,7 +152,7 @@ const NotebookHeader = ({
     return (
       <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
         <ClearButton
-          onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+          onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
           title={getSpotCoordText()}
           titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
         />
@@ -196,7 +199,7 @@ const NotebookHeader = ({
     return (
       <>
         <Image
-          onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
+          onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
           resizeMode={'contain'}
           source={isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
           style={notebookHeaderStyles.headerImage}
@@ -205,13 +208,13 @@ const NotebookHeader = ({
           style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
         >
           <TextInput
-            editable={!isReadOnly}
+            editable={!isReadOnly && !isLegacySample}
             onChangeText={text => onSpotEdit('name', text)}
             style={notebookHeaderStyles.headerSpotName}
             textAlign={'left'}
-            value={spot.properties.name || 'Unknown'}
+            value={headerTitle}
           />
-          {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
+          {getSpotCoordText() ? renderCoordsText() : !isReadOnly && !isLegacySample && renderSetCoordsText()}
         </View>
         <View style={{flexDirection: 'row'}}>
           {isReadOnly && (
