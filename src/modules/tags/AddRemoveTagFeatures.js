@@ -81,6 +81,7 @@ const AddRemoveTagFeatures = () => {
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={'No Features in Active Datasets'}/>}
           data={getAllFeaturesFromSpot()}
+          keyExtractor={item => item.id?.toString() + item.parentSpotId?.toString()}
           renderItem={({item}) => renderSpotFeatureItem(item)}
         />
       </View>
