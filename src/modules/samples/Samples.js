@@ -46,8 +46,7 @@ const Samples = ({checkedItems, handleSpotChecked, isCheckedList, openSpotInNote
         />
         <View style={{flex: 1}}>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' Sample' : ' Samples')}
-            {isCheckedList ? ' in Project' : ' in Active Datasets'}
+            Found {totalSamplesCount + (totalSamplesCount === 1 ? ' Sample' : ' Samples')} in Active Datasets
           </Text>
           <SamplesSectionList
             checkedItems={checkedItems}
