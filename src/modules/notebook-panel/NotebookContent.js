@@ -94,14 +94,16 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             zoomToSpots={zoomToSpots}
           />
         </View>
-        <View style={{...notebookStyles.centerContainer}}>
-          <Page {...pageProps}/>
+        <View style={[{flex: 1}, isSample && notebookStyles.sampleBorder]}>
+          <View style={notebookStyles.centerContainer}>
+            <Page {...pageProps}/>
+          </View>
+          <NotebookFooter
+            isRichSample={spot.properties?.isSample}
+            openPage={openPage}
+            selectedSample={selectedSample}
+          />
         </View>
-        <NotebookFooter
-          isRichSample={spot.properties?.isSample}
-          openPage={openPage}
-          selectedSample={selectedSample}
-        />
       </>
     );
   };

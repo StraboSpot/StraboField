@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUMGREY, SMALL_SCREEN} from '../../shared/styles.constants';
+import {GOLD, MEDIUMGREY, SMALL_SCREEN} from '../../shared/styles.constants';
 
 const notebookStyles = StyleSheet.create({
   centerContainer: {
@@ -36,7 +36,6 @@ const notebookStyles = StyleSheet.create({
     borderBottomColor: themes.MEDIUMGREY,
     borderBottomWidth: 0.5,
     flexDirection: 'row',
-    paddingLeft: 10,
   },
   notebookDrawer: {
     height: '100%',
@@ -50,6 +49,12 @@ const notebookStyles = StyleSheet.create({
     borderLeftColor: MEDIUMGREY,
     borderLeftWidth: 2,
     flex: 1,
+  },
+  sampleBorder: {
+    borderBottomWidth: 5,
+    borderColor: GOLD,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
   },
   traceSurfaceFeatureContainer: {
     borderBottomColor: themes.MEDIUMGREY,

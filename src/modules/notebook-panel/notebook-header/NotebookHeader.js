@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, View} from 'react-native';
+import {Text, TextInput, View} from 'react-native';
 
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
@@ -198,12 +198,14 @@ const NotebookHeader = ({
   const renderNotebookHeaderContent = () => {
     return (
       <>
-        <Image
-          onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
-          resizeMode={'contain'}
-          source={isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
-          style={notebookHeaderStyles.headerImage}
-        />
+        <View style={{paddingLeft: 10, paddingRight: 5}}>
+          <Image
+            onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
+            resizeMode={'contain'}
+            source={isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
+            style={notebookHeaderStyles.headerImage}
+          />
+        </View>
         <View
           style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
         >
@@ -254,21 +256,28 @@ const NotebookHeader = ({
   const renderNotebookSampleHeaderContent = () => {
     return (
       <>
-        <View style={{alignItems: 'flex-start', flex: 1, flexDirection: 'column'}}>
-          <View style={{marginLeft: -10}}>
-            <ClearButton
-              icon={{
-                iconStyle: projectStyles.buttons,
-                name: 'arrow-back',
-                size: 20,
-                type: 'ionicon',
-              }}
-              onPress={goBackToParentSpot}
-              title={parentSpot?.properties?.name || spot.properties.name || ''}
-            />
-          </View>
-          <View style={{alignItems: 'center', flexDirection: 'row'}}>
-            {renderNotebookHeaderContent()}
+        <View style={{alignItems: 'flex-start', flex: 1}}>
+          <ClearButton
+            icon={{
+              iconStyle: projectStyles.buttons,
+              name: 'arrow-back',
+              size: 20,
+              type: 'ionicon',
+            }}
+            onPress={goBackToParentSpot}
+            title={parentSpot?.properties?.name || spot.properties.name || ''}
+          />
+          <View style={[{width: '100%'}, isSample && notebookHeaderStyles.sampleSideBorders]}>
+            {isSample && (
+              <View style={notebookHeaderStyles.sampleBanner}>
+                <Text style={notebookHeaderStyles.sampleBannerText}>
+                  {'S      A      M      P      L      E'}
+                </Text>
+              </View>
+            )}
+            <View style={{alignItems: 'center', flexDirection: 'row'}}>
+              {renderNotebookHeaderContent()}
+            </View>
           </View>
         </View>
       </>
