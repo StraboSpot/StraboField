@@ -49,10 +49,9 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   // Relevant keys for quick-entry modal
   const sampleTypeKey = ['sample_type', 'material_type'];
-  const firstKeys = ['sample_id_name', 'label', 'sample_description'];
+  const firstKeys = ['sample_id_name', 'sample_description'];
   const inplacenessKey = 'inplaceness_of_sample';
   const orientedKey = 'oriented_sample';
-  const lastKeys = ['sample_notes'];
 
   // Relevant fields for quick-entry modal
   const survey = getSurvey(formName);
@@ -60,7 +59,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const firstKeysFields = firstKeys.map(k =>
     survey.find(f => f.name === k),
   );
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
   useLayoutEffect(() => {
     console.log('ULE SampleModal []');
@@ -165,13 +163,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           }
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
-        <Form
-          {...{
-            formName: formName,
-            surveyFragment: lastKeysFields,
-            ...formProps,
-          }}
-        />
       </>
     );
   };
@@ -181,10 +172,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
 
-  const saveForm = async (currentForm) => {
+  const saveForm = async (formRefCurrent) => {
     try {
       setIsLoading(true);
-      let newSample = currentForm.values;
+      let newSample = formRefCurrent.values;
       const date = new Date().toISOString();
 
       dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -218,7 +209,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         setIsLoading(false);
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      await currentForm.resetForm();
+      await formRefCurrent.resetForm();
       if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
 
       if (newSample.sample_id_name) {
