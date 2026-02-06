@@ -30,11 +30,13 @@ const TagDetail = ({
 
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
+
   const [refresh, setRefresh] = useState(false);
 
   const {isSpotInReadOnlyDataset} = useProject();
 
-  // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
+  // console.log('selectedTag', selectedTag);
+  // selectedTag.spots.map((spotId, index) => console.log(index, spotId, getSpotById(spotId)));
 
   useEffect(() => {
     console.log('UE TagDetail [selectedTag]', selectedTag);
@@ -83,22 +85,25 @@ const TagDetail = ({
   };
 
   const renderSamples = () => {
-    const sampleSpotsWithParentSpots = selectedTag.spots?.reduce((acc, spotId) => {
-      if (spots[spotId] && spots[spotId].properties.isSample) {
+    const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
+      const spot = spots[spotId];
+      if (spot?.properties?.isSample) {
         const parentSpot = getSpotWithThisSample(spotId);
-        if (acc[parentSpot.properties.id]) {
-          return {...acc, [parentSpot.properties.id]: [...acc[parentSpot.properties.id], spots[spotId]]};
-        }
-        else return {...acc, [parentSpot.properties.id]: [spots[spotId]]};
+        const parentSpotId = parentSpot.properties.id;
+        return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
+          : {...acc, [parentSpotId]: [spot]};
+      }
+      else if (!isEmpty(spot?.properties?.samples)) {
+        return {...acc, [spot.properties.id]: spot.properties.samples};
       }
       else return acc;
     }, {});
 
     let dataSectioned = [];
-    if (!isEmpty(sampleSpotsWithParentSpots)) {
-      dataSectioned = Object.keys(sampleSpotsWithParentSpots).map((parentId) => {
+    if (!isEmpty(sampleSpots)) {
+      dataSectioned = Object.keys(sampleSpots).map((parentId) => {
         const parentSpot = spots[parentId];
-        return {title: parentSpot.properties.name, data: sampleSpotsWithParentSpots[parentId], spot: parentSpot};
+        return {title: parentSpot.properties.name, data: sampleSpots[parentId], spot: parentSpot};
       });
     }
     return (
