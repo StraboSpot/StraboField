@@ -14,11 +14,20 @@ const SampleDetailOverview = ({page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getLabel} = useForm();
+  const {getLabel, getSurvey} = useForm();
 
   const formName = ['general', 'samples'];
   let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0])) || {};
   delete sampleDetail.id;
+
+  // Order fields to match sample form survey order
+  const fieldOrder = getSurvey(formName)
+    .filter(field => field.type !== 'start' && field.type !== 'end')
+    .map(field => field.name);
+  sampleDetail = fieldOrder.reduce((ordered, key) => {
+    if (key in sampleDetail) ordered[key] = sampleDetail[key];
+    return ordered;
+  }, {});
 
   const getDate = (value) => {
     const dateObject = new Date(value);
