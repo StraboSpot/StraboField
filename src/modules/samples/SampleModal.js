@@ -18,6 +18,7 @@ import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
+import SampleModalImages from './SampleModalImages';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+  const [sampleImages, setSampleImages] = useState([]);
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -188,7 +190,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation.properties[samples] = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        createRichSample(pointSetAtCurrentLocation, newSample);
+        createRichSample(pointSetAtCurrentLocation, newSample, sampleImages);
         const toastMsg = 'Sample Saved!';
         const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
         toastRef.current?.show(toastMsg, toastOptions);
@@ -197,7 +199,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       }
       else {
         dispatch(setModalVisible({modal: null}));
-        createRichSample(spot, newSample);
+        createRichSample(spot, newSample, sampleImages);
         const updatedPreferences = {
           ...preferences,
           starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,
@@ -240,22 +242,25 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       <>
         <FlatList
           ListHeaderComponent={
-            <Formik
-              enableReinitialize={true}
-              initialValues={{
-                material_type: 'intact_rock',
-                sample_type: 'individual_sample',
-                sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
-                inplaceness_of_sample: '5___definitely',
-              }}
-              innerRef={formRef}
-              onSubmit={values => console.log('Submitting form...', values)}>
-              {formProps => (
-                <View style={{flex: 1}}>
-                  {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
-                </View>
-              )}
-            </Formik>
+            <>
+              <Formik
+                enableReinitialize={true}
+                initialValues={{
+                  material_type: 'intact_rock',
+                  sample_type: 'individual_sample',
+                  sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
+                  inplaceness_of_sample: '5___definitely',
+                }}
+                innerRef={formRef}
+                onSubmit={values => console.log('Submitting form...', values)}>
+                {formProps => (
+                  <View style={{flex: 1}}>
+                    {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
+                  </View>
+                )}
+              </Formik>
+              <SampleModalImages sampleImages={sampleImages} setSampleImages={setSampleImages}/>
+            </>
           }
           bounces={false}
         />

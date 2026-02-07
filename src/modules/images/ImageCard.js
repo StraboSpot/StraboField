@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import {Card} from '@rn-vui/base';
@@ -10,6 +10,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
+import {MODAL_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -22,24 +23,31 @@ const ImageCard = ({
                      isReadOnly,
                      isThumbnailOnly,
                      openImage,
+                     saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
                      setImageToView,
                      setIsImageModalVisible,
                    }) => {
   const dispatch = useDispatch();
+  const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const placeholderTitle = `Untitled ${index + 1}`;
 
-  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
-  const [title, setTitle] = useState(
-    image.title && typeof image.title === 'string' && image.title.trim() !== ''
+  const getDisplayTitle = () => {
+    return image.title && typeof image.title === 'string' && image.title.trim() !== ''
       ? image.title.toString()
-      : placeholderTitle,
-  );
+      : placeholderTitle;
+  };
 
+  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
+  const [title, setTitle] = useState(getDisplayTitle);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setTitle(getDisplayTitle());
+  }, [image.title, placeholderTitle]);
 
   const {downloadImageAndSave} = useDevice();
   const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
@@ -55,8 +63,13 @@ const ImageCard = ({
   const handleEndEditing = () => {
     if (isEmpty(title) || title !== image.title) {
       const updatedImage = {...image, title: isEmpty(title) ? placeholderTitle : title};
-      dispatch(editedSpotImage(updatedImage));
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      if (modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+        saveUpdatedImage(updatedImage);
+      }
+      else {
+        dispatch(editedSpotImage(updatedImage));
+        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      }
     }
     setIsEditing(false);
   };

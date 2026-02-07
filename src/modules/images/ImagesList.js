@@ -34,6 +34,7 @@ const ImagesList = ({
           isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
           openImage={openImage}
+          saveUpdatedImage={saveUpdatedImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
           setImageToView={setImageToView}

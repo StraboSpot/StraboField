@@ -81,7 +81,7 @@ const useSamples = () => {
   };
 
   // Create new Sample Spot
-  const createRichSample = (spot, selectedSample) => {
+  const createRichSample = (spot, selectedSample, sampleImages = []) => {
     let d = new Date(Date.now());
     d.setMilliseconds(0);
     const newEnrichedSample = {
@@ -94,6 +94,7 @@ const useSamples = () => {
         name: selectedSample.sample_id_name,
         samples: [selectedSample],
         time: d.toISOString(),
+        ...(sampleImages.length > 0 && {images: sampleImages}),
       },
       type: 'Feature',
     };
