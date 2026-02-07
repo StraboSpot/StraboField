@@ -37,6 +37,7 @@ const NotebookHeader = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
 
   const {
@@ -209,13 +210,25 @@ const NotebookHeader = ({
         <View
           style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
         >
-          <TextInput
-            editable={!isReadOnly && !isLegacySample}
-            onChangeText={text => onSpotEdit('name', text)}
-            style={notebookHeaderStyles.headerSpotName}
-            textAlign={'left'}
-            value={headerTitle}
-          />
+          {isEditingTitle && !isReadOnly && !isLegacySample ? (
+            <TextInput
+              autoFocus
+              onBlur={() => setIsEditingTitle(false)}
+              onChangeText={text => onSpotEdit('name', text)}
+              style={notebookHeaderStyles.headerSpotName}
+              textAlign={'left'}
+              value={headerTitle}
+            />
+          ) : (
+            <Text
+              ellipsizeMode={'tail'}
+              numberOfLines={1}
+              onPress={() => !isReadOnly && !isLegacySample && setIsEditingTitle(true)}
+              style={notebookHeaderStyles.headerSpotName}
+            >
+              {headerTitle}
+            </Text>
+          )}
           {getSpotCoordText() ? renderCoordsText() : !isReadOnly && !isLegacySample && renderSetCoordsText()}
         </View>
         <View style={{flexDirection: 'row'}}>
