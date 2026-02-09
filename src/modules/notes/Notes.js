@@ -1,11 +1,10 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
@@ -151,14 +150,13 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       <FlatListItemSeparator/>
       {!isShowTemplates && (
         <>
-          <ScrollView style={noteStyle.noteContainer}>
-            <NoteForm
-              formRef={formRef}
-              initialNotesValues={initialNotesValues}
-              isReadOnly={isReadOnly}
-            />
-          </ScrollView>
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
+          <NoteForm
+            formRef={formRef}
+            initialNotesValues={initialNotesValues}
+            isReadOnly={isReadOnly}
+          />
+          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE
+            && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
         </>
       )}
     </View>

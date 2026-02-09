@@ -46,12 +46,13 @@ const StatusModal = () => {
     // When showing dataset preferences, make modal larger
     if (isShowingDatasetPreferences) {
       return {
-        height: '60%',
+        maxHeight: '60%',
         width: Platform.OS === 'web' ? 600 : '60%',
       };
     }
     // When loading or showing status messages, use smaller width
     return {
+      height: 'auto',
       width: Platform.OS === 'web' ? 400 : '40%',
     };
   };

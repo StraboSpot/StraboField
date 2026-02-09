@@ -18,6 +18,7 @@ const Form = ({
                 formName,
                 isReadOnly,
                 onMyChange,
+                scrollEnabled = true,
                 setFieldValue,
                 subkey,
                 surveyFragment,
@@ -171,6 +172,7 @@ const Form = ({
       keyExtractor={(item, index) => index.toString()}
       listKey={JSON.stringify(survey)}
       renderItem={({item}) => renderField(item)}
+      scrollEnabled={scrollEnabled}
     />
   );
 };

@@ -1,8 +1,9 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -111,7 +112,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly, scrollEnabled: false}}/>}
       </Formik>
     );
   };
@@ -120,14 +121,12 @@ const SiteSafetyPage = ({isReadOnly}) => {
     <>
       <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <SectionDivider dividerText={page.label}/>
-            {renderSiteSafetyForm()}
-          </>
-        }
-      />
+      <KeyboardAwareScrollView
+        style={{flex: 1}}
+      >
+        <SectionDivider dividerText={page.label}/>
+        {renderSiteSafetyForm()}
+      </KeyboardAwareScrollView>
     </>
   );
 };

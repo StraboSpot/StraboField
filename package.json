@@ -88,6 +88,7 @@
     "react-native-indicators": "0.17.0",
     "react-native-json-tree": "1.5.0",
     "react-native-keep-awake": "4.0.0",
+    "react-native-keyboard-controller": "^1.20.7",
     "react-native-multiple-select": "0.5.12",
     "react-native-orientation-director": "2.6.5",
     "react-native-pager-view": "8.0.0",
