@@ -1,6 +1,7 @@
 import React from 'react';
 import {ImageBackground, Platform, ScrollView, Text, View} from 'react-native';
 
+import DeviceInfo from 'react-native-device-info';
 import {useSelector} from 'react-redux';
 
 import splashScreenStyles from './splashScreen.styles';
@@ -55,6 +56,9 @@ const SplashScreen = ({children}) => {
         {/*)}*/}
       </ScrollView>
       <VersionCheckLabel/>
+      <Text style={splashScreenStyles.buildNumberText}>
+        Build: {DeviceInfo.getBuildNumber()}
+      </Text>
       <Loading isLoading={loading} size={60}/>
     </ImageBackground>
   );
