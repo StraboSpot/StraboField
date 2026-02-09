@@ -111,10 +111,10 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
     switch (visibleInitialSection) {
       case 'serverProjects':
         return (
-          <>
+          <View style={{flex: 1}}>
             {renderBackButton()}
             <DownloadProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>
-          </>
+          </View>
         );
       case 'deviceProjects':
         return (
@@ -166,7 +166,7 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
   return (
     <ModalWrapper
       headerTitle={statusMessageModalTitle}
-      overlayStyleOverride={{justifyContent: 'center', height: visibleInitialSection === 'none' ? null : '80%'}}
+      overlayStyleOverride={{justifyContent: 'center', height: visibleInitialSection === 'none' ? 'auto' : '80%'}}
       showActionButton={false}
       showCancelButton={false}
     >
