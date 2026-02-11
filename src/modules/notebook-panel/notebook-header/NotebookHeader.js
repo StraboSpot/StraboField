@@ -203,6 +203,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       </View>
       <NotebookMenu
         closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
+        closeNotebookPanel={closeNotebookPanel}
         isNotebookMenuVisible={isNotebookMenuVisible}
         isReadOnly={isReadOnly}
         overlayStyle={notebookStyles.dialogBoxPosition}

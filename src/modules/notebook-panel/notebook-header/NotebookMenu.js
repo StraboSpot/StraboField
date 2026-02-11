@@ -17,7 +17,7 @@ import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -31,8 +31,11 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
   const actions = [
     {key: 'copy', title: 'Copy this Spot'},
     {key: 'zoom', title: 'Zoom to this Spot'},
-    {key: 'delete', title: 'Delete this Spot'},
+    {key: 'delete', title: 'Delete this Spot'}, ,
+    {key: 'geography', title: 'Show Geography'},
+    {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
+    ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
 
   const continueDeleteSelectedSpot = () => {
@@ -65,6 +68,9 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
     }
     else if (key === 'delete') deleteSelectedSpot();
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
+    else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
+    else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else closeNotebookPanel();
     closeNotebookMenu();
   };
 
