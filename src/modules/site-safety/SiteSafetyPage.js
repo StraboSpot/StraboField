@@ -13,8 +13,8 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS, SECONDARY_PAGES} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -119,7 +119,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
 
   return (
     <>
-      <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
       <KeyboardAwareScrollView
         style={{flex: 1}}

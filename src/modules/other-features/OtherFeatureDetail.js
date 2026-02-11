@@ -12,7 +12,7 @@ import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -264,7 +264,7 @@ const OtherFeatureDetail = ({
 
   return (
     <View style={{flex: 1}}>
-      <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={'Other Feature Detail'}/>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={'Other Feature Detail'}/>
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={cancelForm}

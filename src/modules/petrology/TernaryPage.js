@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import {TERNARY_MINERALS} from './petrology.constants';
 import {roundToDecimalPlaces} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 
 const TernaryPage = () => {
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -39,7 +39,7 @@ const TernaryPage = () => {
 
   return (
     <>
-      <NotebookPageHeader pageTitle={'Ternary'}/>
+      <PageHeader pageTitle={'Ternary'}/>
       {!((ternary.q > 0 && ternary.a > 0 && ternary.p > 0)
           || (ternary.a > 0 && ternary.p > 0 && ternary.f > 0)
           || (ternary.ol > 0 && ternary.opx > 0 && ternary.cpx > 0)

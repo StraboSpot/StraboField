@@ -12,9 +12,9 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
@@ -77,7 +77,7 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const renderReactionsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         <View>
           <SectionDivider
             dividerText={'Minerals Added to this Spot'}

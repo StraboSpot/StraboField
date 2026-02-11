@@ -18,7 +18,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({isReadOnly, page}) => {
@@ -251,7 +251,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const renderMeasurementsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
+        <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
         {renderSections()}
         {selectedFeaturesTemp.length >= 1 && (
           <View>

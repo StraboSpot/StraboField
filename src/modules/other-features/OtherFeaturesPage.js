@@ -8,7 +8,7 @@ import OtherFeatureItem from './OtherFeatureItem';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesPage = ({isReadOnly}) => {
@@ -53,7 +53,7 @@ const OtherFeaturesPage = ({isReadOnly}) => {
   const renderFeaturesList = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader
+        <PageHeader
           onPressAdd={addFeature}
           pageTitle={'Other Features'}
           showAddButton={!isReadOnly}

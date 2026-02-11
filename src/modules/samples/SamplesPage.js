@@ -6,8 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/Helpers';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page}) => {
@@ -58,7 +58,7 @@ const SamplesPage = ({isReadOnly, page}) => {
   const renderSamplesMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader
+        <PageHeader
           onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
           pageTitle={page.label}
           showAddButton={!isReadOnly}

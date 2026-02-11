@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField} from '../form';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
 const Metadata = ({isReadOnly}) => {
@@ -115,7 +115,7 @@ const Metadata = ({isReadOnly}) => {
     <FlatList
       ListHeaderComponent={
         <>
-          <NotebookPageHeader pageTitle={'Metadata'}/>
+          <PageHeader pageTitle={'Metadata'}/>
           {renderMetadataForm()}
           {renderDatasets()}
         </>

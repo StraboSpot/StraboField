@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setNotebookPageVisible} from './notebook.slice';
+import {MODAL_KEYS, PAGE_KEYS} from './page.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {
@@ -17,17 +17,17 @@ import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setModalVisible} from '../home/home.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 
-const NotebookPageHeader = ({
-                              hideBackButton,
-                              onPressAdd,
-                              onPressBack,
-                              pageTitle,
-                              showAddButton,
-                              showFeaturesTagButton,
-                            }) => {
+const PageHeader = ({
+                      hideBackButton,
+                      onPressAdd,
+                      onPressBack,
+                      pageTitle,
+                      showAddButton,
+                      showFeaturesTagButton,
+                    }) => {
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
@@ -107,4 +107,4 @@ const NotebookPageHeader = ({
   );
 };
 
-export default NotebookPageHeader;
+export default PageHeader;
