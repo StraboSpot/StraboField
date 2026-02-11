@@ -12,6 +12,7 @@ import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS} from '../page/page.constants';
 import {updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
+import {useTags} from '../tags';
 
 const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
   const dispatch = useDispatch();
@@ -22,6 +23,8 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const {addSpotToTags} = useTags();
+
   const toast = useToast();
 
   const formRef = useRef(null);
@@ -29,6 +32,7 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
 
   const initialNamePrefix = preferences.sample_prefix || '';
 
+  const [checkedTagsIds, setCheckedTagsIds] = useState([]);
   const [currentForm, setCurrentForm] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [namePostfix, setNamePostfix] = useState(null);
@@ -77,17 +81,24 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
     else closeModal();
   };
 
+  const handleTagChecked = (tagId) => {
+    console.log('Tag', tagId, checkedTagsIds);
+    if (checkedTagsIds.find(id => id === tagId)) setCheckedTagsIds(checkedTagsIds.filter(id => id !== tagId));
+    else setCheckedTagsIds([...checkedTagsIds, tagId]);
+  };
+
   const saveSample = async (formRefCurrent) => {
     try {
       setIsLoading(true);
       dispatch(setLoadingStatus({bool: true, view: 'home'}));
 
       const date = new Date().toISOString();
+      const newId = getNewId();
       const newSample = {
         ...formRefCurrent.values,
         collection_date: date,
         collection_time: date,
-        id: getNewId(),
+        id: newId,
       };
 
       if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
@@ -110,6 +121,8 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
         setIsLoading(false);
       }
 
+      if (!isEmpty(checkedTagsIds)) addSpotToTags(newId, checkedTagsIds);
+
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
       await formRefCurrent.resetForm();
       if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
@@ -119,7 +132,9 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
         if (foundDuplicateName) {
           await sleep(2000);
           const warningOptions = {duration: 2000, type: 'warning'};
-          if (SMALL_SCREEN && toastRef) toastRef.current?.show('Warning! Sample Name has Already Been Used.', warningOptions);
+          if (SMALL_SCREEN && toastRef) {
+            toastRef.current?.show('Warning! Sample Name has Already Been Used.', warningOptions);
+          }
           else toast.show('Warning! Sample Name has Already Been Used.', warningOptions);
           if (Platform.OS === 'web') await sleep(3000);
         }
@@ -136,9 +151,11 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
   };
 
   return {
+    checkedTagsIds,
     confirmCloseModal,
     currentForm,
     formRef,
+    handleTagChecked,
     isLoading,
     namePostfix,
     namePrefix,

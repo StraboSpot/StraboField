@@ -188,14 +188,13 @@ const useSamples = () => {
     }
   };
 
-  const onSampleFormChange = (formCurrent, name, value) => {
-    console.log(name, 'changed to', value);
-    name === 'collection_date'
-      ? formCurrent.setFieldValue('collection_time', value)
-      : name === 'collection_time'
-        ? formCurrent.setFieldValue('collection_date', value)
-        : formCurrent.setFieldValue(name, value);
-    // formCurrent.setFieldValue(name, value);
+  const onSampleFormChange = (formCurrent, fieldName, fieldValue) => {
+    console.log(fieldName, 'changed to', fieldValue);
+    fieldName === 'collection_date'
+      ? formCurrent.setFieldValue('collection_time', fieldValue)
+      : fieldName === 'collection_time'
+        ? formCurrent.setFieldValue('collection_date', fieldValue)
+        : formCurrent.setFieldValue(fieldName, fieldValue);
   };
 
   const parseXML = (xmlData) => {

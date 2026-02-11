@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import SampleModalForm from './SampleModalForm';
+import SampleModalGeologicUnits from './SampleModalGeologicUnits';
 import SampleModalImages from './SampleModalImages';
 import useSampleModal from './useSampleModal';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -20,9 +21,11 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
 
   const {
+    checkedTagsIds,
     confirmCloseModal,
     currentForm,
     formRef,
+    handleTagChecked,
     isLoading,
     namePostfix,
     namePrefix,
@@ -57,7 +60,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
               startingNumber={startingNumber}
             />
             {!choicesViewKey && (
-              <SampleModalImages sampleImages={sampleImages} setSampleImages={setSampleImages}/>
+              <>
+                <SampleModalImages sampleImages={sampleImages} setSampleImages={setSampleImages}/>
+                <SampleModalGeologicUnits checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
+              </>
             )}
           </>
         }

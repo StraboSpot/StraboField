@@ -18,7 +18,7 @@ import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
 import {TAG_TYPES} from '../project/project.constants';
-import {addedTagToSelectedSpot} from '../project/projects.slice';
+import {addedTagToSelectedSpot, setSelectedTag} from '../project/projects.slice';
 import {TagDetailModal, TagsListItem, useTags} from '../tags';
 
 const TagsModal = ({
@@ -50,11 +50,17 @@ const TagsModal = ({
   const pageVisible = pagesStack.slice(-1)[0];
 
   const pageKey = pageVisible === PAGE_KEYS.GEOLOGIC_UNITS
-  || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
+  || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+  || modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE
+    ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
 
-  const addTag = () => setIsDetailModalVisible(true);
+  const addTag = () => {
+    const newTag = pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'};
+    dispatch(setSelectedTag(newTag));
+    setIsDetailModalVisible(true);
+  };
 
   const checkTags = (tag) => {
     const checkedTagsIdsHere = checkedTagsTemp.map(checkedTag => checkedTag.id);
@@ -71,8 +77,7 @@ const TagsModal = ({
   };
 
   const getRelevantTags = () => {
-    return pageVisible === PAGE_KEYS.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
-      ? searchTagsByType(PAGE_KEYS.GEOLOGIC_UNITS)
+    return pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? searchTagsByType(PAGE_KEYS.GEOLOGIC_UNITS)
       : isEmpty(searchText) ? JSON.parse(JSON.stringify(tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS)))
         : searchTagsByType(searchText);
   };
@@ -107,34 +112,33 @@ const TagsModal = ({
   const renderSpotTagsList = () => {
     return (
       <>
-        {!isEmpty(tags) && pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS
-          && modalVisible !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS && (
-            <Formik
-              initialValues={{}}
-              innerRef={formRef}
-              onSubmit={values => console.log('Submitting form...', values)}
-              validate={fieldValues => setSearchText(fieldValues.searchText)}
-            >
-              {() => (
-                <ListItem containerStyle={commonStyles.listItemFormField}>
-                  <ListItem.Content>
-                    <Field
-                      choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                        tagType => ({label: getTagLabel(tagType), value: tagType}))}
-                      component={formProps => (
-                        SelectInputField(
-                          {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-                      )}
-                      key={'searchText'}
-                      label={'Tag Type'}
-                      name={'searchText'}
-                      single={true}
-                    />
-                  </ListItem.Content>
-                </ListItem>
-              )}
-            </Formik>
-          )}
+        {!isEmpty(tags) && pageKey !== PAGE_KEYS.GEOLOGIC_UNITS && (
+          <Formik
+            initialValues={{}}
+            innerRef={formRef}
+            onSubmit={values => console.log('Submitting form...', values)}
+            validate={fieldValues => setSearchText(fieldValues.searchText)}
+          >
+            {() => (
+              <ListItem containerStyle={commonStyles.listItemFormField}>
+                <ListItem.Content>
+                  <Field
+                    choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                      tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                    component={formProps => (
+                      SelectInputField(
+                        {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+                    )}
+                    key={'searchText'}
+                    label={'Tag Type'}
+                    name={'searchText'}
+                    single={true}
+                  />
+                </ListItem.Content>
+              </ListItem>
+            )}
+          </Formik>
+        )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={
@@ -206,7 +210,8 @@ const TagsModal = ({
           {renderSpotTagsList()}
           {(!isEmpty(tags)
             && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-            && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS) && (
+            && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS
+            && modalVisible !== MODAL_KEYS.NOTEBOOK.SAMPLES && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) && (
             <ActionButton
               disabled={isEmpty(checkedTagsTemp)}
               onPress={save}

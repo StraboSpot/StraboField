@@ -85,6 +85,21 @@ const projectSlice = createSlice({
     addedProjectDescription(state, action) {
       state.project = action.payload;
     },
+    addedSpotToTags(state, action) {
+      const {spotId, tagIds} = action.payload;
+      if (!isEmpty(state.project.tags)) {
+        const updatedTags = state.project.tags.map((tag) => {
+          let updatedTag = JSON.parse(JSON.stringify(tag));
+          if (tagIds.includes(tag.id)) {
+            if (!updatedTag.spots) updatedTag.spots = [];
+            updatedTag.spots.push(spotId);
+          }
+          return updatedTag;
+        });
+        state.project.tags = updatedTags;
+        state.project.modified_timestamp = Date.now();
+      }
+    },
     addedTagToSelectedSpot(state, action) {
       state.addTagToSelectedSpot = action.payload;
       state.project.modified_timestamp = Date.now();
@@ -347,6 +362,7 @@ export const {
   addedNewSpotIdsToDataset,
   addedProject,
   addedProjectDescription,
+  addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
   clearedDatasets,

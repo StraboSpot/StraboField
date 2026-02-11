@@ -11,6 +11,7 @@ import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
 import {
+  addedSpotToTags,
   addedTagToSelectedSpot,
   deletedTagIdFromReports,
   setSelectedTag,
@@ -84,6 +85,10 @@ const useTags = () => {
     if (!isFeatureLevelTagging) addRemoveSpotFromTag(spotId, tag);
     else if (!isMultipleFeaturesTaggingEnabled) addRemoveSpotFeatureFromTag(tag, selectedFeaturesForTagging[0], spotId);
     else addRemoveSpotFeaturesFromTag(tag, selectedFeaturesForTagging, spotId, isAlreadyChecked);
+  };
+
+  const addSpotToTags = (spotId, tagIds) => {
+    dispatch(addedSpotToTags({spotId: spotId, tagIds: tagIds}));
   };
 
   const addSpotsToTags = (tagsList, spotsList) => {
@@ -314,6 +319,7 @@ const useTags = () => {
     addRemoveSpotFeatureFromTag: addRemoveSpotFeatureFromTag,
     addRemoveSpotFromTag: addRemoveSpotFromTag,
     addRemoveTag: addRemoveTag,
+    addSpotToTags: addSpotToTags,
     addSpotsToTags: addSpotsToTags,
     addTag: addTag,
     deleteFeatureTags: deleteFeatureTags,

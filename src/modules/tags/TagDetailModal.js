@@ -10,7 +10,7 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
+import {NOTEBOOK_PAGES, PAGE_KEYS} from '../page/page.constants';
 import {useTags} from '../tags';
 
 const TagDetailModal = ({closeModal}) => {
@@ -25,27 +25,15 @@ const TagDetailModal = ({closeModal}) => {
 
   const formRef = useRef(null);
 
-  const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
-
-  let formName = ['project', 'tags'];
-  let initialValues;
-  if (modalVisible) {
-    let tagType = 'concept';
-    if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-      tagType = PAGE_KEYS.GEOLOGIC_UNITS;
-      formName = ['project', 'geologic_unit'];
-    }
-    initialValues = {type: tagType};
-  }
-  else if (!isEmpty(selectedTag)) {
-    if (selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS) formName = ['project', 'geologic_unit'];
-    initialValues = selectedTag;
-  }
-  else console.error('Tag Problem. No modals and no selected tag');
+  const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
+  const tagType = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
+  const formName = ['project', tagType];
+  const label = NOTEBOOK_PAGES.find(p => p.key === tagType).label.slice(0, -1);
+  const modalHeight = tagType === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
 
   const confirmDeleteTag = () => {
     alert(
-      'Delete Tag',
+      'Delete ' + label,
       'Are you sure you want to delete ' + selectedTag.name + '?',
       [
         {
@@ -90,7 +78,7 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      headerTitle={'Create New Tag'}
+      headerTitle={actionLabel + ' ' + label}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
@@ -104,13 +92,13 @@ const TagDetailModal = ({closeModal}) => {
                   component={formProps => Form({formName: formName, ...formProps})}
                   enableReinitialize={true}
                   initialStatus={{formName: formName}}
-                  initialValues={initialValues}
+                  initialValues={selectedTag}
                   innerRef={formRef}
                   onSubmit={() => console.log('Submitting form...')}
                   validate={values => validateForm({formName: formName, values: values})}
                 />
               </View>
-              {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
+              {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete ' + label}/>}
             </>
           }
         />
