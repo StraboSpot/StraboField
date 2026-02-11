@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
@@ -19,7 +19,7 @@ const Nesting = () => {
   const [parentGenerations, setParentGenerations] = useState(null);
 
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {handleSpotSelected} = useSpots();
+  const {getSpotWithThisSample, handleSpotSelected} = useSpots();
   const {getImageByImageId} = useImages();
   const {
     areImageThumbnailsLoading,
@@ -35,12 +35,15 @@ const Nesting = () => {
 
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
 
+  const targetSpot = selectedSpot?.properties?.isSample ? getSpotWithThisSample(selectedSpot.properties.id)
+    : selectedSpot;
+
   useEffect(() => {
     console.log('UE Nesting [spots, selectedSpot]', spots, selectedSpot);
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
-  const renderImage = async (image, index) => {
+  const renderImage = (image, index) => {
     return (
       <ImageCard
         areImageThumbnailsLoading={areImageThumbnailsLoading}
@@ -85,7 +88,7 @@ const Nesting = () => {
 
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
-    const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
+    const generationText = `${levelNum}${levelNum === 1 ? ' Level' : ' Levels'}${type === 'Parents' ? ' Up' : ' Down'}`;
     const groupedGeneration = generation.reduce(
       (r, v, i, a, k = v.properties.image_basemap) => ((r[k] || (r[k] = [])).push(v), r), {});
     console.log('groupedGeneration', groupedGeneration);
@@ -97,8 +100,8 @@ const Nesting = () => {
         <Text style={{paddingLeft: 10}}>{generationText}</Text>
         <FlatList
           data={Object.entries(groupedGeneration)}
-          keyExtractor={index => type + index}
-          listKey={type + i}
+          keyExtractor={index => `${type}${index}`}
+          listKey={`${type}${i}`}
           renderItem={({item, index}) => renderGroup(type, i, item, index)}
         />
         {type === 'Parents' && (
@@ -108,15 +111,21 @@ const Nesting = () => {
     );
   };
 
+  const reversedParentGenerations = useMemo(
+    () => parentGenerations ? [...parentGenerations].reverse() : null,
+    [parentGenerations],
+  );
+
   const renderGenerations = (type) => {
-    const generationData = type === 'Parents' ? parentGenerations : childrenGenerations;
+    const generationData = type === 'Parents' ? reversedParentGenerations : childrenGenerations;
     if (!isEmpty(generationData)) {
+      const sourceData = type === 'Parents' ? parentGenerations : childrenGenerations;
       return (
         <FlatList
-          data={type === 'Parents' ? generationData.reverse() : generationData}
-          keyExtractor={(item, index) => type + index}
+          data={generationData}
+          keyExtractor={(item, index) => `${type}${index}`}
           listKey={type}
-          renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
+          renderItem={({item, index}) => renderGeneration(type, item, index, sourceData.length)}
         />
       );
     }
@@ -147,8 +156,8 @@ const Nesting = () => {
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             data={group}
-            keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
-            listKey={type + i + b}
+            keyExtractor={item => `NestedItem${item.properties.id}`}
+            listKey={`${type}${i}${b}`}
             renderItem={({item}) => renderName(item)}
           />
         </View>
@@ -165,16 +174,16 @@ const Nesting = () => {
   };
 
   const updateNest = () => {
-    if (!isEmpty(selectedSpot)) {
-      console.log('Updating Nest for Selected Spot ...');
-      console.log('Selected Spot:', selectedSpot);
-      const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
+    if (!isEmpty(targetSpot)) {
+      console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
+        targetSpot, '...');
+      const parentSpots = getParentGenerationsSpots(targetSpot, 10);
       setParentGenerations(parentSpots);
-      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
+      const childrenSpots = getChildrenGenerationsSpots(targetSpot, 10);
       setChildrenGenerations(childrenSpots);
 
       // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
+      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), targetSpot];
       console.log(allSpotsInNest);
       const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
         const imageBasemapId = spot.properties?.image_basemap;
@@ -184,7 +193,9 @@ const Nesting = () => {
         }
         else return acc;
       }, []);
-      setImages(allImagesInNest);
+      const newImageIds = allImagesInNest.map(img => img.id).sort().join(',');
+      const currentImageIds = images.map(img => img.id).sort().join(',');
+      if (newImageIds !== currentImageIds) setImages(allImagesInNest);
     }
   };
 
@@ -194,8 +205,8 @@ const Nesting = () => {
       <FlatList
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}
-        data={[selectedSpot]}
-        keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
+        data={[targetSpot]}
+        keyExtractor={item => `NestedItem${item.properties.id}`}
         renderItem={({item}) => renderSelf(item)}
       />
     </View>

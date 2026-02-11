@@ -181,7 +181,7 @@ const projectSlice = createSlice({
         });
         state.project.tags = updatedTags;
         state.project.modified_timestamp = Date.now();
-        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag.id) || {};
+        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
       }
     },
     deletedTagIdFromReports(state, action) {

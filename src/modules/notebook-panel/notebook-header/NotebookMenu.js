@@ -30,10 +30,11 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, isS
   const navigation = useNavigation();
   const {deleteInterval} = useStratSection();
 
+  const type = isSample ? 'Sample' : 'Spot';
   const actions = [
-    {key: 'copy', title: isSample ? 'Copy this Sample' : 'Copy this Spot'},
-    {key: 'zoom', title: isSample ? 'Zoom to this Sample' : 'Zoom to this Spot'},
-    {key: 'delete', title: isSample ? 'Delete this Sample' : 'Delete this Spot'},
+    ...(!isSample ? [{key: 'copy', title: `Copy this ${type}`}] : []),
+    {key: 'zoom', title: `Zoom to this ${type}`},
+    {key: 'delete', title: `Delete this ${type}`},
     {key: 'nesting', title: 'Show Nesting'},
   ];
 

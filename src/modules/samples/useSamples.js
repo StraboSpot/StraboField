@@ -119,7 +119,7 @@ const useSamples = () => {
   };
 
   const deleteRichSample = (sampleToDelete, parentSpot) => {
-    console.log('Deleteing Sample', sampleToDelete, 'from Spot', parentSpot);
+    console.log('Deleting Sample', sampleToDelete, 'from Spot', parentSpot);
     if (parentSpot) {
       const updatedSamples = parentSpot.properties?.samples?.filter(s => s.id !== sampleToDelete.properties.id);
       let updatedParentSpot = JSON.parse(JSON.stringify(parentSpot));

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {FlatList} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {deepFindFeatureTypeById, isEmpty} from '../../shared/Helpers';
@@ -11,6 +11,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/page.constants';
+import {deletedSpotIdFromTags} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
@@ -25,6 +26,8 @@ const TagDetail = ({
                      openSpotInNotebook,
                      setIsDetailModalVisible,
                    }) => {
+  const dispatch = useDispatch();
+
   const {getSpotById, getSpotWithThisSample} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
 
@@ -89,7 +92,12 @@ const TagDetail = ({
       const spot = spots[spotId];
       if (spot?.properties?.isSample) {
         const parentSpot = getSpotWithThisSample(spotId);
-        const parentSpotId = parentSpot.properties.id;
+        if (!parentSpot) {
+          console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
+          // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
+          return acc;
+        }
+        const parentSpotId = parentSpot?.properties?.id;
         return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
           : {...acc, [parentSpotId]: [spot]};
       }

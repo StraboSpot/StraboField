@@ -245,13 +245,11 @@ const NotebookHeader = ({
               onPress={goToDatasetsPage}
             />
           )}
-          {!isSample && (
-            <IconButton
-              onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
-              source={require('../../../assets/icons/MapActions.png')}
-              style={notebookHeaderStyles.threeDotMenu}
-            />
-          )}
+          <IconButton
+            onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
+            source={require('../../../assets/icons/MapActions.png')}
+            style={notebookHeaderStyles.threeDotMenu}
+          />
         </View>
         <NotebookMenu
           closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
