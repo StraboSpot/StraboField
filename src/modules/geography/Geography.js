@@ -13,7 +13,7 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
 import useMapView from '../maps/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
@@ -296,7 +296,7 @@ const Geography = ({isReadOnly}) => {
       <FlatList
         ListHeaderComponent={
           <>
-            <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Geography'}/>
+            <PageHeader hideBackButton={!isReadOnly} pageTitle={'Geography'}/>
             {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
             {renderGeometryForm()}
             {renderFormFields()}
