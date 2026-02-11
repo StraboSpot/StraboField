@@ -11,7 +11,7 @@ import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {formStyles} from '../form';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly}) => {
   const inputRef = useRef(null);
@@ -57,7 +57,7 @@ const ExternalData = ({isReadOnly}) => {
 
   return (
     <View style={{flex: 1}}>
-      <NotebookPageHeader pageTitle={'External Data'}/>
+      <PageHeader pageTitle={'External Data'}/>
       <SectionDivider dividerText={'Links To Web Resources'}/>
       <View style={{flex: 1}}>
         {!isReadOnly && (

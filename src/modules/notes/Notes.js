@@ -14,8 +14,8 @@ import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
@@ -70,7 +70,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
   const renderCancelSaveButtons = () => {
     return (
       <View>
-        <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
       </View>
     );

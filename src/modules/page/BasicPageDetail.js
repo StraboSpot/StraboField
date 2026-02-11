@@ -6,14 +6,15 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {PAGE_KEYS} from './page.constants';
+import PageHeader from './PageHeader';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {overlayStyles} from '../home/overlays';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/IGSNModal';
@@ -25,7 +26,6 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 
 
 const BasicPageDetail = ({
@@ -344,7 +344,7 @@ const BasicPageDetail = ({
         >
           {(isTemplate || !isEmpty(selectedFeature)) && (
             <>
-              <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+              <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
               {PageTabsComponent && PageTabsComponent}
               {!isReadOnly && (
                 <SaveAndCancelButtons

@@ -8,8 +8,8 @@ import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -67,7 +67,7 @@ const IntervalPage = ({isReadOnly, page}) => {
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>
-      <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
+      <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}

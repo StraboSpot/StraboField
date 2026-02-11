@@ -7,8 +7,8 @@ import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
@@ -30,7 +30,7 @@ const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
 
   return (
     <>
-      <NotebookPageHeader pageTitle={page.label}/>
+      <PageHeader pageTitle={page.label}/>
       <FlatList
         ListFooterComponent={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS && (
           <>

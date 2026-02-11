@@ -8,8 +8,8 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {ImageCard, useImages, useImageThumbnails} from '../images';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {
@@ -190,7 +190,7 @@ const Nesting = () => {
 
   return (
     <View style={{flex: 1}}>
-      <NotebookPageHeader pageTitle={'Nesting'}/>
+      <PageHeader pageTitle={'Nesting'}/>
       <FlatList
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}

@@ -14,10 +14,10 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -119,7 +119,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     const dividerText = 'Beds';
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         {renderBeddingShared()}
         {isReadOnly ? <SectionDivider dividerText={dividerText}/>
           : (

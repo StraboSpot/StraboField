@@ -22,8 +22,8 @@ import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/com
 import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {MODAL_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
@@ -522,7 +522,7 @@ const MeasurementDetail = ({
     <>
       {selectedMeasurement && (
         <View style={styles.measurementsContentContainer}>
-          <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+          <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
           {!isReadOnly && renderCancelSaveButtons()}
           <FlatList
             ListHeaderComponent={

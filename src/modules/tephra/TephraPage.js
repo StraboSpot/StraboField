@@ -14,9 +14,9 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -100,7 +100,7 @@ const TephraPage = ({isReadOnly, page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={tephraStyles.mainAttributesContainer}>
-        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
+        <PageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <View style={tephraStyles.draggableListContainer}>
           {data1.length > 1 && (
             <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>

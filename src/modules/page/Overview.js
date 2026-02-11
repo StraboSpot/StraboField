@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {NOTEBOOK_PAGES, PAGE_KEYS, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.constants';
+import PageHeader from './PageHeader';
 import usePage from './usePage';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {SwitchWrapper} from '../../shared/ui';
@@ -18,7 +19,6 @@ import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -93,7 +93,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     }
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={pageTitle}/>
+        <PageHeader hideBackButton pageTitle={pageTitle}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
         <FlatList
           ListHeaderComponent={
@@ -125,7 +125,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
+        <PageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
           keyExtractor={(item, index) => item + index}

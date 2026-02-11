@@ -12,9 +12,9 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SelectInputField} from '../form';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -138,7 +138,7 @@ const MineralsPage = ({isReadOnly, page}) => {
   const renderMineralsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton={!isReadOnly}/>
+        <PageHeader onPressAdd={addMineral} pageTitle={page.label} showAddButton={!isReadOnly}/>
         {!isReadOnly && renderCopyDataSelectBox()}
         {renderMineralsList()}
       </View>

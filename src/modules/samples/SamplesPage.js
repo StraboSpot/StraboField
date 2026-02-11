@@ -7,10 +7,10 @@ import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/Helpers';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
 import Overview from '../page/Overview';
 import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
@@ -67,7 +67,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   const renderSamplesMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader
+        <PageHeader
           onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
           pageTitle={page.label}
           showAddButton={!isReadOnly}

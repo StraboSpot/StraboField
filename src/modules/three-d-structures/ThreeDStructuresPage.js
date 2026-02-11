@@ -11,8 +11,8 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ThreeDStructuresPage = ({isReadOnly, page}) => {
@@ -114,7 +114,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
     <>
       {!isDetailView && (
         <View>
-          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
+          <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
           {renderSections()}
         </View>
       )}
