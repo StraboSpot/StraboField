@@ -253,6 +253,7 @@ const NotebookHeader = ({
         </View>
         <NotebookMenu
           closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
+          closeNotebookPanel={closeNotebookPanel}
           isNotebookMenuVisible={isNotebookMenuVisible}
           isReadOnly={isReadOnly}
           isSample={isSample}
