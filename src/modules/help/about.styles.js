@@ -6,6 +6,10 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: '600',
   },
+  buildText: {
+    fontSize: MEDIUM_TEXT_SIZE,
+    paddingBottom: 20,
+  },
   container: {
     alignItems: 'center',
     flex: 1,
@@ -23,10 +27,6 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: LARGE_TEXT_SIZE,
     paddingBottom: 5,
-  },
-  buildText: {
-    fontSize: MEDIUM_TEXT_SIZE,
-    paddingBottom: 20,
   },
 });
 
