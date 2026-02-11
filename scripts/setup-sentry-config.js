@@ -30,8 +30,8 @@ if (!authToken) {
 }
 
 // Sentry properties content
-const sentryPropertiesContent =
-  `defaults.url=https://sentry.io/
+const sentryPropertiesContent
+  = `defaults.url=https://sentry.io/
 defaults.org=university-of-kansas
 defaults.project=strabospot-2
 auth.token=${authToken}`;
