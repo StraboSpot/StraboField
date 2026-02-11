@@ -46,7 +46,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
       const SectionOverview = page.overview_component;
       const sectionOverview = {
         title: page,
-        data: [<SectionOverview isReadOnly={isReadOnly} key={key} openMainMenuPanel={openMainMenuPanel} page={page}/>],
+        data: [<SectionOverview isReadOnly={isReadOnly} openMainMenuPanel={openMainMenuPanel} page={page}/>],
       };
       return [...acc, sectionOverview];
     }
