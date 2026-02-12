@@ -6,12 +6,12 @@ import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNModalStyles from './IGSNModal.styles';
-import useSamples from './useSamples';
-import SesarLogo from '../../assets/images/logos/sesar2_logo.png';
-import {isEmpty, truncateText} from '../../shared/Helpers';
-import Loading from '../../shared/ui/Loading';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {updatedKey} from '../user/userProfile.slice';
+import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
+import {isEmpty, truncateText} from '../../../shared/Helpers';
+import Loading from '../../../shared/ui/Loading';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {updatedKey} from '../../user/userProfile.slice';
+import useSamples from '../useSamples';
 
 const IGSNModal = forwardRef(({
                                 isVisible,

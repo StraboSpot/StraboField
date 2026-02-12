@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import IGSNDisplay from './IGSNDisplay';
+import IGSNDisplay from './igsn/IGSNDisplay';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/Helpers';

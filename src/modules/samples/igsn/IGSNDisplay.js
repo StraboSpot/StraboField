@@ -3,8 +3,8 @@ import {View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import sampleStyles from './samples.styles';
-import IGSNLogo from '../../assets/images/logos/IGSN_Logo_200.jpg';
+import IGSNLogo from '../../../assets/images/logos/IGSN_Logo_200.jpg';
+import sampleStyles from '../samples.styles';
 
 const IGSNDisplay = ({item}) => {
   return (

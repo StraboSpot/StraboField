@@ -5,17 +5,22 @@ import {Button, CheckBox, Icon} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import sampleStyles from './samples.styles';
-import useSamples from './useSamples';
-import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
-import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
-import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
-import {setLoadingStatus} from '../home/home.slice';
-import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
+import useServerRequests from '../../../services/useServerRequests';
+import {isEmpty} from '../../../shared/Helpers';
+import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import alert from '../../../shared/ui/alert';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
+import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
+import {setLoadingStatus} from '../../home/home.slice';
+import {
+  setInitialSesarState,
+  setSelectedUserCode,
+  setSesarToken,
+  setSesarUserCodes,
+} from '../../user/userProfile.slice';
+import sampleStyles from '../samples.styles';
+import useSamples from '../useSamples';
 
 const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
   const dispatch = useDispatch();
