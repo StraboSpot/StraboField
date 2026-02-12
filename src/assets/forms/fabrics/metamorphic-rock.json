@@ -48,7 +48,7 @@
     {
       "type": "text",
       "name": "plan_fab_min_1",
-      "label": "Mineral(s) that define planar fabric",
+      "label": "Mineral 1: defines planar fabric",
       "required": "false",
       "appearance": "numbers",
       "relevant": "${planar_fabric} != ''"
@@ -56,7 +56,7 @@
     {
       "type": "text",
       "name": "plan_fab_min_2",
-      "label": "Mineral(s) that define planar fabric",
+      "label": "Mineral 2: defines planar fabric",
       "required": "false",
       "appearance": "numbers",
       "relevant": "${planar_fabric} != ''"
@@ -64,7 +64,7 @@
     {
       "type": "text",
       "name": "plan_fab_min_3",
-      "label": "Mineral(s) that define planar fabric",
+      "label": "Mineral 3: defines planar fabric",
       "required": "false",
       "appearance": "numbers",
       "relevant": "${planar_fabric} != ''"
@@ -72,7 +72,7 @@
     {
       "type": "text",
       "name": "plan_fab_min_4",
-      "label": "Mineral(s) that define planar fabric",
+      "label": "Mineral 4: defines planar fabric",
       "required": "false",
       "appearance": "numbers",
       "relevant": "${planar_fabric} != ''"
