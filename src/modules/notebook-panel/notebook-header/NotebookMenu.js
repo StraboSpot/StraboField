@@ -31,7 +31,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
   const actions = [
     {key: 'copy', title: 'Copy this Spot'},
     {key: 'zoom', title: 'Zoom to this Spot'},
-    {key: 'delete', title: 'Delete this Spot'}, ,
+    {key: 'delete', title: 'Delete this Spot'},
     {key: 'geography', title: 'Show Geography'},
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
