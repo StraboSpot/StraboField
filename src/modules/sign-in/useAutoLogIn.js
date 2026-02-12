@@ -65,7 +65,7 @@ const useAutoLogIn = () => {
   };
 
   return {
-    autoLogIn: autoLogIn,
+    autoLogIn,
   };
 };
 

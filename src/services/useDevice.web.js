@@ -9,7 +9,7 @@ const useDevice = () => {
   };
 
   return {
-    openURL: openURL,
+    openURL,
   };
 };
 

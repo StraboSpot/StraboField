@@ -138,12 +138,12 @@ const useCustomMap = () => {
   };
 
   return {
-    deleteMap: deleteMap,
-    getCustomMapDetails: getCustomMapDetails,
-    getMyMapsBBox: getMyMapsBBox,
-    saveCustomMap: saveCustomMap,
-    setCustomMapSwitchValue: setCustomMapSwitchValue,
-    updateMap: updateMap,
+    deleteMap,
+    getCustomMapDetails,
+    getMyMapsBBox,
+    saveCustomMap,
+    setCustomMapSwitchValue,
+    updateMap,
   };
 };
 

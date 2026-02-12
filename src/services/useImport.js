@@ -273,11 +273,11 @@ const useImport = () => {
   };
 
   return {
-    copyZipMapsToProject: copyZipMapsToProject,
-    loadProjectFromDevice: loadProjectFromDevice,
-    moveFiles: moveFiles,
-    unzipBackupFile: unzipBackupFile,
-    unzipFile: unzipFile,
+    copyZipMapsToProject,
+    loadProjectFromDevice,
+    moveFiles,
+    unzipBackupFile,
+    unzipFile,
   };
 };
 

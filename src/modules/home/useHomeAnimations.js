@@ -83,15 +83,15 @@ const useHomeAnimations = ({navigation}) => {
   };
 
   return {
-    animateLeftSide: animateLeftSide,
-    animateMainMenuDrawer: animateMainMenuDrawer,
-    animateNotebookDrawer: animateNotebookDrawer,
-    animateRightSide: animateRightSide,
-    animateTextInputs: animateTextInputs,
-    closeMainMenuPanel: closeMainMenuPanel,
-    closeNotebookPanel: closeNotebookPanel,
-    openMainMenuPanel: openMainMenuPanel,
-    openNotebookPanel: openNotebookPanel,
+    animateLeftSide,
+    animateMainMenuDrawer,
+    animateNotebookDrawer,
+    animateRightSide,
+    animateTextInputs,
+    closeMainMenuPanel,
+    closeNotebookPanel,
+    openMainMenuPanel,
+    openNotebookPanel,
   };
 };
 

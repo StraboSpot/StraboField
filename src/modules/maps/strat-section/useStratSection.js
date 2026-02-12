@@ -132,10 +132,10 @@ const useStratSection = () => {
   };
 
   return {
-    createInterval: createInterval,
-    deleteInterval: deleteInterval,
-    getStratSectionSettings: getStratSectionSettings,
-    orderStratSectionIntervals: orderStratSectionIntervals,
+    createInterval,
+    deleteInterval,
+    getStratSectionSettings,
+    orderStratSectionIntervals,
   };
 };
 

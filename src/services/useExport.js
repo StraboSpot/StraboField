@@ -292,8 +292,8 @@ const useExport = () => {
   };
 
   return {
-    initializeBackup: initializeBackup,
-    zipAndExportProjectFolder: zipAndExportProjectFolder,
+    initializeBackup,
+    zipAndExportProjectFolder,
   };
 };
 

@@ -183,8 +183,8 @@ const useNesting = () => {
   }
 
   return {
-    getChildrenGenerationsSpots: getChildrenGenerationsSpots,
-    getParentGenerationsSpots: getParentGenerationsSpots,
+    getChildrenGenerationsSpots,
+    getParentGenerationsSpots,
   };
 };
 

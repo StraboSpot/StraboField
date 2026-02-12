@@ -66,11 +66,11 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
   };
 
   return {
-    getImageSource: getImageSource,
-    handleEditShapePressed: handleEditShapePressed,
-    handleLinePressed: handleLinePressed,
-    handlePointPressed: handlePointPressed,
-    handlePolygonPressed: handlePolygonPressed,
+    getImageSource,
+    handleEditShapePressed,
+    handleLinePressed,
+    handlePointPressed,
+    handlePolygonPressed,
   };
 };
 

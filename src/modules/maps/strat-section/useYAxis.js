@@ -44,8 +44,8 @@ const useYAxis = (spotsDisplayed) => {
   };
 
   return {
-    getYAxis: getYAxis,
-    getYAxisTickMarks: getYAxisTickMarks,
+    getYAxis,
+    getYAxisTickMarks,
   };
 };
 

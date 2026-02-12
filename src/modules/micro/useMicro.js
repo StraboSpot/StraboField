@@ -35,8 +35,8 @@ const useMicro = () => {
   };
 
   return {
-    getAllLocalMicroProjects: getAllLocalMicroProjects,
-    getAllServerMicroProjects: getAllServerMicroProjects,
+    getAllLocalMicroProjects,
+    getAllServerMicroProjects,
   };
 };
 

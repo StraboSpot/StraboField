@@ -70,8 +70,8 @@ const useXAxis = (n) => {
   };
 
   return {
-    getXAxis: getXAxis,
-    getXAxisTickMarks: getXAxisTickMarks,
+    getXAxis,
+    getXAxisTickMarks,
   };
 };
 

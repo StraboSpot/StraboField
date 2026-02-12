@@ -22,9 +22,9 @@ const useUserProfile = () => {
   };
 
   return {
-    getEmail: getEmail,
-    getInitials: getInitials,
-    getName: getName,
+    getEmail,
+    getInitials,
+    getName,
   };
 };
 

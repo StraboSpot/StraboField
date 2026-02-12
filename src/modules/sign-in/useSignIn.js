@@ -58,8 +58,8 @@ const useSignIn = () => {
   };
 
   return {
-    guestSignIn: guestSignIn,
-    signIn: signIn,
+    guestSignIn,
+    signIn,
   };
 };
 

@@ -165,7 +165,7 @@ const useStereonet = () => {
   };
 
   return {
-    getStereonet: getStereonet,
+    getStereonet,
   };
 };
 

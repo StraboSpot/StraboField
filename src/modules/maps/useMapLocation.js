@@ -73,9 +73,9 @@ const useMapLocation = () => {
   };
 
   return {
-    generateRandomsSpotsAroundCurrentLocation: generateRandomsSpotsAroundCurrentLocation,
-    getCurrentLocation: getCurrentLocation,
-    setPointAtCurrentLocation: setPointAtCurrentLocation,
+    generateRandomsSpotsAroundCurrentLocation,
+    getCurrentLocation,
+    setPointAtCurrentLocation,
   };
 };
 

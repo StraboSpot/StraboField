@@ -148,12 +148,12 @@ const useExternalData = () => {
   };
 
   return {
-    deleteCSV: deleteCSV,
-    deleteURL: deleteURL,
-    readCSV: readCSV,
-    saveCSV: saveCSV,
-    saveEdits: saveEdits,
-    saveURL: saveURL,
+    deleteCSV,
+    deleteURL,
+    readCSV,
+    saveCSV,
+    saveEdits,
+    saveURL,
   };
 };
 

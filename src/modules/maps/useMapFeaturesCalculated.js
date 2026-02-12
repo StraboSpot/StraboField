@@ -159,11 +159,11 @@ const useMapFeaturesCalculated = (mapRef) => {
   };
 
   return {
-    getDrawFeatureAtPress: getDrawFeatureAtPress,
-    getLassoedSpots: getLassoedSpots,
-    getNearestFeatureInBBox: getNearestFeatureInBBox,
-    getSpotAtPress: getSpotAtPress,
-    identifyClosestVertexOnSpotPress: identifyClosestVertexOnSpotPress,
+    getDrawFeatureAtPress,
+    getLassoedSpots,
+    getNearestFeatureInBBox,
+    getSpotAtPress,
+    identifyClosestVertexOnSpotPress,
   };
 };
 

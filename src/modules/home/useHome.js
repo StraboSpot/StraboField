@@ -205,18 +205,18 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   return {
-    clickHandler: clickHandler,
-    dialogClickHandler: dialogClickHandler,
-    dialogs: dialogs,
-    distance: distance,
-    endMeasurement: endMeasurement,
-    selectingMode: selectingMode,
-    mapMode: mapMode,
-    onCancel: onCancel,
-    onEndDrawPressed: onEndDrawPressed,
-    setDistance: setDistance,
-    setMapModeToEdit: setMapModeToEdit,
-    toggleDialog: toggleDialog,
+    clickHandler,
+    dialogClickHandler,
+    dialogs,
+    distance,
+    endMeasurement,
+    selectingMode,
+    mapMode,
+    onCancel,
+    onEndDrawPressed,
+    setDistance,
+    setMapModeToEdit,
+    toggleDialog,
   };
 };
 

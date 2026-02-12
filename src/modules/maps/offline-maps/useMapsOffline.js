@@ -413,21 +413,21 @@ const useMapsOffline = () => {
   };
 
   return {
-    addMapFromDeviceToRedux: addMapFromDeviceToRedux,
-    checkIfTileZipFolderExists: checkIfTileZipFolderExists,
-    checkTileZipFileExistence: checkTileZipFileExistence,
-    checkZipStatus: checkZipStatus,
-    doUnzip: doUnzip,
-    getMapCenterTile: getMapCenterTile,
-    getMapTiles: getMapTiles,
-    getSavedMapsFromDevice: getSavedMapsFromDevice,
-    initializeSaveMap: initializeSaveMap,
-    moveFiles: moveFiles,
-    moveTile: moveTile,
-    saveZipMap: saveZipMap,
-    setOfflineMapTiles: setOfflineMapTiles,
-    switchToOfflineMap: switchToOfflineMap,
-    updateMapTileCountWhenSaving: updateMapTileCountWhenSaving,
+    addMapFromDeviceToRedux,
+    checkIfTileZipFolderExists,
+    checkTileZipFileExistence,
+    checkZipStatus,
+    doUnzip,
+    getMapCenterTile,
+    getMapTiles,
+    getSavedMapsFromDevice,
+    initializeSaveMap,
+    moveFiles,
+    moveTile,
+    saveZipMap,
+    setOfflineMapTiles,
+    switchToOfflineMap,
+    updateMapTileCountWhenSaving,
   };
 };
 

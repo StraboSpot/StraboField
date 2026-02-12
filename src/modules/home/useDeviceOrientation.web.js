@@ -5,8 +5,8 @@ const useDeviceOrientation = () => {
   const unlockOrientation = () => {};
 
   return {
-    lockOrientation: lockOrientation,
-    unlockOrientation: unlockOrientation,
+    lockOrientation,
+    unlockOrientation,
   };
 };
 

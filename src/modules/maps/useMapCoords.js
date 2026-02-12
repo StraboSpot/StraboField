@@ -121,13 +121,13 @@ const useMapCoords = () => {
   };
 
   return {
-    convertFeatureGeometryToImagePixels: convertFeatureGeometryToImagePixels,
-    convertImagePixelsToLatLong: convertImagePixelsToLatLong,
-    getBBoxPaddedInPixels: getBBoxPaddedInPixels,
-    getBoundsPadded: getBoundsPadded,
-    getCentroidOfSelectedSpot: getCentroidOfSelectedSpot,
-    getCoordQuad: getCoordQuad,
-    getMyMapsBboxCoords: getMyMapsBboxCoords,
+    convertFeatureGeometryToImagePixels,
+    convertImagePixelsToLatLong,
+    getBBoxPaddedInPixels,
+    getBoundsPadded,
+    getCentroidOfSelectedSpot,
+    getCoordQuad,
+    getMyMapsBboxCoords,
   };
 };
 

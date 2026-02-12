@@ -37,8 +37,8 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
   };
 
   return {
-    openSpotInNotebook: openSpotInNotebook,
-    zoomToCurrentLocation: zoomToCurrentLocation,
+    openSpotInNotebook,
+    zoomToCurrentLocation,
   };
 };
 

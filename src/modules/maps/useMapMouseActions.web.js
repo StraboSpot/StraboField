@@ -78,9 +78,9 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
   };
 
   return {
-    cursor: cursor,
-    handleMouseEnter: handleMouseEnter,
-    handleMouseLeave: handleMouseLeave,
+    cursor,
+    handleMouseEnter,
+    handleMouseLeave,
   };
 
 };

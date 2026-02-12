@@ -171,11 +171,11 @@ const useMapFeatures = () => {
   };
 
   return {
-    filterFeatures: filterFeatures,
-    getAllMappedSpots: getAllMappedSpots,
-    getDisplayedSpots: getDisplayedSpots,
-    getSpotsAsFeatures: getSpotsAsFeatures,
-    updateFeatureTypes: updateFeatureTypes,
+    filterFeatures,
+    getAllMappedSpots,
+    getDisplayedSpots,
+    getSpotsAsFeatures,
+    updateFeatureTypes,
   };
 };
 

@@ -33,7 +33,7 @@ const useMapMoveEvents = ({mapRef}) => {
   };
 
   return {
-    handleMapMoved: handleMapMoved,
+    handleMapMoved,
   };
 
 };

@@ -84,12 +84,12 @@ const useMicroZips = () => {
   };
 
   return {
-    clearStatus: clearStatus,
-    downloadZip: downloadZip,
-    isLoadingWave: isLoadingWave,
-    percentDone: percentDone,
-    showComplete: showComplete,
-    showLoadingBar: showLoadingBar,
+    clearStatus,
+    downloadZip,
+    isLoadingWave,
+    percentDone,
+    showComplete,
+    showLoadingBar,
   };
 };
 

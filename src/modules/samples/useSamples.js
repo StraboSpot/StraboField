@@ -239,12 +239,12 @@ const useSamples = () => {
   };
 
   return {
-    authenticateWithSesar: authenticateWithSesar,
-    getAndSaveSesarCode: getAndSaveSesarCode,
-    onSampleFormChange: onSampleFormChange,
-    straboSesarMapping: straboSesarMapping,
-    updateSampleIsSesar: updateSampleIsSesar,
-    uploadSample: uploadSample,
+    authenticateWithSesar,
+    getAndSaveSesarCode,
+    onSampleFormChange,
+    straboSesarMapping,
+    updateSampleIsSesar,
+    uploadSample,
   };
 };
 

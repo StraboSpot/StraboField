@@ -92,9 +92,9 @@ const useMapPressEvents = ({
   };
 
   return {
-    handleMapLongPress: handleMapLongPress,
-    handleMapPress: handleMapPress,
-    location: location,
+    handleMapLongPress,
+    handleMapPress,
+    location,
   };
 };
 

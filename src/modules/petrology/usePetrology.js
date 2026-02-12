@@ -126,13 +126,13 @@ const usePetrology = () => {
   };
 
   return {
-    deletePetFeature: deletePetFeature,
-    getMineralTitle: getMineralTitle,
-    getReactionTextureTitle: getReactionTextureTitle,
-    getPetRockTitle: getPetRockTitle,
-    onMineralChange: onMineralChange,
-    savePetFeature: savePetFeature,
-    savePetFeatureValuesFromTemplates: savePetFeatureValuesFromTemplates,
+    deletePetFeature,
+    getMineralTitle,
+    getReactionTextureTitle,
+    getPetRockTitle,
+    onMineralChange,
+    savePetFeature,
+    savePetFeatureValuesFromTemplates,
   };
 };
 

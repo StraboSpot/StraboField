@@ -40,9 +40,9 @@ const useDrawGeometryToggle = () => {
   };
 
   return {
-    handleLineLongPressed: handleLineLongPressed,
-    handlePointLongPressed: handlePointLongPressed,
-    handlePolygonLongPressed: handlePolygonLongPressed,
+    handleLineLongPressed,
+    handlePointLongPressed,
+    handlePolygonLongPressed,
   };
 };
 

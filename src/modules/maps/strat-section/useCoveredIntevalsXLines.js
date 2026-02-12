@@ -18,7 +18,7 @@ const useCoveredIntervalsXLines = (spotsDisplayed) => {
   };
 
   return {
-    getIntervalsWithX: getIntervalsWithX,
+    getIntervalsWithX,
   };
 };
 

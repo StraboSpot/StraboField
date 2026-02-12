@@ -210,11 +210,11 @@ const useUploadImages = () => {
   };
 
   return {
-    initializeImageUpload: initializeImageUpload,
-    resizeImageForUpload: resizeImageForUpload,
-    verifyImageExistsOnDevice: verifyImageExistsOnDevice,
-    uploadImages: uploadImages,
-    uploadProfileImage: uploadProfileImage,
+    initializeImageUpload,
+    resizeImageForUpload,
+    verifyImageExistsOnDevice,
+    uploadImages,
+    uploadProfileImage,
     currentImage,
     currentImageStatus,
     resetState,

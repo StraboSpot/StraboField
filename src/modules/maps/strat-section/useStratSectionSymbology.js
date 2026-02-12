@@ -143,7 +143,7 @@ const useStratSectionSymbology = () => {
   };
 
   return {
-    getStratIntervalFill: getStratIntervalFill,
+    getStratIntervalFill,
   };
 };
 

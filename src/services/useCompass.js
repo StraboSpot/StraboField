@@ -131,12 +131,12 @@ const useCompass = () => {
   };
 
   return {
-    cartesianToSpherical: cartesianToSpherical,
-    matrixAverage: matrixAverage,
-    getHeading: getHeading,
-    getStrikeAndDip: getStrikeAndDip,
-    getTrendAndPlunge: getTrendAndPlunge,
-    getUserDeclination: getUserDeclination,
+    cartesianToSpherical,
+    matrixAverage,
+    getHeading,
+    getStrikeAndDip,
+    getTrendAndPlunge,
+    getUserDeclination,
   };
 };
 

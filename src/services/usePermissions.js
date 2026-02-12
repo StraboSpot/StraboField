@@ -76,10 +76,10 @@ const usePermissions = () => {
   };
 
   return {
-    checkPermission: checkPermission,
-    hasLocationPermission: hasLocationPermission,
-    requestPermission: requestPermission,
-    requestPermissions: requestPermissions,
+    checkPermission,
+    hasLocationPermission,
+    requestPermission,
+    requestPermissions,
   };
 };
 

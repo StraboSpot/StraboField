@@ -140,20 +140,20 @@ dispatch(
   };
 
   return {
-    checkIsSafeDelete: checkIsSafeDelete,
-    checkedSpotsIds: checkedSpotsIds,
-    checkedTagsIds: checkedTagsIds,
-    confirmCloseModal: confirmCloseModal,
-    deleteReport: deleteReport,
-    formRef: formRef,
-    handleSavePressed: handleSavePressed,
-    handleSpotChecked: handleSpotChecked,
-    handleSpotPressed: handleSpotPressed,
-    handleTagChecked: handleTagChecked,
-    handleTagPressed: handleTagPressed,
-    initialValues: initialValues,
-    setUpdatedImages: setUpdatedImages,
-    updatedImages: updatedImages,
+    checkIsSafeDelete,
+    checkedSpotsIds,
+    checkedTagsIds,
+    confirmCloseModal,
+    deleteReport,
+    formRef,
+    handleSavePressed,
+    handleSpotChecked,
+    handleSpotPressed,
+    handleTagChecked,
+    handleTagPressed,
+    initialValues,
+    setUpdatedImages,
+    updatedImages,
   };
 };
 

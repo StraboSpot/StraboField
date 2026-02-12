@@ -29,8 +29,8 @@ const useVersionCheck = () => {
   };
 
   return {
-    animateLabel: animateLabel,
-    checkAppStoreVersion: checkAppStoreVersion,
+    animateLabel,
+    checkAppStoreVersion,
   };
 };
 

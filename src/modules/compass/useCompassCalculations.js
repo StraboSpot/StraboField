@@ -49,7 +49,7 @@ const useCompassCalculations = () => {
   };
 
   return {
-    doMeasurementCalculations: doMeasurementCalculations,
+    doMeasurementCalculations,
   };
 };
 

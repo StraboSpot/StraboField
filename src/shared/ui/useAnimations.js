@@ -20,7 +20,7 @@ const useAnimations = () => {
   };
 
   return {
-    getAnimationType: getAnimationType,
+    getAnimationType,
   };
 };
 

@@ -63,7 +63,7 @@ const useMapMeasure = (mapRef) => {
   };
 
   return {
-    getMeasureFeatures: getMeasureFeatures,
+    getMeasureFeatures,
   };
 };
 

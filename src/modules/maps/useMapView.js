@@ -127,12 +127,12 @@ const useMapView = () => {
   };
 
   return {
-    getCenterCoordinates: getCenterCoordinates,
-    getInitialViewState: getInitialViewState,
-    getZoomLevel: getZoomLevel,
-    isOnGeoMap: isOnGeoMap,
-    setMapView: setMapView,
-    zoomToSpotsNow: zoomToSpotsNow,
+    getCenterCoordinates,
+    getInitialViewState,
+    getZoomLevel,
+    isOnGeoMap,
+    setMapView,
+    zoomToSpotsNow,
   };
 };
 

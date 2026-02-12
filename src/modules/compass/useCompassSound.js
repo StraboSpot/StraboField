@@ -13,7 +13,7 @@ const useCompassSound = () => {
   };
 
   return {
-    playCompassSound: playCompassSound,
+    playCompassSound,
   };
 
 };

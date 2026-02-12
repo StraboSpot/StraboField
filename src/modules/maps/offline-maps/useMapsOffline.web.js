@@ -4,7 +4,7 @@ const useMapsOffline = () => {
 
   const switchToOfflineMap = () => {};
 
-  return {getMapCenterTile: getMapCenterTile, switchToOfflineMap: switchToOfflineMap};
+  return {getMapCenterTile, switchToOfflineMap};
 };
 
 export default useMapsOffline;

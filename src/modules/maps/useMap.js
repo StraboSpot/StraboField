@@ -75,10 +75,10 @@ const useMap = () => {
   };
 
   return {
-    getExtentAndZoomCall: getExtentAndZoomCall,
-    handleError: handleError,
-    isDrawMode: isDrawMode,
-    setBasemap: setBasemap,
+    getExtentAndZoomCall,
+    handleError,
+    isDrawMode,
+    setBasemap,
   };
 };
 

@@ -238,18 +238,18 @@ const useProject = () => {
   };
 
   return {
-    addDataset: addDataset,
-    checkValidDateTime: checkValidDateTime,
-    createDataset: createDataset,
-    destroyDataset: destroyDataset,
-    getActiveDatasets: getActiveDatasets,
-    getAllDeviceProjects: getAllDeviceProjects,
-    getAllServerProjects: getAllServerProjects,
-    getTargetDatasetFromId: getTargetDatasetFromId,
-    initializeNewProject: initializeNewProject,
-    isSpotInReadOnlyDataset: isSpotInReadOnlyDataset,
-    makeDatasetCurrent: makeDatasetCurrent,
-    setSwitchValue: setSwitchValue,
+    addDataset,
+    checkValidDateTime,
+    createDataset,
+    destroyDataset,
+    getActiveDatasets,
+    getAllDeviceProjects,
+    getAllServerProjects,
+    getTargetDatasetFromId,
+    initializeNewProject,
+    isSpotInReadOnlyDataset,
+    makeDatasetCurrent,
+    setSwitchValue,
   };
 };
 

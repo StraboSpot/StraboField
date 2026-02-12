@@ -361,9 +361,9 @@ const useDownload = () => {
   };
 
   return {
-    downloadUserProfile: downloadUserProfile,
-    initializeDownload: initializeDownload,
-    initializeDownloadImages: initializeDownloadImages,
+    downloadUserProfile,
+    initializeDownload,
+    initializeDownloadImages,
   };
 };
 

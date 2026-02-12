@@ -215,17 +215,17 @@ const useForm = () => {
   };
 
   return {
-    getChoices: getChoices,
-    getChoicesByKey: getChoicesByKey,
-    getGroupFields: getGroupFields,
-    getLabel: getLabel,
-    getLabels: getLabels,
-    getRelevantFields: getRelevantFields,
-    getSurvey: getSurvey,
-    hasErrors: hasErrors,
-    isRelevant: isRelevant,
-    showErrors: showErrors,
-    validateForm: validateForm,
+    getChoices,
+    getChoicesByKey,
+    getGroupFields,
+    getLabel,
+    getLabels,
+    getRelevantFields,
+    getSurvey,
+    hasErrors,
+    isRelevant,
+    showErrors,
+    validateForm,
   };
 };
 

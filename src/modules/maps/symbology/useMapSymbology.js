@@ -556,12 +556,12 @@ const useMapSymbology = () => {
   };
 
   return {
-    addSymbology: addSymbology,
-    getLayoutSymbology: getLayoutSymbology,
-    getLinesFilteredByPattern: getLinesFilteredByPattern,
-    getMapSymbology: getMapSymbology,
-    getPaintSymbology: getPaintSymbology,
-    getSymbology: getSymbology,
+    addSymbology,
+    getLayoutSymbology,
+    getLinesFilteredByPattern,
+    getMapSymbology,
+    getPaintSymbology,
+    getSymbology,
   };
 };
 

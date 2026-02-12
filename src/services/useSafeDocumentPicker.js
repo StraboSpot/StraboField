@@ -58,8 +58,8 @@ const useSafeDocumentPicker = () => {
 
   return {
     isPicking,
-    handleError: handleError,
-    safePick: safePick,
+    handleError,
+    safePick,
   };
 };
 

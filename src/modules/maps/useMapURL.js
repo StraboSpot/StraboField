@@ -54,8 +54,8 @@ const useMapURL = () => {
   };
 
   return {
-    buildStyleURL: buildStyleURL,
-    buildTileURL: buildTileURL,
+    buildStyleURL,
+    buildTileURL,
   };
 };
 

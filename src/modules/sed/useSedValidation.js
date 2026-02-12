@@ -149,9 +149,9 @@ const useSedValidation = () => {
   };
 
   return {
-    getBasicLithologyIndex: getBasicLithologyIndex,
-    getSiliciclasticGrainSize: getSiliciclasticGrainSize,
-    validateSedData: validateSedData,
+    getBasicLithologyIndex,
+    getSiliciclasticGrainSize,
+    validateSedData,
   };
 };
 

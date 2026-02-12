@@ -270,10 +270,10 @@ const useStratSectionCalculations = () => {
   };
 
   return {
-    calculateIntervalGeometry: calculateIntervalGeometry,
-    moveIntervalToAfter: moveIntervalToAfter,
-    moveSpotsUpOrDownByPixels: moveSpotsUpOrDownByPixels,
-    recalculateIntervalGeometry: recalculateIntervalGeometry,
+    calculateIntervalGeometry,
+    moveIntervalToAfter,
+    moveSpotsUpOrDownByPixels,
+    recalculateIntervalGeometry,
   };
 };
 

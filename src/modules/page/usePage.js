@@ -130,11 +130,11 @@ const usePage = () => {
   };
 
   return {
-    getPopulatedPagesKeys: getPopulatedPagesKeys,
-    getRelevantGeneralPages: getRelevantGeneralPages,
-    getRelevantPetPages: getRelevantPetPages,
-    getRelevantSedPages: getRelevantSedPages,
-    getSpotDataIconSource: getSpotDataIconSource,
+    getPopulatedPagesKeys,
+    getRelevantGeneralPages,
+    getRelevantPetPages,
+    getRelevantSedPages,
+    getSpotDataIconSource,
   };
 };
 

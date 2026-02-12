@@ -145,9 +145,9 @@ const useMeasurements = () => {
   };
 
   return {
-    createNewMeasurement: createNewMeasurement,
-    deleteMeasurements: deleteMeasurements,
-    getMeasurementLabel: getMeasurementLabel,
+    createNewMeasurement,
+    deleteMeasurements,
+    getMeasurementLabel,
   };
 };
 

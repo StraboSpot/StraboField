@@ -31,7 +31,7 @@ const useMapMoveEvents = ({setViewState}) => {
   };
 
   return {
-    handleMapMoved: handleMapMoved,
+    handleMapMoved,
   };
 
 };

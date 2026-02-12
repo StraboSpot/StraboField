@@ -364,16 +364,16 @@ const useSed = () => {
   };
 
   return {
-    deleteSedFeature: deleteSedFeature,
-    getBeddingTitle: getBeddingTitle,
-    getIntervalTitle: getIntervalTitle,
-    getSedRockTitle: getSedRockTitle,
-    getStratSectionTitle: getStratSectionTitle,
-    onSedFormChange: onSedFormChange,
-    saveSedBedFeature: saveSedBedFeature,
-    saveSedFeature: saveSedFeature,
-    saveSedFeatureValuesFromTemplates: saveSedFeatureValuesFromTemplates,
-    toggleStratSection: toggleStratSection,
+    deleteSedFeature,
+    getBeddingTitle,
+    getIntervalTitle,
+    getSedRockTitle,
+    getStratSectionTitle,
+    onSedFormChange,
+    saveSedBedFeature,
+    saveSedFeature,
+    saveSedFeatureValuesFromTemplates,
+    toggleStratSection,
   };
 };
 
