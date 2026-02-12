@@ -120,28 +120,28 @@
     {
       "type": "text",
       "name": "lin_fab_min_1",
-      "label": "Mineral(s) that define the linear fabric",
+      "label": "Mineral 1: defines the linear fabric",
       "required": "false",
       "relevant": "${linear_fab} != '' and not(selected(${linear_fab}, 'intersect_lin'))"
     },
     {
       "type": "text",
       "name": "lin_fab_min_2",
-      "label": "Mineral(s) that define the linear fabric",
+      "label": "Mineral 2: defines the linear fabric",
       "required": "false",
       "relevant": "${linear_fab} != '' and not(selected(${linear_fab}, 'intersect_lin'))"
     },
     {
       "type": "text",
       "name": "lin_fab_min_3",
-      "label": "Mineral(s) that define the linear fabric",
+      "label": "Mineral 3: define the linear fabric",
       "required": "false",
       "relevant": "${linear_fab} != '' and not(selected(${linear_fab}, 'intersect_lin'))"
     },
     {
       "type": "text",
       "name": "lin_fab_min_4",
-      "label": "Mineral(s) that define the linear fabric",
+      "label": "Mineral 4: define the linear fabric",
       "required": "false",
       "relevant": "${linear_fab} != '' and not(selected(${linear_fab}, 'intersect_lin'))"
     },
@@ -441,18 +441,6 @@
       "label": "Notes",
       "required": "false",
       "appearance": "multiline"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "required": "false",
-      "calculation": "'vWMK6YMJe6VLDvaKGpDKzA'"
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "calculation": "'vNvcdtPZZ2zometsaoJx5t'",
-      "$given_name": "__version__"
     }
   ],
   "choices": [
@@ -465,49 +453,49 @@
       "list_name": "cs2ki85",
       "name": "comp_seg",
       "label": "other compositional segregation",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "cs2ki85",
       "name": "min_align",
       "label": "mineral alignment",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "cs2ki85",
       "name": "schistosity",
       "label": "schistosity",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "cs2ki85",
       "name": "cleavage",
       "label": "cleavage",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "cs2ki85",
       "name": "mylonitic_fol",
       "label": "mylonitic foliation",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "cs2ki85",
       "name": "scaly_fabric",
       "label": "scaly fabric",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "cs2ki85",
       "name": "stylolite",
       "label": "stylolite",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "cs2ki85",
       "name": "other_planar",
       "label": "other",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "mj2eg99",
@@ -518,43 +506,43 @@
       "list_name": "mj2eg99",
       "name": "phyllitic",
       "label": "phyllitic",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "mj2eg99",
       "name": "phacoidal",
       "label": "phacoidal",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "mj2eg99",
       "name": "pencil",
       "label": "pencil",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "mj2eg99",
       "name": "crenulation",
       "label": "crenulation",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "mj2eg99",
       "name": "axial_planar",
       "label": "axial planar",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "mj2eg99",
       "name": "solution",
       "label": "solution",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "mj2eg99",
       "name": "other_clvg",
       "label": "other",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "jw6do33",
@@ -565,19 +553,19 @@
       "list_name": "jw6do33",
       "name": "domainal",
       "label": "domainal",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "jw6do33",
       "name": "spaced",
       "label": "spaced",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "jw6do33",
       "name": "anastomos",
       "label": "anastomosing",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "sv9wq27",
@@ -613,91 +601,91 @@
       "list_name": "lw8uh27",
       "name": "asymm_fold",
       "label": "asymmetric folds",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "lw8uh27",
       "name": "asymm_clast",
       "label": "asymmetric clast",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "lw8uh27",
       "name": "mica_fish",
       "label": "mica fish",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "lw8uh27",
       "name": "bookshelf_slip",
       "label": "bookshelf slip",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "lw8uh27",
       "name": "s_c",
       "label": "S-C fabric",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "lw8uh27",
       "name": "riedel_shear",
       "label": "Riedel fracture/shear",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "lw8uh27",
       "name": "sigmoidal_gash",
       "label": "sigmoidal tension gash(es)",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "lw8uh27",
       "name": "drag_folds",
       "label": "drag folds (layering curvature)",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "lw8uh27",
       "name": "offset_deflect",
       "label": "offset or deflected marker",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "lw8uh27",
       "name": "minor_offset",
       "label": "minor offset",
-      "order": "10"
+      "order": 10
     },
     {
       "list_name": "lw8uh27",
       "name": "crescent_frac",
       "label": "crescentic fractures",
-      "order": "11"
+      "order": 11
     },
     {
       "list_name": "lw8uh27",
       "name": "slickenfiber",
       "label": "slickenfibers",
-      "order": "12"
+      "order": 12
     },
     {
       "list_name": "lw8uh27",
       "name": "fiber_growth",
       "label": "fiber growth",
-      "order": "13"
+      "order": 13
     },
     {
       "list_name": "lw8uh27",
       "name": "gouge_fill",
       "label": "gouge fill",
-      "order": "14"
+      "order": 14
     },
     {
       "list_name": "lw8uh27",
       "name": "other_kin",
       "label": "other",
-      "order": "15"
+      "order": 15
     },
     {
       "list_name": "ps78s13",
@@ -708,31 +696,31 @@
       "list_name": "ps78s13",
       "name": "migmatite",
       "label": "migmatitic",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "ps78s13",
       "name": "porphyroclast",
       "label": "porphyroclastic",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "ps78s13",
       "name": "porphyroblast",
       "label": "porphyroblastic",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "ps78s13",
       "name": "poikiloblast",
       "label": "poikiloblastic",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "ps78s13",
       "name": "other_met_fab",
       "label": "other",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "io9by25",
@@ -743,25 +731,25 @@
       "list_name": "io9by25",
       "name": "relict_sed",
       "label": "relict sedimentary",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "io9by25",
       "name": "vein_vein_arra",
       "label": "veining/vein array",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "io9by25",
       "name": "alter_zone",
       "label": "alteration zone",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "io9by25",
       "name": "other",
       "label": "other",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "lg33p50",
@@ -772,43 +760,43 @@
       "list_name": "lg33p50",
       "name": "fractures",
       "label": "fractures",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "lg33p50",
       "name": "fault",
       "label": "fault",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "lg33p50",
       "name": "envelop_surf",
       "label": "enveloping surface",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "lg33p50",
       "name": "boudinage",
       "label": "boudinage",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "lg33p50",
       "name": "mullions",
       "label": "mullions",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "lg33p50",
       "name": "shear_zone",
       "label": "shear zone",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "lg33p50",
       "name": "other_str_fab",
       "label": "other",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "fk2vt22",
@@ -919,49 +907,48 @@
       "list_name": "au84l98",
       "name": "s>>l",
       "label": "S >> L",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "au84l98",
       "name": "s>l",
       "label": "S > L",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "au84l98",
       "name": "ls",
       "label": "S = L",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "au84l98",
       "name": "l>s",
       "label": "L > S",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "au84l98",
       "name": "l>>s",
       "label": "L >> S",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "au84l98",
       "name": "l",
       "label": "L only",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "au84l98",
       "name": "other_tec",
       "label": "other",
-      "order": "7"
+      "order": 7
     }
   ],
   "settings": [
     {
-      "form_title": "Fabrics - Metamorphic (9/22)",
-      "version": "2 (2022-09-12 17:00:25)"
+      "version": "vWMK6YMJe6VLDvaKGpDKzA"
     }
   ]
 }
