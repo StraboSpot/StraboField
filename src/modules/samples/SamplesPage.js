@@ -52,36 +52,29 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
 
   const renderSampleDetail = () => {
     if (spot.properties?.isSample && !selectedSample) return <Overview/>;
-    else {
-      return (
-        <BasicPageDetail
-          closeDetailView={closeDetailView}
-          isReadOnly={isReadOnly}
-          page={page}
-          selectedFeature={selectedSample}
-        />
-      );
-    }
-  };
-
-  const renderSamplesMain = () => {
     return (
-      <View style={{flex: 1}}>
-        <PageHeader
-          onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
-          pageTitle={page.label}
-          showAddButton={!isReadOnly}
-        />
-        <SamplesList onPress={editSample}/>
-      </View>
+      <BasicPageDetail
+        closeDetailView={closeDetailView}
+        isReadOnly={isReadOnly}
+        page={page}
+        selectedFeature={selectedSample}
+      />
     );
   };
 
-  return (
-    <>
-      {isEmpty(selectedSample) ? renderSamplesMain() : renderSampleDetail()}
-    </>
+  const renderSamplesMain = () => (
+    <View style={{flex: 1}}>
+      <PageHeader
+        onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
+        pageTitle={page.label}
+        showAddButton={!isReadOnly}
+      />
+      <SamplesList onPress={editSample}/>
+    </View>
   );
+
+  if (isEmpty(selectedSample)) return renderSamplesMain();
+  return renderSampleDetail();
 };
 
 export default SamplesPage;

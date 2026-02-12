@@ -31,9 +31,8 @@ const SampleListItem = ({
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const isReadOnly = isSpotInReadOnlyDataset(parentSpot.properties?.id);
-
   const sampleMetadata = sample.properties?.isSample ? sample.properties.samples[0] : sample;
-  let oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
+  const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
   const handleCheckBoxPressed = () => {
     return addRemoveSpotFromTag(sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id,

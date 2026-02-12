@@ -13,14 +13,12 @@ import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
 const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
-
   const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
 
   const tags = useSelector(state => state.project.project?.tags) || [];
-
-  const checkedTags = Object.values(tags).reduce((acc, tag) => {
-    return checkedTagsIds.find(id => id.toString() === tag.id.toString()) ? [...acc, tag] : acc;
-  }, []);
+  const checkedTags = Object.values(tags).filter(
+    tag => checkedTagsIds.find(id => id.toString() === tag.id.toString()),
+  );
 
   const handleAddGeologicUnitsPressed = () => setIsTagsListModalVisible(true);
 

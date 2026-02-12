@@ -23,11 +23,8 @@ const SamplesOverview = ({page}) => {
     }
   };
 
-  return (
-    <>
-      {spot.properties?.isSample ? <SampleDetailOverview/> : <SamplesList onPress={onPressed}/>}
-    </>
-  );
+  if (spot.properties?.isSample) return <SampleDetailOverview/>;
+  return <SamplesList onPress={onPressed}/>;
 };
 
 export default SamplesOverview;

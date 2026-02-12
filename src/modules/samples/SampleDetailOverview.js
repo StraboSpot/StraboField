@@ -10,7 +10,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const SampleDetailOverview = ({page}) => {
+const SampleDetailOverview = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -39,7 +39,7 @@ const SampleDetailOverview = ({page}) => {
     return dateObject.toLocaleTimeString();
   };
 
-  const onPressed = (item) => {
+  const onPressed = () => {
     dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };

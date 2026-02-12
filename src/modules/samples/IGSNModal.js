@@ -20,21 +20,18 @@ const IGSNModal = forwardRef(({
                               }, formRef) => {
 
   const dispatch = useDispatch();
-  const {
-    straboSesarMapping,
-    updateSampleIsSesar,
-    uploadSample,
-  } = useSamples();
+  const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useSamples();
+
   const {sesar} = useSelector(state => state.user);
 
   const formValues = formRef.current?.values || {};
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorView, setErrorView] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
+  const [errorView, setErrorView] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
-  const [modalPage, setModalPage] = useState(null);
   const [mappedSesarValues, setMappedSesarValues] = useState({});
+  const [modalPage, setModalPage] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
@@ -100,12 +97,8 @@ const IGSNModal = forwardRef(({
   };
 
   const setPage = () => {
-    switch (modalPage) {
-      case 'error':
-        return renderErrorView('error');
-      default:
-        return renderUploadContent();
-    }
+    if (modalPage === 'error') return renderErrorView();
+    return renderUploadContent();
   };
 
   const renderErrorView = () => {
@@ -130,7 +123,7 @@ const IGSNModal = forwardRef(({
       return isoToLocalDateTime(item.value, 'time');
     }
     if (item.sesarKey === 'description') return truncateText(item.value, 30);
-    else return item.value;
+    return item.value;
   };
 
   const renderContentItems = () => {
@@ -147,8 +140,8 @@ const IGSNModal = forwardRef(({
           return (
             <View key={item.sesarKey}
                   style={{
-                    flexDirection: 'row',
                     alignItems: 'center',
+                    flexDirection: 'row',
                     justifyContent: 'center',
                     paddingLeft: 20,
                   }}>
@@ -163,14 +156,11 @@ const IGSNModal = forwardRef(({
   };
 
   const renderUploadContent = () => {
+    if (isEmpty(formRef.current?.values?.sample_id_name)) return null;
     return (
-      <>
-        {!isEmpty(formRef.current?.values?.sample_id_name) && (
-          <ScrollView>
-            {renderContentItems()}
-          </ScrollView>
-        )}
-      </>
+      <ScrollView>
+        {renderContentItems()}
+      </ScrollView>
     );
   };
 

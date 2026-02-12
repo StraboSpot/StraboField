@@ -31,7 +31,7 @@ const useSamples = () => {
       console.log('No valid token, redirecting to login...');
       return false;
     }
-    else return validSesarTokens;
+    return validSesarTokens;
   };
 
   const buildSesarXmlSchema = (data, isUpdating) => {
@@ -130,8 +130,7 @@ const useSamples = () => {
       deleteSpot(sampleToDelete);
 
       dispatch(setSelectedSpot(updatedParentSpot));
-      if (isEmpty(updatedSamples)) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-      else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     else {
       deleteSpot(sampleToDelete);
@@ -306,14 +305,14 @@ const useSamples = () => {
   };
 
   return {
-    authenticateWithSesar: authenticateWithSesar,
-    createRichSample: createRichSample,
-    deleteRichSample: deleteRichSample,
-    getAndSaveSesarCode: getAndSaveSesarCode,
-    onSampleFormChange: onSampleFormChange,
-    straboSesarMapping: straboSesarMapping,
-    updateSampleIsSesar: updateSampleIsSesar,
-    uploadSample: uploadSample,
+    authenticateWithSesar,
+    createRichSample,
+    deleteRichSample,
+    getAndSaveSesarCode,
+    onSampleFormChange,
+    straboSesarMapping,
+    updateSampleIsSesar,
+    uploadSample,
   };
 };
 

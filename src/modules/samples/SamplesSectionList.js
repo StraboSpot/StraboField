@@ -37,15 +37,13 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
   const renderSectionHeader = ({title, spot}) => {
     if (title && spot) {
       if (isCheckedList) return <SectionDivider dividerText={title}/>;
-      else {
-        return (
-          <SectionDividerWithRightButton
-            buttonTitle={'View In Spot'}
-            dividerText={title}
-            onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
-          />
-        );
-      }
+      return (
+        <SectionDividerWithRightButton
+          buttonTitle={'View In Spot'}
+          dividerText={title}
+          onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
+        />
+      );
     }
   };
 
@@ -57,7 +55,7 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
       renderItem={({item, section}) => renderSampleListItem(item, section.spot)}
       renderSectionHeader={({section}) => renderSectionHeader(section)}
       sections={dataSectioned}
-      stickySectionHeadersEnabled={true}
+      stickySectionHeadersEnabled
     />
   );
 };
