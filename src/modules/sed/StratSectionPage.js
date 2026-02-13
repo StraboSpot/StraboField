@@ -47,6 +47,17 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return image && image.title ? image.title : 'Untitled ' + (index + 1);
   };
 
+  const saveStratSection = async () => {
+    try {
+      await saveSedFeature(page.key, spot, stratSectionRef.current);
+      await stratSectionRef.current.resetForm();
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving strat section', e);
+    }
+  };
+
   const renderImageItem = (image) => {
     return (
       <ListItem
@@ -178,17 +189,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
         </ListItem>
       </View>
     );
-  };
-
-  const saveStratSection = async () => {
-    try {
-      await saveSedFeature(page.key, spot, stratSectionRef.current);
-      await stratSectionRef.current.resetForm();
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (e) {
-      console.log('Error saving strat section', e);
-    }
   };
 
   return (

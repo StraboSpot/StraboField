@@ -63,7 +63,6 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
     // setConfirmDeleteMessageVisible(false);
   };
 
-
   const handleOnChange = (text) => {
     if (!isEmpty(errorMessage)) setErrorMessage('');
     setDeleteProfileInputValue(text);

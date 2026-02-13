@@ -73,6 +73,12 @@ const TephraPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: null}));
   };
 
+  const updateOrder = () => {
+    setIsReorderingActive(false);
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
+  };
+
   const renderAttributeDetail = () => {
     const subpages = TEPHRA_SUBPAGES;
     return (
@@ -136,12 +142,6 @@ const TephraPage = ({isReadOnly, page}) => {
         </View>
       </View>
     );
-  };
-
-  const updateOrder = () => {
-    setIsReorderingActive(false);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
   };
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();

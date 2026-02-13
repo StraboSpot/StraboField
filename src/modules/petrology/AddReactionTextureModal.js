@@ -62,6 +62,12 @@ const AddReactionTextureModal = () => {
     });
   };
 
+  const saveReactionTexture = () => {
+    savePetFeature(petKey, spot, formRef.current);
+    formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) closeModal();
+  };
+
   const renderAddReactionTextureModalContent = () => {
     return (
       <ModalWrapper
@@ -127,12 +133,6 @@ const AddReactionTextureModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
-  };
-
-  const saveReactionTexture = () => {
-    savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) closeModal();
   };
 
   return renderAddReactionTextureModalContent();

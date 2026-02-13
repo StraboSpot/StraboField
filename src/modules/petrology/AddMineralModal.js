@@ -96,6 +96,13 @@ const AddMineralModal = () => {
     else setSelectedTypeIndex(i);
   };
 
+  const saveMineral = () => {
+    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
+    else savePetFeature(petKey, spot, formRef.current);
+    formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) onCloseModalPressed();
+  };
+
   const renderAddMineral = () => {
     tempValues = formRef.current?.values || {};
     return (
@@ -190,13 +197,6 @@ const AddMineralModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
-  };
-
-  const saveMineral = () => {
-    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
-    else savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
   return (

@@ -67,15 +67,6 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
   };
 
-  const renderCancelSaveButtons = () => {
-    return (
-      <View>
-        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
-      </View>
-    );
-  };
-
   const saveForm = async (currentForm) => {
     try {
       dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -117,6 +108,15 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     catch (e) {
       console.log('Error saving form data to Spot');
     }
+  };
+
+  const renderCancelSaveButtons = () => {
+    return (
+      <View>
+        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
+      </View>
+    );
   };
 
   return (

@@ -150,23 +150,6 @@ const SignUp = ({navigation}) => {
     return errors.map(error => `• ${error.trim()}`).join('\n');
   };
 
-  const renderButtons = () => {
-    return (
-      <>
-        <ActionButton
-          disabled={!isOnline.isInternetReachable}
-          onPress={signUp}
-          title={'Register'}
-        />
-        <OutlineButton
-          backgroundColor={SECONDARY_BACKGROUND_COLOR}
-          onPress={() => navigation.goBack()}
-          title={'Back to Log In'}
-        />
-      </>
-    );
-  };
-
   const signUp = async () => {
     console.log('ConnectedValue', userData.password.value);
     setIsLoading(true);
@@ -208,6 +191,23 @@ const SignUp = ({navigation}) => {
       setStatusMessage('Unable to create account.\nPlease check your internet connection and try again.');
       setStatusDialog(true);
     }
+  };
+
+  const renderButtons = () => {
+    return (
+      <>
+        <ActionButton
+          disabled={!isOnline.isInternetReachable}
+          onPress={signUp}
+          title={'Register'}
+        />
+        <OutlineButton
+          backgroundColor={SECONDARY_BACKGROUND_COLOR}
+          onPress={() => navigation.goBack()}
+          title={'Back to Log In'}
+        />
+      </>
+    );
   };
 
   return (

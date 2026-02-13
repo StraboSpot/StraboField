@@ -66,6 +66,22 @@ const AddFabricModal = () => {
     }
   };
 
+  const saveFabric = async () => {
+    try {
+      await formRef.current.submitForm();
+      const editedFabricData = showErrors(formRef.current);
+      console.log('Saving fabric data to Spot ...');
+      let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
+      editedFabricsData.push({...editedFabricData, id: getNewId()});
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: groupKey, value: editedFabricsData}));
+      if (SMALL_SCREEN) closeModal();
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
   const renderForm = (formProps) => {
     return (
       <>
@@ -151,22 +167,6 @@ const AddFabricModal = () => {
     return (
       <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
     );
-  };
-
-  const saveFabric = async () => {
-    try {
-      await formRef.current.submitForm();
-      const editedFabricData = showErrors(formRef.current);
-      console.log('Saving fabric data to Spot ...');
-      let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
-      editedFabricsData.push({...editedFabricData, id: getNewId()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: groupKey, value: editedFabricsData}));
-      if (SMALL_SCREEN) closeModal();
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-    }
   };
 
   return renderNotebookFabricModalContent();

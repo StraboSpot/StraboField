@@ -73,6 +73,11 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     else await setOfflineMapTiles(customMap);
   };
 
+  const setMap = async (map) => {
+    await setBasemap(map.id);
+    SMALL_SCREEN && onTouchOutside();
+  };
+
   const renderCustomMapItem = (customMap) => {
     return (
       <ListItem
@@ -167,6 +172,62 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     );
   };
 
+  const renderDefaultMapItem = map => (
+    <ListItem
+      containerStyle={[
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]}
+      key={map.id + 'DefaultMapItem'}
+      onPress={() => isInternetReachable ? setMap(map) : setOfflineMapTiles(map)}
+    >
+      <ListItem.Content>
+        <ListItem.Title style={[
+          commonStyles.listItemTitle,
+          SMALL_SCREEN && {
+            fontSize: 16,
+            fontWeight: '500',
+          },
+        ]}>{map.title || map.name}</ListItem.Title>
+        {!isInternetReachable
+          && <ListItem.Subtitle style={{paddingTop: 5}}>({map.count} tiles)</ListItem.Subtitle>}
+      </ListItem.Content>
+      {currentBasemap && currentBasemap.id && map.id === currentBasemap.id
+        && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
+    </ListItem>
+  );
+
+  const renderMapOverlayItem = (customMap, isOffline) => (
+    <ListItem
+      containerStyle={[
+        overlayStyles.overlayContent,
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]}
+      key={customMap.id + 'CustomOverlayItem' + (isOffline ? 'Offline' : '')}
+    >
+      <ListItem.Content>
+        <ListItem.Title style={[
+          commonStyles.listItemTitle,
+          SMALL_SCREEN && {
+            fontSize: 16,
+            fontWeight: '500',
+          },
+        ]}>{customMap.title || customMap.name} -
+          ({customMap.source})</ListItem.Title>
+        {!isInternetReachable
+          && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles)</ListItem.Subtitle>}
+      </ListItem.Content>
+      <SwitchWrapper onValueChange={val => setCustomMapSwitchValue(val, customMap)} value={customMap.isViewable}/>
+    </ListItem>
+  );
+
   const renderOfflineCustomMapItem = (customMap) => {
     return (
       <ListItem
@@ -235,67 +296,6 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
         />
       </View>
     );
-  };
-
-  const renderDefaultMapItem = map => (
-    <ListItem
-      containerStyle={[
-        SMALL_SCREEN && {
-          minHeight: 50,
-          paddingVertical: 15,
-          paddingHorizontal: 20,
-        },
-      ]}
-      key={map.id + 'DefaultMapItem'}
-      onPress={() => isInternetReachable ? setMap(map) : setOfflineMapTiles(map)}
-    >
-      <ListItem.Content>
-        <ListItem.Title style={[
-          commonStyles.listItemTitle,
-          SMALL_SCREEN && {
-            fontSize: 16,
-            fontWeight: '500',
-          },
-        ]}>{map.title || map.name}</ListItem.Title>
-        {!isInternetReachable
-          && <ListItem.Subtitle style={{paddingTop: 5}}>({map.count} tiles)</ListItem.Subtitle>}
-      </ListItem.Content>
-      {currentBasemap && currentBasemap.id && map.id === currentBasemap.id
-        && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
-    </ListItem>
-  );
-
-  const renderMapOverlayItem = (customMap, isOffline) => (
-    <ListItem
-      containerStyle={[
-        overlayStyles.overlayContent,
-        SMALL_SCREEN && {
-          minHeight: 50,
-          paddingVertical: 15,
-          paddingHorizontal: 20,
-        },
-      ]}
-      key={customMap.id + 'CustomOverlayItem' + (isOffline ? 'Offline' : '')}
-    >
-      <ListItem.Content>
-        <ListItem.Title style={[
-          commonStyles.listItemTitle,
-          SMALL_SCREEN && {
-            fontSize: 16,
-            fontWeight: '500',
-          },
-        ]}>{customMap.title || customMap.name} -
-          ({customMap.source})</ListItem.Title>
-        {!isInternetReachable
-          && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles)</ListItem.Subtitle>}
-      </ListItem.Content>
-      <SwitchWrapper onValueChange={val => setCustomMapSwitchValue(val, customMap)} value={customMap.isViewable}/>
-    </ListItem>
-  );
-
-  const setMap = async (map) => {
-    await setBasemap(map.id);
-    SMALL_SCREEN && onTouchOutside();
   };
 
   return (

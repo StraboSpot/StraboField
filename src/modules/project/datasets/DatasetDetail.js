@@ -66,6 +66,13 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
+  const saveDataset = () => {
+    let datasetCopy = JSON.parse(JSON.stringify(dataset));
+    datasetCopy = {...datasetCopy, name: datasetName};
+    dispatch(updatedDatasetProperties(datasetCopy));
+    closeDetailView();
+  };
+
   const renderDeleteConfirmationModal = () => {
     return (
       <DeleteConformationDialogBox
@@ -276,13 +283,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         </ListItem.Content>
       </ListItem>
     );
-  };
-
-  const saveDataset = () => {
-    let datasetCopy = JSON.parse(JSON.stringify(dataset));
-    datasetCopy = {...datasetCopy, name: datasetName};
-    dispatch(updatedDatasetProperties(datasetCopy));
-    closeDetailView();
   };
 
   return (

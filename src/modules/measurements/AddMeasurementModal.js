@@ -136,12 +136,6 @@ const AddMeasurementModal = ({onPress}) => {
 
   }, [compassMeasurementTypes, templates]);
 
-  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
-
-  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
-
   const equalsIgnoreOrder = (a, b) => {
     if (a.length !== b.length) return false;
     const uniqueValues = new Set([...a, ...b]);
@@ -152,6 +146,12 @@ const AddMeasurementModal = ({onPress}) => {
     }
     return true;
   };
+
+  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
+
+  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
 
   const onCloseButton = () => {
     if (choicesViewKey || assocChoicesViewKey) {
@@ -184,6 +184,134 @@ const AddMeasurementModal = ({onPress}) => {
   const onSetChoicesViewKey = (key) => {
     setChoicesViewKey(key);
     setAssocChoicesViewKey(null);
+  };
+
+  const saveMeasurement = async () => {
+    const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
+    && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
+      : measurementTypeForForm;
+    // If plane with associated line copy label from plane data to line data
+    if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
+      if (formRef.current?.values?.label) {
+        formRef.current.setFieldValue('associated_orientation[0].label', formRef.current.values.label);
+      }
+    }
+    try {
+      await formRef.current.submitForm();
+      let editedMeasurementData = showErrors(formRef.current);
+      // If plane with associated line validate associated line data
+      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
+        validateForm({
+          formName: [groupKey, MEASUREMENT_KEYS.LINEAR],
+          values: editedMeasurementData.associated_orientation[0],
+        });
+      }
+      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
+        : spot;
+      let editedMeasurementsData = spotToUpdate.properties.orientation_data
+        ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
+
+      // If already a measurement but adding a new associated measurement
+      if (isSelectedAttitude) {
+        const newAssocMeasurement = JSON.parse(JSON.stringify(editedMeasurementData));
+        editedMeasurementData = JSON.parse(JSON.stringify(selectedAttributes[0]));
+        if (!editedMeasurementData.associated_orientation) editedMeasurementData.associated_orientation = [];
+        editedMeasurementData.associated_orientation.push(newAssocMeasurement);
+      }
+      // If adding planar with an associated measurement from the Quick Entry Modal
+      else if (editedMeasurementData.associated_orientation) {
+        editedMeasurementData.associated_orientation[0].id = getNewUUID();
+        editedMeasurementData.associated_orientation[0].type = MEASUREMENT_KEYS.LINEAR;
+      }
+
+      // If multiple templates then make all linear measurements associated to every planar and tabular measurement
+      if (relevantTemplates.length > 1) {
+        if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR || isSelectedAttitude) {
+          let planarTabularTemplates = getPlanarTemplates(relevantTemplates);
+          let linearTemplates = getLinearTemplates(relevantTemplates);
+          // If already a measurement but adding a new associated measurements with multiple templates
+          // NOTE Right now the code in the first 'If' below is unreachable as relevantTemplates are always
+          // empty if there is a selectedAttitude
+          if (isSelectedAttitude) {
+            const newAssocMeasurement = editedMeasurementData.associated_orientation.splice(-1, 1)[0];
+            planarTabularTemplates.forEach((t) => {
+              editedMeasurementData.associated_orientation.push(
+                {...t.values, ...newAssocMeasurement, id: getNewUUID()});
+            });
+            linearTemplates.forEach((t) => {
+              editedMeasurementData.associated_orientation.push(
+                {...t.values, ...newAssocMeasurement, id: getNewUUID()});
+            });
+            editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
+            editedMeasurementsData.push(editedMeasurementData);
+          }
+          // If an associated measurement from the Quick Entry Modal with multiple templates
+          else {
+            if (planarTabularTemplates.length === 0) planarTabularTemplates = [editedMeasurementData];
+            if (linearTemplates.length === 0) linearTemplates = editedMeasurementData.associated_orientation;
+            planarTabularTemplates.forEach((t) => {
+              const associatedMeasurements = linearTemplates.map(
+                lT => ({...lT.values, ...editedMeasurementData.associated_orientation[0], id: getNewUUID()}));
+              editedMeasurementsData.push(
+                {
+                  ...t.values,
+                  ...editedMeasurementData,
+                  id: getNewUUID(),
+                  associated_orientation: associatedMeasurements,
+                });
+            });
+          }
+        }
+        else {
+          relevantTemplates.forEach(
+            t => editedMeasurementsData.push({...t.values, ...editedMeasurementData, id: getNewUUID()}));
+        }
+        console.log('editedMeasurementData', editedMeasurementsData);
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
+        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
+      }
+      else {
+        if (isSelectedAttitude) {
+          editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
+          editedMeasurementsData.push(editedMeasurementData);
+        }
+        else editedMeasurementsData.push({...editedMeasurementData, id: getNewUUID()});
+        console.log('editedMeasurementData', editedMeasurementData);
+        console.log('Saving Measurement data to Spot ...', editedMeasurementsData);
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
+        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
+      }
+      if (isSelectedAttitude) {
+        dispatch(setSelectedAttributes([editedMeasurementData]));
+        onCloseButton();
+      }
+      toast.show('Measurement Saved!', {type: 'success', duration: 2000});
+      SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
+  const setMeasurements = (data) => {
+    const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
+    && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
+      : measurementTypeForForm;
+    const planarCompassFields = ['strike', 'dip_direction', 'dip', 'quality', 'unix_timestamp'];
+    const linearCompassFields = ['trend', 'plunge', 'rake', 'quality', 'unix_timestamp'];
+    const compassFields = measurementTypeForForm === MEASUREMENT_KEYS.PLANAR ? planarCompassFields
+      : linearCompassFields;
+    compassFields.forEach((compassFieldKey) => {
+      formRef.current.setFieldValue(compassFieldKey,
+        isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
+    });
+    if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
+      linearCompassFields.forEach((compassFieldKey) => {
+        formRef.current.setFieldValue('associated_orientation[0]' + [compassFieldKey],
+          isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
+      });
+    }
+    saveMeasurement().catch(console.error);
   };
 
   const renderForm = (formProps) => {
@@ -351,134 +479,6 @@ const AddMeasurementModal = ({onPress}) => {
       }}
       />
     );
-  };
-
-  const saveMeasurement = async () => {
-    const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
-    && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
-      : measurementTypeForForm;
-    // If plane with associated line copy label from plane data to line data
-    if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      if (formRef.current?.values?.label) {
-        formRef.current.setFieldValue('associated_orientation[0].label', formRef.current.values.label);
-      }
-    }
-    try {
-      await formRef.current.submitForm();
-      let editedMeasurementData = showErrors(formRef.current);
-      // If plane with associated line validate associated line data
-      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
-        validateForm({
-          formName: [groupKey, MEASUREMENT_KEYS.LINEAR],
-          values: editedMeasurementData.associated_orientation[0],
-        });
-      }
-      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
-        : spot;
-      let editedMeasurementsData = spotToUpdate.properties.orientation_data
-        ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
-
-      // If already a measurement but adding a new associated measurement
-      if (isSelectedAttitude) {
-        const newAssocMeasurement = JSON.parse(JSON.stringify(editedMeasurementData));
-        editedMeasurementData = JSON.parse(JSON.stringify(selectedAttributes[0]));
-        if (!editedMeasurementData.associated_orientation) editedMeasurementData.associated_orientation = [];
-        editedMeasurementData.associated_orientation.push(newAssocMeasurement);
-      }
-      // If adding planar with an associated measurement from the Quick Entry Modal
-      else if (editedMeasurementData.associated_orientation) {
-        editedMeasurementData.associated_orientation[0].id = getNewUUID();
-        editedMeasurementData.associated_orientation[0].type = MEASUREMENT_KEYS.LINEAR;
-      }
-
-      // If multiple templates then make all linear measurements associated to every planar and tabular measurement
-      if (relevantTemplates.length > 1) {
-        if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR || isSelectedAttitude) {
-          let planarTabularTemplates = getPlanarTemplates(relevantTemplates);
-          let linearTemplates = getLinearTemplates(relevantTemplates);
-          // If already a measurement but adding a new associated measurements with multiple templates
-          // NOTE Right now the code in the first 'If' below is unreachable as relevantTemplates are always
-          // empty if there is a selectedAttitude
-          if (isSelectedAttitude) {
-            const newAssocMeasurement = editedMeasurementData.associated_orientation.splice(-1, 1)[0];
-            planarTabularTemplates.forEach((t) => {
-              editedMeasurementData.associated_orientation.push(
-                {...t.values, ...newAssocMeasurement, id: getNewUUID()});
-            });
-            linearTemplates.forEach((t) => {
-              editedMeasurementData.associated_orientation.push(
-                {...t.values, ...newAssocMeasurement, id: getNewUUID()});
-            });
-            editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-            editedMeasurementsData.push(editedMeasurementData);
-          }
-          // If an associated measurement from the Quick Entry Modal with multiple templates
-          else {
-            if (planarTabularTemplates.length === 0) planarTabularTemplates = [editedMeasurementData];
-            if (linearTemplates.length === 0) linearTemplates = editedMeasurementData.associated_orientation;
-            planarTabularTemplates.forEach((t) => {
-              const associatedMeasurements = linearTemplates.map(
-                lT => ({...lT.values, ...editedMeasurementData.associated_orientation[0], id: getNewUUID()}));
-              editedMeasurementsData.push(
-                {
-                  ...t.values,
-                  ...editedMeasurementData,
-                  id: getNewUUID(),
-                  associated_orientation: associatedMeasurements,
-                });
-            });
-          }
-        }
-        else {
-          relevantTemplates.forEach(
-            t => editedMeasurementsData.push({...t.values, ...editedMeasurementData, id: getNewUUID()}));
-        }
-        console.log('editedMeasurementData', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
-      }
-      else {
-        if (isSelectedAttitude) {
-          editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-          editedMeasurementsData.push(editedMeasurementData);
-        }
-        else editedMeasurementsData.push({...editedMeasurementData, id: getNewUUID()});
-        console.log('editedMeasurementData', editedMeasurementData);
-        console.log('Saving Measurement data to Spot ...', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
-      }
-      if (isSelectedAttitude) {
-        dispatch(setSelectedAttributes([editedMeasurementData]));
-        onCloseButton();
-      }
-      toast.show('Measurement Saved!', {type: 'success', duration: 2000});
-      SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-    }
-  };
-
-  const setMeasurements = (data) => {
-    const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
-    && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
-      : measurementTypeForForm;
-    const planarCompassFields = ['strike', 'dip_direction', 'dip', 'quality', 'unix_timestamp'];
-    const linearCompassFields = ['trend', 'plunge', 'rake', 'quality', 'unix_timestamp'];
-    const compassFields = measurementTypeForForm === MEASUREMENT_KEYS.PLANAR ? planarCompassFields
-      : linearCompassFields;
-    compassFields.forEach((compassFieldKey) => {
-      formRef.current.setFieldValue(compassFieldKey,
-        isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
-    });
-    if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      linearCompassFields.forEach((compassFieldKey) => {
-        formRef.current.setFieldValue('associated_orientation[0]' + [compassFieldKey],
-          isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
-      });
-    }
-    saveMeasurement().catch(console.error);
   };
 
   return renderMeasurementModalContent();

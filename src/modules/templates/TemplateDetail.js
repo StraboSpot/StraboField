@@ -43,6 +43,16 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
+  const saveTemplateAndGo = async () => {
+    console.log('Saving', templateType, templateName, formRef.current.values);
+    try {
+      await saveTemplate(formRef.current, templateKey, template, templateName);
+      goBack();
+    }
+    catch (error) {
+    }
+  };
+
   const renderDeleteConfirmationModal = () => {
     return (
       <DeleteConformationDialogBox
@@ -78,16 +88,6 @@ const TemplateDetail = ({goBack, template, templateType}) => {
         </ListItem>
       </View>
     );
-  };
-
-  const saveTemplateAndGo = async () => {
-    console.log('Saving', templateType, templateName, formRef.current.values);
-    try {
-      await saveTemplate(formRef.current, templateKey, template, templateName);
-      goBack();
-    }
-    catch (error) {
-    }
   };
 
   return (

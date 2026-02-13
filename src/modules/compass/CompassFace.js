@@ -35,6 +35,17 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
     }
   }, [trend]);
 
+  // Interpolated angles
+  const strikeSpin = strikeSpinValue.interpolate({
+    inputRange: [0, strike],
+    outputRange: ['0deg', strike + 'deg'],
+  });
+
+  const trendSpin = trendSpinValue.interpolate({
+    inputRange: [0, trend],
+    outputRange: ['0deg', trend + 'deg'],
+  });
+
   const renderCompassSymbols = () => {
     const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
     const planarOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
@@ -70,17 +81,6 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
       />
     );
   };
-
-  // Interpolated angles
-  const strikeSpin = strikeSpinValue.interpolate({
-    inputRange: [0, strike],
-    outputRange: ['0deg', strike + 'deg'],
-  });
-
-  const trendSpin = trendSpinValue.interpolate({
-    inputRange: [0, trend],
-    outputRange: ['0deg', trend + 'deg'],
-  });
 
   return (
     <View style={compassStyles.compassImageContainer}>

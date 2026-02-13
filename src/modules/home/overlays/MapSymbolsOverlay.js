@@ -44,6 +44,32 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
 
   const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
 
+  const toggleFeatureTypesOff = (featureType) => {
+    let featureTypesOffCopy = [...featureTypesOff];
+    const i = featureTypesOffCopy.indexOf(featureType);
+    if (i === -1) featureTypesOffCopy.push(featureType);
+    else featureTypesOffCopy.splice(i, 1);
+    dispatch(setFeatureTypesOff(featureTypesOffCopy));
+  };
+
+  const toggleGeometryTypesOff = (geometryType) => {
+    let geometryTypesOffCopy = [...geometryTypesOff];
+    const i = geometryTypesOffCopy.indexOf(geometryType);
+    if (i === -1) geometryTypesOffCopy.push(geometryType);
+    else geometryTypesOffCopy.splice(i, 1);
+    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
+  };
+
+  const toggleLabelTypeOn = () => {
+    if (labelTypeOn) dispatch(setLabelTypeOn(undefined));
+    else dispatch(setLabelTypeOn('dip'));
+  };
+
+  const toggleShowTagColor = () => {
+    if (tagTypeForColor) dispatch(setTagTypeForColor(undefined));
+    else dispatch(setTagTypeForColor('geologic_unit'));
+  };
+
   const renderGeometryTypesList = ({item}) => {
     return (
       <ListItem containerStyle={[
@@ -94,32 +120,6 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
         </>
       </ListItem>
     );
-  };
-
-  const toggleFeatureTypesOff = (featureType) => {
-    let featureTypesOffCopy = [...featureTypesOff];
-    const i = featureTypesOffCopy.indexOf(featureType);
-    if (i === -1) featureTypesOffCopy.push(featureType);
-    else featureTypesOffCopy.splice(i, 1);
-    dispatch(setFeatureTypesOff(featureTypesOffCopy));
-  };
-
-  const toggleGeometryTypesOff = (geometryType) => {
-    let geometryTypesOffCopy = [...geometryTypesOff];
-    const i = geometryTypesOffCopy.indexOf(geometryType);
-    if (i === -1) geometryTypesOffCopy.push(geometryType);
-    else geometryTypesOffCopy.splice(i, 1);
-    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
-  };
-
-  const toggleLabelTypeOn = () => {
-    if (labelTypeOn) dispatch(setLabelTypeOn(undefined));
-    else dispatch(setLabelTypeOn('dip'));
-  };
-
-  const toggleShowTagColor = () => {
-    if (tagTypeForColor) dispatch(setTagTypeForColor(undefined));
-    else dispatch(setTagTypeForColor('geologic_unit'));
   };
 
   return (

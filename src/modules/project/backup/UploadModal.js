@@ -98,6 +98,32 @@ const UploadModal = ({closeModal, isVisible}) => {
     }
   };
 
+  const uploadImagesOnly = async () => {
+    try {
+      dispatch(clearedStatusMessages());
+      Platform.OS !== 'web' && KeepAwake.activate();
+      setModalTitle('Uploading');
+      setUploadState('uploading');
+      const imageStatus = await initializeImageUpload();
+      setImageUploadStatus(imageStatus);
+      if (imageStatus.imagesNotFound) {
+        setUploadState('error');
+        setModalTitle('Uploaded With Errors!');
+        setErrorMesssage(
+          `There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
+      }
+      else {
+        setUploadState('complete');
+        setModalTitle('All Uploaded!');
+      }
+    }
+    catch (err) {
+      console.error('Error uploading', err);
+      alert('Upload Failed!', err.toString());
+      closeModal();
+    }
+  };
+
   const renderErrorView = () => {
     return (
       <View style={{padding: 10}}>
@@ -216,32 +242,6 @@ const UploadModal = ({closeModal, isVisible}) => {
         </View>
       </View>
     );
-  };
-
-  const uploadImagesOnly = async () => {
-    try {
-      dispatch(clearedStatusMessages());
-      Platform.OS !== 'web' && KeepAwake.activate();
-      setModalTitle('Uploading');
-      setUploadState('uploading');
-      const imageStatus = await initializeImageUpload();
-      setImageUploadStatus(imageStatus);
-      if (imageStatus.imagesNotFound) {
-        setUploadState('error');
-        setModalTitle('Uploaded With Errors!');
-        setErrorMesssage(
-          `There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
-      }
-      else {
-        setUploadState('complete');
-        setModalTitle('All Uploaded!');
-      }
-    }
-    catch (err) {
-      console.error('Error uploading', err);
-      alert('Upload Failed!', err.toString());
-      closeModal();
-    }
   };
 
   return (

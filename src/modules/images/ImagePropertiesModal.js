@@ -16,21 +16,6 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
 
   const formRef = useRef(null);
 
-  const renderFormFields = () => {
-    const formName = ['general', 'images'];
-    console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
-    return (
-      <Formik
-        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-        initialStatus={{formName: formName}}
-        initialValues={image}
-        innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-      />
-    );
-  };
-
   const saveFormAndGo = async () => {
     try {
       await formRef.current.submitForm();
@@ -46,6 +31,21 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       console.log('Error submitting form', e);
       return Promise.reject();
     }
+  };
+
+  const renderFormFields = () => {
+    const formName = ['general', 'images'];
+    console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
+    return (
+      <Formik
+        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+        initialStatus={{formName: formName}}
+        initialValues={image}
+        innerRef={formRef}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: formName, values: values})}
+      />
+    );
   };
 
   return (

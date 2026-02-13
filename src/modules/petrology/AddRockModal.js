@@ -95,6 +95,19 @@ const AddRockModal = ({modalKey}) => {
     }
   };
 
+  const saveRock = async () => {
+    if (areMultipleTemplates) {
+      if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+      else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+    }
+    else {
+      if (groupKey === 'pet') await savePetFeature(pageKey, spot, formRef.current);
+      else if (groupKey === 'sed') await saveSedFeature(pageKey, spot, formRef.current);
+      dispatch(setModalValues({...formRef.current.values, id: getNewId()}));
+    }
+    if (SMALL_SCREEN) onCloseModalPressed();
+  };
+
   const renderAddRock = () => {
     return (
       <>
@@ -209,19 +222,6 @@ const AddRockModal = ({modalKey}) => {
     return (
       <Form {...{formName: [groupKey, rockKey], surveyFragment: relevantFields, ...formProps}}/>
     );
-  };
-
-  const saveRock = async () => {
-    if (areMultipleTemplates) {
-      if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
-      else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
-    }
-    else {
-      if (groupKey === 'pet') await savePetFeature(pageKey, spot, formRef.current);
-      else if (groupKey === 'sed') await saveSedFeature(pageKey, spot, formRef.current);
-      dispatch(setModalValues({...formRef.current.values, id: getNewId()}));
-    }
-    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
   return renderAddRockModalContent();

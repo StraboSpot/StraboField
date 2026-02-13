@@ -75,6 +75,24 @@ const AddEarthquakeModal = () => {
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
+  const saveEarthquake = async () => {
+    try {
+      await formRef.current.submitForm();
+      const editedEarthquakeData = showErrors(formRef.current);
+      console.log('Saving earthquake data to Spot ...');
+      let editedEarthquakesData = spot.properties.earthquakes
+        ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
+        : [];
+      editedEarthquakesData.push({...editedEarthquakeData, id: getNewUUID()});
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: pageKey, value: editedEarthquakesData}));
+      if (SMALL_SCREEN) closeModal();
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
   const renderForm = (formProps) => {
     const mainButtonsKeysRelevant1 = mainButtonsKeys1.filter((k) => {
       const field = survey.find(f => f.name === k);
@@ -189,24 +207,6 @@ const AddEarthquakeModal = () => {
     return (
       <Form {...{formName: [groupKey, pageKey], surveyFragment: relevantFields, ...formProps}}/>
     );
-  };
-
-  const saveEarthquake = async () => {
-    try {
-      await formRef.current.submitForm();
-      const editedEarthquakeData = showErrors(formRef.current);
-      console.log('Saving earthquake data to Spot ...');
-      let editedEarthquakesData = spot.properties.earthquakes
-        ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
-        : [];
-      editedEarthquakesData.push({...editedEarthquakeData, id: getNewUUID()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: pageKey, value: editedEarthquakesData}));
-      if (SMALL_SCREEN) closeModal();
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-    }
   };
 
   return renderNotebookEarthquakeModal();

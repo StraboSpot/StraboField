@@ -67,6 +67,23 @@ const AddThreeDStructureModal = () => {
     }
   };
 
+  const save3DStructure = async () => {
+    try {
+      await formRef.current.submitForm();
+      const edited3DStructureData = showErrors(formRef.current);
+      console.log('Saving 3D Structure data to Spot ...');
+      let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
+        : [];
+      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
+      if (SMALL_SCREEN) closeModal();
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
   const renderForm = (formProps) => {
     if (formProps && formProps.status && formProps.status.formName) {
       return (
@@ -165,23 +182,6 @@ const AddThreeDStructureModal = () => {
       return (
         <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
       );
-    }
-  };
-
-  const save3DStructure = async () => {
-    try {
-      await formRef.current.submitForm();
-      const edited3DStructureData = showErrors(formRef.current);
-      console.log('Saving 3D Structure data to Spot ...');
-      let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
-        : [];
-      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
-      if (SMALL_SCREEN) closeModal();
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
     }
   };
 

@@ -113,6 +113,17 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     await checkSpotName(value);
   };
 
+  const setToCurrentLocation = async () => {
+    const currentLocation = await getCurrentLocation();
+    let editedSpot = JSON.parse(JSON.stringify(spot));
+    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
+    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
+    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
+    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+    dispatch(editedOrCreatedSpot(editedSpot));
+    dispatch(setSelectedSpot(editedSpot));
+  };
+
   const renderCoordsText = () => {
     return (
       <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
@@ -147,17 +158,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
         </View>
       </View>
     );
-  };
-
-  const setToCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
-    let editedSpot = JSON.parse(JSON.stringify(spot));
-    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
-    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
-    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
-    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
-    dispatch(editedOrCreatedSpot(editedSpot));
-    dispatch(setSelectedSpot(editedSpot));
   };
 
   return (

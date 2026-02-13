@@ -29,8 +29,13 @@ const useMapView = () => {
   const toast = useToast();
   const {convertImagePixelsToLatLong, getBoundsPadded} = useMapCoords();
 
+  /* Internal Functions */
+
   const isOnImageBasemap = feature => feature.properties?.image_basemap;
+
   const isOnStratSection = feature => feature.properties?.strat_section_id;
+
+  /* Exported Functions */
 
   // Evaluate and return appropriate center coordinates
   const getCenterCoordinates = () => {

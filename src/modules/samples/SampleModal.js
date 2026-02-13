@@ -126,6 +126,73 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     else formRef.current?.setFieldValue(orientedKey, 'no');
   };
 
+  const saveForm = async (currentForm) => {
+    try {
+      setIsLoading(true);
+      let newSample = currentForm.values;
+      const date = new Date().toISOString();
+
+      dispatch(setLoadingStatus({view: 'home', bool: true}));
+      newSample.id = getNewId();
+      newSample.collection_date = date;
+      newSample.collection_time = date;
+
+      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+        let samples = 'samples';
+        let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
+        pointSetAtCurrentLocation.properties[samples] = [newSample];
+        console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
+        dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
+        dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toastRef.current?.show(toastMsg, toastOptions);
+        setIsLoading(false);
+        await zoomToCurrentLocation();
+      }
+      else {
+        const samples = spot.properties?.samples
+          ? [...spot.properties.samples, newSample]
+          : [newSample];
+        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+        dispatch(editedSpotProperties({field: 'samples', value: samples}));
+        const updatedPreferences = {
+          ...preferences,
+          starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,
+        };
+        dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
+        const toastMsg = 'Sample Saved!';
+        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
+        toast.show(toastMsg, toastOptions);
+        setIsLoading(false);
+      }
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      await currentForm.resetForm();
+      if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
+
+      if (newSample.sample_id_name) {
+        const foundDuplicateName = await checkSampleName(newSample.sample_id_name);
+        if (foundDuplicateName) {
+          const toastMsg = 'Warning! Sample Name has Already Been Used.';
+          const toastOptions = {duration: 2000, type: 'warning'};
+          await sleep(2000);
+          if (SMALL_SCREEN && toastRef) toastRef.current?.show(toastMsg, toastOptions);
+          else toast.show(toastMsg, toastOptions);
+          if (Platform.OS === 'web') await sleep(3000);
+        }
+      }
+    }
+    catch (err) {
+      setIsLoading(false);
+      console.error('Error saving Sample', err);
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      const toastMsg = `Error Saving Sample! \n${err}`;
+      const toastOptions = {duration: 2000, type: 'danger'};
+      if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
+      else toast.show(toastMsg, toastOptions);
+    }
+  };
+
   const renderForm = (formProps) => {
     return (
       <>
@@ -207,73 +274,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
-  };
-
-  const saveForm = async (currentForm) => {
-    try {
-      setIsLoading(true);
-      let newSample = currentForm.values;
-      const date = new Date().toISOString();
-
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
-      newSample.id = getNewId();
-      newSample.collection_date = date;
-      newSample.collection_time = date;
-
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
-        let samples = 'samples';
-        let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
-        pointSetAtCurrentLocation.properties[samples] = [newSample];
-        console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
-        dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
-        const toastMsg = 'Sample Saved!';
-        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
-        toastRef.current?.show(toastMsg, toastOptions);
-        setIsLoading(false);
-        await zoomToCurrentLocation();
-      }
-      else {
-        const samples = spot.properties?.samples
-          ? [...spot.properties.samples, newSample]
-          : [newSample];
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'samples', value: samples}));
-        const updatedPreferences = {
-          ...preferences,
-          starting_sample_number: namePostfix ? startingNumber : startingNumber + 1,
-        };
-        dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
-        const toastMsg = 'Sample Saved!';
-        const toastOptions = {duration: 2000, type: 'success', placement: 'top'};
-        toast.show(toastMsg, toastOptions);
-        setIsLoading(false);
-      }
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      await currentForm.resetForm();
-      if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
-
-      if (newSample.sample_id_name) {
-        const foundDuplicateName = await checkSampleName(newSample.sample_id_name);
-        if (foundDuplicateName) {
-          const toastMsg = 'Warning! Sample Name has Already Been Used.';
-          const toastOptions = {duration: 2000, type: 'warning'};
-          await sleep(2000);
-          if (SMALL_SCREEN && toastRef) toastRef.current?.show(toastMsg, toastOptions);
-          else toast.show(toastMsg, toastOptions);
-          if (Platform.OS === 'web') await sleep(3000);
-        }
-      }
-    }
-    catch (err) {
-      setIsLoading(false);
-      console.error('Error saving Sample', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      const toastMsg = `Error Saving Sample! \n${err}`;
-      const toastOptions = {duration: 2000, type: 'danger'};
-      if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
-      else toast.show(toastMsg, toastOptions);
-    }
   };
 
   return (

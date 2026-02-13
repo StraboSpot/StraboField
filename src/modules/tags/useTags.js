@@ -247,25 +247,6 @@ const useTags = () => {
     return validSpots.length;
   };
 
-  const renderTagInfo = () => {
-    let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
-    if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
-    const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
-    const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
-    let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
-      if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
-      else return acc;
-    }, []);
-    const notes = selectedTag.notes ? truncateText(selectedTag.notes, 100) : undefined;
-    return (
-      <View style={tagsStyles.sectionContainer}>
-        {<Text style={tagsStyles.listText}>{toTitleCase(type)}{subType && ' - ' + subType.toUpperCase()}</Text>}
-        {!isEmpty(rockUnitString) && <Text style={tagsStyles.listText}>{rockUnitString}</Text>}
-        {notes && <Text style={tagsStyles.listText}>Notes: {notes}</Text>}
-      </View>
-    );
-  };
-
   const saveTag = (tagToSave) => {
     let updatedTags;
     if (!Array.isArray(tagToSave)) {
@@ -306,6 +287,25 @@ const useTags = () => {
     let tagCopy = JSON.parse(JSON.stringify(tag));
     tagCopy.continuousTagging = !tag.continuousTagging;
     saveTag(tagCopy);
+  };
+
+  const renderTagInfo = () => {
+    let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
+    if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
+    const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
+    const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
+    let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
+      if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
+      else return acc;
+    }, []);
+    const notes = selectedTag.notes ? truncateText(selectedTag.notes, 100) : undefined;
+    return (
+      <View style={tagsStyles.sectionContainer}>
+        {<Text style={tagsStyles.listText}>{toTitleCase(type)}{subType && ' - ' + subType.toUpperCase()}</Text>}
+        {!isEmpty(rockUnitString) && <Text style={tagsStyles.listText}>{rockUnitString}</Text>}
+        {notes && <Text style={tagsStyles.listText}>Notes: {notes}</Text>}
+      </View>
+    );
   };
 
   return {

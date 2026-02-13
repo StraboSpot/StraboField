@@ -20,11 +20,11 @@ const CompassDebug = ({compassData, matrixRotation}) => {
     <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
   );
 
+  const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
+
   const Row = ({children}) => (
     <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
   );
-
-  const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
 
   const renderCompassData = () => (
     <View style={compassStyles.compassDataGridContainer}>

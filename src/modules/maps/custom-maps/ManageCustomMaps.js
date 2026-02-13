@@ -50,6 +50,16 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     return name;
   };
 
+  const viewCustomMap = async (item) => {
+    let basemap = item;
+    if (item.overlay) {
+      updateMap({...basemap, isViewable: true});
+      if (DEFAULT_MAPS.every(map => currentBasemap.id !== map.id)) basemap = await setBasemap();
+    }
+    else basemap = await setBasemap(item.id);
+    basemap.bbox && setTimeout(() => zoomToCustomMap(basemap.bbox), 1000);
+  };
+
   const renderCustomMapListItem = (item) => {
     console.log(item);
     return (
@@ -76,16 +86,6 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
         <ListItem.Chevron/>
       </ListItem>
     );
-  };
-
-  const viewCustomMap = async (item) => {
-    let basemap = item;
-    if (item.overlay) {
-      updateMap({...basemap, isViewable: true});
-      if (DEFAULT_MAPS.every(map => currentBasemap.id !== map.id)) basemap = await setBasemap();
-    }
-    else basemap = await setBasemap(item.id);
-    basemap.bbox && setTimeout(() => zoomToCustomMap(basemap.bbox), 1000);
   };
 
   return (

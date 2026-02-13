@@ -48,6 +48,8 @@ const BackupProject = () => {
     setIsUploadModalVisible(true);
   };
 
+  const saveProject = () => checkForActiveDatasets('save');
+
   const renderUploadAndBackupButtons = () => {
     return (
       <>
@@ -67,8 +69,6 @@ const BackupProject = () => {
       </>
     );
   };
-
-  const saveProject = () => checkForActiveDatasets('save');
 
   return (
     <View style={{flex: 1}}>

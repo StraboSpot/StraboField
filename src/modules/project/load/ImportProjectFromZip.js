@@ -81,21 +81,6 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}));
   };
 
-  const renderImportComplete = () => {
-    return (
-      <View>
-        <View style={{padding: 10}}>
-          <Text style={{textAlign: 'center'}}>
-            Project has been saved to the app under MyStraboSpot --&gt; Projects on Device
-          </Text>
-        </View>
-        <View style={{alignItems: 'center'}}>
-          <OutlineButton onPress={goToSavedProjects} title={'Go to saved projects'}/>
-        </View>
-      </View>
-    );
-  };
-
   const saveToDevice = async () => {
     try {
       setIsLoading(true);
@@ -140,6 +125,21 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
         await saveToDevice();
       }
     }
+  };
+
+  const renderImportComplete = () => {
+    return (
+      <View>
+        <View style={{padding: 10}}>
+          <Text style={{textAlign: 'center'}}>
+            Project has been saved to the app under MyStraboSpot --&gt; Projects on Device
+          </Text>
+        </View>
+        <View style={{alignItems: 'center'}}>
+          <OutlineButton onPress={goToSavedProjects} title={'Go to saved projects'}/>
+        </View>
+      </View>
+    );
   };
 
   return (

@@ -105,6 +105,35 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     dispatch(setIsOfflineMapsModalVisible(true));
   };
 
+  const saveMapEdits = () => {
+    console.log('Map name saved!', selectedMap.name);
+    dispatch(editedOfflineMap(selectedMap));
+    setIsNameModalVisible(false);
+  };
+
+  const toggleOfflineMap = async (item) => {
+    if (item.isOfflineMapVisible) {
+      dispatch(setOfflineMapVisible({mapId: item.id, viewable: false}));
+      await setBasemap(item.id);
+    }
+    else {
+      dispatch(setOfflineMapVisible({mapId: item.id, viewable: true}));
+      const res = await switchToOfflineMap(item.id);
+      if (!isEmpty(res)) {
+        setSelectedMap(res);
+        setIsWarningModalVisible(true);
+      }
+      else zoomToCenterOfflineTile();
+    }
+  };
+
+  const updateMapsFromDevice = async () => {
+    setLoading(true);
+    await getSavedMapsFromDevice();
+    console.log('Got maps from device');
+    setLoading(false);
+  };
+
   const renderEditMapModal = () => {
     return (
       <TextInputModal
@@ -199,35 +228,6 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
         <Text>Selected map is not available for offline use. Switching to first available map: {selectedMap.name}</Text>
       </WarningModal>
     );
-  };
-
-  const saveMapEdits = () => {
-    console.log('Map name saved!', selectedMap.name);
-    dispatch(editedOfflineMap(selectedMap));
-    setIsNameModalVisible(false);
-  };
-
-  const toggleOfflineMap = async (item) => {
-    if (item.isOfflineMapVisible) {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: false}));
-      await setBasemap(item.id);
-    }
-    else {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: true}));
-      const res = await switchToOfflineMap(item.id);
-      if (!isEmpty(res)) {
-        setSelectedMap(res);
-        setIsWarningModalVisible(true);
-      }
-      else zoomToCenterOfflineTile();
-    }
-  };
-
-  const updateMapsFromDevice = async () => {
-    setLoading(true);
-    await getSavedMapsFromDevice();
-    console.log('Got maps from device');
-    setLoading(false);
   };
 
   return (

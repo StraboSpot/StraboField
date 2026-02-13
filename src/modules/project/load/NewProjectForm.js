@@ -27,22 +27,6 @@ const NewProjectForm = ({openMainMenuPanel}) => {
     magnetic_declination: 0,
   };
 
-  const renderFormFields = () => {
-    const formName = ['general', 'project_description'];
-    console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
-    return (
-      <Formik
-        component={formProps => Form({...formProps, formName: formName})}
-        enableReinitialize={false}
-        initialStatus={{formName: formName}}
-        initialValues={initialValues}
-        innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: formName, values: values})}
-      />
-    );
-  };
-
   const saveForm = async () => {
     try {
       await formRef.current.submitForm();
@@ -60,6 +44,22 @@ const NewProjectForm = ({openMainMenuPanel}) => {
       console.log('Error submitting form', e);
       return Promise.reject();
     }
+  };
+
+  const renderFormFields = () => {
+    const formName = ['general', 'project_description'];
+    console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
+    return (
+      <Formik
+        component={formProps => Form({...formProps, formName: formName})}
+        enableReinitialize={false}
+        initialStatus={{formName: formName}}
+        initialValues={initialValues}
+        innerRef={formRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
+      />
+    );
   };
 
   return (

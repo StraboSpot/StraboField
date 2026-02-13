@@ -31,6 +31,50 @@ const Geography = ({isReadOnly}) => {
     dispatch(setNotebookPageVisibleToPrev());
   };
 
+  const saveForm = async () => {
+    try {
+      await geomFormRef.current.submitForm();
+      const editedGeomFormData = showErrors(geomFormRef.current);
+      await formRef.current.submitForm();
+      let geographyProperties = showErrors(formRef.current);
+      console.log('Saving form data to Spot ...');
+      let geometry = spot.geometry;
+      if (isOnGeoMap(spot)) {
+        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
+          const point = turf.point([editedGeomFormData.longitude, editedGeomFormData.latitude]);
+          geometry = point.geometry;
+        }
+      }
+      else if (!isOnGeoMap(spot)) {
+        if (!isEmpty(editedGeomFormData.x_pixels) && !isEmpty(editedGeomFormData.y_pixels)) {
+          const point = turf.point([editedGeomFormData.x_pixels, editedGeomFormData.y_pixels]);
+          geometry = point.geometry;
+        }
+        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
+          geographyProperties.lng = editedGeomFormData.longitude;
+          geographyProperties.lat = editedGeomFormData.latitude;
+        }
+      }
+      const editedSpot = {geometry: geometry, properties: {...geographyProperties}, type: spot.type};
+      dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+      dispatch(editedOrCreatedSpot(editedSpot));
+      return Promise.resolve();
+    }
+    catch (e) {
+      console.log('Error submitting form', e);
+      return Promise.reject();
+    }
+  };
+
+  const saveFormAndGo = () => {
+    saveForm().then(() => {
+      console.log('Finished saving form data to Spot');
+      dispatch(setNotebookPageVisibleToPrev());
+    }, () => {
+      console.log('Error saving form data to Spot');
+    });
+  };
+
   const renderFormFields = () => {
     const formName = ['general', 'geography'];
     console.log('Rendering Form:', formName[0] + '.' + formName[1], 'with', spot.properties);
@@ -245,50 +289,6 @@ const Geography = ({isReadOnly}) => {
         </ListItem.Content>
       </ListItem>
     );
-  };
-
-  const saveForm = async () => {
-    try {
-      await geomFormRef.current.submitForm();
-      const editedGeomFormData = showErrors(geomFormRef.current);
-      await formRef.current.submitForm();
-      let geographyProperties = showErrors(formRef.current);
-      console.log('Saving form data to Spot ...');
-      let geometry = spot.geometry;
-      if (isOnGeoMap(spot)) {
-        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
-          const point = turf.point([editedGeomFormData.longitude, editedGeomFormData.latitude]);
-          geometry = point.geometry;
-        }
-      }
-      else if (!isOnGeoMap(spot)) {
-        if (!isEmpty(editedGeomFormData.x_pixels) && !isEmpty(editedGeomFormData.y_pixels)) {
-          const point = turf.point([editedGeomFormData.x_pixels, editedGeomFormData.y_pixels]);
-          geometry = point.geometry;
-        }
-        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
-          geographyProperties.lng = editedGeomFormData.longitude;
-          geographyProperties.lat = editedGeomFormData.latitude;
-        }
-      }
-      const editedSpot = {geometry: geometry, properties: {...geographyProperties}, type: spot.type};
-      dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
-      dispatch(editedOrCreatedSpot(editedSpot));
-      return Promise.resolve();
-    }
-    catch (e) {
-      console.log('Error submitting form', e);
-      return Promise.reject();
-    }
-  };
-
-  const saveFormAndGo = () => {
-    saveForm().then(() => {
-      console.log('Finished saving form data to Spot');
-      dispatch(setNotebookPageVisibleToPrev());
-    }, () => {
-      console.log('Error saving form data to Spot');
-    });
   };
 
   return (

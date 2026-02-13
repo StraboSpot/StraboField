@@ -78,59 +78,6 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     else dispatch(setModalVisible({modal: null}));
   };
 
-  const renderSectionHeader = (page) => {
-    return (
-      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
-      </Pressable>
-    );
-  };
-
-  const renderSections = () => {
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
-        <SectionList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => item}
-          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-          sections={sections}
-          stickySectionHeadersEnabled={true}
-        />
-      </View>
-    );
-  };
-
-  const renderTraceSurfaceFeatureForm = () => {
-    const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
-      ? ['general', 'trace'] : ['general', 'surface_feature'];
-    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
-    let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
-    if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
-      initialValues = {...initialValues, 'trace_feature': true};
-    }
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={pageTitle}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
-        <FlatList
-          ListHeaderComponent={
-            <Formik
-              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-              enableReinitialize={true}
-              initialStatus={{formName: formName}}
-              initialValues={initialValues}
-              innerRef={formRef}
-              onSubmit={onSubmitForm}
-              validate={values => validateForm({formName: formName, values: values})}
-            />
-          }
-        />
-      </View>
-    );
-  };
-
   const saveForm = async () => {
     try {
       await formRef.current.submitForm();
@@ -192,6 +139,59 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       );
     }
     else continueToggleTraceSurfaceFeature();
+  };
+
+  const renderSectionHeader = (page) => {
+    return (
+      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
+        <SectionDivider dividerText={page.label}/>
+      </Pressable>
+    );
+  };
+
+  const renderSections = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <SectionList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({item}) => item}
+          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+          sections={sections}
+          stickySectionHeadersEnabled={true}
+        />
+      </View>
+    );
+  };
+
+  const renderTraceSurfaceFeatureForm = () => {
+    const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
+      ? ['general', 'trace'] : ['general', 'surface_feature'];
+    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
+    let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
+    if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
+      initialValues = {...initialValues, 'trace_feature': true};
+    }
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader hideBackButton pageTitle={pageTitle}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
+        <FlatList
+          ListHeaderComponent={
+            <Formik
+              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+              enableReinitialize={true}
+              initialStatus={{formName: formName}}
+              initialValues={initialValues}
+              innerRef={formRef}
+              onSubmit={onSubmitForm}
+              validate={values => validateForm({formName: formName, values: values})}
+            />
+          }
+        />
+      </View>
+    );
   };
 
   return (

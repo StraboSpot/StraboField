@@ -126,43 +126,6 @@ const UserProfile = () => {
     }
   };
 
-  const renderProfileImageModal = () => {
-    return (
-      <ModalWrapper
-        closeModal={closeProfileImageModal}
-        headerTitle={'Edit Profile Image'}
-        isVisible={isImageDialogVisible}
-        overlayStyleOverride={{height: 'auto'}}
-        showActionButton={false}
-        showCancelButton={false}
-        showCloseButton
-      >
-        <View style={{alignItems: 'center'}}>
-          <UserProfileAvatar size={'xlarge'} tempUserProfileImageURI={tempUserProfileImage?.uri}/>
-        </View>
-        <OutlineButton
-          onPress={() => pickImageSource('gallery')}
-          title={'Gallery'}
-        />
-        <OutlineButton
-          onPress={() => pickImageSource('camera')}
-          title={'Camera'}
-        />
-        <OutlineButton
-          loading={isDeletingProfileImage}
-          onPress={removeProfileImage}
-          title={'Remove Profile Image'}
-        />
-        <OutlineButton
-          disabled={isEmpty(tempUserProfileImage)}
-          loading={isUploadingProfileImage}
-          onPress={saveImage}
-          title={'Upload New Profile Image'}
-        />
-      </ModalWrapper>
-    );
-  };
-
   const saveForm = async () => {
     try {
       const formCurrent = formRef.current;
@@ -206,6 +169,43 @@ const UserProfile = () => {
       closeProfileImageModal();
       setIsUploadingProfileImage(false);
     }
+  };
+
+  const renderProfileImageModal = () => {
+    return (
+      <ModalWrapper
+        closeModal={closeProfileImageModal}
+        headerTitle={'Edit Profile Image'}
+        isVisible={isImageDialogVisible}
+        overlayStyleOverride={{height: 'auto'}}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
+      >
+        <View style={{alignItems: 'center'}}>
+          <UserProfileAvatar size={'xlarge'} tempUserProfileImageURI={tempUserProfileImage?.uri}/>
+        </View>
+        <OutlineButton
+          onPress={() => pickImageSource('gallery')}
+          title={'Gallery'}
+        />
+        <OutlineButton
+          onPress={() => pickImageSource('camera')}
+          title={'Camera'}
+        />
+        <OutlineButton
+          loading={isDeletingProfileImage}
+          onPress={removeProfileImage}
+          title={'Remove Profile Image'}
+        />
+        <OutlineButton
+          disabled={isEmpty(tempUserProfileImage)}
+          loading={isUploadingProfileImage}
+          onPress={saveImage}
+          title={'Upload New Profile Image'}
+        />
+      </ModalWrapper>
+    );
   };
 
   return (

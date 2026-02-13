@@ -103,6 +103,12 @@ const BeddingPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: null}));
   };
 
+  const saveBeddingShared = async (formCurrent) => {
+    await saveSedFeature(page.key, spot, formCurrent);
+    await formCurrent.resetForm();
+    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  };
+
   const renderAttributeDetail = () => {
     return (
       <BasicPageDetail
@@ -185,12 +191,6 @@ const BeddingPage = ({isReadOnly, page}) => {
         />
       </View>
     );
-  };
-
-  const saveBeddingShared = async (formCurrent) => {
-    await saveSedFeature(page.key, spot, formCurrent);
-    await formCurrent.resetForm();
-    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();

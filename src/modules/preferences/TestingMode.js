@@ -38,7 +38,18 @@ const TestingMode = ({isTestingMode, textStyles}) => {
     setIsTestingModalVisible(value);
     dispatch(setTestingMode(value));
   };
-  
+
+  const userEntry = (value) => {
+    setPassword(value);
+  };
+
+  const verifyPassword = () => {
+    if (password === testingModePassword) {
+      setIsTestingModalVisible(false);
+    }
+    else setIsErrorMessage(true);
+  };
+
   const renderPrompt = () => (
     <ModalWrapper
       actionTitle={'Ok'}
@@ -60,17 +71,6 @@ const TestingMode = ({isTestingMode, textStyles}) => {
       />
     </ModalWrapper>
   );
-
-  const userEntry = (value) => {
-    setPassword(value);
-  };
-
-  const verifyPassword = () => {
-    if (password === testingModePassword) {
-      setIsTestingModalVisible(false);
-    }
-    else setIsErrorMessage(true);
-  };
 
   return (
     <>

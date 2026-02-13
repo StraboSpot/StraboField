@@ -512,11 +512,11 @@ const useSpots = () => {
       && spot1.properties.strat_section_id === spot2.properties.strat_section_id;
   };
 
+  const isOnStratSection = feature => feature.properties?.strat_section_id;
+
   const isStratInterval = (spot) => {
     return spot?.properties?.strat_section_id && spot?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
   };
-
-  const isOnStratSection = feature => feature.properties?.strat_section_id;
 
   const sortSpotsAlphabetically = (spotsToSort) => {
     spotsToSort.sort(

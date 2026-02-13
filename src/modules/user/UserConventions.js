@@ -103,24 +103,6 @@ const UserProfile = () => {
     setIsDownloading(false);
   };
 
-  const renderBulkUpdatesSection = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Convert Measurements'}/>
-        <OutlineButton
-          onPress={convertStrikeDipDirection}
-          title={'Convert Strike <-> Dip Direction'}
-        />
-        <View style={{paddingHorizontal: 10}}>
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
-            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
-            updated.
-          </Text>
-        </View>
-      </>
-    );
-  };
-
   const saveForm = async () => {
     try {
       const formCurrent = formRef.current;
@@ -140,6 +122,24 @@ const UserProfile = () => {
       console.error('Error uploading profile', err);
       toast.show('Error Saving Profile', {type: 'danger'});
     }
+  };
+
+  const renderBulkUpdatesSection = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Convert Measurements'}/>
+        <OutlineButton
+          onPress={convertStrikeDipDirection}
+          title={'Convert Strike <-> Dip Direction'}
+        />
+        <View style={{paddingHorizontal: 10}}>
+          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
+            updated.
+          </Text>
+        </View>
+      </>
+    );
   };
 
   return (

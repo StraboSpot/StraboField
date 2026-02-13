@@ -40,6 +40,30 @@ const Nesting = () => {
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
+  const updateNest = () => {
+    if (!isEmpty(selectedSpot)) {
+      console.log('Updating Nest for Selected Spot ...');
+      console.log('Selected Spot:', selectedSpot);
+      const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
+      setParentGenerations(parentSpots);
+      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
+      setChildrenGenerations(childrenSpots);
+
+      // Get All Images (Image Basemaps) Used in Nest
+      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
+      console.log(allSpotsInNest);
+      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
+        const imageBasemapId = spot.properties?.image_basemap;
+        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
+          const image = getImageByImageId(spot.properties.image_basemap);
+          return isEmpty(image) ? acc : [...acc, image];
+        }
+        else return acc;
+      }, []);
+      setImages(allImagesInNest);
+    }
+  };
+
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
     const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
@@ -161,30 +185,6 @@ const Nesting = () => {
         {renderItem(self)}
       </View>
     );
-  };
-
-  const updateNest = () => {
-    if (!isEmpty(selectedSpot)) {
-      console.log('Updating Nest for Selected Spot ...');
-      console.log('Selected Spot:', selectedSpot);
-      const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
-      setParentGenerations(parentSpots);
-      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
-      setChildrenGenerations(childrenSpots);
-
-      // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
-      console.log(allSpotsInNest);
-      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
-        const imageBasemapId = spot.properties?.image_basemap;
-        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
-          const image = getImageByImageId(spot.properties.image_basemap);
-          return isEmpty(image) ? acc : [...acc, image];
-        }
-        else return acc;
-      }, []);
-      setImages(allImagesInNest);
-    }
   };
 
   return (

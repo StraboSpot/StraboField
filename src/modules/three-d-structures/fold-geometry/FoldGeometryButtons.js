@@ -9,6 +9,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles} from '../../form';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
+
   const FoldGeometryEditButton = () => (
     <Button
       buttonStyle={[formStyles.formButtonSmall, {

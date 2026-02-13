@@ -26,6 +26,8 @@ const useReportModal = ({openSpotInNotebook}) => {
   const [checkedTagsIds, setCheckedTagsIds] = useState(reportTags);
   const initialValues = isEmpty(report) ? {} : report;
 
+  /* Internal Functions */
+
   const alertLeaveReport = (itemText, cont) => {
     alert(
       'Leave Report',

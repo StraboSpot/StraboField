@@ -80,6 +80,32 @@ const CustomMapDetails = () => {
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
   };
 
+  const saveMap = async () => {
+    try {
+      setIsLoadingModalVisible(true);
+      setIsLoading(true);
+      if (!isEmpty(customMapToEdit)) {
+        setTitle('Updating Custom Map');
+        setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
+        updateMap(editableCustomMapData);
+      }
+      else {
+        setTitle('Saving Custom Map');
+        setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
+        const customMap = await saveCustomMap(editableCustomMapData);
+        console.log(customMap);
+      }
+      setMessage('Success!');
+      setIsLoading(false);
+    }
+    catch (err) {
+      console.error('Error saving custom map', err);
+      setTitle('Something went wrong!');
+      setMessage(err);
+      setIsLoading(false);
+    }
+  };
+
   const renderCustomMapName = (item) => {
     const radioSelected = <Icon color={BLUE} name={'radiobox-marked'} type={'material-community'}/>;
     const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
@@ -241,32 +267,6 @@ const CustomMapDetails = () => {
         />
       </>
     );
-  };
-
-  const saveMap = async () => {
-    try {
-      setIsLoadingModalVisible(true);
-      setIsLoading(true);
-      if (!isEmpty(customMapToEdit)) {
-        setTitle('Updating Custom Map');
-        setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
-        updateMap(editableCustomMapData);
-      }
-      else {
-        setTitle('Saving Custom Map');
-        setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
-        const customMap = await saveCustomMap(editableCustomMapData);
-        console.log(customMap);
-      }
-      setMessage('Success!');
-      setIsLoading(false);
-    }
-    catch (err) {
-      console.error('Error saving custom map', err);
-      setTitle('Something went wrong!');
-      setMessage(err);
-      setIsLoading(false);
-    }
   };
 
   return (
