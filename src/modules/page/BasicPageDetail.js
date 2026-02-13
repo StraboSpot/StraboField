@@ -169,10 +169,6 @@ const BasicPageDetail = ({
       }
     };
 
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
     const getFormName = () => {
       let formName = [groupKey, pageKey];
       if (groupKey === 'pet' && selectedFeature.rock_type) formName = ['pet_deprecated', pageKey];
@@ -193,22 +189,14 @@ const BasicPageDetail = ({
       }
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
+    const handleIGSNChecked = (value) => {
+      setIsIGSNChecked(value);
+    };
+
+    const onSampleSaved = async (formCurrent) => {
+      console.log('Saving Sample To SESAR', formRef.current?.values);
+      await saveFeature(formCurrent);
+      closeDetailView();
     };
 
     const onSubmitForm = (values, {resetForm}) => {
@@ -261,15 +249,26 @@ const BasicPageDetail = ({
       );
     };
 
-    const saveButtonOnPress = () => {
-      isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
+    const renderIGSNUpload = () => {
+      return (
+        <>
+          {!isEmpty(encoded_login) ? (
+            <IGSNUploadAndRegister
+              handleIGSNChecked={handleIGSNChecked}
+              isIGSNChecked={isIGSNChecked}
+              selectedFeature={selectedFeature}
+            />
+          ) : (
+            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+              You need to login to StraboSpot to upload to SESAR
+            </Text>
+          )}
+        </>
+      );
     };
 
-    const updateIGSNAndShowModal = async (formCurrent) => {
-      setIsIGSNModalVisible(true);
-      console.log('setting form values for IGSN modals');
-      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
-      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
+    const saveButtonOnPress = () => {
+      isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
     };
 
     const saveFeature = async (formCurrent) => {
@@ -320,16 +319,17 @@ const BasicPageDetail = ({
       }
     };
 
-    const onSampleSaved = async (formCurrent) => {
-      console.log('Saving Sample To SESAR', formRef.current?.values);
-      await saveFeature(formCurrent);
-      closeDetailView();
-    };
-
     const saveTemplateForm = async (formCurrent) => {
       await formCurrent.submitForm();
       const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
       saveTemplate(formValues);
+    };
+
+    const updateIGSNAndShowModal = async (formCurrent) => {
+      setIsIGSNModalVisible(true);
+      console.log('setting form values for IGSN modals');
+      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
+      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
     };
 
     return (

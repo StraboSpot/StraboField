@@ -38,6 +38,20 @@ const UrlData = ({
     else dispatch(setNotebookPageVisible(PAGE_KEYS.DATA));
   };
 
+  const onSaveEdits = () => {
+    try {
+      setIsEditModalVisible(false);
+      if (urlValidator(urlToEdit.url)) saveEdits(urlToEdit);
+      else throw Error('Not valid URL.');
+    }
+    catch (err) {
+      console.error('Error saving edits', err);
+      dispatch(clearedStatusMessages());
+      dispatch(addedStatusMessage('Please make sure you enter a valid url. ' + err));
+      dispatch(setIsErrorMessagesModalVisible(true));
+    }
+  };
+
   const renderURLEditModal = () => {
     return (
       <TextInputModal
@@ -88,21 +102,7 @@ const UrlData = ({
       </ListItem>
     );
   };
-
-  const onSaveEdits = () => {
-    try {
-      setIsEditModalVisible(false);
-      if (urlValidator(urlToEdit.url)) saveEdits(urlToEdit);
-      else throw Error('Not valid URL.');
-    }
-    catch (err) {
-      console.error('Error saving edits', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Please make sure you enter a valid url. ' + err));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
-  };
-
+  
   return (
     <View style={{flex: 1}}>
       <FlatList

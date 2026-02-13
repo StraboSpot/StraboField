@@ -56,16 +56,16 @@ const SpotFilters = ({
     updateSearch(undefined, gotSpotsFiltered);
   }, [recentViews, sortedView, spots, spotsInMapExtentIds]);
 
-  const toggleReverseSort = () => {
-    setIsReverseSort(prevState => !prevState);
+  const closePicker = () => {
+    setIsPickerVisible(false);
   };
 
   const openPicker = () => {
     setIsPickerVisible(true);
   };
 
-  const closePicker = () => {
-    setIsPickerVisible(false);
+  const toggleReverseSort = () => {
+    setIsReverseSort(prevState => !prevState);
   };
 
   const updateSearch = (search = searchState, spotsToSearch = spotsFiltered) => {

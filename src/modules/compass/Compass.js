@@ -92,9 +92,51 @@ const Compass = ({
     closeCompass();
   };
 
-  // const trueNorthButton = () => <Text>True North</Text>;
-  // const magNorthButton = () => <Text>Mag North</Text>;
-  // const groupButtons = [{element: trueNorthButton}, {element: magNorthButton}];
+  const getCartesianToSpherical = async (matrixRotationData) => {
+    let ENU_Pole;
+    let ENU_TP;
+    let strike;
+    let trend;
+    let declination = magneticDeclination?.current;
+
+    const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
+    matrixRawData.current = matrix;
+
+    let {magneticHeading, trueHeading} = matrixRotationData;
+    const {m21, m22, m23, m31, m32, m33} = matrix;
+    if (Platform.OS === 'ios') {
+      ENU_Pole = await cartesianToSpherical(-m32, m31, m33);
+      ENU_TP = await cartesianToSpherical(-m22, m21, m23);
+    }
+    else {
+      ENU_Pole = await cartesianToSpherical(m31, m32, m33);
+      ENU_TP = await cartesianToSpherical(m21, m22, m23);
+    }
+    const strikeAndDip = await getStrikeAndDip(ENU_Pole);
+    const trendAndPlunge = await getTrendAndPlunge(ENU_TP);
+
+    if (Platform.OS === 'ios') {
+      strike = strikeAndDip.strike;
+      trend = trendAndPlunge.trend;
+    }
+    else {
+      trueHeading = (magneticHeading + declination) % 360;
+      strike = (strikeAndDip.strike + declination) % 360;
+      trend = (trendAndPlunge.trend + declination) % 360;
+    }
+
+    const dipDirection = (strike + 90) % 360;
+    setCompassData({
+      declination: declination.toFixed(2),
+      dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
+      dip_direction: roundToDecimalPlaces(dipDirection, 0),
+      magHeading: roundToDecimalPlaces(magneticHeading, 0),
+      plunge: roundToDecimalPlaces(trendAndPlunge.plunge, 0),
+      strike: roundToDecimalPlaces(strike, 0),
+      trend: roundToDecimalPlaces(trend, 0),
+      trueHeading: roundToDecimalPlaces(trueHeading, 0),
+    });
+  };
 
   const getDeclination = async () => {
     try {
@@ -144,63 +186,6 @@ const Compass = ({
     }
   };
 
-  const getCartesianToSpherical = async (matrixRotationData) => {
-    let ENU_Pole;
-    let ENU_TP;
-    let strike;
-    let trend;
-    let declination = magneticDeclination?.current;
-
-    const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
-    matrixRawData.current = matrix;
-
-    let {magneticHeading, trueHeading} = matrixRotationData;
-    const {m21, m22, m23, m31, m32, m33} = matrix;
-    if (Platform.OS === 'ios') {
-      ENU_Pole = await cartesianToSpherical(-m32, m31, m33);
-      ENU_TP = await cartesianToSpherical(-m22, m21, m23);
-    }
-    else {
-      ENU_Pole = await cartesianToSpherical(m31, m32, m33);
-      ENU_TP = await cartesianToSpherical(m21, m22, m23);
-    }
-    const strikeAndDip = await getStrikeAndDip(ENU_Pole);
-    const trendAndPlunge = await getTrendAndPlunge(ENU_TP);
-
-    if (Platform.OS === 'ios') {
-      strike = strikeAndDip.strike;
-      trend = trendAndPlunge.trend;
-    }
-    else {
-      trueHeading = (magneticHeading + declination) % 360;
-      strike = (strikeAndDip.strike + declination) % 360;
-      trend = (trendAndPlunge.trend + declination) % 360;
-    }
-
-    const dipDirection = (strike + 90) % 360;
-    setCompassData({
-      declination: declination.toFixed(2),
-      dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
-      dip_direction: roundToDecimalPlaces(dipDirection, 0),
-      magHeading: roundToDecimalPlaces(magneticHeading, 0),
-      plunge: roundToDecimalPlaces(trendAndPlunge.plunge, 0),
-      strike: roundToDecimalPlaces(strike, 0),
-      trend: roundToDecimalPlaces(trend, 0),
-      trueHeading: roundToDecimalPlaces(trueHeading, 0),
-    });
-  };
-
-  const handleMatrixRotationData = async (matrixData) => {
-    try {
-      // console.log(matrixData);
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
-      await getCartesianToSpherical(matrixData);
-    }
-    catch (err) {
-      console.error('Error Getting Matrix', err);
-    }
-  };
-
   const handleCalibrationStatus = (data) => {
     // Reset flag if calibration is now OK
     if (data.needsCalibration === false) {
@@ -219,6 +204,17 @@ const Compass = ({
 
       alert('Compass Calibration Required',
         'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+    }
+  };
+
+  const handleMatrixRotationData = async (matrixData) => {
+    try {
+      // console.log(matrixData);
+      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
+      await getCartesianToSpherical(matrixData);
+    }
+    catch (err) {
+      console.error('Error Getting Matrix', err);
     }
   };
 

@@ -61,6 +61,10 @@ const ImageCard = ({
     setIsEditing(false);
   };
 
+  const handleImageFinishedLoading = () => {
+    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
+  };
+
   const handleImagePressed = async () => {
     if (imageThumbnailURIs?.[image.id]) {
       if (openImage) openImage(image);
@@ -81,10 +85,6 @@ const ImageCard = ({
       else setIsImageMissingOnServer(true);
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: false});
     }
-  };
-
-  const handleImageFinishedLoading = () => {
-    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
   };
 
   return (

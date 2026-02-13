@@ -44,6 +44,34 @@ const DateInputField = ({
     setIsDatePickerModalVisible(false);
   };
 
+  const renderDatePicker = () => {
+    return (
+      // <View style={{}}>
+      <DateTimePicker
+        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+        mode={isShowTimeOnly ? 'time' : 'date'}
+        neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
+        onChange={changeDate}
+        textColor={colorScheme === 'dark' && 'black'}
+        value={date}
+      />
+      // </View>
+    );
+  };
+
+  const renderDatePickerDialogBox = () => {
+    return (<ModalWrapper
+      actionTitle={'Set Date'}
+      headerTitle={'Pick ' + label}
+      isVisible={isDatePickerModalVisible}
+      onActionPressed={onSavePressed}
+      overlayStyleOverride={{width: 350, maxHeight: 350}}
+      showCancelButton={false}
+    >
+      {renderDatePicker()}
+    </ModalWrapper>);
+  };
+
   const saveDate = async (event, selectedDate) => {
     console.log('Change Date', name, event, selectedDate);
     if (Platform.OS === 'ios') {
@@ -81,34 +109,6 @@ const DateInputField = ({
     // No validation needed, just set the value
     else setFieldValue(name, selectedDate);
     console.log('After setFieldValue, name:', name, 'selectedDate:', selectedDate);
-  };
-
-  const renderDatePicker = () => {
-    return (
-      // <View style={{}}>
-      <DateTimePicker
-        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-        mode={isShowTimeOnly ? 'time' : 'date'}
-        neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
-        onChange={changeDate}
-        textColor={colorScheme === 'dark' && 'black'}
-        value={date}
-      />
-      // </View>
-    );
-  };
-
-  const renderDatePickerDialogBox = () => {
-    return (<ModalWrapper
-      actionTitle={'Set Date'}
-      headerTitle={'Pick ' + label}
-      isVisible={isDatePickerModalVisible}
-      onActionPressed={onSavePressed}
-      overlayStyleOverride={{width: 350, maxHeight: 350}}
-      showCancelButton={false}
-    >
-      {renderDatePicker()}
-    </ModalWrapper>);
   };
 
   return (<>
