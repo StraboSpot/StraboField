@@ -20,7 +20,8 @@ const useExternalData = () => {
   let csvObject = {};
   let CSVData = '';
 
-  // INTERNAL
+  /* Internal Functions */
+
   const createCSVObject = (CSVFile, data) => {
     csvObject.name = CSVFile.name.substring(0, CSVFile.name.lastIndexOf('.'));
     csvObject.size = CSVFile.size;
@@ -29,6 +30,8 @@ const useExternalData = () => {
     console.log('CSV Object', csvObject);
     return csvObject;
   };
+
+  /* Exported Functions */
 
   const deleteCSV = (tableToDelete) => {
     const CSVcopy = JSON.parse(JSON.stringify(spot.properties.data.tables));

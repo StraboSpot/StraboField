@@ -8,7 +8,6 @@ import alert from '../../shared/ui/alert';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
-
   const {getLocalImageURI, saveFile} = useImages();
 
   const saveSketch = async (success, path) => {

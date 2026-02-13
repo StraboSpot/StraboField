@@ -14,6 +14,8 @@ const useImageThumbnails = ({images}) => {
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
   }, [images]);
 
+  /* Internal Functions */
+
   const loadImageThumbnailURIs = async () => {
     try {
       console.log('Getting Image URI Thumbnails for Images:', images);

@@ -31,11 +31,6 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
 
   const {clearUser} = useResetState();
 
-  const displayFirstName = () => {
-    if (user.name && !isEmpty(user.name)) return user.name.split(' ')[0];
-    else return 'Guest';
-  };
-
   useEffect(() => {
     setDisplayName(displayFirstName);
     return () => {
@@ -49,22 +44,16 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
     dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
   }, [isOnline]);
 
+  const displayFirstName = () => {
+    if (user.name && !isEmpty(user.name)) return user.name.split(' ')[0];
+    else return 'Guest';
+  };
+
   const goBackToMain = () => {
     if (visibleInitialSection !== 'none') {
       setVisibleInitialSection('none');
       dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
     }
-  };
-
-  const renderLoadProjectButtons = () => {
-    return (
-      <LoadProjectButtons
-        onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
-        onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
-        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
-        onStartNewProject={() => handleOnPress('project')}
-      />
-    );
   };
 
   const handleOnPress = (type) => {
@@ -104,6 +93,17 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
           title={'Back'}
         />
       </View>
+    );
+  };
+
+  const renderLoadProjectButtons = () => {
+    return (
+      <LoadProjectButtons
+        onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
+        onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
+        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
+        onStartNewProject={() => handleOnPress('project')}
+      />
     );
   };
 

@@ -16,12 +16,12 @@ const CompassDebug = ({compassData, matrixRotation}) => {
     return () => console.log('Compass Debug UNMOUNTED');
   }, []);
 
-  const Row = ({children}) => (
-    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
-  );
-
   const Col = ({children, flex = 1}) => (
     <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
+  );
+
+  const Row = ({children}) => (
+    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
   );
 
   const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;

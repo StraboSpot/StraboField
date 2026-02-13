@@ -10,7 +10,6 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
-
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
 
   const {showErrors, validateForm} = useForm();

@@ -96,20 +96,20 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
     );
   };
 
-  const toggleGeometryTypesOff = (geometryType) => {
-    let geometryTypesOffCopy = [...geometryTypesOff];
-    const i = geometryTypesOffCopy.indexOf(geometryType);
-    if (i === -1) geometryTypesOffCopy.push(geometryType);
-    else geometryTypesOffCopy.splice(i, 1);
-    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
-  };
-
   const toggleFeatureTypesOff = (featureType) => {
     let featureTypesOffCopy = [...featureTypesOff];
     const i = featureTypesOffCopy.indexOf(featureType);
     if (i === -1) featureTypesOffCopy.push(featureType);
     else featureTypesOffCopy.splice(i, 1);
     dispatch(setFeatureTypesOff(featureTypesOffCopy));
+  };
+
+  const toggleGeometryTypesOff = (geometryType) => {
+    let geometryTypesOffCopy = [...geometryTypesOff];
+    const i = geometryTypesOffCopy.indexOf(geometryType);
+    if (i === -1) geometryTypesOffCopy.push(geometryType);
+    else geometryTypesOffCopy.splice(i, 1);
+    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
   };
 
   const toggleLabelTypeOn = () => {

@@ -136,6 +136,12 @@ const AddMeasurementModal = ({onPress}) => {
 
   }, [compassMeasurementTypes, templates]);
 
+  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
+
+  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
+
   const equalsIgnoreOrder = (a, b) => {
     if (a.length !== b.length) return false;
     const uniqueValues = new Set([...a, ...b]);
@@ -146,12 +152,6 @@ const AddMeasurementModal = ({onPress}) => {
     }
     return true;
   };
-
-  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
-
-  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
 
   const onCloseButton = () => {
     if (choicesViewKey || assocChoicesViewKey) {
@@ -346,8 +346,8 @@ const AddMeasurementModal = ({onPress}) => {
       <Form {...{
         ...formProps,
         formName: assocFormProps.status.formName,
-        surveyFragment: relevantFields,
         subkey: 'associated_orientation',
+        surveyFragment: relevantFields,
       }}
       />
     );

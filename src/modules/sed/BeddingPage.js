@@ -51,20 +51,6 @@ const BeddingPage = ({isReadOnly, page}) => {
     return () => confirmLeavePage();
   }, []);
 
-  const confirmLeavePage = () => {
-    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
-      const formCurrent = beddingSharedRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your interval before continuing?',
-        [
-          {text: 'No', style: 'cancel'},
-          {text: 'Yes', onPress: () => saveBeddingShared(formCurrent)},
-        ],
-        {cancelable: false},
-      );
-    }
-  };
-
   const addAttribute = async () => {
     if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
       alert('Unsaved Changes',
@@ -87,6 +73,20 @@ const BeddingPage = ({isReadOnly, page}) => {
       setIsDetailView(true);
       setSelectedAttribute({id: getNewUUID()});
       dispatch(setModalVisible({modal: null}));
+    }
+  };
+
+  const confirmLeavePage = () => {
+    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
+      const formCurrent = beddingSharedRef.current;
+      alert('Unsaved Changes',
+        'Would you like to save your interval before continuing?',
+        [
+          {text: 'No', style: 'cancel'},
+          {text: 'Yes', onPress: () => saveBeddingShared(formCurrent)},
+        ],
+        {cancelable: false},
+      );
     }
   };
 

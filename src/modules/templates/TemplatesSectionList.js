@@ -9,7 +9,6 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const TemplatesSectionList = ({handleTemplatePressed}) => {
-
   const templates = useSelector(state => state.project.project?.templates);
 
   const templatesSectioned = Object.entries(templates).reduce((acc, [key, value]) => {

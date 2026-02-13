@@ -6,6 +6,7 @@ import {isEmpty} from '../shared/Helpers';
 import alert from '../shared/ui/alert';
 
 const usePermissions = () => {
+  /* Internal Functions */
 
   const permissionsRequestType = (permission) => {
     switch (permission) {
@@ -34,6 +35,8 @@ const usePermissions = () => {
         };
     }
   };
+
+  /* Exported Functions */
 
   const checkPermission = async (permission) => {
     let granted;

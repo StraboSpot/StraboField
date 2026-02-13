@@ -73,6 +73,17 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     else return undefined;
   };
 
+  const getSurfaceFeatureText = () => {
+    const surfaceFeatureDictionary = LABEL_DICTIONARY.general.surface_feature;
+    const key = spot.properties.surface_feature.surface_feature_type;
+    let surfaceFeatureText = surfaceFeatureDictionary[key] || key.replace(/_/g, ' ');
+    if (spot.properties.surface_feature.surface_feature_type === 'other'
+      && spot.properties.surface_feature.other_surface_feature_type) {
+      surfaceFeatureText = spot.properties.surface_feature.other_surface_feature_type;
+    }
+    return toTitleCase(surfaceFeatureText);
+  };
+
   const getTraceText = () => {
     const traceDictionary = LABEL_DICTIONARY.general.trace;
     const key = spot.properties.trace.trace_type;
@@ -88,15 +99,12 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return traceText;
   };
 
-  const getSurfaceFeatureText = () => {
-    const surfaceFeatureDictionary = LABEL_DICTIONARY.general.surface_feature;
-    const key = spot.properties.surface_feature.surface_feature_type;
-    let surfaceFeatureText = surfaceFeatureDictionary[key] || key.replace(/_/g, ' ');
-    if (spot.properties.surface_feature.surface_feature_type === 'other'
-      && spot.properties.surface_feature.other_surface_feature_type) {
-      surfaceFeatureText = spot.properties.surface_feature.other_surface_feature_type;
-    }
-    return toTitleCase(surfaceFeatureText);
+  const goToDatasetsPage = () => {
+    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
+      {duration: 4000, placement: 'top', type: 'warning'});
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   const onSpotEdit = async (field, value) => {
@@ -150,15 +158,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
     dispatch(editedOrCreatedSpot(editedSpot));
     dispatch(setSelectedSpot(editedSpot));
-  };
-
-
-  const goToDatasetsPage = () => {
-    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
-      {duration: 4000, placement: 'top', type: 'warning'});
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
-    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   return (

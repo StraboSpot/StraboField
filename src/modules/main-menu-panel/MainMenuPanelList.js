@@ -45,11 +45,11 @@ const MainMenuPanelList = ({searchText}) => {
     }
   };
 
+  const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
+
   const renderItem = ({item, section}) => {
     if (!sectionsCollapsed.includes(section.title)) return <MainMenuPanelListItem title={item}/>;
   };
-
-  const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
 
   const renderMenuSectionHeader = ({section: {title}}) => {
     return (

@@ -16,10 +16,6 @@ const ShortcutsList = () => {
   const dispatch = useDispatch();
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
 
-  const toggleSwitch = (switchName) => {
-    dispatch(setShortcutSwitchPositions({switchName: switchName}));
-  };
-
   const renderShortcutListItem = (toggleButton) => {
     if (Platform.OS !== 'web' || (Platform.OS === 'web' && toggleButton.key !== MODAL_KEYS.SHORTCUTS.PHOTO
       && toggleButton.key !== MODAL_KEYS.SHORTCUTS.SKETCH)) {
@@ -39,6 +35,10 @@ const ShortcutsList = () => {
         </ListItem>
       );
     }
+  };
+
+  const toggleSwitch = (switchName) => {
+    dispatch(setShortcutSwitchPositions({switchName: switchName}));
   };
 
   return (

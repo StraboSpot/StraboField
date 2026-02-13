@@ -35,10 +35,6 @@ const useReportModal = ({openSpotInNotebook}) => {
     );
   };
 
-  const checkIsSafeDelete = () => {
-    if (!isEmpty(updatedImages)) return 'Remove all images from this report before deleting.';
-  };
-
   const checkReportChanged = (itemText, go) => {
     const isImageObjChanged = !isEqual(reportImages, updatedImages);
     const isSpotsObjChanged = !isEqual(reportSpots, checkedSpotsIds);
@@ -69,14 +65,6 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
-  const confirmCloseModal = () => checkReportChanged(null, closeModal);
-
-  const deleteReport = () => {
-    closeModal();
-    const updatedReports = reports.filter(r => r.id !== report.id);
-    dispatch(updatedProject({field: 'reports', value: updatedReports}));
-  };
-
   const goToSpot = (spot) => {
     console.log('Going to Spot', spot);
     closeModal();
@@ -88,34 +76,12 @@ const useReportModal = ({openSpotInNotebook}) => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
     dispatch(setSelectedTag(tag));
     if (tag.type === 'geologic_unit') {
-dispatch(
-      setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
-}
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
+    }
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
   };
 
-  const handleSavePressed = async () => {
-    await saveReport();
-    closeModal();
-  };
-
-  const handleSpotChecked = (spotId) => {
-    console.log('Spot', spotId, checkedSpotsIds);
-    if (checkedSpotsIds.find(id => id === spotId)) setCheckedSpotsIds(checkedSpotsIds.filter(id => id !== spotId));
-    else setCheckedSpotsIds([...checkedSpotsIds, spotId]);
-  };
-
-  const handleSpotPressed = spot => alertLeaveReport('Spot', () => handleSpotPressedCont(spot));
-
   const handleSpotPressedCont = spot => checkReportChanged('Spot', () => goToSpot(spot));
-
-  const handleTagChecked = (tagId) => {
-    console.log('Tag', tagId, checkedTagsIds);
-    if (checkedTagsIds.find(id => id === tagId)) setCheckedTagsIds(checkedTagsIds.filter(id => id !== tagId));
-    else setCheckedTagsIds([...checkedTagsIds, tagId]);
-  };
-
-  const handleTagPressed = tag => alertLeaveReport('Tag', () => handleTagPressedCont(tag));
 
   const handleTagPressedCont = tag => checkReportChanged('Tag', () => goToTag(tag));
 
@@ -139,10 +105,45 @@ dispatch(
     }
   };
 
+  /* Exported Functions */
+
+  const checkIsSafeDelete = () => {
+    if (!isEmpty(updatedImages)) return 'Remove all images from this report before deleting.';
+  };
+
+  const confirmCloseModal = () => checkReportChanged(null, closeModal);
+
+  const deleteReport = () => {
+    closeModal();
+    const updatedReports = reports.filter(r => r.id !== report.id);
+    dispatch(updatedProject({field: 'reports', value: updatedReports}));
+  };
+
+  const handleSavePressed = async () => {
+    await saveReport();
+    closeModal();
+  };
+
+  const handleSpotChecked = (spotId) => {
+    console.log('Spot', spotId, checkedSpotsIds);
+    if (checkedSpotsIds.find(id => id === spotId)) setCheckedSpotsIds(checkedSpotsIds.filter(id => id !== spotId));
+    else setCheckedSpotsIds([...checkedSpotsIds, spotId]);
+  };
+
+  const handleSpotPressed = spot => alertLeaveReport('Spot', () => handleSpotPressedCont(spot));
+
+  const handleTagChecked = (tagId) => {
+    console.log('Tag', tagId, checkedTagsIds);
+    if (checkedTagsIds.find(id => id === tagId)) setCheckedTagsIds(checkedTagsIds.filter(id => id !== tagId));
+    else setCheckedTagsIds([...checkedTagsIds, tagId]);
+  };
+
+  const handleTagPressed = tag => alertLeaveReport('Tag', () => handleTagPressedCont(tag));
+
   return {
-    checkIsSafeDelete,
     checkedSpotsIds,
     checkedTagsIds,
+    checkIsSafeDelete,
     confirmCloseModal,
     deleteReport,
     formRef,

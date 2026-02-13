@@ -37,24 +37,7 @@ const useUpload = () => {
   const {getSpotsByIds} = useSpots();
   const {initializeImageUpload} = useUploadImages();
 
-  const initializeUpload = async () => {
-    Platform.OS !== 'web' && KeepAwake.activate();
-    try {
-      await uploadProject();
-      await uploadDatasets();
-      const imageStatus = await initializeImageUpload();
-      projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      // projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      dispatch(setIsImageTransferring(false));
-      Platform.OS !== 'web' && KeepAwake.deactivate();
-      return projectUploadStatus;
-    }
-    catch (err) {
-      dispatch(addedStatusMessage(`\nUpload Failed!\n\n ${err}`));
-      console.error('Upload Failed!', err);
-      throw Error(err);
-    }
-  };
+  /* Internal Functions */
 
   const uploadDataset = async (dataset) => {
     try {
@@ -82,6 +65,68 @@ const useUpload = () => {
     catch (err) {
       console.error(dataset.name + ': Error Uploading Dataset Properties...', err);
       // dispatch(addedStatusMessage(`Error Uploading Dataset Properties!\n ${err}`));
+      throw Error(err);
+    }
+  };
+
+  // Upload Spots
+  const uploadSpots = async (dataset) => {
+    let datasetSpots;
+    if (dataset.spotIds) {
+      datasetSpots = getSpotsByIds(dataset.spotIds);
+      datasetSpots.forEach(spotValue => checkValidDateTime(spotValue));
+    }
+    try {
+      if (isEmpty(datasetSpots)) {
+        setUploadStatusMessage('There are no spots to upload.');
+        await deleteAllSpotsInDataset(dataset.id);
+      }
+      else {
+        const spotCollection = {
+          type: 'FeatureCollection',
+          features: Object.values(datasetSpots),
+        };
+        console.log(dataset.name + ': Uploading Spots...', spotCollection);
+        setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
+        await updateDatasetSpots(dataset.id, spotCollection);
+        setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
+        // dispatch(removedLastStatusMessage());
+        // dispatch(addedStatusMessage('\nFinished uploading spots.\n'));
+        // await uploadImages(Object.values(datasetSpots), dataset.name);
+      }
+    }
+    catch (err) {
+      console.error(dataset.name + ': Error Uploading Project Spots.', err);
+      setUploadStatusMessage(`${dataset.name}: Error Uploading Spots.\n\n ${err}\n`);
+      // Added this below to handle spots that were getting added to 2 datasets, which the server will not accept
+      if (err?.startsWith('Spot(s) already exist in another dataset')) {
+        const spotId = parseInt(err.split(')')[1].split('(')[1].split(')')[0], 10);
+        // console.log('dupes', spotId);
+        dispatch(deletedSpotIdFromDataset({datasetId: dataset.id, spotId: spotId}));
+        alert('Fixed Spot in Another Dataset Error',
+          'Spot removed from ' + dataset.name + '. Please try uploading again.');
+      }
+      throw Error(err);
+    }
+  };
+
+  /* Exported Functions */
+
+  const initializeUpload = async () => {
+    Platform.OS !== 'web' && KeepAwake.activate();
+    try {
+      await uploadProject();
+      await uploadDatasets();
+      const imageStatus = await initializeImageUpload();
+      projectUploadStatus = {...projectUploadStatus, images: imageStatus};
+      // projectUploadStatus = {...projectUploadStatus, images: imageStatus};
+      dispatch(setIsImageTransferring(false));
+      Platform.OS !== 'web' && KeepAwake.deactivate();
+      return projectUploadStatus;
+    }
+    catch (err) {
+      dispatch(addedStatusMessage(`\nUpload Failed!\n\n ${err}`));
+      console.error('Upload Failed!', err);
       throw Error(err);
     }
   };
@@ -150,47 +195,6 @@ const useUpload = () => {
     await updateProject(project);
     setUploadStatusMessage(`Finished uploading ${project.description.project_name} Properties.`);
     return true;
-  };
-
-  // Upload Spots
-  const uploadSpots = async (dataset) => {
-    let datasetSpots;
-    if (dataset.spotIds) {
-      datasetSpots = getSpotsByIds(dataset.spotIds);
-      datasetSpots.forEach(spotValue => checkValidDateTime(spotValue));
-    }
-    try {
-      if (isEmpty(datasetSpots)) {
-        setUploadStatusMessage('There are no spots to upload.');
-        await deleteAllSpotsInDataset(dataset.id);
-      }
-      else {
-        const spotCollection = {
-          type: 'FeatureCollection',
-          features: Object.values(datasetSpots),
-        };
-        console.log(dataset.name + ': Uploading Spots...', spotCollection);
-        setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
-        await updateDatasetSpots(dataset.id, spotCollection);
-        setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
-        // dispatch(removedLastStatusMessage());
-        // dispatch(addedStatusMessage('\nFinished uploading spots.\n'));
-        // await uploadImages(Object.values(datasetSpots), dataset.name);
-      }
-    }
-    catch (err) {
-      console.error(dataset.name + ': Error Uploading Project Spots.', err);
-      setUploadStatusMessage(`${dataset.name}: Error Uploading Spots.\n\n ${err}\n`);
-      // Added this below to handle spots that were getting added to 2 datasets, which the server will not accept
-      if (err?.startsWith('Spot(s) already exist in another dataset')) {
-        const spotId = parseInt(err.split(')')[1].split('(')[1].split(')')[0], 10);
-        // console.log('dupes', spotId);
-        dispatch(deletedSpotIdFromDataset({datasetId: dataset.id, spotId: spotId}));
-        alert('Fixed Spot in Another Dataset Error',
-          'Spot removed from ' + dataset.name + '. Please try uploading again.');
-      }
-      throw Error(err);
-    }
   };
 
   return {

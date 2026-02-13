@@ -41,6 +41,44 @@ const useImport = () => {
     readDirectory,
   } = useDevice();
 
+  /* Internal Functions */
+
+  const checkForMaps = async (dataFile, selectedProject, isExternal) => {
+    let progress;
+    const {mapNamesDb, otherMapsDb} = dataFile;
+    dispatch(addedStatusMessage('Checking for maps to import...'));
+    if (!isEmpty(otherMapsDb)) {
+      dispatch(removedLastStatusMessage());
+      dispatch(addedCustomMapsFromBackup(otherMapsDb));
+      dispatch(addedStatusMessage('Added custom maps.'));
+    }
+    else {
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('No custom maps to import.'));
+    }
+    dispatch(addedStatusMessage('Checking for map tiles to import...'));
+    if (!isEmpty(mapNamesDb)) {
+      await copyZipMapsToProject(selectedProject, isExternal);
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('Finished importing maps.'));
+      dispatch(addedStatusMessage(`Finished copying and ${'\n'}unzipping all files`));
+      dispatch(addedStatusMessage('Moving Maps...'));
+      progress = await moveFiles(dataFile);
+      console.log('fileCount', progress);
+      dispatch(addedMapsFromDevice({mapType: 'offlineMaps', maps: mapNamesDb}));
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('---------------------'));
+      dispatch(addedStatusMessage(`Map tiles imported: ${progress.fileCount || 0}`));
+      dispatch(addedStatusMessage(`Map tiles installed: ${progress.neededTiles || 0}`));
+      dispatch(addedStatusMessage(`Map tiles already installed: ${progress.notNeededTiles || 0}`));
+      dispatch(addedStatusMessage('Finished moving tiles'));
+    }
+    else {
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('No maps to import.'));
+    }
+  };
+
   const copyImages = async (fileName) => {
     try {
       const existsWithLowercase = await doesDeviceDirExist(APP_DIRECTORIES.BACKUP_DIR
@@ -76,6 +114,26 @@ const useImport = () => {
     }
   };
 
+  const moveTile = async (tileArray, id, map) => {
+    await Promise.all(
+      tileArray.map(async (tile) => {
+        fileCount++;
+        const fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
+        if (!fileExists) {
+          await moveFile(
+            APP_DIRECTORIES.TILE_TEMP + id + '/tiles/' + tile,
+            APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
+          neededTiles++;
+        }
+        else {
+          notNeededTiles++;
+        }
+      }),
+    );
+  };
+
+  /* Exported Functions */
+
   const copyZipMapsToProject = async (fileName, isExternal) => {
     try {
       const sourceDir = isExternal ? APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID : APP_DIRECTORIES.BACKUP_DIR;
@@ -105,42 +163,6 @@ const useImport = () => {
     }
     catch (err) {
       console.error('Error Copying Maps for Distribution', err);
-    }
-  };
-
-  const checkForMaps = async (dataFile, selectedProject, isExternal) => {
-    let progress;
-    const {mapNamesDb, otherMapsDb} = dataFile;
-    dispatch(addedStatusMessage('Checking for maps to import...'));
-    if (!isEmpty(otherMapsDb)) {
-      dispatch(removedLastStatusMessage());
-      dispatch(addedCustomMapsFromBackup(otherMapsDb));
-      dispatch(addedStatusMessage('Added custom maps.'));
-    }
-    else {
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('No custom maps to import.'));
-    }
-    dispatch(addedStatusMessage('Checking for map tiles to import...'));
-    if (!isEmpty(mapNamesDb)) {
-      await copyZipMapsToProject(selectedProject, isExternal);
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Finished importing maps.'));
-      dispatch(addedStatusMessage(`Finished copying and ${'\n'}unzipping all files`));
-      dispatch(addedStatusMessage('Moving Maps...'));
-      progress = await moveFiles(dataFile);
-      console.log('fileCount', progress);
-      dispatch(addedMapsFromDevice({mapType: 'offlineMaps', maps: mapNamesDb}));
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('---------------------'));
-      dispatch(addedStatusMessage(`Map tiles imported: ${progress.fileCount || 0}`));
-      dispatch(addedStatusMessage(`Map tiles installed: ${progress.neededTiles || 0}`));
-      dispatch(addedStatusMessage(`Map tiles already installed: ${progress.notNeededTiles || 0}`));
-      dispatch(addedStatusMessage('Finished moving tiles'));
-    }
-    else {
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('No maps to import.'));
     }
   };
 
@@ -209,24 +231,20 @@ const useImport = () => {
     }
   };
 
-  const moveTile = async (tileArray, id, map) => {
-    await Promise.all(
-      tileArray.map(async (tile) => {
-        fileCount++;
-        const fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
-        if (!fileExists) {
-          await moveFile(
-            APP_DIRECTORIES.TILE_TEMP + id + '/tiles/' + tile,
-            APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
-          neededTiles++;
-        }
-        else {
-          notNeededTiles++;
-        }
-      }),
-    );
-  };
+  const unzipBackupFile = async (zipFile) => {
+    try {
+      const source = APP_DIRECTORIES.BACKUP_DIR + zipFile;
+      const target = APP_DIRECTORIES.BACKUP_DIR;
 
+      await unzip(source, target);
+      console.log('backup file unzipped successfully!');
+      await deleteFromDevice(source);
+      console.log('.zip file removed successfully!');
+    }
+    catch (err) {
+      console.error('Error unzipping backup files', err);
+    }
+  };
 
   const unzipFile = async (filePath) => {
     try {
@@ -254,21 +272,6 @@ const useImport = () => {
     }
     catch (err) {
       console.error('Error unzipping files', err);
-    }
-  };
-
-  const unzipBackupFile = async (zipFile) => {
-    try {
-      const source = APP_DIRECTORIES.BACKUP_DIR + zipFile;
-      const target = APP_DIRECTORIES.BACKUP_DIR;
-
-      await unzip(source, target);
-      console.log('backup file unzipped successfully!');
-      await deleteFromDevice(source);
-      console.log('.zip file removed successfully!');
-    }
-    catch (err) {
-      console.error('Error unzipping backup files', err);
     }
   };
 

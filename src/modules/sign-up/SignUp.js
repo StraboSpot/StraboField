@@ -70,17 +70,6 @@ const SignUp = ({navigation}) => {
   const [statusType, setStatusType] = useState('info'); // 'success', 'error', 'info'
   const [userData, setUserData] = useState(initialState);
 
-  // Helper function to parse validation errors
-  const parseValidationErrors = (message) => {
-    if (!message) return [];
-
-    // Split by periods and filter out empty strings
-    const errors = message.split('.').filter(error => error.trim().length > 0);
-
-    // Format as bullet points for better readability
-    return errors.map(error => `• ${error.trim()}`).join('\n');
-  };
-
   // Helper function to format success messages
   const formatMessage = (message, isSuccess = false) => {
     if (isSuccess) {
@@ -94,6 +83,24 @@ const SignUp = ({navigation}) => {
 
     // For other messages, just clean up the formatting
     return message.replace(/\./g, '.\n');
+  };
+
+  const getModalStyles = () => {
+    // You can customize modal appearance based on status type
+    switch (statusType) {
+      case 'success':
+        return {
+          headerStyle: {backgroundColor: '#d4edda'},
+          titleStyle: {color: '#155724'},
+        };
+      case 'error':
+        return {
+          headerStyle: {backgroundColor: '#f8d7da'},
+          titleStyle: {color: '#721c24'},
+        };
+      default:
+        return {};
+    }
   };
 
   const onChangeText = (key, value) => {
@@ -130,6 +137,34 @@ const SignUp = ({navigation}) => {
         touched: true,
       },
     }));
+  };
+
+  // Helper function to parse validation errors
+  const parseValidationErrors = (message) => {
+    if (!message) return [];
+
+    // Split by periods and filter out empty strings
+    const errors = message.split('.').filter(error => error.trim().length > 0);
+
+    // Format as bullet points for better readability
+    return errors.map(error => `• ${error.trim()}`).join('\n');
+  };
+
+  const renderButtons = () => {
+    return (
+      <>
+        <ActionButton
+          disabled={!isOnline.isInternetReachable}
+          onPress={signUp}
+          title={'Register'}
+        />
+        <OutlineButton
+          backgroundColor={SECONDARY_BACKGROUND_COLOR}
+          onPress={() => navigation.goBack()}
+          title={'Back to Log In'}
+        />
+      </>
+    );
   };
 
   const signUp = async () => {
@@ -172,41 +207,6 @@ const SignUp = ({navigation}) => {
       setStatusType('error');
       setStatusMessage('Unable to create account.\nPlease check your internet connection and try again.');
       setStatusDialog(true);
-    }
-  };
-
-  const renderButtons = () => {
-    return (
-      <>
-        <ActionButton
-          disabled={!isOnline.isInternetReachable}
-          onPress={signUp}
-          title={'Register'}
-        />
-        <OutlineButton
-          backgroundColor={SECONDARY_BACKGROUND_COLOR}
-          onPress={() => navigation.goBack()}
-          title={'Back to Log In'}
-        />
-      </>
-    );
-  };
-
-  const getModalStyles = () => {
-    // You can customize modal appearance based on status type
-    switch (statusType) {
-      case 'success':
-        return {
-          headerStyle: {backgroundColor: '#d4edda'},
-          titleStyle: {color: '#155724'},
-        };
-      case 'error':
-        return {
-          headerStyle: {backgroundColor: '#f8d7da'},
-          titleStyle: {color: '#721c24'},
-        };
-      default:
-        return {};
     }
   };
 

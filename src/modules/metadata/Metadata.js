@@ -24,6 +24,42 @@ const Metadata = ({isReadOnly}) => {
     }
   };
 
+  const renderDatasetItem = (dataset) => {
+    const isChecked = dataset.spotIds?.includes(spot.properties.id);
+    return (
+      <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
+          <ListItem.Subtitle>
+            {dataset.spotIds
+              ? `(${dataset.spotIds.length} spot${dataset.spotIds.length !== 1 ? 's' : ''})`
+              : '(0 spots)'}
+          </ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.CheckBox
+          checked={isChecked}
+          checkedIcon={'radiobox-marked'}
+          disabled={isReadOnly}
+          iconType={'material-community'}
+          onPress={() => handleDatasetChecked(dataset)}
+          uncheckedIcon={'radiobox-blank'}
+        />
+      </ListItem>
+    );
+  };
+
+  const renderDatasets = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Datasets'}/>
+        <FlatList
+          data={Object.values(datasets)}
+          renderItem={({item}) => renderDatasetItem(item)}
+        />
+      </>
+    );
+  };
+
   const renderMetadataForm = () => {
     return (
       <Formik
@@ -72,42 +108,6 @@ const Metadata = ({isReadOnly}) => {
           </>
         )}
       </Formik>
-    );
-  };
-
-  const renderDatasetItem = (dataset) => {
-    const isChecked = dataset.spotIds?.includes(spot.properties.id);
-    return (
-      <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
-          <ListItem.Subtitle>
-            {dataset.spotIds
-              ? `(${dataset.spotIds.length} spot${dataset.spotIds.length !== 1 ? 's' : ''})`
-              : '(0 spots)'}
-          </ListItem.Subtitle>
-        </ListItem.Content>
-        <ListItem.CheckBox
-          checked={isChecked}
-          checkedIcon={'radiobox-marked'}
-          disabled={isReadOnly}
-          iconType={'material-community'}
-          onPress={() => handleDatasetChecked(dataset)}
-          uncheckedIcon={'radiobox-blank'}
-        />
-      </ListItem>
-    );
-  };
-
-  const renderDatasets = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Datasets'}/>
-        <FlatList
-          data={Object.values(datasets)}
-          renderItem={({item}) => renderDatasetItem(item)}
-        />
-      </>
     );
   };
 

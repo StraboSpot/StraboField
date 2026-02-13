@@ -33,16 +33,16 @@ const StraboFieldProjects = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.EXPORT_PROJECT}));
   };
 
-  const onLoadProjectsFromServer = () => {
-    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT}));
-  };
-
   const onLoadProjectsFromDevice = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}));
   };
 
   const onLoadProjectsFromDownloadsFolder = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.IMPORT_PROJECT}));
+  };
+
+  const onLoadProjectsFromServer = () => {
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT}));
   };
 
   const onStartNewProject = () => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.NEW_PROJECT}));

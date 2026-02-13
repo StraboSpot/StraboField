@@ -5,7 +5,6 @@ import {isEmpty} from '../../shared/Helpers';
 import {Form, MainButtons} from '../form';
 
 const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) => {
-
   const igneousRockClass = formName[1];
 
   const renderSpecificIgneousRock = () => {

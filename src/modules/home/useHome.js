@@ -39,11 +39,46 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
 
+  /* Internal Functions */
+
   const cancelEdits = async () => {
     await mapComponentRef.current?.cancelEdits();
     setMapMode(MAP_MODES.VIEW);
     unlockOrientation();
   };
+
+  const createPointAtCurrentLocation = async () => {
+    try {
+      dispatch(setLoadingStatus({view: 'home', bool: true}));
+      await setPointAtCurrentLocation();
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      toast.show(`Point Spot Added at Current\n Location to Dataset ${getTargetDatasetFromId().name.toUpperCase()}`,
+        {type: 'success'});
+      openNotebookPanel();
+    }
+    catch (err) {
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      console.error('Error setting point to current location', err);
+    }
+  };
+
+  const saveEdits = async () => {
+    mapComponentRef.current?.saveEdits();
+    //cancelEdits();
+    setMapMode(MAP_MODES.VIEW);
+    unlockOrientation();
+  };
+
+  const setDraw = async (mapModeToSet) => {
+    mapComponentRef.current?.cancelDraw();
+    if (mapMode === mapModeToSet
+      || (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON && mapModeToSet === MAP_MODES.DRAW.POLYGON)
+      || (mapMode === MAP_MODES.DRAW.FREEHANDLINE && mapModeToSet === MAP_MODES.DRAW.LINE)
+    ) mapModeToSet = MAP_MODES.VIEW;
+    setMapMode(mapModeToSet);
+  };
+
+  /* Exported Functions */
 
   const clickHandler = async (name, value) => {
     switch (name) {
@@ -128,21 +163,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     }
   };
 
-  const createPointAtCurrentLocation = async () => {
-    try {
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
-      await setPointAtCurrentLocation();
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show(`Point Spot Added at Current\n Location to Dataset ${getTargetDatasetFromId().name.toUpperCase()}`,
-        {type: 'success'});
-      openNotebookPanel();
-    }
-    catch (err) {
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      console.error('Error setting point to current location', err);
-    }
-  };
-
   const dialogClickHandler = (dialog, name, position) => {
     clickHandler(name, position);
     toggleDialog(dialog);
@@ -173,22 +193,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     }
   };
 
-  const saveEdits = async () => {
-    mapComponentRef.current?.saveEdits();
-    //cancelEdits();
-    setMapMode(MAP_MODES.VIEW);
-    unlockOrientation();
-  };
-
-  const setDraw = async (mapModeToSet) => {
-    mapComponentRef.current?.cancelDraw();
-    if (mapMode === mapModeToSet
-      || (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON && mapModeToSet === MAP_MODES.DRAW.POLYGON)
-      || (mapMode === MAP_MODES.DRAW.FREEHANDLINE && mapModeToSet === MAP_MODES.DRAW.LINE)
-    ) mapModeToSet = MAP_MODES.VIEW;
-    setMapMode(mapModeToSet);
-  };
-
   const setMapModeToEdit = () => {
     lockOrientation();
     setMapMode(MAP_MODES.EDIT);
@@ -210,10 +214,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     dialogs,
     distance,
     endMeasurement,
-    selectingMode,
     mapMode,
     onCancel,
     onEndDrawPressed,
+    selectingMode,
     setDistance,
     setMapModeToEdit,
     toggleDialog,

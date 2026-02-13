@@ -21,6 +21,8 @@ const useMapFeaturesCalculated = (mapRef) => {
     'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
     'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
+  /* Internal Functions */
+
   const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
     let minDistance = Number.MAX_VALUE;
     let minIndex = -1;
@@ -72,6 +74,8 @@ const useMapFeaturesCalculated = (mapRef) => {
     }
     return distances;
   };
+
+  /* Exported Functions */
 
   // Get the nearest draw feature from the draw layer where the screen was pressed
   const getDrawFeatureAtPress = async (screenPointX, screenPoint) => {

@@ -29,6 +29,9 @@ const useMapView = () => {
   const toast = useToast();
   const {convertImagePixelsToLatLong, getBoundsPadded} = useMapCoords();
 
+  const isOnImageBasemap = feature => feature.properties?.image_basemap;
+  const isOnStratSection = feature => feature.properties?.strat_section_id;
+
   // Evaluate and return appropriate center coordinates
   const getCenterCoordinates = () => {
     // console.log('Getting initial map center...', center);
@@ -75,10 +78,6 @@ const useMapView = () => {
     if (isEmpty(feature)) return false;
     return !feature.properties.image_basemap && !feature.properties.strat_section_id;
   };
-
-  const isOnImageBasemap = feature => feature.properties?.image_basemap;
-
-  const isOnStratSection = feature => feature.properties?.strat_section_id;
 
   const setMapView = (newCenter, newZoom) => {
     if (!isEqual(center, newCenter)) dispatch(setCenter(newCenter));

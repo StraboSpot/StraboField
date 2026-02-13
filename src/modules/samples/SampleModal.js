@@ -175,6 +175,35 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     );
   };
 
+  const renderSampleMainContent = () => {
+    return (
+      <>
+        <FlatList
+          ListHeaderComponent={
+            <Formik
+              enableReinitialize={true}
+              initialValues={{
+                material_type: 'intact_rock',
+                sample_type: 'individual_sample',
+                sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
+                inplaceness_of_sample: '5___definitely',
+              }}
+              innerRef={formRef}
+              onSubmit={values => console.log('Submitting form...', values)}>
+              {formProps => (
+                <View style={{flex: 1}}>
+                  {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
+                </View>
+              )}
+            </Formik>
+          }
+          bounces={false}
+        />
+        {!choicesViewKey && <ActionButton isLoading={isLoading} onPress={() => saveForm(formRef.current)}/>}
+      </>
+    );
+  };
+
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
@@ -245,35 +274,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
       else toast.show(toastMsg, toastOptions);
     }
-  };
-
-  const renderSampleMainContent = () => {
-    return (
-      <>
-        <FlatList
-          ListHeaderComponent={
-            <Formik
-              enableReinitialize={true}
-              initialValues={{
-                material_type: 'intact_rock',
-                sample_type: 'individual_sample',
-                sample_id_name: namePrefix + (namePostfix || (startingNumber < 10 ? '0' + startingNumber : startingNumber)),
-                inplaceness_of_sample: '5___definitely',
-              }}
-              innerRef={formRef}
-              onSubmit={values => console.log('Submitting form...', values)}>
-              {formProps => (
-                <View style={{flex: 1}}>
-                  {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
-                </View>
-              )}
-            </Formik>
-          }
-          bounces={false}
-        />
-        {!choicesViewKey && <ActionButton isLoading={isLoading} onPress={() => saveForm(formRef.current)}/>}
-      </>
-    );
   };
 
   return (

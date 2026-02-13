@@ -11,7 +11,6 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const Documentation = ({navigation}) => {
-
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
   const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);

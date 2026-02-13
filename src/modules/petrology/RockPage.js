@@ -88,19 +88,6 @@ const RockPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: page.key}));
   };
 
-  const editRock = (rock, i) => {
-    if (!rock.id) {
-      let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-      rock = {...rock, id: getNewUUID()};
-      editedSedData[pageKey].splice(i, 1, rock);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    }
-    setIsDetailView(true);
-    setSelectedRock(rock);
-    dispatch(setModalVisible({modal: null}));
-  };
-
   const copyPetData = (spotId) => {
     const spotToCopy = getSpotById(spotId);
 
@@ -155,6 +142,19 @@ const RockPage = ({isReadOnly, page}) => {
     else console.log('Spot to copy is empty. Aborting copying.');
   };
 
+  const editRock = (rock, i) => {
+    if (!rock.id) {
+      let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
+      rock = {...rock, id: getNewUUID()};
+      editedSedData[pageKey].splice(i, 1, rock);
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    }
+    setIsDetailView(true);
+    setSelectedRock(rock);
+    dispatch(setModalVisible({modal: null}));
+  };
+
   const getSpotsWithRockType = () => {
     const allActiveSpotsWithGroupKey = getSpotsWithKey(groupKey);
     setSpotsWithRockType(allActiveSpotsWithGroupKey.filter(s => s.properties.id !== spot.properties.id
@@ -191,6 +191,28 @@ const RockPage = ({isReadOnly, page}) => {
           </ListItem.Content>
         </ListItem>
       </Formik>
+    );
+  };
+
+  const renderRockDetail = () => {
+    return (
+      <BasicPageDetail
+        closeDetailView={() => setIsDetailView(false)}
+        groupKey={groupKey}
+        isReadOnly={isReadOnly}
+        page={page}
+        selectedFeature={selectedRock}
+      />
+    );
+  };
+
+  const renderRockMain = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader pageTitle={page.label}/>
+        {!isReadOnly && renderCopySelect()}
+        {renderSections()}
+      </View>
     );
   };
 
@@ -240,28 +262,6 @@ const RockPage = ({isReadOnly, page}) => {
         sections={rocksGrouped}
         stickySectionHeadersEnabled={true}
       />
-    );
-  };
-
-  const renderRockDetail = () => {
-    return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
-        groupKey={groupKey}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedRock}
-      />
-    );
-  };
-
-  const renderRockMain = () => {
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader pageTitle={page.label}/>
-        {!isReadOnly && renderCopySelect()}
-        {renderSections()}
-      </View>
     );
   };
 

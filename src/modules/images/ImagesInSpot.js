@@ -8,7 +8,6 @@ import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const ImagesInSpot = ({isReadOnly, saveImages}) => {
-
   const dispatch = useDispatch();
   const images = useSelector(state => state.spot.selectedSpot.properties?.images) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);

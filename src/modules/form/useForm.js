@@ -6,6 +6,7 @@ import alert from '../../shared/ui/alert';
 import {LABEL_DICTIONARY} from '../form';
 
 const useForm = () => {
+  /* Internal Functions */
 
   const covertXLSFormLogicToJS = (logic) => {
     logic = logic.replace(/not/g, '!');
@@ -19,6 +20,20 @@ const useForm = () => {
     logic = logic.replace(/ and /g, ' && ');
     return logic;
   };
+
+  const isRequired = (field, values) => {
+    if (field.required === 'true' || field.required === true) return true;
+    else if (field.required === 'false' || field.required === false || isEmpty(field.required)) return false;
+    else {
+      const requiredLogicJS = covertXLSFormLogicToJS(field.required);
+      // console.log(field.name, 'required:', requiredLogicJS);
+
+      const F = new Function('values', 'return ' + requiredLogicJS);
+      return F(values);
+    }
+  };
+
+  /* Exported Functions */
 
   // Return the choices object given the form category and name
   const getChoices = ([category, name]) => {
@@ -111,18 +126,6 @@ const useForm = () => {
 
     const F = new Function('values', 'return ' + relevantLogicJS);
     return F(values);
-  };
-
-  const isRequired = (field, values) => {
-    if (field.required === 'true' || field.required === true) return true;
-    else if (field.required === 'false' || field.required === false || isEmpty(field.required)) return false;
-    else {
-      const requiredLogicJS = covertXLSFormLogicToJS(field.required);
-      // console.log(field.name, 'required:', requiredLogicJS);
-
-      const F = new Function('values', 'return ' + requiredLogicJS);
-      return F(values);
-    }
   };
 
   // Remove errors from data, if any, and show alert. Throw error if not leaving page.

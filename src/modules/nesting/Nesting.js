@@ -40,48 +40,6 @@ const Nesting = () => {
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
-  const renderImage = async (image, index) => {
-    return (
-      <ImageCard
-        areImageThumbnailsLoading={areImageThumbnailsLoading}
-        image={image}
-        imageThumbnailURIs={imageThumbnailURIs}
-        index={index}
-        isThumbnailOnly
-        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
-        setImageThumbnailURIs={setImageThumbnailURIs}
-      />
-    );
-  };
-
-  const renderItem = (spot) => {
-    if (spot && spot.properties) {
-      if (spot.properties.image_basemap) {
-        const image = getImageByImageId(spot.properties.image_basemap);
-        return (
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{alignSelf: 'center'}}>
-              {renderImage(image, 0)}
-            </View>
-            <View style={{flex: 1, alignSelf: 'center'}}>
-              {renderName(spot)}
-            </View>
-          </View>
-        );
-      }
-      else return renderName(spot);
-    }
-  };
-
-  const renderName = (spot) => {
-    return (
-      <SpotsListItem
-        onPress={() => handleSpotSelected(spot)}
-        spot={spot}
-      />
-    );
-  };
-
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
     const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
@@ -152,6 +110,48 @@ const Nesting = () => {
           />
         </View>
       </View>
+    );
+  };
+
+  const renderImage = async (image, index) => {
+    return (
+      <ImageCard
+        areImageThumbnailsLoading={areImageThumbnailsLoading}
+        image={image}
+        imageThumbnailURIs={imageThumbnailURIs}
+        index={index}
+        isThumbnailOnly
+        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
+        setImageThumbnailURIs={setImageThumbnailURIs}
+      />
+    );
+  };
+
+  const renderItem = (spot) => {
+    if (spot && spot.properties) {
+      if (spot.properties.image_basemap) {
+        const image = getImageByImageId(spot.properties.image_basemap);
+        return (
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{alignSelf: 'center'}}>
+              {renderImage(image, 0)}
+            </View>
+            <View style={{flex: 1, alignSelf: 'center'}}>
+              {renderName(spot)}
+            </View>
+          </View>
+        );
+      }
+      else return renderName(spot);
+    }
+  };
+
+  const renderName = (spot) => {
+    return (
+      <SpotsListItem
+        onPress={() => handleSpotSelected(spot)}
+        spot={spot}
+      />
     );
   };
 

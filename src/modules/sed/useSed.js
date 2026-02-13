@@ -29,6 +29,8 @@ const useSed = () => {
 
   const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
+  /* Internal Functions */
+
   // Check for any changes we need to make to the Sed fields or geometry when a Spot that is a strat interval
   // has fields that are changed
   const checkForIntervalUpdates = (pageKey, spot, savedSpot) => {
@@ -170,6 +172,15 @@ const useSed = () => {
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
 
+  const deleteStratSection = (spot) => {
+    let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
+    delete editedSedData.strat_section;
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+  };
+
+  /* Exported Functions */
+
   const deleteSedFeature = (key, spot, selectedFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
@@ -194,13 +205,6 @@ const useSed = () => {
       editedSedData[pageKey] = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-  };
-
-  const deleteStratSection = (spot) => {
-    let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
-    delete editedSedData.strat_section;
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };

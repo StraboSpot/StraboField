@@ -19,6 +19,17 @@ const BasicOverviewList = ({page}) => {
   const isPet = PET_PAGES.find(p => p.key === page.key);
   const isSed = SED_PAGES.find(p => p.key === page.key);
 
+  const addIdForSS1ImportedSedData = (item, i) => {
+    let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
+    item = {...item, id: getNewUUID()};
+    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) editedSedData[PAGE_KEYS.LITHOLOGIES].splice(i, 1, item);
+    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, item);
+    else editedSedData[page.key].splice(i, 1, item);
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    dispatch(setSelectedAttributes([item]));
+  };
+
   const getData = () => {
     let data = spot.properties[page.key] || [];
     if (isPet && spot.properties.pet) {
@@ -36,17 +47,6 @@ const BasicOverviewList = ({page}) => {
 
     if (!Array.isArray(data)) data = [];
     return data;
-  };
-
-  const addIdForSS1ImportedSedData = (item, i) => {
-    let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-    item = {...item, id: getNewUUID()};
-    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) editedSedData[PAGE_KEYS.LITHOLOGIES].splice(i, 1, item);
-    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, item);
-    else editedSedData[page.key].splice(i, 1, item);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    dispatch(setSelectedAttributes([item]));
   };
 
   const onItemPressed = (item, i) => {

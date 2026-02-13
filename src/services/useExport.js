@@ -45,6 +45,8 @@ const useExport = () => {
     spotsDb: spotsDb,
   };
 
+  /* Internal Functions */
+
   const backupProjectToDevice = async (fileName) => {
     await gatherDataForBackup(fileName);
     console.log('Added Project Data to backup.');
@@ -181,6 +183,25 @@ const useExport = () => {
     }
   };
 
+  const moveDistributedImage = async (image_id, fileName, directory) => {
+    try {
+      const imageExists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES + image_id + '.jpg');
+      if (imageExists) {
+        await copyFiles(APP_DIRECTORIES.IMAGES + image_id + '.jpg',
+          directory + fileName + '/images/' + image_id + '.jpg');
+        imageSuccess++;
+        console.log(imageSuccess, 'Copied image to backup:', image_id);
+      }
+      else throw Error('Image not found.');
+    }
+    catch (err) {
+      imageBackupFailures++;
+      console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
+    }
+  };
+
+  /* Exported Functions */
+
   const initializeBackup = async (fileName) => {
     try {
       if (hasSpace(fileName)) fileName = fileName.replaceAll(' ', '_');
@@ -200,23 +221,6 @@ const useExport = () => {
     }
     catch (err) {
       console.error('Error Saving Project!: ', err);
-    }
-  };
-
-  const moveDistributedImage = async (image_id, fileName, directory) => {
-    try {
-      const imageExists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES + image_id + '.jpg');
-      if (imageExists) {
-        await copyFiles(APP_DIRECTORIES.IMAGES + image_id + '.jpg',
-          directory + fileName + '/images/' + image_id + '.jpg');
-        imageSuccess++;
-        console.log(imageSuccess, 'Copied image to backup:', image_id);
-      }
-      else throw Error('Image not found.');
-    }
-    catch (err) {
-      imageBackupFailures++;
-      console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
     }
   };
 

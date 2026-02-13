@@ -49,6 +49,34 @@ const Geography = ({isReadOnly}) => {
     );
   };
 
+  const renderGeoCoords = (initialGeomValues) => {
+    return (
+      <>
+        {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
+          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
+          : renderGeoFieldText(initialGeomValues)
+        }
+      </>
+    );
+  };
+
+  const renderGeoFieldText = () => {
+    return (
+      <ListItem containerStyle={commonStyles.listItemFormField}>
+        <ListItem.Content>
+          <Field
+            appearance={'multiline'}
+            component={TextInputField}
+            editable={false}
+            key={'coordsString'}
+            label={'Coordinates as [Longitude, Latitude]'}
+            name={'coordsString'}
+          />
+        </ListItem.Content>
+      </ListItem>
+    );
+  };
+
   // Render the form for the Geometry
   const renderGeometryForm = () => {
     // Get the array of coordinates as a string
@@ -127,34 +155,6 @@ const Geography = ({isReadOnly}) => {
           </View>
         )}
       </Formik>
-    );
-  };
-
-  const renderGeoCoords = (initialGeomValues) => {
-    return (
-      <>
-        {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
-          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
-          : renderGeoFieldText(initialGeomValues)
-        }
-      </>
-    );
-  };
-
-  const renderGeoFieldText = () => {
-    return (
-      <ListItem containerStyle={commonStyles.listItemFormField}>
-        <ListItem.Content>
-          <Field
-            appearance={'multiline'}
-            component={TextInputField}
-            editable={false}
-            key={'coordsString'}
-            label={'Coordinates as [Longitude, Latitude]'}
-            name={'coordsString'}
-          />
-        </ListItem.Content>
-      </ListItem>
     );
   };
 

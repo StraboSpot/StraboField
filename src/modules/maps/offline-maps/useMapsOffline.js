@@ -41,7 +41,8 @@ const useMapsOffline = () => {
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl, getTilesFromHost, zipURLStatus} = useServerRequests();
 
-  //INTERNAL
+  /* Internal Functions */
+
   const adjustTileCount = async (files) => {
     console.log(`Adjusting Tile Count... ${files}`);
     for (const file of files) {
@@ -55,6 +56,72 @@ const useMapsOffline = () => {
       else await addMapFromDeviceToRedux(file);
     }
   };
+
+  const checkIfZipStatusReady = (data) => {
+    return data.status === 'Zip File Ready.';
+  };
+
+  const createOfflineMapObject = async (mapId, customMap) => {
+    let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
+    tileCount = tileCount.length;
+
+    let map = {
+      id: mapId,
+      name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
+      count: tileCount,
+      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
+      source: !mapId ? source : 'direct from filesystem',
+      mapId: zipUID,
+      date: new Date().toLocaleString(),
+      isOfflineMapVisible: false,
+      version: 8,
+      sources: {
+        'raster-tiles': {
+          type: 'raster',
+          tiles: ['file://' + APP_DIRECTORIES.TILE_CACHE + mapId + '/tiles/{z}_{x}_{y}.png'],
+          tileSize: 256,
+        },
+      },
+      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      layers: [{
+        id: mapId,
+        type: 'raster',
+        source: 'raster-tiles',
+        minzoom: 0,
+      }],
+    };
+    console.log(map);
+    return map;
+  };
+
+  const getMapNameFromId = (mapID) => {
+    const mapObj = DEFAULT_MAPS.find(mapType => mapType.id === mapID);
+    if (!mapObj) {
+      const name = customMaps[mapID]?.title ? customMaps[mapID].title : mapID;
+      return name;
+    }
+    return mapObj.title;
+  };
+
+  const getMedian = (arr) => {
+    arr = arr.slice(0); // create copy
+    const middle = (arr.length + 1) / 2;
+    const sorted = arr.sort((a, b) => a - b);
+    return (sorted.length % 2) ? sorted[middle - 1] : (sorted[middle - 1.5] + sorted[middle - 0.5]) / 2;
+  };
+
+  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+  const tile2lat = (y, z) => {
+    const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
+    return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
+  };
+
+  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+  const tile2long = (x, z) => {
+    return (x / Math.pow(2, z) * 360 - 180);
+  };
+
+  /* Exported Functions */
 
   const addMapFromDeviceToRedux = async (mapId) => {
     const map = await createOfflineMapObject(mapId);
@@ -91,10 +158,6 @@ const useMapsOffline = () => {
     }
   };
 
-  const checkIfZipStatusReady = (data) => {
-    return data.status === 'Zip File Ready.';
-  };
-
   const checkZipStatus = async (zipId) => {
     return new Promise((resolve, reject) => {
       const interval = setInterval(async () => {
@@ -113,39 +176,6 @@ const useMapsOffline = () => {
       console.error('Error:', error);
       return Promise.reject(error);
     });
-  };
-
-  const createOfflineMapObject = async (mapId, customMap) => {
-    let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
-    tileCount = tileCount.length;
-
-    let map = {
-      id: mapId,
-      name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
-      count: tileCount,
-      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
-      source: !mapId ? source : 'direct from filesystem',
-      mapId: zipUID,
-      date: new Date().toLocaleString(),
-      isOfflineMapVisible: false,
-      version: 8,
-      sources: {
-        'raster-tiles': {
-          type: 'raster',
-          tiles: ['file://' + APP_DIRECTORIES.TILE_CACHE + mapId + '/tiles/{z}_{x}_{y}.png'],
-          tileSize: 256,
-        },
-      },
-      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
-      layers: [{
-        id: mapId,
-        type: 'raster',
-        source: 'raster-tiles',
-        minzoom: 0,
-      }],
-    };
-    console.log(map);
-    return map;
   };
 
   const doUnzip = async () => {
@@ -213,15 +243,6 @@ const useMapsOffline = () => {
     }
   };
 
-  const getMapNameFromId = (mapID) => {
-    const mapObj = DEFAULT_MAPS.find(mapType => mapType.id === mapID);
-    if (!mapObj) {
-      const name = customMaps[mapID]?.title ? customMaps[mapID].title : mapID;
-      return name;
-    }
-    return mapObj.title;
-  };
-
   // Start getting the tiles to download by creating a zip url
   const getMapTiles = async (extentString, downloadZoom) => {
     try {
@@ -270,15 +291,6 @@ const useMapsOffline = () => {
       console.error('Error Getting Map Tiles.', err);
       throw new Error(err);
     }
-  };
-
-  const getMedian = (arr) => {
-    arr = arr.slice(0); // create copy
-    const middle = (arr.length + 1) / 2,
-      sorted = arr.sort(function (a, b) {
-        return a - b;
-      });
-    return (sorted.length % 2) ? sorted[middle - 1] : (sorted[middle - 1.5] + sorted[middle - 0.5]) / 2;
   };
 
   const getSavedMapsFromDevice = async () => {
@@ -384,17 +396,6 @@ const useMapsOffline = () => {
           ]);
       }
     }
-  };
-
-  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-  const tile2long = (x, z) => {
-    return (x / Math.pow(2, z) * 360 - 180);
-  };
-
-  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-  const tile2lat = (y, z) => {
-    const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
-    return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
   };
 
   const updateMapTileCountWhenSaving = async (mapId) => {

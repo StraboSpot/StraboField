@@ -31,19 +31,7 @@ const useTags = () => {
 
   const {getLabel} = useForm();
 
-  // link unlink given tag and spot feature.
-  const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
-    const featureData = feature.id;
-    if (!tag.features) tag.features = {};
-    if (isEmpty(tag.features[spotId])) tag.features[spotId] = [featureData];
-    else {
-      let featureTagsForSpot = tag.features[spotId];
-      const index = featureTagsForSpot.findIndex(id => id === feature.id);
-      if (index === -1) featureTagsForSpot.push(featureData);
-      else featureTagsForSpot.splice(index, 1);
-    }
-    saveTag(tag);
-  };
+  /* Internal Functions */
 
   // link unlink multiple tags and spot features.
   const addRemoveSpotFeaturesFromTag = (tag, features, spotId, isAlreadyChecked) => {
@@ -60,6 +48,42 @@ const useTags = () => {
       }
     });
     tag.features[spotId] = featureTagsForSpot;
+    saveTag(tag);
+  };
+
+  const getFeature = (spotId, featureId) => {
+    const spot = spots[spotId];
+    if (!isEmpty(spot) && !isEmpty(spot.properties)) {
+      let foundFeature = deepFindFeatureById(spot.properties, featureId);
+      return JSON.parse(JSON.stringify(foundFeature));
+    }
+  };
+
+  const getFeatureLabel = (feature) => {
+    return feature && (feature.label || feature.name_of_experiment || 'Unknown Name');
+  };
+
+  const getFeatureTagsAtSpot = (featuresAtSpot) => {
+    if (isEmpty(selectedSpot)) return [];
+    let spotId = selectedSpot.properties.id;
+    let featureIds = featuresAtSpot.map(feature => feature.id);
+    return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
+      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
+  };
+
+  /* Exported Functions */
+
+  // link unlink given tag and spot feature.
+  const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
+    const featureData = feature.id;
+    if (!tag.features) tag.features = {};
+    if (isEmpty(tag.features[spotId])) tag.features[spotId] = [featureData];
+    else {
+      let featureTagsForSpot = tag.features[spotId];
+      const index = featureTagsForSpot.findIndex(id => id === feature.id);
+      if (index === -1) featureTagsForSpot.push(featureData);
+      else featureTagsForSpot.splice(index, 1);
+    }
     saveTag(tag);
   };
 
@@ -159,14 +183,6 @@ const useTags = () => {
     return allTaggedFeatures;
   };
 
-  const getFeature = (spotId, featureId) => {
-    const spot = spots[spotId];
-    if (!isEmpty(spot) && !isEmpty(spot.properties)) {
-      let foundFeature = deepFindFeatureById(spot.properties, featureId);
-      return JSON.parse(JSON.stringify(foundFeature));
-    }
-  };
-
   const getFeatureDisplayComponent = (featureType, spotFeature) => {
     switch (featureType) {
       case PAGE_KEYS.MEASUREMENTS:
@@ -178,18 +194,6 @@ const useTags = () => {
       default:
         return <Text>{spotFeature.label}</Text>;
     }
-  };
-
-  const getFeatureLabel = (feature) => {
-    return feature && (feature.label || feature.name_of_experiment || 'Unknown Name');
-  };
-
-  const getFeatureTagsAtSpot = (featuresAtSpot) => {
-    if (isEmpty(selectedSpot)) return [];
-    let spotId = selectedSpot.properties.id;
-    let featureIds = featuresAtSpot.map(feature => feature.id);
-    return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
-      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
   };
 
   const getGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
@@ -217,9 +221,10 @@ const useTags = () => {
     return validSpots.reduce((acc, spotId) => acc + tag.features[spotId].length, 0);
   };
 
-  const getTagSpotsCount = (tag) => {
-    const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
-    return validSpots.length;
+  const getTagLabel = (key) => {
+    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
+    if (key) return getLabel(key, formName);
+    return 'No Type Specified';
   };
 
   // to display all tags at given feature.
@@ -237,10 +242,9 @@ const useTags = () => {
     return projectTags.filter(tag => tag.spots && tag.spots.includes(spotId));
   };
 
-  const getTagLabel = (key) => {
-    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
-    if (key) return getLabel(key, formName);
-    return 'No Type Specified';
+  const getTagSpotsCount = (tag) => {
+    const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
+    return validSpots.length;
   };
 
   const renderTagInfo = () => {
@@ -321,9 +325,9 @@ const useTags = () => {
     getNonGeologicUnitTagsAtSpot,
     getTagFeaturesCount,
     getTagLabel,
-    getTagSpotsCount,
     getTagsAtFeature,
     getTagsAtSpot,
+    getTagSpotsCount,
     renderTagInfo,
     saveTag,
     setFeaturesSelectedForMultiTagging,

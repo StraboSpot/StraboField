@@ -43,12 +43,6 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
     getAllProjects().then(() => console.log('OK got projects'));
   }, [doRefresh]);
 
-  const handleStateChange = async (state) => {
-    if (state === 'active' && source === 'device') {
-      getAllProjects().then(() => console.log('Updated Project List'));
-    }
-  };
-
   const getAllProjects = async () => {
     let projectsResponse;
     setLoading(true);
@@ -68,6 +62,12 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
       console.log('List of Projects:', projectsResponse);
       setProjectsArr(projectsResponse);
       setLoading(false);
+    }
+  };
+
+  const handleStateChange = async (state) => {
+    if (state === 'active' && source === 'device') {
+      getAllProjects().then(() => console.log('Updated Project List'));
     }
   };
 

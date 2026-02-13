@@ -31,6 +31,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const spotsCount = dataset.spotIds?.length || 0;
 
   const isActive = activeDatasetsIds.includes(dataset.id);
+  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
 
   const downloadImages = async () => {
     setIsDownloadingImages(true);
@@ -49,52 +50,12 @@ const DatasetPreferencesListItem = ({dataset}) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-
   const onSwitch = async (val) => {
     const value = await setSwitchValue(val, dataset);
     console.log('Value has been switched', value);
   };
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
-
-  const renderStateIcon = () => {
-    return (
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
-          <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>
-            {checked ? 'Target Dataset' : ''}
-          </Text>
-        </ListItem>
-        <Icon
-          color={checked ? themes.PRIMARY_ACCENT_COLOR
-            : isActive || isReadOnly ? themes.MEDIUMGREY
-              : themes.SECONDARY_BACKGROUND_COLOR}
-          containerStyle={{paddingRight: 10}}
-          disabled={!isActive}
-          disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
-          name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => makeDatasetCurrent(dataset.id)}
-          type={'ionicon'}
-        />
-      </View>
-    );
-  };
-
-  const renderIsActiveDatasetSwitch = () => {
-    return (
-      <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
-        <ListItem.Content
-          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-        >
-          <View style={{flex: 1}}>
-            <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
-          </View>
-        </ListItem.Content>
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
-      </ListItem>
-    );
-  };
 
   const renderDownloadImages = () => {
     return (
@@ -124,6 +85,21 @@ const DatasetPreferencesListItem = ({dataset}) => {
     );
   };
 
+  const renderIsActiveDatasetSwitch = () => {
+    return (
+      <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
+        <ListItem.Content
+          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+        >
+          <View style={{flex: 1}}>
+            <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
+          </View>
+        </ListItem.Content>
+        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
+      </ListItem>
+    );
+  };
+
   const renderReadOnlyDatasetButton = () => {
     return (
       <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
@@ -134,6 +110,29 @@ const DatasetPreferencesListItem = ({dataset}) => {
         </ListItem.Content>
         <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
       </ListItem>
+    );
+  };
+
+  const renderStateIcon = () => {
+    return (
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
+          <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>
+            {checked ? 'Target Dataset' : ''}
+          </Text>
+        </ListItem>
+        <Icon
+          color={checked ? themes.PRIMARY_ACCENT_COLOR
+            : isActive || isReadOnly ? themes.MEDIUMGREY
+              : themes.SECONDARY_BACKGROUND_COLOR}
+          containerStyle={{paddingRight: 10}}
+          disabled={!isActive}
+          disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
+          name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
+          onPress={() => makeDatasetCurrent(dataset.id)}
+          type={'ionicon'}
+        />
+      </View>
     );
   };
 

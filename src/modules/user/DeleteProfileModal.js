@@ -16,7 +16,6 @@ import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 
 const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDeleteProfileModalVisible}) => {
-
   const [confirmDeleteMessageVisible, setConfirmDeleteMessageVisible] = useState(false);
   const [deleteProfileInputValue, setDeleteProfileInputValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,19 +24,8 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
   const {clearUser} = useResetState();
   const {authenticateUser, deleteAccount} = useServerRequests();
 
-
-  const handleOnChange = (text) => {
-    if (!isEmpty(errorMessage)) setErrorMessage('');
-    setDeleteProfileInputValue(text);
-  };
-
-  const handleDeleteModalClose = () => {
-    console.log('handleDeleteModalClose');
-    setDeleteProfileModalVisible(false);
-    setDeleteProfileInputValue('');
-    setErrorMessage('');
-    // setConfirmDeleteMessageVisible(false);
-  };
+  const offlineText = <Text style={userStyles.deleteProfileText}>You must be online in order to delete your
+    account.</Text>;
 
   const authenticate = async () => {
     if (!isEmpty(deleteProfileInputValue)) {
@@ -51,22 +39,6 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
     else setErrorMessage('Need to enter your password');
   };
 
-  const onDeletePressed = async () => {
-    const encodedLogin = Base64.encode(`${email}:${deleteProfileInputValue}`);
-    console.log(encodedLogin);
-    const res = await deleteAccount(encodedLogin);
-    console.log('ACCOUNT DELETED!', res);
-    setDeleteProfileModalVisible(false);
-    clearUser();  // Navigation happens automatically when clearUser() sets isAuthenticated to false
-    toast.show('Account Successfully Deleted!', {type: 'success', duration: 2000});
-  };
-
-  const goBack = () => {
-    setConfirmDeleteMessageVisible(false);
-    setDeleteProfileInputValue('');
-    setErrorMessage('');
-  };
-
   const deleteModalText = (
     <View>
       <Text style={userStyles.deleteProfileText}>
@@ -77,8 +49,35 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
     </View>
   );
 
-  const offlineText = <Text style={userStyles.deleteProfileText}>You must be online in order to delete your
-    account.</Text>;
+  const goBack = () => {
+    setConfirmDeleteMessageVisible(false);
+    setDeleteProfileInputValue('');
+    setErrorMessage('');
+  };
+
+  const handleDeleteModalClose = () => {
+    console.log('handleDeleteModalClose');
+    setDeleteProfileModalVisible(false);
+    setDeleteProfileInputValue('');
+    setErrorMessage('');
+    // setConfirmDeleteMessageVisible(false);
+  };
+
+
+  const handleOnChange = (text) => {
+    if (!isEmpty(errorMessage)) setErrorMessage('');
+    setDeleteProfileInputValue(text);
+  };
+
+  const onDeletePressed = async () => {
+    const encodedLogin = Base64.encode(`${email}:${deleteProfileInputValue}`);
+    console.log(encodedLogin);
+    const res = await deleteAccount(encodedLogin);
+    console.log('ACCOUNT DELETED!', res);
+    setDeleteProfileModalVisible(false);
+    clearUser();  // Navigation happens automatically when clearUser() sets isAuthenticated to false
+    toast.show('Account Successfully Deleted!', {type: 'success', duration: 2000});
+  };
 
   return (
     <ModalWrapper

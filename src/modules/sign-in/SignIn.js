@@ -16,7 +16,6 @@ import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
 
@@ -28,6 +27,13 @@ const SignIn = ({navigation}) => {
 
   const {guestSignIn, signIn} = useSignIn();
 
+  const handleGuestSignIn = async () => {
+    await guestSignIn();
+    console.log('GUEST SIGN IN');
+  };
+
+  const handleRegister = () => navigation.navigate('SignUp');
+
   const handleSignIn = async () => {
     try {
       setLoading(true);
@@ -38,13 +44,6 @@ const SignIn = ({navigation}) => {
       setLoading(false);
     }
   };
-
-  const handleGuestSignIn = async () => {
-    await guestSignIn();
-    console.log('GUEST SIGN IN');
-  };
-
-  const handleRegister = () => navigation.navigate('SignUp');
 
   const renderButtons = () => {
     return (

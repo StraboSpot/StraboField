@@ -108,6 +108,18 @@ const MineralsPage = ({isReadOnly, page}) => {
     );
   };
 
+  const renderMineralDetail = () => {
+    return (
+      <BasicPageDetail
+        closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
+        isReadOnly={isReadOnly}
+        page={page}
+        selectedFeature={selectedMineral}
+      />
+    );
+  };
+
   const renderMineralsList = () => {
     let mineralData = spot.properties.pet && spot.properties.pet[page.key] || [];
     if (!Array.isArray(mineralData)) mineralData = [];
@@ -119,18 +131,6 @@ const MineralsPage = ({isReadOnly, page}) => {
         data={mineralDataSorted}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
-      />
-    );
-  };
-
-  const renderMineralDetail = () => {
-    return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
-        groupKey={'pet'}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedMineral}
       />
     );
   };

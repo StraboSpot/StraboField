@@ -11,7 +11,6 @@ import {PAGE_KEYS} from '../page/page.constants';
 
 // Animations for Drawers & Keyboard
 const useHomeAnimations = ({navigation}) => {
-
   const dispatch = useDispatch();
 
   const animatedValueLeftSide = useRef(new Animated.Value(0)).current;
@@ -37,6 +36,8 @@ const useHomeAnimations = ({navigation}) => {
   const animateRightSide = {transform: [{translateX: animatedValueRightSide}]};
   const animateTextInputs = {transform: [{translateY: animatedValueTextInputs}]};
 
+  /* Internal Functions */
+
   // Used to animate open and close of Settings Panel and Notebook Panel
   const animateDrawer = (animatedState, toValue) => {
     Animated.timing(animatedState, {
@@ -46,6 +47,8 @@ const useHomeAnimations = ({navigation}) => {
       useNativeDriver: Platform.OS !== 'web',
     }).start();
   };
+
+  /* Exported Functions */
 
   const closeMainMenuPanel = () => {
     console.log('Closing Main Menu Panel...');

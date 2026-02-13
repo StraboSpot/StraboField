@@ -14,14 +14,13 @@ import {useTags} from '../tags';
 
 const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
+  const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {getPopulatedPagesKeys} = usePage();
   const {isSpotInReadOnlyDataset} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
   const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
-
-  const selectedTag = useSelector(state => state.project.selectedTag);
 
   const getSpotDataIcons = () => {
     const populatedPagesKeys = getPopulatedPagesKeys(spot);

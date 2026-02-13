@@ -21,6 +21,25 @@ const useAutoLogIn = () => {
 
   const project = useRef(null);
 
+  /* Internal Functions */
+
+  const loadProjectWeb = async (projectId, newEncodedLogin) => {
+    try {
+      await initializeDownload({id: projectId}, newEncodedLogin);
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+    }
+    catch (err) {
+      console.error('Error loading project', err);
+      dispatch(clearedStatusMessages());
+      dispatch(addedStatusMessage('Error loading project!'));
+      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      throw Error;
+    }
+  };
+
+  /* Exported Functions */
+
   const autoLogIn = async () => {
     console.log('Performing Auto Login...');
 
@@ -47,21 +66,6 @@ const useAutoLogIn = () => {
       }
     }
     else throw Error('Credentials not found.');
-  };
-
-  const loadProjectWeb = async (projectId, newEncodedLogin) => {
-    try {
-      await initializeDownload({id: projectId}, newEncodedLogin);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-    }
-    catch (err) {
-      console.error('Error loading project', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error loading project!'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      throw Error;
-    }
   };
 
   return {

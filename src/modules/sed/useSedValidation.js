@@ -8,14 +8,7 @@ const useSedValidation = () => {
   const {getLabel} = useForm();
   const {getSpotWithThisStratSection, isStratInterval} = useSpots();
 
-  const getBasicLithologyIndex = (lithology) => {
-    if (lithology.primary_lithology === 'organic_coal') return 1;
-    else if (lithology.mud_silt_grain_size) return 2;
-    else if (lithology.sand_grain_size) return 3;
-    else if (lithology.congl_grain_size || lithology.breccia_grain_size) return 4;
-    else if (lithology.dunham_classification) return 5;
-    return 0;
-  };
+  /* Internal Functions */
 
   // Get the default units which is the same as the units for the section that this Spot is in
   const getDefaultUnits = (spot) => {
@@ -27,6 +20,17 @@ const useSedValidation = () => {
       }
     }
     return undefined;
+  };
+
+  /* Exported Functions */
+
+  const getBasicLithologyIndex = (lithology) => {
+    if (lithology.primary_lithology === 'organic_coal') return 1;
+    else if (lithology.mud_silt_grain_size) return 2;
+    else if (lithology.sand_grain_size) return 3;
+    else if (lithology.congl_grain_size || lithology.breccia_grain_size) return 4;
+    else if (lithology.dunham_classification) return 5;
+    return 0;
   };
 
   const getSiliciclasticGrainSize = (lithology) => {

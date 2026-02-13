@@ -22,18 +22,16 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const spotsCount = dataset.spotIds?.length || 0;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
+  const isActive = activeDatasetsIds.includes(dataset.id);
+  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
 
   const handleDatasetPressed = () => {
     setDatasetToView(dataset);
   };
 
-  const isActive = activeDatasetsIds.includes(dataset.id);
-
   const isDisabled = (id) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
-
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
 
   const onSwitch = async (val) => {
     const value = await setSwitchValue(val, dataset);

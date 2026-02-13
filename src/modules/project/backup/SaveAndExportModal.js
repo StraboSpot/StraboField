@@ -24,17 +24,6 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
 
-  const getButtonTitle = () => {
-    if (backingUpStatus === '') {
-      if (backupAction === 'save') return 'Save';
-      if (backupAction === 'export') {
-        if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
-        else return selectedFilename ? 'Export' : 'Save & Export';
-      }
-    }
-    else if (backingUpStatus === 'complete' || backingUpStatus === 'error') return 'Close';
-  };
-
   const exportProject = async () => {
     try {
       console.log('FileName', backupFileName);
@@ -58,10 +47,15 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
     }
   };
 
-  const handleClosePress = () => {
-    setBackingUpStatus('');
-    setModalTitle('Confirm or Change Folder Name');
-    closeModal();
+  const getButtonTitle = () => {
+    if (backingUpStatus === '') {
+      if (backupAction === 'save') return 'Save';
+      if (backupAction === 'export') {
+        if (Platform.OS === 'ios') return selectedFilename ? 'Zip' : 'Save & Zip';
+        else return selectedFilename ? 'Export' : 'Save & Export';
+      }
+    }
+    else if (backingUpStatus === 'complete' || backingUpStatus === 'error') return 'Close';
   };
 
   const handleActionPressed = async () => {
@@ -70,6 +64,12 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
       if (backupAction === 'save') await initiateBackup();
       else if (backupAction === 'export') await exportProject();
     }
+  };
+
+  const handleClosePress = () => {
+    setBackingUpStatus('');
+    setModalTitle('Confirm or Change Folder Name');
+    closeModal();
   };
 
   const initiateBackup = async () => {

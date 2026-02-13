@@ -18,17 +18,6 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   // const toast = useToast();
   const toastRef = useRef(null);
 
-  const showToast = (message, type) => {
-    const toastOptions = {
-      type: type,
-      placement: 'top',
-      duration: 2000,
-    };
-    // Fallback to alert on web since react-native-toast-notifications may not work
-    if (Platform.OS === 'web') alert(message);
-    else toastRef.current.show(message, toastOptions);
-  };
-
   const [wasExported, setWasExported] = useState(false);
   const [isExportError, setIsExportError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,6 +42,17 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
       setIsExportError(true);
       setLoading(false);
     }
+  };
+
+  const showToast = (message, type) => {
+    const toastOptions = {
+      type: type,
+      placement: 'top',
+      duration: 2000,
+    };
+    // Fallback to alert on web since react-native-toast-notifications may not work
+    if (Platform.OS === 'web') alert(message);
+    else toastRef.current.show(message, toastOptions);
   };
 
   return (

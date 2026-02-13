@@ -4,6 +4,7 @@ import {checkVersion} from 'react-native-check-version';
 import DeviceInfo from 'react-native-device-info';
 
 const useVersionCheck = () => {
+
   const animateLabel = (animatedPulse) => {
     Animated.sequence([
       // increase size

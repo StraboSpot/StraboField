@@ -55,32 +55,6 @@ const CustomMapDetails = () => {
     }
   }, [customMapToEdit]);
 
-  const saveMap = async () => {
-    try {
-      setIsLoadingModalVisible(true);
-      setIsLoading(true);
-      if (!isEmpty(customMapToEdit)) {
-        setTitle('Updating Custom Map');
-        setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
-        updateMap(editableCustomMapData);
-      }
-      else {
-        setTitle('Saving Custom Map');
-        setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
-        const customMap = await saveCustomMap(editableCustomMapData);
-        console.log(customMap);
-      }
-      setMessage('Success!');
-      setIsLoading(false);
-    }
-    catch (err) {
-      console.error('Error saving custom map', err);
-      setTitle('Something went wrong!');
-      setMessage(err);
-      setIsLoading(false);
-    }
-  };
-
   const confirmDeleteMap = async () => {
     alert(
       'Delete Custom Map',
@@ -198,23 +172,6 @@ const CustomMapDetails = () => {
     );
   };
 
-  const renderTitle = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Custom Map Title'}/>
-        <Input
-          containerStyle={{paddingHorizontal: 10}}
-          errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
-          errorStyle={customMapStyles.requiredMessage}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          inputStyle={formStyles.fieldValue}
-          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
-          value={editableCustomMapData?.title || ''}
-        />
-      </>
-    );
-  };
-
   const renderOverlaySection = () => {
     const opacity = editableCustomMapData?.opacity && typeof (editableCustomMapData.opacity) === 'number'
     && editableCustomMapData.opacity >= 0 && editableCustomMapData.opacity <= 1 ? editableCustomMapData.opacity : 1;
@@ -267,6 +224,49 @@ const CustomMapDetails = () => {
         title={'Custom Maps'}
       />
     );
+  };
+
+  const renderTitle = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Custom Map Title'}/>
+        <Input
+          containerStyle={{paddingHorizontal: 10}}
+          errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
+          errorStyle={customMapStyles.requiredMessage}
+          inputContainerStyle={{borderBottomWidth: 0}}
+          inputStyle={formStyles.fieldValue}
+          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
+          value={editableCustomMapData?.title || ''}
+        />
+      </>
+    );
+  };
+
+  const saveMap = async () => {
+    try {
+      setIsLoadingModalVisible(true);
+      setIsLoading(true);
+      if (!isEmpty(customMapToEdit)) {
+        setTitle('Updating Custom Map');
+        setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
+        updateMap(editableCustomMapData);
+      }
+      else {
+        setTitle('Saving Custom Map');
+        setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
+        const customMap = await saveCustomMap(editableCustomMapData);
+        console.log(customMap);
+      }
+      setMessage('Success!');
+      setIsLoading(false);
+    }
+    catch (err) {
+      console.error('Error saving custom map', err);
+      setTitle('Something went wrong!');
+      setMessage(err);
+      setIsLoading(false);
+    }
   };
 
   return (

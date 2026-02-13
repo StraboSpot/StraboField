@@ -64,32 +64,6 @@ const SiteSafetyPage = ({isReadOnly}) => {
     }
   };
 
-  const saveFormAndGo = async (currentForm = formRef.current) => {
-    try {
-      await saveForm(currentForm);
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
-  const saveForm = async (currentForm) => {
-    try {
-      await currentForm.submitForm();
-      const editedSiteSafetyFormData = showErrors(currentForm);
-      const spotId = spot.properties.id;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
-      dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
-      await currentForm.resetForm();
-      if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-      return Promise.reject();
-    }
-  };
-
   const renderCancelSaveButtons = () => {
     return (
       <View>
@@ -115,6 +89,32 @@ const SiteSafetyPage = ({isReadOnly}) => {
         {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly, scrollEnabled: false}}/>}
       </Formik>
     );
+  };
+
+  const saveForm = async (currentForm) => {
+    try {
+      await currentForm.submitForm();
+      const editedSiteSafetyFormData = showErrors(currentForm);
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
+      await currentForm.resetForm();
+      if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+      return Promise.reject();
+    }
+  };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
+    try {
+      await saveForm(currentForm);
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
+    }
   };
 
   return (

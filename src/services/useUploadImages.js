@@ -29,11 +29,28 @@ const useUploadImages = () => {
   const [totalImages, setTotalImages] = useState(0);
   const [imageUploadStatusMessage, setImageUploadStatusMessage] = useState('');
 
-  const resetState = () => {
-    console.log('resetting State', imageUploadStatusMessage);
-    setImageUploadStatusMessage('');
-    setCurrentImage('');
-    setCurrentImageStatus({success: 0, failed: 0});
+  /* Internal Functions */
+
+  // Upload the image to server
+  const doUploadImage = async (imageId, imageUri, isProfileImage) => {
+    try {
+      setCurrentImage(imageId);
+
+      console.log(': Uploading Image', imageId, '...');
+
+      let formdata = new FormData();
+      formdata.append('image_file', {uri: imageUri, name: 'image.jpg', type: 'image/jpeg'});
+      formdata.append('id', imageId);
+      formdata.append('modified_timestamp', Date.now());
+      const res = await uploadImage(formdata, user.encoded_login, isProfileImage);
+      console.log('Image Upload Res', res);
+      console.log(': Finished Uploading Image', imageId);
+      dispatch(updatedProjectTransferProgress(0));
+    }
+    catch (err) {
+      console.log('Error Uploading Image', imageId, err);
+      throw Error('Error Uploading Image', imageId, err);
+    }
   };
 
   // Gather all the images in spots and returns the ids.
@@ -43,6 +60,8 @@ const useUploadImages = () => {
     console.log(imageIds);
     return imageIds;
   };
+
+  /* Exported Functions */
 
   const initializeImageUpload = async () => {
     let imagesStatus = {};
@@ -68,6 +87,13 @@ const useUploadImages = () => {
       imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
     }
     return imagesStatus;
+  };
+
+  const resetState = () => {
+    console.log('resetting State', imageUploadStatusMessage);
+    setImageUploadStatusMessage('');
+    setCurrentImage('');
+    setCurrentImageStatus({success: 0, failed: 0});
   };
 
   // Downsize image for upload
@@ -99,55 +125,6 @@ const useUploadImages = () => {
     catch (err) {
       console.error('Error Resizing Image.', err);
       throw Error('Error Resizing Image.', err);
-    }
-  };
-
-  const verifyImageExistsOnDevice = async (neededImageIds, imagesFound) => {
-    const imagesToUpload = [];
-    const imagesNotFoundOnDevice = [];
-    await Promise.all((
-      neededImageIds.map(async (imageId) => {
-          const imageURI = getLocalImageURI(imageId);
-          const isValidImageURI = await doesDeviceDirExist(imageURI);
-          if (isValidImageURI) {
-            console.log(`Image ${imageId} EXISTS`);
-            return imagesFound.find((image) => {
-              if (image.id.toString() === imageId) {
-                imagesToUpload.push({...image, uri: imageURI});
-                // setImagesToUpload(prevState => ([...prevState, imageWithPath]));
-                // return {...image, uri: imageURI};
-              }
-            });
-          }
-          else {
-            console.log('Local file not found for image:' + imageId);
-            imagesNotFoundOnDevice.push(imageId);
-          }
-        },
-      )
-    ));
-    return {imagesToUpload: imagesToUpload, imagesNotFoundOnDevice: imagesNotFoundOnDevice};
-  };
-
-  // Upload the image to server
-  const doUploadImage = async (imageId, imageUri, isProfileImage) => {
-    try {
-      setCurrentImage(imageId);
-
-      console.log(': Uploading Image', imageId, '...');
-
-      let formdata = new FormData();
-      formdata.append('image_file', {uri: imageUri, name: 'image.jpg', type: 'image/jpeg'});
-      formdata.append('id', imageId);
-      formdata.append('modified_timestamp', Date.now());
-      const res = await uploadImage(formdata, user.encoded_login, isProfileImage);
-      console.log('Image Upload Res', res);
-      console.log(': Finished Uploading Image', imageId);
-      dispatch(updatedProjectTransferProgress(0));
-    }
-    catch (err) {
-      console.log('Error Uploading Image', imageId, err);
-      throw Error('Error Uploading Image', imageId, err);
     }
   };
 
@@ -209,17 +186,44 @@ const useUploadImages = () => {
     }
   };
 
+  const verifyImageExistsOnDevice = async (neededImageIds, imagesFound) => {
+    const imagesToUpload = [];
+    const imagesNotFoundOnDevice = [];
+    await Promise.all((
+      neededImageIds.map(async (imageId) => {
+          const imageURI = getLocalImageURI(imageId);
+          const isValidImageURI = await doesDeviceDirExist(imageURI);
+          if (isValidImageURI) {
+            console.log(`Image ${imageId} EXISTS`);
+            return imagesFound.find((image) => {
+              if (image.id.toString() === imageId) {
+                imagesToUpload.push({...image, uri: imageURI});
+                // setImagesToUpload(prevState => ([...prevState, imageWithPath]));
+                // return {...image, uri: imageURI};
+              }
+            });
+          }
+          else {
+            console.log('Local file not found for image:' + imageId);
+            imagesNotFoundOnDevice.push(imageId);
+          }
+        },
+      )
+    ));
+    return {imagesToUpload: imagesToUpload, imagesNotFoundOnDevice: imagesNotFoundOnDevice};
+  };
+
   return {
-    initializeImageUpload,
-    resizeImageForUpload,
-    verifyImageExistsOnDevice,
-    uploadImages,
-    uploadProfileImage,
     currentImage,
     currentImageStatus,
-    resetState,
-    totalImages,
     imageUploadStatusMessage,
+    initializeImageUpload,
+    resetState,
+    resizeImageForUpload,
+    totalImages,
+    uploadImages,
+    uploadProfileImage,
+    verifyImageExistsOnDevice,
   };
 };
 

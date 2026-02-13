@@ -5,6 +5,8 @@ const useStratSectionSymbology = () => {
   const {getSiliciclasticGrainSize} = useSedValidation();
   const {getStratSectionSettings} = useStratSection();
 
+  /* Internal Functions */
+
   const getGrainSize = (lithology) => {
     if (lithology.primary_lithology === 'limestone' || lithology.primary_lithology === 'dolostone') {
       return lithology.dunham_classification;
@@ -14,6 +16,8 @@ const useStratSectionSymbology = () => {
     }
     return lithology.primary_lithology;
   };
+
+  /* Exported Functions */
 
   const getStratIntervalFill = (featureProperties) => {
     let fill;

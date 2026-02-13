@@ -35,12 +35,12 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     console.log('MAPS', maps);
   }, []);
 
-  const filterDefaultCustomMaps = () => {
-    return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
-  };
-
   const filterCustomEndpointCustomMaps = () => {
     return Object.values(customMaps).filter(map => map.url[0].includes('http://'));
+  };
+
+  const filterDefaultCustomMaps = () => {
+    return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
   };
 
   const mapTypeName = (source) => {

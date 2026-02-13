@@ -103,6 +103,12 @@ const UserProfile = () => {
       }
     }
   };
+
+  const purgeRedux = async () => {
+    await persistor.purge(); // Use this to clear persistStore completely
+    console.log('Redux store purged');
+  };
+
   const removeProfileImage = async () => {
     try {
       setIsDeletingProfileImage(true);
@@ -200,11 +206,6 @@ const UserProfile = () => {
       closeProfileImageModal();
       setIsUploadingProfileImage(false);
     }
-  };
-
-  const purgeRedux = async () => {
-    await persistor.purge(); // Use this to clear persistStore completely
-    console.log('Redux store purged');
   };
 
   return (

@@ -144,6 +144,39 @@ const AddIntervalModal = () => {
     return data;
   };
 
+  const renderAddIntervalFormFields = () => {
+    return (
+      <Formik
+        initialStatus={{formName: formName}}
+        initialValues={{}}
+        innerRef={formRef}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={true}
+      >
+        {formProps => <Form {...{...formProps, formName: formName}}/>}
+      </Formik>
+    );
+  };
+
+  const renderAddIntervalModal = () => {
+    return (
+      <ModalWrapper
+        closeModal={close}
+        headerTitle={'Add Interval'}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
+      >
+        <FlatList
+          ListFooterComponent={renderAddIntervalFormFields()}
+          ListHeaderComponent={renderAddIntervalNameField()}
+        />
+        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
+      </ModalWrapper>
+    );
+  };
+
   const renderAddIntervalNameField = () => {
     const initialIntervalName = {
       intervalName: (preferences.spot_prefix || '') + (preferences.starting_number_for_spot || ''),
@@ -201,39 +234,6 @@ const AddIntervalModal = () => {
           </>
         )}
       </Formik>
-    );
-  };
-
-  const renderAddIntervalFormFields = () => {
-    return (
-      <Formik
-        initialStatus={{formName: formName}}
-        initialValues={{}}
-        innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        validateOnChange={true}
-      >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
-      </Formik>
-    );
-  };
-
-  const renderAddIntervalModal = () => {
-    return (
-      <ModalWrapper
-        closeModal={close}
-        headerTitle={'Add Interval'}
-        showActionButton={false}
-        showCancelButton={false}
-        showCloseButton
-      >
-        <FlatList
-          ListFooterComponent={renderAddIntervalFormFields()}
-          ListHeaderComponent={renderAddIntervalNameField()}
-        />
-        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
-      </ModalWrapper>
     );
   };
 

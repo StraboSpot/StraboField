@@ -12,7 +12,9 @@ import PageHeader from '../page/PageHeader';
 const TernaryPage = () => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const gatherTernaryValues = () => {
+  const ternary = gatherTernaryValues();
+
+  function gatherTernaryValues() {
     let ternaryTemp = {};
     if (spot.properties.pet && spot.properties.pet.minerals && Array.isArray(spot.properties.pet.minerals)) {
       console.log('Calculating ternary values...');
@@ -33,9 +35,7 @@ const TernaryPage = () => {
       ternaryTemp.oph_sum = ternaryTemp.ol + ternaryTemp.pyx + ternaryTemp.hbl;
     }
     return ternaryTemp;
-  };
-
-  const ternary = gatherTernaryValues();
+  }
 
   return (
     <>

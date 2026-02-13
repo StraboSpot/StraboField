@@ -30,6 +30,27 @@ const useCustomMap = () => {
   const {buildTileURL} = useMapURL();
   const {testCustomMapUrl, getMyMapsBbox} = useServerRequests();
 
+  /* Internal Functions */
+
+  const getProviderInfo = (source) => {
+    let providerInfo = {...MAP_PROVIDERS[source]};
+    if (customDatabaseEndpoint.isSelected) {
+      const serverUrl = customDatabaseEndpoint.endpoint;
+      const lastOccur = serverUrl.lastIndexOf('/');
+      providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
+      return providerInfo;
+    }
+    console.log(providerInfo);
+    return providerInfo;
+  };
+
+  const viewCustomMap = (map) => {
+    console.log('Setting current basemap to a custom basemap...');
+    dispatch(setCurrentBasemap(map));
+  };
+
+  /* Exported Functions */
+
   const deleteMap = async (mapId) => {
     console.log('Deleting Map Here');
     console.log('map: ', mapId);
@@ -58,18 +79,6 @@ const useCustomMap = () => {
     }
     const response = await getMyMapsBbox(STRABO_APIS.MY_MAPS_BBOX + mapId);
     console.log(response);
-  };
-
-  const getProviderInfo = (source) => {
-    let providerInfo = {...MAP_PROVIDERS[source]};
-    if (customDatabaseEndpoint.isSelected) {
-      const serverUrl = customDatabaseEndpoint.endpoint;
-      const lastOccur = serverUrl.lastIndexOf('/');
-      providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
-      return providerInfo;
-    }
-    console.log(providerInfo);
-    return providerInfo;
   };
 
   const saveCustomMap = async (map) => {
@@ -130,11 +139,6 @@ const useCustomMap = () => {
     console.log(customMapsCopy);
     dispatch(updateCustomMap(map));
     dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
-  };
-
-  const viewCustomMap = (map) => {
-    console.log('Setting current basemap to a custom basemap...');
-    dispatch(setCurrentBasemap(map));
   };
 
   return {

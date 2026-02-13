@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -15,6 +15,7 @@ const SamplesList = ({onPress}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const samples = spot?.properties?.samples || [];
+
   const renderSamplesListItem = (item) => {
     let oriented = item.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
     return (

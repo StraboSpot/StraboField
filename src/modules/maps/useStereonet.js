@@ -8,6 +8,19 @@ import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measuremen
 const useStereonet = () => {
   const userName = useSelector(state => state.user?.name);
 
+  /* Internal Functions */
+
+  const getTimeAndDateFromModifiedTimestamp = (field) => {
+    return {
+      time: moment(field).format('HH:mm:ss'),
+      day: moment(field).format('D'),
+      month: moment(field).format('MM'),
+      year: moment(field).format('YYYY'),
+    };
+  };
+
+  /* Exported Functions */
+
   const getStereonet = async (spots) => {
     let hasData = false;
 
@@ -153,15 +166,6 @@ const useStereonet = () => {
     else {
       alert('Error!\n\nYour selected spots contained no valid stereonet data.');
     }
-  };
-
-  const getTimeAndDateFromModifiedTimestamp = (field) => {
-    return {
-      time: moment(field).format('HH:mm:ss'),
-      day: moment(field).format('D'),
-      month: moment(field).format('MM'),
-      year: moment(field).format('YYYY'),
-    };
   };
 
   return {

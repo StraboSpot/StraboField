@@ -15,7 +15,6 @@ import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
 const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
-
   const {width} = useWindowSize();
   const itemWidth = 300;
   const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;

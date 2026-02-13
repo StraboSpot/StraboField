@@ -41,8 +41,11 @@ const StratSectionPage = ({isReadOnly, page}) => {
 
   const stratSection = spot.properties?.sed?.strat_section || {};
 
-  // console.log('Spot:', spot);
-  // console.log('Strat Section:', stratSection);
+  const getImageLabel = (id) => {
+    const index = spot.properties.images.findIndex(i => id === i.id);
+    const image = spot.properties.images[index];
+    return image && image.title ? image.title : 'Untitled ' + (index + 1);
+  };
 
   const renderImageItem = (image) => {
     return (
@@ -57,12 +60,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
         <ListItem.Chevron/>
       </ListItem>
     );
-  };
-
-  const getImageLabel = (id) => {
-    const index = spot.properties.images.findIndex(i => id === i.id);
-    const image = spot.properties.images[index];
-    return image && image.title ? image.title : 'Untitled ' + (index + 1);
   };
 
   const renderImageOverlaysSection = () => {
@@ -109,25 +106,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
         >
           {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
         </Formik>
-      </View>
-    );
-  };
-
-  const renderStratSectionToggle = () => {
-    return (
-      <View>
-        <ListItem containerStyle={commonStyles.listItem} key={'strat_section_toggle'}>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>
-              Add a Stratigraphic Section at this Spot?
-            </ListItem.Title>
-          </ListItem.Content>
-          <SwitchWrapper
-            disabled={isReadOnly}
-            onValueChange={() => toggleStratSection(spot)}
-            value={!isEmpty(stratSection)}
-          />
-        </ListItem>
       </View>
     );
   };
@@ -179,6 +157,25 @@ const StratSectionPage = ({isReadOnly, page}) => {
             }
           />
         </View>
+      </View>
+    );
+  };
+
+  const renderStratSectionToggle = () => {
+    return (
+      <View>
+        <ListItem containerStyle={commonStyles.listItem} key={'strat_section_toggle'}>
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>
+              Add a Stratigraphic Section at this Spot?
+            </ListItem.Title>
+          </ListItem.Content>
+          <SwitchWrapper
+            disabled={isReadOnly}
+            onValueChange={() => toggleStratSection(spot)}
+            value={!isEmpty(stratSection)}
+          />
+        </ListItem>
       </View>
     );
   };

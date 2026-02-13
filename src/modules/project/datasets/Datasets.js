@@ -8,7 +8,6 @@ import DatasetDetail from './DatasetDetail';
 import DatasetsOverview from './DatasetsOverview';
 
 const Datasets = () => {
-
   const [datasetToView, setDatasetToView] = useState(null);
 
   const dispatch = useDispatch();

@@ -44,18 +44,18 @@ const ProjectDescription = () => {
     }, 2000);
   };
 
+  const saveForm = async (descriptionCurrent) => {
+    await descriptionCurrent.submitForm();
+    console.log('Saving project daily-notes to Project ...', descriptionCurrent.values);
+    dispatch(updatedProject({field: 'description', value: descriptionCurrent.values}));
+  };
+
   const showErrors = (descriptionCurrent) => {
     const errorMessages = Object.entries(descriptionCurrent.errors).map(([key, value]) => (
       getLabel(key, formName) + ': ' + value
     ));
     alert('Project Description Errors!', 'Changes in the following fields were not saved.'
       + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
-  };
-
-  const saveForm = async (descriptionCurrent) => {
-    await descriptionCurrent.submitForm();
-    console.log('Saving project daily-notes to Project ...', descriptionCurrent.values);
-    dispatch(updatedProject({field: 'description', value: descriptionCurrent.values}));
   };
 
   return (

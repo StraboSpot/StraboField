@@ -18,7 +18,6 @@ import ModalWrapper from './ui/modals/ModalWrapper';
 
 
 const ColorPickerModal = ({closeModal}) => {
-
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const [hexColor, setHexColor] = useState(selectedTag.color || undefined);

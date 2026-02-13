@@ -7,7 +7,6 @@ import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-
   const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 

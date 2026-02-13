@@ -15,7 +15,6 @@ import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
 const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
-
   const {width} = useWindowSize();
   const itemWidth = 300;
   const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;

@@ -10,9 +10,7 @@ import {NumberInputField} from '../form';
 import useMapLocation from '../maps/useMapLocation';
 
 const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
-
   const {getCurrentLocation} = useMapLocation();
-
 
   const fillWithCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();

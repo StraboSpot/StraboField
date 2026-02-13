@@ -17,6 +17,8 @@ const useMapCoords = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const {getMyMapsBbox} = useServerRequests();
 
+  /* Internal Functions */
+
   // Convert WGS84 to x,y pixels, assuming x,y are web mercator, or vice versa
   const convertCoords = (feature, fromProjection, toProjection) => {
     if (feature.geometry.type === 'Point') {
@@ -46,6 +48,8 @@ const useMapCoords = () => {
     }
     return feature;
   };
+
+  /* Exported Functions */
 
   // Convert WGS84 to image x,y pixels, assuming x,y are web mercator
   const convertFeatureGeometryToImagePixels = (feature) => {

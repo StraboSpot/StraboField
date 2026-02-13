@@ -49,16 +49,6 @@ const DailyNotesModal = () => {
     );
   };
 
-  const saveNote = (values) => {
-    const dailyNotes = JSON.parse(JSON.stringify(projectDescription.daily_setup || []));
-    const dailyNotesFiltered = dailyNotes.filter(n => n.date !== values.date);
-    const dailyNotesUpdated = [...dailyNotesFiltered, values];
-    const projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesUpdated};
-    dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
-    dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
-  };
-
   const renderDailyNotesModal = () => {
     return (
       <ModalWrapper
@@ -105,6 +95,16 @@ const DailyNotesModal = () => {
         </Formik>
       </ModalWrapper>
     );
+  };
+
+  const saveNote = (values) => {
+    const dailyNotes = JSON.parse(JSON.stringify(projectDescription.daily_setup || []));
+    const dailyNotesFiltered = dailyNotes.filter(n => n.date !== values.date);
+    const dailyNotesUpdated = [...dailyNotesFiltered, values];
+    const projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesUpdated};
+    dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
+    dispatch(setModalValues({}));
+    dispatch(setModalVisible({modal: null}));
   };
 
   return renderDailyNotesModal();

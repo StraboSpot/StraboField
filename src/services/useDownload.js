@@ -54,6 +54,20 @@ const useDownload = () => {
 
   let tempActiveDatasetsIds, tempTargetDatasetId;
 
+  /* Internal Functions */
+
+  const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
+    if (datasets.length >= 1) {
+      // console.log('Starting Dataset Spots Download!');
+
+      // Synchronous download
+      await datasets.reduce(async (previousPromise, dataset) => {
+        await previousPromise;
+        await downloadSpots(dataset, encodedLoginScoped);
+      }, Promise.resolve());
+    }
+  };
+
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
@@ -189,6 +203,56 @@ const useDownload = () => {
     }
   };
 
+  const findNeededImages = async (spotsDownloaded, dataset) => {
+    try {
+      // console.log(dataset.name, ':', 'Gathering Needed Images...');
+      const spotImages = await gatherNeededImages(spotsDownloaded, dataset);
+      if (spotImages?.imageIds.length > 0) {
+        // console.log(dataset.name, ':', 'Images needed', spotImages.neededImagesIds.length, 'of', spotImages?.imageIds.length);
+        return spotImages;
+      }
+      else {
+        console.log(dataset.name, ':', 'No Images in dataset.');
+        return undefined;
+      }
+    }
+    catch (err) {
+      console.error(dataset.name, ':', 'Error Gathering Images. Error:', err);
+    }
+  };
+
+  const loadCustomMaps = (maps) => {
+    maps.map(async (map) => {
+      let mapId = map.id;
+      // Pull out mapbox styles map id
+      if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
+        mapId = map.id.split('/').slice(3).join('/');
+      }
+      let providerInfo = MAP_PROVIDERS[map.source];
+      if (map.source === 'strabospot_mymaps') {
+        if (!isEmpty(endpoint) && isSelected) {
+          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
+          if (await testCustomMapUrl(tileEndpoint + map.id)) {
+            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
+            providerInfo = {...providerInfo, url: [tileEndpoint]};
+          }
+          else throw Error('Invalid IP address');
+        }
+      }
+      const customMap = {
+        ...map,
+        ...providerInfo,
+        id: mapId,
+        key: map.accessToken || map.key,
+        source: map.source,
+      };
+      console.log(customMap);
+      customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
+    });
+  };
+
+  /* Exported Functions */
+
   const downloadUserProfile = async (encodedLoginScoped = encodedLogin) => {
     try {
       let userProfileRes = await getProfile(encodedLoginScoped);
@@ -210,36 +274,6 @@ const useDownload = () => {
     }
     catch (err) {
       throw Error(err);
-    }
-  };
-
-  const findNeededImages = async (spotsDownloaded, dataset) => {
-    try {
-      // console.log(dataset.name, ':', 'Gathering Needed Images...');
-      const spotImages = await gatherNeededImages(spotsDownloaded, dataset);
-      if (spotImages?.imageIds.length > 0) {
-        // console.log(dataset.name, ':', 'Images needed', spotImages.neededImagesIds.length, 'of', spotImages?.imageIds.length);
-        return spotImages;
-      }
-      else {
-        console.log(dataset.name, ':', 'No Images in dataset.');
-        return undefined;
-      }
-    }
-    catch (err) {
-      console.error(dataset.name, ':', 'Error Gathering Images. Error:', err);
-    }
-  };
-
-  const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
-    if (datasets.length >= 1) {
-      // console.log('Starting Dataset Spots Download!');
-
-      // Synchronous download
-      await datasets.reduce(async (previousPromise, dataset) => {
-        await previousPromise;
-        await downloadSpots(dataset, encodedLoginScoped);
-      }, Promise.resolve());
     }
   };
 
@@ -328,36 +362,6 @@ const useDownload = () => {
       console.warn('Error Downloading Images: ' + err);
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
-  };
-
-  const loadCustomMaps = (maps) => {
-    maps.map(async (map) => {
-      let mapId = map.id;
-      // Pull out mapbox styles map id
-      if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
-        mapId = map.id.split('/').slice(3).join('/');
-      }
-      let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === 'strabospot_mymaps') {
-        if (!isEmpty(endpoint) && isSelected) {
-          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)) {
-            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
-            providerInfo = {...providerInfo, url: [tileEndpoint]};
-          }
-          else throw Error('Invalid IP address');
-        }
-      }
-      const customMap = {
-        ...map,
-        ...providerInfo,
-        id: mapId,
-        key: map.accessToken || map.key,
-        source: map.source,
-      };
-      console.log(customMap);
-      customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
-    });
   };
 
   return {

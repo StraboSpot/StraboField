@@ -22,14 +22,7 @@ const useDevice = () => {
 
   const {getImage, getProfileImageURL} = useServerRequests();
 
-  const copyFiles = async (source, target) => {
-    try {
-      await RNFS.copyFile(source, target);
-    }
-    catch (err) {
-      throw Error(err);
-    }
-  };
+  /* Internal Functions */
 
   // INTERNAL
   const createAppDirectory = async (directory) => {
@@ -43,6 +36,17 @@ const useDevice = () => {
         console.error('Error creating directory', directory, 'ERROR:', err);
         throw Error(err);
       });
+  };
+
+  /* Exported Functions */
+
+  const copyFiles = async (source, target) => {
+    try {
+      await RNFS.copyFile(source, target);
+    }
+    catch (err) {
+      throw Error(err);
+    }
   };
 
   const createProjectDirectories = async () => {
@@ -157,11 +161,6 @@ const useDevice = () => {
     }
   };
 
-  // TODO: Check to consolidate with doesDeviceDirectoryExist();
-  const doesDeviceDirExist = async (dir) => {
-    return await RNFS.exists(dir);
-  };
-
   // TODO: Check to consolidate with doesDeviceDirExist();
   const doesDeviceDirectoryExist = async (directory) => {
     try {
@@ -178,6 +177,11 @@ const useDevice = () => {
     }
   };
 
+  // TODO: Check to consolidate with doesDeviceDirectoryExist();
+  const doesDeviceDirExist = async (dir) => {
+    return await RNFS.exists(dir);
+  };
+
   const doesFileExist = async (path, file = '') => {
     return await RNFS.exists(path + file);
   };
@@ -187,26 +191,10 @@ const useDevice = () => {
     return await RNFS.exists(microPDF);
   };
 
-  const downloadImageAndSave = async (imageId) => {
-    try {
-      const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
-      const imageBlob = await getImage(imageId);
-      if (imageBlob) {
-        const reader = new FileReader();
-        const base64Data = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
-          reader.onerror = error => reject(error);
-          reader.readAsDataURL(imageBlob); // Read the blob as base64
-        });
-        await RNFS.writeFile(path, base64Data, 'base64');
-        console.log('Image saved to:', path);
-        return true;
-      }
-      throw Error;
-    }
-    catch (err) {
-      console.error('Error downloading or saving file:', err);
-    }
+  const downloadAndSaveMap = async (downloadOptions) => {
+    const res = await RNFS.downloadFile(downloadOptions).promise;
+    if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
+    else throw Error;
   };
 
   const downloadAndSaveProfileImage = async (encodedLogin) => {
@@ -236,10 +224,26 @@ const useDevice = () => {
       });
   };
 
-  const downloadAndSaveMap = async (downloadOptions) => {
-    const res = await RNFS.downloadFile(downloadOptions).promise;
-    if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
-    else throw Error;
+  const downloadImageAndSave = async (imageId) => {
+    try {
+      const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
+      const imageBlob = await getImage(imageId);
+      if (imageBlob) {
+        const reader = new FileReader();
+        const base64Data = await new Promise((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
+          reader.onerror = error => reject(error);
+          reader.readAsDataURL(imageBlob); // Read the blob as base64
+        });
+        await RNFS.writeFile(path, base64Data, 'base64');
+        console.log('Image saved to:', path);
+        return true;
+      }
+      throw Error;
+    }
+    catch (err) {
+      console.error('Error downloading or saving file:', err);
+    }
   };
 
   const exportMicroProjectPDF = async (pdfFile) => {
@@ -370,6 +374,19 @@ const useDevice = () => {
     return res;
   };
 
+  const readDeviceJSONFile = async (fileName) => {
+    try {
+      const dataFile = '/data.json';
+      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
+      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
+      console.log(JSON.parse(response));
+      return JSON.parse(response);
+    }
+    catch (err) {
+      console.error('Error reading JSON file', err);
+    }
+  };
+
   const readDirectory = async (directory) => {
     console.log('Reading directory', directory);
     const exists = await RNFS.exists(directory);
@@ -423,19 +440,6 @@ const useDevice = () => {
         const errorMessage = e2.message || 'Unable to read data file.';
         throw Error(errorMessage);
       }
-    }
-  };
-
-  const readDeviceJSONFile = async (fileName) => {
-    try {
-      const dataFile = '/data.json';
-      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      console.log(JSON.parse(response));
-      return JSON.parse(response);
-    }
-    catch (err) {
-      console.error('Error reading JSON file', err);
     }
   };
 
@@ -513,13 +517,13 @@ const useDevice = () => {
     deleteTempImagesFolder,
     doesBackupFileExist,
     doesDeviceBackupDirExist,
-    doesDeviceDirExist,
     doesDeviceDirectoryExist,
+    doesDeviceDirExist,
     doesFileExist,
     doesMicroProjectPDFExist,
-    downloadImageAndSave,
-    downloadAndSaveProfileImage,
     downloadAndSaveMap,
+    downloadAndSaveProfileImage,
+    downloadImageAndSave,
     exportMicroProjectPDF,
     getDeviceStorageSpaceInfo,
     getExternalProjectData,
@@ -530,11 +534,11 @@ const useDevice = () => {
     moveFile,
     openURL,
     pickCSV,
+    readDeviceJSONFile,
     readDirectory,
     readDirectoryForMapFiles,
     readDirectoryForMapTiles,
     readFile,
-    readDeviceJSONFile,
     requestReadDirectoryPermission,
     unZipAndCopyImportedData,
     writeFileToDevice,

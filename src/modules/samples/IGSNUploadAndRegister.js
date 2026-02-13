@@ -46,15 +46,8 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
 
-  const handleOpenURL = async ({url}) => {
-    console.log('App resumed with URL:', url);
-    if (url) {
-      const code = url.split('/')[3];
-      await getSesarTokenAndCodes(code);
-    }
-    else {
-      console.log('No code found in URL.');
-    }
+  const closePicker = () => {
+    setIsPickerVisible(false);
   };
 
   const getSesarTokenAndCodes = async (orcidToken) => {
@@ -92,20 +85,19 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     }
   };
 
+  const handleOpenURL = async ({url}) => {
+    console.log('App resumed with URL:', url);
+    if (url) {
+      const code = url.split('/')[3];
+      await getSesarTokenAndCodes(code);
+    }
+    else {
+      console.log('No code found in URL.');
+    }
+  };
+
   const handlePress = async () => {
     handleIGSNChecked(!isIGSNChecked);
-  };
-
-  const orcidAuthentication = async () => {
-    await getOrcidToken();
-  };
-
-  const openPicker = () => {
-    setIsPickerVisible(true);
-  };
-
-  const closePicker = () => {
-    setIsPickerVisible(false);
   };
 
   const onReset = () => {
@@ -117,6 +109,14 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
 
   const onUserCodeSelect = async (userCode) => {
     dispatch(setSelectedUserCode(userCode));
+  };
+
+  const openPicker = () => {
+    setIsPickerVisible(true);
+  };
+
+  const orcidAuthentication = async () => {
+    await getOrcidToken();
   };
 
   const renderIGSNUploadCheckbox = () => {

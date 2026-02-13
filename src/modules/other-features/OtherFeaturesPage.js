@@ -50,6 +50,20 @@ const OtherFeaturesPage = ({isReadOnly}) => {
     );
   };
 
+  const renderFeatureDetail = () => {
+    return (
+      <>
+        <OtherFeatureDetail
+          featureTypes={otherFeatures}
+          hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
+          isReadOnly={isReadOnly}
+          renderFeature={feature => renderFeature(feature)}
+          selectedFeature={selectedFeature}
+        />
+      </>
+    );
+  };
+
   const renderFeaturesList = () => {
     return (
       <View style={{flex: 1}}>
@@ -67,20 +81,6 @@ const OtherFeaturesPage = ({isReadOnly}) => {
           renderItem={item => renderFeature(item.item)}
         />
       </View>
-    );
-  };
-
-  const renderFeatureDetail = () => {
-    return (
-      <>
-        <OtherFeatureDetail
-          featureTypes={otherFeatures}
-          hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
-          isReadOnly={isReadOnly}
-          renderFeature={feature => renderFeature(feature)}
-          selectedFeature={selectedFeature}
-        />
-      </>
     );
   };
 

@@ -29,23 +29,6 @@ const CustomFeatureTypes = () => {
     return true;
   };
 
-  const deleteFeatureConfirm = (feature) => {
-    alert('Delete Feature ' + toTitleCase(feature),
-      'Are you sure you would like to delete ' + feature + '?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => deleteCustomFeature(feature),
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
   const deleteCustomFeatureValidation = (feature) => {
     let allSpots = Object.values(getActiveSpotsObj());
     let isValidDelete = true;
@@ -64,6 +47,23 @@ const CustomFeatureTypes = () => {
       if (!isValidDelete) return false;
     }
     deleteFeatureConfirm(feature);
+  };
+
+  const deleteFeatureConfirm = (feature) => {
+    alert('Delete Feature ' + toTitleCase(feature),
+      'Are you sure you would like to delete ' + feature + '?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => deleteCustomFeature(feature),
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const renderFeature = (feature) => {

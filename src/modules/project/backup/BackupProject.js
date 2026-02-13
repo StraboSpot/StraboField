@@ -29,10 +29,6 @@ const BackupProject = () => {
 
   const {openURL} = useDevice();
 
-  const saveProject = () => checkForActiveDatasets('save');
-
-  const exportProject = () => checkForActiveDatasets('export');
-
   const checkForActiveDatasets = (backupActionToSet) => {
     if (activeDatasets.length > 0) {
       setIsSaveAndExportModalVisible(true);
@@ -44,6 +40,8 @@ const BackupProject = () => {
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };
+
+  const exportProject = () => checkForActiveDatasets('export');
 
   const onUpload = () => {
     dispatch(setSelectedProject({source: '', project: ''}));
@@ -69,6 +67,8 @@ const BackupProject = () => {
       </>
     );
   };
+
+  const saveProject = () => checkForActiveDatasets('save');
 
   return (
     <View style={{flex: 1}}>

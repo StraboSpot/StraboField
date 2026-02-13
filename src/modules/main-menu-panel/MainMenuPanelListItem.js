@@ -17,8 +17,6 @@ const MainMenuPanelListItem = ({onPress, title}) => {
 
   const {getTargetDatasetFromId} = useProject();
 
-  const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
-
   const getTitle = () => {
     let subtitle;
     if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS) {
@@ -36,6 +34,8 @@ const MainMenuPanelListItem = ({onPress, title}) => {
       </ListItem.Title>
     );
   };
+
+  const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
 
   return (
     <ListItem containerStyle={commonStyles.listItem} onPress={onPress || handleMenuItemPress}>

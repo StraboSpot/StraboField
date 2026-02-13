@@ -2,6 +2,7 @@ import {isEmpty, roundToDecimalPlaces, toDegrees, toRadians} from '../../shared/
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 
 const useCompassCalculations = () => {
+  /* Internal Functions */
 
   const calcDipDir = (strike, formRefCurrent) => {
     console.log('Calculating dip direction...');
@@ -31,6 +32,8 @@ const useCompassCalculations = () => {
     formRefCurrent.setFieldValue('trend', roundToDecimalPlaces(trend, 0));
     formRefCurrent.setFieldValue('plunge', roundToDecimalPlaces(plunge, 0));
   };
+
+  /* Exported Functions */
 
   const doMeasurementCalculations = async (name, value, formRefCurrent, selectedAttitude, selectedMeasurement) => {
     //console.log(name, 'changed to', value);

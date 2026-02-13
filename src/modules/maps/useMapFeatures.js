@@ -16,17 +16,7 @@ const useMapFeatures = () => {
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const filterFeatures = (mappedFeatures) => {
-    let filteredFeatures = JSON.parse(JSON.stringify(mappedFeatures));
-    if (!isEmpty(filteredFeatures) && !isEmpty(featureTypesOff)) {
-      filteredFeatures = filterByFeatureType(filteredFeatures);
-    }
-    if (!isEmpty(filteredFeatures) && !isEmpty(geometryTypesOff)) {
-      filteredFeatures = filterByGeometryType(filteredFeatures);
-    }
-    // console.log('Mapped Features after fitlering:', filteredFeatures);
-    return filteredFeatures;
-  };
+  /* Internal Functions */
 
   // Filter Spots currently visible on the map by feature type (i.e. toggled on in the Map Symbols Overlay)
   const filterByFeatureType = (mappedFeatures) => {
@@ -73,6 +63,20 @@ const useMapFeatures = () => {
     });
 
     // console.log('Features after filtering by geometry type', filteredFeatures);
+    return filteredFeatures;
+  };
+
+  /* Exported Functions */
+
+  const filterFeatures = (mappedFeatures) => {
+    let filteredFeatures = JSON.parse(JSON.stringify(mappedFeatures));
+    if (!isEmpty(filteredFeatures) && !isEmpty(featureTypesOff)) {
+      filteredFeatures = filterByFeatureType(filteredFeatures);
+    }
+    if (!isEmpty(filteredFeatures) && !isEmpty(geometryTypesOff)) {
+      filteredFeatures = filterByGeometryType(filteredFeatures);
+    }
+    // console.log('Mapped Features after fitlering:', filteredFeatures);
     return filteredFeatures;
   };
 

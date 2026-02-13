@@ -66,16 +66,40 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     else setIsTraceSurfaceFeatureEdit(true);
   };
 
+  // What happens after submitting the form is handled in saveFormAndGo since we want to show
+  // an alert message if there are errors but this function won't be called if form is invalid
+  const onSubmitForm = () => {
+    console.log('In onSubmitForm');
+  };
+
   const openPage = (page) => {
     dispatch(setNotebookPageVisible(page.key));
     if (page.modal) dispatch(setModalVisible({modal: page.modal}));
     else dispatch(setModalVisible({modal: null}));
   };
 
-  // What happens after submitting the form is handled in saveFormAndGo since we want to show
-  // an alert message if there are errors but this function won't be called if form is invalid
-  const onSubmitForm = () => {
-    console.log('In onSubmitForm');
+  const renderSectionHeader = (page) => {
+    return (
+      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
+        <SectionDivider dividerText={page.label}/>
+      </Pressable>
+    );
+  };
+
+  const renderSections = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <SectionList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({item}) => item}
+          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+          sections={sections}
+          stickySectionHeadersEnabled={true}
+        />
+      </View>
+    );
   };
 
   const renderTraceSurfaceFeatureForm = () => {
@@ -102,30 +126,6 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
               validate={values => validateForm({formName: formName, values: values})}
             />
           }
-        />
-      </View>
-    );
-  };
-
-  const renderSectionHeader = (page) => {
-    return (
-      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
-      </Pressable>
-    );
-  };
-
-  const renderSections = () => {
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
-        <SectionList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => item}
-          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-          sections={sections}
-          stickySectionHeadersEnabled={true}
         />
       </View>
     );

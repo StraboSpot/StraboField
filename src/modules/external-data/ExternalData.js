@@ -22,6 +22,13 @@ const ExternalData = ({isReadOnly}) => {
   const [url, setUrl] = useState('');
   const {readCSV, saveURL} = useExternalData();
 
+  const handleFileChange = async (e) => {
+    console.log('CSV File', e.target.files[0]);
+    const file = e.target.files[0];
+    await readCSV(file);
+    console.log('CSV From Web Saved');
+  };
+
   const importCSVFile = () => {
     try {
       if (Platform.OS !== 'web') readCSV().catch(console.error);
@@ -33,13 +40,6 @@ const ExternalData = ({isReadOnly}) => {
     catch (err) {
       console.error('ERROR selecting .CSV file', err);
     }
-  };
-
-  const handleFileChange = async (e) => {
-    console.log('CSV File', e.target.files[0]);
-    const file = e.target.files[0];
-    await readCSV(file);
-    console.log('CSV From Web Saved');
   };
 
   const saveUrl = async () => {

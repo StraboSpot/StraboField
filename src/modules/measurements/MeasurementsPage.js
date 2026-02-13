@@ -154,6 +154,33 @@ const MeasurementsPage = ({isReadOnly, page}) => {
     setMultiSelectMode(type);
   };
 
+  const renderMeasurementDetail = () => {
+    return (
+      <MeasurementDetail
+        closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
+        page={page}
+      />
+    );
+  };
+
+  const renderMeasurementsMain = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
+        {renderSections()}
+        {selectedFeaturesTemp.length >= 1 && (
+          <View>
+            <DeleteButton
+              onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
+              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
+            />
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderSectionHeader = ({title, data}) => {
     const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === title);
     return (
@@ -235,33 +262,6 @@ const MeasurementsPage = ({isReadOnly, page}) => {
         sections={sections}
         stickySectionHeadersEnabled={true}
       />
-    );
-  };
-
-  const renderMeasurementDetail = () => {
-    return (
-      <MeasurementDetail
-        closeDetailView={() => setIsDetailView(false)}
-        isReadOnly={isReadOnly}
-        page={page}
-      />
-    );
-  };
-
-  const renderMeasurementsMain = () => {
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
-        {renderSections()}
-        {selectedFeaturesTemp.length >= 1 && (
-          <View>
-            <DeleteButton
-              onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
-              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
-            />
-          </View>
-        )}
-      </View>
     );
   };
 

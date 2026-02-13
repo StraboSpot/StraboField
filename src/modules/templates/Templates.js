@@ -10,7 +10,6 @@ import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
 const Templates = () => {
-
   const [isNewTemplateListVisible, setIsNewTemplateListVisible] = useState(false);
   const [templateType, setTemplateType] = useState(null);
   const [templateVisible, setTemplateVisible] = useState(null);
@@ -72,7 +71,6 @@ const Templates = () => {
       </>
     );
   };
-
 
   return (
     <>

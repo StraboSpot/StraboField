@@ -37,18 +37,6 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     else formProps.setFieldValue('facies', updatedFacies);
   };
 
-  const faciesButtonText = (key) => {
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <Text
-          style={formProps?.values?.facies?.includes(key) ? formStyles.formButtonSelectedTitle
-            : formStyles.formButtonTitle}>
-          {getLabel(key, formName)}
-        </Text>
-      </View>
-    );
-  };
-
   const FaciesButton = (faciesProps) => {
     return (
       <Button
@@ -63,6 +51,18 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
       >
         {faciesButtonText(faciesProps.faciesKey)}
       </Button>
+    );
+  };
+
+  const faciesButtonText = (key) => {
+    return (
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <Text
+          style={formProps?.values?.facies?.includes(key) ? formStyles.formButtonSelectedTitle
+            : formStyles.formButtonTitle}>
+          {getLabel(key, formName)}
+        </Text>
+      </View>
     );
   };
 

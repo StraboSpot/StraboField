@@ -18,6 +18,112 @@ const useStratSectionCalculations = () => {
   const xInterval = 10;  // Horizontal spacing between grain sizes/weathering tick marks
   const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
+  /* Internal Functions */
+
+  const getIntervalWidth = (sedData, stratSectionId, interbed) => {
+    const character = sedData.character;
+    const lithologies = sedData.lithologies;
+    const n = interbed ? 1 : 0;
+
+    const defaultWidth = xInterval / 4;
+    let i, intervalWidth = defaultWidth;
+    // Unexposed/Covered
+    if (!character || character === 'unexposed_cove' || character === 'not_measured' || !lithologies) {
+      intervalWidth = (0 + 1) * xInterval;  // Same as clay
+    }
+    else if (lithologies[n] && (character === 'bed' || character === 'bed_mixed_lit' || character === 'interbedded'
+      || character === 'package_succe')) {
+      // Weathering Column
+      if (stratSection.column_profile === 'weathering_pro') {
+        i = SED_LABEL_DICTIONARY.weathering.findIndex((weatheringOption) => {
+          return weatheringOption.name === lithologies[n].relative_resistance_weather;
+        });
+        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
+      }
+      // Basic Lithologies Column Profile
+      else if (stratSection.column_profile === 'basic_lithologies') {
+        i = getBasicLithologyIndex(lithologies[n]);
+        intervalWidth = i === -1 ? defaultWidth : (i + 2) * xInterval;
+      }
+      // Primary Lithology = siliciclastic
+      else if (lithologies[n].primary_lithology === 'siliciclastic' && getSiliciclasticGrainSize(lithologies[n])) {
+        const grainSizeName = getSiliciclasticGrainSize(lithologies[n]);
+        i = SED_LABEL_DICTIONARY.clastic.findIndex(grainSizeOption => grainSizeOption.name === grainSizeName);
+        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
+      }
+      // Primary Lithology = limestone or dolostone
+      else if ((lithologies[n].primary_lithology === 'limestone' || lithologies[n].primary_lithology === 'dolostone')
+        && lithologies[n].dunham_classification) {
+        i = SED_LABEL_DICTIONARY.carbonate.findIndex((grainSizeOption) => {
+          return grainSizeOption.name === lithologies[n].dunham_classification;
+        });
+        intervalWidth = i === -1 ? defaultWidth : (i + 2.33) * xInterval;
+      }
+      // Other Lithologies
+      else if (lithologies[n].primary_lithology) {
+        i = SED_LABEL_DICTIONARY.lithologies.findIndex((grainSizeOption) => {
+          return grainSizeOption.name === lithologies[n].primary_lithology;
+        });
+        i = i - 3; // First 3 indexes are siliciclastic, limestone & dolostone which are handled above
+        intervalWidth = i === -1 ? defaultWidth : (i + 2.66) * xInterval;
+      }
+      else intervalWidth = (0 + 1) * xInterval;  // Same as clay
+    }
+    else console.error('Sed data error:', lithologies[n]);
+    return intervalWidth;
+  };
+
+  // Get the height (y) of the whole section
+  const getSectionHeight = () => {
+    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    return intervals.reduce((acc, i) => {
+      const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
+      const ys = coords.flat().map(c => c[1]);
+      const maxY = Math.max(...ys);
+      return Math.max(acc, maxY);
+    }, 0);
+  };
+
+  // Move Spot up or down by a given number of pixels (a positive number for pixels to move up or negative for down)
+  const moveSpotByPixels = (spot, pixels) => {
+    const spotCopyGeom = JSON.parse(JSON.stringify(spot.geometry));
+    if (spot.geometry.type === 'Point') spotCopyGeom.coordinates[1] = spot.geometry.coordinates[1] + pixels;
+    else if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiPoint') {
+      spot.geometry.coordinates.forEach((pointCoords, i) => {
+        spotCopyGeom.coordinates[i][1] = pointCoords[1] + pixels;
+      });
+    }
+    else if (spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiLineString') {
+      spot.geometry.coordinates.forEach((lineCoords, l) => {
+        lineCoords.forEach((pointCoords, i) => {
+          spotCopyGeom.coordinates[l][i][1] = pointCoords[1] + pixels;
+        });
+      });
+    }
+    else if (spot.geometry.type === 'MultiPolygon') {
+      spot.geometry.coordinates.forEach((polygonCoords, p) => {
+        polygonCoords.forEach((lineCoords, l) => {
+          lineCoords.forEach((pointCoords, i) => {
+            spotCopyGeom.coordinates[p][l][i][1] = pointCoords[1] + pixels;
+          });
+        });
+      });
+    }
+    // Interbedded (Geometry Collections)
+    else if (spot.geometry.type === 'GeometryCollection') {
+      spot.geometry.geometries.forEach((geometry, g) => {
+        geometry.coordinates.forEach((lineCoords, l) => {
+          lineCoords.forEach((pointCoords, i) => {
+            spotCopyGeom.geometries[g].coordinates[l][i][1] = pointCoords[1] + pixels;
+          });
+        });
+      });
+    }
+    return {...spot, geometry: spotCopyGeom};
+  };
+
+  /* Exported Functions */
+
   // Calculate the geometry for an interval (single bed or interbedded)
   const calculateIntervalGeometry = (stratSectionId, sedData, minY) => {
     const character = sedData.character;
@@ -99,70 +205,6 @@ const useStratSectionCalculations = () => {
     return geometry;
   };
 
-  const getIntervalWidth = (sedData, stratSectionId, interbed) => {
-    const character = sedData.character;
-    const lithologies = sedData.lithologies;
-    const n = interbed ? 1 : 0;
-
-    const defaultWidth = xInterval / 4;
-    let i, intervalWidth = defaultWidth;
-    // Unexposed/Covered
-    if (!character || character === 'unexposed_cove' || character === 'not_measured' || !lithologies) {
-      intervalWidth = (0 + 1) * xInterval;  // Same as clay
-    }
-    else if (lithologies[n] && (character === 'bed' || character === 'bed_mixed_lit' || character === 'interbedded'
-      || character === 'package_succe')) {
-      // Weathering Column
-      if (stratSection.column_profile === 'weathering_pro') {
-        i = SED_LABEL_DICTIONARY.weathering.findIndex((weatheringOption) => {
-          return weatheringOption.name === lithologies[n].relative_resistance_weather;
-        });
-        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
-      }
-      // Basic Lithologies Column Profile
-      else if (stratSection.column_profile === 'basic_lithologies') {
-        i = getBasicLithologyIndex(lithologies[n]);
-        intervalWidth = i === -1 ? defaultWidth : (i + 2) * xInterval;
-      }
-      // Primary Lithology = siliciclastic
-      else if (lithologies[n].primary_lithology === 'siliciclastic' && getSiliciclasticGrainSize(lithologies[n])) {
-        const grainSizeName = getSiliciclasticGrainSize(lithologies[n]);
-        i = SED_LABEL_DICTIONARY.clastic.findIndex(grainSizeOption => grainSizeOption.name === grainSizeName);
-        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
-      }
-      // Primary Lithology = limestone or dolostone
-      else if ((lithologies[n].primary_lithology === 'limestone' || lithologies[n].primary_lithology === 'dolostone')
-        && lithologies[n].dunham_classification) {
-        i = SED_LABEL_DICTIONARY.carbonate.findIndex((grainSizeOption) => {
-          return grainSizeOption.name === lithologies[n].dunham_classification;
-        });
-        intervalWidth = i === -1 ? defaultWidth : (i + 2.33) * xInterval;
-      }
-      // Other Lithologies
-      else if (lithologies[n].primary_lithology) {
-        i = SED_LABEL_DICTIONARY.lithologies.findIndex((grainSizeOption) => {
-          return grainSizeOption.name === lithologies[n].primary_lithology;
-        });
-        i = i - 3; // First 3 indexes are siliciclastic, limestone & dolostone which are handled above
-        intervalWidth = i === -1 ? defaultWidth : (i + 2.66) * xInterval;
-      }
-      else intervalWidth = (0 + 1) * xInterval;  // Same as clay
-    }
-    else console.error('Sed data error:', lithologies[n]);
-    return intervalWidth;
-  };
-
-  // Get the height (y) of the whole section
-  const getSectionHeight = () => {
-    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
-    return intervals.reduce((acc, i) => {
-      const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
-      const ys = coords.flat().map(c => c[1]);
-      const maxY = Math.max(...ys);
-      return Math.max(acc, maxY);
-    }, 0);
-  };
-
   // Move target interval to after given interval (the preceding interval)
   const moveIntervalToAfter = (targetInterval, precedingInterval) => {
     let targetIntervalExtent = turf.bbox(targetInterval);
@@ -203,44 +245,6 @@ const useStratSectionCalculations = () => {
     targetIntervalExtent = turf.bbox(targetIntervalModified);
     moveSpotsUpOrDownByPixels(targetIntervalModified.properties.strat_section_id, targetIntervalExtent[1],
       targetIntervalHeight, targetIntervalModified.properties.id);
-  };
-
-  // Move Spot up or down by a given number of pixels (a positive number for pixels to move up or negative for down)
-  const moveSpotByPixels = (spot, pixels) => {
-    const spotCopyGeom = JSON.parse(JSON.stringify(spot.geometry));
-    if (spot.geometry.type === 'Point') spotCopyGeom.coordinates[1] = spot.geometry.coordinates[1] + pixels;
-    else if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiPoint') {
-      spot.geometry.coordinates.forEach((pointCoords, i) => {
-        spotCopyGeom.coordinates[i][1] = pointCoords[1] + pixels;
-      });
-    }
-    else if (spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiLineString') {
-      spot.geometry.coordinates.forEach((lineCoords, l) => {
-        lineCoords.forEach((pointCoords, i) => {
-          spotCopyGeom.coordinates[l][i][1] = pointCoords[1] + pixels;
-        });
-      });
-    }
-    else if (spot.geometry.type === 'MultiPolygon') {
-      spot.geometry.coordinates.forEach((polygonCoords, p) => {
-        polygonCoords.forEach((lineCoords, l) => {
-          lineCoords.forEach((pointCoords, i) => {
-            spotCopyGeom.coordinates[p][l][i][1] = pointCoords[1] + pixels;
-          });
-        });
-      });
-    }
-    // Interbedded (Geometry Collections)
-    else if (spot.geometry.type === 'GeometryCollection') {
-      spot.geometry.geometries.forEach((geometry, g) => {
-        geometry.coordinates.forEach((lineCoords, l) => {
-          lineCoords.forEach((pointCoords, i) => {
-            spotCopyGeom.geometries[g].coordinates[l][i][1] = pointCoords[1] + pixels;
-          });
-        });
-      });
-    }
-    return {...spot, geometry: spotCopyGeom};
   };
 
   // Move all Spots (except excluded Spot, if given) in a specified Strat Section

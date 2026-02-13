@@ -9,7 +9,6 @@ import useMap from './useMap';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
-
   const [cursor, setCursor] = useState('');
   const [prevMapMode, setPrevMapMode] = useState(mapMode);
 
@@ -43,15 +42,7 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     mapRef.current?.once('mouseup', onUp);
   });
 
-  const handleMouseEnter = () => {
-    if (mapMode === MAP_MODES.VIEW || mapMode === MAP_MODES.EDIT) setCursor('pointer');
-  };
-
-  const handleMouseLeave = () => {
-    if (mapMode === MAP_MODES.VIEW) setCursor('');
-    else if (isDrawMode(mapMode)) setCursor('pointer');
-    else if (mapMode === MAP_MODES.EDIT) setCursor('default');
-  };
+  /* Internal Functions */
 
   const onPointMove = (e) => {
     setCursor('grabbing'); // Set a UI indicator for dragging
@@ -75,6 +66,18 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     const coords = e.lngLat;
     const vertexScreenCoords = mapRef.current.project([coords.lng, coords.lat]);
     dispatch(setVertexEndCoords([vertexScreenCoords.x, vertexScreenCoords.y]));
+  };
+
+  /* Exported Functions */
+
+  const handleMouseEnter = () => {
+    if (mapMode === MAP_MODES.VIEW || mapMode === MAP_MODES.EDIT) setCursor('pointer');
+  };
+
+  const handleMouseLeave = () => {
+    if (mapMode === MAP_MODES.VIEW) setCursor('');
+    else if (isDrawMode(mapMode)) setCursor('pointer');
+    else if (mapMode === MAP_MODES.EDIT) setCursor('default');
   };
 
   return {

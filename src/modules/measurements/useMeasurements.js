@@ -22,6 +22,37 @@ const useMeasurements = () => {
   const {getLabel} = useForm();
   const {deleteFeatureTags} = useTags();
 
+  /* Internal Functions */
+
+  const removeMeasurementFromObj = (currentOrientationData, measurementToDelete) => {
+    let aborted = false;
+    let orientationDataCopy = JSON.parse(JSON.stringify(currentOrientationData));
+    orientationDataCopy.forEach((measurement, i) => {
+      if (measurementToDelete.id === measurement.id && !measurement.associated_orientation) orientationDataCopy[i] = {};
+      else if (measurementToDelete.id === measurement.id && measurement.associated_orientation) {
+        alert('Unable to Delete', 'Please delete the associated features before deleting the primary feature.');
+        aborted = true;
+        throw Error;
+      }
+      else if (measurement.associated_orientation) {
+        measurement.associated_orientation.forEach((associatedMeasurement, j) => {
+          if (measurementToDelete.id === associatedMeasurement.id) orientationDataCopy[i].associated_orientation[j] = {};
+        });
+        orientationDataCopy[i].associated_orientation = orientationDataCopy[i].associated_orientation.filter(
+          associatedMeasurement => !isEmpty(associatedMeasurement));
+      }
+      if (measurement.associated_orientation && isEmpty(measurement.associated_orientation)) {
+        delete orientationDataCopy[i].associated_orientation;
+      }
+    });
+    if (!aborted) {
+      orientationDataCopy = orientationDataCopy.filter(measurement => !isEmpty(measurement));
+      return orientationDataCopy;
+    }
+  };
+
+  /* Exported Functions */
+
   const createNewMeasurement = () => {
     let measurements = [];
     if (compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR)) {
@@ -115,33 +146,6 @@ const useMeasurements = () => {
 
   const getMeasurementLabel = (key) => {
     return getLabel(key, ['measurement']);
-  };
-
-  const removeMeasurementFromObj = (currentOrientationData, measurementToDelete) => {
-    let aborted = false;
-    let orientationDataCopy = JSON.parse(JSON.stringify(currentOrientationData));
-    orientationDataCopy.forEach((measurement, i) => {
-      if (measurementToDelete.id === measurement.id && !measurement.associated_orientation) orientationDataCopy[i] = {};
-      else if (measurementToDelete.id === measurement.id && measurement.associated_orientation) {
-        alert('Unable to Delete', 'Please delete the associated features before deleting the primary feature.');
-        aborted = true;
-        throw Error;
-      }
-      else if (measurement.associated_orientation) {
-        measurement.associated_orientation.forEach((associatedMeasurement, j) => {
-          if (measurementToDelete.id === associatedMeasurement.id) orientationDataCopy[i].associated_orientation[j] = {};
-        });
-        orientationDataCopy[i].associated_orientation = orientationDataCopy[i].associated_orientation.filter(
-          associatedMeasurement => !isEmpty(associatedMeasurement));
-      }
-      if (measurement.associated_orientation && isEmpty(measurement.associated_orientation)) {
-        delete orientationDataCopy[i].associated_orientation;
-      }
-    });
-    if (!aborted) {
-      orientationDataCopy = orientationDataCopy.filter(measurement => !isEmpty(measurement));
-      return orientationDataCopy;
-    }
   };
 
   return {

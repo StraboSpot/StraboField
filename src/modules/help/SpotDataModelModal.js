@@ -10,7 +10,6 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const SpotDataModelModal = ({close}) => {
-
   const [spotDataModel, setSpotDataModel] = useState({});
 
   useEffect(() => {

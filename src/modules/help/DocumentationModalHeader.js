@@ -9,14 +9,13 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   const [pickerVisible, setPickerVisible] = useState(false);
 
+  const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+  const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
+
   const handleSelectPage = (page) => {
     setPickerVisible(false);
     onJumpToPage(page);
   };
-
-  const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
-
-  const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
 
   return (
     <>

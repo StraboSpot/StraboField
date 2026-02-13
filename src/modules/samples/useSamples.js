@@ -16,14 +16,7 @@ const useSamples = () => {
   const {name, sesar} = useSelector(state => state.user);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
-  const authenticateWithSesar = async (sesarTokens) => {
-    const validSesarTokens = await getValidToken(sesarTokens);
-    if (!validSesarTokens) {
-      console.log('No valid token, redirecting to login...');
-      return false;
-    }
-    else return validSesarTokens;
-  };
+  /* Internal Functions */
 
   const buildSesarXmlSchema = (data, isUpdating) => {
     // const userCode = !isUpdating ? <user_code>${data.user_code}</user_code> : ""
@@ -71,18 +64,6 @@ const useSamples = () => {
     }, {});
   };
 
-  const getAndSaveSesarCode = async (sesarTokens) => {
-    const xml = await getSesarUserCode(sesarTokens.access);
-    let json = parseXML(xml);
-
-    if (json.results.valid.includes('yes')) return json;
-    else if (json.results.error) throw Error(json.results.error);
-    else {
-      const newTokens = await getValidToken(sesarTokens);
-      return await getAndSaveSesarCode(newTokens);
-    }
-  };
-
   const getFirstAndLastElementsOfLineArray = () => {
     if (selectedSpot.geometry.type === 'LineString' && selectedSpot.geometry.coordinates.length > 1) {
       const firstElement = selectedSpot.geometry.coordinates[0];
@@ -118,16 +99,6 @@ const useSamples = () => {
     catch (error) {
       return true; // If decoding fails, assume expired
     }
-  };
-
-  const onSampleFormChange = (formCurrent, name, value) => {
-    console.log(name, 'changed to', value);
-    name === 'collection_date'
-      ? formCurrent.setFieldValue('collection_time', value)
-      : name === 'collection_time'
-        ? formCurrent.setFieldValue('collection_date', value)
-        : formCurrent.setFieldValue(name, value);
-    // formCurrent.setFieldValue(name, value);
   };
 
   const parseXML = (xmlData) => {
@@ -174,6 +145,43 @@ const useSamples = () => {
     }
   };
 
+  const truncateDateISOString = (date) => {
+    return date.slice(0, date.indexOf('.')) + 'Z';
+  };
+
+  /* Exported Functions */
+
+  const authenticateWithSesar = async (sesarTokens) => {
+    const validSesarTokens = await getValidToken(sesarTokens);
+    if (!validSesarTokens) {
+      console.log('No valid token, redirecting to login...');
+      return false;
+    }
+    else return validSesarTokens;
+  };
+
+  const getAndSaveSesarCode = async (sesarTokens) => {
+    const xml = await getSesarUserCode(sesarTokens.access);
+    let json = parseXML(xml);
+
+    if (json.results.valid.includes('yes')) return json;
+    else if (json.results.error) throw Error(json.results.error);
+    else {
+      const newTokens = await getValidToken(sesarTokens);
+      return await getAndSaveSesarCode(newTokens);
+    }
+  };
+
+  const onSampleFormChange = (formCurrent, name, value) => {
+    console.log(name, 'changed to', value);
+    name === 'collection_date'
+      ? formCurrent.setFieldValue('collection_time', value)
+      : name === 'collection_time'
+        ? formCurrent.setFieldValue('collection_date', value)
+        : formCurrent.setFieldValue(name, value);
+    // formCurrent.setFieldValue(name, value);
+  };
+
   const straboSesarMapping = (sampleValue) => {
     console.log('sampleValue', sampleValue);
     const geometryType = selectedSpot?.geometry?.type;
@@ -216,10 +224,6 @@ const useSamples = () => {
       {label: 'Collector:', sesarKey: 'collector', value: name},
     ];
     return mappedObj;
-  };
-
-  const truncateDateISOString = (date) => {
-    return date.slice(0, date.indexOf('.')) + 'Z';
   };
 
   const updateSampleIsSesar = async (mappedArray) => {

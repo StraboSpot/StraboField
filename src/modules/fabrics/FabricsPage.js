@@ -54,6 +54,17 @@ const FabricsPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: null}));
   };
 
+  const renderFabricDetail = () => {
+    return (
+      <BasicPageDetail
+        closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
+        page={page}
+        selectedFeature={selectedFabric}
+      />
+    );
+  };
+
   const renderFabricSections = () => {
     let fabricsGrouped = Object.values(FABRIC_SECTIONS).reduce((acc, {title, key}) => {
       const data = key ? spot?.properties?.fabrics?.filter(fabric => fabric.type === key) || []
@@ -76,6 +87,15 @@ const FabricsPage = ({isReadOnly, page}) => {
     );
   };
 
+  const renderFabricsMain = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader pageTitle={page.label}/>
+        {renderFabricSections()}
+      </View>
+    );
+  };
+
   const renderSectionHeader = (sectionTitle) => {
     const sectionKey = Object.values(FABRIC_SECTIONS).reduce((acc, {title, key}) => {
         return sectionTitle === title ? key : acc;
@@ -90,26 +110,6 @@ const FabricsPage = ({isReadOnly, page}) => {
       );
     }
     else return <SectionDivider dividerText={sectionTitle}/>;
-  };
-
-  const renderFabricDetail = () => {
-    return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedFabric}
-      />
-    );
-  };
-
-  const renderFabricsMain = () => {
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader pageTitle={page.label}/>
-        {renderFabricSections()}
-      </View>
-    );
   };
 
   return isDetailView ? renderFabricDetail() : renderFabricsMain();

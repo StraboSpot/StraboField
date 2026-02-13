@@ -20,12 +20,7 @@ const useMicroZips = () => {
   const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
   const {deleteFromDevice} = useDevice();
 
-  const clearStatus = () => {
-    setShowLoadingBar(false);
-    setShowComplete(false);
-    setIsLoadingWave(false);
-    setPercentDone(0);
-  };
+  /* Internal Functions */
 
   const doUnzip = async (projectId) => {
     try {
@@ -41,6 +36,15 @@ const useMicroZips = () => {
       console.error('Unzip Error:', err);
       throw Error();
     }
+  };
+
+  /* Exported Functions */
+
+  const clearStatus = () => {
+    setShowLoadingBar(false);
+    setShowComplete(false);
+    setIsLoadingWave(false);
+    setPercentDone(0);
   };
 
   const downloadZip = async (projectId) => {

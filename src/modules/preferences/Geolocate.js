@@ -17,7 +17,23 @@ const Geolocate = () => {
   const dispatch = useDispatch();
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
 
-  const convertMillisecondsToSliderValue = (milliseconds) => {
+  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
+  const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
+
+  const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
+
+  useEffect(() => {
+    setValue(convertMillisecondsToSliderValue(currentTimeout));
+  }, [currentTimeout]);
+
+  const color = () => {
+    let r = interpolate(255, 0);
+    let g = interpolate(0, 255);
+    let b = interpolate(0, 0);
+    return `rgb(${r},${g},${b})`;
+  };
+
+  function convertMillisecondsToSliderValue(milliseconds) {
     const timeMap = {
       [2 * 60 * 1000]: 0,
       [5 * 60 * 1000]: 1,
@@ -26,22 +42,7 @@ const Geolocate = () => {
       [null]: 4,
     };
     return timeMap[milliseconds];
-  };
-
-  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
-  const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
-
-  useEffect(() => {
-    setValue(convertMillisecondsToSliderValue(currentTimeout));
-  }, [currentTimeout]);
-
-  const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
-  const color = () => {
-    let r = interpolate(255, 0);
-    let g = interpolate(0, 255);
-    let b = interpolate(0, 0);
-    return `rgb(${r},${g},${b})`;
-  };
+  }
 
   const interpolate = (start, end) => {
     let k = (value - 0) / 4; // 0 =>min  && 4 => MAX

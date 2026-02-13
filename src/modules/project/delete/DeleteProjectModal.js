@@ -8,7 +8,6 @@ import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 
 const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
-
   const DELETE_STATUS = {
     IN_PROGRESS: 'in_progress',
     PENDING: 'pending',

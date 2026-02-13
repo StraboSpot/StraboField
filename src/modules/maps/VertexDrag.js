@@ -29,10 +29,6 @@ const VertexDrag = () => {
     };
   });
 
-  const saveEnd = (endCoords) => {
-    dispatch(setVertexEndCoords(endCoords));
-  };
-
   const gesture = Gesture.Pan()
     .onBegin(() => {
       isPressed.value = true;
@@ -58,6 +54,10 @@ const VertexDrag = () => {
       // console.log('onFinalize');
       isPressed.value = false;
     });
+
+  const saveEnd = (endCoords) => {
+    dispatch(setVertexEndCoords(endCoords));
+  };
 
   return (
     <GestureDetector gesture={gesture}>

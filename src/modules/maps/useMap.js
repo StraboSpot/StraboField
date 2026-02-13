@@ -22,6 +22,8 @@ const useMap = () => {
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl} = useServerRequests();
 
+  const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
+
   const getExtentAndZoomCall = (extentString, zoomLevel) => {
     let url = getTileBaseUrl();
     url = customDatabaseEndpoint.isSelected ? url + '/zipcount' : STRABO_APIS.TILE_COUNT;
@@ -35,8 +37,6 @@ const useMap = () => {
     dispatch(setIsOfflineMapsModalVisible(false));
     dispatch(setIsErrorMessagesModalVisible(true));
   };
-
-  const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 
   const setBasemap = async (mapId) => {
     try {
