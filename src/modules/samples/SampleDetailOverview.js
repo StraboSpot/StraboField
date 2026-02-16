@@ -1,9 +1,10 @@
 import React from 'react';
-import {Pressable, Text} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import {truncateText} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -39,25 +40,48 @@ const SampleDetailOverview = () => {
     return dateObject.toLocaleTimeString();
   };
 
-  const onPressed = () => {
+  const onViewDetailPressed = () => {
     dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
+  const onIGSNPressed = () => {
+    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+  };
+
   return (
-    <Pressable onPress={onPressed} style={{padding: 10}}>
+    <View style={{padding: 10, gap: 5, flex: 1, flexDirection: 'column'}}>
       {Object.entries(sampleDetail).slice(0, 10).map(([key, value]) => {
         return (
           <Text key={key} style={[commonStyles.listItemTitle, {paddingVertical: 2}]}>
             <Text style={{fontWeight: 'bold'}}>{getLabel(key, formName)}: </Text>
             {key === 'collection_date' ? getDate(value)
               : key === 'collection_time' ? getTime(value)
-                : getLabel(value, formName)}
+                : key === 'sample_description' ? truncateText(value, 300) : getLabel(value, formName)}
           </Text>
         );
       })}
-      <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>View More Detail</Text>
-    </Pressable>
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        padding: 10,
+      }}>
+        <Pressable onPress={onViewDetailPressed}>
+          <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
+            View More Detail
+          </Text>
+        </Pressable>
+        <Pressable onPress={onIGSNPressed}>
+          <Text style={[commonStyles.listItemTitle, {
+            color: PRIMARY_ACCENT_COLOR,
+            paddingTop: 5,
+          }]}>
+            {sampleDetail.Sample_IGSN ? 'View IGSN Data' : 'Get IGSN'}
+          </Text>
+        </Pressable>
+      </View>
+    </View>
   );
 };
 

@@ -34,6 +34,7 @@ import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
+import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
 import SamplesPage from '../samples/SamplesPage';
@@ -68,6 +69,7 @@ export const PAGE_KEYS = {
   FOSSILS: 'fossils',
   GEOGRAPHY: 'geography',
   GEOLOGIC_UNITS: 'geologic_unit',
+  IGSN: 'igsn',
   IMAGES: 'images',
   INTERPRETATIONS: 'interpretations',
   INTERVAL: 'interval',
@@ -233,7 +235,13 @@ export const SUBPAGES = [
     key: PAGE_KEYS.GEOGRAPHY,
     label: 'Geography',
     page_component: Geography,
-  }, {
+  },
+  {
+    key: PAGE_KEYS.IGSN,
+    label: 'Igsn',
+    page_component: IGSNPage,
+  },
+  {
     key: PAGE_KEYS.NESTING,
     label: 'Nesting',
     page_component: Nesting,
