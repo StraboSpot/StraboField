@@ -12,7 +12,7 @@ import useMapCoords from '../useMapCoords';
 const StratSectionBackground = ({spotsDisplayed}) => {
   console.log('Rendering StratSectionBackground...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const stratSection = useSelector(state => state.map.stratSection);
 

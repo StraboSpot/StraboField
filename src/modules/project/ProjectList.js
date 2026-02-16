@@ -17,14 +17,15 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
 const ProjectList = ({doRefresh, onProjectPress, source}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
 
   const {getAllDeviceProjects, getAllServerProjects} = useProject();
+
+  /* Local State */
 
   const [errorMessage, setErrorMessage] = useState(null);
   const [isError, setIsError] = useState(false);

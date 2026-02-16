@@ -8,7 +8,7 @@ import {isEmpty, roundToDecimalPlaces} from '../shared/Helpers';
 let matrixArray = [];
 
 const useCompass = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 

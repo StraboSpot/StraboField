@@ -27,10 +27,9 @@ import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap}
 import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};

@@ -13,10 +13,9 @@ import {setShortcutSwitchPositions} from '../home/home.slice';
 import {MODAL_KEYS, SHORTCUT_MODALS} from '../page/page.constants';
 
 const ShortcutsList = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
 
   /* Logic Helpers */

@@ -9,10 +9,9 @@ import {userAgent} from './userAgent';
 import alert from '../shared/ui/alert';
 
 const useServerRequests = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const {encoded_login, sesar} = useSelector(state => state.user);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 

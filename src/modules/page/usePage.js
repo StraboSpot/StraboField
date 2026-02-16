@@ -5,7 +5,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {useTags} from '../tags';
 
 const usePage = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const reports = useSelector(state => state.project.project?.reports) || [];

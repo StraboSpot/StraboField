@@ -4,9 +4,11 @@ import {useImages} from './index';
 import {isEmpty} from '../../shared/Helpers';
 
 const useImageThumbnails = ({images}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getImageThumbnailURIs} = useImages();
+
+  /* Local State */
 
   const [areImageThumbnailsLoading, setAreImageThumbnailsLoading] = useState({});
   const [imageThumbnailURIs, setImageThumbnailURIs] = useState({});

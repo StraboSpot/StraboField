@@ -10,12 +10,14 @@ import FeatureTagsList from '../../shared/ui/FeatureTagsList';
 import {useTags} from '../tags';
 
 const OtherFeatureItem = ({editFeature, feature}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {setFeaturesSelectedForMultiTagging} = useTags();
+
+  /* Local State */
 
   const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
 
@@ -25,6 +27,8 @@ const OtherFeatureItem = ({editFeature, feature}) => {
     console.log('UE OtherFeatureItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
     if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
   }, [isMultipleFeaturesTaggingEnabled]);
+
+  /* Logic Helpers */
 
   const editFeatureItem = (featureItem) => {
     if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(featureItem));

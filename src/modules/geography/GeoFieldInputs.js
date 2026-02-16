@@ -10,7 +10,7 @@ import {NumberInputField} from '../form';
 import useMapLocation from '../maps/useMapLocation';
 
 const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getCurrentLocation} = useMapLocation();
 

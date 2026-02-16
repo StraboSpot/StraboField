@@ -10,7 +10,7 @@ import * as themes from '../../shared/styles.constants';
 import PageHeader from '../page/PageHeader';
 
 const TernaryPage = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
 

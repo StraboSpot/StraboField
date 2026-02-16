@@ -15,9 +15,11 @@ const DELETE_STATUS = {
 };
 
 const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {deleteFromDevice} = useDevice();
+
+  /* Local State */
 
   const [deleteProjectStatus, setDeleteProjectStatus] = useState(DELETE_STATUS.PENDING);
 

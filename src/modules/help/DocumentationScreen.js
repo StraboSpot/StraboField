@@ -9,7 +9,7 @@ import {isEmpty, openUrl} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 
 const DocumentationScreen = ({route, navigation}) => {
-  /* Data Hooks / State */
+  /* Local State */
 
   const ref = useRef(null);
 

@@ -12,12 +12,13 @@ import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
 const Metadata = ({isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const datasets = useSelector(state => state.project.datasets);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const metadataFormRef = useRef(null);
 

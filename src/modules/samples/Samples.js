@@ -14,9 +14,11 @@ import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
+
+  /* Local State */
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);

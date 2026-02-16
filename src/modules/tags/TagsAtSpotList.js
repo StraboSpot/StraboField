@@ -7,7 +7,7 @@ import {PAGE_KEYS} from '../page/page.constants';
 import {TagsListItem, useTags} from '../tags';
 
 const TagsAtSpotList = ({openMainMenuPanel, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getGeologicUnitTagsAtSpot, getNonGeologicUnitTagsAtSpot} = useTags();
 

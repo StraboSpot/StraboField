@@ -9,10 +9,9 @@ const formName = ['general', 'samples'];
 const parseString = require('react-native-xml2js').parseString;
 
 const useSamples = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const {name, sesar} = useSelector(state => state.user);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 

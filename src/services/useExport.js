@@ -14,10 +14,9 @@ let imageBackupFailures = 0;
 let imageSuccess = 0;
 
 const useExport = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const mapNamesDb = useSelector(state => state.offlineMap.offlineMaps);
   const otherMapsDb = useSelector(state => state.map.customMaps);
   const projectDb = useSelector(state => state.project);

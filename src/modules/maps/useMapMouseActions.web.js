@@ -9,16 +9,20 @@ import useMap from './useMap';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {isDrawMode} = useMap();
 
+  /* Local State */
+
   const pointMoving = useRef(null);
 
   const [cursor, setCursor] = useState('');
   const [prevMapMode, setPrevMapMode] = useState(mapMode);
+
+  /* Derived Variables */
 
   if (mapMode !== prevMapMode) {
     // console.log('MapMode changed from', prevMapMode, 'to', mapMode);

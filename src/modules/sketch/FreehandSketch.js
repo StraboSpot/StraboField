@@ -11,12 +11,14 @@ import {setFreehandFeatureCoords} from '../maps/maps.slice';
 let freehandFeatureCoords = [];
 
 const FreehandSketch = ({mapMode}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {height, width} = useWindowSize();
+
+  /* Local State */
 
   const freehandDrawRef = useRef(null);
 

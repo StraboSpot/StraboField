@@ -7,7 +7,7 @@ import * as themes from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 
 const MineralsGlossary = ({addMineral}) => {
-  /* Data Hooks / State */
+  /* Local State */
 
   const [activeMineralInfo, setActiveMineralInfo] = useState({});
 

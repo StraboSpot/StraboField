@@ -1,6 +1,7 @@
 import Assets from '../../assets/lottie-animations';
 
 const useAnimations = () => {
+  /* Exported Functions */
 
   const getAnimationType = (type) => {
     switch (type) {

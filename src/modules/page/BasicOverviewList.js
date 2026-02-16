@@ -13,10 +13,9 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const BasicOverviewList = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   /* Derived Variables */

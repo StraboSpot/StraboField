@@ -28,15 +28,16 @@ const actions = [
 ];
 
 const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const navigation = useNavigation();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
+
+  /* Local State */
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);

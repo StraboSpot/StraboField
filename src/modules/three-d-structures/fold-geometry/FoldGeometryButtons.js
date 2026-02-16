@@ -9,7 +9,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles} from '../../form';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
-  /* Render Functions */
+  /* Logic Helpers */
 
   const FoldGeometryEditButton = () => (
     <Button
@@ -30,6 +30,8 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
       type={'outline'}
     />
   );
+
+  /* Render Functions */
 
   const renderFoldGeometryIcons = () => {
     let foldGeometryData = [];

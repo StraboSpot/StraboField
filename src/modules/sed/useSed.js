@@ -21,10 +21,9 @@ import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
 const useSed = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getLabel, getLabels, showErrors} = useForm();

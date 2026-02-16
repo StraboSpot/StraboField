@@ -25,10 +25,9 @@ import useMap from '../useMap';
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   console.log('Rendering ManageOfflineMaps...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
@@ -36,6 +35,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const {deleteOfflineMap} = useDevice();
   const {setBasemap} = useMap();
   const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
+
+  /* Local State */
 
   const [availableMaps, setAvailableMaps] = useState({});
   const [isNameModalVisible, setIsNameModalVisible] = useState(false);

@@ -25,16 +25,26 @@ import {calculateScaleRatio} from './scale';
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   // console.log('Rendering SaveMapsModal...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const statusMessages = useSelector(state => state.home.statusMessages);
 
   const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
+  const {
+    checkTileZipFileExistence,
+    checkZipStatus,
+    doUnzip,
+    initializeSaveMap,
+    moveFiles,
+    moveTile,
+    updateMapTileCountWhenSaving,
+  } = useMapsOffline();
   const {getTileBaseUrl} = useServerRequests();
+
+  /* Local State */
 
   const [downloadZoom, setDownloadZoom] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
@@ -51,16 +61,6 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const [tileCount, setTileCount] = useState(0);
   const [tilesToInstall, setTilesToInstall] = useState(0);
   const [zoomLevels, setZoomLevels] = useState([]);
-
-  const {
-    checkTileZipFileExistence,
-    checkZipStatus,
-    doUnzip,
-    initializeSaveMap,
-    moveFiles,
-    moveTile,
-    updateMapTileCountWhenSaving,
-  } = useMapsOffline();
 
   /* Derived Variables */
 
@@ -104,6 +104,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     console.log('extentString is UE', extentString);
     shouldDownload().catch(err => console.error('Error in SaveMapsModal shouldDownload()', err));
   }, [downloadZoom]);
+
+  /* Logic Helpers */
 
   const downloadZip = async (zipUID) => {
     try {

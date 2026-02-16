@@ -20,15 +20,16 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const MineralsPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getMineralTitle} = usePetrology();
   const {getSpotById, getSpotsWithKey} = useSpots();
+
+  /* Local State */
 
   const preFormRef = useRef(null);
 

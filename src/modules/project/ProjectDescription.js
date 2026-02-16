@@ -11,13 +11,14 @@ const formName = ['general', 'project_description'];
 let timeout;
 
 const ProjectDescription = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const project = useSelector(state => state.project.project);
 
   const {getLabel, hasErrors, validateForm} = useForm();
+
+  /* Local State */
 
   const descriptionFormRef = useRef(null);
 

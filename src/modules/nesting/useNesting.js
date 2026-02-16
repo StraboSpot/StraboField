@@ -4,7 +4,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {useSpots} from '../spots';
 
 const useNesting = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getActiveSpotsObj, getSpotById, isOnGeoMap, isOnSameImageBasemap, isOnSameStratSection} = useSpots();
 

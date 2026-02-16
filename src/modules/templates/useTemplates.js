@@ -7,10 +7,9 @@ import {useForm} from '../form';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const useTemplates = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const templates = useSelector(state => state.project.project?.templates);
 
   const {showErrors} = useForm();

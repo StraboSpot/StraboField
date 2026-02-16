@@ -10,7 +10,7 @@ import homeStyles from '../home.style';
 import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay} from '../overlays';
 
 const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
@@ -20,7 +20,7 @@ const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
   const {updateFeatureTypes} = useMapFeatures();
 
   /* Logic Helpers */
-  
+
   const toggleMapSymbolsOverlay = () => {
     if (!dialogs.mapSymbolsMenuVisible) updateFeatureTypes();
     toggleDialog('mapSymbolsMenuVisible');

@@ -23,14 +23,15 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, openMainMenuPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
   const {getPopulatedPagesKeys} = usePage();
+
+  /* Local State */
 
   const formRef = useRef(null);
 
@@ -52,7 +53,6 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     }
     else return acc;
   }, []);
-
 
   /* Side Effects */
 

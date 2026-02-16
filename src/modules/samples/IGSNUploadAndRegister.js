@@ -18,16 +18,17 @@ import {setLoadingStatus} from '../home/home.slice';
 import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
 
 const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
 
   const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
   const {getSesarToken, getOrcidToken} = useServerRequests();
   const toast = useToast();
+
+  /* Local State */
 
   // const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isPickerVisible, setIsPickerVisible] = useState(false);

@@ -15,7 +15,7 @@ import useDrawGeometryToggle from '../home/buttons/useDrawGeometryToggle';
 import {MAP_MODES} from '../maps/maps.constants';
 
 const DrawGeometryToggles = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const drawGeometries = useSelector(state => state.map.drawGeometries);
 

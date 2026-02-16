@@ -21,11 +21,13 @@ const offlineText = (
 );
 
 const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDeleteProfileModalVisible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {clearUser} = useResetState();
   const {authenticateUser, deleteAccount} = useServerRequests();
   const toast = useToast();
+
+  /* Local State */
 
   const [confirmDeleteMessageVisible, setConfirmDeleteMessageVisible] = useState(false);
   const [deleteProfileInputValue, setDeleteProfileInputValue] = useState('');

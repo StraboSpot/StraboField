@@ -23,14 +23,15 @@ const groupKey = '_3d_structures';
 const types = Object.values(THREE_D_STRUCTURE_TYPES);
 
 const AddThreeDStructureModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

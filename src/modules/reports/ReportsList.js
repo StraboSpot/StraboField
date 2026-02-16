@@ -13,10 +13,9 @@ import {MODAL_KEYS} from '../page/page.constants';
 const ReportsList = ({isCheckedList, reportsSubset}) => {
   console.log('Rendering ReportsList...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const reports = useSelector(state => state.project.project?.reports) || [];
 
   /* Derived Variables */

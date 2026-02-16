@@ -18,10 +18,9 @@ import {useSpots} from '../spots';
 import {useTags} from '../tags';
 
 const AddRemoveTagFeatures = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 

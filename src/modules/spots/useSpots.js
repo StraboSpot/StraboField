@@ -23,10 +23,9 @@ import useProject from '../project/useProject';
 import {useTags} from '../tags';
 
 const useSpots = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};

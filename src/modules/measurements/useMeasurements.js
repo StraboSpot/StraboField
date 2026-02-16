@@ -11,10 +11,9 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 import {useTags} from '../tags';
 
 const useMeasurements = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const activeMeasurementTemplates = useSelector(state => state.project.project?.templates?.activeMeasurementTemplates)
     || [];
   const compassMeasurements = useSelector(state => state.compass.measurements);

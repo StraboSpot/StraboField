@@ -12,11 +12,12 @@ const selectedVertexOffset = 10;
 const VertexDrag = () => {
   // console.log('Rendering VertexDrag...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const vertexStartCoords = useSelector(state => state.map.vertexStartCoords);
+
+  /* Local State */
 
   const vertexStartCoordsObj = {
     x: vertexStartCoords[0] - selectedVertexOffset,

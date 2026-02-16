@@ -17,7 +17,7 @@ import useMap from '../useMap';
 const ManageCustomMaps = ({zoomToCustomMap}) => {
   // console.log('Rendering ManageCustomMaps...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customMaps = useSelector(state => state.map.customMaps);
@@ -26,6 +26,8 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
 
   const {getCustomMapDetails, updateMap} = useCustomMap();
   const {setBasemap} = useMap();
+
+  /* Local State */
 
   const [filteredMaps, setFilteredMaps] = useState([]);
 

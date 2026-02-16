@@ -22,12 +22,13 @@ const FABRIC_SECTIONS = {
 };
 
 const FabricsPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedFabric, setSelectedFabric] = useState({});

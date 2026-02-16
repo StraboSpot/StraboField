@@ -6,15 +6,16 @@ import {setIsMapMoved, setZoom} from './maps.slice';
 import useMapView from './useMapView';
 
 const useMapMoveEvents = ({mapRef}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {setMapView} = useMapView();
+
+  /* Local State */
 
   const cameraChangedTimestampRef = useRef(0);
 

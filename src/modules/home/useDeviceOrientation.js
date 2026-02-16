@@ -6,7 +6,7 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 const toastOptions = {duration: 1000, placement: 'top'};
 
 const useDeviceOrientation = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const toast = useToast();
   const {width, height} = useWindowSize();

@@ -21,15 +21,16 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const statusMessageModalTitle = useSelector(state => state.home.statusMessageModalTitle);
   const user = useSelector(state => state.user);
 
   const {clearUser} = useResetState();
+
+  /* Local State */
 
   const [displayName, setDisplayName] = useState('');
   const [visibleInitialSection, setVisibleInitialSection] = useState('none');

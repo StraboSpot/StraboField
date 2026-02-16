@@ -13,10 +13,9 @@ import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../services/connec
 import {STRABO_APIS} from '../../services/urls.constants';
 
 const CustomEndpoint = ({containerStyles, textStyles}) => {
-    /* Data Hooks / State */
+    /* Data Hooks */
 
     const dispatch = useDispatch();
-
     const customMaps = useSelector(state => state.map.customMaps);
     const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 

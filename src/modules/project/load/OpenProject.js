@@ -20,13 +20,14 @@ const source = 'device';
 
 // Open project on device in StraboSpot app directory
 const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const {loadProjectFromDevice} = useImport();
+
+  /* Local State */
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToOpen, setProjectToOpen] = useState(null);

@@ -18,14 +18,15 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getMineralTitle} = usePetrology();
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState({});

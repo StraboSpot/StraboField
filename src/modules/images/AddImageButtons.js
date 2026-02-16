@@ -14,12 +14,14 @@ import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 
 const AddImageButtons = ({saveImages}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {getImagesFromCameraRoll, launchCameraFromNotebook} = useImages();
   const {uploadFromWeb} = useUpload();
+
+  /* Local State */
 
   const inputRef = useRef(null);
 

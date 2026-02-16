@@ -9,10 +9,9 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 
 const ReportsListModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
 
   /* Logic Helpers */

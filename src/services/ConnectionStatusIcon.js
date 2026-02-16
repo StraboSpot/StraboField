@@ -10,7 +10,7 @@ const offlineIcon = require('../assets/icons/ConnectionStatusButton_offline.png'
 const onlineIcon = require('../assets/icons/ConnectionStatusButton_online.png');
 
 const ConnectionStatusIcon = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isOnline = useSelector(state => state.connections.isOnline);
 

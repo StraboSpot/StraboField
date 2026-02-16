@@ -24,15 +24,16 @@ import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
 const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, openMainMenuPanel, zoomToSpots}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getCurrentLocation} = useMapLocation();
   const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
   const toast = useToast();
+
+  /* Local State */
 
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
 

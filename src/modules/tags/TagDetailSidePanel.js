@@ -15,11 +15,12 @@ import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 import {TagDetail, TagDetailModal} from '../tags';
 
 const TagDetailSidePanel = ({openNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedTag = useSelector(state => state.project.selectedTag);
+
+  /* Local State */
 
   const [isColorPickerModalVisible, setIsColorPickerModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);

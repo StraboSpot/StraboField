@@ -24,15 +24,16 @@ const SECTIONS = {
 };
 
 const ThreeDStructuresPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel} = useForm();
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selected3dStructure, setSelected3dStructure] = useState({});

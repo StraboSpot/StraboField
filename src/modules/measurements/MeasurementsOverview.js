@@ -10,10 +10,9 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsOverview = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const orientationsData = useSelector(state => state.spot.selectedSpot.properties.orientation_data);
 
   /* Event Handlers */

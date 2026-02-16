@@ -28,15 +28,16 @@ import PageHeader from '../page/PageHeader';
 const StratSectionPage = ({isReadOnly, page}) => {
   // console.log('Rendering StratSectionPage...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
+
+  /* Local State */
 
   const stratSectionRef = useRef(null);
 

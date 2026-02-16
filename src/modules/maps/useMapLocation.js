@@ -9,7 +9,7 @@ import {useSpots} from '../spots';
 import {setSelectedSpot} from '../spots/spots.slice';
 
 const useMapLocation = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

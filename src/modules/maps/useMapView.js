@@ -13,10 +13,9 @@ import useMapCoords from './useMapCoords';
 import {isEmpty, isEqual} from '../../shared/Helpers';
 
 const useMapView = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const center = useSelector(state => state.map.center);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);

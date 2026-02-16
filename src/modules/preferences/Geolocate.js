@@ -16,11 +16,12 @@ const batteryImg = require('../../assets/icons/battery-full-outline.png');
 const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
 
 const Geolocate = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
+
+  /* Local State */
 
   const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
   const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));

@@ -13,10 +13,9 @@ import PageHeader from '../page/PageHeader';
 const ReportsPage = () => {
   console.log('Rendering ReportsPage...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const reports = useSelector(state => state.project.project?.reports) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 

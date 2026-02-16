@@ -10,17 +10,16 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ThreeDStructuresOverview = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   /* Derived Variables */
 
   const threeDStructures = spot?.properties?._3d_structures?.filter(d => d.type !== 'fabric') || [];
 
-  /* Event Handlers */
+  /* Logic Helpers */
 
   const on3DStructurePressed = (threeDStructure) => {
     dispatch(setSelectedAttributes([threeDStructure]));

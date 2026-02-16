@@ -4,7 +4,6 @@ import {TagsModal} from './index';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
-
   /* Render Functions */
 
   const renderAddTagsToSpotsShortcutModal = () => {

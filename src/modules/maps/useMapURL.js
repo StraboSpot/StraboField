@@ -1,7 +1,7 @@
 import {useSelector} from 'react-redux';
 
 const useMapURL = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const userMapboxToken = useSelector(state => state.user.mapboxToken);
 

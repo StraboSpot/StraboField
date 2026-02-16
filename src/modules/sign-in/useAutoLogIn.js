@@ -14,12 +14,14 @@ import {
 import {setSelectedProject} from '../project/projects.slice';
 
 const useAutoLogIn = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {initializeDownload} = useDownload();
   const {signIn} = useSignIn();
+
+  /* Local State */
 
   const project = useRef(null);
 

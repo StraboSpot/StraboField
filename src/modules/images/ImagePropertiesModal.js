@@ -10,9 +10,11 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {showErrors, validateForm} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

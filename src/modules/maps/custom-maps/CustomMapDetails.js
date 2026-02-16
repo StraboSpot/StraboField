@@ -29,14 +29,15 @@ import {selectedCustomMapToEdit} from '../maps.slice';
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 
 const CustomMapDetails = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
   const MBAccessToken = useSelector(state => state.user.mapboxToken);
 
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
+
+  /* Local State */
 
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
   const [isLoading, setIsLoading] = useState(false);

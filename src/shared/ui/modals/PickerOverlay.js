@@ -7,7 +7,6 @@ import ModalWrapper from './ModalWrapper';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
 
 const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelect, value}) => {
-
   /* Event Handlers */
 
   const handleSelect = item => onSelect(item);

@@ -10,10 +10,9 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesOverview = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const featuresData = useSelector(state => state.spot.selectedSpot.properties.other_features);
 
   /* Render Functions */

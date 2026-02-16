@@ -14,11 +14,13 @@ import {formStyles} from '../form';
 import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {readCSV, saveURL} = useExternalData();
+
+  /* Local State */
 
   const inputRef = useRef(null);
 

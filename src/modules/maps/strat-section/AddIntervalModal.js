@@ -21,10 +21,9 @@ import {setSelectedSpot} from '../../spots/spots.slice';
 const formName = ['sed', 'add_interval'];
 
 const AddIntervalModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -32,6 +31,8 @@ const AddIntervalModal = () => {
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
+
+  /* Local State */
 
   const formRef = useRef(null);
   const preFormRef = useRef(null);
@@ -64,7 +65,6 @@ const AddIntervalModal = () => {
       initialValues.package_thickness_units = stratSection.column_y_axis_units;
       initialValues.interbed_thickness_units = stratSection.column_y_axis_units;
     }
-
     // Testing Data
     /*      vm.intervalName = 'Interval Inserting';
      initialValues.interval_thickness = 2;
@@ -77,7 +77,6 @@ const AddIntervalModal = () => {
      initialValues.interbed_proportion_change = 'no_change';
      initialValues.avg_thickness = 5;
      initialValues.avg_thickness_1 = 8;*/
-
     formRef.current.setValues(initialValues);
   }, []);
 

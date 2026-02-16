@@ -28,15 +28,16 @@ const lastKeys = ['average_grain_size_mm', 'maximum_grain_size_mm', 'modal', 'mi
 let tempValues = {};
 
 const AddMineralModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {onMineralChange, savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
+
+  /* Local State */
 
   const formRef = useRef(null);
 
@@ -47,7 +48,6 @@ const AddMineralModal = () => {
 
   /* Derived Variables */
 
-  // Relevant fields for quick-entry modal
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.MINERALS;
   const formName = ['pet', petKey];

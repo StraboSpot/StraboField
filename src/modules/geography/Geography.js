@@ -18,14 +18,15 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
 const Geography = ({isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
   const {isOnGeoMap} = useMapView();
+
+  /* Local State */
 
   const formRef = useRef(null);
   const geomFormRef = useRef(null);

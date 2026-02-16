@@ -33,10 +33,9 @@ const groupKey = 'measurement';
 const toastOptions = {duration: 1000, placement: 'top'};
 
 const AddMeasurementModal = ({onPress}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
@@ -47,6 +46,8 @@ const AddMeasurementModal = ({onPress}) => {
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
   const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
@@ -84,18 +85,13 @@ const AddMeasurementModal = ({onPress}) => {
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
-
     const prev = prevValuesRef.current;
-
     if (equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes)
       && JSON.stringify(prev.templates) === JSON.stringify(templates)
     ) return;
-
     prevValuesRef.current = {compassMeasurementTypes, templates};
-
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     setSelectedTypeIndex(MEASUREMENT_TYPES.findIndex(t => t.key === typeObj.key));
-
     // Get the templates for the measurement type
     // (We're not using templates if there is already a selected attitude, like when adding an associated
     // measurement to an existing attitude, so default to [] in that case)
@@ -103,12 +99,10 @@ const AddMeasurementModal = ({onPress}) => {
       && templates.useMeasurementTemplates && templates.activeMeasurementTemplates
       && templates.activeMeasurementTemplates.filter(t => typeObj.form_keys.includes(t.values?.type || t.type)) || [];
     setRelevantTemplates(gotRelevantTemplates);
-
     let initialValuesTemp = {
       id: getNewUUID(),
       type: typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR : typeObj.key,
     };
-
     // Set the initial form values if not multiple templates
     if (gotRelevantTemplates.length <= 1 || (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR
       && getPlanarTemplates(gotRelevantTemplates).length <= 1
@@ -136,7 +130,6 @@ const AddMeasurementModal = ({onPress}) => {
     formRef.current?.setStatus({formName: formName});
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
-
   }, [compassMeasurementTypes, templates]);
 
   /* Event Handlers */
@@ -481,8 +474,8 @@ const AddMeasurementModal = ({onPress}) => {
     }
     return (
       <Form {...{
-        ...formProps,
         formName: assocFormProps.status.formName,
+        ...formProps,
         subkey: 'associated_orientation',
         surveyFragment: relevantFields,
       }}

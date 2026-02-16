@@ -11,10 +11,9 @@ import {isEmpty} from '../../shared/Helpers';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
 const useMapCoords = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);

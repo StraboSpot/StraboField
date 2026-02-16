@@ -11,9 +11,11 @@ import {PAGE_KEYS} from '../page/page.constants';
 
 // Animations for Drawers & Keyboard
 const useHomeAnimations = ({navigation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
 
   const animatedValueLeftSide = useRef(new Animated.Value(0)).current;
   const animatedValueMainMenuDrawer = useRef(new Animated.Value(-MAIN_MENU_DRAWER_WIDTH)).current;

@@ -11,13 +11,14 @@ import commonStyles from '../../shared/common.styles';
 const formName = ['settings', 'project_settings'];
 
 const ProjectPrivacy = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
   const {validateForm} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

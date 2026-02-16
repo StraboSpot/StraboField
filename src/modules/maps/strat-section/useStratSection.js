@@ -6,11 +6,13 @@ import {useForm} from '../../form';
 import {useSpots} from '../../spots';
 
 const useStratSection = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getSurvey} = useForm();
   const {deleteSpot, getSpotWithThisStratSection} = useSpots();
   const {calculateIntervalGeometry, moveSpotsUpOrDownByPixels} = useStratSectionCalculations();
+
+  /* Exported Functions */
 
   // Create a new strat section interval, separating the fields to their respective objects
   const createInterval = (stratSectionId, data) => {

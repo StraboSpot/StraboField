@@ -14,17 +14,15 @@ import {
 } from '../home/home.slice';
 
 const useMap = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
 
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl} = useServerRequests();
-
 
   /* Exported Functions */
 

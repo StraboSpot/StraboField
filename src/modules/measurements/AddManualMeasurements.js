@@ -20,10 +20,12 @@ const planarFormName = [groupKey, MEASUREMENT_KEYS.PLANAR];
 const linearFormName = [groupKey, MEASUREMENT_KEYS.LINEAR];
 
 const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {doMeasurementCalculations} = useCompassCalculations();
   const {getSurvey} = useForm();
+
+  /* Local State */
 
   const [sliderValue, setSliderValue] = useState(6);
 
@@ -47,6 +49,8 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
       formProps.setFieldValue('associated_orientation[0].' + qualityKey, sliderValueString);
     }
   }, [sliderValue]);
+
+  /* Event Handlers */
 
   const onMyChange = (name, value) => {
     if (name === 'rake' || name === 'strike' || name === 'dip_direction') {

@@ -23,15 +23,16 @@ import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const BeddingPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
+
+  /* Local State */
 
   const beddingSharedRef = useRef(null);
 

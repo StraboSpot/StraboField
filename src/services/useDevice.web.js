@@ -1,6 +1,7 @@
 import {Linking} from 'react-native';
 
 const useDevice = () => {
+  /* Exported Functions */
 
   const openURL = async (url) => {
     const initialUrl = await Linking.canOpenURL(url);

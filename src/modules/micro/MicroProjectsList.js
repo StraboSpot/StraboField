@@ -19,10 +19,16 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
 const MicroProjectsList = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
+
+  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
+  const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
+  const {clearStatus, downloadZip, isLoadingWave, percentDone, showComplete, showLoadingBar} = useMicroZips();
+
+  /* Local State */
 
   const [doc, setDoc] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
@@ -32,10 +38,6 @@ const MicroProjectsList = () => {
   const [projectsExistsArr, setProjectsExistsArr] = useState([]);
   const [projectsUpdateAvailableArr, setProjectsUpdateAvailableArr] = useState([]);
   const [visible, setVisible] = useState(false);
-
-  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
-  const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
-  const {clearStatus, downloadZip, isLoadingWave, percentDone, showComplete, showLoadingBar} = useMicroZips();
 
   /* Side Effects */
 

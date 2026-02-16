@@ -15,7 +15,7 @@ import {useTags} from '../tags';
 const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
 

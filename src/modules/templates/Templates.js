@@ -10,9 +10,11 @@ import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
 const Templates = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getTemplateTitle} = useTemplates();
+
+  /* Local State */
 
   const [isNewTemplateListVisible, setIsNewTemplateListVisible] = useState(false);
   const [templateType, setTemplateType] = useState(null);

@@ -10,10 +10,9 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsOverview = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   /* Derived Variables */

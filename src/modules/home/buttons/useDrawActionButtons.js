@@ -5,7 +5,7 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {MAP_MODES} from '../../maps/maps.constants';
 
 const useDrawActionButtons = ({clickHandler, mapMode}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const drawGeometries = useSelector(state => state.map.drawGeometries);

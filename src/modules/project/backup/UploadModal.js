@@ -21,22 +21,13 @@ import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.
 import {setIsImageTransferring} from '../projects.slice';
 
 const UploadModal = ({closeModal, isVisible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
-
-  const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
-  const [imageUploadStatus, setImageUploadStatus] = useState({});
-  const [modalTitle, setModalTitle] = useState('Upload Project');
-  const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
-  const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
-  const [uploadState, setUploadState] = useState('not started');
 
   const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
   const {
@@ -47,6 +38,16 @@ const UploadModal = ({closeModal, isVisible}) => {
     initializeImageUpload,
     resetState,
   } = useUploadImages();
+
+  /* Local State */
+
+  const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
+  const [errorMessage, setErrorMesssage] = useState('');
+  const [imageUploadStatus, setImageUploadStatus] = useState({});
+  const [modalTitle, setModalTitle] = useState('Upload Project');
+  const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
+  const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
+  const [uploadState, setUploadState] = useState('not started');
 
   /* Side Effects */
 

@@ -29,10 +29,9 @@ const orientedKey = 'oriented_sample';
 const lastKeys = ['sample_notes'];
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -41,6 +40,8 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const {setPointAtCurrentLocation} = useMapLocation();
   const {checkSampleName, getNewSpotName} = useSpots();
   const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
   const toastRef = useRef(null);

@@ -17,11 +17,13 @@ import {SpotsList, SpotsListItem} from '../spots';
 const itemWidth = 300;
 
 const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
 
   const {width} = useWindowSize();
+
+  /* Local State */
 
   const [isSpotsListModalVisible, setIsSpotsListModalVisible] = useState(false);
 
@@ -31,7 +33,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
     return checkedSpotsIds.find(id => id.toString() === spotId) ? [...acc, spotObj] : acc;
   }, []);
   const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
-  
+
   /* Logic Helpers */
 
   const addAssociatedSpots = () => setIsSpotsListModalVisible(true);

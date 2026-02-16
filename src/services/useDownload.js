@@ -42,10 +42,9 @@ let spotsToSave = [];
 let tempActiveDatasetsIds, tempTargetDatasetId;
 
 const useDownload = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);

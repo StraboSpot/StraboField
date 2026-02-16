@@ -13,10 +13,12 @@ import formStyles from '../form/form.styles';
 import useMapLocation from '../maps/useMapLocation';
 
 const GenerateRandomSpots = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {generateRandomsSpotsAroundCurrentLocation} = useMapLocation();
   const toast = useToast();
+
+  /* Local State */
 
   const [isSpotGeneratorVisible, setIsSpotGeneratorVisible] = useState(false);
   const [loading, setLoading] = useState(false);

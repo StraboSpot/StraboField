@@ -8,7 +8,7 @@ import alert from '../../shared/ui/alert';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getLocalImageURI, saveFile} = useImages();
 

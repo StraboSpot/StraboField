@@ -20,15 +20,12 @@ import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const UserProfile = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
-
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
@@ -36,8 +33,12 @@ const UserProfile = () => {
   const toast = useToast();
   const {uploadProfile} = useUpload();
 
+  /* Local State */
+
   const formRef = useRef(null);
-  
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
   /* Derived Variables */
 
   const formName = ['general', 'user_conventions'];

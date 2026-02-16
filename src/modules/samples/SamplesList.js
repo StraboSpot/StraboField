@@ -12,7 +12,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
 const SamplesList = ({onPress}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
 

@@ -28,10 +28,9 @@ let imageCount = 0;
 let newImages = [];
 
 const useImages = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const project = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);

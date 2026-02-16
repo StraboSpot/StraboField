@@ -15,7 +15,7 @@ import useSafeDocumentPicker from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

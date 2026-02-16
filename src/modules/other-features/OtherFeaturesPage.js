@@ -12,14 +12,15 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesPage = ({isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const otherFeatures = useSelector(state => state.project.project?.other_features);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [isFeatureDetailVisible, setIsFeatureDetailVisible] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState({});

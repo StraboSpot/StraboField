@@ -10,10 +10,9 @@ import {editedSpotImages} from '../spots/spots.slice';
 const ImagesOverview = ({isReadOnly}) => {
   console.log('Rendering ImagesOverview...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const toast = useToast();

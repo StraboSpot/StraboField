@@ -6,7 +6,7 @@ import {useSpots} from '../spots';
 const ImageBasemapsList = ({closeManMenuPanel}) => {
   console.log('Rendering ImageBasemaps...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getImageBasemap} = useImages();
   const {getActiveImageBasemaps} = useSpots();

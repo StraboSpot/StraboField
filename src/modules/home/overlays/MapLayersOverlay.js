@@ -22,7 +22,7 @@ import useMap from '../../maps/useMap';
 const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
 
 const MapLayersOverlay = ({onTouchOutside, visible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customEndpoint = useSelector(state => state.connections.databaseEndpoint);
@@ -33,6 +33,8 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   const {setCustomMapSwitchValue} = useCustomMap();
   const {setBasemap} = useMap();
   const {setOfflineMapTiles} = useMapsOffline();
+
+  /* Local State */
 
   const [dialogTitle, setDialogTitle] = useState('Map Layers');
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));

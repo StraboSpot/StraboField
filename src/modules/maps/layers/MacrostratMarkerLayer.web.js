@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/Helpers';
 
 const MacrostratMarkerLayer = ({location}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 

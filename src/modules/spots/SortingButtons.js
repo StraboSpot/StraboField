@@ -8,10 +8,9 @@ import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constan
 import {setSelectedButtonIndex, setSortedView} from '../main-menu-panel/mainMenuPanel.slice';
 
 const SortingButtons = ({spots}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedButtonIndex = useSelector(state => state.mainMenu.selectedButtonIndex);
 
   /* Logic Helpers */

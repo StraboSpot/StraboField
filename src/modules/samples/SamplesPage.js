@@ -11,12 +11,13 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedSample, setSelectedSample] = useState({});

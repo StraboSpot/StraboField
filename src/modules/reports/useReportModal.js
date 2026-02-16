@@ -11,14 +11,15 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/main
 import {setSelectedTag, updatedProject} from '../project/projects.slice';
 
 const useReportModal = ({openSpotInNotebook}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
 
   const {showErrors} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

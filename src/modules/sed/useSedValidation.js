@@ -5,7 +5,7 @@ import {PAGE_KEYS} from '../page/page.constants';
 import {useSpots} from '../spots';
 
 const useSedValidation = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getLabel} = useForm();
   const {getSpotWithThisStratSection, isStratInterval} = useSpots();

@@ -14,9 +14,11 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {exportMicroProjectPDF} = useDevice();
+
+  /* Local State */
 
   // const toast = useToast();
   const toastRef = useRef(null);

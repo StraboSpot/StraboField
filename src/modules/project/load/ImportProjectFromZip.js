@@ -23,17 +23,10 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
 const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-
-  const toast = useToast();
-
-  const [importComplete, setIsImportComplete] = useState(false);
-  const [importedProject, setImportedProject] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     doesBackupFileExist,
@@ -42,6 +35,13 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     makeDirectory,
     unZipAndCopyImportedData,
   } = useDevice();
+  const toast = useToast();
+
+  /* Local State */
+
+  const [importComplete, setIsImportComplete] = useState(false);
+  const [importedProject, setImportedProject] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   /* Side Effects */
 

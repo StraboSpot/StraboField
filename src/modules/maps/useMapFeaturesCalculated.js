@@ -14,7 +14,7 @@ const spotLayers = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerN
   'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
 const useMapFeaturesCalculated = (mapRef) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const stratSection = useSelector(state => state.map.stratSection);

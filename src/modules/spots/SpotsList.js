@@ -11,9 +11,11 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
   // console.log('Rendering SpotsList...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getActiveSpotsObj} = useSpots();
+
+  /* Local State */
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);

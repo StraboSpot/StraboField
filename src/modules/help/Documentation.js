@@ -58,9 +58,11 @@ const links = [
 ];
 
 const Documentation = ({navigation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
+
+  /* Local State */
 
   const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);
 

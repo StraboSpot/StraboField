@@ -8,10 +8,9 @@ import OutlineButton from './buttons/OutlineButton';
 
 // Update the Spots in the map
 const UpdateSpotsInMapExtentButton = ({title, updateSpotsInMapExtent}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isMapMoved = useSelector(state => state.map.isMapMoved);
 
   /* Event Handlers */

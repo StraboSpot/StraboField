@@ -21,14 +21,15 @@ const baseOnOtherKey = 'other_based_on';
 const lastKeys = ['notes'];
 
 const AddReactionTextureModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getChoices, getSurvey, getRelevantFields} = useForm();
   const {savePetFeature} = usePetrology();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

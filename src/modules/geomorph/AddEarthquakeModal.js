@@ -18,13 +18,14 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const AddEarthquakeModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getChoices, getRelevantFields, getSurvey, isRelevant, showErrors, validateForm} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

@@ -29,11 +29,13 @@ const COLOR_CHOICES = [
 ];
 
 const ColorPickerModal = ({closeModal}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {saveTag} = useTags();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

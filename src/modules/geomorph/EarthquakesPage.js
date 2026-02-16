@@ -14,12 +14,13 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const EarthquakesPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});

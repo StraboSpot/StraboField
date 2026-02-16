@@ -12,14 +12,14 @@ const xCl = 10;  // Horizontal spacing between clastic tick marks
 const xMi = 26.6; // Horizontal space between miscellaneous lithologies tick marks
 
 const useXAxis = (n) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
   const {convertImagePixelsToLatLong} = useMapCoords();
 
-  /* Exported Variables */
+  /* Exported Functions */
 
   const getXAxis = () => {
     const xAxis = JSON.parse(JSON.stringify(lineString));

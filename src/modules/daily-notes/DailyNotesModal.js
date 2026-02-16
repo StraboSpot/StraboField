@@ -14,12 +14,13 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
 const DailyNotesModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const modalValues = useSelector(state => state.home.modalValues);
   const projectDescription = useSelector(state => state.project.project?.description);
+
+  /* Local State */
 
   const formRef = useRef(null);
 

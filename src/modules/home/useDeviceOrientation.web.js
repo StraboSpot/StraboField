@@ -1,4 +1,5 @@
 const useDeviceOrientation = () => {
+  /* Exported Functions */
 
   const lockOrientation = () => {};
 

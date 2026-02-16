@@ -25,10 +25,9 @@ let neededTiles = 0;
 let notNeededTiles = 0;
 
 const useImport = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const project = useSelector(state => state.project.project);
 
   const {

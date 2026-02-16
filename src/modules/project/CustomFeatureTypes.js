@@ -16,13 +16,14 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {useSpots} from '../spots';
 
 const CustomFeatureTypes = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const projectFeatures = useSelector(state => state.project.project?.other_features);
 
   const {getActiveSpotsObj} = useSpots();
+
+  /* Local State */
 
   const [refresh] = useState();
 

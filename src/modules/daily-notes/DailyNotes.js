@@ -13,10 +13,9 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 
 const DailyNotes = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const dailyNotes = useSelector(state => state.project.project?.description?.daily_setup) || [];
 
   /* Logic Helpers */

@@ -10,7 +10,7 @@ import {useSpots} from '../spots';
 import {TagsListItem, useTags} from '../tags';
 
 const FeatureTagsAtSpotList = ({openMainMenuPanel, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 

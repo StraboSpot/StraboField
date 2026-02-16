@@ -23,10 +23,9 @@ import useSed from '../sed/useSed';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const AddRockModal = ({modalKey}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
@@ -34,6 +33,8 @@ const AddRockModal = ({modalKey}) => {
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
   const {saveSedFeature, saveSedFeatureValuesFromTemplates} = useSed();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

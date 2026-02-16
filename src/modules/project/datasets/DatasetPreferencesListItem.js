@@ -14,16 +14,17 @@ import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetPreferencesListItem = ({dataset}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
   const {makeDatasetCurrent, setSwitchValue} = useProject();
+
+  /* Local State */
 
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
 

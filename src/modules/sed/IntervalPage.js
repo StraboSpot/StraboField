@@ -17,14 +17,15 @@ import {editedSpotProperties} from '../spots/spots.slice';
 const formName = ['sed', 'interval'];
 
 const IntervalPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
+
+  /* Local State */
 
   const intervalRef = useRef(null);
 
@@ -50,6 +51,8 @@ const IntervalPage = ({isReadOnly, page}) => {
     }
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const confirmLeavePage = () => {
     if (intervalRef.current && intervalRef.current.dirty) {

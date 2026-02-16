@@ -21,14 +21,15 @@ import {editedSpotProperties} from '../spots/spots.slice';
 const formName = ['general', 'site_safety'];
 
 const SiteSafetyPage = ({isReadOnly}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
   const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

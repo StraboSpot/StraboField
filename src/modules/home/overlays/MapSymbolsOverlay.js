@@ -24,10 +24,9 @@ import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
 
 const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
@@ -37,6 +36,8 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
   const {getMeasurementLabel} = useMeasurements();
+
+  /* Local State */
 
   const [isFeatureTypesExpanded, setFeatureTypesExpanded] = useState(true);
   const [isGeometryTypesExpanded, setGeometryTypesExpanded] = useState(true);

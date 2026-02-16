@@ -16,16 +16,20 @@ import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
+let sortedSpotsWithImages = [];
+
 const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   console.log('Rendering ImageGallery...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const navigate = useNavigation();
   const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
+
+  /* Local State */
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
@@ -34,7 +38,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
-  let sortedSpotsWithImages = [];
 
   /* Logic Helpers */
 

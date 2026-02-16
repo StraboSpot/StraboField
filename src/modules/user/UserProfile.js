@@ -30,10 +30,9 @@ import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisibl
 const formName = ['general', 'user_profile'];
 
 const UserProfile = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
   const userEncodedLogin = useSelector(state => state.user.encoded_login);
@@ -46,6 +45,8 @@ const UserProfile = () => {
   const toast = useToast();
   const {uploadProfile} = useUpload();
   const {resizeImageForUpload, uploadProfileImage} = useUploadImages();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

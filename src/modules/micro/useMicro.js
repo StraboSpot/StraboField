@@ -3,7 +3,7 @@ import useDevice from '../../services/useDevice';
 import useServerRequests from '../../services/useServerRequests';
 
 const useMicro = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {doesMicroProjectPDFExist, getMicroProjectName, readDirectory} = useDevice();
   const {getMyMicroProjects} = useServerRequests();

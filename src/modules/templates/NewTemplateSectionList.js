@@ -7,7 +7,7 @@ import useTemplates from './useTemplates';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const NewTemplateSectionList = ({handleNewTemplatePressed}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getNewTemplatesList, getTemplateTitle} = useTemplates();
 

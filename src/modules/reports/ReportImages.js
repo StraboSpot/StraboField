@@ -9,10 +9,9 @@ import {AddImageButtons, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
 
 const ReportImages = ({setUpdatedImages, updatedImages}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
 

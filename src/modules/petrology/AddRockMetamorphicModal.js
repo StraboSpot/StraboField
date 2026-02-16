@@ -17,10 +17,12 @@ const fourthKeys = ['zone'];
 const lastKeys = ['notes_metamorphic'];
 
 const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getLabel} = useForm();
   const {width} = useWindowSize();
+
+  /* Local State */
 
   const [isFaciesModalVisible, setIsFaciesModalVisible] = useState(false);
 

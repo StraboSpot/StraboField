@@ -26,9 +26,11 @@ const pickerLabels = {
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {
   console.log('Rendering SpotsNavigator...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const pickerRef = useRef();
 

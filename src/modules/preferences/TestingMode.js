@@ -17,9 +17,11 @@ const errorMessage = 'Wrong Password!';
 const testingModePassword = 'Strab0R0cks';
 
 const TestingMode = ({isTestingMode, textStyles}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
 
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [isTestingModalVisible, setIsTestingModalVisible] = useState(false);

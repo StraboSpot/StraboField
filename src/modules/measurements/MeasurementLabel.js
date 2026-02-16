@@ -9,7 +9,7 @@ import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 
 const MeasurementLabel = ({isDetail, item}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const measurementConvention = useSelector(state => state.user?.measurement_convention);
 

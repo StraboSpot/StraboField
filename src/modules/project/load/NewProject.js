@@ -9,9 +9,11 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
 const NewProject = ({closeNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(true);
 

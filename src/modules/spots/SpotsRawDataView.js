@@ -11,12 +11,13 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
 const SpotsRawDataView = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const project = useSelector(state => state.project.project);
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
+
+  /* Local State */
 
   const toast = useRef(null);
 

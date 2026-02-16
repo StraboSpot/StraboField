@@ -19,14 +19,15 @@ const initialValues = {
 };
 
 const NewProjectForm = ({openMainMenuPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const {showErrors, validateForm} = useForm();
   const {initializeNewProject} = useProject();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

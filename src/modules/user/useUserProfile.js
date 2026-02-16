@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {isEmpty, truncateText} from '../../shared/Helpers';
 
 const useUserProfile = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const userData = useSelector(state => state.user);

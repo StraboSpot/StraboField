@@ -15,11 +15,13 @@ const source = 'device';
 
 // Delete a project on device in StraboSpot app directory
 const DeleteProject = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {openURL} = useDevice();
+
+  /* Local State */
 
   const [doReloadPage, setDoReloadPage] = useState(false);
   const [isDeleteProjectModalVisible, setIsDeleteProjectModalVisible] = useState(false);

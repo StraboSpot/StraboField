@@ -14,10 +14,9 @@ let CSVData = '';
 let csvObject = {};
 
 const useExternalData = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {pickCSV, readFile} = useDevice();

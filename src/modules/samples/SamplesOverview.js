@@ -7,7 +7,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesOverview = ({page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

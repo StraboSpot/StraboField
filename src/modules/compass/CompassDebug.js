@@ -9,7 +9,7 @@ import {roundToDecimalPlaces} from '../../shared/Helpers';
 import {overlayStyles} from '../home/overlays';
 
 const CompassDebug = ({compassData, matrixRotation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
 

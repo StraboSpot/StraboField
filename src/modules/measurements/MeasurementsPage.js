@@ -22,10 +22,9 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
@@ -33,6 +32,8 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {createNewMeasurement, deleteMeasurements} = useMeasurements();
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [multiSelectMode, setMultiSelectMode] = useState();

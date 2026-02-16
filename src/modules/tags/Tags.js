@@ -17,13 +17,14 @@ import {TagDetailModal, TagsList} from '../tags';
 const Tags = ({type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
+
+  /* Local State */
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);

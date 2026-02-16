@@ -12,7 +12,7 @@ import {SwitchWrapper} from '../../../shared/ui/';
 import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];

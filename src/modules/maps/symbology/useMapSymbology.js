@@ -13,7 +13,7 @@ const linePatterns = {
 };
 
 const useMapSymbology = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const labelTypeOn = useSelector(state => state.map.labelTypeOn);
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);

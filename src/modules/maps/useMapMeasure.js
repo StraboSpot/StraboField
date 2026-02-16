@@ -6,7 +6,7 @@ import useMapFeaturesCalculated from './useMapFeaturesCalculated';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapMeasure = (mapRef) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getNearestFeatureInBBox} = useMapFeaturesCalculated(mapRef);
 

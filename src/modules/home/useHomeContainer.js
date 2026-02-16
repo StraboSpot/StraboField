@@ -8,10 +8,9 @@ import {useSpots} from '../spots';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
 
   const {handleSpotSelected} = useSpots();

@@ -18,15 +18,16 @@ import {setSelectedProject} from '../projects.slice';
 const BackupProject = () => {
   console.log('Rendering BackupProject...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
   const {openURL} = useDevice();
+
+  /* Local State */
 
   const [backupAction, setBackupAction] = useState(undefined);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);

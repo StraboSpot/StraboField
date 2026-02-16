@@ -7,10 +7,7 @@ import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-  /* Data Hooks / State */
-
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
+  /* Data Hooks */
 
   const {
     checkIsSafeDelete,
@@ -28,6 +25,11 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     setUpdatedImages,
     updatedImages,
   } = useReportModal({openSpotInNotebook: openSpotInNotebook});
+
+  /* Local State */
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
 
   /* Event Handlers */
 

@@ -13,16 +13,17 @@ import {isEmpty} from '../../Helpers';
 import OutlineButton from '../buttons/OutlineButton';
 
 const StatusModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentProjectId = useSelector(state => state.project.project?.id);
   const isModalLoading = useSelector(state => state.home.loading.modal);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
+
+  /* Local State */
 
   const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
 

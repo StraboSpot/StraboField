@@ -7,7 +7,7 @@ import styles from './documentation.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
-  /* Data Hooks / State */
+  /* Local State */
 
   const [pickerVisible, setPickerVisible] = useState(false);
 

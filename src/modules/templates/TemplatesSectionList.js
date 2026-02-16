@@ -9,7 +9,7 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const TemplatesSectionList = ({handleTemplatePressed}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const templates = useSelector(state => state.project.project?.templates);
 

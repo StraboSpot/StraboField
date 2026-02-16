@@ -13,11 +13,12 @@ import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
 const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
+
+  /* Local State */
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 

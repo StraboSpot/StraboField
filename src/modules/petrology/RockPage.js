@@ -24,15 +24,16 @@ import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const RockPage = ({isReadOnly, page}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getSurvey} = useForm();
   const {getSpotById, getSpotsWithKey} = useSpots();
+
+  /* Local State */
 
   const preFormRef = useRef(null);
 

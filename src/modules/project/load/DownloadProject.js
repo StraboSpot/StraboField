@@ -13,14 +13,15 @@ const source = 'server';
 
 // Download Project
 const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const project = useSelector(state => state.project.project);
 
   const {initializeDownload} = useDownload();
+
+  /* Local State */
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);

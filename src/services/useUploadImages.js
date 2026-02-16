@@ -13,16 +13,17 @@ import {setIsImageTransferring} from '../modules/project/projects.slice';
 import {isEmpty} from '../shared/Helpers';
 
 const useUploadImages = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const spots = useSelector(state => state.spot.spots);
   const user = useSelector(state => state.user);
 
   const {deleteTempImagesFolder, doesDeviceDirExist, makeDirectory} = useDevice();
   const {getAllImages, getImageHeightAndWidth, getLocalImageURI} = useImages();
   const {uploadImage, verifyImagesExistence} = useServerRequests();
+
+  /* Local State */
 
   const [currentImage, setCurrentImage] = useState('');
   const [currentImageStatus, setCurrentImageStatus] = useState({success: 0, failed: 0});

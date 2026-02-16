@@ -12,13 +12,15 @@ import {isEmpty} from '../../shared/Helpers';
 import {AvatarAccessoryWrapper, AvatarWrapper} from '../../shared/ui/avatars';
 
 const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage, size, tempUserProfileImageURI}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const imageURI = useSelector(state => state.user?.image);
   const isOnline = useSelector(state => state.connections.isOnline);
 
   const {doesFileExist} = useDevice();
   const {getInitials} = useUserProfile();
+
+  /* Local State */
 
   const [source, setSource] = useState(defaultAvatar);
 
@@ -27,6 +29,8 @@ const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage
   useEffect(() => {
     getAvatarSource();
   }, [tempUserProfileImageURI, shouldUpdateImage]);
+
+  /* Logic Helpers */
 
   const getAvatarSource = async () => {
     console.log('tempUserProfileImageURI', tempUserProfileImageURI);

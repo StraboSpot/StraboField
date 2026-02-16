@@ -12,10 +12,9 @@ import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import useProject from '../project/useProject';
 
 const MainMenuPanelListItem = ({onPress, title}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentProjectId = useSelector(state => state.project.project?.id);
 
   const {getTargetDatasetFromId} = useProject();

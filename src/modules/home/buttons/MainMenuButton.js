@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const MainMenuButton = ({closeMainMenuPanel, openMainMenuPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isMainMenuPanelVisible = useSelector(state => state.home.isMainMenuPanelVisible);
 

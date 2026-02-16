@@ -12,10 +12,9 @@ const xInterval = 10;  // Horizontal spacing between grain sizes/weathering tick
 const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
 const useStratSectionCalculations = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getBasicLithologyIndex, getSiliciclasticGrainSize} = useSedValidation();

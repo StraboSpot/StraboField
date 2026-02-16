@@ -20,10 +20,9 @@ import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slic
 import useProject from '../useProject';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -31,6 +30,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset} = useProject();
   const toast = useToast();
+
+  /* Local State */
 
   const [datasetName, setDatasetName] = useState(dataset.name);
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);

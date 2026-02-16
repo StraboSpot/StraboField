@@ -17,17 +17,16 @@ const datasetsNotUploaded = [];
 let projectUploadStatus = {};
 
 const useUpload = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const project = useSelector(state => state.project.project);
   const projectDatasets = useSelector(state => state.project.datasets);
   const user = useSelector(state => state.user);
 
-  const [uploadStatusMessage, setUploadStatusMessage] = useState('');
-
   const {checkValidDateTime} = useProject();
+  const {getSpotsByIds} = useSpots();
+  const {initializeImageUpload} = useUploadImages();
   const {
     addDatasetToProject,
     deleteAllSpotsInDataset,
@@ -37,8 +36,10 @@ const useUpload = () => {
     updateProject,
     uploadWebImage,
   } = useServerRequests();
-  const {getSpotsByIds} = useSpots();
-  const {initializeImageUpload} = useUploadImages();
+
+  /* Local State */
+
+  const [uploadStatusMessage, setUploadStatusMessage] = useState('');
 
   /* Internal Functions */
 

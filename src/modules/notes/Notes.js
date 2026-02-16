@@ -21,10 +21,9 @@ import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -32,6 +31,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
 
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

@@ -11,7 +11,7 @@ import {MODAL_KEYS} from '../page/page.constants';
 const ReportsMenu = ({}) => {
   console.log('Rendering ReportsMenu...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

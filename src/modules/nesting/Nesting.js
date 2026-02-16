@@ -15,16 +15,12 @@ import {SpotsListItem, useSpots} from '../spots';
 const Nesting = () => {
   console.log('Rendering Nesting');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
-
-  const [childrenGenerations, setChildrenGenerations] = useState(null);
-  const [images, setImages] = useState([]);
-  const [parentGenerations, setParentGenerations] = useState(null);
 
   const {getImageByImageId} = useImages();
   const {
@@ -32,6 +28,12 @@ const Nesting = () => {
   } = useImageThumbnails({images});
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {handleSpotSelected} = useSpots();
+
+  /* Local State */
+
+  const [childrenGenerations, setChildrenGenerations] = useState(null);
+  const [images, setImages] = useState([]);
+  const [parentGenerations, setParentGenerations] = useState(null);
 
   /* Derived Variables */
 

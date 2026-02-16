@@ -8,7 +8,7 @@ const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineStrin
 const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
 const useYAxis = (spotsDisplayed) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {convertImagePixelsToLatLong} = useMapCoords();
 

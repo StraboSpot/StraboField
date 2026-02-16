@@ -17,11 +17,13 @@ import {TagsListItem, TagsModal} from '../tags';
 const itemWidth = 300;
 
 const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const {width} = useWindowSize();
+
+  /* Local State */
 
   const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
 

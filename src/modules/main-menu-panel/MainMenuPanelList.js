@@ -14,12 +14,13 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const MainMenuPanelList = ({searchText}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
+
+  /* Local State */
 
   const [menuItems, setMenuItems] = useState(MAIN_MENU_DATA);
 

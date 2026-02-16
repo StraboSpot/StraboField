@@ -5,7 +5,7 @@ import {toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 
 const ThreeDStructureLabel = ({item}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {getLabel} = useForm();
 

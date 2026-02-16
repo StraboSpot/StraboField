@@ -20,10 +20,9 @@ const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distri
   : 'Downloads/StraboSpot2/Backups';
 
 const StraboFieldProjects = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 

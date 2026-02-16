@@ -16,12 +16,14 @@ import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
   const isOnline = useSelector(state => state.connections.isOnline);
 
   const {guestSignIn, signIn} = useSignIn();
+
+  /* Local State */
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);

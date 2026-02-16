@@ -17,10 +17,9 @@ import {setLoadingStatus, setModalVisible} from '../home.slice';
 const ShortcutButtons = ({openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
@@ -28,6 +27,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
+
+  /* Local State */
 
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 

@@ -5,7 +5,7 @@ import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 
 const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
-  /* Data Hooks / State */
+  /* Local State */
 
   const [strikeSpinValue] = useState(new Animated.Value(0));
   const [trendSpinValue] = useState(new Animated.Value(0));
@@ -44,6 +44,8 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
       }).start();
     }
   }, [trend]);
+
+  /* Render Functions */
 
   const renderCompassSymbols = () => {
     const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);

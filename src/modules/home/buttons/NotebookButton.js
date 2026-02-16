@@ -5,11 +5,11 @@ import {useSelector} from 'react-redux';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 
 const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
 
-  /* Event Handlers */
+  /* Logic Helpers */
 
   const toggleNotebookPanel = () => {
     if (isNotebookPanelVisible) closeNotebookPanel();

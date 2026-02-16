@@ -12,7 +12,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const usePetrology = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

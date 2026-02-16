@@ -59,11 +59,13 @@ const initialState = {
 };
 
 const SignUp = ({navigation}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const isOnline = useSelector(state => state.connections.isOnline);
 
   const {registerUser} = useServerRequests();
+
+  /* Local State */
 
   const [isLoading, setIsLoading] = useState(false);
   const [statusDialog, setStatusDialog] = useState(false);

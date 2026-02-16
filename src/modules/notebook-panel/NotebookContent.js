@@ -24,10 +24,9 @@ import {SpotsListItem, useSpots} from '../spots';
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
   console.log('Rendering NotebookContent...');
 
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);

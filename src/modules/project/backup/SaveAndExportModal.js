@@ -11,16 +11,17 @@ import {setSelectedProject} from '../projects.slice';
 import SaveAndExportModalContent from './SaveAndExportModalContent';
 
 const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentProject = useSelector(state => state.project.project);
+
+  const {initializeBackup, zipAndExportProjectFolder} = useExport();
+
+  /* Local State */
 
   const defaultFileName = selectedFilename || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + currentProject.description.project_name).replace(/\s/g, '');
-
-  const {initializeBackup, zipAndExportProjectFolder} = useExport();
 
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);

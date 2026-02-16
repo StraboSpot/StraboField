@@ -14,12 +14,14 @@ import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 
 const NotebookFooter = ({openPage}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
+
+  /* Local State */
 
   const [isMorePagesMenuVisible, setIsMorePagesMenuVisible] = useState(false);
 

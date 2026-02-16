@@ -16,12 +16,14 @@ import {PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {deletedTemplate} from '../project/projects.slice';
 
 const TemplateDetail = ({goBack, template, templateType}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {validateForm} = useForm();
   const {saveTemplate} = useTemplates();
+
+  /* Local State */
 
   const formRef = useRef(null);
 

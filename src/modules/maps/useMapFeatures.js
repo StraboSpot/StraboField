@@ -5,10 +5,9 @@ import {isEmpty, isEqualUnordered} from '../../shared/Helpers';
 import {useSpots} from '../spots';
 
 const useMapFeatures = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];

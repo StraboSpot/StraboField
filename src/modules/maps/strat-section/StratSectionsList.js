@@ -16,7 +16,7 @@ import {setSelectedSpot} from '../../spots/spots.slice';
 import {setStratSection} from '../maps.slice';
 
 const StratSectionsList = ({closeManMenuPanel}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 

@@ -2,7 +2,6 @@ import React from 'react';
 import {Text} from 'react-native';
 
 const OtherFeatureLabel = ({item}) => {
-
   /* Logic Helpers */
 
   const getTitle = (feature) => {

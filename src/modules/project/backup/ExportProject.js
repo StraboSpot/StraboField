@@ -15,11 +15,13 @@ const source = 'device';
 
 // Export a saved project on device in StraboSpot app directory
 const ExportProject = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
   const {openURL} = useDevice();
+
+  /* Local State */
 
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
   const [projectToExportFilename, setProjectToExportFilename] = useState(null);

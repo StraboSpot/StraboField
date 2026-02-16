@@ -20,10 +20,9 @@ let notNeededTiles = 0;
 let zipUID;
 
 const useMapsOffline = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);

@@ -17,10 +17,9 @@ let formName = ['project', 'tags'];
 let initialValues;
 
 const TagDetailModal = ({closeModal}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -29,9 +28,12 @@ const TagDetailModal = ({closeModal}) => {
   const {validateForm, showErrors} = useForm();
   const {deleteTag, saveTag} = useTags();
 
+  /* Local State */
+
   const formRef = useRef(null);
 
   /* Derived Variables */
+
   if (modalVisible) {
     let tagType = 'concept';
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {

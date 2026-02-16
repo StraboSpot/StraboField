@@ -4,9 +4,11 @@ import TextInputModal from '../../../shared/ui/TextInputModal';
 import useProject from '../useProject';
 
 const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible}) => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const {addDataset} = useProject();
+
+  /* Local State */
 
   const [datasetName, setDatasetName] = useState(null);
 
