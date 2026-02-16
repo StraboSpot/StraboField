@@ -236,7 +236,7 @@ const BasicPageDetail = ({
               <>
                 <Form {...{
                   ...formProps,
-                  fieldCustomHeights: page.key === PAGE_KEYS.SAMPLES ? {sample_description: 150} : undefined,
+                  // fieldCustomHeights: page.key === PAGE_KEYS.SAMPLES ? {sample_description: 200} : undefined, //TODO Possibly make the description higher
                   formName: formName,
                   isReadOnly: isReadOnly,
                   onMyChange: page.key === PAGE_KEYS.MINERALS
