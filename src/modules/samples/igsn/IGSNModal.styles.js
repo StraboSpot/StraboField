@@ -1,27 +1,15 @@
-import {StyleSheet} from 'react-native';
-
 import * as themes from '../../../shared/styles.constants';
 
-const IGSNModalStyles = StyleSheet.create({
+const IGSNModalStyles = {
   container: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
   },
-  errorContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 20,
-    maxHeight: 400,
-    paddingHorizontal: 20,
-  },
   errorMessageText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  fieldValueText: {
-    fontWeight: '500',
   },
   headerText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
@@ -36,8 +24,8 @@ const IGSNModalStyles = StyleSheet.create({
   },
   sesarImage: {
     borderWidth: 2,
-    height: 120,
-    width: 340,
+    height: 100,
+    width: 300,
   },
   sesarImageContainer: {
     alignContent: 'center',
@@ -46,14 +34,46 @@ const IGSNModalStyles = StyleSheet.create({
   },
   uploadContentDescription: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
-    margin: 30,
+    color: themes.PRIMARY_TEXT_COLOR,
+    marginTop: 10,
     textAlign: 'center',
+    fontStyle: 'italic',
   },
   uploadContentText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     padding: 5,
   },
-});
+  contentContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    width: 400,
+  },
+  fieldRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: themes.LIST_BORDER_COLOR,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  labelColumn: {
+    flex: 1.5, // Controls the width of the left side
+  },
+  valueColumn: {
+    flex: 2,   // Controls the width of the right side
+    paddingLeft: 10,
+  },
+  fieldValueText: {
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontWeight: '400',
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: themes.RED,
+    borderRadius: 10,
+  },
+};
 
 export default IGSNModalStyles;

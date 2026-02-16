@@ -127,30 +127,24 @@ const IGSNModal = forwardRef(({
   };
 
   const renderContentItems = () => {
-    // const sesarMappedObj = straboSesarMapping(formRef.current?.values || {});
     return (
-      <View style={{
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-      }}>
-        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      <View style={IGSNModalStyles.contentContainer}>
+
         {!isUploaded && isVisible && mappedSesarValues.map((item) => {
           if (item.sesarKey === 'user_code' && formRef.current?.values?.isOnMySesar) return null;
           if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
+
           return (
-            <View key={item.sesarKey}
-                  style={{
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    paddingLeft: 20,
-                  }}>
-              <Text style={IGSNModalStyles.uploadContentText}>{item.label}</Text>
-              <Text style={IGSNModalStyles.fieldValueText}> {formatContentItems(item)}</Text>
+            <View key={item.sesarKey} style={IGSNModalStyles.fieldRow}>
+              <View style={IGSNModalStyles.labelColumn}>
+                <Text style={IGSNModalStyles.uploadContentText}>{item.label}</Text>
+              </View>
+              <View style={IGSNModalStyles.valueColumn}>
+                <Text style={IGSNModalStyles.fieldValueText}>{formatContentItems(item)}</Text>
+              </View>
             </View>
           );
-        })
-        }
+        })}
       </View>
     );
   };
@@ -186,6 +180,7 @@ const IGSNModal = forwardRef(({
             style={IGSNModalStyles.sesarImage}
           />
         </View>
+        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
         {setPage()}
       </View>
       <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>

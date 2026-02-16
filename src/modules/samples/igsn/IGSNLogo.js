@@ -3,10 +3,9 @@ import {View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import IGSNLogo from '../../../assets/images/logos/IGSN_Logo_200.jpg';
 import sampleStyles from '../samples.styles';
 
-const IGSNDisplay = ({item}) => {
+const IGSNLogo = ({item}) => {
   return (
     <View style={sampleStyles.logoDisplayContainer}>
       {item.isOnMySesar && (
@@ -19,4 +18,4 @@ const IGSNDisplay = ({item}) => {
   );
 };
 
-export default IGSNDisplay;
+export default IGSNLogo;
