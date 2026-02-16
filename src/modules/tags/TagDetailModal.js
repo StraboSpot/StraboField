@@ -47,7 +47,6 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
-
   const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
 
   /* Logic Helpers */

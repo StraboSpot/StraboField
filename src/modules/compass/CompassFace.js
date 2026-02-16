@@ -12,9 +12,8 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
 
   /* Derived Variables */
 
-  const strike = compassData?.strike ?? 0;
-
   // Interpolated angles
+  const strike = compassData?.strike ?? 0;
   const strikeSpin = strikeSpinValue.interpolate({inputRange: [0, strike], outputRange: ['0deg', strike + 'deg']});
   const trend = compassData?.trend ?? 0;
   const trendSpin = trendSpinValue.interpolate({inputRange: [0, trend], outputRange: ['0deg', trend + 'deg']});

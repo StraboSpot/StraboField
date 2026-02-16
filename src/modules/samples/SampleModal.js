@@ -46,21 +46,22 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   const formRef = useRef(null);
   const toastRef = useRef(null);
 
-  const initialNamePrefix = preferences.sample_prefix || '';
-
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [currentForm, setCurrentForm] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
   const [namePostfix, setNamePostfix] = useState(null);
+
+  const initialNamePrefix = preferences.sample_prefix || '';
+
   const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
   const [startingNumber, setStartingNumber] = useState(null);
 
   /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const survey = getSurvey(formName);
   const choices = getChoices(formName);
+  const survey = getSurvey(formName);
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 

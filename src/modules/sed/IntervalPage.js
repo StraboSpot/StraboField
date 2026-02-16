@@ -41,7 +41,6 @@ const IntervalPage = ({isReadOnly, page}) => {
     // console.log('Spot:', spot);
     // console.log('Interval:', interval);
     // console.log('Character:', character);
-
     if (spot.properties?.sed?.interval_type) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
       editedSedData.character = spot.properties?.sed?.interval_type;

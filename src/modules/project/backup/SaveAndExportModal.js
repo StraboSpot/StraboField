@@ -20,10 +20,11 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   /* Local State */
 
+  const [backingUpStatus, setBackingUpStatus] = useState('');
+
   const defaultFileName = selectedFilename || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + currentProject.description.project_name).replace(/\s/g, '');
 
-  const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
   const [modalTitle, setModalTitle] = useState('Confirm or Change\nFolder Name');

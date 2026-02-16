@@ -41,9 +41,9 @@ const AddReactionTextureModal = () => {
   const petKey = PAGE_KEYS.REACTIONS;
   const formName = ['pet', petKey];
   const survey = getSurvey(formName);
+  const basedOnOtherField = survey.find(f => f.name === baseOnOtherKey);
   const choices = getChoices(formName);
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const basedOnOtherField = survey.find(f => f.name === baseOnOtherKey);
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
   /* Side Effects */

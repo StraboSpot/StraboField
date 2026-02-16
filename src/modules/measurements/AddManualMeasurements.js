@@ -33,11 +33,10 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
 
   // Relevant fields for quick-entry modal
   const planarSurvey = getSurvey(planarFormName);
-  const planarKeysFields = planarKeys.map(k => planarSurvey.find(f => f.name === k));
+  const labelField = planarSurvey.find(f => f.name === labelKey);
   const linearSurvey = getSurvey(linearFormName);
   const linearKeysFields = linearKeys.map(k => linearSurvey.find(f => f.name === k));
-
-  const labelField = planarSurvey.find(f => f.name === labelKey);
+  const planarKeysFields = planarKeys.map(k => planarSurvey.find(f => f.name === k));
 
   /* Side Effects */
 

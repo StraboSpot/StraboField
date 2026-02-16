@@ -20,10 +20,11 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   /* Local State */
 
+  const [isReverseSort, setIsReverseSort] = useState(false);
+
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');

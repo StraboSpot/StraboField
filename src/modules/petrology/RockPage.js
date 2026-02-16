@@ -43,32 +43,27 @@ const RockPage = ({isReadOnly, page}) => {
 
   /* Derived Variables */
 
+  const ALTERATION_ORE_SECTIONS = {
+    ALTERATION_ORE: {title: 'Alteration, Ore Rocks', key: PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE},
+    DEPRECATED: {title: 'Alteration, Ore Rocks (Deprecated Version)', key: null},
+  };
+  const FAULT_SECTIONS = {
+    FAULT: {title: 'Fault & Shear Zone Rocks', key: PAGE_KEYS.ROCK_TYPE_FAULT},
+  };
+  const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
   const IGNEOUS_SECTIONS = {
     PLUTONIC: {title: 'Plutonic Rocks', key: IGNEOUS_ROCK_CLASSES.PLUTONIC},
     VOLCANIC: {title: 'Volcanic Rocks', key: IGNEOUS_ROCK_CLASSES.VOLCANIC},
     DEPRECATED: {title: 'Igneous Rocks (Deprecated Version)', key: null},
   };
-
   const METAMORPHIC_SECTIONS = {
     PLUTONIC: {title: 'Metamorphic Rocks', key: PAGE_KEYS.ROCK_TYPE_METAMORPHIC},
     DEPRECATED: {title: 'Metamorphic Rocks (Deprecated Version)', key: null},
   };
-
-  const ALTERATION_ORE_SECTIONS = {
-    ALTERATION_ORE: {title: 'Alteration, Ore Rocks', key: PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE},
-    DEPRECATED: {title: 'Alteration, Ore Rocks (Deprecated Version)', key: null},
-  };
-
+  const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
   const SEDIMENTARY_SECTIONS = {
     SEDIMENTARY: {title: 'Sedimentary Rocks', key: PAGE_KEYS.LITHOLOGIES},
   };
-
-  const FAULT_SECTIONS = {
-    FAULT: {title: 'Fault & Shear Zone Rocks', key: PAGE_KEYS.ROCK_TYPE_FAULT},
-  };
-
-  const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
-  const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
   const pageSections = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTIONS
     : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTIONS
       : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTIONS

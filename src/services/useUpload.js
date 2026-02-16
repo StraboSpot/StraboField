@@ -25,8 +25,6 @@ const useUpload = () => {
   const user = useSelector(state => state.user);
 
   const {checkValidDateTime} = useProject();
-  const {getSpotsByIds} = useSpots();
-  const {initializeImageUpload} = useUploadImages();
   const {
     addDatasetToProject,
     deleteAllSpotsInDataset,
@@ -36,6 +34,8 @@ const useUpload = () => {
     updateProject,
     uploadWebImage,
   } = useServerRequests();
+  const {getSpotsByIds} = useSpots();
+  const {initializeImageUpload} = useUploadImages();
 
   /* Local State */
 

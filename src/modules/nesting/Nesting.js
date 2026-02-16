@@ -23,16 +23,18 @@ const Nesting = () => {
   const spots = useSelector(state => state.spot.spots);
 
   const {getImageByImageId} = useImages();
+
+  const [images, setImages] = useState([]);
   const {
     areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
   } = useImageThumbnails({images});
+
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {handleSpotSelected} = useSpots();
 
   /* Local State */
 
   const [childrenGenerations, setChildrenGenerations] = useState(null);
-  const [images, setImages] = useState([]);
   const [parentGenerations, setParentGenerations] = useState(null);
 
   /* Derived Variables */

@@ -36,9 +36,9 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     || templateType === 'plutonic' || templateType === 'volcanic';
   const isSed = SED_PAGES.find(p => p.key === templateType);
   const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
-  const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
-  || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
   const formName = template.values.type ? ['measurement', template.values.type] : [groupKey, templateType];
+  const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
+    || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
 
   /* Event Handlers */
 

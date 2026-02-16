@@ -17,6 +17,37 @@ import {PAGE_KEYS} from '../page/page.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const groupKey = 'general';
+
+// Relevant keys for quick-entry modal
+const mainButtonsKeys1 = ['earthquake_feature', 'fault_type'];
+const mainButtonsKeys2 = ['movement', 'rupture_expression',
+  'liquefaction_area_affected', 'fault_slip_meas', 'date_of_movement', 'time_of_movement', 'landslide_feat',
+  'slide_type', 'material_type', 'area_affected', 'cause_of_damage', 'date_of_damage', 'time_of_damage',
+  'utility_affected', 'facility_affected', 'damage_severity', 'mode_of_observation'];
+const confidenceInFeatureKey = 'confidence_in_feature';
+const lastKeys = ['diameter', 'height_of_material', 'max_vert_movement', 'dir_of_slope_mov',
+  'displacement_amt', 'depth', 'max_drop_in_elevation', 'length_exposed_downslope', 'slip_preferred', 'slip_min',
+  'slip_max', 'horiz_sep_pref', 'horiz_sep_min', 'horiz_sep_max', 'vert_sep_pref', 'vert_sep_min', 'vertical_sep_max',
+  'slip_azimuth', 'heave_pref', 'heave_min', 'rupture_width_pref', 'rupture_width_min', 'rupture_width_max', 'notes'];
+
+const FAULT_ORIENTATION_KEYS = {
+  group_fs5ba04: {
+    strike: 'strike',
+    dip_direction: 'azimuth_dip_dir',
+    dip: 'dip',
+    quality: 'meas_quality',
+  },
+};
+
+const VECTOR_MEASUREMENT_KEYS = {
+  group_bf6rc11: {
+    trend: 'trend',
+    plunge: 'plunge',
+    quality: 'vector_meas_confidence',
+  },
+};
+
 const AddEarthquakeModal = () => {
   /* Data Hooks */
 
@@ -36,42 +67,11 @@ const AddEarthquakeModal = () => {
 
   /* Derived Variables */
 
-  const groupKey = 'general';
+  // Relevant fields for quick-entry modal
   const pageKey = PAGE_KEYS.EARTHQUAKES;
   const formName = [groupKey, pageKey];
-
-  // Relevant keys for quick-entry modal
-  const mainButtonsKeys1 = ['earthquake_feature', 'fault_type'];
-  const mainButtonsKeys2 = ['movement', 'rupture_expression',
-    'liquefaction_area_affected', 'fault_slip_meas', 'date_of_movement', 'time_of_movement', 'landslide_feat',
-    'slide_type', 'material_type', 'area_affected', 'cause_of_damage', 'date_of_damage', 'time_of_damage',
-    'utility_affected', 'facility_affected', 'damage_severity', 'mode_of_observation'];
-  const confidenceInFeatureKey = 'confidence_in_feature';
-  const lastKeys = ['diameter', 'height_of_material', 'max_vert_movement', 'dir_of_slope_mov',
-    'displacement_amt', 'depth', 'max_drop_in_elevation', 'length_exposed_downslope', 'slip_preferred', 'slip_min',
-    'slip_max', 'horiz_sep_pref', 'horiz_sep_min', 'horiz_sep_max', 'vert_sep_pref', 'vert_sep_min', 'vertical_sep_max',
-    'slip_azimuth', 'heave_pref', 'heave_min', 'rupture_width_pref', 'rupture_width_min', 'rupture_width_max', 'notes'];
-
-  const FAULT_ORIENTATION_KEYS = {
-    group_fs5ba04: {
-      strike: 'strike',
-      dip_direction: 'azimuth_dip_dir',
-      dip: 'dip',
-      quality: 'meas_quality',
-    },
-  };
-
-  const VECTOR_MEASUREMENT_KEYS = {
-    group_bf6rc11: {
-      trend: 'trend',
-      plunge: 'plunge',
-      quality: 'vector_meas_confidence',
-    },
-  };
-
-  // Relevant fields for quick-entry modal
-  const survey = getSurvey(formName);
   const choices = getChoices(formName);
+  const survey = getSurvey(formName);
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
   /* Side Effects */

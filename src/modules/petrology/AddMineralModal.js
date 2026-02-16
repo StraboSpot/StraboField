@@ -50,14 +50,13 @@ const AddMineralModal = () => {
 
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.MINERALS;
-  const formName = ['pet', petKey];
-  const survey = getSurvey(formName);
-  const choices = getChoices(formName);
-  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
-
   const areMultipleTemplates = templates[petKey] && templates[petKey].isInUse && templates[petKey].active
     && templates[petKey].active.length > 1;
+  const formName = ['pet', petKey];
+  const choices = getChoices(formName);
+  const survey = getSurvey(formName);
+  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
   /* Side Effects */
 

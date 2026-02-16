@@ -19,13 +19,14 @@ const VertexDrag = () => {
 
   /* Local State */
 
+  const isPressed = useSharedValue(false);
+
   const vertexStartCoordsObj = {
     x: vertexStartCoords[0] - selectedVertexOffset,
     y: vertexStartCoords[1] - selectedVertexOffset,
   };
-  const isPressed = useSharedValue(false);
+
   const offset = useSharedValue(vertexStartCoordsObj);
-  const start = useSharedValue(vertexStartCoordsObj);
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
@@ -33,6 +34,8 @@ const VertexDrag = () => {
       backgroundColor: isPressed.value ? 'yellow' : 'orange',
     };
   });
+
+  const start = useSharedValue(vertexStartCoordsObj);
 
   /* Derived Variables */
 

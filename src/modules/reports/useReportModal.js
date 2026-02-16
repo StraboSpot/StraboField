@@ -24,10 +24,15 @@ const useReportModal = ({openSpotInNotebook}) => {
   const formRef = useRef(null);
 
   const reportSpots = report?.spots ? JSON.parse(JSON.stringify(report?.spots)) : [];
+
   const [checkedSpotsIds, setCheckedSpotsIds] = useState(reportSpots);
+
   const reportTags = report?.tags ? JSON.parse(JSON.stringify(report?.tags)) : [];
+
   const [checkedTagsIds, setCheckedTagsIds] = useState(reportTags);
+
   const reportImages = report?.images ? JSON.parse(JSON.stringify(report?.images)) : [];
+
   const [updatedImages, setUpdatedImages] = useState(reportImages);
 
   /* Derived Variables */
