@@ -13,6 +13,7 @@ import {DateInputField, NumberInputField, SelectInputField, TextInputField, useF
 import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
 
 const Form = ({
+                fieldCustomHeights,
                 getIsDisabled,
                 errors,
                 formName,
@@ -66,6 +67,7 @@ const Form = ({
         appearance={field.appearance}
         // autoFocus={field.name === 'name'}
         component={TextInputField}
+        // customHeight={fieldCustomHeights?.[field.name]} //Creates a custom height for textboxes (i.e. description multilines)
         editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
         key={subkey ? subkey + '[0].' + field.name : field.name}
         label={field.label}
