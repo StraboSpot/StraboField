@@ -13,7 +13,7 @@ import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const Compass = ({
                    closeCompass,

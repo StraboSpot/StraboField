@@ -15,7 +15,7 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 // Relevant keys for quick-entry modal

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {TagsNotebookModal} from '../tags';
 
 const FeatureTagsModal = () => {

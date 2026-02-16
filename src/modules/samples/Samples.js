@@ -9,7 +9,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 

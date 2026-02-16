@@ -22,8 +22,8 @@ import {Form, useForm} from '../form';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const StratSectionPage = ({isReadOnly, page}) => {
   // console.log('Rendering StratSectionPage...');

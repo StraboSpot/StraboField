@@ -8,8 +8,8 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {ImageCard, useImages, useImageThumbnails} from '../images';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {

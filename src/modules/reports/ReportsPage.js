@@ -7,8 +7,8 @@ import {ReportsList} from '.';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsPage = () => {
   console.log('Rendering ReportsPage...');

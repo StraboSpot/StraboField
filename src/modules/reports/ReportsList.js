@@ -8,7 +8,7 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsList = ({isCheckedList, reportsSubset}) => {
   console.log('Rendering ReportsList...');

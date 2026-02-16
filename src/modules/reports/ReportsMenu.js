@@ -6,7 +6,7 @@ import {useDispatch} from 'react-redux';
 import {ReportsList} from '.';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsMenu = ({}) => {
   console.log('Rendering ReportsMenu...');

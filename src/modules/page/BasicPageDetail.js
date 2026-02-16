@@ -5,8 +5,8 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {PAGE_KEYS} from './page.constants';
 import PageHeader from './PageHeader';
+import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';

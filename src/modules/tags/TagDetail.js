@@ -10,7 +10,7 @@ import {NotebookPageAvatar} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 import {useTags} from '../tags';

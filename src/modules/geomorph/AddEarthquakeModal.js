@@ -13,7 +13,7 @@ import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 

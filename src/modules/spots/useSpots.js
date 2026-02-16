@@ -9,7 +9,7 @@ import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/Help
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,

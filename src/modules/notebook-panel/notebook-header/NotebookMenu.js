@@ -12,7 +12,7 @@ import {WarningModal} from '../../../shared/ui/modals';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';

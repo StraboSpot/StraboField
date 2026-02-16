@@ -10,7 +10,7 @@ import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 import {TagDetail, TagDetailModal} from '../tags';
 

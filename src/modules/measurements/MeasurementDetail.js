@@ -22,8 +22,8 @@ import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/com
 import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 

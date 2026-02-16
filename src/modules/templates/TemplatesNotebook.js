@@ -20,7 +20,8 @@ import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import NoteForm from '../notes/NoteForm';
 import BasicPageDetail from '../page/BasicPageDetail';
-import {MODAL_KEYS, MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const TemplatesNotebook = ({

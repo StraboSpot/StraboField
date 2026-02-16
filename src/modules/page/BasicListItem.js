@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon, ListItem} from '@rn-vui/base';
 
-import {PAGE_KEYS} from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import {useForm} from '../form';

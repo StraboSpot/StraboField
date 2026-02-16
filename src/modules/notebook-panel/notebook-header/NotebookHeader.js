@@ -16,7 +16,7 @@ import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useMapLocation from '../../maps/useMapLocation';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';

@@ -9,7 +9,7 @@ import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../sha
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedTagToSelectedSpot,
   deletedTagIdFromReports,

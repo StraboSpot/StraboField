@@ -14,7 +14,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag} from '../project/projects.slice';
 
 const TagsList = ({type, selectedIndex}) => {

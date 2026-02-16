@@ -10,7 +10,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {MAP_MODES} from '../maps/maps.constants';
 import {setFreehandFeatureCoords} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';

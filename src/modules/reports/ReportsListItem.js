@@ -7,7 +7,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedProject} from '../project/projects.slice';
 import {useTags} from '../tags';
 

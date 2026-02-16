@@ -16,7 +16,7 @@ import useStereonet from './useStereonet';
 import {getNewId, getNewUUID, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdsToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {

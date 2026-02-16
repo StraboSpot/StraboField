@@ -15,7 +15,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import TextInputModal from '../../shared/ui/TextInputModal';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const UrlData = ({
                    editable,

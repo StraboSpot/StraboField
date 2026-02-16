@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {
   const {getRelevantFields, getSurvey, validateForm} = useForm();

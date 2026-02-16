@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {DrawActionButtons, ShortcutButtons} from './';
 import NotebookButton from './NotebookButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {MODAL_KEYS} from '../../page/page.constants';
+import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';

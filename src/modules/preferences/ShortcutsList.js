@@ -10,7 +10,8 @@ import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setShortcutSwitchPositions} from '../home/home.slice';
-import {MODAL_KEYS, SHORTCUT_MODALS} from '../page/page.constants';
+import {SHORTCUT_MODALS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ShortcutsList = () => {
   /* Data Hooks */

@@ -5,7 +5,7 @@ import alert from '../../shared/ui/alert';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';

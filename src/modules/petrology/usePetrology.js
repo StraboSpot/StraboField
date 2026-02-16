@@ -7,7 +7,7 @@ import {
 } from './petrology.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 

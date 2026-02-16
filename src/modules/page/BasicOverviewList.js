@@ -4,7 +4,8 @@ import {FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BasicListItem from './BasicListItem';
-import {PAGE_KEYS, PET_PAGES, SED_PAGES} from './page.constants';
+import {PET_PAGES, SED_PAGES} from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';

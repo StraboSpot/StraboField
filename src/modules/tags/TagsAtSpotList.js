@@ -3,7 +3,7 @@ import {FlatList} from 'react-native';
 
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {TagsListItem, useTags} from '../tags';
 
 const TagsAtSpotList = ({openMainMenuPanel, page}) => {

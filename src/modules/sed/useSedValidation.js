@@ -1,7 +1,7 @@
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 
 const useSedValidation = () => {
