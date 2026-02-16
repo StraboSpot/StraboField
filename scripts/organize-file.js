@@ -59,7 +59,7 @@
 //    Non-function declarations (hook calls, state, effects, etc.) are organized
 //    into sections with block comment headers:
 //    - /* Data Hooks */: useDispatch, useSelector, useContext, custom hooks
-//    - /* Local State */: useState, useRef, useReducer
+//    - /* Local State */: useState, useRef, useReducer, useSharedValue, useAnimatedStyle
 //    - /* Derived Variables */: plain variable declarations (no hooks)
 //    - /* Derived State */: useMemo, useCallback
 //    - /* Side Effects */: useEffect, useLayoutEffect
@@ -336,9 +336,10 @@ const PREAMBLE_HEADER_RE = /^\s*\/\*\s*(Data Hooks\s*\/?\s*State|Data Hooks|Loca
 // Categorize a preamble statement by the hook it contains
 function categorizePreambleStatement(stmtLines) {
   const text = stmtLines.join(' ');
+  if (/^\s*(\/\/\s*)?console\.log\b/.test(stmtLines[0])) return 'consoleLogs';
   if (/\buseEffect\b|\buseLayoutEffect\b/.test(text)) return 'sideEffects';
   if (/\buseMemo\b|\buseCallback\b/.test(text)) return 'derivedState';
-  if (/\b(useState|useRef|useReducer)\b/.test(text)) return 'localState';
+  if (/\b(useState|useRef|useReducer|useSharedValue|useAnimatedStyle)\b/.test(text)) return 'localState';
   if (/\buse[A-Z]\w*\b/.test(text)) return 'dataHooks';
   return 'derivedVars';
 }
@@ -375,6 +376,14 @@ function parsePreambleStatements(preambleChunks, indent) {
     // Skip old section headers (will be regenerated)
     if (PREAMBLE_HEADER_RE.test(allLines[i])) { i++; continue; }
 
+    // Commented-out console.log — treat as its own statement (not attached to next)
+    if (/^\s*\/\/\s*console\.log\b/.test(allLines[i])) {
+      if (pending.length > 0) { statements.push(pending); pending = []; }
+      statements.push([allLines[i]]);
+      i++;
+      continue;
+    }
+
     // Collect comment lines to attach to the next code statement
     if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) {
       pending.push(allLines[i]);
@@ -394,13 +403,28 @@ function parsePreambleStatements(preambleChunks, indent) {
     }
     i++;
 
-    while (depth > 0 && i < allLines.length) {
+    while (i < allLines.length) {
       if (allLines[i] === null) { i++; continue; }
-      stmtLines.push(allLines[i]);
-      for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
-        depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+      // Continue if brackets are still open
+      if (depth > 0) {
+        stmtLines.push(allLines[i]);
+        for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
+          depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+        }
+        i++;
+        continue;
       }
-      i++;
+      // Continue if next line starts with a continuation operator (&&, ||, ?., ?, :, .)
+      const nextTrimmed = allLines[i].trim();
+      if (/^(&&|\|\||[?.:])/.test(nextTrimmed)) {
+        stmtLines.push(allLines[i]);
+        for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
+          depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+        }
+        i++;
+        continue;
+      }
+      break;
     }
 
     statements.push(stmtLines);
@@ -418,7 +442,7 @@ function getHookType(stmtLines) {
     const trimmed = line.trim();
     if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
     const match = trimmed.match(/\b(use[A-Z]\w*)\b/);
-    return match ? match[1] : null;
+    if (match) return match[1];
   }
   return null;
 }
@@ -435,6 +459,87 @@ function getPreambleSortKey(stmtLines) {
   return '';
 }
 
+// Extract all variable names declared by a preamble statement
+function getDeclaredVars(stmtLines) {
+  const vars = [];
+  for (const line of stmtLines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+    // Destructured: const {a, b} = ... or const [a, b] = ...
+    const destructM = trimmed.match(/(?:const|let|var)\s+[\[{]([^}\]]+)[}\]]/);
+    if (destructM) {
+      destructM[1].split(',').forEach(v => {
+        const name = v.trim().split(/\s*[:=]\s*/)[0].replace(/\.\.\./g, '').trim();
+        if (name && /^\w+$/.test(name)) vars.push(name);
+      });
+      continue;
+    }
+    // Simple: const foo = ...
+    const simpleM = trimmed.match(/(?:const|let|var)\s+(\w+)/);
+    if (simpleM) vars.push(simpleM[1]);
+  }
+  return vars;
+}
+
+// Get the right-hand side text of a statement (everything after the = sign on declaration lines),
+// excluding comments. Used to detect references to other variables.
+function getRhsText(stmtLines) {
+  const parts = [];
+  for (const line of stmtLines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+    parts.push(trimmed);
+  }
+  const text = parts.join(' ');
+  // Remove everything up to and including the first = (the declaration part)
+  const eqIdx = text.indexOf('=');
+  return eqIdx !== -1 ? text.slice(eqIdx + 1) : text;
+}
+
+// Sort statements alphabetically but ensure declarations come before their usages.
+// If statement B references a variable declared in statement A, A must come before B.
+function dependencyAwareSort(statements) {
+  // First, sort alphabetically
+  const sorted = [...statements].sort((a, b) =>
+    getPreambleSortKey(a).localeCompare(getPreambleSortKey(b)),
+  );
+  // Build a map of variable name -> index in sorted array
+  const declMap = new Map(); // varName -> stmt index
+  for (let i = 0; i < sorted.length; i++) {
+    for (const v of getDeclaredVars(sorted[i])) {
+      declMap.set(v, i);
+    }
+  }
+  // Repeatedly scan and move dependencies upward until stable
+  let changed = true;
+  let iterations = 0;
+  while (changed && iterations < 100) {
+    changed = false;
+    iterations++;
+    // Rebuild declMap after any reorder
+    declMap.clear();
+    for (let i = 0; i < sorted.length; i++) {
+      for (const v of getDeclaredVars(sorted[i])) {
+        declMap.set(v, i);
+      }
+    }
+    for (let i = 0; i < sorted.length; i++) {
+      const rhs = getRhsText(sorted[i]);
+      for (const [varName, declIdx] of declMap) {
+        // If this statement references a variable declared later, move the declaration before this one
+        if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+          const [moved] = sorted.splice(declIdx, 1);
+          sorted.splice(i, 0, moved);
+          changed = true;
+          break;
+        }
+      }
+      if (changed) break;
+    }
+  }
+  return sorted;
+}
+
 // Sub-group statements by hook type, sort groups alphabetically, and sort
 // statements within each group by variable name. Returns array of groups.
 function subGroupAndSort(statements) {
@@ -446,7 +551,7 @@ function subGroupAndSort(statements) {
   }
   const sortedTypes = Object.keys(groups).sort();
   for (const type of sortedTypes) {
-    groups[type].sort((a, b) => getPreambleSortKey(a).localeCompare(getPreambleSortKey(b)));
+    groups[type] = dependencyAwareSort(groups[type]);
   }
   return sortedTypes.map(type => groups[type]);
 }
@@ -843,6 +948,7 @@ for (const file of files) {
   // === PART 4: Organize preamble into sections ===
   const preambleStatements = parsePreambleStatements(preambleChunks, indent);
   const preambleGroups = {};
+  preambleGroups.consoleLogs = [];
   for (const cat of PREAMBLE_CATEGORIES) preambleGroups[cat] = [];
 
   for (const stmt of preambleStatements) {
@@ -850,8 +956,35 @@ for (const file of files) {
     preambleGroups[cat].push(stmt);
   }
 
+  // Cross-category dependency resolution: if a statement in an earlier category
+  // references a variable declared in a later category, move that declaration up.
+  for (let ci = 0; ci < PREAMBLE_CATEGORIES.length; ci++) {
+    const cat = PREAMBLE_CATEGORIES[ci];
+    for (const stmt of preambleGroups[cat]) {
+      const rhs = getRhsText(stmt);
+      for (let cj = ci + 1; cj < PREAMBLE_CATEGORIES.length; cj++) {
+        const laterCat = PREAMBLE_CATEGORIES[cj];
+        for (let si = preambleGroups[laterCat].length - 1; si >= 0; si--) {
+          const laterStmt = preambleGroups[laterCat][si];
+          const declVars = getDeclaredVars(laterStmt);
+          if (declVars.some(v => new RegExp('(?<!\\.)\\b' + v + '\\b').test(rhs))) {
+            preambleGroups[laterCat].splice(si, 1);
+            preambleGroups[cat].push(laterStmt);
+          }
+        }
+      }
+    }
+  }
+
   // Build new body
   let newBodyLines = [];
+
+  // Console logs before first section (no header)
+  if (preambleGroups.consoleLogs.length > 0) {
+    for (const stmt of preambleGroups.consoleLogs) {
+      for (const line of stmt) newBodyLines.push(line);
+    }
+  }
 
   // Preamble sections
   for (const cat of PREAMBLE_CATEGORIES) {
@@ -863,45 +996,112 @@ for (const file of files) {
     newBodyLines.push('');
 
     // Data Hooks: sub-group by tier (external → custom hooks),
-    // then by hook type within each tier, alphabetized
+    // then by hook type within each tier, alphabetized, then fix cross-group dependencies
     if (cat === 'dataHooks') {
       const tiers = [[], []];
       for (const stmt of preambleGroups[cat]) {
         tiers[getDataHooksTier(stmt)].push(stmt);
       }
-      let firstGroup = true;
+      // Flatten tiers into ordered list
+      const flatOrdered = [];
       for (let t = 0; t < tiers.length; t++) {
         if (tiers[t].length === 0) continue;
         const subGroups = subGroupAndSort(tiers[t]);
-        for (let g = 0; g < subGroups.length; g++) {
-          const needsBlankLine = !firstGroup && (g === 0);
-          if (needsBlankLine && newBodyLines.length > 0 && newBodyLines[newBodyLines.length - 1].trim() !== '') {
-            newBodyLines.push('');
+        for (const group of subGroups) flatOrdered.push(...group);
+      }
+      // Fix cross-group dependencies
+      let moved = true;
+      while (moved) {
+        moved = false;
+        const declPositions = new Map();
+        for (let i = 0; i < flatOrdered.length; i++) {
+          for (const v of getDeclaredVars(flatOrdered[i])) declPositions.set(v, i);
+        }
+        for (let i = 0; i < flatOrdered.length; i++) {
+          const rhs = getRhsText(flatOrdered[i]);
+          for (const [varName, declIdx] of declPositions) {
+            if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+              const [dep] = flatOrdered.splice(declIdx, 1);
+              flatOrdered.splice(i, 0, dep);
+              moved = true;
+              break;
+            }
           }
-          firstGroup = false;
-          for (const stmt of subGroups[g]) {
-            for (const line of stmt) newBodyLines.push(line);
-          }
+          if (moved) break;
         }
       }
+      // Re-detect group boundaries for blank line insertion (tier change or hook type change)
+      let prevTier = null;
+      for (const stmt of flatOrdered) {
+        const tier = getDataHooksTier(stmt);
+        if (prevTier !== null && tier !== prevTier
+          && newBodyLines.length > 0 && newBodyLines[newBodyLines.length - 1].trim() !== '') {
+          newBodyLines.push('');
+        }
+        prevTier = tier;
+        for (const line of stmt) newBodyLines.push(line);
+      }
     } else if (cat === 'localState') {
-      // Local State: sub-group by hook type, alphabetized
+      // Local State: sub-group by hook type, alphabetized, then fix cross-group dependencies
       const subGroups = subGroupAndSort(preambleGroups[cat]);
+      // Check for cross-group dependencies: if a statement in an earlier group
+      // references a variable declared in a later group, move that declaration
+      // before the referencing group.
+      const flatOrdered = [];
+      for (const group of subGroups) flatOrdered.push(...group);
+      // Build declaration map
+      const declPositions = new Map();
+      for (let i = 0; i < flatOrdered.length; i++) {
+        for (const v of getDeclaredVars(flatOrdered[i])) declPositions.set(v, i);
+      }
+      // Move dependencies: scan for references to later-declared variables
+      let moved = true;
+      while (moved) {
+        moved = false;
+        declPositions.clear();
+        for (let i = 0; i < flatOrdered.length; i++) {
+          for (const v of getDeclaredVars(flatOrdered[i])) declPositions.set(v, i);
+        }
+        for (let i = 0; i < flatOrdered.length; i++) {
+          const rhs = getRhsText(flatOrdered[i]);
+          for (const [varName, declIdx] of declPositions) {
+            if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+              const [dep] = flatOrdered.splice(declIdx, 1);
+              flatOrdered.splice(i, 0, dep);
+              moved = true;
+              break;
+            }
+          }
+          if (moved) break;
+        }
+      }
+      // Re-build sub-groups from the reordered list
+      const reGrouped = [];
+      let currentGroup = [];
+      let currentHookType = null;
+      for (const stmt of flatOrdered) {
+        const hookType = (getHookType(stmt) || 'zzz_other').toLowerCase();
+        if (currentHookType !== null && hookType !== currentHookType) {
+          if (currentGroup.length > 0) reGrouped.push(currentGroup);
+          currentGroup = [];
+        }
+        currentHookType = hookType;
+        currentGroup.push(stmt);
+      }
+      if (currentGroup.length > 0) reGrouped.push(currentGroup);
       let firstGroup = true;
-      for (let g = 0; g < subGroups.length; g++) {
+      for (let g = 0; g < reGrouped.length; g++) {
         if (!firstGroup && newBodyLines.length > 0 && newBodyLines[newBodyLines.length - 1].trim() !== '') {
           newBodyLines.push('');
         }
         firstGroup = false;
-        for (const stmt of subGroups[g]) {
+        for (const stmt of reGrouped[g]) {
           for (const line of stmt) newBodyLines.push(line);
         }
       }
     } else if (cat === 'derivedVars') {
-      // Derived Variables: alphabetize by variable name
-      const sorted = [...preambleGroups[cat]].sort((a, b) =>
-        getPreambleSortKey(a).localeCompare(getPreambleSortKey(b)),
-      );
+      // Derived Variables: alphabetize by variable name, keeping declarations before usages
+      const sorted = dependencyAwareSort(preambleGroups[cat]);
       for (const stmt of sorted) {
         for (const line of stmt) newBodyLines.push(line);
       }
