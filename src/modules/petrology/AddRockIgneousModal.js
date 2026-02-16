@@ -5,7 +5,11 @@ import {isEmpty} from '../../shared/Helpers';
 import {Form, MainButtons} from '../form';
 
 const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Derived Variables */
+
   const igneousRockClass = formName[1];
+
+  /* Render Functions */
 
   const renderSpecificIgneousRock = () => {
     // Relevant keys for quick-entry modal
@@ -42,6 +46,8 @@ const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) =
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

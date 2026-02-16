@@ -3,14 +3,15 @@ import {useToast} from 'react-native-toast-notifications';
 
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 
-const useDeviceOrientation = () => {
-  const {width, height} = useWindowSize();
-  const toast = useToast();
+const toastOptions = {duration: 1000, placement: 'top'};
 
-  const toastOptions = {
-    duration: 1000,
-    placement: 'top',
-  };
+const useDeviceOrientation = () => {
+  /* Data Hooks / State */
+
+  const toast = useToast();
+  const {width, height} = useWindowSize();
+
+  /* Exported Functions */
 
   const lockOrientation = () => {
     const orientation = width > height ? Orientation.landscape : Orientation.portrait;

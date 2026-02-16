@@ -14,7 +14,10 @@ import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetPreferencesListItem = ({dataset}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -24,14 +27,26 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
 
+  /* Derived Variables */
+
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
+  const isActive = activeDatasetsIds.includes(dataset.id);
+  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
   const spotsCount = dataset.spotIds?.length || 0;
 
-  const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
+  /* Event Handlers */
+
+  const onSwitch = async (val) => {
+    const value = await setSwitchValue(val, dataset);
+    console.log('Value has been switched', value);
+  };
+
+  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
+
+  /* Logic Helpers */
 
   const downloadImages = async () => {
     setIsDownloadingImages(true);
@@ -50,12 +65,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
-  const onSwitch = async (val) => {
-    const value = await setSwitchValue(val, dataset);
-    console.log('Value has been switched', value);
-  };
-
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
+  /* Render Functions */
 
   const renderDownloadImages = () => {
     return (
@@ -135,6 +145,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View>

@@ -11,18 +11,39 @@ import {setSelectedProject} from '../projects.slice';
 import SaveAndExportModalContent from './SaveAndExportModalContent';
 
 const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const currentProject = useSelector(state => state.project.project);
 
-  const defaultFileName = selectedFilename || (moment(new Date()).format(
-    'YYYY-MM-DD_hmma') + '_' + currentProject.description.project_name).replace(/\s/g, '');
+  const defaultFileName = selectedFilename || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
+    + currentProject.description.project_name).replace(/\s/g, '');
+
+  const {initializeBackup, zipAndExportProjectFolder} = useExport();
 
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
   const [modalTitle, setModalTitle] = useState('Confirm or Change\nFolder Name');
 
-  const {initializeBackup, zipAndExportProjectFolder} = useExport();
+  /* Event Handlers */
+
+  const handleActionPressed = async () => {
+    if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
+    else {
+      if (backupAction === 'save') await initiateBackup();
+      else if (backupAction === 'export') await exportProject();
+    }
+  };
+
+  const handleClosePress = () => {
+    setBackingUpStatus('');
+    setModalTitle('Confirm or Change Folder Name');
+    closeModal();
+  };
+
+  /* Logic Helpers */
 
   const exportProject = async () => {
     try {
@@ -58,20 +79,6 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
     else if (backingUpStatus === 'complete' || backingUpStatus === 'error') return 'Close';
   };
 
-  const handleActionPressed = async () => {
-    if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
-    else {
-      if (backupAction === 'save') await initiateBackup();
-      else if (backupAction === 'export') await exportProject();
-    }
-  };
-
-  const handleClosePress = () => {
-    setBackingUpStatus('');
-    setModalTitle('Confirm or Change Folder Name');
-    closeModal();
-  };
-
   const initiateBackup = async () => {
     try {
       setBackingUpStatus('inProgress');
@@ -86,6 +93,8 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
       setModalTitle(('Error!'));
     }
   };
+
+  /* View */
 
   return (
     <ModalWrapper

@@ -5,9 +5,13 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {MAP_MODES} from '../../maps/maps.constants';
 
 const useDrawActionButtons = ({clickHandler, mapMode}) => {
+  /* Data Hooks / State */
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const drawGeometries = useSelector(state => state.map.drawGeometries);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  /* Exported Functions */
 
   const getImageSource = (type) => {
     if (type === MAP_MODES.EDIT) {

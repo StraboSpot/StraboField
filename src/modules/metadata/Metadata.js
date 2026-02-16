@@ -12,17 +12,24 @@ import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
 const Metadata = ({isReadOnly}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const datasets = useSelector(state => state.project.datasets);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const metadataFormRef = useRef(null);
+
+  /* Event Handlers */
 
   const handleDatasetChecked = (datasetChecked) => {
     if (!datasetChecked.spotIds?.includes(spot.properties.id)) {
       dispatch(movedSpotIdBetweenDatasets({toDatasetId: datasetChecked.id, spotId: spot.properties.id}));
     }
   };
+
+  /* Render Functions */
 
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
@@ -110,6 +117,8 @@ const Metadata = ({isReadOnly}) => {
       </Formik>
     );
   };
+
+  /* View */
 
   return (
     <FlatList

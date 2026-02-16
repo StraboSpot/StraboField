@@ -21,7 +21,10 @@ import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.
 import {setIsImageTransferring} from '../projects.slice';
 
 const UploadModal = ({closeModal, isVisible}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
@@ -32,8 +35,8 @@ const UploadModal = ({closeModal, isVisible}) => {
   const [imageUploadStatus, setImageUploadStatus] = useState({});
   const [modalTitle, setModalTitle] = useState('Upload Project');
   const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
-  const [uploadState, setUploadState] = useState('not started');
   const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
+  const [uploadState, setUploadState] = useState('not started');
 
   const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
   const {
@@ -45,11 +48,15 @@ const UploadModal = ({closeModal, isVisible}) => {
     resetState,
   } = useUploadImages();
 
+  /* Side Effects */
+
   useEffect(() => {
     console.log('uploadState', uploadState);
     console.log('Current Image', currentImage);
     console.log('Is Image Transferring', isImageTransferring);
   }, [uploadState, currentImage]);
+
+  /* Event Handlers */
 
   const handleActionPressed = async () => {
     if (uploadState === 'not started') await initiateUpload();
@@ -65,6 +72,8 @@ const UploadModal = ({closeModal, isVisible}) => {
     resetState();
     closeModal();
   };
+
+  /* Logic Helpers */
 
   const initiateUpload = async () => {
     try {
@@ -123,6 +132,8 @@ const UploadModal = ({closeModal, isVisible}) => {
       closeModal();
     }
   };
+
+  /* Render Functions */
 
   const renderErrorView = () => {
     return (
@@ -243,6 +254,8 @@ const UploadModal = ({closeModal, isVisible}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

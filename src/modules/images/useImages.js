@@ -24,21 +24,24 @@ import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {clearedSelectedSpots, editedSpotImage, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 
+let imageCount = 0;
+let newImages = [];
+
 const useImages = () => {
-  const navigation = useNavigation();
-  const toast = useToast();
-  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
-  const {checkPermission, requestPermission} = usePermissions();
-  const {width, height} = useWindowSize();
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const project = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  let imageCount = 0;
-  let newImages = [];
+  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
+  const navigation = useNavigation();
+  const {checkPermission, requestPermission} = usePermissions();
+  const toast = useToast();
+  const {width, height} = useWindowSize();
 
   /* Internal Functions */
 

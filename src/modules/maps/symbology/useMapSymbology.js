@@ -5,19 +5,23 @@ import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
 
+const linePatterns = {
+  solid: [1, 0],
+  dotted: [0.5, 2],
+  dashed: [5, 2],
+  dotDashed: [5, 2, 0.5, 2],
+};
+
 const useMapSymbology = () => {
+  /* Data Hooks / State */
+
+  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
+  const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
+
   const {getStratIntervalFill} = useStratSectionSymbology();
   const {getTagsAtSpot} = useTags();
 
-  const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
-  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
-
-  const linePatterns = {
-    solid: [1, 0],
-    dotted: [0.5, 2],
-    dashed: [5, 2],
-    dotDashed: [5, 2, 0.5, 2],
-  };
+  /* Derived Variables */
 
   const mapStyles = {
     point: {

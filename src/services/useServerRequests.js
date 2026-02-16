@@ -9,9 +9,14 @@ import {userAgent} from './userAgent';
 import alert from '../shared/ui/alert';
 
 const useServerRequests = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
-  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+
   const {encoded_login, sesar} = useSelector(state => state.user);
+  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+
+  /* Derived Variables */
 
   // URL Helpers
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;

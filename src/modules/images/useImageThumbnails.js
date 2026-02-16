@@ -4,10 +4,14 @@ import {useImages} from './index';
 import {isEmpty} from '../../shared/Helpers';
 
 const useImageThumbnails = ({images}) => {
+  /* Data Hooks / State */
+
   const {getImageThumbnailURIs} = useImages();
 
   const [areImageThumbnailsLoading, setAreImageThumbnailsLoading] = useState({});
   const [imageThumbnailURIs, setImageThumbnailURIs] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ImageThumbnail []');

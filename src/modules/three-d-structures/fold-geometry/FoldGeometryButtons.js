@@ -9,6 +9,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles} from '../../form';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
+  /* Render Functions */
 
   const FoldGeometryEditButton = () => (
     <Button
@@ -48,6 +49,8 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
     });
     return foldGeometryData;
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', padding: 10, paddingTop: 2.5, paddingBottom: 5}}>

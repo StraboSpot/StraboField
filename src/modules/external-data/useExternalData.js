@@ -10,15 +10,18 @@ import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../ho
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+let CSVData = '';
+let csvObject = {};
+
 const useExternalData = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {pickCSV, readFile} = useDevice();
   const toast = useToast();
-
-  let csvObject = {};
-  let CSVData = '';
 
   /* Internal Functions */
 

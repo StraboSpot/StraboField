@@ -17,41 +17,31 @@ import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
+const actions = [
+  {key: 'copy', title: 'Copy this Spot'},
+  {key: 'zoom', title: 'Zoom to this Spot'},
+  {key: 'delete', title: 'Delete this Spot'},
+  {key: 'geography', title: 'Show Geography'},
+  {key: 'metadata', title: 'Show Metadata'},
+  {key: 'nesting', title: 'Show Nesting'},
+  ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
+];
+
 const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const navigation = useNavigation();
+  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
-  const actions = [
-    {key: 'copy', title: 'Copy this Spot'},
-    {key: 'zoom', title: 'Zoom to this Spot'},
-    {key: 'delete', title: 'Delete this Spot'},
-    {key: 'geography', title: 'Show Geography'},
-    {key: 'metadata', title: 'Show Metadata'},
-    {key: 'nesting', title: 'Show Nesting'},
-    ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
-  ];
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
 
-  const continueDeleteSelectedSpot = () => {
-    if (errorMessage) {
-      setErrorMessage('');
-      setIsDeleteSpotModalVisible(false);
-    }
-    else if (isStratInterval(spot)) deleteInterval(spot);
-    else deleteSpot(spot.properties.id);
-  };
-
-  const deleteSelectedSpot = () => {
-    const safeDeleteMessage = checkIsSafeDelete(spot);
-    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
-    setIsDeleteSpotModalVisible(true);
-  };
+  /* Event Handlers */
 
   const onPress = (key) => {
     if (key === 'copy') {
@@ -74,6 +64,25 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
     closeNotebookMenu();
   };
 
+  /* Logic Helpers */
+
+  const continueDeleteSelectedSpot = () => {
+    if (errorMessage) {
+      setErrorMessage('');
+      setIsDeleteSpotModalVisible(false);
+    }
+    else if (isStratInterval(spot)) deleteInterval(spot);
+    else deleteSpot(spot.properties.id);
+  };
+
+  const deleteSelectedSpot = () => {
+    const safeDeleteMessage = checkIsSafeDelete(spot);
+    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
+    setIsDeleteSpotModalVisible(true);
+  };
+
+  /* Render Functions */
+
   const renderActionItem = ({item}) => {
     if (isReadOnly && item.key === 'delete') return;
     else {
@@ -95,6 +104,8 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         : <Text>Are you sure you want to delete Spot: {spot.properties.name}?</Text>
     );
   };
+
+  /* View */
 
   return (
     <>

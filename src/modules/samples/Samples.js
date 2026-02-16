@@ -14,6 +14,8 @@ import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+  /* Data Hooks / State */
+
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
 
   const activeSpotsObj = getActiveSpotsObj();
@@ -23,6 +25,8 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+
+  /* Render Functions */
 
   const renderNoSamplesText = () => {
     return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
@@ -91,6 +95,8 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <>

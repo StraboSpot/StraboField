@@ -6,17 +6,17 @@ import {MODAL_KEYS} from '../page/page.constants';
 import {TagsNotebookModal} from '../tags';
 
 const FeatureTagsModal = () => {
+  /* Data Hooks / State */
+
   const modalVisible = useSelector(state => state.home.modalVisible);
+
+  /* Derived Variables */
 
   const isFeatureLevelTaggingOn = modalVisible === MODAL_KEYS.OTHER.FEATURE_TAGS;
 
-  const renderFeatureTagsModal = () => {
-    return (
-      <TagsNotebookModal isFeatureLevelTagging={isFeatureLevelTaggingOn}/>
-    );
-  };
+  /* View */
 
-  return renderFeatureTagsModal();
+  return <TagsNotebookModal isFeatureLevelTagging={isFeatureLevelTaggingOn}/>;
 };
 
 export default FeatureTagsModal;

@@ -23,10 +23,10 @@ import useProject from '../project/useProject';
 import {useTags} from '../tags';
 
 const useSpots = () => {
-  const {getActiveDatasets, getTargetDatasetFromId} = useProject();
-  const {addSpotsToTags} = useTags();
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
@@ -38,6 +38,8 @@ const useSpots = () => {
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
+  const {getActiveDatasets, getTargetDatasetFromId} = useProject();
+  const {addSpotsToTags} = useTags();
   const toast = useToast();
 
   /* Internal Functions */

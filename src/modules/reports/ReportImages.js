@@ -9,11 +9,16 @@ import {AddImageButtons, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
 
 const ReportImages = ({setUpdatedImages, updatedImages}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
 
   const {deleteImageFile} = useImages();
+
+  /* Logic Helpers */
 
   const deleteImage = async (deletedImage) => {
     const imagesFiltered = updatedImages.filter(i => i.id !== deletedImage.id);
@@ -42,6 +47,8 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
     const imagesFiltered = updatedImages.filter(i => i.id !== updatedImage.id);
     setUpdatedImages([...imagesFiltered, updatedImage]);
   };
+
+  /* View */
 
   return (
     <View>

@@ -8,18 +8,20 @@ import {isEmpty} from '../../shared/Helpers';
 import useNesting from '../nesting/useNesting';
 import {useSpots} from '../spots';
 
+const spotLayers = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
+  'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
+  'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
+  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
+
 const useMapFeaturesCalculated = (mapRef) => {
+  /* Data Hooks / State */
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {convertImagePixelsToLatLong, getBBoxPaddedInPixels} = useMapCoords();
   const {getChildrenGenerationsSpots} = useNesting();
   const {getSpotById, getSpotsByIds} = useSpots();
-
-  const spotLayers = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
-    'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
-    'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
-    'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
   /* Internal Functions */
 

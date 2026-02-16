@@ -10,11 +10,15 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
-  const [isAnnotated, setIsAnnotated] = useState(image.annotated);
+  /* Data Hooks / State */
 
   const {showErrors, validateForm} = useForm();
 
   const formRef = useRef(null);
+
+  const [isAnnotated, setIsAnnotated] = useState(image.annotated);
+
+  /* Logic Helpers */
 
   const saveFormAndGo = async () => {
     try {
@@ -33,6 +37,8 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
     }
   };
 
+  /* Render Functions */
+
   const renderFormFields = () => {
     const formName = ['general', 'images'];
     console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
@@ -47,6 +53,8 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       />
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

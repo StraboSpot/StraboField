@@ -11,8 +11,13 @@ import {resetSpotState} from '../modules/spots/spots.slice';
 import {resetUserState} from '../modules/user/userProfile.slice';
 
 const useResetState = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const {deleteProfileImageFile} = useDevice();
+
+  /* Exported Functions */
 
   const clearProject = () => {
     dispatch(resetCompassState());

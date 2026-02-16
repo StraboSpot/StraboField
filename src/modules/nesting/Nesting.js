@@ -14,31 +14,37 @@ import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {
   console.log('Rendering Nesting');
-  const [childrenGenerations, setChildrenGenerations] = useState(null);
-  const [images, setImages] = useState([]);
-  const [parentGenerations, setParentGenerations] = useState(null);
 
-  const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {handleSpotSelected} = useSpots();
-  const {getImageByImageId} = useImages();
-  const {
-    areImageThumbnailsLoading,
-    imageThumbnailURIs,
-    setAreImageThumbnailsLoading,
-    setImageThumbnailURIs,
-  } = useImageThumbnails({images});
+  /* Data Hooks / State */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
+  const [childrenGenerations, setChildrenGenerations] = useState(null);
+  const [images, setImages] = useState([]);
+  const [parentGenerations, setParentGenerations] = useState(null);
+
+  const {getImageByImageId} = useImages();
+  const {
+    areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
+  } = useImageThumbnails({images});
+  const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
+  const {handleSpotSelected} = useSpots();
+
+  /* Derived Variables */
+
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Nesting [spots, selectedSpot]', spots, selectedSpot);
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
+
+  /* Logic Helpers */
 
   const updateNest = () => {
     if (!isEmpty(selectedSpot)) {
@@ -63,6 +69,8 @@ const Nesting = () => {
       setImages(allImagesInNest);
     }
   };
+
+  /* Render Functions */
 
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
@@ -186,6 +194,8 @@ const Nesting = () => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

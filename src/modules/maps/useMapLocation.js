@@ -9,9 +9,14 @@ import {useSpots} from '../spots';
 import {setSelectedSpot} from '../spots/spots.slice';
 
 const useMapLocation = () => {
-  const {createRandomSpots, createSpot} = useSpots();
-  const {hasLocationPermission} = usePermissions();
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
+  const {hasLocationPermission} = usePermissions();
+  const {createRandomSpots, createSpot} = useSpots();
+
+  /* Exported Functions */
 
   const generateRandomsSpotsAroundCurrentLocation = async (numRandomSpots) => {
     const currentLocation = await getCurrentLocation();

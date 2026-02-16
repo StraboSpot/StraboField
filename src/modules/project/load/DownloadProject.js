@@ -9,19 +9,23 @@ import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 
+const source = 'server';
+
 // Download Project
 const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const project = useSelector(state => state.project.project);
 
+  const {initializeDownload} = useDownload();
+
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
 
-  const {initializeDownload} = useDownload();
-
-  const source = 'server';
+  /* Logic Helpers */
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
@@ -45,6 +49,8 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     }
     else return undefined;
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

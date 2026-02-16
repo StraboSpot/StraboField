@@ -27,13 +27,27 @@ import {persistor} from '../../store/ConfigureStore';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
+const formName = ['general', 'user_profile'];
+
 const UserProfile = () => {
-  const formRef = useRef(null);
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
   const userEncodedLogin = useSelector(state => state.user.encoded_login);
+
+  const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
+  const {downloadUserProfile} = useDownload();
+  const {hasErrors, validateForm} = useForm();
+  const {checkPermission} = usePermissions();
+  const {deleteProfileImage} = useServerRequests();
+  const toast = useToast();
+  const {uploadProfile} = useUpload();
+  const {resizeImageForUpload, uploadProfileImage} = useUploadImages();
+
+  const formRef = useRef(null);
 
   const [isDeleteProfileModalVisible, setDeleteProfileModalVisible] = useState(false);
   const [isDeletingProfileImage, setIsDeletingProfileImage] = useState(false);
@@ -43,20 +57,21 @@ const UserProfile = () => {
   const [shouldUpdateImage, setShouldUpdateImage] = useState(false);
   const [tempUserProfileImage, setTempUserProfileImage] = useState(null);
 
-  const toast = useToast();
-  const {deleteProfileImage} = useServerRequests();
-  const {checkPermission} = usePermissions();
-  const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
-  const {downloadUserProfile} = useDownload();
-  const {hasErrors, validateForm} = useForm();
-  const {resizeImageForUpload, uploadProfileImage} = useUploadImages();
-  const {uploadProfile} = useUpload();
-
-  const formName = ['general', 'user_profile'];
+  /* Side Effects */
 
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
+
+  /* Event Handlers */
+
+  const onDownloadUserProfile = async () => {
+    setIsDownloading(true);
+    await downloadUserProfile();
+    setIsDownloading(false);
+  };
+
+  /* Logic Helpers */
 
   const closeProfileImageModal = () => {
     setImageDialogVisible(false);
@@ -68,12 +83,6 @@ const UserProfile = () => {
   };
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
-
-  const onDownloadUserProfile = async () => {
-    setIsDownloading(true);
-    await downloadUserProfile();
-    setIsDownloading(false);
-  };
 
   const openProfileImageModal = () => {
     setShouldUpdateImage(false);
@@ -171,6 +180,8 @@ const UserProfile = () => {
     }
   };
 
+  /* Render Functions */
+
   const renderProfileImageModal = () => {
     return (
       <ModalWrapper
@@ -207,6 +218,8 @@ const UserProfile = () => {
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return (
     <>

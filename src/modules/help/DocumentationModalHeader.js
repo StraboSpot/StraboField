@@ -7,15 +7,23 @@ import styles from './documentation.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
+  /* Data Hooks / State */
+
   const [pickerVisible, setPickerVisible] = useState(false);
+
+  /* Derived Variables */
 
   const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
   const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
+
+  /* Event Handlers */
 
   const handleSelectPage = (page) => {
     setPickerVisible(false);
     onJumpToPage(page);
   };
+
+  /* View */
 
   return (
     <>

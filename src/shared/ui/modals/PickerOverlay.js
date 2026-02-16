@@ -8,9 +8,11 @@ import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from 
 
 const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelect, value}) => {
 
-  const handleSelect = (item) => {
-    onSelect(item);
-  };
+  /* Event Handlers */
+
+  const handleSelect = item => onSelect(item);
+
+  /* View */
 
   return (
     <ModalWrapper

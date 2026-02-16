@@ -10,16 +10,25 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsOverview = ({page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Derived Variables */
 
   const fabrics = [...(spot?.properties?.fabrics || []),
     ...(spot?.properties?._3d_structures?.filter(struct => struct.type === 'fabric') || [])];
+
+  /* Event Handlers */
 
   const onFabricPressed = (fabric) => {
     dispatch(setSelectedAttributes([fabric]));
     dispatch(setNotebookPageVisible(page.key));
   };
+
+  /* View */
 
   return (
     <FlatList

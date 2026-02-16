@@ -14,20 +14,25 @@ import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
+const FABRIC_SECTIONS = {
+  FAULT_ROCK: {title: 'Structural Fabrics', key: 'fault_rock'},
+  IGNEOUS: {title: 'Igneous Fabrics', key: 'igneous_rock'},
+  METAMORPHIC: {title: 'Metamorphic Fabrics', key: 'metamorphic_rock'},
+  DEPRECATED: {title: 'Fabrics (Deprecated Version)', key: null},
+};
+
 const FabricsPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [selectedFabric, setSelectedFabric] = useState({});
   const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedFabric, setSelectedFabric] = useState({});
 
-  const FABRIC_SECTIONS = {
-    FAULT_ROCK: {title: 'Structural Fabrics', key: 'fault_rock'},
-    IGNEOUS: {title: 'Igneous Fabrics', key: 'igneous_rock'},
-    METAMORPHIC: {title: 'Metamorphic Fabrics', key: 'metamorphic_rock'},
-    DEPRECATED: {title: 'Fabrics (Deprecated Version)', key: null},
-  };
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE FabricsPage []');
@@ -43,6 +48,8 @@ const FabricsPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const addFabric = (type) => {
     dispatch(setModalValues({type: type}));
     dispatch(setModalVisible({modal: page.key}));
@@ -53,6 +60,8 @@ const FabricsPage = ({isReadOnly, page}) => {
     setSelectedFabric(fabric);
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderFabricDetail = () => {
     return (
@@ -111,6 +120,8 @@ const FabricsPage = ({isReadOnly, page}) => {
     }
     else return <SectionDivider dividerText={sectionTitle}/>;
   };
+
+  /* View */
 
   return isDetailView ? renderFabricDetail() : renderFabricsMain();
 };

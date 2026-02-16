@@ -9,10 +9,14 @@ import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 
 const MeasurementLabel = ({isDetail, item}) => {
+  /* Data Hooks / State */
+
   const measurementConvention = useSelector(state => state.user?.measurement_convention);
 
-  const {getMeasurementLabel} = useMeasurements();
   const {getLabel} = useForm();
+  const {getMeasurementLabel} = useMeasurements();
+
+  /* Logic Helpers */
 
   const getMeasurementText = (measurement) => {
     let measurementText = '';
@@ -45,6 +49,8 @@ const MeasurementLabel = ({isDetail, item}) => {
     const secondOrderClassLabel = secondOrderClass && getMeasurementLabel(measurement[secondOrderClass]).toUpperCase();
     return firstOrderClassLabel + (secondOrderClass ? ' - ' + secondOrderClassLabel : '');
   };
+
+  /* View */
 
   return (
     <>

@@ -18,22 +18,30 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const groupKey = 'fabrics';
+
 const AddFabricModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [survey, setSurvey] = useState({});
-  const [choices, setChoices] = useState({});
 
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
 
   const formRef = useRef(null);
 
+  const [choices, setChoices] = useState({});
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+  const [survey, setSurvey] = useState({});
+
+  /* Derived Variables */
+
   const types = Object.keys(FABRIC_TYPES);
-  const groupKey = 'fabrics';
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddFabricModal []');
@@ -51,7 +59,7 @@ const AddFabricModal = () => {
     setChoices(getChoices(formName));
   }, [modalValues]);
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  /* Event Handlers */
 
   const onFabricTypePress = (i) => {
     if (i !== selectedTypeIndex) {
@@ -65,6 +73,10 @@ const AddFabricModal = () => {
       setChoices(getChoices(formName));
     }
   };
+
+  /* Logic Helpers */
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const saveFabric = async () => {
     try {
@@ -81,6 +93,8 @@ const AddFabricModal = () => {
       console.log('Error submitting form', err);
     }
   };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     return (
@@ -168,6 +182,8 @@ const AddFabricModal = () => {
       <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
     );
   };
+
+  /* View */
 
   return renderNotebookFabricModalContent();
 };

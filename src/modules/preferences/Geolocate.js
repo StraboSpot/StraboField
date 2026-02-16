@@ -12,19 +12,35 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setGeolocationTimeout} from '../home/home.slice';
 
+const batteryImg = require('../../assets/icons/battery-full-outline.png');
+const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
+
 const Geolocate = () => {
-  const batteryImg = require('../../assets/icons/battery-full-outline.png');
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
 
-  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
   const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
+  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
 
-  const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
+  /* Side Effects */
 
   useEffect(() => {
     setValue(convertMillisecondsToSliderValue(currentTimeout));
   }, [currentTimeout]);
+
+  /* Event Handlers */
+
+  const onSliderChange = (sliderValue) => {
+    console.log('SLIDER CHANGE', sliderValue);
+    const timeout = convertSliderValueToMilliseconds(sliderValue);
+    console.log('TIMEOUT', timeout);
+    dispatch(setGeolocationTimeout(timeout));
+  };
+
+  /* Logic Helpers */
 
   const color = () => {
     let r = interpolate(255, 0);
@@ -49,12 +65,7 @@ const Geolocate = () => {
     return Math.ceil((1 - k) * end + k * start) % 256;
   };
 
-  const onSliderChange = (sliderValue) => {
-    console.log('SLIDER CHANGE', sliderValue);
-    const timeout = convertSliderValueToMilliseconds(sliderValue);
-    console.log('TIMEOUT', timeout);
-    dispatch(setGeolocationTimeout(timeout));
-  };
+  /* View */
 
   return (
     <>

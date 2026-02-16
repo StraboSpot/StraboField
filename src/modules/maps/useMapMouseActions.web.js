@@ -9,14 +9,16 @@ import useMap from './useMap';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
-  const [cursor, setCursor] = useState('');
-  const [prevMapMode, setPrevMapMode] = useState(mapMode);
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
 
+  const {isDrawMode} = useMap();
+
   const pointMoving = useRef(null);
 
-  const {isDrawMode} = useMap();
+  const [cursor, setCursor] = useState('');
+  const [prevMapMode, setPrevMapMode] = useState(mapMode);
 
   if (mapMode !== prevMapMode) {
     // console.log('MapMode changed from', prevMapMode, 'to', mapMode);
@@ -24,6 +26,8 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     if (isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT) setCursor('pointer');
     else setCursor('');
   }
+
+  /* Event Handlers */
 
   //When the cursor enters a feature in the point edit layer, prepare for dragging.
   mapRef.current?.on('mouseenter', 'pointLayerEdit', () => {

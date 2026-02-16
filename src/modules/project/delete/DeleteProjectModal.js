@@ -7,17 +7,31 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 
+const DELETE_STATUS = {
+  IN_PROGRESS: 'in_progress',
+  PENDING: 'pending',
+  SUCCESS: 'success',
+  ERROR: 'error',
+};
+
 const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
-  const DELETE_STATUS = {
-    IN_PROGRESS: 'in_progress',
-    PENDING: 'pending',
-    SUCCESS: 'success',
-    ERROR: 'error',
-  };
+  /* Data Hooks / State */
+
+  const {deleteFromDevice} = useDevice();
 
   const [deleteProjectStatus, setDeleteProjectStatus] = useState(DELETE_STATUS.PENDING);
 
-  const {deleteFromDevice} = useDevice();
+  /* Event Handlers */
+
+  const handleConfirmPress = async () => {
+    if (deleteProjectStatus === DELETE_STATUS.PENDING) await deleteProjectFromLocalStorage();
+    else {
+      closeModal();
+      setDeleteProjectStatus(DELETE_STATUS.PENDING);
+    }
+  };
+
+  /* Logic Helpers */
 
   const deleteProjectFromLocalStorage = async () => {
     try {
@@ -32,13 +46,7 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
     }
   };
 
-  const handleConfirmPress = async () => {
-    if (deleteProjectStatus === DELETE_STATUS.PENDING) await deleteProjectFromLocalStorage();
-    else {
-      closeModal();
-      setDeleteProjectStatus(DELETE_STATUS.PENDING);
-    }
-  };
+  /* View */
 
   return (
     <ModalWrapper

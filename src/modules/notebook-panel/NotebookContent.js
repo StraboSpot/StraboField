@@ -24,7 +24,10 @@ import {SpotsListItem, useSpots} from '../spots';
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
   console.log('Rendering NotebookContent...');
 
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
@@ -34,13 +37,19 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
 
+  /* Derived Variables */
+
   const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const pageVisible = pagesStack.slice(-1)[0];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
   }, [pageVisible, spot]);
+
+  /* Logic Helpers */
 
   const openPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -53,6 +62,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     }
     else dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderNotebookContent = () => {
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
@@ -152,6 +163,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       </View>
     );
   };
+
+  /* View */
 
   return isEmpty(spot) ? renderNotebookContentNoSpot() : renderNotebookContent();
 };

@@ -14,21 +14,29 @@ import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 
 const NotebookFooter = ({openPage}) => {
+  /* Data Hooks / State */
+
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
-  const [isMorePagesMenuVisible, setIsMorePagesMenuVisible] = useState(false);
-
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
-  const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
+  const [isMorePagesMenuVisible, setIsMorePagesMenuVisible] = useState(false);
+
+  /* Derived Variables */
+
   const pagesToShow = [...getRelevantGeneralPages(), ...getRelevantPetPages(), ...getRelevantSedPages()];
   const notebookPagesValidOn = notebookPagesOn.filter(i => pagesToShow.find(p => p.key === i));
+  const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
+
+  /* Logic Helpers */
 
   const getPageIcon = (key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     return notebookPageVisible === key ? page.icon_pressed_src : page.icon_src;
   };
+
+  /* View */
 
   return (
     <>

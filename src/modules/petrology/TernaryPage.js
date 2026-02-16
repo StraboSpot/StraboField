@@ -10,9 +10,15 @@ import * as themes from '../../shared/styles.constants';
 import PageHeader from '../page/PageHeader';
 
 const TernaryPage = () => {
+  /* Data Hooks / State */
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const ternary = gatherTernaryValues();
+
+  /* Logic Helpers */
 
   function gatherTernaryValues() {
     let ternaryTemp = {};
@@ -36,6 +42,8 @@ const TernaryPage = () => {
     }
     return ternaryTemp;
   }
+
+  /* View */
 
   return (
     <>

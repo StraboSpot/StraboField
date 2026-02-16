@@ -14,32 +14,32 @@ import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
 import useMapURL from '../useMapURL';
 
+let fileCount = 0;
+let neededTiles = 0;
+let notNeededTiles = 0;
+let zipUID;
+
 const useMapsOffline = () => {
-  let zipUID;
-  let fileCount = 0;
-  let neededTiles = 0;
-  let notNeededTiles = 0;
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const customMaps = useSelector(state => state.map.customMaps);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
+  const customMaps = useSelector(state => state.map.customMaps);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const user = useSelector(state => state.user);
 
-  const source = currentBasemap && currentBasemap.source;
-  const url = 'file://' + APP_DIRECTORIES.TILE_CACHE;
-
   const {
-    deleteFromDevice,
-    doesDeviceDirExist,
-    makeDirectory,
-    moveFile,
-    readDirectoryForMapFiles,
-    readDirectoryForMapTiles,
+    deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectoryForMapFiles, readDirectoryForMapTiles,
   } = useDevice();
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl, getTilesFromHost, zipURLStatus} = useServerRequests();
+
+  /* Derived Variables */
+
+  const source = currentBasemap && currentBasemap.source;
+  const url = 'file://' + APP_DIRECTORIES.TILE_CACHE;
 
   /* Internal Functions */
 

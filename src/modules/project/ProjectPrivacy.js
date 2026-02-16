@@ -8,15 +8,20 @@ import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
 
+const formName = ['settings', 'project_settings'];
+
 const ProjectPrivacy = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
   const {validateForm} = useForm();
 
   const formRef = useRef(null);
 
-  const formName = ['settings', 'project_settings'];
+  /* Event Handlers */
 
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
@@ -25,6 +30,8 @@ const ProjectPrivacy = () => {
     console.log('Saving privacy preferences to Project ...', updatedValues);
     dispatch(updatedProject({field: 'preferences', value: updatedValues}));
   };
+
+  /* View */
 
   return (
     <View>

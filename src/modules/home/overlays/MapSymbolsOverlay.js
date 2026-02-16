@@ -24,7 +24,10 @@ import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
 
 const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
@@ -33,16 +36,20 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
+  const {getMeasurementLabel} = useMeasurements();
+
   const [isFeatureTypesExpanded, setFeatureTypesExpanded] = useState(true);
   const [isGeometryTypesExpanded, setGeometryTypesExpanded] = useState(true);
 
-  const {getMeasurementLabel} = useMeasurements();
-
-  const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
+  /* Event Handlers */
 
   const handleShowOnly1stMeas = () => dispatch(setIsShowOnly1stMeas(!isShowOnly1stMeas));
 
   const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
+
+  /* Logic Helpers */
+
+  const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
 
   const toggleFeatureTypesOff = (featureType) => {
     let featureTypesOffCopy = [...featureTypesOff];
@@ -69,6 +76,8 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
     if (tagTypeForColor) dispatch(setTagTypeForColor(undefined));
     else dispatch(setTagTypeForColor('geologic_unit'));
   };
+
+  /* Render Functions */
 
   const renderGeometryTypesList = ({item}) => {
     return (
@@ -121,6 +130,8 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

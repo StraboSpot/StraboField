@@ -12,13 +12,19 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesPage = ({isReadOnly}) => {
+  /* Data Hooks / State */
+
+  const dispatch = useDispatch();
+
+  const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const otherFeatures = useSelector(state => state.project.project?.other_features);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const spot = useSelector(state => state.spot.selectedSpot);
+
   const [isFeatureDetailVisible, setIsFeatureDetailVisible] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState({});
-  const dispatch = useDispatch();
-  const spot = useSelector(state => state.spot.selectedSpot);
-  const otherFeatures = useSelector(state => state.project.project?.other_features);
-  const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE OtherFeaturesPage []');
@@ -34,6 +40,8 @@ const OtherFeaturesPage = ({isReadOnly}) => {
     }
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const addFeature = () => {
     setSelectedFeature({id: getNewId()});
     setIsFeatureDetailVisible(true);
@@ -43,6 +51,8 @@ const OtherFeaturesPage = ({isReadOnly}) => {
     setSelectedFeature(feature);
     setIsFeatureDetailVisible(true);
   };
+
+  /* Render Functions */
 
   const renderFeature = (feature) => {
     return (
@@ -83,6 +93,8 @@ const OtherFeaturesPage = ({isReadOnly}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

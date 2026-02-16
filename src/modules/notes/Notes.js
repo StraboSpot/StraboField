@@ -21,20 +21,28 @@ import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const toast = useToast();
+
+  const formRef = useRef(null);
+
   const [initialNotesValues, setInitialNotesValues] = useState({note: initialNote});
   const [isShowTemplates, setIsShowTemplates] = useState(false);
 
-  const toast = useToast();
-  const {setPointAtCurrentLocation} = useMapLocation();
+  /* Derived Variables */
 
-  const formRef = useRef(null);
   const page = PRIMARY_PAGES.find(p => p.key === PAGE_KEYS.NOTES);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE Notes [templates]', templates);
@@ -45,6 +53,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
     return () => confirmLeavePage();
   }, [templates]);
+
+  /* Logic Helpers */
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
@@ -110,6 +120,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderCancelSaveButtons = () => {
     return (
       <View>
@@ -118,6 +130,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

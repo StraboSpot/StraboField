@@ -20,7 +20,10 @@ import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slic
 import useProject from '../useProject';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -29,16 +32,15 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const {destroyDataset} = useProject();
   const toast = useToast();
 
-  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [datasetName, setDatasetName] = useState(dataset.name);
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+
+  /* Derived Variables */
 
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
 
-  const downloadImages = async () => {
-    await initializeDownloadImages(dataset);
-    closeDetailView();
-  };
+  /* Event Handlers */
 
   const handleBackPressed = () => {
     if (datasetName !== dataset.name) {
@@ -49,6 +51,15 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   };
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
+
+  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
+
+  /* Logic Helpers */
+
+  const downloadImages = async () => {
+    await initializeDownloadImages(dataset);
+    closeDetailView();
+  };
 
   const initializeDeleteDataset = () => {
     setIsDeleteConfirmModalVisible(false);
@@ -64,14 +75,14 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
   };
 
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
-
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
     datasetCopy = {...datasetCopy, name: datasetName};
     dispatch(updatedDatasetProperties(datasetCopy));
     closeDetailView();
   };
+
+  /* Render Functions */
 
   const renderDeleteConfirmationModal = () => {
     return (
@@ -284,6 +295,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <>

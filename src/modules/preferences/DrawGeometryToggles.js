@@ -15,17 +15,25 @@ import useDrawGeometryToggle from '../home/buttons/useDrawGeometryToggle';
 import {MAP_MODES} from '../maps/maps.constants';
 
 const DrawGeometryToggles = () => {
+  /* Data Hooks / State */
+
   const drawGeometries = useSelector(state => state.map.drawGeometries);
 
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
+  /* Derived Variables */
+
   const defaultGeometries = [MAP_MODES.DRAW.POINT, MAP_MODES.DRAW.LINE, MAP_MODES.DRAW.POLYGON];
+
+  /* Event Handlers */
 
   const handleTogglePressed = (item, i) => {
     if (item === MAP_MODES.DRAW.POINT) handlePointLongPressed();
     else if (item === MAP_MODES.DRAW.LINE) handleLineLongPressed();
     else handlePolygonLongPressed();
   };
+
+  /* Render Functions */
 
   const renderDrawGeometryToggleButtons = ({item}) => {
     const buttonsText = ['Sharp Vertices', 'Curved Vertices'];
@@ -58,6 +66,8 @@ const DrawGeometryToggles = () => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <>

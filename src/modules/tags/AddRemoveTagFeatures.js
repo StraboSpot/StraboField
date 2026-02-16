@@ -18,13 +18,18 @@ import {useSpots} from '../spots';
 import {useTags} from '../tags';
 
 const AddRemoveTagFeatures = () => {
+  /* Data Hooks / State */
+
+  const dispatch = useDispatch();
+
+  const selectedTag = useSelector(state => state.project.selectedTag);
+  const spots = useSelector(state => state.spot.spots);
+
   const {isSpotInReadOnlyDataset} = useProject();
   const {getAllFeaturesFromSpot} = useSpots();
   const {addRemoveSpotFeatureFromTag, getFeatureDisplayComponent} = useTags();
 
-  const dispatch = useDispatch();
-  const selectedTag = useSelector(state => state.project.selectedTag);
-  const spots = useSelector(state => state.spot.spots);
+  /* Render Functions */
 
   const renderSpotFeatureItem = (feature) => {
     const spotId = feature.parentSpotId;
@@ -68,6 +73,8 @@ const AddRemoveTagFeatures = () => {
       );
     }
   };
+
+  /* View */
 
   return (
     <>

@@ -16,32 +16,39 @@ import {PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {deletedTemplate} from '../project/projects.slice';
 
 const TemplateDetail = ({goBack, template, templateType}) => {
-  const dispatch = useDispatch();
+  /* Data Hooks / State */
 
-  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
-  const [templateName, setTemplateName] = useState(template.name);
+  const dispatch = useDispatch();
 
   const {validateForm} = useForm();
   const {saveTemplate} = useTemplates();
 
   const formRef = useRef(null);
 
-  const isPet = PET_PAGES.find(
-    p => p.key === templateType) || templateType === 'plutonic' || templateType === 'volcanic';
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+  const [templateName, setTemplateName] = useState(template.name);
+
+  /* Derived Variables */
+
+  const isPet = PET_PAGES.find(p => p.key === templateType)
+    || templateType === 'plutonic' || templateType === 'volcanic';
   const isSed = SED_PAGES.find(p => p.key === templateType);
   const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
   const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
   || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
-
   const formName = template.values.type ? ['measurement', template.values.type] : [groupKey, templateType];
+
+  /* Event Handlers */
+
+  const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
+
+  /* Logic Helpers */
 
   const deleteTemplate = () => {
     dispatch(deletedTemplate({key: templateKey, template: template}));
     goBack();
     setIsDeleteConfirmModalVisible(false);
   };
-
-  const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
   const saveTemplateAndGo = async () => {
     console.log('Saving', templateType, templateName, formRef.current.values);
@@ -52,6 +59,8 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     catch (error) {
     }
   };
+
+  /* Render Functions */
 
   const renderDeleteConfirmationModal = () => {
     return (
@@ -89,6 +98,8 @@ const TemplateDetail = ({goBack, template, templateType}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

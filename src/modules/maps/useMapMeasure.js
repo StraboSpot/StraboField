@@ -6,7 +6,11 @@ import useMapFeaturesCalculated from './useMapFeaturesCalculated';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapMeasure = (mapRef) => {
+  /* Data Hooks / State */
+
   const {getNearestFeatureInBBox} = useMapFeaturesCalculated(mapRef);
+
+  /* Exported Functions */
 
   const getMeasureFeatures = async (e, measureFeaturesTemp, setDistance) => {
     let distance;
@@ -15,13 +19,7 @@ const useMapMeasure = (mapRef) => {
         : [e.properties.screenPointX, e.properties.screenPointY];
 
     // Used to draw a line between points
-    const linestring = {
-      'type': 'Feature',
-      'geometry': {
-        'type': 'LineString',
-        'coordinates': [],
-      },
-    };
+    const linestring = {'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': []}};
 
     const featureAtPoint = await getNearestFeatureInBBox([screenPointX, screenPointY], ['measureLayerPoints']);
     // console.log('Feature at pressed point:', featureAtPoint);

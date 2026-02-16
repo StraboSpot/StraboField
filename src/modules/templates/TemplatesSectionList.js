@@ -9,7 +9,11 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const TemplatesSectionList = ({handleTemplatePressed}) => {
+  /* Data Hooks / State */
+
   const templates = useSelector(state => state.project.project?.templates);
+
+  /* Derived Variables */
 
   const templatesSectioned = Object.entries(templates).reduce((acc, [key, value]) => {
     if (isEmpty(value) || (value.templates && isEmpty(value.templates))) return acc;
@@ -34,6 +38,8 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
     data: section.data.sort((a, b) => a.name.localeCompare(b.name)),
   })).sort((a, b) => a.title.localeCompare(b.title));
 
+  /* Render Functions */
+
   const renderTemplateListItem = ({item, section}) => {
     return (
       <TemplateListItem
@@ -43,6 +49,8 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <SectionList

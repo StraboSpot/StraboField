@@ -19,22 +19,27 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const groupKey = '_3d_structures';
+const types = Object.values(THREE_D_STRUCTURE_TYPES);
+
 const AddThreeDStructureModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [survey, setSurvey] = useState({});
-  const [choices, setChoices] = useState({});
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
 
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
 
   const formRef = useRef(null);
 
-  const types = Object.values(THREE_D_STRUCTURE_TYPES);
-  const groupKey = '_3d_structures';
+  const [choices, setChoices] = useState({});
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+  const [survey, setSurvey] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddThreeDStructureModal []');
@@ -51,6 +56,8 @@ const AddThreeDStructureModal = () => {
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
   }, [modalValues]);
+
+  /* Logic Helpers */
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
@@ -83,6 +90,8 @@ const AddThreeDStructureModal = () => {
       console.log('Error submitting form', err);
     }
   };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     if (formProps && formProps.status && formProps.status.formName) {
@@ -184,6 +193,8 @@ const AddThreeDStructureModal = () => {
       );
     }
   };
+
+  /* View */
 
   return renderNotebookThreeDStructureModalContent();
 };

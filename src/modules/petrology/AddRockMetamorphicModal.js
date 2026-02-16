@@ -9,22 +9,27 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
 
+// Relevant keys for quick-entry modal
+const firstKeys = ['metamorphic_rock_type'];
+const secondKeys = ['protolith'];
+const thirdKeys = ['facies'];
+const fourthKeys = ['zone'];
+const lastKeys = ['notes_metamorphic'];
+
 const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Data Hooks / State */
+
+  const {getLabel} = useForm();
   const {width} = useWindowSize();
 
   const [isFaciesModalVisible, setIsFaciesModalVisible] = useState(false);
 
-  const {getLabel} = useForm();
-
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['metamorphic_rock_type'];
-  const secondKeys = ['protolith'];
-  const thirdKeys = ['facies'];
-  const fourthKeys = ['zone'];
-  const lastKeys = ['notes_metamorphic'];
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* Logic Helpers */
 
   const addFacies = (faciesPressed) => {
     const currentFacies = JSON.parse(JSON.stringify(formProps.values?.facies || []));
@@ -65,6 +70,8 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
       </View>
     );
   };
+
+  /* Render Functions */
 
   const renderFaciesModal = () => {
     const faciesModalWidth = width > 520 ? 700 : '90%';
@@ -155,6 +162,8 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return (
     <>

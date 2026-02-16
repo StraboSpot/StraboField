@@ -18,16 +18,19 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 
+const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+
 const useSed = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getLabel, getLabels, showErrors} = useForm();
-  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
   const {validateSedData} = useSedValidation();
+  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
   const {moveSpotsUpOrDownByPixels, recalculateIntervalGeometry} = useStratSectionCalculations();
-
-  const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
   /* Internal Functions */
 

@@ -12,12 +12,19 @@ import {SpotsList} from '../spots';
 import {useTags} from '../tags';
 
 const AddRemoveTagSpots = ({updateSpotsInMapExtent}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {addRemoveSpotFromTag} = useTags();
 
+  /* Event Handlers */
+
   const handleSpotChecked = spot => addRemoveSpotFromTag(spot.properties.id, selectedTag);
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

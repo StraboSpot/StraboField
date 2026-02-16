@@ -7,13 +7,17 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setVertexEndCoords} from './maps.slice';
 import mapStyles from './maps.styles';
 
+const selectedVertexOffset = 10;
+
 const VertexDrag = () => {
   // console.log('Rendering VertexDrag...');
 
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const vertexStartCoords = useSelector(state => state.map.vertexStartCoords);
 
-  const selectedVertexOffset = 10;
   const vertexStartCoordsObj = {
     x: vertexStartCoords[0] - selectedVertexOffset,
     y: vertexStartCoords[1] - selectedVertexOffset,
@@ -28,6 +32,8 @@ const VertexDrag = () => {
       backgroundColor: isPressed.value ? 'yellow' : 'orange',
     };
   });
+
+  /* Derived Variables */
 
   const gesture = Gesture.Pan()
     .onBegin(() => {
@@ -55,9 +61,13 @@ const VertexDrag = () => {
       isPressed.value = false;
     });
 
+  /* Logic Helpers */
+
   const saveEnd = (endCoords) => {
     dispatch(setVertexEndCoords(endCoords));
   };
+
+  /* View */
 
   return (
     <GestureDetector gesture={gesture}>

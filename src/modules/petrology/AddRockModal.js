@@ -23,29 +23,36 @@ import useSed from '../sed/useSed';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const AddRockModal = ({modalKey}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [survey, setSurvey] = useState({});
-  const [choices, setChoices] = useState({});
-  const [initialValues, setInitialValues] = useState({id: getNewId()});
-  const [isShowTemplates, setIsShowTemplates] = useState(false);
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
-  const [rockKey, setRockKey] = useState(null);
-  const formRef = useRef(null);
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
   const {saveSedFeature, saveSedFeatureValuesFromTemplates} = useSed();
 
+  const formRef = useRef(null);
+
+  const [choices, setChoices] = useState({});
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [initialValues, setInitialValues] = useState({id: getNewId()});
+  const [isShowTemplates, setIsShowTemplates] = useState(false);
+  const [rockKey, setRockKey] = useState(null);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
+  const [survey, setSurvey] = useState({});
+
+  /* Derived Variables */
+
   const areMultipleTemplates = templates[rockKey] && templates[rockKey].isInUse && templates[rockKey].active
     && templates[rockKey].active.length > 1;
   const groupKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
   const pageKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : modalKey;
-  const types = Object.values(IGNEOUS_ROCK_CLASSES);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE AddRockModal [modalValues, pageKey, templates]', modalValues, pageKey, templates);
@@ -78,6 +85,8 @@ const AddRockModal = ({modalKey}) => {
     return () => dispatch(setModalValues({}));
   }, []);
 
+  /* Event Handlers */
+
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
     else if (isShowTemplates) setIsShowTemplates(false);
@@ -87,6 +96,7 @@ const AddRockModal = ({modalKey}) => {
   const onIgneousRockTypePress = (i) => {
     if (i !== selectedTypeIndex) {
       setSelectedTypeIndex(i);
+      const types = Object.values(IGNEOUS_ROCK_CLASSES);
       const type = types[i];
       dispatch(setModalValues({id: getNewId(), igneous_rock_class: type}));
       const formNameSwitched = ['pet', type];
@@ -94,6 +104,8 @@ const AddRockModal = ({modalKey}) => {
       setChoices(getChoices(formNameSwitched));
     }
   };
+
+  /* Logic Helpers */
 
   const saveRock = async () => {
     if (areMultipleTemplates) {
@@ -107,6 +119,8 @@ const AddRockModal = ({modalKey}) => {
     }
     if (SMALL_SCREEN) onCloseModalPressed();
   };
+
+  /* Render Functions */
 
   const renderAddRock = () => {
     return (
@@ -223,6 +237,8 @@ const AddRockModal = ({modalKey}) => {
       <Form {...{formName: [groupKey, rockKey], surveyFragment: relevantFields, ...formProps}}/>
     );
   };
+
+  /* View */
 
   return renderAddRockModalContent();
 };

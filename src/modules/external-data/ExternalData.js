@@ -14,13 +14,19 @@ import {formStyles} from '../form';
 import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly}) => {
-  const inputRef = useRef(null);
+  /* Data Hooks / State */
 
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {readCSV, saveURL} = useExternalData();
+
+  const inputRef = useRef(null);
+
   const [error, setError] = useState(false);
   const [protocol, setProtocol] = useState('http://');
   const [url, setUrl] = useState('');
-  const {readCSV, saveURL} = useExternalData();
+
+  /* Event Handlers */
 
   const handleFileChange = async (e) => {
     console.log('CSV File', e.target.files[0]);
@@ -28,6 +34,8 @@ const ExternalData = ({isReadOnly}) => {
     await readCSV(file);
     console.log('CSV From Web Saved');
   };
+
+  /* Logic Helpers */
 
   const importCSVFile = () => {
     try {
@@ -54,6 +62,8 @@ const ExternalData = ({isReadOnly}) => {
       console.error('Not Valid URL Yet');
     }
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

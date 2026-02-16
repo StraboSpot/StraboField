@@ -23,16 +23,21 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, openMainMenuPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
-  const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
-
-  const formRef = useRef(null);
 
   const {showErrors, validateForm} = useForm();
   const {getPopulatedPagesKeys} = usePage();
+
+  const formRef = useRef(null);
+
+  const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
+  const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
+
+  /* Derived Variables */
 
   const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
   const sections = visiblePagesKeys.reduce((acc, key) => {
@@ -48,18 +53,16 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     else return acc;
   }, []);
 
+
+  /* Side Effects */
+
   useEffect(() => {
     console.log('UE Overview [spot]', spot);
     setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
   }, [spot]);
 
-  const cancelFormAndGo = () => {
-    setIsTraceSurfaceFeatureEdit(false);
-    if (isTraceSurfaceFeatureEnabled && !spot.properties.trace && !spot.properties.surface_feature) {
-      setIsTraceSurfaceFeatureEnabled(false);
-    }
-  };
+  /* Event Handlers */
 
   const handleToggleShowTraceSurfaceFeatureForm = () => {
     if (isTraceSurfaceFeatureEdit) setIsTraceSurfaceFeatureEdit(false);
@@ -70,6 +73,15 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   // an alert message if there are errors but this function won't be called if form is invalid
   const onSubmitForm = () => {
     console.log('In onSubmitForm');
+  };
+
+  /* Logic Helpers */
+
+  const cancelFormAndGo = () => {
+    setIsTraceSurfaceFeatureEdit(false);
+    if (isTraceSurfaceFeatureEnabled && !spot.properties.trace && !spot.properties.surface_feature) {
+      setIsTraceSurfaceFeatureEnabled(false);
+    }
   };
 
   const openPage = (page) => {
@@ -141,6 +153,8 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     else continueToggleTraceSurfaceFeature();
   };
 
+  /* Render Functions */
+
   const renderSectionHeader = (page) => {
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
@@ -193,6 +207,8 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

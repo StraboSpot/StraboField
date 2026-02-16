@@ -12,11 +12,15 @@ import useMapCoords from '../useMapCoords';
 const StratSectionBackground = ({spotsDisplayed}) => {
   console.log('Rendering StratSectionBackground...');
 
+  /* Data Hooks / State */
+
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getLocalImageURI} = useImages();
   const {getCoordQuad} = useMapCoords();
   const {getSpotWithThisStratSection} = useSpots();
+
+  /* Render Functions */
 
   const renderImageOverlays = () => {
     const stratSectionSpot = getSpotWithThisStratSection(stratSection.strat_section_id);
@@ -43,6 +47,8 @@ const StratSectionBackground = ({spotsDisplayed}) => {
       );
     });
   };
+
+  /* View */
 
   return (
     <>

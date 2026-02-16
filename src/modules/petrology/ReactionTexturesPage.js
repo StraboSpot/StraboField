@@ -18,14 +18,19 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [selectedReaction, setSelectedReaction] = useState({});
-  const [isDetailView, setIsDetailView] = useState(false);
-
   const {getMineralTitle} = usePetrology();
+
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ReactionTexturesPage []');
@@ -41,9 +46,9 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
-  const addReaction = () => {
-    dispatch(setModalVisible({modal: page.key}));
-  };
+  /* Logic Helpers */
+
+  const addReaction = () => dispatch(setModalVisible({modal: page.key}));
 
   const editReaction = (reaction) => {
     setIsDetailView(true);
@@ -61,6 +66,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
       return existingMineralsSorted.join(' - ');
     }
   };
+
+  /* Render Functions */
 
   const renderReactionDetail = () => {
     return (
@@ -106,6 +113,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderReactionDetail() : renderReactionsMain();
 };

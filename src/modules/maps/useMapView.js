@@ -6,28 +6,25 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  GEO_LAT_LNG_PROJECTION,
-  LATITUDE,
-  LONGITUDE,
-  PIXEL_PROJECTION,
-  STRAT_SECTION_CENTER,
-  ZOOM,
-  ZOOM_STRAT_SECTION,
+  GEO_LAT_LNG_PROJECTION, LATITUDE, LONGITUDE, PIXEL_PROJECTION, STRAT_SECTION_CENTER, ZOOM, ZOOM_STRAT_SECTION,
 } from './maps.constants';
 import {setCenter, setZoom} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import {isEmpty, isEqual} from '../../shared/Helpers';
 
 const useMapView = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const center = useSelector(state => state.map.center);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const zoom = useSelector(state => state.map.zoom);
 
-  const toast = useToast();
   const {convertImagePixelsToLatLong, getBoundsPadded} = useMapCoords();
+  const toast = useToast();
 
   /* Internal Functions */
 

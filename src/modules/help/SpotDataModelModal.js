@@ -10,11 +10,17 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const SpotDataModelModal = ({close}) => {
+  /* Data Hooks / State */
+
   const [spotDataModel, setSpotDataModel] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     createSpotDataModel();
   }, []);
+
+  /* Logic Helpers */
 
   const createSpotDataModel = () => {
     console.log('Creating...................................................');
@@ -168,6 +174,8 @@ const SpotDataModelModal = ({close}) => {
     // Level 1: contents of properties (what we want to show)
     return level <= 1;
   };
+
+  /* View */
 
   return (
     <ModalWrapper

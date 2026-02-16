@@ -14,15 +14,26 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const MainMenuPanelList = ({searchText}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
 
   const [menuItems, setMenuItems] = useState(MAIN_MENU_DATA);
 
+  /* Side Effects */
+
   useEffect(() => {
     filterMenuItems();
   }, [searchText]);
+
+  /* Event Handlers */
+
+  const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
+
+  /* Logic Helpers */
 
   const filterMenuItems = () => {
     let mainMenuData = MAIN_MENU_DATA;
@@ -45,7 +56,7 @@ const MainMenuPanelList = ({searchText}) => {
     }
   };
 
-  const onPressSectionAccordion = title => dispatch(setSectionsCollapsed(title));
+  /* Render Functions */
 
   const renderItem = ({item, section}) => {
     if (!sectionsCollapsed.includes(section.title)) return <MainMenuPanelListItem title={item}/>;
@@ -66,6 +77,8 @@ const MainMenuPanelList = ({searchText}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <SectionList

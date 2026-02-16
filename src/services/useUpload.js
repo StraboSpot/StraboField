@@ -13,13 +13,16 @@ import {useSpots} from '../modules/spots';
 import {isEmpty} from '../shared/Helpers';
 import alert from '../shared/ui/alert';
 
+const datasetsNotUploaded = [];
+let projectUploadStatus = {};
+
 const useUpload = () => {
-  let projectUploadStatus = {};
-  const datasetsNotUploaded = [];
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
-  const projectDatasets = useSelector(state => state.project.datasets);
+
   const project = useSelector(state => state.project.project);
+  const projectDatasets = useSelector(state => state.project.datasets);
   const user = useSelector(state => state.user);
 
   const [uploadStatusMessage, setUploadStatusMessage] = useState('');

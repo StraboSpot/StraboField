@@ -13,19 +13,28 @@ import PageHeader from '../page/PageHeader';
 const ReportsPage = () => {
   console.log('Rendering ReportsPage...');
 
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const reports = useSelector(state => state.project.project?.reports) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Derived Variables */
 
   const reportsUsingThisSpot = reports.reduce((acc, report) => {
     const doesThisReportUseThisSpot = report?.spots?.find(id => id === spot.properties.id);
     return doesThisReportUseThisSpot ? [...acc, report] : acc;
   }, []);
 
+  /* Logic Helpers */
+
   const addReport = () => {
     dispatch(setModalValues({spots: [spot.properties.id]}));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

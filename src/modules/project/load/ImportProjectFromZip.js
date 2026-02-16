@@ -23,8 +23,13 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
 const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+
+  const toast = useToast();
 
   const [importComplete, setIsImportComplete] = useState(false);
   const [importedProject, setImportedProject] = useState({});
@@ -37,13 +42,16 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     makeDirectory,
     unZipAndCopyImportedData,
   } = useDevice();
-  const toast = useToast();
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE MyStraboSpot []');
     checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
     getZippedProject();
   }, []);
+
+  /* Logic Helpers */
 
   const checkAndroidDownloadDir = async () => {
     const exists = await doesDeviceBackupDirExist(undefined, true);
@@ -127,6 +135,8 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderImportComplete = () => {
     return (
       <View>
@@ -141,6 +151,8 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

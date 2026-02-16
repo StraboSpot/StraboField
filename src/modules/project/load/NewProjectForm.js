@@ -12,8 +12,17 @@ import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useProject from '../useProject';
 
+const initialValues = {
+  start_date: new Date().toISOString(),
+  gps_datum: 'WGS84 (Default)',
+  magnetic_declination: 0,
+};
+
 const NewProjectForm = ({openMainMenuPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const {showErrors, validateForm} = useForm();
@@ -21,11 +30,7 @@ const NewProjectForm = ({openMainMenuPanel}) => {
 
   const formRef = useRef(null);
 
-  const initialValues = {
-    start_date: new Date().toISOString(),
-    gps_datum: 'WGS84 (Default)',
-    magnetic_declination: 0,
-  };
+  /* Logic Helpers */
 
   const saveForm = async () => {
     try {
@@ -46,6 +51,8 @@ const NewProjectForm = ({openMainMenuPanel}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderFormFields = () => {
     const formName = ['general', 'project_description'];
     console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
@@ -61,6 +68,8 @@ const NewProjectForm = ({openMainMenuPanel}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>

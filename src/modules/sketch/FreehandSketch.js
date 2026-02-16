@@ -11,12 +11,16 @@ import {setFreehandFeatureCoords} from '../maps/maps.slice';
 let freehandFeatureCoords = [];
 
 const FreehandSketch = ({mapMode}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
+  const {height, width} = useWindowSize();
 
   const freehandDrawRef = useRef(null);
-  const {height, width} = useWindowSize();
+
+  /* Side Effects */
 
   useEffect(() => {
     lockOrientation();
@@ -27,7 +31,7 @@ const FreehandSketch = ({mapMode}) => {
     clear();
   }, [mapMode]);
 
-  const clear = () => freehandDrawRef.current.clear();
+  /* Event Handlers */
 
   const onStrokeChanged = (x, y) => freehandFeatureCoords.push([x, y]);
 
@@ -37,6 +41,12 @@ const FreehandSketch = ({mapMode}) => {
     if (freehandFeatureCoords.length > 1) clear();
     freehandFeatureCoords = [];
   };
+
+  /* Logic Helpers */
+
+  const clear = () => freehandDrawRef.current.clear();
+
+  /* View */
 
   return (
     <View style={{position: 'absolute', width: width, height: height}}>

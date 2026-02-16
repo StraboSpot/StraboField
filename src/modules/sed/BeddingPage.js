@@ -23,19 +23,26 @@ import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const BeddingPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState({});
 
   const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
 
   const beddingSharedRef = useRef(null);
 
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedAttribute, setSelectedAttribute] = useState({});
+
+  /* Derived Variables */
+
   const bedding = spot.properties?.sed?.bedding || {};
+
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE BeddingPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -50,6 +57,8 @@ const BeddingPage = ({isReadOnly, page}) => {
     // console.log('ULE BeddingPage []');
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const addAttribute = async () => {
     if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
@@ -108,6 +117,8 @@ const BeddingPage = ({isReadOnly, page}) => {
     await formCurrent.resetForm();
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
+
+  /* Render Functions */
 
   const renderAttributeDetail = () => {
     return (
@@ -192,6 +203,8 @@ const BeddingPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

@@ -10,19 +10,19 @@ import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} fro
 import {setBackupFileName} from '../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../shared/Helpers';
 
+let imageBackupFailures = 0;
+let imageSuccess = 0;
+
 const useExport = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const mapNamesDb = useSelector(state => state.offlineMap.offlineMaps);
   const otherMapsDb = useSelector(state => state.map.customMaps);
   const projectDb = useSelector(state => state.project);
   const spotsDb = useSelector(state => state.spot.spots);
   const userDb = useSelector(state => state.user);
-
-  const appExportDirectory = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.EXPORT_FILES_ANDROID;
-
-  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
-  const userDbCopy = JSON.parse(JSON.stringify(userDb));
-  const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
 
   const {
     copyFiles,
@@ -34,9 +34,13 @@ const useExport = () => {
     readFile,
     writeFileToDevice,
   } = useDevice();
-  let imageBackupFailures = 0;
-  let imageSuccess = 0;
 
+  /* Derived Variables */
+
+  const appExportDirectory = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.EXPORT_FILES_ANDROID;
+  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
+  const userDbCopy = JSON.parse(JSON.stringify(userDb));
+  const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
   let dataForExport = {
     mapNamesDb: mapNamesDb,
     mapTilesDb: {},

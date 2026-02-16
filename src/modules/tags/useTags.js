@@ -20,7 +20,10 @@ import {setSelectedAttributes} from '../spots/spots.slice';
 import ThreeDStructureLabel from '../three-d-structures/ThreeDStructureLabel';
 
 const useTags = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const projectTags = useSelector(state => state.project.project?.tags) || [];

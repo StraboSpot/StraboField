@@ -16,12 +16,22 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {useSpots} from '../spots';
 
 const CustomFeatureTypes = () => {
-  const [refresh] = useState();
-  const {getActiveSpotsObj} = useSpots();
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const projectFeatures = useSelector(state => state.project.project?.other_features);
+
+  const {getActiveSpotsObj} = useSpots();
+
+  const [refresh] = useState();
+
+  /* Derived Variables */
+
   const customFeatureTypes = projectFeatures
     && projectFeatures.filter(feature => !DEFAULT_GEOLOGIC_TYPES.includes(feature));
+
+  /* Logic Helpers */
 
   const deleteCustomFeature = (feature) => {
     let projectFeaturesCopy = projectFeatures.filter(projectFeature => feature !== projectFeature);
@@ -66,6 +76,8 @@ const CustomFeatureTypes = () => {
     );
   };
 
+  /* Render Functions */
+
   const renderFeature = (feature) => {
     return (
       <View>
@@ -87,6 +99,8 @@ const CustomFeatureTypes = () => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

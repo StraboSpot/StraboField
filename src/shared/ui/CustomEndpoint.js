@@ -13,11 +13,16 @@ import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../services/connec
 import {STRABO_APIS} from '../../services/urls.constants';
 
 const CustomEndpoint = ({containerStyles, textStyles}) => {
+    /* Data Hooks / State */
+
     const dispatch = useDispatch();
-    const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+
     const customMaps = useSelector(state => state.map.customMaps);
+    const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
     const {setBasemap} = useMap();
+
+    /* Event Handlers */
 
     const handleEndpointSwitchValue = async (value) => {
       Object.values(customMaps).map(map => map.isViewable && dispatch(updateCustomMap({...map, isViewable: false})));
@@ -30,6 +35,8 @@ const CustomEndpoint = ({containerStyles, textStyles}) => {
       dispatch(setCustomDatabaseUrl(endpointURLLocal));
       console.log('Endpoint dispatched', endpointURLLocal);
     };
+
+    /* View */
 
     return (
       <View style={[uiStyles.customEndpointContainer, containerStyles]}>

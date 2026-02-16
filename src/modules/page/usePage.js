@@ -5,11 +5,15 @@ import {isEmpty} from '../../shared/Helpers';
 import {useTags} from '../tags';
 
 const usePage = () => {
+  /* Data Hooks / State */
+
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {getTagsAtSpot} = useTags();
+
+  /* Exported Functions */
 
   // Return the keys for the Spot pages that are populated with data
   const getPopulatedPagesKeys = (spot) => {

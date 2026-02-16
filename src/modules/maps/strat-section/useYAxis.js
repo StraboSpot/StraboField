@@ -4,14 +4,18 @@ import proj4 from 'proj4';
 import {GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION} from '../maps.constants';
 import useMapCoords from '../useMapCoords';
 
+const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
+const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+
 const useYAxis = (spotsDisplayed) => {
+  /* Data Hooks / State */
+
   const {convertImagePixelsToLatLong} = useMapCoords();
 
-  const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
-  const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+  /* Derived Variables */
+
   const intervals = spotsDisplayed.filter(
     feature => feature?.properties?.surface_feature?.surface_feature_type === 'strat_interval');
-
   // Get max X and max Y for strat intervals
   const maxXY = intervals.reduce((acc, i) => {
     const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
@@ -21,6 +25,8 @@ const useYAxis = (spotsDisplayed) => {
     const maxY = Math.max(...ys);
     return [Math.max(acc[0], maxX), Math.max(acc[1], maxY)];
   }, [0, 0]);
+
+  /* Exported Functions */
 
   const getYAxis = () => {
     const yAxis = JSON.parse(JSON.stringify(lineString));

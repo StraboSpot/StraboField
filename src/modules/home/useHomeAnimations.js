@@ -11,6 +11,8 @@ import {PAGE_KEYS} from '../page/page.constants';
 
 // Animations for Drawers & Keyboard
 const useHomeAnimations = ({navigation}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const animatedValueLeftSide = useRef(new Animated.Value(0)).current;
@@ -18,6 +20,16 @@ const useHomeAnimations = ({navigation}) => {
   const animatedValueNotebookDrawer = useRef(new Animated.Value(NOTEBOOK_DRAWER_WIDTH)).current;
   const animatedValueRightSide = useRef(new Animated.Value(0)).current;
   const animatedValueTextInputs = useRef(new Animated.Value(0)).current;
+
+  /* Derived Variables */
+
+  const animateLeftSide = {transform: [{translateX: animatedValueLeftSide}]};
+  const animateMainMenuDrawer = {transform: [{translateX: animatedValueMainMenuDrawer}]};
+  const animateNotebookDrawer = {transform: [{translateX: animatedValueNotebookDrawer}]};
+  const animateRightSide = {transform: [{translateX: animatedValueRightSide}]};
+  const animateTextInputs = {transform: [{translateY: animatedValueTextInputs}]};
+
+  /* Side Effects */
 
   // Cleanup: Stop all animations when component unmounts to prevent KERN_PROTECTION_FAILURE crashes
   useEffect(() => {
@@ -29,12 +41,6 @@ const useHomeAnimations = ({navigation}) => {
       animatedValueTextInputs.stopAnimation();
     };
   }, []);
-
-  const animateLeftSide = {transform: [{translateX: animatedValueLeftSide}]};
-  const animateMainMenuDrawer = {transform: [{translateX: animatedValueMainMenuDrawer}]};
-  const animateNotebookDrawer = {transform: [{translateX: animatedValueNotebookDrawer}]};
-  const animateRightSide = {transform: [{translateX: animatedValueRightSide}]};
-  const animateTextInputs = {transform: [{translateY: animatedValueTextInputs}]};
 
   /* Internal Functions */
 

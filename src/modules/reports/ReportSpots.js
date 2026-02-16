@@ -14,20 +14,29 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
-const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
-  const {width} = useWindowSize();
-  const itemWidth = 300;
-  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+const itemWidth = 300;
 
-  const [isSpotsListModalVisible, setIsSpotsListModalVisible] = useState(false);
+const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
+  /* Data Hooks / State */
 
   const spots = useSelector(state => state.spot.spots);
 
-  const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
+  const {width} = useWindowSize();
+
+  const [isSpotsListModalVisible, setIsSpotsListModalVisible] = useState(false);
+
+  /* Derived Variables */
 
   const checkedSpots = Object.entries(spots).reduce((acc, [spotId, spotObj]) => {
     return checkedSpotsIds.find(id => id.toString() === spotId) ? [...acc, spotObj] : acc;
   }, []);
+  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+  
+  /* Logic Helpers */
+
+  const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
+
+  /* View */
 
   return (
     <>

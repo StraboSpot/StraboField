@@ -25,12 +25,17 @@ import useMap from '../useMap';
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   console.log('Rendering ManageOfflineMaps...');
 
-  const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
-  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
-  const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  /* Data Hooks / State */
 
-  const animatedPulse = useMemo(() => new Animated.Value(1), []);
+  const dispatch = useDispatch();
+
+  const isOnline = useSelector(state => state.connections.isOnline);
+  const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+
+  const {deleteOfflineMap} = useDevice();
+  const {setBasemap} = useMap();
+  const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
 
   const [availableMaps, setAvailableMaps] = useState({});
   const [isNameModalVisible, setIsNameModalVisible] = useState(false);
@@ -38,9 +43,11 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const [loading, setLoading] = useState(false);
   const [selectedMap, setSelectedMap] = useState({});
 
-  const {deleteOfflineMap} = useDevice();
-  const {setBasemap} = useMap();
-  const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
+  /* Derived State */
+
+  const animatedPulse = useMemo(() => new Animated.Value(1), []);
+
+  /* Side Effects */
 
   useEffect(() => {
     Animated.sequence([
@@ -63,6 +70,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     console.log('UE ManageOfflineMaps [offlineMaps]', offlineMaps);
     setAvailableMaps(offlineMaps);
   }, [offlineMaps]);
+
+  /* Logic Helpers */
 
   const confirmDeleteMap = async () => {
     alert(
@@ -133,6 +142,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     console.log('Got maps from device');
     setLoading(false);
   };
+
+  /* Render Functions */
 
   const renderEditMapModal = () => {
     return (
@@ -229,6 +240,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
       </WarningModal>
     );
   };
+
+  /* View */
 
   return (
     <>

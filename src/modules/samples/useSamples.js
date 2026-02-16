@@ -5,16 +5,19 @@ import {isEmpty} from '../../shared/Helpers';
 import useForm from '../form/useForm';
 import {setSesarToken} from '../user/userProfile.slice';
 
+const formName = ['general', 'samples'];
 const parseString = require('react-native-xml2js').parseString;
 
 const useSamples = () => {
-  const formName = ['general', 'samples'];
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
+  const {name, sesar} = useSelector(state => state.user);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel} = useForm();
   const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
-  const {name, sesar} = useSelector(state => state.user);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   /* Internal Functions */
 

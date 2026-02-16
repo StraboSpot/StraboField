@@ -18,16 +18,17 @@ import {addedSpotsFromDevice} from '../modules/spots/spots.slice';
 import {isEmpty} from '../shared/Helpers';
 import {persistor} from '../store/ConfigureStore';
 
-const useImport = () => {
-  let isOldBackup;
-  let fileCount = 0;
-  let neededTiles = 0;
-  let notNeededTiles = 0;
-  let mapFailures = 0;
+let fileCount = 0;
+let isOldBackup;
+let mapFailures = 0;
+let neededTiles = 0;
+let notNeededTiles = 0;
 
-  const {clearProject} = useResetState();
+const useImport = () => {
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const project = useSelector(state => state.project.project);
 
   const {
@@ -40,6 +41,7 @@ const useImport = () => {
     readDeviceJSONFile,
     readDirectory,
   } = useDevice();
+  const {clearProject} = useResetState();
 
   /* Internal Functions */
 

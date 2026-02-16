@@ -14,20 +14,29 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
-const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
-  const {width} = useWindowSize();
-  const itemWidth = 300;
-  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+const itemWidth = 300;
 
-  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
+  /* Data Hooks / State */
 
   const tags = useSelector(state => state.project.project?.tags) || [];
 
-  const addAssociatedSpots = () => setIsTagsListModalVisible(true);
+  const {width} = useWindowSize();
+
+  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+
+  /* Derived Variables */
 
   const checkedTags = Object.values(tags).reduce((acc, tag) => {
     return checkedTagsIds.find(id => id.toString() === tag.id.toString()) ? [...acc, tag] : acc;
   }, []);
+  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+
+  /* Logic Helpers */
+
+  const addAssociatedSpots = () => setIsTagsListModalVisible(true);
+
+  /* View */
 
   return (
     <>

@@ -16,8 +16,12 @@ import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
-  const isOnline = useSelector(state => state.connections.isOnline);
+  /* Data Hooks / State */
+
   const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
+  const isOnline = useSelector(state => state.connections.isOnline);
+
+  const {guestSignIn, signIn} = useSignIn();
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -25,7 +29,7 @@ const SignIn = ({navigation}) => {
   const [password, setPassword] = useState(__DEV__ ? PASSWORD_TEST : '');
   const [username, setUsername] = useState(__DEV__ ? USERNAME_TEST : '');
 
-  const {guestSignIn, signIn} = useSignIn();
+  /* Event Handlers */
 
   const handleGuestSignIn = async () => {
     await guestSignIn();
@@ -44,6 +48,8 @@ const SignIn = ({navigation}) => {
       setLoading(false);
     }
   };
+
+  /* Render Functions */
 
   const renderButtons = () => {
     return (
@@ -87,6 +93,8 @@ const SignIn = ({navigation}) => {
       </ErrorModal>
     );
   };
+
+  /* View */
 
   return (
     <SplashScreen>

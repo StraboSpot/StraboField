@@ -9,12 +9,18 @@ import {roundToDecimalPlaces} from '../../shared/Helpers';
 import {overlayStyles} from '../home/overlays';
 
 const CompassDebug = ({compassData, matrixRotation}) => {
+  /* Data Hooks / State */
+
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('Compass Debug MOUNTED');
     return () => console.log('Compass Debug UNMOUNTED');
   }, []);
+
+  /* Logic Helpers */
 
   const Col = ({children, flex = 1}) => (
     <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
@@ -25,6 +31,8 @@ const CompassDebug = ({compassData, matrixRotation}) => {
   const Row = ({children}) => (
     <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
   );
+
+  /* Render Functions */
 
   const renderCompassData = () => (
     <View style={compassStyles.compassDataGridContainer}>
@@ -91,6 +99,8 @@ const CompassDebug = ({compassData, matrixRotation}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

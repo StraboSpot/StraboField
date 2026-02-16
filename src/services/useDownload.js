@@ -34,16 +34,20 @@ import {addedSpotsFromServer} from '../modules/spots/spots.slice';
 import {setUserData} from '../modules/user/userProfile.slice';
 import {isEmpty} from '../shared/Helpers';
 
+let customMapsToSave = {};
+let datasetsObjToSave = {};
+let imagesDownloadedCount = 0;
+let imagesFailedCount = 0;
+let spotsToSave = [];
+let tempActiveDatasetsIds, tempTargetDatasetId;
+
 const useDownload = () => {
-  let customMapsToSave = {};
-  let datasetsObjToSave = {};
-  let imagesDownloadedCount = 0;
-  let imagesFailedCount = 0;
-  let spotsToSave = [];
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
-  const encodedLogin = useSelector(state => state.user.encoded_login);
+
   const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
+  const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
@@ -51,8 +55,6 @@ const useDownload = () => {
   const {createDataset} = useProject();
   const {clearProject} = useResetState();
   const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
-
-  let tempActiveDatasetsIds, tempTargetDatasetId;
 
   /* Internal Functions */
 

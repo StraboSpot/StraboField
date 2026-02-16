@@ -18,18 +18,25 @@ import {setLoadingStatus} from '../home/home.slice';
 import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
 
 const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
-  const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
-  const toast = useToast();
-  const {getSesarToken, getOrcidToken} = useServerRequests();
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
-  const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+
+  const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
+  const {getSesarToken, getOrcidToken} = useServerRequests();
+  const toast = useToast();
 
   // const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
+  /* Derived Variables */
+
   let tokens = sesarToken;
+
+  /* Side Effects */
 
   useEffect(() => {
     const subscription = Linking.addEventListener('url', handleOpenURL);
@@ -45,6 +52,36 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     isIGSNChecked && !isEmpty(sesarToken?.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
+
+  /* Event Handlers */
+
+  const handleOpenURL = async ({url}) => {
+    console.log('App resumed with URL:', url);
+    if (url) {
+      const code = url.split('/')[3];
+      await getSesarTokenAndCodes(code);
+    }
+    else {
+      console.log('No code found in URL.');
+    }
+  };
+
+  const handlePress = async () => {
+    handleIGSNChecked(!isIGSNChecked);
+  };
+
+  const onReset = () => {
+    dispatch(setInitialSesarState());
+    console.log('Sesar credentials have beed reset');
+    toast.show('Sesar credentials have beed reset', {type: 'success'});
+    // handleIGSNChecked(false);
+  };
+
+  const onUserCodeSelect = async (userCode) => {
+    dispatch(setSelectedUserCode(userCode));
+  };
+
+  /* Logic Helpers */
 
   const closePicker = () => {
     setIsPickerVisible(false);
@@ -85,32 +122,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     }
   };
 
-  const handleOpenURL = async ({url}) => {
-    console.log('App resumed with URL:', url);
-    if (url) {
-      const code = url.split('/')[3];
-      await getSesarTokenAndCodes(code);
-    }
-    else {
-      console.log('No code found in URL.');
-    }
-  };
-
-  const handlePress = async () => {
-    handleIGSNChecked(!isIGSNChecked);
-  };
-
-  const onReset = () => {
-    dispatch(setInitialSesarState());
-    console.log('Sesar credentials have beed reset');
-    toast.show('Sesar credentials have beed reset', {type: 'success'});
-    // handleIGSNChecked(false);
-  };
-
-  const onUserCodeSelect = async (userCode) => {
-    dispatch(setSelectedUserCode(userCode));
-  };
-
   const openPicker = () => {
     setIsPickerVisible(true);
   };
@@ -118,6 +129,8 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const orcidAuthentication = async () => {
     await getOrcidToken();
   };
+
+  /* Render Functions */
 
   const renderIGSNUploadCheckbox = () => {
     return (
@@ -224,6 +237,8 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       );
     }
   };
+
+  /* View */
 
   return (
     <>

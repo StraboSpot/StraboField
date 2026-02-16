@@ -9,9 +9,13 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
 const NewProject = ({closeNotebookPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(true);
+
+  /* Logic Helpers */
 
   const backToStraboField = () => dispatch(setSidePanelVisible({bool: false}));
 
@@ -19,6 +23,8 @@ const NewProject = ({closeNotebookPanel}) => {
     closeNotebookPanel();
     setIsConfirmOverwriteModalVisible(false);
   };
+
+  /* View */
 
   return (
     <>

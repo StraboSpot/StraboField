@@ -14,7 +14,11 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const formName = ['sed', 'interval'];
+
 const IntervalPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -24,10 +28,12 @@ const IntervalPage = ({isReadOnly, page}) => {
 
   const intervalRef = useRef(null);
 
+  /* Derived Variables */
+
   const character = spot.properties?.sed?.character || undefined;
   const interval = spot.properties?.sed?.interval || {};
 
-  const formName = ['sed', 'interval'];
+  /* Side Effects */
 
   useLayoutEffect(() => {
     // console.log('ULE IntervalPage []');
@@ -64,6 +70,8 @@ const IntervalPage = ({isReadOnly, page}) => {
     await formCurrent.resetForm();
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>

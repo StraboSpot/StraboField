@@ -29,17 +29,22 @@ import {selectedCustomMapToEdit} from '../maps.slice';
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 
 const CustomMapDetails = () => {
-  const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
-  const MBAccessToken = useSelector(state => state.user.mapboxToken);
+
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
+  const MBAccessToken = useSelector(state => state.user.mapboxToken);
+
+  const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
 
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
   const [message, setMessage] = useState('Starting...');
-  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
+
+  /* Side Effects */
 
   useEffect(() => {
     if (!isEmpty(customMapToEdit)) setEditableCustomMapData(customMapToEdit);
@@ -54,6 +59,16 @@ const CustomMapDetails = () => {
       });
     }
   }, [customMapToEdit]);
+
+  /* Event Handlers */
+
+  const handlePress = () => {
+    setIsLoadingModalVisible(false);
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
+  };
+
+  /* Logic Helpers */
 
   const confirmDeleteMap = async () => {
     alert(
@@ -72,12 +87,6 @@ const CustomMapDetails = () => {
       ],
       {cancelable: false},
     );
-  };
-
-  const handlePress = () => {
-    setIsLoadingModalVisible(false);
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
   };
 
   const saveMap = async () => {
@@ -105,6 +114,8 @@ const CustomMapDetails = () => {
       setIsLoading(false);
     }
   };
+
+  /* Render Functions */
 
   const renderCustomMapName = (item) => {
     const radioSelected = <Icon color={BLUE} name={'radiobox-marked'} type={'material-community'}/>;
@@ -268,6 +279,8 @@ const CustomMapDetails = () => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

@@ -20,18 +20,23 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const MineralsPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {getMineralTitle} = usePetrology();
+  const {getSpotById, getSpotsWithKey} = useSpots();
+
+  const preFormRef = useRef(null);
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedMineral, setSelectedMineral] = useState({});
   const [spotsWithMinerals, setSpotsWithMinerals] = useState([]);
 
-  const preFormRef = useRef(null);
-
-  const {getSpotById, getSpotsWithKey} = useSpots();
-  const {getMineralTitle} = usePetrology();
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE MineralsPage []');
@@ -47,6 +52,8 @@ const MineralsPage = ({isReadOnly, page}) => {
     }
     getSpotsWithMinerals();
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const addMineral = () => {
     dispatch(setModalVisible({modal: page.key}));
@@ -81,6 +88,8 @@ const MineralsPage = ({isReadOnly, page}) => {
     setSpotsWithMinerals(allSpotsWithPet.filter(s => s.properties.id !== spot.properties.id
       && s.properties.pet && s.properties.pet[page.key]));
   };
+
+  /* Render Functions */
 
   const renderCopyDataSelectBox = () => {
     return (
@@ -144,6 +153,8 @@ const MineralsPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderMineralDetail() : renderMineralsMain();
 };

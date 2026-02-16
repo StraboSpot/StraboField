@@ -11,22 +11,28 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
+const source = 'device';
+
 // Delete a project on device in StraboSpot app directory
 const DeleteProject = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
+  const {openURL} = useDevice();
 
   const [doReloadPage, setDoReloadPage] = useState(false);
   const [isDeleteProjectModalVisible, setIsDeleteProjectModalVisible] = useState(false);
   const [projectToDeleteFilename, setProjectToDeleteFilename] = useState(null);
+
+  /* Side Effects */
 
   useEffect(() => {
     //  Need to reload page after saved project deleted
     console.log('doReloadPage: ', doReloadPage);
   }, [doReloadPage]);
 
-  const {openURL} = useDevice();
-
-  const source = 'device';
+  /* Logic Helpers */
 
   const closeDeleteProjectModal = () => setIsDeleteProjectModalVisible(false);
 
@@ -34,6 +40,8 @@ const DeleteProject = () => {
     setProjectToDeleteFilename(project.fileName);
     setIsDeleteProjectModalVisible(true);
   };
+
+  /* View */
 
   return (
     <>

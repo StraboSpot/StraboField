@@ -16,17 +16,22 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
+const source = 'device';
+
 // Open project on device in StraboSpot app directory
 const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+
+  const {loadProjectFromDevice} = useImport();
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToOpen, setProjectToOpen] = useState(null);
 
-  const {loadProjectFromDevice} = useImport();
-
-  const source = 'device';
+  /* Logic Helpers */
 
   const closeConfirmOverwriteModal = () => setIsConfirmOverwriteModalVisible(false);
 
@@ -58,6 +63,8 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
       dispatch(setIsStatusMessagesModalVisible(false));
     }
   };
+
+  /* View */
 
   return (
     <>

@@ -1,8 +1,11 @@
 const useMapsOffline = () => {
+  /* Exported Functions */
 
-  const getMapCenterTile = () => {};
+  const getMapCenterTile = () => {
+  };
 
-  const switchToOfflineMap = () => {};
+  const switchToOfflineMap = () => {
+  };
 
   return {getMapCenterTile, switchToOfflineMap};
 };

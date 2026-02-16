@@ -29,13 +29,27 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
+const groupKey = 'measurement';
+const toastOptions = {duration: 1000, placement: 'top'};
+
 const AddMeasurementModal = ({onPress}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
+
+  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const toast = useToast();
+
+  const formRef = useRef(null);
+  const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
   const [assocChoicesViewKey, setAssocChoicesViewKey] = useState(null);
   const [choices, setChoices] = useState({});
@@ -46,25 +60,15 @@ const AddMeasurementModal = ({onPress}) => {
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
-  const [survey, setSurvey] = useState({});
   const [sliderValue, setSliderValue] = useState(6);
+  const [survey, setSurvey] = useState({});
 
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
-  const {setPointAtCurrentLocation} = useMapLocation();
-  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
-  const toast = useToast();
+  /* Derived Variables */
 
-  const toastOptions = {
-    duration: 1000,
-    placement: 'top',
-  };
-
-  const formRef = useRef(null);
-  const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
-
-  const groupKey = 'measurement';
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
@@ -83,8 +87,7 @@ const AddMeasurementModal = ({onPress}) => {
 
     const prev = prevValuesRef.current;
 
-    if (
-      equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes)
+    if (equalsIgnoreOrder(prev.compassMeasurementTypes || [], compassMeasurementTypes)
       && JSON.stringify(prev.templates) === JSON.stringify(templates)
     ) return;
 
@@ -136,22 +139,7 @@ const AddMeasurementModal = ({onPress}) => {
 
   }, [compassMeasurementTypes, templates]);
 
-  const equalsIgnoreOrder = (a, b) => {
-    if (a.length !== b.length) return false;
-    const uniqueValues = new Set([...a, ...b]);
-    for (const v of uniqueValues) {
-      const aCount = a.filter(e => e === v).length;
-      const bCount = b.filter(e => e === v).length;
-      if (aCount !== bCount) return false;
-    }
-    return true;
-  };
-
-  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
-
-  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
+  /* Event Handlers */
 
   const onCloseButton = () => {
     if (choicesViewKey || assocChoicesViewKey) {
@@ -185,6 +173,25 @@ const AddMeasurementModal = ({onPress}) => {
     setChoicesViewKey(key);
     setAssocChoicesViewKey(null);
   };
+
+  /* Logic Helpers */
+
+  const equalsIgnoreOrder = (a, b) => {
+    if (a.length !== b.length) return false;
+    const uniqueValues = new Set([...a, ...b]);
+    for (const v of uniqueValues) {
+      const aCount = a.filter(e => e === v).length;
+      const bCount = b.filter(e => e === v).length;
+      if (aCount !== bCount) return false;
+    }
+    return true;
+  };
+
+  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
+
+  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
+    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
 
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
@@ -313,6 +320,8 @@ const AddMeasurementModal = ({onPress}) => {
     }
     saveMeasurement().catch(console.error);
   };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     const assocFormName = [groupKey, 'linear_orientation'];
@@ -480,6 +489,8 @@ const AddMeasurementModal = ({onPress}) => {
       />
     );
   };
+
+  /* View */
 
   return renderMeasurementModalContent();
 };

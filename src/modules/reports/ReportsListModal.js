@@ -9,14 +9,20 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/page.constants';
 
 const ReportsListModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
+
+  /* Logic Helpers */
 
   const addReport = () => {
     dispatch(setModalValues({spots: selectedSpots.map(s => s.properties.id)}));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
+
+  /* View */
 
   return (
     <ModalWrapper>

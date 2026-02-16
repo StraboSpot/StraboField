@@ -14,22 +14,27 @@ import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/page.constants';
 
+// Relevant keys for quick-entry modal
+const firstKeys = ['reactions'];
+const basedOnKey = 'based_on';
+const baseOnOtherKey = 'other_based_on';
+const lastKeys = ['notes'];
+
 const AddReactionTextureModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-
-  const formRef = useRef(null);
 
   const {getChoices, getSurvey, getRelevantFields} = useForm();
   const {savePetFeature} = usePetrology();
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['reactions'];
-  const basedOnKey = 'based_on';
-  const baseOnOtherKey = 'other_based_on';
-  const lastKeys = ['notes'];
+  const formRef = useRef(null);
+
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.REACTIONS;
@@ -40,12 +45,14 @@ const AddReactionTextureModal = () => {
   const basedOnOtherField = survey.find(f => f.name === baseOnOtherKey);
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
+  /* Side Effects */
+
   useEffect(() => {
     console.log('UE AddReactionTextureModal []');
     return () => dispatch(setModalValues({}));
   }, []);
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  /* Event Handlers */
 
   const onMultiChoiceSelected = (fieldKey, choiceName) => {
     const fieldValues = formRef.current?.values[fieldKey] || [];
@@ -62,11 +69,17 @@ const AddReactionTextureModal = () => {
     });
   };
 
+  /* Logic Helpers */
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
   const saveReactionTexture = () => {
     savePetFeature(petKey, spot, formRef.current);
     formRef.current?.setFieldValue('id', getNewId());
     if (SMALL_SCREEN) closeModal();
   };
+
+  /* Render Functions */
 
   const renderAddReactionTextureModalContent = () => {
     return (
@@ -134,6 +147,8 @@ const AddReactionTextureModal = () => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
+
+  /* View */
 
   return renderAddReactionTextureModalContent();
 };

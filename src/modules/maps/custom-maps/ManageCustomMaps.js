@@ -17,23 +17,31 @@ import useMap from '../useMap';
 const ManageCustomMaps = ({zoomToCustomMap}) => {
   // console.log('Rendering ManageCustomMaps...');
 
-  const customMaps = useSelector(state => state.map.customMaps);
-  const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
-  const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const isOnline = useSelector(state => state.connections.isOnline);
+  /* Data Hooks / State */
 
-  const [filteredMaps, setFilteredMaps] = useState([]);
+  const currentBasemap = useSelector(state => state.map.currentBasemap);
+  const customMaps = useSelector(state => state.map.customMaps);
+  const isOnline = useSelector(state => state.connections.isOnline);
+  const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
   const {getCustomMapDetails, updateMap} = useCustomMap();
   const {setBasemap} = useMap();
 
+  const [filteredMaps, setFilteredMaps] = useState([]);
+
+  /* Derived Variables */
+
   const {isInternetReachable, isConnected} = isOnline;
+
+  /* Side Effects */
 
   useEffect(() => {
     const maps = isSelected ? filterCustomEndpointCustomMaps() : filterDefaultCustomMaps();
     setFilteredMaps(maps);
     console.log('MAPS', maps);
   }, []);
+
+  /* Logic Helpers */
 
   const filterCustomEndpointCustomMaps = () => {
     return Object.values(customMaps).filter(map => map.url[0].includes('http://'));
@@ -59,6 +67,8 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     else basemap = await setBasemap(item.id);
     basemap.bbox && setTimeout(() => zoomToCustomMap(basemap.bbox), 1000);
   };
+
+  /* Render Functions */
 
   const renderCustomMapListItem = (item) => {
     console.log(item);
@@ -87,6 +97,8 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <>

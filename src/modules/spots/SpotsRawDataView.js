@@ -11,18 +11,32 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
 const SpotsRawDataView = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const project = useSelector(state => state.project.project);
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
 
+  const toast = useRef(null);
+
   const [dataJson, setDataJson] = useState({});
 
-  const toast = useRef(null);
+  /* Side Effects */
 
   useEffect(() => {
     console.log('Selected Spots', selectedSpots);
     buildObject();
   }, [selectedSpots]);
+
+  /* Event Handlers */
+
+  const onClipboardPress = () => {
+    Clipboard.setString(JSON.stringify(selectedSpots));
+    toast.current.show('Copied to clipboard', {data: {title: 'noWifi', message: 'hello'}});
+  };
+
+  /* Logic Helpers */
 
   const buildObject = () => {
     const filteredDataJson = {
@@ -37,10 +51,7 @@ const SpotsRawDataView = () => {
     dispatch(setModalVisible({modal: null}));
   };
 
-  const onClipboardPress = () => {
-    Clipboard.setString(JSON.stringify(selectedSpots));
-    toast.current.show('Copied to clipboard', {data: {title: 'noWifi', message: 'hello'}});
-  };
+  /* View */
 
   return (
     <ModalWrapper

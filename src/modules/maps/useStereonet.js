@@ -6,6 +6,8 @@ import alert from '../../shared/ui/alert';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measurements/measurements.constants';
 
 const useStereonet = () => {
+  /* Data Hooks / State */
+
   const userName = useSelector(state => state.user?.name);
 
   /* Internal Functions */

@@ -12,6 +12,8 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const usePetrology = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const {getLabel, getLabels, getSurvey, showErrors} = useForm();

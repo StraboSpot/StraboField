@@ -28,18 +28,25 @@ import PageHeader from '../page/PageHeader';
 const StratSectionPage = ({isReadOnly, page}) => {
   // console.log('Rendering StratSectionPage...');
 
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [selectedImage, setSelectedImage] = useState(undefined);
-
-  const stratSectionRef = useRef(null);
 
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
 
+  const stratSectionRef = useRef(null);
+
+  const [selectedImage, setSelectedImage] = useState(undefined);
+
+  /* Derived Variables */
+
   const stratSection = spot.properties?.sed?.strat_section || {};
+
+  /* Logic Helpers */
 
   const getImageLabel = (id) => {
     const index = spot.properties.images.findIndex(i => id === i.id);
@@ -57,6 +64,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
       console.log('Error saving strat section', e);
     }
   };
+
+  /* Render Functions */
 
   const renderImageItem = (image) => {
     return (
@@ -190,6 +199,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

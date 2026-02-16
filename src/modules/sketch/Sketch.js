@@ -8,7 +8,11 @@ import alert from '../../shared/ui/alert';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
+  /* Data Hooks / State */
+
   const {getLocalImageURI, saveFile} = useImages();
+
+  /* Logic Helpers */
 
   const saveSketch = async (success, path) => {
     try {
@@ -40,6 +44,8 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
       );
     }
   };
+
+  /* View */
 
   return (
     <View style={styles.container}>

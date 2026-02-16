@@ -5,9 +5,9 @@ import {isEmpty, isEqualUnordered} from '../../shared/Helpers';
 import {useSpots} from '../spots';
 
 const useMapFeatures = () => {
-  const dispatch = useDispatch();
+  /* Data Hooks / State */
 
-  const {getMappableSpots} = useSpots();
+  const dispatch = useDispatch();
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
@@ -15,6 +15,8 @@ const useMapFeatures = () => {
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  const {getMappableSpots} = useSpots();
 
   /* Internal Functions */
 

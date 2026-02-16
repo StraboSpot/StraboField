@@ -7,30 +7,35 @@ import {updatedProject} from './projects.slice';
 import alert from '../../shared/ui/alert';
 import {Form, useForm} from '../form';
 
+const formName = ['general', 'project_description'];
+let timeout;
+
 const ProjectDescription = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const project = useSelector(state => state.project.project);
 
   const {getLabel, hasErrors, validateForm} = useForm();
 
   const descriptionFormRef = useRef(null);
-  let timeout;
 
-  const formName = ['general', 'project_description'];
+  /* Derived Variables */
+
   const projectDescription = {
     ...project.description,
     gps_datum: project.description?.gps_datum || 'WGS84 (Default)',
     magnetic_declination: project.description?.magnetic_declination || 0,
   };
 
+  /* Side Effects */
+
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
 
-  const doCleanup = () => {
-    if (hasErrors(descriptionFormRef.current)) showErrors(descriptionFormRef.current);
-    else if (descriptionFormRef.current?.dirty) saveForm(descriptionFormRef.current);
-  };
+  /* Event Handlers */
 
   const onMyChange = async (name, value) => {
     await descriptionFormRef.current.setFieldValue(name, value);
@@ -42,6 +47,13 @@ const ProjectDescription = () => {
       const updatedValues = {...descriptionFormRef.current.values, [name]: value};
       if (!hasErrors(descriptionFormRef.current)) await saveForm(descriptionFormRef.current, updatedValues);
     }, 2000);
+  };
+
+  /* Logic Helpers */
+
+  const doCleanup = () => {
+    if (hasErrors(descriptionFormRef.current)) showErrors(descriptionFormRef.current);
+    else if (descriptionFormRef.current?.dirty) saveForm(descriptionFormRef.current);
   };
 
   const saveForm = async (descriptionCurrent) => {
@@ -57,6 +69,8 @@ const ProjectDescription = () => {
     alert('Project Description Errors!', 'Changes in the following fields were not saved.'
       + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
   };
+
+  /* View */
 
   return (
     <Formik

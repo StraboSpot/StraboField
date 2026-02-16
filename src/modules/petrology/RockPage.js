@@ -24,22 +24,23 @@ import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const RockPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getSurvey} = useForm();
   const {getSpotById, getSpotsWithKey} = useSpots();
 
+  const preFormRef = useRef(null);
+
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedRock, setSelectedRock] = useState({});
   const [spotsWithRockType, setSpotsWithRockType] = useState([]);
 
-  const preFormRef = useRef(null);
-
-  const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
-  const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
-  const rockData = spot.properties[groupKey] || {};
+  /* Derived Variables */
 
   const IGNEOUS_SECTIONS = {
     PLUTONIC: {title: 'Plutonic Rocks', key: IGNEOUS_ROCK_CLASSES.PLUTONIC},
@@ -65,11 +66,16 @@ const RockPage = ({isReadOnly, page}) => {
     FAULT: {title: 'Fault & Shear Zone Rocks', key: PAGE_KEYS.ROCK_TYPE_FAULT},
   };
 
+  const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
+  const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
   const pageSections = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTIONS
     : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTIONS
       : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTIONS
         : pageKey === PAGE_KEYS.ROCK_TYPE_FAULT ? FAULT_SECTIONS
           : SEDIMENTARY_SECTIONS;
+  const rockData = spot.properties[groupKey] || {};
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE RockPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -80,6 +86,8 @@ const RockPage = ({isReadOnly, page}) => {
     }
     getSpotsWithRockType();
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const addRock = (sectionKey) => {
     let newRock = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: sectionKey}
@@ -161,6 +169,8 @@ const RockPage = ({isReadOnly, page}) => {
       && (s.properties[groupKey]
         && (s.properties[groupKey].rock_type?.includes(pageKey) || s.properties[groupKey][pageKey]))));
   };
+
+  /* Render Functions */
 
   const renderCopySelect = () => {
     // Sort reverse chronologically
@@ -264,6 +274,8 @@ const RockPage = ({isReadOnly, page}) => {
       />
     );
   };
+
+  /* View */
 
   return isDetailView ? renderRockDetail() : renderRockMain();
 };

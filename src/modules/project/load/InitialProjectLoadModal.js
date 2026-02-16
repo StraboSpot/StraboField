@@ -21,15 +21,20 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');
 
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
-  const statusMessageModalTitle = useSelector(state => state.home.statusMessageModalTitle);
+
   const isOnline = useSelector(state => state.connections.isOnline);
+  const statusMessageModalTitle = useSelector(state => state.home.statusMessageModalTitle);
   const user = useSelector(state => state.user);
+
+  const {clearUser} = useResetState();
 
   const [displayName, setDisplayName] = useState('');
   const [visibleInitialSection, setVisibleInitialSection] = useState('none');
 
-  const {clearUser} = useResetState();
+  /* Side Effects */
 
   useEffect(() => {
     setDisplayName(displayFirstName);
@@ -44,17 +49,7 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
     dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
   }, [isOnline]);
 
-  const displayFirstName = () => {
-    if (user.name && !isEmpty(user.name)) return user.name.split(' ')[0];
-    else return 'Guest';
-  };
-
-  const goBackToMain = () => {
-    if (visibleInitialSection !== 'none') {
-      setVisibleInitialSection('none');
-      dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
-    }
-  };
+  /* Event Handlers */
 
   const handleOnPress = (type) => {
     switch (type) {
@@ -78,6 +73,22 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
         dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
     }
   };
+
+  /* Logic Helpers */
+
+  const displayFirstName = () => {
+    if (user.name && !isEmpty(user.name)) return user.name.split(' ')[0];
+    else return 'Guest';
+  };
+
+  const goBackToMain = () => {
+    if (visibleInitialSection !== 'none') {
+      setVisibleInitialSection('none');
+      dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
+    }
+  };
+
+  /* Render Functions */
 
   const renderBackButton = () => {
     return (
@@ -162,6 +173,8 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
       </View>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

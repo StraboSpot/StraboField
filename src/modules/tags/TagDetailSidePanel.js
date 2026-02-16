@@ -15,15 +15,22 @@ import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 import {TagDetail, TagDetailModal} from '../tags';
 
 const TagDetailSidePanel = ({openNotebookPanel}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const [isColorPickerModalVisible, setIsColorPickerModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
+  /* Derived Variables */
+
   const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
     : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
   const colorLabel = label === MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS ? 'Unit' : label.slice(0, -1);
+
+  /* Logic Helpers */
 
   const closeDetailModal = () => setIsDetailModalVisible(false);
 
@@ -32,6 +39,8 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
     dispatch(setSelectedAttributes([feature]));
     openNotebookPanel(featureType);
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

@@ -13,11 +13,28 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const BasicOverviewList = ({page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Derived Variables */
 
   const isPet = PET_PAGES.find(p => p.key === page.key);
   const isSed = SED_PAGES.find(p => p.key === page.key);
+
+  /* Event Handlers */
+
+  const onItemPressed = (item, i) => {
+    if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
+      addIdForSS1ImportedSedData(item, i);
+    }
+    else dispatch(setSelectedAttributes([item]));
+    dispatch(setNotebookPageVisible(page.key));
+  };
+
+  /* Logic Helpers */
 
   const addIdForSS1ImportedSedData = (item, i) => {
     let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
@@ -49,13 +66,7 @@ const BasicOverviewList = ({page}) => {
     return data;
   };
 
-  const onItemPressed = (item, i) => {
-    if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
-      addIdForSS1ImportedSedData(item, i);
-    }
-    else dispatch(setSelectedAttributes([item]));
-    dispatch(setNotebookPageVisible(page.key));
-  };
+  /* View */
 
   return (
     <FlatList

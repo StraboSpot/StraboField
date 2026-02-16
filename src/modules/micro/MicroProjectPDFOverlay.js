@@ -14,18 +14,25 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
+  /* Data Hooks / State */
+
   const {exportMicroProjectPDF} = useDevice();
+
   // const toast = useToast();
   const toastRef = useRef(null);
 
-  const [wasExported, setWasExported] = useState(false);
   const [isExportError, setIsExportError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [wasExported, setWasExported] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     setWasExported(false);
     setIsExportError(false);
   }, [visible]);
+
+  /* Event Handlers */
 
   const handleExport = async () => {
     try {
@@ -44,6 +51,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
     }
   };
 
+  /* Logic Helpers */
+
   const showToast = (message, type) => {
     const toastOptions = {
       type: type,
@@ -54,6 +63,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
     if (Platform.OS === 'web') alert(message);
     else toastRef.current.show(message, toastOptions);
   };
+
+  /* View */
 
   return (
     <ModalWrapper

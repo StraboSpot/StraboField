@@ -8,7 +8,11 @@ import {useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/Helpers';
 
 const MacrostratMarkerLayer = ({location}) => {
+  /* Data Hooks / State */
+
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  /* Logic Helpers */
 
   const setCoords = () => {
     if (!isEmpty(selectedSpot) && selectedSpot.geometry.type === 'Point') {
@@ -16,6 +20,8 @@ const MacrostratMarkerLayer = ({location}) => {
     }
     return location.coords;
   };
+
+  /* View */
 
   return (
     <PointAnnotation coordinate={setCoords()} id={'marker'}>

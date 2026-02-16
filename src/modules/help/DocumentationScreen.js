@@ -9,15 +9,20 @@ import {isEmpty, openUrl} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 
 const DocumentationScreen = ({route, navigation}) => {
-  const {document} = route.params;
+  /* Data Hooks / State */
+
   const ref = useRef(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const goBack = () => {
-    navigation.goBack();
-  };
+  /* Derived Variables */
+
+  const {document} = route.params;
+
+  /* Logic Helpers */
+
+  const goBack = () => navigation.goBack();
 
   const openLink = async (url) => {
     try {
@@ -28,6 +33,8 @@ const DocumentationScreen = ({route, navigation}) => {
       alert(error.message);
     }
   };
+
+  /* View */
 
   return (
     <View style={documentationStyles.viewerContainer}>

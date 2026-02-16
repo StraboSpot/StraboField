@@ -13,22 +13,25 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
 import {useTags} from '../tags';
 
+let formName = ['project', 'tags'];
+let initialValues;
+
 const TagDetailModal = ({closeModal}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
-  const selectedTag = useSelector(state => state.project.selectedTag);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {deleteTag, saveTag} = useTags();
   const {validateForm, showErrors} = useForm();
+  const {deleteTag, saveTag} = useTags();
 
   const formRef = useRef(null);
 
-  const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
-
-  let formName = ['project', 'tags'];
-  let initialValues;
+  /* Derived Variables */
   if (modalVisible) {
     let tagType = 'concept';
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
@@ -42,6 +45,10 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
+
+  const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+
+  /* Logic Helpers */
 
   const confirmDeleteTag = () => {
     alert(
@@ -87,6 +94,8 @@ const TagDetailModal = ({closeModal}) => {
       console.log('Error saving tag data', e);
     }
   };
+
+  /* View */
 
   return (
     <ModalWrapper

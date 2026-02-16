@@ -9,16 +9,19 @@ import useDevice from '../../services/useDevice';
 import {addedStatusMessage, removedLastStatusMessage} from '../home/home.slice';
 
 const useMicroZips = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const user = useSelector(state => state.user);
+
+  const {deleteFromDevice} = useDevice();
+  const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
 
   const [isLoadingWave, setIsLoadingWave] = useState(false);
   const [percentDone, setPercentDone] = useState(0);
   const [showComplete, setShowComplete] = useState(false);
   const [showLoadingBar, setShowLoadingBar] = useState(false);
-
-  const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
-  const {deleteFromDevice} = useDevice();
 
   /* Internal Functions */
 

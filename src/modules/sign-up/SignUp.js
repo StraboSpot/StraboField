@@ -14,50 +14,52 @@ import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SplashScreen from '../splash-screen/SplashScreen';
 
+const initialState = {
+  firstName: {
+    value: '',
+    valid: false,
+    validationRules: {
+      notEmpty: false,
+    },
+    touched: false,
+  },
+  lastName: {
+    value: '',
+    valid: false,
+    validationRules: {
+      notEmpty: false,
+    },
+    touched: false,
+  },
+  password: {
+    value: '',
+    valid: false,
+    validationRules: {
+      characterValidator: false,
+    },
+    touched: false,
+    showPassword: false,
+  },
+  confirmPassword: {
+    value: '',
+    valid: false,
+    validationRules: {
+      equalTo: 'password',
+    },
+    touched: false,
+  },
+  email: {
+    value: '',
+    valid: false,
+    validationRules: {
+      isEmail: true,
+    },
+    touched: false,
+  },
+};
+
 const SignUp = ({navigation}) => {
-  const initialState = {
-    firstName: {
-      value: '',
-      valid: false,
-      validationRules: {
-        notEmpty: false,
-      },
-      touched: false,
-    },
-    lastName: {
-      value: '',
-      valid: false,
-      validationRules: {
-        notEmpty: false,
-      },
-      touched: false,
-    },
-    password: {
-      value: '',
-      valid: false,
-      validationRules: {
-        characterValidator: false,
-      },
-      touched: false,
-      showPassword: false,
-    },
-    confirmPassword: {
-      value: '',
-      valid: false,
-      validationRules: {
-        equalTo: 'password',
-      },
-      touched: false,
-    },
-    email: {
-      value: '',
-      valid: false,
-      validationRules: {
-        isEmail: true,
-      },
-      touched: false,
-    },
-  };
+  /* Data Hooks / State */
 
   const isOnline = useSelector(state => state.connections.isOnline);
 
@@ -65,43 +67,12 @@ const SignUp = ({navigation}) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [statusDialog, setStatusDialog] = useState(false);
-  const [statusMessage, setStatusMessage] = useState(null);
   const [statusDialogTitle, setStatusDialogTitle] = useState(null);
+  const [statusMessage, setStatusMessage] = useState(null);
   const [statusType, setStatusType] = useState('info'); // 'success', 'error', 'info'
   const [userData, setUserData] = useState(initialState);
 
-  // Helper function to format success messages
-  const formatMessage = (message, isSuccess = false) => {
-    if (isSuccess) {
-      return message;
-    }
-
-    // Check if it looks like validation errors (contains "cannot be blank" or similar patterns)
-    if (message.includes('cannot be blank') || message.includes('is invalid') || message.includes('must')) {
-      return parseValidationErrors(message);
-    }
-
-    // For other messages, just clean up the formatting
-    return message.replace(/\./g, '.\n');
-  };
-
-  const getModalStyles = () => {
-    // You can customize modal appearance based on status type
-    switch (statusType) {
-      case 'success':
-        return {
-          headerStyle: {backgroundColor: '#d4edda'},
-          titleStyle: {color: '#155724'},
-        };
-      case 'error':
-        return {
-          headerStyle: {backgroundColor: '#f8d7da'},
-          titleStyle: {color: '#721c24'},
-        };
-      default:
-        return {};
-    }
-  };
+  /* Event Handlers */
 
   const onChangeText = (key, value) => {
     let connectedValue = {};
@@ -137,6 +108,41 @@ const SignUp = ({navigation}) => {
         touched: true,
       },
     }));
+  };
+
+  /* Logic Helpers */
+
+  // Helper function to format success messages
+  const formatMessage = (message, isSuccess = false) => {
+    if (isSuccess) {
+      return message;
+    }
+
+    // Check if it looks like validation errors (contains "cannot be blank" or similar patterns)
+    if (message.includes('cannot be blank') || message.includes('is invalid') || message.includes('must')) {
+      return parseValidationErrors(message);
+    }
+
+    // For other messages, just clean up the formatting
+    return message.replace(/\./g, '.\n');
+  };
+
+  const getModalStyles = () => {
+    // You can customize modal appearance based on status type
+    switch (statusType) {
+      case 'success':
+        return {
+          headerStyle: {backgroundColor: '#d4edda'},
+          titleStyle: {color: '#155724'},
+        };
+      case 'error':
+        return {
+          headerStyle: {backgroundColor: '#f8d7da'},
+          titleStyle: {color: '#721c24'},
+        };
+      default:
+        return {};
+    }
   };
 
   // Helper function to parse validation errors
@@ -193,6 +199,8 @@ const SignUp = ({navigation}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderButtons = () => {
     return (
       <>
@@ -209,6 +217,8 @@ const SignUp = ({navigation}) => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

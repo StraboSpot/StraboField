@@ -8,29 +8,36 @@ import compassStyles from '../compass/compass.styles';
 import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 
+const groupKey = 'measurement';
+
+// Relevant keys for quick-entry modal
+const labelKey = 'label';
+const planarKeys = ['strike', 'dip_direction', 'dip'];
+const linearKeys = ['trend', 'plunge', 'rake'];
+const qualityKey = 'quality';
+
+const planarFormName = [groupKey, MEASUREMENT_KEYS.PLANAR];
+const linearFormName = [groupKey, MEASUREMENT_KEYS.LINEAR];
+
 const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
+  /* Data Hooks / State */
+
   const {doMeasurementCalculations} = useCompassCalculations();
   const {getSurvey} = useForm();
 
   const [sliderValue, setSliderValue] = useState(6);
 
-  const groupKey = 'measurement';
-
-  // Relevant keys for quick-entry modal
-  const labelKey = 'label';
-  const planarKeys = ['strike', 'dip_direction', 'dip'];
-  const linearKeys = ['trend', 'plunge', 'rake'];
-  const qualityKey = 'quality';
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const planarFormName = [groupKey, MEASUREMENT_KEYS.PLANAR];
   const planarSurvey = getSurvey(planarFormName);
   const planarKeysFields = planarKeys.map(k => planarSurvey.find(f => f.name === k));
-  const linearFormName = [groupKey, MEASUREMENT_KEYS.LINEAR];
   const linearSurvey = getSurvey(linearFormName);
   const linearKeysFields = linearKeys.map(k => linearSurvey.find(f => f.name === k));
 
   const labelField = planarSurvey.find(f => f.name === labelKey);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddManualMeasurements [sliderValue]', sliderValue);
@@ -51,6 +58,8 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
     }
     else formRefCurrent.setFieldValue(name, value);
   };
+
+  /* View */
 
   return (
     <>

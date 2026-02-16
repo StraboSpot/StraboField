@@ -6,6 +6,8 @@ import {useForm} from '../../form';
 import {useSpots} from '../../spots';
 
 const useStratSection = () => {
+  /* Data Hooks / State */
+
   const {getSurvey} = useForm();
   const {deleteSpot, getSpotWithThisStratSection} = useSpots();
   const {calculateIntervalGeometry, moveSpotsUpOrDownByPixels} = useStratSectionCalculations();

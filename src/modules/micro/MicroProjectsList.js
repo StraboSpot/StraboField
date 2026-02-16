@@ -19,6 +19,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
 const MicroProjectsList = () => {
+  /* Data Hooks / State */
+
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
 
@@ -33,14 +35,9 @@ const MicroProjectsList = () => {
 
   const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
   const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
-  const {
-    clearStatus,
-    downloadZip,
-    isLoadingWave,
-    percentDone,
-    showComplete,
-    showLoadingBar,
-  } = useMicroZips();
+  const {clearStatus, downloadZip, isLoadingWave, percentDone, showComplete, showLoadingBar} = useMicroZips();
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ProjectList');
@@ -53,6 +50,8 @@ const MicroProjectsList = () => {
     console.log('UE ProjectList [showComplete, isConnected, isInternetReachable]');
     getAllMicroProjects().then(() => console.log('OK got projects'));
   }, [showComplete, isConnected, isInternetReachable]);
+
+  /* Logic Helpers */
 
   const checkForMicroProject = async (item, i) => {
     if (!projectsExistsArr[i] || (isConnected && isInternetReachable && projectsUpdateAvailableArr[i])) {
@@ -131,6 +130,8 @@ const MicroProjectsList = () => {
     setLoading(false);
   };
 
+  /* Render Functions */
+
   const renderMicroProjectItem = (item, i) => {
     const modifiedTimeAndDate = moment.unix(item.modifiedtimestamp / 1000).format('MMM Do YYYY, h:mm a');
     return (
@@ -181,6 +182,8 @@ const MicroProjectsList = () => {
       );
     }
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

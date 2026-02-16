@@ -20,26 +20,43 @@ import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const UserProfile = () => {
-  const formRef = useRef(null);
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
+
   const isOnline = useSelector(state => state.connections.isOnline);
-  const userData = useSelector(state => state.user);
   const spots = useSelector(state => state.spot.spots);
+  const userData = useSelector(state => state.user);
 
   const [isDownloading, setIsDownloading] = useState(false);
 
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {uploadProfile} = useUpload();
   const toast = useToast();
+  const {uploadProfile} = useUpload();
+
+  const formRef = useRef(null);
+  
+  /* Derived Variables */
 
   const formName = ['general', 'user_conventions'];
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
+
+  /* Event Handlers */
+
+  const onDownloadUserProfile = async () => {
+    setIsDownloading(true);
+    await downloadUserProfile();
+    setIsDownloading(false);
+  };
+
+  /* Logic Helpers */
 
   const convertStrikeDipDirection = () => {
     if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
@@ -97,12 +114,6 @@ const UserProfile = () => {
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
 
-  const onDownloadUserProfile = async () => {
-    setIsDownloading(true);
-    await downloadUserProfile();
-    setIsDownloading(false);
-  };
-
   const saveForm = async () => {
     try {
       const formCurrent = formRef.current;
@@ -124,6 +135,8 @@ const UserProfile = () => {
     }
   };
 
+  /* Render Functions */
+
   const renderBulkUpdatesSection = () => {
     return (
       <>
@@ -141,6 +154,8 @@ const UserProfile = () => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

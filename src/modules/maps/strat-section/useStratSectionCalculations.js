@@ -8,15 +8,18 @@ import useSedValidation from '../../sed/useSedValidation';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedOrCreatedSpots} from '../../spots/spots.slice';
 
+const xInterval = 10;  // Horizontal spacing between grain sizes/weathering tick marks
+const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+
 const useStratSectionCalculations = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
   const {getBasicLithologyIndex, getSiliciclasticGrainSize} = useSedValidation();
-
-  const xInterval = 10;  // Horizontal spacing between grain sizes/weathering tick marks
-  const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+  const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
 
   /* Internal Functions */
 

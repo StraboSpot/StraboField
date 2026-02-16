@@ -10,11 +10,18 @@ import {useSpots} from '../spots';
 import {TagsListItem, useTags} from '../tags';
 
 const FeatureTagsAtSpotList = ({openMainMenuPanel, page}) => {
-  const {getGeologicUnitFeatureTagsAtSpot, getNonGeologicUnitFeatureTagsAtSpot} = useTags();
-  const {getAllFeaturesFromSpot} = useSpots();
+  /* Data Hooks / State */
+
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  const {getAllFeaturesFromSpot} = useSpots();
+  const {getGeologicUnitFeatureTagsAtSpot, getNonGeologicUnitFeatureTagsAtSpot} = useTags();
+
+  /* Derived Variables */
+
   const listEmptyText = page.key === PAGE_KEYS.GEOLOGIC_UNITS ? 'No Geologic Units' : 'No Tags';
+
+  /* Logic Helpers */
 
   const getFeatureTagsAtSpot = () => {
     let featuresAtSpot = getAllFeaturesFromSpot(selectedSpot);
@@ -22,9 +29,13 @@ const FeatureTagsAtSpotList = ({openMainMenuPanel, page}) => {
       : getNonGeologicUnitFeatureTagsAtSpot(featuresAtSpot);
   };
 
+  /* Render Functions */
+
   const renderTag = (tag) => {
     return <TagsListItem isChevronVisible openMainMenuPanel={openMainMenuPanel} tag={tag}/>;
   };
+
+  /* View */
 
   return (
     <FlatList

@@ -18,17 +18,22 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const AddEarthquakeModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-
-  const formRef = useRef(null);
   const {getChoices, getRelevantFields, getSurvey, isRelevant, showErrors, validateForm} = useForm();
 
+  const formRef = useRef(null);
+
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [isFaultOrientationModalVisible, setIsFaultOrientationModalVisible] = useState(false);
   const [isVectorMeasurementModalVisible, setIsVectorMeasurementModalVisible] = useState(false);
   const [measurementsGroupField, setMeasurementsGroupField] = useState({});
+
+  /* Derived Variables */
 
   const groupKey = 'general';
   const pageKey = PAGE_KEYS.EARTHQUAKES;
@@ -68,10 +73,14 @@ const AddEarthquakeModal = () => {
   const choices = getChoices(formName);
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
+  /* Side Effects */
+
   useEffect(() => {
     console.log('UE AddEarthquakeModal []');
     return () => dispatch(setModalValues({}));
   }, []);
+
+  /* Logic Helpers */
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
@@ -92,6 +101,8 @@ const AddEarthquakeModal = () => {
       console.log('Error submitting form', err);
     }
   };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     const mainButtonsKeysRelevant1 = mainButtonsKeys1.filter((k) => {
@@ -208,6 +219,8 @@ const AddEarthquakeModal = () => {
       <Form {...{formName: [groupKey, pageKey], surveyFragment: relevantFields, ...formProps}}/>
     );
   };
+
+  /* View */
 
   return renderNotebookEarthquakeModal();
 };

@@ -13,21 +13,25 @@ import {setIsImageTransferring} from '../modules/project/projects.slice';
 import {isEmpty} from '../shared/Helpers';
 
 const useUploadImages = () => {
-  // const imagesToUpload = [];
-  const tempImagesDownsizedDirectory = APP_DIRECTORIES.APP_DIR + '/TempImages';
+  /* Data Hooks / State */
+
+  const dispatch = useDispatch();
+
+  const spots = useSelector(state => state.spot.spots);
+  const user = useSelector(state => state.user);
 
   const {deleteTempImagesFolder, doesDeviceDirExist, makeDirectory} = useDevice();
   const {getAllImages, getImageHeightAndWidth, getLocalImageURI} = useImages();
   const {uploadImage, verifyImagesExistence} = useServerRequests();
 
-  const dispatch = useDispatch();
-  const user = useSelector(state => state.user);
-  const spots = useSelector(state => state.spot.spots);
-
   const [currentImage, setCurrentImage] = useState('');
   const [currentImageStatus, setCurrentImageStatus] = useState({success: 0, failed: 0});
-  const [totalImages, setTotalImages] = useState(0);
   const [imageUploadStatusMessage, setImageUploadStatusMessage] = useState('');
+  const [totalImages, setTotalImages] = useState(0);
+
+  /* Derived Variables */
+
+  const tempImagesDownsizedDirectory = APP_DIRECTORIES.APP_DIR + '/TempImages';
 
   /* Internal Functions */
 

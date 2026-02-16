@@ -13,19 +13,27 @@ import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
 const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
-  const firstDividerText = pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units';
+  /* Derived Variables */
 
   const pageVisible = pagesStack.slice(-1)[0];
+  const firstDividerText = pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units';
+
+  /* Logic Helpers */
 
   const closeTagDetailModal = () => {
     setIsDetailModalVisible(false);
     dispatch(addedTagToSelectedSpot(false));
   };
+
+  /* View */
 
   return (
     <>
@@ -47,7 +55,7 @@ const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
                   onPress={() => dispatch(setModalVisible({modal: pageVisible}))}
                 />
               )}
-              <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
+            <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
           </>
         }
       />

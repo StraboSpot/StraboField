@@ -2,6 +2,8 @@ import useStratSection from './useStratSection';
 import useSedValidation from '../../sed/useSedValidation';
 
 const useStratSectionSymbology = () => {
+  /* Data Hooks / State */
+
   const {getSiliciclasticGrainSize} = useSedValidation();
   const {getStratSectionSettings} = useStratSection();
 

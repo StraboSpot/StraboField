@@ -27,7 +27,10 @@ import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap}
 import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
@@ -37,10 +40,10 @@ const useProject = () => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const user = useSelector(state => state.user);
 
-  const toast = useToast();
   const {doesDeviceBackupDirExist, readDirectory} = useDevice();
   const {clearProject} = useResetState();
   const {getMyProjects} = useServerRequests();
+  const toast = useToast();
 
   /* Internal Functions */
 

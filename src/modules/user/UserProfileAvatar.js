@@ -12,13 +12,17 @@ import {isEmpty} from '../../shared/Helpers';
 import {AvatarAccessoryWrapper, AvatarWrapper} from '../../shared/ui/avatars';
 
 const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage, size, tempUserProfileImageURI}) => {
-  const isOnline = useSelector(state => state.connections.isOnline);
-  const imageURI = useSelector(state => state.user?.image);
+  /* Data Hooks / State */
 
-  const {getInitials} = useUserProfile();
+  const imageURI = useSelector(state => state.user?.image);
+  const isOnline = useSelector(state => state.connections.isOnline);
+
   const {doesFileExist} = useDevice();
+  const {getInitials} = useUserProfile();
 
   const [source, setSource] = useState(defaultAvatar);
+
+  /* Side Effects */
 
   useEffect(() => {
     getAvatarSource();
@@ -41,6 +45,8 @@ const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage
       else setSource(defaultAvatar);
     }
   };
+
+  /* View */
 
   return (
     <AvatarWrapper

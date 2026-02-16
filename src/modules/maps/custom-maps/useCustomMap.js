@@ -19,7 +19,10 @@ import useMapCoords from '../useMapCoords';
 import useMapURL from '../useMapURL';
 
 const useCustomMap = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);

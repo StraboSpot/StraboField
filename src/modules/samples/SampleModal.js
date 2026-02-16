@@ -19,47 +19,51 @@ import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/pr
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 
+const formName = ['general', 'samples'];
+
+// Relevant keys for quick-entry modal
+const sampleTypeKey = ['sample_type', 'material_type'];
+const firstKeys = ['sample_id_name', 'label', 'sample_description'];
+const inplacenessKey = 'inplaceness_of_sample';
+const orientedKey = 'oriented_sample';
+const lastKeys = ['sample_notes'];
+
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
-
   const {getChoices, getRelevantFields, getSurvey} = useForm();
+  const {setPointAtCurrentLocation} = useMapLocation();
   const {checkSampleName, getNewSpotName} = useSpots();
   const toast = useToast();
-  const {setPointAtCurrentLocation} = useMapLocation();
-
-  const initialNamePrefix = preferences.sample_prefix || '';
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [namePostfix, setNamePostfix] = useState(null);
-  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
-  const [startingNumber, setStartingNumber] = useState(null);
-  const [currentForm, setCurrentForm] = useState(null);
 
   const formRef = useRef(null);
   const toastRef = useRef(null);
 
-  const formName = ['general', 'samples'];
+  const initialNamePrefix = preferences.sample_prefix || '';
 
-  // Relevant keys for quick-entry modal
-  const sampleTypeKey = ['sample_type', 'material_type'];
-  const firstKeys = ['sample_id_name', 'label', 'sample_description'];
-  const inplacenessKey = 'inplaceness_of_sample';
-  const orientedKey = 'oriented_sample';
-  const lastKeys = ['sample_notes'];
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [currentForm, setCurrentForm] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+  const [namePostfix, setNamePostfix] = useState(null);
+  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
+  const [startingNumber, setStartingNumber] = useState(null);
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const survey = getSurvey(formName);
   const choices = getChoices(formName);
-  const firstKeysFields = firstKeys.map(k =>
-    survey.find(f => f.name === k),
-  );
+  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE SampleModal []');
@@ -73,7 +77,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         : spot?.properties?.name;
       setNamePrefix(spotName + initialNamePrefix);
     }
-
     if (preferences.sample_postfix_letter) {
       let postfixLetter = 'a';
       if (spot?.properties?.samples && !isEmpty(spot?.properties?.samples)) {
@@ -99,16 +102,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     }
   }, [spot]);
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
-
-  const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
-      const formCurrent = formRef.current;
-      setCurrentForm(formCurrent);
-      setIsWarningModalVisible(true);
-    }
-    else closeModal();
-  };
+  /* Event Handlers */
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
@@ -124,6 +118,19 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       formRef.current?.setFieldValue(orientedKey, undefined);
     }
     else formRef.current?.setFieldValue(orientedKey, 'no');
+  };
+
+  /* Logic Helpers */
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
+  const confirmLeavePage = () => {
+    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      const formCurrent = formRef.current;
+      setCurrentForm(formCurrent);
+      setIsWarningModalVisible(true);
+    }
+    else closeModal();
   };
 
   const saveForm = async (currentForm) => {
@@ -192,6 +199,8 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       else toast.show(toastMsg, toastOptions);
     }
   };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     return (
@@ -275,6 +284,8 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
+
+  /* View */
 
   return (
     <ModalWrapper

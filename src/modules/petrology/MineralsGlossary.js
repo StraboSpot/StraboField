@@ -7,15 +7,23 @@ import * as themes from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 
 const MineralsGlossary = ({addMineral}) => {
+  /* Data Hooks / State */
+
   const [activeMineralInfo, setActiveMineralInfo] = useState({});
 
+  /* Derived Variables */
+
   const glossaryChunked = chunk(MINERAL_GLOSSARY_INFO, Math.ceil((MINERAL_GLOSSARY_INFO.length + 1) / 2));
+
+  /* Logic Helpers */
 
   function chunk(input, size) {
     return input.reduce((arr, item, idx) => {
       return idx % size === 0 ? [...arr, [item]] : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
     }, []);
   }
+
+  /* Render Functions */
 
   const renderMineralInfo = () => {
     return (
@@ -73,6 +81,8 @@ const MineralsGlossary = ({addMineral}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <FlatList ListHeaderComponent={

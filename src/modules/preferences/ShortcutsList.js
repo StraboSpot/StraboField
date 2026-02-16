@@ -13,12 +13,19 @@ import {setShortcutSwitchPositions} from '../home/home.slice';
 import {MODAL_KEYS, SHORTCUT_MODALS} from '../page/page.constants';
 
 const ShortcutsList = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
+
+  /* Logic Helpers */
 
   const toggleSwitch = (switchName) => {
     dispatch(setShortcutSwitchPositions({switchName: switchName}));
   };
+
+  /* Render Functions */
 
   const renderShortcutListItem = (toggleButton) => {
     if (Platform.OS !== 'web' || (Platform.OS === 'web' && toggleButton.key !== MODAL_KEYS.SHORTCUTS.PHOTO
@@ -40,6 +47,8 @@ const ShortcutsList = () => {
       );
     }
   };
+
+  /* View */
 
   return (
     <>

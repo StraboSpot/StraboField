@@ -5,22 +5,21 @@ import {BASIC_LITHOLOGIES_LABELS, CARBONATE_KEYS, GRAIN_SIZE_KEYS, LITHOLOGIES_K
 import {useForm} from '../../form';
 import useMapCoords from '../useMapCoords';
 
+const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
+const s = 20; // spacing between multiple x axes
+const xCa = 23.3; // Horizontal space between carbonate tick marks
+const xCl = 10;  // Horizontal spacing between clastic tick marks
+const xMi = 26.6; // Horizontal space between miscellaneous lithologies tick marks
+
 const useXAxis = (n) => {
+  /* Data Hooks / State */
+
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
   const {convertImagePixelsToLatLong} = useMapCoords();
 
-  const xCl = 10;  // Horizontal spacing between clastic tick marks
-  const xCa = 23.3; // Horizontal space between carbonate tick marks
-  const xMi = 26.6; // Horizontal space between miscellaneous lithologies tick marks
-  const s = 20; // spacing between multiple x axes
-
-  const lineString = {
-    type: 'Feature',
-    properties: {},
-    geometry: {type: 'LineString', coordinates: []},
-  };
+  /* Exported Variables */
 
   const getXAxis = () => {
     const xAxis = JSON.parse(JSON.stringify(lineString));

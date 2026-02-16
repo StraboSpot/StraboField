@@ -15,16 +15,16 @@ import useSafeDocumentPicker from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
-  const {checkPermission} = usePermissions();
-  const {handleError, safePick} = useSafeDocumentPicker();
+  /* Data Hooks / State */
 
   const dispatch = useDispatch();
 
+  const {checkPermission} = usePermissions();
+  const {handleError, safePick} = useSafeDocumentPicker();
   const {getImage, getProfileImageURL} = useServerRequests();
 
   /* Internal Functions */
 
-  // INTERNAL
   const createAppDirectory = async (directory) => {
     console.log('Creating directory...', directory);
     return RNFS.mkdir(directory)

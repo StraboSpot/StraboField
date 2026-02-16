@@ -14,22 +14,33 @@ import {useTags} from '../tags';
 
 const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
+
+  /* Data Hooks / State */
+
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {getPopulatedPagesKeys} = usePage();
   const {isSpotInReadOnlyDataset} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
+  /* Derived Variables */
+
   const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+
+  /* Event Handlers */
+
+  const handleCheckBoxPressed = () => {
+    return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
+  };
+
+  /* Logic Helpers */
 
   const getSpotDataIcons = () => {
     const populatedPagesKeys = getPopulatedPagesKeys(spot);
     return isReadOnly ? ['isReadOnly', ...populatedPagesKeys] : populatedPagesKeys;
   };
 
-  const handleCheckBoxPressed = () => {
-    return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
-  };
+  /* Render Functions */
 
   const renderCheckboxes = () => {
     return (
@@ -82,6 +93,8 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
     const tagsString = tags.map(tag => tag.name).sort().join(', ');
     return !isEmpty(tagsString) && <ListItem.Subtitle>{tagsString}</ListItem.Subtitle>;
   };
+
+  /* View */
 
   return (
     <ListItem

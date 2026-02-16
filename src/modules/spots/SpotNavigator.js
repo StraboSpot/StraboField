@@ -15,27 +15,33 @@ import {ImageGallery} from '../images';
 import {ReportsList} from '../reports';
 import Samples from '../samples/Samples';
 
+const pickerKeys = {SPOTS: 'spots', IMAGES: 'images', SAMPLES: 'samples', REPORTS: 'reports'};
+const pickerLabels = {
+  [pickerKeys.SPOTS]: 'SPOTS LISTS',
+  [pickerKeys.SAMPLES]: 'SAMPLES',
+  [pickerKeys.IMAGES]: 'IMAGE GALLERY',
+  [pickerKeys.REPORTS]: 'REPORTS',
+};
+
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {
   console.log('Rendering SpotsNavigator...');
+
+  /* Data Hooks / State */
 
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const pickerRef = useRef();
 
-  const pickerKeys = {SPOTS: 'spots', IMAGES: 'images', SAMPLES: 'samples', REPORTS: 'reports'};
   const [pickerKey, setPickerKey] = useState(pickerKeys.SPOTS);
 
-  const pickerLabels = {
-    [pickerKeys.SPOTS]: 'SPOTS LISTS',
-    [pickerKeys.SAMPLES]: 'SAMPLES',
-    [pickerKeys.IMAGES]: 'IMAGE GALLERY',
-    [pickerKeys.REPORTS]: 'REPORTS',
-  };
+  /* Logic Helpers */
 
   const openSpotInNotebookFromNavigator = (spot, notebookPage, attributes) => {
     closeSpotsNavigator();
     openSpotInNotebook(spot, notebookPage, attributes);
   };
+
+  /* View */
 
   return (
     <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR, flex: 1}}>

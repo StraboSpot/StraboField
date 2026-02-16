@@ -16,23 +16,27 @@ import {useSpots} from '../spots';
 import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 
 const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
+  /* Data Hooks / State */
+
+  const dispatch = useDispatch();
+
+  const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
+  const stratSection = useSelector(state => state.map.stratSection);
+
+  const {lockOrientation, unlockOrientation} = useDeviceOrientation();
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const {getTargetDatasetFromId} = useProject();
+  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
+  const toast = useToast();
+
   const [dialogs, setDialogs] = useState(
     {mapActionsMenuVisible: false, mapSymbolsMenuVisible: false, baseMapMenuVisible: false});
   const [distance, setDistance] = useState(0);
   const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
-  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
-  const {getTargetDatasetFromId} = useProject();
-  const {lockOrientation, unlockOrientation} = useDeviceOrientation();
-  const {setPointAtCurrentLocation} = useMapLocation();
-
-  const dispatch = useDispatch();
-  const toast = useToast();
-
-  const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
-  const stratSection = useSelector(state => state.map.stratSection);
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE Home [mapMode]', mapMode);
@@ -79,6 +83,29 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   /* Exported Functions */
+
+  const onCancel = async () => {
+    console.log('Cancel');
+    await cancelEdits();
+    dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
+  };
+
+  const onEndDrawPressed = async () => {
+    try {
+      dispatch(setLoadingStatus({view: 'home', bool: true}));
+      const newOrEditedSpot = await mapComponentRef.current?.endDraw();
+      setMapMode(MAP_MODES.VIEW);
+      if (!isEmpty(newOrEditedSpot) && (!selectingMode || selectingMode === 'tag')) {
+        openNotebookPanel(PAGE_KEYS.OVERVIEW);
+      }
+      setSelectingMode(null);
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+    }
+    catch (err) {
+      console.error('Error at endDraw', err);
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+    }
+  };
 
   const clickHandler = async (name, value) => {
     switch (name) {
@@ -169,29 +196,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const endMeasurement = () => setMapMode(MAP_MODES.VIEW);
-
-  const onCancel = async () => {
-    console.log('Cancel');
-    await cancelEdits();
-    dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
-  };
-
-  const onEndDrawPressed = async () => {
-    try {
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
-      const newOrEditedSpot = await mapComponentRef.current?.endDraw();
-      setMapMode(MAP_MODES.VIEW);
-      if (!isEmpty(newOrEditedSpot) && (!selectingMode || selectingMode === 'tag')) {
-        openNotebookPanel(PAGE_KEYS.OVERVIEW);
-      }
-      setSelectingMode(null);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-    }
-    catch (err) {
-      console.error('Error at endDraw', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-    }
-  };
 
   const setMapModeToEdit = () => {
     lockOrientation();

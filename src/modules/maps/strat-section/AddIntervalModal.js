@@ -18,12 +18,15 @@ import {updatedProject} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {setSelectedSpot} from '../../spots/spots.slice';
 
+const formName = ['sed', 'add_interval'];
+
 const AddIntervalModal = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
-
-  const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
@@ -33,9 +36,13 @@ const AddIntervalModal = () => {
   const formRef = useRef(null);
   const preFormRef = useRef(null);
 
-  const formName = ['sed', 'add_interval'];
+  const [intervalToCopy, setIntervalToCopy] = useState(null);
+
+  /* Derived Variables */
 
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+
+  /* Side Effects */
 
   useEffect(() => {
     const initialValues = {};
@@ -73,6 +80,8 @@ const AddIntervalModal = () => {
 
     formRef.current.setValues(initialValues);
   }, []);
+
+  /* Logic Helpers */
 
   const close = () => {
     dispatch(setModalValues({}));
@@ -190,6 +199,8 @@ const AddIntervalModal = () => {
     return errors;
   };
 
+  /* Render Functions */
+
   const renderAddIntervalFormFields = () => {
     return (
       <Formik
@@ -282,6 +293,8 @@ const AddIntervalModal = () => {
       </Formik>
     );
   };
+
+  /* View */
 
   return renderAddIntervalModal();
 };

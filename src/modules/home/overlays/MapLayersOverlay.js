@@ -19,7 +19,17 @@ import {BASEMAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
 
+const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
+
 const MapLayersOverlay = ({onTouchOutside, visible}) => {
+  /* Data Hooks / State */
+
+  const currentBasemap = useSelector(state => state.map.currentBasemap);
+  const customEndpoint = useSelector(state => state.connections.databaseEndpoint);
+  const customMaps = useSelector(state => state.map.customMaps);
+  const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+
   const {setCustomMapSwitchValue} = useCustomMap();
   const {setBasemap} = useMap();
   const {setOfflineMapTiles} = useMapsOffline();
@@ -27,24 +37,28 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   const [dialogTitle, setDialogTitle] = useState('Map Layers');
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
-  const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const customEndpoint = useSelector(state => state.connections.databaseEndpoint);
-  const customMaps = useSelector(state => state.map.customMaps);
-  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
-  const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
-
-  const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
+  /* Side Effects */
 
   useEffect(() => {
     if (customEndpoint.isSelected) setDialogTitle(`Map Layers - ${customEndpoint.endpoint}`);
   }, [customEndpoint.isSelected, customEndpoint.endpoint]);
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', ({window}) => {
-      setDimensions(window);
-    });
+    const subscription = Dimensions.addEventListener('change', ({window}) => setDimensions(window));
     return () => subscription?.remove();
   }, []);
+
+  /* Event Handlers */
+
+  const onSetBasemap = async (customMap) => {
+    if ((isInternetReachable && isConnected) || (!isInternetReachable && isConnected)) {
+      if (!customMap.url) await setOfflineMapTiles(customMap);
+      else await setBasemap(customMap.id);
+    }
+    else await setOfflineMapTiles(customMap);
+  };
+
+  /* Logic Helpers */
 
   const determineWhatCustomMapListToRender = () => {
     if (isInternetReachable && isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
@@ -65,18 +79,12 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const isValidSource = map => map.source === 'mapbox_styles' || map.source === 'strabospot_mymaps';
 
-  const onSetBasemap = async (customMap) => {
-    if ((isInternetReachable && isConnected) || (!isInternetReachable && isConnected)) {
-      if (!customMap.url) await setOfflineMapTiles(customMap);
-      else await setBasemap(customMap.id);
-    }
-    else await setOfflineMapTiles(customMap);
-  };
-
   const setMap = async (map) => {
     await setBasemap(map.id);
     SMALL_SCREEN && onTouchOutside();
   };
+
+  /* Render Functions */
 
   const renderCustomMapItem = (customMap) => {
     return (
@@ -297,6 +305,8 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

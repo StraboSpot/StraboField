@@ -16,14 +16,20 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
 import LogOut from '../user/LogOut';
 
+const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
+  : 'Downloads/StraboSpot2/Backups';
+
 const StraboFieldProjects = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
+
   const {openURL} = useDevice();
 
-  const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
-    : 'Downloads/StraboSpot2/Backups';
+  /* Event Handlers */
 
   const onDeleteLocalCopy = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_PROJECT}));
@@ -46,6 +52,8 @@ const StraboFieldProjects = () => {
   };
 
   const onStartNewProject = () => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.NEW_PROJECT}));
+
+  /* View */
 
   return (
     <>

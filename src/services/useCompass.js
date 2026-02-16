@@ -5,12 +5,15 @@ import useMapCoords from '../modules/maps/useMapCoords';
 import useMapLocation from '../modules/maps/useMapLocation';
 import {isEmpty, roundToDecimalPlaces} from '../shared/Helpers';
 
-const useCompass = () => {
-  let matrixArray = [];
+let matrixArray = [];
 
-  const {getCurrentLocation} = useMapLocation();
-  const {getCentroidOfSelectedSpot} = useMapCoords();
+const useCompass = () => {
+  /* Data Hooks / State */
+
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  const {getCentroidOfSelectedSpot} = useMapCoords();
+  const {getCurrentLocation} = useMapLocation();
 
   /* Internal Functions */
 

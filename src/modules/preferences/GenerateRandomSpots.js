@@ -13,13 +13,16 @@ import formStyles from '../form/form.styles';
 import useMapLocation from '../maps/useMapLocation';
 
 const GenerateRandomSpots = () => {
-  const toast = useToast();
-
-  const [numRandomSpots, setNumRandomSpots] = useState(100);
-  const [isSpotGeneratorVisible, setIsSpotGeneratorVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  /* Data Hooks / State */
 
   const {generateRandomsSpotsAroundCurrentLocation} = useMapLocation();
+  const toast = useToast();
+
+  const [isSpotGeneratorVisible, setIsSpotGeneratorVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [numRandomSpots, setNumRandomSpots] = useState(100);
+
+  /* Logic Helpers */
 
   const generateRandomSpots = async () => {
     const numRandomSpotsInt = parseInt(numRandomSpots, 10);
@@ -32,6 +35,8 @@ const GenerateRandomSpots = () => {
     }
     else alert('Error Generating Random Spots', 'The number of Spots must be an integer.');
   };
+
+  /* View */
 
   return (
     <>

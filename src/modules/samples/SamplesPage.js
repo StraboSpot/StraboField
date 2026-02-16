@@ -11,6 +11,8 @@ import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
 
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
@@ -18,6 +20,8 @@ const SamplesPage = ({isReadOnly, page}) => {
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedSample, setSelectedSample] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE SamplesPage []');
@@ -33,11 +37,15 @@ const SamplesPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const editSample = (sample) => {
     setIsDetailView(true);
     setSelectedSample(sample);
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderSamplesDetail = () => {
     return (
@@ -67,6 +75,8 @@ const SamplesPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

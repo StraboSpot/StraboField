@@ -14,13 +14,19 @@ import {
 } from '../home/home.slice';
 
 const useMap = () => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
 
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl} = useServerRequests();
+
+
+  /* Exported Functions */
 
   const getExtentAndZoomCall = (extentString, zoomLevel) => {
     let url = getTileBaseUrl();

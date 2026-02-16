@@ -5,11 +5,21 @@ import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 
 const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
+  /* Data Hooks / State */
+
   const [strikeSpinValue] = useState(new Animated.Value(0));
   const [trendSpinValue] = useState(new Animated.Value(0));
 
+  /* Derived Variables */
+
   const strike = compassData?.strike ?? 0;
+
+  // Interpolated angles
+  const strikeSpin = strikeSpinValue.interpolate({inputRange: [0, strike], outputRange: ['0deg', strike + 'deg']});
   const trend = compassData?.trend ?? 0;
+  const trendSpin = trendSpinValue.interpolate({inputRange: [0, trend], outputRange: ['0deg', trend + 'deg']});
+
+  /* Side Effects */
 
   // Animate STRIKE rotation
   useEffect(() => {
@@ -34,17 +44,6 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
       }).start();
     }
   }, [trend]);
-
-  // Interpolated angles
-  const strikeSpin = strikeSpinValue.interpolate({
-    inputRange: [0, strike],
-    outputRange: ['0deg', strike + 'deg'],
-  });
-
-  const trendSpin = trendSpinValue.interpolate({
-    inputRange: [0, trend],
-    outputRange: ['0deg', trend + 'deg'],
-  });
 
   const renderCompassSymbols = () => {
     const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
@@ -81,6 +80,8 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
       />
     );
   };
+
+  /* View */
 
   return (
     <View style={compassStyles.compassImageContainer}>

@@ -24,14 +24,27 @@ import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
 const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, openMainMenuPanel, zoomToSpots}) => {
+  /* Data Hooks / State */
+
   const dispatch = useDispatch();
+
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {getCurrentLocation} = useMapLocation();
+  const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
+  const toast = useToast();
 
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
 
-  const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
-  const {getCurrentLocation} = useMapLocation();
-  const toast = useToast();
+  /* Event Handlers */
+
+  const onSpotEdit = async (field, value) => {
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: field, value: value}));
+    await checkSpotName(value);
+  };
+
+  /* Logic Helpers */
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -107,12 +120,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     if (openMainMenuPanel) openMainMenuPanel();
   };
 
-  const onSpotEdit = async (field, value) => {
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: field, value: value}));
-    await checkSpotName(value);
-  };
-
   const setToCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();
     let editedSpot = JSON.parse(JSON.stringify(spot));
@@ -123,6 +130,8 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     dispatch(editedOrCreatedSpot(editedSpot));
     dispatch(setSelectedSpot(editedSpot));
   };
+
+  /* Render Functions */
 
   const renderCoordsText = () => {
     return (
@@ -159,6 +168,8 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>
