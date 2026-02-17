@@ -1,38 +1,12 @@
 import moment from 'moment';
 
+import {convertXLSFormLogicToJS, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {LABEL_DICTIONARY} from '../form';
 
 const useForm = () => {
-  /* Internal Functions */
-
-  const covertXLSFormLogicToJS = (logic) => {
-    logic = logic.replace(/not/g, '!');
-    logic = logic.replace(/selected\(\${(.*?)}, /g, 'values?.$1?.includes(');
-    logic = logic.replace(/\$/g, '');
-    logic = logic.replace(/{/g, 'values?.');
-    logic = logic.replace(/}/g, '');
-    logic = logic.replace(/''/g, 'undefined');
-    logic = logic.replace(/ = /g, ' == ');
-    logic = logic.replace(/ or /g, ' || ');
-    logic = logic.replace(/ and /g, ' && ');
-    return logic;
-  };
-
-  const isRequired = (field, values) => {
-    if (field.required === 'true' || field.required === true) return true;
-    else if (field.required === 'false' || field.required === false || isEmpty(field.required)) return false;
-    else {
-      const requiredLogicJS = covertXLSFormLogicToJS(field.required);
-      // console.log(field.name, 'required:', requiredLogicJS);
-
-      const F = new Function('values', 'return ' + requiredLogicJS);
-      return F(values);
-    }
-  };
-
   /* Exported Functions */
 
   // Return the choices object given the form category and name
@@ -121,7 +95,7 @@ const useForm = () => {
   const isRelevant = (field, values) => {
     //console.log('values', values);
     if (isEmpty(field.relevant)) return true;
-    const relevantLogicJS = covertXLSFormLogicToJS(field.relevant);
+    const relevantLogicJS = convertXLSFormLogicToJS(field.relevant);
     // console.log(field.name, 'relevant:', relevantLogicJS);
 
     const F = new Function('values', 'return ' + relevantLogicJS);

@@ -5,12 +5,11 @@ import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
+import {showFieldInfo} from './form.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
 
 const Form = ({
                 getIsDisabled,
@@ -24,9 +23,15 @@ const Form = ({
                 surveyFragment,
                 values,
               }) => {
+  /* Data Hooks */
+
   const {getChoices, getSurvey, isRelevant} = useForm();
 
+  /* Derived Variables */
+
   const survey = surveyFragment || getSurvey(formName);
+
+  /* Render Functions */
 
   const renderAcknowledgeInput = (field) => {
     return (
@@ -155,15 +160,6 @@ const Form = ({
         )}
       </>
     );
-  };
-
-  const showFieldInfo = (label, info) => {
-    if (label === 'Mineral Name Abbreviation') {
-      info += '\n\n';
-      const arr = Object.entries(LABELS_WITH_ABBREVIATIONS).map(([key, value]) => key + ': ' + value);
-      info += arr.join('\n');
-    }
-    alert(label, info);
   };
 
   return (
