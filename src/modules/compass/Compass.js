@@ -56,9 +56,10 @@ const Compass = ({
   const [showCompassRawDataView, setShowCompassRawDataView] = useState(false);
   // const [userDeclination, setUserDeclination] = useState('');
 
+  const CompassEvents = new NativeEventEmitter(CompassModule);
+
   /* Derived Variables */
 
-  const CompassEvents = new NativeEventEmitter(CompassModule);
   const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
 
   /* Side Effects */

@@ -12,14 +12,20 @@ import {BLACK} from '../../shared/styles.constants';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 
 const MainMenuPanelHeader = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isSideMenuVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
 
+  /* Derived Variables */
+
   const doShowSubheader = !Object.values(MAIN_MENU_ITEMS.ACCOUNT).includes(mainMenuPageVisible)
     && !Object.values(MAIN_MENU_ITEMS.APP_SETTINGS).includes(mainMenuPageVisible)
     && !Object.values(MAIN_MENU_ITEMS.HELP).includes(mainMenuPageVisible);
+
+  /* View */
 
   return (
     <View style={[mainMenuPanelStyles.mainMenuHeaderContainer, {paddingLeft: mainMenuPageVisible ? 0 : 10}]}>

@@ -6,8 +6,11 @@ import * as turf from '@turf/turf';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const EditLayers = ({editFeatureVertex}) => {
+  /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <MapboxGL.ShapeSource

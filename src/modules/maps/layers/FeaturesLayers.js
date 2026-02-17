@@ -14,11 +14,31 @@ import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
 
 const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
-  const [symbols, setSymbol] = useState({...MAP_SYMBOLS, ...STRAT_PATTERNS});
+  /* Data Hooks */
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
   const {isSpotInReadOnlyDataset} = useProject();
+
+  /* Local State */
+
+  const [symbols, setSymbol] = useState({...MAP_SYMBOLS, ...STRAT_PATTERNS});
+
+  /* Derived Variables */
+
+  // Selected point Spots need to be shown in the Unselected Features Layer
+  // so we have a point for the selected halo to be around
+  const features = [...featuresNotSelected, ...featuresSelected?.filter(spot => spot.geometry.type === 'Point') || []];
+
+  // If in Edit Mode split into Editiable and Read Only features
+  const featuresEditable = [];
+  const featuresReadOnly = [];
+  if (mapMode === MAP_MODES.EDIT) {
+    features.forEach((f) => {
+      if (isSpotInReadOnlyDataset(f.properties.id)) featuresReadOnly.push(f);
+      else featuresEditable.push(f);
+    });
+  }
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
   console.log('Getting Spots Not Selected as Features...');
@@ -30,21 +50,6 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   const spotsSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsSelected)));
   const featuresSelected = getSpotsAsFeatures(spotsSelectedWithSymbology);
   const featuresSelectedUniq = getUniqFeatures(featuresSelected);
-
-  // Selected point Spots need to be shown in the Unselected Features Layer
-  // so we have a point for the selected halo to be around
-  const features = [...featuresNotSelected, ...featuresSelected?.filter(
-    spot => spot.geometry.type === 'Point') || []];
-
-  // If in Edit Mode split into Editiable and Read Only features
-  const featuresReadOnly = [];
-  const featuresEditable = [];
-  if (mapMode === MAP_MODES.EDIT) {
-    features.forEach((f) => {
-      if (isSpotInReadOnlyDataset(f.properties.id)) featuresReadOnly.push(f);
-      else featuresEditable.push(f);
-    });
-  }
 
   /* View */
 

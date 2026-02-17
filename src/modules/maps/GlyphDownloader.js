@@ -18,8 +18,11 @@ import MapboxGL from '@rnmapbox/maps';
 import {GLYPH_CENTER_COORDINATE, GLYPH_TEXT_SHAPE} from './maps.constants';
 
 const GlyphDownloader = () => {
+  /* Logic Helpers */
 
   // initMapboxErrorHandling();
+
+  /* View */
 
   return (
     <MapboxGL.MapView

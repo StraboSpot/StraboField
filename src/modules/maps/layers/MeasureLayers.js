@@ -6,8 +6,11 @@ import * as turf from '@turf/turf';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const MeasureLayers = ({measureFeatures}) => {
+  /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <MapboxGL.ShapeSource

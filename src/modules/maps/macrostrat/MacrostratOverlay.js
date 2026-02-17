@@ -161,12 +161,13 @@ const MacrostratOverlay = ({
     );
   };
 
+  /* View */
+
   return (
     <>
       {isVisible && (
-        <Card
-          containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen] : [macrostratOverlayStyles.container]}
-        >
+        <Card containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen]
+          : [macrostratOverlayStyles.container]}>
           <View style={{alignItems: 'flex-end', paddingTop: 5}}>
             <CloseButton onPress={closeModal}/>
           </View>

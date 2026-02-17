@@ -6,7 +6,11 @@ import * as turf from '@turf/turf';
 import useCoveredIntervalXLines from './useCoveredIntevalsXLines';
 
 const CoveredIntervalsXLines = ({spotsDisplayed}) => {
+  /* Data Hooks */
+
   const {getIntervalsWithX} = useCoveredIntervalXLines(spotsDisplayed);
+
+  /* View */
 
   return (
     <MapboxGL.ShapeSource

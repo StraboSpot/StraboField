@@ -21,9 +21,15 @@ const ManualMeasurement = ({
                              setSliderValue,
                              sliderValue,
                            }) => {
+  /* Data Hooks */
+
   const modalVisible = useSelector(state => state.home.modalVisible);
 
+  /* Local State */
+
   const manualFormRef = useRef(null);
+
+  /* View */
 
   return (
     <Formik

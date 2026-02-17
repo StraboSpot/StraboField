@@ -7,7 +7,12 @@ import UrlData from './URLData';
 import {isEmpty} from '../../shared/Helpers';
 
 const DataOverview = () => {
+  /* Data Hooks */
+
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* View */
+
   return (
     <>
       {!isEmpty(spot.properties?.data?.urls) && <UrlData editable={false} spot={spot}/>}
