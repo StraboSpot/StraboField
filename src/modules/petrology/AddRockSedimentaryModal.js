@@ -9,7 +9,6 @@ const {
 } = ADD_ROCK_KEYS.sedimentary;
 
 const AddRockSedimentaryModal = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
-
   /* Derived Variables */
 
   // Relevant fields for quick-entry modal

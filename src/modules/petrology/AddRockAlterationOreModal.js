@@ -6,7 +6,6 @@ import {Form, MainButtons} from '../form';
 const {firstKeys, secondKeys, lastKeys} = ADD_ROCK_KEYS.alteration_ore;
 
 const AddRockAlterationOreModal = ({formName, formProps, setChoicesViewKey, survey}) => {
-
   /* Derived Variables */
 
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
