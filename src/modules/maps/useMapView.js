@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   GEO_LAT_LNG_PROJECTION, LATITUDE, LONGITUDE, PIXEL_PROJECTION, STRAT_SECTION_CENTER, ZOOM, ZOOM_STRAT_SECTION,
 } from './maps.constants';
+import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from './maps.helpers';
 import {setCenter, setZoom} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import {isEmpty, isEqual} from '../../shared/Helpers';
@@ -24,12 +25,6 @@ const useMapView = () => {
 
   const {convertImagePixelsToLatLong, getBoundsPadded} = useMapCoords();
   const toast = useToast();
-
-  /* Internal Functions */
-
-  const isOnImageBasemap = feature => feature.properties?.image_basemap;
-
-  const isOnStratSection = feature => feature.properties?.strat_section_id;
 
   /* Exported Functions */
 
@@ -72,12 +67,6 @@ const useMapView = () => {
     if (currentImageBasemap) return ZOOM;
     else if (stratSection) return ZOOM_STRAT_SECTION;
     return zoom;
-  };
-
-  // If feature is mapped on geographical map, not an image basemap or strat section
-  const isOnGeoMap = (feature) => {
-    if (isEmpty(feature)) return false;
-    return !feature.properties.image_basemap && !feature.properties.strat_section_id;
   };
 
   const setMapView = (newCenter, newZoom) => {

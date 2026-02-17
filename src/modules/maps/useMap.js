@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {BASEMAPS, MAP_MODES} from './maps.constants';
+import {BASEMAPS} from './maps.constants';
+import {isDrawMode} from './maps.helpers';
 import {setCurrentBasemap} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import useMapURL from './useMapURL';
@@ -39,8 +40,6 @@ const useMap = () => {
     dispatch(setIsOfflineMapsModalVisible(false));
     dispatch(setIsErrorMessagesModalVisible(true));
   };
-
-  const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 
   const setBasemap = async (mapId) => {
     try {

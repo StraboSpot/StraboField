@@ -4,6 +4,7 @@ import {Animated, FlatList, Platform, Text, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getOfflineMapTitle} from './offlineMaps.helpers';
 import {editedOfflineMap, setOfflineMapVisible} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
@@ -102,14 +103,6 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     setIsNameModalVisible(true);
   };
 
-  const getTitle = (map) => {
-    let name = map.name;
-    if (!map.name) {
-      return map.id;
-    }
-    else return name;
-  };
-
   const handDownloadMapTilesPressed = () => {
     closeMainMenuPanel();
     dispatch(setIsOfflineMapsModalVisible(true));
@@ -189,7 +182,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
         <ListItem.Content style={styles.itemContainer}>
           <View style={{marginLeft: 10}}>
             <ListItem.Title style={commonStyles.listItemTitle}>
-              {`${!isEmpty(item) ? truncateText(getTitle(item), 20) : 'No Name'}`}
+              {`${!isEmpty(item) ? truncateText(getOfflineMapTitle(item), 20) : 'No Name'}`}
             </ListItem.Title>
             <ListItem.Subtitle style={styles.itemSubTextStyle}>{item.count} tiles</ListItem.Subtitle>
           </View>

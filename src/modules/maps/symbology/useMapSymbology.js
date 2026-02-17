@@ -1,16 +1,11 @@
 import {useSelector} from 'react-redux';
 
+import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapSymbology.constants';
+import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
 import {hexToRgb, isEmpty} from '../../../shared/Helpers';
 import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
-
-const linePatterns = {
-  solid: [1, 0],
-  dotted: [0.5, 2],
-  dashed: [5, 2],
-  dotDashed: [5, 2, 0.5, 2],
-};
 
 const useMapSymbology = () => {
   /* Data Hooks */
@@ -26,7 +21,7 @@ const useMapSymbology = () => {
   const mapStyles = {
     point: {
       textIgnorePlacement: true,  // Need to be able to stack symbols at same location
-      textField: getLabel(),
+      textField: getLabel(labelTypeOn),
       textAnchor: 'left',
       textOffset: getLabelOffset(),
       iconImage: getIconImage(),
@@ -41,7 +36,7 @@ const useMapSymbology = () => {
       circleColor: ['get', 'circleColor', ['get', 'symbology']],
     },
     lineLabel: {
-      textField: getLabel(),
+      textField: getLabel(labelTypeOn),
       symbolPlacement: 'line',
       textAnchor: 'bottom',
     },
@@ -52,22 +47,22 @@ const useMapSymbology = () => {
     lineDotted: {
       lineColor: ['get', 'lineColor', ['get', 'symbology']],
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dotted,   // Can't use data-driven styling with line-dasharray - it is not supported
+      lineDasharray: LINE_PATTERNS.dotted,  // Can't use data-driven styling with line-dasharray - it is not supported
                                             // Used filters on the line layers instead
                                             // https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-line-line-dasharray
     },
     lineDashed: {
       lineColor: ['get', 'lineColor', ['get', 'symbology']],
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dashed,
+      lineDasharray: LINE_PATTERNS.dashed,
     },
     lineDotDashed: {
       lineColor: ['get', 'lineColor', ['get', 'symbology']],
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dotDashed,
+      lineDasharray: LINE_PATTERNS.dotDashed,
     },
     polygonLabel: {
-      textField: getLabel(),
+      textField: getLabel(labelTypeOn),
     },
     polygon: {
       fillColor: ['get', 'fillColor', ['get', 'symbology']],
@@ -89,17 +84,17 @@ const useMapSymbology = () => {
     lineSelectedDotted: {
       lineColor: 'orange',
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dotted,
+      lineDasharray: LINE_PATTERNS.dotted,
     },
     lineSelectedDashed: {
       lineColor: 'orange',
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dashed,
+      lineDasharray: LINE_PATTERNS.dashed,
     },
     lineSelectedDotDashed: {
       lineColor: 'orange',
       lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
-      lineDasharray: linePatterns.dotDashed,
+      lineDasharray: LINE_PATTERNS.dotDashed,
     },
     polygonSelected: {
       fillColor: 'orange',
@@ -177,170 +172,10 @@ const useMapSymbology = () => {
 
   /* Internal Functions */
 
-  // Get the image for the symbol
-  function getIconImage() {
-    return ['case', ['has', 'orientation'],
-      // Variable bindings
-      ['let',
-        'symbol_orientation',
-        ['case',
-          ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
-          ['case',
-            ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
-            0,
-          ],
-        ],
-        ['let',
-          'feature_type',
-          ['get', 'feature_type', ['get', 'orientation']],
-
-          // Output
-          ['case',
-            // Case 1: Orientation has facing
-            ['all',
-              ['==', ['get', 'facing', ['get', 'orientation']], 'overturned'],
-              ['any',
-                ['==', ['var', 'feature_type'], 'bedding'],
-              ],
-            ], ['concat', ['get', 'feature_type', ['get', 'orientation']], '_overturned'],
-            ['case',
-              // Case 2: Symbol orientation is 0 and feature type is bedding or foliation
-              ['all',
-                ['==', ['var', 'symbol_orientation'], 0],
-                ['any',
-                  ['==', ['var', 'feature_type'], 'bedding'], ['==', ['var', 'feature_type'], 'foliation'],
-                ],
-              ], ['concat', ['var', 'feature_type'], '_horizontal'],
-              ['case',
-                // Case 3: Symbol orientation between 0-90 and feature type is bedding, contact, foliation or shear zone
-                ['all',
-                  ['>', ['var', 'symbol_orientation'], 0],
-                  ['<', ['var', 'symbol_orientation'], 90],
-                  ['any',
-                    ['==', ['var', 'feature_type'], 'bedding'], ['==', ['var', 'feature_type'], 'contact'],
-                    ['==', ['var', 'feature_type'], 'foliation'], ['==', ['var', 'feature_type'], 'shear_zone'],
-                  ],
-                ], ['concat', ['var', 'feature_type'], '_inclined'],
-                ['case',
-                  // Case 4: Symbol orientation is 90 and feature type is bedding, contact, foliation or shear zone
-                  ['all',
-                    ['==', ['var', 'symbol_orientation'], 90],
-                    ['any',
-                      ['==', ['var', 'feature_type'], 'bedding'], ['==', ['var', 'feature_type'], 'contact'],
-                      ['==', ['var', 'feature_type'], 'foliation'], ['==', ['var', 'feature_type'], 'shear_zone'],
-                    ],
-                  ], ['concat', ['var', 'feature_type'], '_vertical'],
-                  ['case',
-                    // Case 5: Other features with no symbol orientation
-                    ['all',
-                      ['has', 'feature_type', ['get', 'orientation']],
-                      ['any',
-                        ['==', ['var', 'feature_type'], 'fault'], ['==', ['var', 'feature_type'], 'fracture'],
-                        ['==', ['var', 'feature_type'], 'vein'],
-                      ],
-                    ], ['get', 'feature_type', ['get', 'orientation']],
-                    ['case',
-                      // Defaults
-                      ['==', ['get', 'type', ['get', 'orientation']], 'linear_orientation'], 'lineation_general',
-                      'default_point',
-                    ],
-                  ],
-                ],
-              ],
-            ],
-          ],
-        ],
-      ],
-      'default_point',
-    ];
-  }
-
-  // Get the rotation of the symbol, either strike, trend or failing both, 0
-  function getIconRotation() {
-    return [
-      'case',
-      ['has', 'strike', ['get', 'orientation']], ['get', 'strike', ['get', 'orientation']],
-      ['case',
-        ['has', 'dip_direction', ['get', 'orientation']], ['%', ['-', ['get', 'dip_direction', ['get', 'orientation']], 90], 360],
-        ['case',
-          ['has', 'trend', ['get', 'orientation']], ['get', 'trend', ['get', 'orientation']],
-          0,
-        ],
-      ],
-    ];
-  }
-
-  // Get the label
-  function getLabel() {
-    if (labelTypeOn === 'name') return ['get', 'name'];
-    else if (labelTypeOn === 'dip') {
-      return [
-        'case', ['has', 'orientation'],
-        ['case',
-          ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
-          ['case',
-            ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
-            '',
-          ],
-        ],
-        '',
-      ];
-    }
-    else return '';
-
-    // Does not work on iOS - iOS doesn't build if there is more than 1 condition and a fallback in a case expression
-    /*return ['case', ['has', 'orientation'],
-     ['case',
-     ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
-     ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
-     ['get', 'name'],
-     ],
-     ['get', 'name'],
-     ];*/
-  }
-
-  // Get the label offset, which is further to the right if the symbol rotation is between 60-120 or 240-300
-  function getLabelOffset() {
-    return ['case', ['has', 'orientation'],
-      // Variable bindings
-      ['let',
-        'rotation',
-        ['case',
-          ['has', 'strike', ['get', 'orientation']], ['get', 'strike', ['get', 'orientation']],
-          ['case',
-            ['has', 'dip_direction', ['get', 'orientation']], ['%', ['-', ['get', 'dip_direction', ['get', 'orientation']], 90], 360],
-            ['case',
-              ['has', 'trend', ['get', 'orientation']], ['get', 'trend', ['get', 'orientation']],
-              0,
-            ],
-          ],
-        ],
-
-        // Output
-        ['case',
-          // Symbol rotation between 60-120 or 240-300
-          ['any',
-            ['all',
-              ['>=', ['var', 'rotation'], 60],
-              ['<=', ['var', 'rotation'], 120],
-            ],
-            ['all',
-              ['>=', ['var', 'rotation'], 240],
-              ['<=', ['var', 'rotation'], 300],
-            ],
-          ], ['literal', [2, 0]],     // Need to specify 'literal' to return an array in expressions
-          // Default
-          ['literal', [0.75, 0]],
-        ],
-      ],
-      ['literal', [0.75, 0]],
-    ];
-  }
-
   const getLineSymbology = (feature) => {
     let color = '#663300';
     let width = 2;
-    let lineDash = linePatterns.solid;
+    let lineDash = LINE_PATTERNS.solid;
 
     if (feature.properties.trace) {
       const trace = feature.properties.trace;
@@ -372,17 +207,17 @@ const useMapSymbology = () => {
       }
 
       // Set line pattern
-      lineDash = linePatterns.dotted;
+      lineDash = LINE_PATTERNS.dotted;
       switch (trace.trace_quality) {
         case 'known':
-          lineDash = linePatterns.solid;
+          lineDash = LINE_PATTERNS.solid;
           break;
         case 'approximate':
         case 'approximate(?)':
-          lineDash = linePatterns.dashed;
+          lineDash = LINE_PATTERNS.dashed;
           break;
         case 'other':
-          lineDash = linePatterns.dotDashed;
+          lineDash = LINE_PATTERNS.dotDashed;
           break;
       }
     }
@@ -472,28 +307,11 @@ const useMapSymbology = () => {
   };
 
   const getLayoutSymbology = () => {
-    // Map of properties for native to web
-    const layoutPropertiesMap = {
-      iconAllowOverlap: 'icon-allow-overlap',
-      iconIgnorePlacement: 'icon-ignore-placement',
-      iconImage: 'icon-image',
-      iconRotate: 'icon-rotate',
-      iconSize: 'icon-size',
-      symbolPlacement: 'symbol-placement',
-      symbolSpacing: 'symbol-spacing',
-      textAnchor: 'text-anchor',
-      textField: 'text-field',
-      textIgnorePlacement: 'text-ignore-placement',
-      textOffset: 'text-offset',
-      textRotate: 'text-rotate',
-      textSize: 'text-size',
-    };
-
     return Object.entries(mapStyles).reduce((acc, [key, value]) => ({
       ...acc,
       ...{
         [key]: Object.entries(value).reduce((acc2, [property, style]) => {
-            return layoutPropertiesMap[property] ? {...acc2, ...{[layoutPropertiesMap[property]]: style}} : acc2;
+            return LAYOUT_PROPERTIES_MAP[property] ? {...acc2, ...{[LAYOUT_PROPERTIES_MAP[property]]: style}} : acc2;
           },
           {}),
       },
@@ -504,7 +322,7 @@ const useMapSymbology = () => {
     return (
       ['all',
         ['==', ['geometry-type'], 'LineString'],
-        ['==', ['to-string', ['get', 'lineDasharray', ['get', 'symbology']]], ['to-string', ['literal', linePatterns[pattern]]]],
+        ['==', ['to-string', ['get', 'lineDasharray', ['get', 'symbology']]], ['to-string', ['literal', LINE_PATTERNS[pattern]]]],
       ]
     );
   };
@@ -512,26 +330,11 @@ const useMapSymbology = () => {
   const getMapSymbology = () => mapStyles;
 
   const getPaintSymbology = () => {
-    // Map of properties for native to web
-    const paintPropertiesMap = {
-      circleColor: 'circle-color',
-      circleOpacity: 'circle-opacity',
-      circleRadius: 'circle-radius',
-      circleStrokeColor: 'circle-stroke-color',
-      circleStrokeWidth: 'circle-stroke-width',
-      fillColor: 'fill-color',
-      fillOpacity: 'fill-opacity',
-      fillOutlineColor: 'fill-outline-color',
-      fillPattern: 'fill-pattern',
-      lineColor: 'line-color',
-      lineDasharray: 'line-dasharray',
-      lineWidth: 'line-width',
-    };
     return Object.entries(mapStyles).reduce((acc, [key, value]) => ({
       ...acc,
       ...{
         [key]: Object.entries(value).reduce((acc2, [property, style]) => {
-            return paintPropertiesMap[property] ? {...acc2, ...{[paintPropertiesMap[property]]: style}} : acc2;
+            return PAINT_PROPERTIES_MAP[property] ? {...acc2, ...{[PAINT_PROPERTIES_MAP[property]]: style}} : acc2;
           },
           {}),
       },

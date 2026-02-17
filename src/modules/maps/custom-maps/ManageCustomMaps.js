@@ -4,6 +4,7 @@ import {FlatList, Text} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {getMapTypeName} from './customMaps.helpers';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
@@ -53,13 +54,6 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
   };
 
-  const mapTypeName = (source) => {
-    let name;
-    if (source === 'mapbox_styles') name = 'Mapbox Styles';
-    if (source === 'strabospot_mymaps') name = 'Strabo MyMaps';
-    return name;
-  };
-
   const viewCustomMap = async (item) => {
     let basemap = item;
     if (item.overlay) {
@@ -82,7 +76,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
-          <ListItem.Subtitle>({mapTypeName(item.source)} - {item.id})</ListItem.Subtitle>
+          <ListItem.Subtitle>({getMapTypeName(item.source)} - {item.id})</ListItem.Subtitle>
         </ListItem.Content>
         {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
           <Icon

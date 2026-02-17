@@ -15,31 +15,20 @@ import React from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 
+import {GLYPH_CENTER_COORDINATE, GLYPH_TEXT_SHAPE} from './maps.constants';
+
 const GlyphDownloader = () => {
 
   // initMapboxErrorHandling();
-
-  const CENTER_COORDINATE = [-71.416555631, 42.662938497];
-
-  const TEXT_SHAPE = {
-    'type': 'Feature',
-    'properties': {},
-    'geometry': {
-      'type': 'Point',
-      'coordinates': CENTER_COORDINATE,
-    },
-  };
 
   return (
     <MapboxGL.MapView
       style={{left: 0, top: 0, height: 50, width: 50, zIndex: -1, position: 'absolute', opacity: 0}}
     >
-      <MapboxGL.Camera
-        centerCoordinate={CENTER_COORDINATE}
-      />
+      <MapboxGL.Camera centerCoordinate={GLYPH_CENTER_COORDINATE}/>
       <MapboxGL.ShapeSource
         id={'glyph_downloader_shape_id'}
-        shape={TEXT_SHAPE}
+        shape={GLYPH_TEXT_SHAPE}
       >
         <MapboxGL.SymbolLayer
           id={'glyph_downloader_layer_id'}

@@ -1,17 +1,14 @@
-import {PixelRatio, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
+import {SPOT_LAYERS} from './maps.constants';
+import {getClosestSpotDistanceAndIndex} from './maps.helpers';
 import useMapCoords from './useMapCoords';
 import {isEmpty} from '../../shared/Helpers';
 import useNesting from '../nesting/useNesting';
 import {useSpots} from '../spots';
-
-const spotLayers = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
-  'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
-  'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
-  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
 const useMapFeaturesCalculated = (mapRef) => {
   /* Data Hooks */
@@ -24,18 +21,6 @@ const useMapFeaturesCalculated = (mapRef) => {
   const {getSpotById, getSpotsByIds} = useSpots();
 
   /* Internal Functions */
-
-  const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
-    let minDistance = Number.MAX_VALUE;
-    let minIndex = -1;
-    for (let j = 0; j < distancesFromSpot.length; j++) {
-      if (minDistance > distancesFromSpot[j]) { // trying to get the minimum distance
-        minDistance = distancesFromSpot[j];
-        minIndex = j;
-      } // else we can ignore that feature.
-    }
-    return [minDistance, minIndex];
-  };
 
   const getDistancesFromSpot = async (screenPointX, screenPointY, featuresInRect) => {
     const dummyFeature = {
@@ -138,7 +123,7 @@ const useMapFeaturesCalculated = (mapRef) => {
 
   // Get the Spot where screen was pressed
   const getSpotAtPress = async (screenPointX, screenPointY) => {
-    const nearestFeature = await getNearestFeatureInBBox([screenPointX, screenPointY], spotLayers);
+    const nearestFeature = await getNearestFeatureInBBox([screenPointX, screenPointY], SPOT_LAYERS);
     const nearestSpot = nearestFeature?.properties?.id ? getSpotById(
       nearestFeature.properties.id) || nearestFeature : {};
     if (isEmpty(nearestSpot)) console.log('No spots near press.');
