@@ -22,6 +22,13 @@ const SpotFilters = ({
                        spotsSearched,
                        updateSpotsInMapExtent,
                      }) => {
+  /* Data Hooks */
+
+  const recentViews = useSelector(state => state.spot.recentViews);
+  const sortedView = useSelector(state => state.mainMenu.sortedView);
+  const spots = useSelector(state => state.spot.spots);
+  const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
+
   const {
     getRecentSpots,
     getSpotsInMapExtent,
@@ -31,15 +38,14 @@ const SpotFilters = ({
     sortSpotsByRecentlyViewed,
   } = useSpots();
 
-  const recentViews = useSelector(state => state.spot.recentViews);
-  const sortedView = useSelector(state => state.mainMenu.sortedView);
-  const spots = useSelector(state => state.spot.spots);
-  const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
+  /* Local State */
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [searchState, setSearchState] = useState('');
   const [sortOrder, setSortOrder] = useState('Date Created');
   const [spotsFiltered, setSpotsFiltered] = useState(activeSpots);
+
+  /* Side Effects */
 
   useEffect(() => {
     let gotSpotsFiltered = activeSpots;
@@ -55,6 +61,8 @@ const SpotFilters = ({
     setSpotsFiltered(gotSpotsFiltered);
     updateSearch(undefined, gotSpotsFiltered);
   }, [recentViews, sortedView, spots, spotsInMapExtentIds]);
+
+  /* Logic Helpers */
 
   const closePicker = () => {
     setIsPickerVisible(false);
@@ -90,6 +98,8 @@ const SpotFilters = ({
     setSpotsSorted(gotSpotsSorted);
     closePicker();
   };
+
+  /* View */
 
   return (
     <>

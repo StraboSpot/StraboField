@@ -4,6 +4,19 @@ import * as Sentry from '@sentry/react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {
+  getImageBasemapsInSpot,
+  getSpotGeometryIconSource,
+  isOnGeoMap,
+  isOnImageBasemap,
+  isOnSameImageBasemap,
+  isOnSameStratSection,
+  isOnStratSection,
+  isStratInterval,
+  sortSpotsAlphabetically,
+  sortSpotsByDateCreated,
+  sortSpotsByDateLastModified,
+} from './spots.helpers';
 import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, setSelectedSpot} from './spots.slice';
 import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
@@ -35,19 +48,13 @@ const useSpots = () => {
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
   const stratSection = useSelector(state => state.map.stratSection);
   const tags = useSelector(state => state.project.project?.tags) || [];
-  const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
+  const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
   const {getActiveDatasets, getTargetDatasetFromId} = useProject();
   const {addSpotsToTags} = useTags();
   const toast = useToast();
 
   /* Internal Functions */
-
-  const getImageBasemapsInSpot = (spot) => {
-    return spot.properties.images && spot.properties.images.reduce((acc, image) => {
-      return image.annotated ? [...acc, image] : acc;
-    }, []) || [];
-  };
 
   const getNewSpotNameObj = (newSpot) => {
     let namePrefix = preferences.spot_prefix || '';
@@ -399,25 +406,6 @@ const useSpots = () => {
     });
   };
 
-  const getSpotGeometryIconSource = (spot) => {
-    if (spot?.geometry?.type === 'Point') {
-      if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePoint_pressed.png');
-      else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratPoint_pressed.png');
-      else return require('../../assets/icons/Point_pressed.png');
-    }
-    else if (spot?.geometry?.type === 'LineString') {
-      if (spot.properties?.image_basemap) return require('../../assets/icons/ImageLine_pressed.png');
-      else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratLine_pressed.png');
-      else return require('../../assets/icons/Line_pressed.png');
-    }
-    else if (spot?.geometry?.type === 'Polygon' || spot?.geometry?.type === 'GeometryCollection') {
-      if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePolygon_pressed.png');
-      else if (spot.properties?.strat_section_id) return require('../../assets/icons/StratPolygon_pressed.png');
-      else return require('../../assets/icons/Polygon_pressed.png');
-    }
-    else return require('../../assets/icons/QuestionMark_pressed.png');
-  };
-
   const getSpotsByIds = (spotIds) => {
     const foundSpots = [];
     Object.entries(spots).forEach((obj) => {
@@ -493,46 +481,6 @@ const useSpots = () => {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSectionSettings) dispatch(setStratSection(stratSectionSettings));
     }
-  };
-
-  // If feature is mapped on geographical map, not an image basemap or strat section
-  const isOnGeoMap = (feature) => {
-    if (isEmpty(feature)) return false;
-    return !feature.properties.image_basemap && !feature.properties.strat_section_id;
-  };
-
-  const isOnImageBasemap = feature => feature.properties?.image_basemap;
-
-  const isOnSameImageBasemap = (spot1, spot2) => {
-    return isOnImageBasemap(spot1) && isOnImageBasemap(spot2)
-      && spot1.properties.image_basemap === spot2.properties.image_basemap;
-  };
-
-  const isOnSameStratSection = (spot1, spot2) => {
-    return isOnStratSection(spot1) && isOnStratSection(spot2)
-      && spot1.properties.strat_section_id === spot2.properties.strat_section_id;
-  };
-
-  const isOnStratSection = feature => feature.properties?.strat_section_id;
-
-  const isStratInterval = (spot) => {
-    return spot?.properties?.strat_section_id && spot?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
-  };
-
-  const sortSpotsAlphabetically = (spotsToSort) => {
-    spotsToSort.sort(
-      ((a, b) => (a.properties?.name?.toLowerCase() || '').localeCompare(b.properties?.name?.toLowerCase() || '')));
-    return spotsToSort;
-  };
-
-  const sortSpotsByDateCreated = (spotsToSort) => {
-    spotsToSort.sort(((a, b) => new Date(b.properties.date) - new Date(a.properties.date)));
-    return spotsToSort;
-  };
-
-  const sortSpotsByDateLastModified = (spotsToSort) => {
-    spotsToSort.sort(((a, b) => new Date(b.properties.modified_timestamp) - new Date(a.properties.modified_timestamp)));
-    return spotsToSort;
   };
 
   // Use RecentViews to move those spots to the beginning of the spotsToSort
