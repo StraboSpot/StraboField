@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ListItem} from '@rn-vui/base';
 
-import {FIRST_ORDER_FABRIC_FIELDS} from './fabric.constants';
+import {ADD_FABRIC_FIELDS, DEFAULT_FABRIC_TYPE, DEPRECATED_FABRIC_TYPE} from './fabric.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
@@ -14,24 +14,23 @@ const FabricListItem = ({
   const {getLabel, getLabels} = useForm();
 
   const getTitle = (fabricObj) => {
-    if (fabricObj.type === 'fabric') {
-      if (fabricObj.feature_type) return toTitleCase(getLabel(fabricObj.feature_type, ['_3d_structures', 'fabric']));
-      else return 'Fabric';
+    const {type} = fabricObj;
+    if (type === DEPRECATED_FABRIC_TYPE) {
+      return fabricObj.feature_type
+        ? toTitleCase(getLabel(fabricObj.feature_type, ['_3d_structures', DEPRECATED_FABRIC_TYPE]))
+        : 'Fabric';
     }
-    else {
-      const labelsArr = FIRST_ORDER_FABRIC_FIELDS[fabricObj.type]
-        && FIRST_ORDER_FABRIC_FIELDS[fabricObj.type].reduce((acc, fieldName) => {
-          if (fabricObj[fieldName]) {
-            const mainLabel = getLabel(fieldName, ['fabrics', fabricObj.type]);
-            const choiceLabels = getLabels(fabricObj[fieldName], ['fabrics', fabricObj.type]);
-            return [...acc, toTitleCase(mainLabel) + ' - ' + choiceLabels.toUpperCase()];
-          }
-          else return acc;
-        }, []);
-      if (isEmpty(labelsArr) && fabricObj.type === 'fault_rock') return 'Structural Fabric';
-      else if (isEmpty(labelsArr)) return toTitleCase(getLabel(fabricObj.type, ['fabrics', fabricObj.type]));
-      else return labelsArr.join(', ');
+    const surveyPath = ['fabrics', type];
+    const labelsArr = ADD_FABRIC_FIELDS[type]?.reduce((acc, fieldName) => {
+      if (!fabricObj[fieldName]) return acc;
+      const mainLabel = getLabel(fieldName, surveyPath);
+      const choiceLabels = getLabels(fabricObj[fieldName], surveyPath);
+      return [...acc, toTitleCase(mainLabel) + ' - ' + choiceLabels.toUpperCase()];
+    }, []);
+    if (isEmpty(labelsArr)) {
+      return type === DEFAULT_FABRIC_TYPE ? 'Structural Fabric' : toTitleCase(getLabel(type, surveyPath));
     }
+    return labelsArr.join(', ');
   };
 
   return (

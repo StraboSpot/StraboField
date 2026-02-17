@@ -1,18 +1,14 @@
 import React from 'react';
 
-import {FIRST_ORDER_FABRIC_FIELDS} from './fabric.constants';
+import {ADD_FABRIC_KEYS, ADD_FABRIC_FIELDS} from './fabric.constants';
 import {Form, MainButtons} from '../form';
 
 const IgneousRockFabric = ({formName, formProps, setChoicesViewKey, survey}) => {
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['label'];
-  const mainButtonsKeys = FIRST_ORDER_FABRIC_FIELDS.igneous_rock;
-  const lastKeys = ['mag_interp_note'];
-
-  // Relevant fields for quick-entry modal
+  const {firstKeys, lastKeys} = ADD_FABRIC_KEYS.igneous_rock;
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const mainButtonsKeys = ADD_FABRIC_FIELDS.igneous_rock;
 
   return (
     <>

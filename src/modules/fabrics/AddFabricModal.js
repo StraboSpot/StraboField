@@ -5,7 +5,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {FABRIC_TYPES} from './fabric.constants';
+import {DEFAULT_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_TYPES} from './fabric.constants';
 import FaultRockFabric from './FaultRockFabric';
 import IgneousRockFabric from './IgneousRockFabric';
 import MetamRockFabric from './MetamRockFabric';
@@ -17,8 +17,6 @@ import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
-
-const groupKey = 'fabrics';
 
 const AddFabricModal = () => {
   /* Data Hooks */
@@ -51,10 +49,10 @@ const AddFabricModal = () => {
 
   useEffect(() => {
     console.log('UE AddFabricModal [modalValues]', modalValues);
-    const initialValues = isEmpty(modalValues) ? {id: getNewId(), type: 'fault_rock'} : modalValues;
+    const initialValues = isEmpty(modalValues) ? {id: getNewId(), type: DEFAULT_FABRIC_TYPE} : modalValues;
     formRef.current?.setValues(initialValues);
     setSelectedTypeIndex(types.indexOf(initialValues.type));
-    const formName = [groupKey, initialValues.type];
+    const formName = [FABRICS_GROUP_KEY, initialValues.type];
     formRef.current?.setStatus({formName: formName});
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
@@ -68,7 +66,7 @@ const AddFabricModal = () => {
       formRef.current?.resetForm();
       const type = types[i];
       formRef.current?.setFieldValue('type', type);
-      const formName = [groupKey, type];
+      const formName = [FABRICS_GROUP_KEY, type];
       formRef.current?.setStatus({formName: formName});
       setSurvey(getSurvey(formName));
       setChoices(getChoices(formName));
@@ -87,7 +85,7 @@ const AddFabricModal = () => {
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
       editedFabricsData.push({...editedFabricData, id: getNewId()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: groupKey, value: editedFabricsData}));
+      dispatch(editedSpotProperties({field: FABRICS_GROUP_KEY, value: editedFabricsData}));
       if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
@@ -141,7 +139,7 @@ const AddFabricModal = () => {
   };
 
   const renderNotebookFabricModalContent = () => {
-    const formName = [groupKey, types[selectedTypeIndex]];
+    const formName = [FABRICS_GROUP_KEY, types[selectedTypeIndex]];
     return (
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
@@ -180,7 +178,7 @@ const AddFabricModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
+      <Form {...{formName: [FABRICS_GROUP_KEY, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
     );
   };
 
