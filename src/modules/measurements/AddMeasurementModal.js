@@ -9,7 +9,15 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddLine from './AddLine';
 import AddManualMeasurements from './AddManualMeasurements';
 import AddPlane from './AddPlane';
-import {MEASUREMENT_KEYS, MEASUREMENT_TYPES} from './measurements.constants';
+import {
+  LINEAR_COMPASS_FIELDS,
+  MEASUREMENT_GROUP_KEY,
+  MEASUREMENT_KEYS,
+  MEASUREMENT_TYPES,
+  PLANAR_COMPASS_FIELDS,
+  TOAST_OPTIONS,
+} from './measurements.constants';
+import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
@@ -28,9 +36,6 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
-
-const groupKey = 'measurement';
-const toastOptions = {duration: 1000, placement: 'top'};
 
 const AddMeasurementModal = ({onPress}) => {
   /* Data Hooks */
@@ -75,7 +80,7 @@ const AddMeasurementModal = ({onPress}) => {
     console.log('UE AddMeasurementModal []');
     if (!SMALL_SCREEN && Platform.OS !== 'web') {
       lockToPortrait();
-      toast.show('Screen orientation LOCKED', {...toastOptions, type: 'lock'});
+      toast.show('Screen orientation LOCKED', {...TOAST_OPTIONS, type: 'lock'});
     }
     return () => {
       dispatch(setModalValues({}));
@@ -126,7 +131,7 @@ const AddMeasurementModal = ({onPress}) => {
     }
     setInitialValues(initialValuesTemp);
     setMeasurementTypeForForm(initialValuesTemp.type);
-    const formName = [groupKey, initialValuesTemp.type];
+    const formName = [MEASUREMENT_GROUP_KEY, initialValuesTemp.type];
     formRef.current?.setStatus({formName: formName});
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
@@ -150,7 +155,7 @@ const AddMeasurementModal = ({onPress}) => {
       const typeObj = MEASUREMENT_TYPES[i];
       setMeasurementTypeForForm(typeObj.form_keys[0]);
       const formType = typeObj.form_keys[0];
-      const formName = [groupKey, formType];
+      const formName = [MEASUREMENT_GROUP_KEY, formType];
       setSurvey(getSurvey(formName));
       setChoices(getChoices(formName));
       dispatch(setCompassMeasurementTypes(typeObj.compass_toggles));
@@ -169,23 +174,6 @@ const AddMeasurementModal = ({onPress}) => {
 
   /* Logic Helpers */
 
-  const equalsIgnoreOrder = (a, b) => {
-    if (a.length !== b.length) return false;
-    const uniqueValues = new Set([...a, ...b]);
-    for (const v of uniqueValues) {
-      const aCount = a.filter(e => e === v).length;
-      const bCount = b.filter(e => e === v).length;
-      if (aCount !== bCount) return false;
-    }
-    return true;
-  };
-
-  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
-
-  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
-
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
@@ -202,7 +190,7 @@ const AddMeasurementModal = ({onPress}) => {
       // If plane with associated line validate associated line data
       if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
         validateForm({
-          formName: [groupKey, MEASUREMENT_KEYS.LINEAR],
+          formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
           values: editedMeasurementData.associated_orientation[0],
         });
       }
@@ -297,16 +285,14 @@ const AddMeasurementModal = ({onPress}) => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
       : measurementTypeForForm;
-    const planarCompassFields = ['strike', 'dip_direction', 'dip', 'quality', 'unix_timestamp'];
-    const linearCompassFields = ['trend', 'plunge', 'rake', 'quality', 'unix_timestamp'];
-    const compassFields = measurementTypeForForm === MEASUREMENT_KEYS.PLANAR ? planarCompassFields
-      : linearCompassFields;
+    const compassFields = measurementTypeForForm === MEASUREMENT_KEYS.PLANAR ? PLANAR_COMPASS_FIELDS
+      : LINEAR_COMPASS_FIELDS;
     compassFields.forEach((compassFieldKey) => {
       formRef.current.setFieldValue(compassFieldKey,
         isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
     });
     if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      linearCompassFields.forEach((compassFieldKey) => {
+      LINEAR_COMPASS_FIELDS.forEach((compassFieldKey) => {
         formRef.current.setFieldValue('associated_orientation[0]' + [compassFieldKey],
           isEmpty(data?.[compassFieldKey]) ? undefined : data?.[compassFieldKey]);
       });
@@ -317,7 +303,7 @@ const AddMeasurementModal = ({onPress}) => {
   /* Render Functions */
 
   const renderForm = (formProps) => {
-    const assocFormName = [groupKey, 'linear_orientation'];
+    const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
     const assocSurvey = getSurvey(assocFormName);
     const assocChoices = getChoices(assocFormName);
     let assocFormProps = JSON.parse(JSON.stringify(formProps));
@@ -384,7 +370,7 @@ const AddMeasurementModal = ({onPress}) => {
                 <>
                   <AddPlane
                     choices={choices}
-                    formName={[groupKey, MEASUREMENT_KEYS.PLANAR]}
+                    formName={[MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.PLANAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
                     setChoicesViewKey={onSetChoicesViewKey}
@@ -397,7 +383,7 @@ const AddMeasurementModal = ({onPress}) => {
                 <>
                   <AddLine
                     choices={assocChoices}
-                    formName={[groupKey, MEASUREMENT_KEYS.LINEAR]}
+                    formName={[MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR]}
                     formProps={formProps}
                     isManualMeasurement={isManualMeasurement}
                     isPlanarLinear={typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR}
@@ -414,7 +400,7 @@ const AddMeasurementModal = ({onPress}) => {
   };
 
   const renderMeasurementModalContent = () => {
-    const formName = [groupKey, measurementTypeForForm];
+    const formName = [MEASUREMENT_GROUP_KEY, measurementTypeForForm];
     return (
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
@@ -465,7 +451,7 @@ const AddMeasurementModal = ({onPress}) => {
   const renderSubformAssoc = (formProps) => {
     let assocFormProps = JSON.parse(JSON.stringify(formProps));
     assocFormProps.values = {};
-    const assocFormName = [groupKey, 'linear_orientation'];
+    const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
     assocFormProps.status = {formName: assocFormName};
     const assocSurvey = getSurvey(assocFormName);
     let relevantFields = getRelevantFields(assocSurvey, assocChoicesViewKey);

@@ -7,6 +7,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementItem from './MeasurementItem';
+import {isEmptyMeasurement} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
@@ -34,6 +35,8 @@ const MeasurementDetail = ({
                              selectedAttitudes,
                              saveTemplate,
                            }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
@@ -42,18 +45,24 @@ const MeasurementDetail = ({
   const {doMeasurementCalculations} = useCompassCalculations();
   const {showErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
+  const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
-  const toast = useToast();
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState(null);
 
+  /* Derived Variables */
+
   const isTemplate = saveTemplate;
   const selectedAttitude = selectedAttributes?.length > 0 ? JSON.parse(JSON.stringify(selectedAttributes[0]))
     : isTemplate ? selectedAttitudes[0]
       : {};
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
@@ -98,6 +107,87 @@ const MeasurementDetail = ({
       else dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.LINEAR]));
     }
   }, [selectedMeasurement]);
+
+  /* Event Handlers */
+
+  // Confirm switching the selected measurement
+  const onAddAssociatedMeasurement = () => {
+    if (formRef.current.dirty) {
+      alert('Unsaved Changes',
+        'Would you like to save your data before continuing?',
+        [{
+          text: 'No',
+          onPress: () => {
+            formRef.current.resetForm();
+            addAssociatedMeasurement();
+          },
+          style: 'cancel',
+        }, {
+          text: 'Yes',
+          onPress: () => saveFormAndAddAssociatedMeasurement(),
+        }],
+        {cancelable: false},
+      );
+    }
+    else addAssociatedMeasurement();
+  };
+
+  const onMyChange = (name, value) => {
+    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
+      const valueAsFloat = parseFloat(value, 10);
+      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
+        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
+      }
+      else formRef.current.setFieldValue(name, undefined);
+    }
+    else formRef.current.setFieldValue(name, value);
+  };
+
+  // Confirm switch between Planar and Tabular Zone
+  const onSwitchPlanarTabular = (i) => {
+    const currentType = formRef.current.values.type;
+    if ((i === 0 && currentType === 'tabular_orientation') || (i === 1 && currentType === 'planar_orientation')) {
+      const newType = currentType === 'tabular_orientation' ? 'planar_orientation' : 'tabular_orientation';
+      const typeText = newType === 'tabular_orientation' ? 'Tabular Zone' : 'Planar Orientation';
+      const alertTextEnd = selectedAttributes.length === 1 ? 'this measurement to a ' + typeText + '? You will '
+        + 'lose all data for this measurement not relevant to ' + typeText + '.'
+        : 'these measurements to ' + typeText + '? You will lose all data for these measurements not relevant to '
+        + typeText + '.';
+      alert('Switch to ' + typeText, 'Are you sure you want to switch ' + alertTextEnd,
+        [{
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        }, {
+          text: 'OK', onPress: () => switchPlanarTabular(newType),
+        }],
+        {cancelable: false},
+      );
+    }
+  };
+
+  // Confirm switching the selected measurement
+  const onSwitchSelectedMeasurement = (measurement) => {
+    if (measurement.id !== selectedMeasurement.id) {
+      if (formRef.current.dirty) {
+        alert('Unsaved Changes',
+          'Would you like to save your data before continuing?',
+          [{
+            text: 'No',
+            onPress: () => switchSelectedMeasurement(measurement),
+            style: 'cancel',
+          }, {
+            text: 'Yes',
+            onPress: () => saveFormAndSwitchSelectedMeasurement(measurement),
+          }],
+          {cancelable: false},
+        );
+      }
+      else switchSelectedMeasurement(measurement);
+    }
+  };
+
+  /* Logic Helpers */
 
   const addAssociatedMeasurement = () => {
     const types = selectedAttitude.type === 'linear_orientation' ? [COMPASS_TOGGLE_BUTTONS.PLANAR]
@@ -168,90 +258,117 @@ const MeasurementDetail = ({
     }
   };
 
-  const isEmptyMeasurement = (measurement) => {
-    return isEmpty(measurement)
-      || (!isEmpty(measurement) && ((Object.keys(measurement).length === 2 && measurement.id && measurement.type)
-        || (Object.keys(measurement).length === 3 && measurement.id && measurement.type
-          && measurement.associated_orientation
-          && isEmpty(measurement.associated_orientation.filter(aO => !isEmptyMeasurement(aO))))));
-  };
-
-  // Confirm switching the selected measurement
-  const onAddAssociatedMeasurement = () => {
-    if (formRef.current.dirty) {
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [{
-          text: 'No',
-          onPress: () => {
-            formRef.current.resetForm();
-            addAssociatedMeasurement();
-          },
-          style: 'cancel',
-        }, {
-          text: 'Yes',
-          onPress: () => saveFormAndAddAssociatedMeasurement(),
-        }],
-        {cancelable: false},
-      );
+  const getPageTitle = () => {
+    if (selectedMeasurement?.type) {
+      if (selectedMeasurement.type === 'tabular_orientation') return 'Tabular Zone Detail';
+      else return toTitleCase(selectedMeasurement.type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
     }
-    else addAssociatedMeasurement();
+    else return 'Measurement Detail';
   };
 
-  const onMyChange = (name, value) => {
-    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
-      const valueAsFloat = parseFloat(value, 10);
-      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
-        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
+  const saveForm = async (formCurrent) => {
+    try {
+      await formCurrent.submitForm();
+      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      console.log('Saving form data to Spot ...');
+      let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
+      let editedSelectedMeasurements = [];
+      let idsOfMeasurementsToEdit = [formValues.id];
+      if (selectedAttributes.length > 1) {
+        const fieldsToExclude = ['id', 'associated_orientation', 'label', 'strike', 'dip_direction', 'dip',
+          'trend', 'plunge', 'rake', 'rake_calculated'];
+        fieldsToExclude.forEach(key => delete formValues[key]);
+        if (formCurrent.values.id === selectedAttitude.id) {
+          idsOfMeasurementsToEdit = selectedAttributes.map(measurement => measurement.id);
+        }
+        else {
+          idsOfMeasurementsToEdit = selectedAttributes.reduce(
+            (acc, measurement) => [...acc, ...measurement.associated_orientation.map(
+              associatedOrientation => associatedOrientation.id)], []);
+        }
       }
-      else formRef.current.setFieldValue(name, undefined);
+
+      orientationDataCopy.forEach((measurement, i) => {
+        if (idsOfMeasurementsToEdit.includes(measurement.id)) {
+          orientationDataCopy[i] = selectedAttributes.length === 1
+            ? {...formValues, modified_timestamp: Date.now()}
+            : {...measurement, ...formValues};
+          editedSelectedMeasurements.push(orientationDataCopy[i]);
+        }
+        else if (measurement.associated_orientation) {
+          measurement.associated_orientation.forEach((associatedMeasurement, j) => {
+            if (idsOfMeasurementsToEdit.includes(associatedMeasurement.id)) {
+              orientationDataCopy[i].associated_orientation[j] = selectedAttributes.length === 1 ? formValues
+                : {...associatedMeasurement, ...formValues};
+              editedSelectedMeasurements.push(orientationDataCopy[i]);
+            }
+          });
+        }
+      });
+      dispatch(setSelectedAttributes(editedSelectedMeasurements));
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
+      await formCurrent.resetForm();
+      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
+      console.log('Finished saving form data to Spot');
     }
-    else formRef.current.setFieldValue(name, value);
+    catch (e) {
+      console.log('Error submitting form.', e);
+      return Promise.reject();
+    }
   };
 
-  // Confirm switching the selected measurement
-  const onSwitchSelectedMeasurement = (measurement) => {
-    if (measurement.id !== selectedMeasurement.id) {
-      if (formRef.current.dirty) {
-        alert('Unsaved Changes',
-          'Would you like to save your data before continuing?',
-          [{
-            text: 'No',
-            onPress: () => switchSelectedMeasurement(measurement),
-            style: 'cancel',
-          }, {
-            text: 'Yes',
-            onPress: () => saveFormAndSwitchSelectedMeasurement(measurement),
-          }],
-          {cancelable: false},
-        );
-      }
-      else switchSelectedMeasurement(measurement);
+  const saveFormAndAddAssociatedMeasurement = async () => {
+    try {
+      setIsAddingAssociatedMeasurementAfterSave(true);
+      await saveForm(formRef.current);
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
     }
   };
 
-  // Confirm switch between Planar and Tabular Zone
-  const onSwitchPlanarTabular = (i) => {
-    const currentType = formRef.current.values.type;
-    if ((i === 0 && currentType === 'tabular_orientation') || (i === 1 && currentType === 'planar_orientation')) {
-      const newType = currentType === 'tabular_orientation' ? 'planar_orientation' : 'tabular_orientation';
-      const typeText = newType === 'tabular_orientation' ? 'Tabular Zone' : 'Planar Orientation';
-      const alertTextEnd = selectedAttributes.length === 1 ? 'this measurement to a ' + typeText + '? You will '
-        + 'lose all data for this measurement not relevant to ' + typeText + '.'
-        : 'these measurements to ' + typeText + '? You will lose all data for these measurements not relevant to '
-        + typeText + '.';
-      alert('Switch to ' + typeText, 'Are you sure you want to switch ' + alertTextEnd,
-        [{
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        }, {
-          text: 'OK', onPress: () => switchPlanarTabular(newType),
-        }],
-        {cancelable: false},
-      );
+  const saveFormAndGo = async () => {
+    try {
+      await saveForm(formRef.current);
+      closeDetailView();
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
     }
   };
+
+  const saveFormAndSwitchSelectedMeasurement = async (measurement) => {
+    try {
+      await saveForm(formRef.current);
+      switchSelectedMeasurement(measurement);
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
+    }
+  };
+
+  const saveTemplateForm = async (formCurrent) => {
+    await formCurrent.submitForm();
+    const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+    await saveTemplate(formValues);
+  };
+
+  // Switch between Planar and Tabular Zone
+  const switchPlanarTabular = (type) => {
+    const modifiedMeasurement = {...formRef.current.values, type: type};
+    switchSelectedMeasurement(modifiedMeasurement);
+  };
+
+  // Switch the selected measurement
+  const switchSelectedMeasurement = (measurement) => {
+    setSelectedMeasurement(measurement);
+    let formCategory = selectedAttributes.length === 1 && !isTemplate ? 'measurement' : 'measurement_bulk';
+    setFormName([formCategory, measurement.type]);
+  };
+
+  /* Render Functions */
 
   const renderAssociatedMeasurements = () => {
     const addButtonText = selectedAttitude && selectedAttitude.type === 'linear_orientation'
@@ -408,115 +525,7 @@ const MeasurementDetail = ({
     );
   };
 
-  const saveForm = async (formCurrent) => {
-    try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
-      console.log('Saving form data to Spot ...');
-      let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
-      let editedSelectedMeasurements = [];
-      let idsOfMeasurementsToEdit = [formValues.id];
-      if (selectedAttributes.length > 1) {
-        const fieldsToExclude = ['id', 'associated_orientation', 'label', 'strike', 'dip_direction', 'dip',
-          'trend', 'plunge', 'rake', 'rake_calculated'];
-        fieldsToExclude.forEach(key => delete formValues[key]);
-        if (formCurrent.values.id === selectedAttitude.id) {
-          idsOfMeasurementsToEdit = selectedAttributes.map(measurement => measurement.id);
-        }
-        else {
-          idsOfMeasurementsToEdit = selectedAttributes.reduce(
-            (acc, measurement) => [...acc, ...measurement.associated_orientation.map(
-              associatedOrientation => associatedOrientation.id)], []);
-        }
-      }
-
-      orientationDataCopy.forEach((measurement, i) => {
-        if (idsOfMeasurementsToEdit.includes(measurement.id)) {
-          orientationDataCopy[i] = selectedAttributes.length === 1
-            ? {...formValues, modified_timestamp: Date.now()}
-            : {...measurement, ...formValues};
-          editedSelectedMeasurements.push(orientationDataCopy[i]);
-        }
-        else if (measurement.associated_orientation) {
-          measurement.associated_orientation.forEach((associatedMeasurement, j) => {
-            if (idsOfMeasurementsToEdit.includes(associatedMeasurement.id)) {
-              orientationDataCopy[i].associated_orientation[j] = selectedAttributes.length === 1 ? formValues
-                : {...associatedMeasurement, ...formValues};
-              editedSelectedMeasurements.push(orientationDataCopy[i]);
-            }
-          });
-        }
-      });
-      dispatch(setSelectedAttributes(editedSelectedMeasurements));
-      const spotId = spot.properties.id;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
-      dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
-      await formCurrent.resetForm();
-      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
-      console.log('Finished saving form data to Spot');
-    }
-    catch (e) {
-      console.log('Error submitting form.', e);
-      return Promise.reject();
-    }
-  };
-
-  const saveFormAndGo = async () => {
-    try {
-      await saveForm(formRef.current);
-      closeDetailView();
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
-  const saveFormAndAddAssociatedMeasurement = async () => {
-    try {
-      setIsAddingAssociatedMeasurementAfterSave(true);
-      await saveForm(formRef.current);
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
-  const saveFormAndSwitchSelectedMeasurement = async (measurement) => {
-    try {
-      await saveForm(formRef.current);
-      switchSelectedMeasurement(measurement);
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
-  const saveTemplateForm = async (formCurrent) => {
-    await formCurrent.submitForm();
-    const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
-    await saveTemplate(formValues);
-  };
-
-  // Switch the selected measurement
-  const switchSelectedMeasurement = (measurement) => {
-    setSelectedMeasurement(measurement);
-    let formCategory = selectedAttributes.length === 1 && !isTemplate ? 'measurement' : 'measurement_bulk';
-    setFormName([formCategory, measurement.type]);
-  };
-
-  // Switch between Planar and Tabular Zone
-  const switchPlanarTabular = (type) => {
-    const modifiedMeasurement = {...formRef.current.values, type: type};
-    switchSelectedMeasurement(modifiedMeasurement);
-  };
-
-  const getPageTitle = () => {
-    if (selectedMeasurement?.type) {
-      if (selectedMeasurement.type === 'tabular_orientation') return 'Tabular Zone Detail';
-      else return toTitleCase(selectedMeasurement.type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
-    }
-    else return 'Measurement Detail';
-  };
+  /* View */
 
   return (
     <>
