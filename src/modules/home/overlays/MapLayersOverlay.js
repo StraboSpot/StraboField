@@ -18,6 +18,7 @@ import useCustomMap from '../../maps/custom-maps/useCustomMap';
 import {BASEMAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
+import {getCustomMapsWithValidSources, getCustomOverlaysWithValidSources} from '../home.helpers';
 
 const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
 
@@ -74,12 +75,6 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     }
     else return [renderOfflineCustomMapsList(), renderOfflineCustomOverlaysList()];
   };
-
-  const getCustomMapsWithValidSources = maps => Object.values(maps).filter(m => isValidSource(m) && !m.overlay);
-
-  const getCustomOverlaysWithValidSources = maps => Object.values(maps).filter(m => isValidSource(m) && m.overlay);
-
-  const isValidSource = map => map.source === 'mapbox_styles' || map.source === 'strabospot_mymaps';
 
   const setMap = async (map) => {
     await setBasemap(map.id);

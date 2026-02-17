@@ -9,6 +9,7 @@ import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {MAP_ACTIONS} from '../home.constants';
 
 const MapActionsOverlay = ({
                              onPress,
@@ -21,18 +22,6 @@ const MapActionsOverlay = ({
   const stratSection = useSelector(state => state.map.stratSection);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
-
-  const actions = [
-    {key: 'zoom', title: 'Zoom to Extent of Spots'},
-    {key: 'saveMap', title: 'Save Map for Offline Use'},
-    {key: 'stereonet', title: 'Lasso Spots for Stereonet'},
-    {key: 'selectSpots', title: 'Lasso Spots for QAQC'},
-    // {key: 'zoomToOfflineMap', title: 'Zoom to Offline Map'},
-    {key: 'addTag', title: 'Add Tag(s) to Spot(s)'},
-    {key: 'addToReport', title: 'Add Spot(s) to Report'},
-    {key: 'mapMeasurement', title: 'Measure Distance'},
-    {key: 'stratSection', title: 'Strat Section Settings'},
-  ];
 
   const mapActionItem = (item) => {
     const isNative = Platform.OS !== 'web';
@@ -103,7 +92,7 @@ const MapActionsOverlay = ({
           paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
         }}
-        data={actions}
+        data={MAP_ACTIONS}
         key={'mapActions'}
         renderItem={({item}) => mapActionItem(item)}
         style={{width: '100%'}}

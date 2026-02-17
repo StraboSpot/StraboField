@@ -6,6 +6,7 @@ import {Button, Header, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ActionButtonsSmallScreen, MainMenuButton, ShortcutButtons} from './buttons';
+import {NAVIGATION_OPTIONS} from './home.constants';
 import {setModalVisible} from './home.slice';
 import homeStyles from './home.style';
 import * as themes from '../../shared/styles.constants';
@@ -55,12 +56,6 @@ const HomeViewSmallScreen = forwardRef(({
     Platform.OS !== 'web'
     && lockToPortrait();
   }, []);
-
-  const navigationOptions = {
-    gestureEnabled: false,
-    headerShown: false,
-    swipeEnabled: false,
-  };
 
   const Tab = createMaterialTopTabNavigator();
 
@@ -121,7 +116,7 @@ const HomeViewSmallScreen = forwardRef(({
           <Tab.Screen
             name={'Map'}
             options={{
-              ...navigationOptions,
+              ...NAVIGATION_OPTIONS,
               tabBarLabel: stratSection ? 'Strat Section'
                 : currentImageBasemap ? 'Image Basemap'
                   : 'Map',
@@ -191,7 +186,7 @@ const HomeViewSmallScreen = forwardRef(({
               </>
             }
           </Tab.Screen>
-          <Tab.Screen name={'Notebook'} options={navigationOptions}>
+          <Tab.Screen name={'Notebook'} options={NAVIGATION_OPTIONS}>
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}
