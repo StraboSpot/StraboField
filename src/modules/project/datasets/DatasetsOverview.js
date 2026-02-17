@@ -8,8 +8,11 @@ import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWith
 import MainMenuPanelHeader from '../../main-menu-panel/MainMenuPanelHeader';
 
 const DatasetsPage = ({setDatasetToView}) => {
+  /* Local State */
 
   const [isAddDatasetModalVisible, setIsAddDatasetModalVisible] = useState(false);
+
+  /* View */
 
   return (
     <>

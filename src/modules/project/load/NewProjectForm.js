@@ -10,6 +10,7 @@ import {Form, useForm} from '../../form';
 import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {PROJECT_DESCRIPTION_FORM_NAME} from '../project.constants';
 import useProject from '../useProject';
 
 const initialValues = {
@@ -55,17 +56,16 @@ const NewProjectForm = ({openMainMenuPanel}) => {
   /* Render Functions */
 
   const renderFormFields = () => {
-    const formName = ['general', 'project_description'];
-    console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
+    console.log('Rendering form:', PROJECT_DESCRIPTION_FORM_NAME.join('.'), 'with values:', initialValues);
     return (
       <Formik
-        component={formProps => Form({...formProps, formName: formName})}
+        component={formProps => Form({...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME})}
         enableReinitialize={false}
-        initialStatus={{formName: formName}}
+        initialStatus={{formName: PROJECT_DESCRIPTION_FORM_NAME}}
         initialValues={initialValues}
         innerRef={formRef}
         onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: formName, values: values})}
+        validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
       />
     );
   };

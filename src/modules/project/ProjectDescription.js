@@ -3,11 +3,11 @@ import React, {useLayoutEffect, useRef} from 'react';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {PROJECT_DESCRIPTION_FORM_NAME} from './project.constants';
 import {updatedProject} from './projects.slice';
 import alert from '../../shared/ui/alert';
 import {Form, useForm} from '../form';
 
-const formName = ['general', 'project_description'];
 let timeout;
 
 const ProjectDescription = () => {
@@ -65,7 +65,7 @@ const ProjectDescription = () => {
 
   const showErrors = (descriptionCurrent) => {
     const errorMessages = Object.entries(descriptionCurrent.errors).map(([key, value]) => (
-      getLabel(key, formName) + ': ' + value
+      getLabel(key, PROJECT_DESCRIPTION_FORM_NAME) + ': ' + value
     ));
     alert('Project Description Errors!', 'Changes in the following fields were not saved.'
       + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
@@ -76,12 +76,12 @@ const ProjectDescription = () => {
   return (
     <Formik
       component={formProps => Form(
-        {...formProps, formName: formName, onMyChange: onMyChange, setFieldValue: onMyChange})}
+        {...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME, onMyChange: onMyChange, setFieldValue: onMyChange})}
       enableReinitialize={true}
       initialValues={projectDescription}
       innerRef={descriptionFormRef}
       onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: formName, values: values})}
+      validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
       validateOnChange={true}
     />
   );
