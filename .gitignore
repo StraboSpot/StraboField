@@ -93,3 +93,4 @@ CHANGELOG.md
 env.json
 /android/keystore.properties
 /android/app/src/main/assets/modules.json
+/.claude/settings.local.json
