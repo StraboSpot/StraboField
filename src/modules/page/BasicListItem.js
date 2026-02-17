@@ -17,9 +17,13 @@ const BasicListItem = ({
                          item,
                          page,
                        }) => {
+  /* Data Hooks */
+
+  const {getLabel} = useForm();
   const {getMineralTitle, getPetRockTitle, getReactionTextureTitle} = usePetrology();
   const {getBeddingTitle, getSedRockTitle, getStratSectionTitle} = useSed();
-  const {getLabel} = useForm();
+
+  /* Logic Helpers */
 
   const getTitle = () => {
     switch (page.key) {
@@ -54,6 +58,8 @@ const BasicListItem = ({
         return 'Unknown';
     }
   };
+
+  /* View */
 
   return (
     <ListItem

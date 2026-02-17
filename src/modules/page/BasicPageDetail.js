@@ -38,14 +38,12 @@ const BasicPageDetail = ({
                            saveTemplate,
                            selectedFeature,
                          }) => {
+    /* Data Hooks */
+
     const dispatch = useDispatch();
-    const spot = useSelector(state => state.spot.selectedSpot);
     const {isInternetReachable} = useSelector(state => state.connections.isOnline);
     const {sesar, encoded_login} = useSelector(state => state.user);
-
-    const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
-    const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
-    const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+    const spot = useSelector(state => state.spot.selectedSpot);
 
     const {showErrors, validateForm} = useForm();
     const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
@@ -53,11 +51,18 @@ const BasicPageDetail = ({
     const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
     const {checkSampleName} = useSpots();
     const {deleteFeatureTags} = useTags();
-
-    const formRef = useRef(null);
     const toast = useToast();
 
+    /* Local State */
+
+    const formRef = useRef(null);
+
     const [initialValues, setInitialValues] = useState({});
+    const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+    const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
+    const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+
+    /* Derived Variables */
 
     const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
       : page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
@@ -66,12 +71,13 @@ const BasicPageDetail = ({
       if (spot.properties[groupKey] && spot.properties[groupKey][pageKey]) pageData = spot.properties[groupKey][pageKey];
       else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
     }
+    const isTemplate = saveTemplate;
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
       : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
-    const isTemplate = saveTemplate;
+    /* Side Effects */
 
     useLayoutEffect(() => {
       console.log('ULE BasicPageDetail []');
@@ -93,6 +99,27 @@ const BasicPageDetail = ({
     useEffect(() => {
       checkIfIsDisabled();
     }, [sesar.sesarToken.access]);
+
+    /* Event Handlers */
+
+    const handleIGSNChecked = (value) => {
+      setIsIGSNChecked(value);
+    };
+
+    const onSampleSaved = async (formCurrent) => {
+      console.log('Saving Sample To SESAR', formRef.current?.values);
+      await saveFeature(formCurrent);
+      closeDetailView();
+    };
+
+    const onSubmitForm = (values, {resetForm}) => {
+      console.log('Submitting form...', values);
+      setInitialValues(values);
+      resetForm({values});
+      console.log('Reset form...');
+    };
+
+    /* Logic Helpers */
 
     const cancelForm = async () => {
       closeDetailView();
@@ -189,84 +216,6 @@ const BasicPageDetail = ({
       }
     };
 
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
-    const onSampleSaved = async (formCurrent) => {
-      console.log('Saving Sample To SESAR', formRef.current?.values);
-      await saveFeature(formCurrent);
-      closeDetailView();
-    };
-
-    const onSubmitForm = (values, {resetForm}) => {
-      console.log('Submitting form...', values);
-      setInitialValues(values);
-      resetForm({values});
-      console.log('Reset form...');
-    };
-
-    const renderFormFields = () => {
-      const formName = getFormName();
-      return (
-        <View style={{flex: 1}}>
-          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
-          <Formik
-            enableReinitialize={true}
-            initialStatus={{formName: formName}}
-            initialValues={initialValues}
-            innerRef={formRef}
-            onReset={() => console.log('Resetting form...')}
-            onSubmit={onSubmitForm}
-            validate={values => validateForm({formName: formName, values: values})}
-          >
-            {formProps => (
-              <>
-                <Form {...{
-                  ...formProps,
-                  formName: formName,
-                  isReadOnly: isReadOnly,
-                  onMyChange: page.key === PAGE_KEYS.MINERALS
-                    ? ((name, value) => onMineralChange(formRef.current, name, value))
-                    : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
-                      ? ((name, value) => onSedFormChange(formRef.current, name, value))
-                      : page.key === PAGE_KEYS.SAMPLES
-                        ? ((name, value) => onSampleFormChange(formRef.current, name, value))
-                        : undefined
-                  ,
-                  getIsDisabled: getIsDisabled,
-                }}/>
-              </>
-            )}
-          </Formik>
-          {!isReadOnly && (
-            <DeleteButton
-              onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
-              title={'Delete ' + title + (isTemplate ? ' Template' : '')}
-            />
-          )}
-        </View>
-      );
-    };
-
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
-    };
-
     const saveButtonOnPress = () => {
       isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
     };
@@ -331,6 +280,71 @@ const BasicPageDetail = ({
       await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
       console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
     };
+
+    /* Render Functions */
+
+    const renderFormFields = () => {
+      const formName = getFormName();
+      return (
+        <View style={{flex: 1}}>
+          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
+          <Formik
+            enableReinitialize={true}
+            initialStatus={{formName: formName}}
+            initialValues={initialValues}
+            innerRef={formRef}
+            onReset={() => console.log('Resetting form...')}
+            onSubmit={onSubmitForm}
+            validate={values => validateForm({formName: formName, values: values})}
+          >
+            {formProps => (
+              <>
+                <Form {...{
+                  ...formProps,
+                  formName: formName,
+                  isReadOnly: isReadOnly,
+                  onMyChange: page.key === PAGE_KEYS.MINERALS
+                    ? ((name, value) => onMineralChange(formRef.current, name, value))
+                    : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
+                      ? ((name, value) => onSedFormChange(formRef.current, name, value))
+                      : page.key === PAGE_KEYS.SAMPLES
+                        ? ((name, value) => onSampleFormChange(formRef.current, name, value))
+                        : undefined
+                  ,
+                  getIsDisabled: getIsDisabled,
+                }}/>
+              </>
+            )}
+          </Formik>
+          {!isReadOnly && (
+            <DeleteButton
+              onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+              title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+            />
+          )}
+        </View>
+      );
+    };
+
+    const renderIGSNUpload = () => {
+      return (
+        <>
+          {!isEmpty(encoded_login) ? (
+            <IGSNUploadAndRegister
+              handleIGSNChecked={handleIGSNChecked}
+              isIGSNChecked={isIGSNChecked}
+              selectedFeature={selectedFeature}
+            />
+          ) : (
+            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+              You need to login to StraboSpot to upload to SESAR
+            </Text>
+          )}
+        </>
+      );
+    };
+
+    /* View */
 
     return (
       <>

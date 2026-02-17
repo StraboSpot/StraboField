@@ -28,9 +28,13 @@ const PageHeader = ({
                       showAddButton,
                       showFeaturesTagButton,
                     }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
+
+  /* Logic Helpers */
 
   const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
 
@@ -45,6 +49,8 @@ const PageHeader = ({
   const toggleFeaturesTagButton = () => {
     dispatch(setMultipleFeaturesTaggingEnabled(!isMultipleFeaturesTaggingEnabled));
   };
+
+  /* View */
 
   return (
     <>
