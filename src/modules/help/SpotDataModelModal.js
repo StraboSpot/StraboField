@@ -4,6 +4,7 @@ import {ScrollView} from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
 
+import {shouldExpandNode} from './help.helpers';
 import forms from '../../assets/forms';
 import {isEmpty} from '../../shared/Helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -166,13 +167,6 @@ const SpotDataModelModal = ({close}) => {
     });
 
     setSpotDataModel(spotDataModelTemp);
-  };
-
-  const shouldExpandNode = (keyName, data, level) => {
-    // Since hideRoot is true, level 0 is actually the first visible level
-    // Level 0: type, geometry, properties
-    // Level 1: contents of properties (what we want to show)
-    return level <= 1;
   };
 
   /* View */
