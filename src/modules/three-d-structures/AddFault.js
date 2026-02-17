@@ -1,24 +1,29 @@
 import React, {useState} from 'react';
 
-import {FAULT_MEASUREMENTS_KEYS} from './threeDStructures.constants';
+import {
+  ADD_FAULT_FIRST_KEYS,
+  ADD_FAULT_LAST_KEYS,
+  ADD_FAULT_MAIN_BUTTONS_KEYS,
+  ADD_FAULT_SECOND_BUTTON_KEYS,
+  FAULT_MEASUREMENTS_KEYS,
+} from './threeDStructures.constants';
 import {Form, MainButtons} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
 const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Local State */
 
-  const [isFaultMeasurementsModalVisible, setIsFaultMeasurementsModalVisible] = useState(false);
   const [faultMeasurementsGroupField, setFaultMeasurementsGroupField] = useState({});
+  const [isFaultMeasurementsModalVisible, setIsFaultMeasurementsModalVisible] = useState(false);
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['label'];
-  const mainButtonsKeys = ['fault_or_sz_type'];
-  const secondButtonKeys = ['movement', 'movement_justification', 'directional_indicators'];
-  const lastKeys = ['movement_amount_m', 'amplitude_m', 'folded_layer_thickness_m', 'fault_notes'];
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const firstKeysFields = ADD_FAULT_FIRST_KEYS.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = ADD_FAULT_LAST_KEYS.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>
@@ -26,7 +31,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
       <MainButtons
         formName={formName}
         formProps={formProps}
-        mainKeys={mainButtonsKeys}
+        mainKeys={ADD_FAULT_MAIN_BUTTONS_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
       <MeasurementButtons
@@ -39,7 +44,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
       <MainButtons
         formName={formName}
         formProps={formProps}
-        mainKeys={secondButtonKeys}
+        mainKeys={ADD_FAULT_SECOND_BUTTON_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
       <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>

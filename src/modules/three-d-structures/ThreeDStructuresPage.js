@@ -4,6 +4,7 @@ import {SectionList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ThreeDStructureItem from './ThreeDStructureItem';
+import {THREE_D_STRUCTURE_SECTIONS} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -14,14 +15,6 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
-
-const SECTIONS = {
-  // FABRICS: {title: 'Fabrics', key: 'fabric'}, // Hidden here and displayed on Fabrics page as deprecated
-  FOLDS: {title: 'Folds', key: 'fold'},
-  FAULTS: {title: 'Faults', key: 'fault'},
-  TENSORS: {title: 'Tensors', key: 'tensor'},
-  OTHER: {title: 'Other', key: 'other'},
-};
 
 const ThreeDStructuresPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -82,7 +75,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   };
 
   const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(SECTIONS).reduce(
+    const sectionKey = Object.values(THREE_D_STRUCTURE_SECTIONS).reduce(
       (acc, {title, key}) => sectionTitle === title ? key : acc, '');
     return (
       <>
@@ -99,7 +92,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   };
 
   const renderSections = () => {
-    const dataSectioned = Object.values(SECTIONS).reduce((acc, {title, key}) => {
+    const dataSectioned = Object.values(THREE_D_STRUCTURE_SECTIONS).reduce((acc, {title, key}) => {
       const data = spot?.properties?._3d_structures?.filter(d => d.type === key) || [];
       const dataSorted = data.slice().sort((a, b) => get3dStructureTitle(a).localeCompare(get3dStructureTitle(b)));
       return [...acc, {title: title, data: dataSorted}];
