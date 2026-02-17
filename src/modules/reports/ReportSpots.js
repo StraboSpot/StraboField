@@ -3,6 +3,7 @@ import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-nati
 
 import {useSelector} from 'react-redux';
 
+import {REPORT_ITEM_WIDTH} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -13,8 +14,6 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
-
-const itemWidth = 300;
 
 const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
   /* Data Hooks */
@@ -62,7 +61,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
           {checkedSpots.map(d => (
             <TouchableOpacity
               key={d.properties.id.toString()}
-              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : itemWidth}}
+              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : REPORT_ITEM_WIDTH}}
             >
               <SpotsListItem onPress={handleSpotPressed} spot={d}/>
             </TouchableOpacity>

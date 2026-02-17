@@ -3,6 +3,7 @@ import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-nati
 
 import {useSelector} from 'react-redux';
 
+import {REPORT_ITEM_WIDTH} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -13,8 +14,6 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
-
-const itemWidth = 300;
 
 const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
   /* Data Hooks */
@@ -62,7 +61,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
           {checkedTags.map(t => (
             <TouchableOpacity
               key={t.id.toString()}
-              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : itemWidth}}
+              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : REPORT_ITEM_WIDTH}}
             >
               <TagsListItem isChevronVisible onPress={handleTagPressed} tag={t}/>
             </TouchableOpacity>
