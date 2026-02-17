@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {USER_CONVENTIONS_FORM_NAME} from './user.constants';
 import userStyles from './user.styles';
 import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/useDownload';
@@ -38,10 +39,6 @@ const UserProfile = () => {
   const formRef = useRef(null);
 
   const [isDownloading, setIsDownloading] = useState(false);
-
-  /* Derived Variables */
-
-  const formName = ['general', 'user_conventions'];
 
   /* Side Effects */
 
@@ -165,12 +162,12 @@ const UserProfile = () => {
           ListHeaderComponent={
             <>
               <Formik
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                component={formProps => Form({formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
                 enableReinitialize={true}  // Update values if preferences change while form open
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
+                validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
               {renderBulkUpdatesSection()}
