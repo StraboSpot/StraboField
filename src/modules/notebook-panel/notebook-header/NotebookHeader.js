@@ -20,6 +20,7 @@ import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
+import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
@@ -103,8 +104,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     const key = spot.properties.trace.trace_type;
     let traceText = traceDictionary[key] || key.replace(/_/g, ' ');
     traceText = toTitleCase(traceText) + ' Trace';
-    const traceSubTypeFields = ['contact_type', 'geologic_structure_type', 'geomorphic_feature', 'antropogenic_feature', 'other_feature'];
-    const subType = traceSubTypeFields.find(subTypeField => spot.properties.trace[subTypeField]);
+    const subType = TRACE_SUB_TYPE_FIELDS.find(subTypeField => spot.properties.trace[subTypeField]);
     if (subType) {
       const subTypeValue = spot.properties.trace[subType];
       const subTypeLabel = traceDictionary[subTypeValue];

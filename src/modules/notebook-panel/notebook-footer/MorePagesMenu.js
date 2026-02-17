@@ -18,14 +18,20 @@ const MorePagesMenu = ({
                          closeMorePagesMenu,
                          visible,
                        }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
 
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
+  /* Derived Variables */
+
   const generalPagesToShow = getRelevantGeneralPages();
   const petPagesToShow = getRelevantPetPages();
   const sedPagesToShow = getRelevantSedPages();
+
+  /* Logic Helpers */
 
   const switchPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -36,6 +42,8 @@ const MorePagesMenu = ({
     if (notebookPagesOn.includes(key)) dispatch(removedNotebookPageOn(key));
     else dispatch(addedNotebookPageOn(key));
   };
+
+  /* Render Functions */
 
   const renderMenuItem = (page, isShowBottomDivider) => {
     return (
@@ -61,6 +69,8 @@ const MorePagesMenu = ({
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

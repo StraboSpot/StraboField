@@ -14,18 +14,9 @@ import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {useSpots} from '../../spots';
+import {NOTEBOOK_MENU_ACTIONS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
-
-const actions = [
-  {key: 'copy', title: 'Copy this Spot'},
-  {key: 'zoom', title: 'Zoom to this Spot'},
-  {key: 'delete', title: 'Delete this Spot'},
-  {key: 'geography', title: 'Show Geography'},
-  {key: 'metadata', title: 'Show Metadata'},
-  {key: 'nesting', title: 'Show Nesting'},
-  ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
-];
 
 const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
   /* Data Hooks */
@@ -123,7 +114,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           contentContainerStyle={{alignItems: 'center'}}
-          data={actions}
+          data={NOTEBOOK_MENU_ACTIONS}
           key={'notebookActions'}
           renderItem={renderActionItem}
         />
