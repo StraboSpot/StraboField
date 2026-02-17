@@ -24,20 +24,33 @@ const OtherFeatureDetail = ({
                               isReadOnly,
                               selectedFeature,
                             }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+  const projectFeatures = useSelector(state => state.project.project?.other_features);
+  const spot = useSelector(state => state.spot.selectedSpot);
+
   const {showErrors} = useForm();
   const {deleteFeatureTags} = useTags();
-  const spot = useSelector(state => state.spot.selectedSpot);
-  const projectFeatures = useSelector(state => state.project.project?.other_features);
+
+  /* Local State */
+
+  const formRef = useRef(null);
+
+  let [otherType, setOtherType] = useState(undefined);
+
+  /* Derived Variables */
 
   const customFeatureTypes = projectFeatures.filter(feature => !DEFAULT_GEOLOGIC_TYPES.includes(feature));
-  let [otherType, setOtherType] = useState(undefined);
-  const formRef = useRef(null);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE OtherFeatureDetail []');
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const cancelForm = async () => {
     hideFeatureDetail();
@@ -92,6 +105,77 @@ const OtherFeatureDetail = ({
       {cancelable: false},
     );
   };
+
+  const saveForm = async (formCurrent) => {
+    try {
+      await formCurrent.submitForm();
+      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let featureToEdit;
+      let otherFeatures = spot.properties.other_features;
+      if (otherFeatures && otherFeatures.length > 0) {
+        let existingFeatures = otherFeatures.filter(feature => feature.id === selectedFeature.id);
+        if (!isEmpty(existingFeatures)) {
+          otherFeatures = otherFeatures.filter(feature => feature.id !== selectedFeature.id);
+          featureToEdit = JSON.parse(JSON.stringify(existingFeatures[0]));
+        }
+        else {
+          otherFeatures = JSON.parse(JSON.stringify(otherFeatures));
+          featureToEdit = selectedFeature;
+        }
+      }
+      else {
+        otherFeatures = [];
+        featureToEdit = selectedFeature;
+      }
+      if (updateFeature(featureToEdit, otherFeatures, formValues)) {
+        await formRef.current.resetForm();
+        hideFeatureDetail();
+      }
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
+  const updateFeature = (feature, otherFeatures, formValues) => {
+    feature.label = formValues.label || formValues.name;
+    feature.name = formValues.name;
+    if (formValues.type === 'other') {
+      if (validateAndSetNewType(otherType)) {
+        feature.type = otherType;
+        //let index = projectFeatures[projectFeatures.length - 1].id + 1;
+        let name = otherType;
+        let projectFeaturesCopy = JSON.parse(JSON.stringify(projectFeatures));
+        projectFeaturesCopy.push(name);
+        dispatch(addedCustomFeatureTypes(projectFeaturesCopy));
+      }
+      else return false;
+    }
+    else feature.type = formValues.type;
+    feature.description = formValues.description;
+    otherFeatures.push(feature);
+    const spotId = spot.properties.id;
+    dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+    dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures, spotId: spotId}));
+    return true;
+  };
+
+  const validateAndSetNewType = (newType) => {
+    let existingCustomFeatureTypes = customFeatureTypes.filter(feature => feature === newType);
+    if (!isEmpty(existingCustomFeatureTypes)) {
+      alert('Alert!',
+        'The type ' + newType + ' is already being used. Choose a different type name.');
+      setOtherType('');
+      return false;
+    }
+    else if (isEmpty(otherType)) {
+      alert('Alert!', 'The new type being defined is empty');
+      return false;
+    }
+    else return true;
+  };
+
+  /* Render Functions */
 
   const renderForm = () => {
     // Validate the feature
@@ -193,74 +277,7 @@ const OtherFeatureDetail = ({
     );
   };
 
-  const saveForm = async (formCurrent) => {
-    try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
-      let featureToEdit;
-      let otherFeatures = spot.properties.other_features;
-      if (otherFeatures && otherFeatures.length > 0) {
-        let existingFeatures = otherFeatures.filter(feature => feature.id === selectedFeature.id);
-        if (!isEmpty(existingFeatures)) {
-          otherFeatures = otherFeatures.filter(feature => feature.id !== selectedFeature.id);
-          featureToEdit = JSON.parse(JSON.stringify(existingFeatures[0]));
-        }
-        else {
-          otherFeatures = JSON.parse(JSON.stringify(otherFeatures));
-          featureToEdit = selectedFeature;
-        }
-      }
-      else {
-        otherFeatures = [];
-        featureToEdit = selectedFeature;
-      }
-      if (updateFeature(featureToEdit, otherFeatures, formValues)) {
-        await formRef.current.resetForm();
-        hideFeatureDetail();
-      }
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-    }
-  };
-
-  const updateFeature = (feature, otherFeatures, formValues) => {
-    feature.label = formValues.label || formValues.name;
-    feature.name = formValues.name;
-    if (formValues.type === 'other') {
-      if (validateAndSetNewType(otherType)) {
-        feature.type = otherType;
-        //let index = projectFeatures[projectFeatures.length - 1].id + 1;
-        let name = otherType;
-        let projectFeaturesCopy = JSON.parse(JSON.stringify(projectFeatures));
-        projectFeaturesCopy.push(name);
-        dispatch(addedCustomFeatureTypes(projectFeaturesCopy));
-      }
-      else return false;
-    }
-    else feature.type = formValues.type;
-    feature.description = formValues.description;
-    otherFeatures.push(feature);
-    const spotId = spot.properties.id;
-    dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
-    dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures, spotId: spotId}));
-    return true;
-  };
-
-  const validateAndSetNewType = (newType) => {
-    let existingCustomFeatureTypes = customFeatureTypes.filter(feature => feature === newType);
-    if (!isEmpty(existingCustomFeatureTypes)) {
-      alert('Alert!',
-        'The type ' + newType + ' is already being used. Choose a different type name.');
-      setOtherType('');
-      return false;
-    }
-    else if (isEmpty(otherType)) {
-      alert('Alert!', 'The new type being defined is empty');
-      return false;
-    }
-    else return true;
-  };
+  /* View */
 
   return (
     <View style={{flex: 1}}>
