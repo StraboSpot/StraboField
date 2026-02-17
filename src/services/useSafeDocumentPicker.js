@@ -7,10 +7,17 @@ import {useDispatch} from 'react-redux';
 import {setLoadingStatus} from '../modules/home/home.slice';
 
 const useSafeDocumentPicker = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+
   const toast = useToast();
 
+  /* Local State */
+
   const [isPicking, setIsPicking] = useState(false);
+
+  /* Derived State */
 
   const handleError = useCallback((err) => {
     console.log(isErrorWithCode(err));
@@ -40,7 +47,6 @@ const useSafeDocumentPicker = () => {
 
   const safePick = useCallback(async (options) => {
     if (isPicking) return null;
-
     setIsPicking(true);
     try {
       return await pick(options);
@@ -57,8 +63,8 @@ const useSafeDocumentPicker = () => {
   }, [isPicking, dispatch, handleError]);
 
   return {
-    isPicking,
     handleError,
+    isPicking,
     safePick,
   };
 };

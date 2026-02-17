@@ -5,6 +5,7 @@ import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {APP_EXPORT_DIRECTORY} from './directories.constants';
 import useDevice from './useDevice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';
@@ -36,7 +37,6 @@ const useExport = () => {
 
   /* Derived Variables */
 
-  const appExportDirectory = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.EXPORT_FILES_ANDROID;
   const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
   const userDbCopy = JSON.parse(JSON.stringify(userDb));
   const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
@@ -84,7 +84,7 @@ const useExport = () => {
 
   const gatherImagesForDistribution = async (data, fileName, isBeingExported) => {
     try {
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       console.log('data:', data);
       await doesDeviceDirectoryExist(deviceDir + fileName + '/images');
       dispatch(removedLastStatusMessage());
@@ -141,7 +141,7 @@ const useExport = () => {
     try {
       const maps = data.mapNamesDb;
       const mapCount = Object.values(maps).length;
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Offline Maps...'));
       if (!isEmpty(maps)) {
@@ -166,7 +166,7 @@ const useExport = () => {
   const gatherOtherMapsForDistribution = async (exportedFileName, isBeingExported) => {
     try {
       console.log(configDb);
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Custom Maps...'));
       if (!isEmpty(configDb.other_maps)) {
@@ -230,14 +230,14 @@ const useExport = () => {
   const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported) => {
     // try {
     // dispatch(setLoadingStatus({view: 'modal', bool: true}));
-    await makeDirectory(appExportDirectory + selectedBackupFile);
+    await makeDirectory(APP_EXPORT_DIRECTORY + selectedBackupFile);
 
     // Make temp directory for the export files to be zipped up.
-    console.log('Directory made:', appExportDirectory);
+    console.log('Directory made:', APP_EXPORT_DIRECTORY);
 
     // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
     const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
-    const destination = appExportDirectory + selectedBackupFile;
+    const destination = APP_EXPORT_DIRECTORY + selectedBackupFile;
     console.log(selectedBackupFile);
 
     const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
@@ -256,13 +256,13 @@ const useExport = () => {
     if (Platform.OS === 'ios') {
       // iOS: Zip directly to Distribution folder
       const zipPath = APP_DIRECTORIES.EXPORT_FILES_IOS;
-      const path = await zip(appExportDirectory + selectedBackupFile, zipPath + zipFileName);
+      const path = await zip(APP_EXPORT_DIRECTORY + selectedBackupFile, zipPath + zipFileName);
       console.log(`zip completed at ${path}`);
     }
     else {
       // Android: Zip to private directory first, then copy to Downloads via MediaStore
-      const tempZipPath = appExportDirectory + zipFileName;
-      await zip(appExportDirectory + selectedBackupFile, tempZipPath);
+      const tempZipPath = APP_EXPORT_DIRECTORY + zipFileName;
+      await zip(APP_EXPORT_DIRECTORY + selectedBackupFile, tempZipPath);
       console.log(`zip completed at ${tempZipPath}`);
 
       // Copy to Downloads folder using MediaStore (required for Android 11+)
@@ -278,10 +278,10 @@ const useExport = () => {
       console.log('File copied to Downloads:', result);
 
       // Clean up temp zip file
-      await deleteFromDevice(appExportDirectory, zipFileName);
+      await deleteFromDevice(APP_EXPORT_DIRECTORY, zipFileName);
     }
 
-    const deleteTempFolder = await deleteFromDevice(appExportDirectory, selectedBackupFile);
+    const deleteTempFolder = await deleteFromDevice(APP_EXPORT_DIRECTORY, selectedBackupFile);
     console.log('Folder', deleteTempFolder);
     console.log('All Done Exporting');
     dispatch(clearedStatusMessages());

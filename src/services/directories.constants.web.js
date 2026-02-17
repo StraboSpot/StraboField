@@ -1,3 +1,6 @@
+export const APP_EXPORT_DIRECTORY = '';
+export const TEMP_IMAGES_DOWNSIZED_DIRECTORY = '';
+
 export const APP_DIRECTORIES = {
   ROOT_PATH: '',
   APP_DIR: '',

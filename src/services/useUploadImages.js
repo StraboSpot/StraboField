@@ -4,7 +4,8 @@ import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProjectTransferProgress} from './connections.slice';
-import {APP_DIRECTORIES} from './directories.constants';
+import {APP_DIRECTORIES, TEMP_IMAGES_DOWNSIZED_DIRECTORY} from './directories.constants';
+import {getImageIds} from './services.helpers';
 import useDevice from './useDevice';
 import useServerRequests from './useServerRequests';
 import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../modules/home/home.slice';
@@ -30,10 +31,6 @@ const useUploadImages = () => {
   const [imageUploadStatusMessage, setImageUploadStatusMessage] = useState('');
   const [totalImages, setTotalImages] = useState(0);
 
-  /* Derived Variables */
-
-  const tempImagesDownsizedDirectory = APP_DIRECTORIES.APP_DIR + '/TempImages';
-
   /* Internal Functions */
 
   // Upload the image to server
@@ -56,14 +53,6 @@ const useUploadImages = () => {
       console.log('Error Uploading Image', imageId, err);
       throw Error('Error Uploading Image', imageId, err);
     }
-  };
-
-  // Gather all the images in spots and returns the ids.
-  const getImageIds = (images) => {
-    const imageIds = [];
-    images.forEach(image => imageIds.push(image.id));
-    console.log(imageIds);
-    return imageIds;
   };
 
   /* Exported Functions */
@@ -121,8 +110,8 @@ const useUploadImages = () => {
           height = max_size;
         }
 
-        await makeDirectory(tempImagesDownsizedDirectory);
-        const createResizedImageProps = [imageProps.uri, width, height, 'JPEG', 100, 0, tempImagesDownsizedDirectory];
+        await makeDirectory(TEMP_IMAGES_DOWNSIZED_DIRECTORY);
+        const createResizedImageProps = [imageProps.uri, width, height, 'JPEG', 100, 0, TEMP_IMAGES_DOWNSIZED_DIRECTORY];
         return await ImageResizer.createResizedImage(...createResizedImageProps);
       }
       else return imageProps;
