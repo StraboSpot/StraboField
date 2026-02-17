@@ -28,9 +28,7 @@ const TagsModal = ({
                      isFeatureLevelTagging,
                      zoomToCurrentLocation,
                    }) => {
-  const toast = useToast();
-  const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
-  const {setPointAtCurrentLocation} = useMapLocation();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
@@ -42,18 +40,27 @@ const TagsModal = ({
   const selectedSpotsForTagging = useSelector(state => state.spot.intersectedSpotsForTagging);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
+  const toast = useToast();
+
+  /* Local State */
+
   const formRef = useRef(null);
 
   const [checkedTagsTemp, setCheckedTagsTemp] = useState([]);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  const pageVisible = pagesStack.slice(-1)[0];
+  /* Derived Variables */
 
+  const pageVisible = pagesStack.slice(-1)[0];
   const pageKey = pageVisible === PAGE_KEYS.GEOLOGIC_UNITS
   || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+
+  /* Logic Helpers */
 
   const addTag = () => setIsDetailModalVisible(true);
 
@@ -104,6 +111,13 @@ const TagsModal = ({
       toast.show('Tags Saved Error!', {type: 'danger'});
     }
   };
+
+  const searchTagsByType = (tagType) => {
+    const tagsCopy = JSON.parse(JSON.stringify(tags));
+    return filterTagsByTagType(tagsCopy, tagType);
+  };
+
+  /* Render Functions */
 
   const renderSpotTagsList = () => {
     return (
@@ -189,11 +203,6 @@ const TagsModal = ({
     );
   };
 
-  const searchTagsByType = (tagType) => {
-    const tagsCopy = JSON.parse(JSON.stringify(tags));
-    return filterTagsByTagType(tagsCopy, tagType);
-  };
-
   const renderTagsModalContent = () => {
     return (
       <>
@@ -219,6 +228,8 @@ const TagsModal = ({
       </>
     );
   };
+
+  /* View */
 
   return renderTagsModalContent();
 };

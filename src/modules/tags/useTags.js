@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {tagsStyles} from './index';
 import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
+import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
@@ -59,10 +60,6 @@ const useTags = () => {
       let foundFeature = deepFindFeatureById(spot.properties, featureId);
       return JSON.parse(JSON.stringify(foundFeature));
     }
-  };
-
-  const getFeatureLabel = (feature) => {
-    return feature && (feature.label || feature.name_of_experiment || 'Unknown Name');
   };
 
   const getFeatureTagsAtSpot = (featuresAtSpot) => {
@@ -157,12 +154,6 @@ const useTags = () => {
     dispatch(deletedTagIdFromReports(tagToDelete.id));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));
     dispatch(setSelectedTag({}));
-  };
-
-  const filterTagsByTagType = (tags, tagType) => {
-    if (isEmpty(tagType)) return tags;
-    const tagsByTagsType = tags.filter(tag => tag.type.toUpperCase().startsWith(tagType.toUpperCase()));
-    return tagsByTagsType;
   };
 
   // to display all features that are currently tagged to the provided tag
@@ -296,12 +287,6 @@ const useTags = () => {
       dispatch(setSelectedAttributes(selectedFeaturesForTaggingCopy));
       return false;
     }
-  };
-
-  const tagSpotExists = (tag, spot) => {
-    if (isEmpty(tag.spots)) return false;
-    const i = tag.spots.indexOf(spot.properties.id);
-    return i !== -1;
   };
 
   const toggleContinuousTagging = (tag) => {

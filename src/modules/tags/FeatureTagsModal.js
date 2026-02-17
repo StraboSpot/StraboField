@@ -6,7 +6,7 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {TagsNotebookModal} from '../tags';
 
 const FeatureTagsModal = () => {
-  /* Data Hooks / State */
+  /* Data Hooks */
 
   const modalVisible = useSelector(state => state.home.modalVisible);
 

@@ -22,22 +22,30 @@ const TagDetail = ({
                      openSpot,
                      setIsDetailModalVisible,
                    }) => {
-  const {getSpotById} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+  /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
-  const [refresh, setRefresh] = useState(false);
-
-  const {isSpotInReadOnlyDataset} = useProject();
 
   // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
+
+  const {isSpotInReadOnlyDataset} = useProject();
+  const {getSpotById} = useSpots();
+  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+
+  /* Local State */
+
+  const [refresh, setRefresh] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE TagDetail [selectedTag]', selectedTag);
     setRefresh(!refresh); // #TODO : Current hack to render two different FlatListComponents when selectedTag Changes.
                           //         To handle the navigation issue from 0 tagged features to non zero tagged features.
   }, [selectedTag]);
+
+  /* Render Functions */
 
   const renderSpotFeatureItem = (feature) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -97,6 +105,8 @@ const TagDetail = ({
       />
     );
   };
+
+  /* View */
 
   return (
     <FlatList
