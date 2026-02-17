@@ -4,6 +4,7 @@ import {Platform, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
+import {formatDeg} from './compass.helpers';
 import compassStyles from './compass.styles';
 import {roundToDecimalPlaces} from '../../shared/Helpers';
 import {overlayStyles} from '../home/overlays';
@@ -22,11 +23,7 @@ const CompassDebug = ({compassData, matrixRotation}) => {
 
   /* Logic Helpers */
 
-  const Col = ({children, flex = 1}) => (
-    <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
-  );
-
-  const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
+  const Col = ({children, flex = 1}) => <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>;
 
   const Row = ({children}) => (
     <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
