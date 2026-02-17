@@ -491,6 +491,9 @@ function getRhsText(stmtLines) {
     parts.push(trimmed);
   }
   const text = parts.join(' ');
+  // For non-declaration statements (if, for, etc.), use the full text
+  // so that all variable references are detected for dependency ordering
+  if (!/^\s*(?:const|let|var)\s/.test(text)) return text;
   // Remove everything up to and including the first = (the declaration part)
   const eqIdx = text.indexOf('=');
   return eqIdx !== -1 ? text.slice(eqIdx + 1) : text;
@@ -905,8 +908,8 @@ for (const file of files) {
   internalFuncs.sort(funcSort);
   exportedFuncs.sort(funcSort);
 
-  // Only proceed if there are functions to organize
-  if (internalFuncs.length === 0 && exportedFuncs.length === 0) continue;
+  // Only skip if there's nothing to organize (no functions and no preamble)
+  if (internalFuncs.length === 0 && exportedFuncs.length === 0 && preambleChunks.length === 0) continue;
 
   // === PART 3: Detect functions that need hoisting ===
   // Preamble code (non-function chunks like object literals) runs at definition
