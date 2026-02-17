@@ -7,6 +7,7 @@ import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import GeoFieldInputs from './GeoFieldInputs';
+import {GEOGRAPHY_FORM_NAME} from './geography.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -84,7 +85,7 @@ const Geography = ({isReadOnly}) => {
   /* Render Functions */
 
   const renderFormFields = () => {
-    const formName = ['general', 'geography'];
+    const formName = GEOGRAPHY_FORM_NAME;
     console.log('Rendering Form:', formName[0] + '.' + formName[1], 'with', spot.properties);
     return (
       <View style={{flex: 1}}>
