@@ -1,14 +1,18 @@
 import React from 'react';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import {Form, MainButtons} from '../form';
 
+const {firstKeys, lastKeys} = ADD_ROCK_KEYS.fault;
+
 const AddRockFaultModal = ({formName, formProps, setChoicesViewKey, survey}) => {
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['fault_rock'];
-  const lastKeys = ['interp_note'];
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>

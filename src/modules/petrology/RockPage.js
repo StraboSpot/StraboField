@@ -5,7 +5,13 @@ import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
+import {
+  ALTERATION_ORE_SECTION_TITLE,
+  FAULT_SECTION_TITLE,
+  IGNEOUS_SECTION_TITLES,
+  METAMORPHIC_SECTION_TITLE,
+  SEDIMENTARY_SECTION_TITLE,
+} from './petrology.constants';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
@@ -43,32 +49,13 @@ const RockPage = ({isReadOnly, page}) => {
 
   /* Derived Variables */
 
-  const ALTERATION_ORE_SECTIONS = {
-    ALTERATION_ORE: {title: 'Alteration, Ore Rocks', key: PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE},
-    DEPRECATED: {title: 'Alteration, Ore Rocks (Deprecated Version)', key: null},
-  };
-  const FAULT_SECTIONS = {
-    FAULT: {title: 'Fault & Shear Zone Rocks', key: PAGE_KEYS.ROCK_TYPE_FAULT},
-  };
   const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
-  const IGNEOUS_SECTIONS = {
-    PLUTONIC: {title: 'Plutonic Rocks', key: IGNEOUS_ROCK_CLASSES.PLUTONIC},
-    VOLCANIC: {title: 'Volcanic Rocks', key: IGNEOUS_ROCK_CLASSES.VOLCANIC},
-    DEPRECATED: {title: 'Igneous Rocks (Deprecated Version)', key: null},
-  };
-  const METAMORPHIC_SECTIONS = {
-    PLUTONIC: {title: 'Metamorphic Rocks', key: PAGE_KEYS.ROCK_TYPE_METAMORPHIC},
-    DEPRECATED: {title: 'Metamorphic Rocks (Deprecated Version)', key: null},
-  };
   const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
-  const SEDIMENTARY_SECTIONS = {
-    SEDIMENTARY: {title: 'Sedimentary Rocks', key: PAGE_KEYS.LITHOLOGIES},
-  };
-  const pageSections = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTIONS
-    : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTIONS
-      : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTIONS
-        : pageKey === PAGE_KEYS.ROCK_TYPE_FAULT ? FAULT_SECTIONS
-          : SEDIMENTARY_SECTIONS;
+  const pageSectionsTitles = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTION_TITLES
+    : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTION_TITLE
+      : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTION_TITLE
+        : pageKey === PAGE_KEYS.ROCK_TYPE_FAULT ? FAULT_SECTION_TITLE
+          : SEDIMENTARY_SECTION_TITLE;
   const rockData = spot.properties[groupKey] || {};
 
   /* Side Effects */
@@ -222,12 +209,8 @@ const RockPage = ({isReadOnly, page}) => {
     );
   };
 
-  const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(pageSections).reduce((acc, {title, key}) => {
-        return sectionTitle === title ? key : acc;
-      },
-      '');
-    if (sectionKey && !isReadOnly) {
+  const renderSectionHeader = (sectionTitle, sectionKey) => {
+    if (sectionKey !== 'deprecated' && !isReadOnly) {
       return (
         <SectionDividerWithRightButton
           dividerText={sectionTitle}
@@ -239,15 +222,15 @@ const RockPage = ({isReadOnly, page}) => {
   };
 
   const renderSections = () => {
-    const rocksGrouped = Object.values(pageSections).reduce((acc, {title, key}) => {
-      const data = key ? spot?.properties[groupKey] && spot?.properties[groupKey][pageKey]
+    const rocksGrouped = Object.entries(pageSectionsTitles).reduce((acc, [key, title]) => {
+      const data = key !== 'deprecated' ? spot?.properties[groupKey] && spot?.properties[groupKey][pageKey]
         && Array.isArray(spot?.properties[groupKey][pageKey])
         && spot?.properties[groupKey][pageKey].filter(
           rock => key === pageKey || rock.igneous_rock_class === key) || []
         : spot?.properties[groupKey] && spot?.properties[groupKey].rock_type?.includes(pageKey)
           ? [spot.properties[groupKey]]
           : [];
-      return !key && isEmpty(data) ? acc : [...acc, {title: title, data: data.reverse()}];
+      return key === 'deprecated' && isEmpty(data) ? acc : [...acc, {title, key, data: data.reverse()}];
     }, []);
 
     return (
@@ -264,7 +247,7 @@ const RockPage = ({isReadOnly, page}) => {
         renderSectionFooter={({section}) => {
           return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
         }}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+        renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
         sections={rocksGrouped}
         stickySectionHeadersEnabled={true}
       />

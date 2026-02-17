@@ -1,6 +1,6 @@
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
+import {LABELS_WITH_ABBREVIATIONS} from '../petrology/minerals.constants';
 
 export const convertXLSFormLogicToJS = (logic) => {
   logic = logic.replace(/not/g, '!');

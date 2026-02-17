@@ -4,6 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -14,11 +15,7 @@ import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
-// Relevant keys for quick-entry modal
-const firstKeys = ['reactions'];
-const basedOnKey = 'based_on';
-const baseOnOtherKey = 'other_based_on';
-const lastKeys = ['notes'];
+const {firstKeys, basedOnKey, basedOnOtherKey, lastKeys} = ADD_ROCK_KEYS.reaction;
 
 const AddReactionTextureModal = () => {
   /* Data Hooks */
@@ -41,7 +38,7 @@ const AddReactionTextureModal = () => {
   const petKey = PAGE_KEYS.REACTIONS;
   const formName = ['pet', petKey];
   const survey = getSurvey(formName);
-  const basedOnOtherField = survey.find(f => f.name === baseOnOtherKey);
+  const basedOnOtherField = survey.find(f => f.name === basedOnOtherKey);
   const choices = getChoices(formName);
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));

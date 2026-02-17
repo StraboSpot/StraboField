@@ -3,18 +3,14 @@ import {ScrollView, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
 
-// Relevant keys for quick-entry modal
-const firstKeys = ['metamorphic_rock_type'];
-const secondKeys = ['protolith'];
-const thirdKeys = ['facies'];
-const fourthKeys = ['zone'];
-const lastKeys = ['notes_metamorphic'];
+const {firstKeys, secondKeys, thirdKeys, fourthKeys, lastKeys} = ADD_ROCK_KEYS.metamorphic;
 
 const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey}) => {
   /* Data Hooks */

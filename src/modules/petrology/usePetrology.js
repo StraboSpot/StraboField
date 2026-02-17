@@ -1,10 +1,7 @@
 import {useDispatch} from 'react-redux';
 
-import {
-  ABBREVIATIONS_WITH_LABELS,
-  LABELS_WITH_ABBREVIATIONS,
-  ROCK_FIRST_ORDER_CLASS_FIELDS,
-} from './petrology.constants';
+import {ROCK_FIRST_ORDER_CLASS_FIELDS} from './petrology.constants';
+import {getAbbrevFromFullMineralName, getFullMineralNameFromAbbrev} from './petrology.helpers';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -17,17 +14,6 @@ const usePetrology = () => {
   const dispatch = useDispatch();
 
   const {getLabel, getLabels, getSurvey, showErrors} = useForm();
-
-  /* Internal Functions */
-
-  const getAbbrevFromFullMineralName = (name) => {
-    const keyMatch = Object.keys(LABELS_WITH_ABBREVIATIONS).find(key => key.toLowerCase() === name.toLowerCase());
-    if (keyMatch) return LABELS_WITH_ABBREVIATIONS[keyMatch].split(',')[0];
-  };
-
-  const getFullMineralNameFromAbbrev = (abbrev) => {
-    return ABBREVIATIONS_WITH_LABELS[abbrev.toLowerCase()];
-  };
 
   /* Exported Functions */
 

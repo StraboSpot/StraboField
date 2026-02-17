@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
@@ -18,12 +19,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
-// Relevant keys for quick-entry modal
-const firstKeys = ['mineral_abbrev', 'full_mineral_name'];
-const igOrMetKey = 'igneous_or_metamorphic';
-const igButtonsKeys = ['habit', 'textural_setting_igneous'];
-const metButtonsKeys = ['habit_met', 'textural_setting_metamorphic'];
-const lastKeys = ['average_grain_size_mm', 'maximum_grain_size_mm', 'modal', 'mineral_notes'];
+const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
 
 let tempValues = {};
 

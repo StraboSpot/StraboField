@@ -1,27 +1,18 @@
 import React, {useState} from 'react';
 import {FlatList, Linking, Text, View} from 'react-native';
 
-import {MINERAL_GLOSSARY_INFO} from './petrology.constants';
+import {MINERAL_GLOSSARY_INFO} from './minerals.constants';
+import {chunk} from './petrology.helpers';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
+
+const glossaryChunked = chunk(MINERAL_GLOSSARY_INFO, Math.ceil((MINERAL_GLOSSARY_INFO.length + 1) / 2));
 
 const MineralsGlossary = ({addMineral}) => {
   /* Local State */
 
   const [activeMineralInfo, setActiveMineralInfo] = useState({});
-
-  /* Derived Variables */
-
-  const glossaryChunked = chunk(MINERAL_GLOSSARY_INFO, Math.ceil((MINERAL_GLOSSARY_INFO.length + 1) / 2));
-
-  /* Logic Helpers */
-
-  function chunk(input, size) {
-    return input.reduce((arr, item, idx) => {
-      return idx % size === 0 ? [...arr, [item]] : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
-    }, []);
-  }
 
   /* Render Functions */
 
