@@ -1,5 +1,4 @@
-import * as turf from '@turf/turf';
-
+import {isWithin} from './nesting.helpers';
 import {isEmpty} from '../../shared/Helpers';
 import {useSpots} from '../spots';
 
@@ -104,54 +103,6 @@ const useNesting = () => {
       });
     }
     return parentSpots;
-  };
-
-  // Is spot 1 completely within spot 2?
-  // Boolean-within returns true if the first geometry is completely within the second geometry.
-  const isWithin = (spot1, spot2) => {
-    let boolWithin = false;
-    const validTypesForBooleanWithin = {
-      'Point': ['MultiPoint', 'LineString', 'Polygon'],
-      'MultiPoint': ['MultiPoint', 'LineString', 'Polygon', 'MultiPolygon'],
-      'LineString': ['LineString', 'Polygon', 'MultiPolygon'],
-      'Polygon': ['Polygon', 'MultiPolygon'],
-    };
-    try {
-      // Make sure we're using booleanWithin with valid types
-      if (Object.keys(validTypesForBooleanWithin).includes(spot1.geometry.type)
-        && validTypesForBooleanWithin[spot1.geometry.type]?.includes(spot2.geometry.type)) {
-        boolWithin = turf.booleanWithin(spot1, spot2);
-      }
-      // Handle Geometry Collections
-      else if (spot1.geometry.type === 'GeometryCollection') {
-        spot1.geometry.geometries.forEach((geometry1) => {
-          if (!boolWithin && Object.keys(validTypesForBooleanWithin).includes(geometry1.type)
-            && validTypesForBooleanWithin[geometry1]?.includes(spot2.geometry.type)) {
-            boolWithin = turf.booleanWithin(geometry1, spot2.geometry.type);
-          }
-          else if (!boolWithin && spot2.geometry.type === 'GeometryCollection') {
-            spot2.geometry.geometries.forEach((geometry2) => {
-              if (!boolWithin && Object.keys(validTypesForBooleanWithin).includes(geometry1.type)
-                && validTypesForBooleanWithin[geometry1]?.includes(geometry2)) {
-                boolWithin = turf.booleanWithin(geometry1, geometry2);
-              }
-            });
-          }
-        });
-      }
-      else if (spot2.geometry.type === 'GeometryCollection') {
-        spot2.geometry.geometries.forEach((geometry2) => {
-          if (!boolWithin && Object.keys(validTypesForBooleanWithin).includes(spot1.geometry.type)
-            && validTypesForBooleanWithin[spot1.geometry.type]?.includes(geometry2.type)) {
-            boolWithin = turf.booleanWithin(spot1.geometry, geometry2);
-          }
-        });
-      }
-    }
-    catch (e) {
-      console.error('Error with Spot geometry! Spot 1:', spot1, 'Spot 2:', spot2, 'Error:', e);
-    }
-    return boolWithin;
   };
 
   /* Exported Functions */
