@@ -22,7 +22,11 @@ const WarningModal = ({
                         showConfirmButton,
                         title,
                       }) => {
+  /* Data Hooks */
+
   const statusMessages = useSelector(state => state.home.statusMessages);
+
+  /* View */
 
   return (
     <ModalWrapper
