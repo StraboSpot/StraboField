@@ -4,6 +4,17 @@ import {FlatList, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {
+  CONFIDENCE_IN_FEATURE_KEY,
+  EARTHQUAKE_FORM_NAME,
+  EARTHQUAKE_GROUP_KEY,
+  EARTHQUAKE_PAGE_KEY,
+  FAULT_ORIENTATION_KEYS,
+  LAST_KEYS,
+  MAIN_BUTTONS_KEYS_1,
+  MAIN_BUTTONS_KEYS_2,
+  VECTOR_MEASUREMENT_KEYS,
+} from './geomorph.constants';
 import {getNewUUID} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
@@ -13,40 +24,12 @@ import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const groupKey = 'general';
-
-// Relevant keys for quick-entry modal
-const mainButtonsKeys1 = ['earthquake_feature', 'fault_type'];
-const mainButtonsKeys2 = ['movement', 'rupture_expression',
-  'liquefaction_area_affected', 'fault_slip_meas', 'date_of_movement', 'time_of_movement', 'landslide_feat',
-  'slide_type', 'material_type', 'area_affected', 'cause_of_damage', 'date_of_damage', 'time_of_damage',
-  'utility_affected', 'facility_affected', 'damage_severity', 'mode_of_observation'];
-const confidenceInFeatureKey = 'confidence_in_feature';
-const lastKeys = ['diameter', 'height_of_material', 'max_vert_movement', 'dir_of_slope_mov',
-  'displacement_amt', 'depth', 'max_drop_in_elevation', 'length_exposed_downslope', 'slip_preferred', 'slip_min',
-  'slip_max', 'horiz_sep_pref', 'horiz_sep_min', 'horiz_sep_max', 'vert_sep_pref', 'vert_sep_min', 'vertical_sep_max',
-  'slip_azimuth', 'heave_pref', 'heave_min', 'rupture_width_pref', 'rupture_width_min', 'rupture_width_max', 'notes'];
-
-const FAULT_ORIENTATION_KEYS = {
-  group_fs5ba04: {
-    strike: 'strike',
-    dip_direction: 'azimuth_dip_dir',
-    dip: 'dip',
-    quality: 'meas_quality',
-  },
-};
-
-const VECTOR_MEASUREMENT_KEYS = {
-  group_bf6rc11: {
-    trend: 'trend',
-    plunge: 'plunge',
-    quality: 'vector_meas_confidence',
-  },
-};
+const formName = EARTHQUAKE_FORM_NAME;
+const groupKey = EARTHQUAKE_GROUP_KEY;
+const pageKey = EARTHQUAKE_PAGE_KEY;
 
 const AddEarthquakeModal = () => {
   /* Data Hooks */
@@ -67,12 +50,9 @@ const AddEarthquakeModal = () => {
 
   /* Derived Variables */
 
-  // Relevant fields for quick-entry modal
-  const pageKey = PAGE_KEYS.EARTHQUAKES;
-  const formName = [groupKey, pageKey];
   const choices = getChoices(formName);
   const survey = getSurvey(formName);
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const LAST_KEYSFields = LAST_KEYS.map(k => survey.find(f => f.name === k));
 
   /* Side Effects */
 
@@ -106,11 +86,11 @@ const AddEarthquakeModal = () => {
   /* Render Functions */
 
   const renderForm = (formProps) => {
-    const mainButtonsKeysRelevant1 = mainButtonsKeys1.filter((k) => {
+    const mainButtonsKeysRelevant1 = MAIN_BUTTONS_KEYS_1.filter((k) => {
       const field = survey.find(f => f.name === k);
       return isRelevant(field, formProps.values);
     });
-    const mainButtonsKeysRelevant2 = mainButtonsKeys2.filter((k) => {
+    const mainButtonsKeysRelevant2 = MAIN_BUTTONS_KEYS_2.filter((k) => {
       const field = survey.find(f => f.name === k);
       return isRelevant(field, formProps.values);
     });
@@ -151,13 +131,13 @@ const AddEarthquakeModal = () => {
         <LittleSpacer/>
         <FormSlider
           choices={choices}
-          fieldKey={confidenceInFeatureKey}
+          fieldKey={CONFIDENCE_IN_FEATURE_KEY}
           formProps={formProps}
           labels={['Low', 'High']}
           survey={survey}
         />
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+        <Form {...{formName: formName, surveyFragment: LAST_KEYSFields, ...formProps}}/>
         {isFaultOrientationModalVisible && (
           <MeasurementModal
             formName={formName}
