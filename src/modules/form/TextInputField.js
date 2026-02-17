@@ -54,14 +54,14 @@ const TextInputField = ({
           <Text style={formStyles.fieldLabel}>{label}</Text>
           {placeholder && (
             <Icon
-            />
-          )}
-        </View>
-      )}
               color={themes.PRIMARY_ACCENT_COLOR}
               name={'information-circle-outline'}
               onPress={() => onShowFieldInfo(label, placeholder)}
               type={'ionicon'}
+            />
+          )}
+        </View>
+      )}
       <TextInput
         autoCapitalize={autoCapitalize}
         editable={editable}
