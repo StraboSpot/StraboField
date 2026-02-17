@@ -1,3 +1,4 @@
+import {getSiliciclasticGrainSize} from './sed.helpers';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
@@ -25,33 +26,6 @@ const useSedValidation = () => {
   };
 
   /* Exported Functions */
-
-  const getBasicLithologyIndex = (lithology) => {
-    if (lithology.primary_lithology === 'organic_coal') return 1;
-    else if (lithology.mud_silt_grain_size) return 2;
-    else if (lithology.sand_grain_size) return 3;
-    else if (lithology.congl_grain_size || lithology.breccia_grain_size) return 4;
-    else if (lithology.dunham_classification) return 5;
-    return 0;
-  };
-
-  const getSiliciclasticGrainSize = (lithology) => {
-    switch (lithology.siliciclastic_type) {
-      case 'sandstone':
-        return lithology.sand_grain_size;
-      case 'conglomerate':
-        return lithology.congl_grain_size;
-      case 'breccia':
-        return lithology.breccia_grain_size;
-      case 'claystone':
-      case 'mudstone':
-      case 'shale':
-      case 'siltstone':
-        return lithology.mud_silt_grain_size;
-      default:
-        return undefined;
-    }
-  };
 
   const validateSedData = (sed, spot, pageKey) => {
     let errorMessages = [];
@@ -155,8 +129,6 @@ const useSedValidation = () => {
   };
 
   return {
-    getBasicLithologyIndex,
-    getSiliciclasticGrainSize,
     validateSedData,
   };
 };

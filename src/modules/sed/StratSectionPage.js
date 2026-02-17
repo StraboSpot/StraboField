@@ -106,7 +106,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
   };
 
   const renderSectionSettingsSection = () => {
-    const formName = ['sed', 'strat_section'];
+    const stratSectionFormName = ['sed', 'strat_section'];
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
@@ -122,10 +122,10 @@ const StratSectionPage = ({isReadOnly, page}) => {
           innerRef={stratSectionRef}
           onReset={() => console.log('Resetting form...')}
           onSubmit={() => console.log('Submitting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
+          validate={values => validateForm({formName: stratSectionFormName, values: values})}
           validateOnChange={false}
         >
-          {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+          {formProps => <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>}
         </Formik>
       </View>
     );

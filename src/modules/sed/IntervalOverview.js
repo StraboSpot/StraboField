@@ -8,11 +8,15 @@ import commonStyles from '../../shared/common.styles';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
 const IntervalOverview = ({page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const character = useSelector(state => state.spot.selectedSpot.properties.sed?.character) || '';
   const interval = useSelector(state => state.spot.selectedSpot.properties.sed?.interval) || {};
 
   const {getIntervalTitle} = useSed();
+
+  /* View */
 
   return (
     <>

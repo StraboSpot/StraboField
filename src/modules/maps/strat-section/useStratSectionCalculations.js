@@ -5,12 +5,10 @@ import {SED_LABEL_DICTIONARY} from './stratSection.constants';
 import {moveSpotByPixels} from './stratSection.helpers';
 import alert from '../../../shared/ui/alert';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
-import useSedValidation from '../../sed/useSedValidation';
+import {X_INTERVAL, Y_MULTIPLIER} from '../../sed/sed.constants';
+import {getBasicLithologyIndex, getSiliciclasticGrainSize} from '../../sed/sed.helpers';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedOrCreatedSpots} from '../../spots/spots.slice';
-
-const xInterval = 10;  // Horizontal spacing between grain sizes/weathering tick marks
-const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
 
 const useStratSectionCalculations = () => {
   /* Data Hooks */
@@ -18,7 +16,6 @@ const useStratSectionCalculations = () => {
   const dispatch = useDispatch();
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getBasicLithologyIndex, getSiliciclasticGrainSize} = useSedValidation();
   const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
 
   /* Internal Functions */
@@ -28,11 +25,11 @@ const useStratSectionCalculations = () => {
     const lithologies = sedData.lithologies;
     const n = interbed ? 1 : 0;
 
-    const defaultWidth = xInterval / 4;
+    const defaultWidth = X_INTERVAL / 4;
     let i, intervalWidth = defaultWidth;
     // Unexposed/Covered
     if (!character || character === 'unexposed_cove' || character === 'not_measured' || !lithologies) {
-      intervalWidth = (0 + 1) * xInterval;  // Same as clay
+      intervalWidth = (0 + 1) * X_INTERVAL;  // Same as clay
     }
     else if (lithologies[n] && (character === 'bed' || character === 'bed_mixed_lit' || character === 'interbedded'
       || character === 'package_succe')) {
@@ -41,18 +38,18 @@ const useStratSectionCalculations = () => {
         i = SED_LABEL_DICTIONARY.weathering.findIndex((weatheringOption) => {
           return weatheringOption.name === lithologies[n].relative_resistance_weather;
         });
-        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
+        intervalWidth = i === -1 ? defaultWidth : (i + 1) * X_INTERVAL;
       }
       // Basic Lithologies Column Profile
       else if (stratSection.column_profile === 'basic_lithologies') {
         i = getBasicLithologyIndex(lithologies[n]);
-        intervalWidth = i === -1 ? defaultWidth : (i + 2) * xInterval;
+        intervalWidth = i === -1 ? defaultWidth : (i + 2) * X_INTERVAL;
       }
       // Primary Lithology = siliciclastic
       else if (lithologies[n].primary_lithology === 'siliciclastic' && getSiliciclasticGrainSize(lithologies[n])) {
         const grainSizeName = getSiliciclasticGrainSize(lithologies[n]);
         i = SED_LABEL_DICTIONARY.clastic.findIndex(grainSizeOption => grainSizeOption.name === grainSizeName);
-        intervalWidth = i === -1 ? defaultWidth : (i + 1) * xInterval;
+        intervalWidth = i === -1 ? defaultWidth : (i + 1) * X_INTERVAL;
       }
       // Primary Lithology = limestone or dolostone
       else if ((lithologies[n].primary_lithology === 'limestone' || lithologies[n].primary_lithology === 'dolostone')
@@ -60,7 +57,7 @@ const useStratSectionCalculations = () => {
         i = SED_LABEL_DICTIONARY.carbonate.findIndex((grainSizeOption) => {
           return grainSizeOption.name === lithologies[n].dunham_classification;
         });
-        intervalWidth = i === -1 ? defaultWidth : (i + 2.33) * xInterval;
+        intervalWidth = i === -1 ? defaultWidth : (i + 2.33) * X_INTERVAL;
       }
       // Other Lithologies
       else if (lithologies[n].primary_lithology) {
@@ -68,9 +65,9 @@ const useStratSectionCalculations = () => {
           return grainSizeOption.name === lithologies[n].primary_lithology;
         });
         i = i - 3; // First 3 indexes are siliciclastic, limestone & dolostone which are handled above
-        intervalWidth = i === -1 ? defaultWidth : (i + 2.66) * xInterval;
+        intervalWidth = i === -1 ? defaultWidth : (i + 2.66) * X_INTERVAL;
       }
-      else intervalWidth = (0 + 1) * xInterval;  // Same as clay
+      else intervalWidth = (0 + 1) * X_INTERVAL;  // Same as clay
     }
     else console.error('Sed data error:', lithologies[n]);
     return intervalWidth;
@@ -95,7 +92,7 @@ const useStratSectionCalculations = () => {
     const interval = sedData.interval;
     const bedding = sedData.bedding;
 
-    const intervalHeight = interval.interval_thickness * yMultiplier;
+    const intervalHeight = interval.interval_thickness * Y_MULTIPLIER;
     const intervalWidth = getIntervalWidth(sedData, stratSectionId);
     const minX = 0;
     minY = minY === undefined ? getSectionHeight() : minY;
@@ -119,7 +116,7 @@ const useStratSectionCalculations = () => {
 
       // Per Casey: Don't use the data from Lithology 1 interbed thickness for plotting since it, along with interval
       // thickness, proportion and Lithology 2 interbed thickness are too many data numbers to plot all faithfully
-      const y2 = thickness2 * yMultiplier < intervalHeight ? thickness2 * yMultiplier : intervalHeight;
+      const y2 = thickness2 * Y_MULTIPLIER < intervalHeight ? thickness2 * Y_MULTIPLIER : intervalHeight;
       let interbedHeight2 = intervalHeight * (bedding.interbed_proportion / 100 || 0.5);  // secondary interbed
       interbedHeight2 = interbedHeight2 > y2 ? interbedHeight2 : y2;
       const interbedHeight1 = intervalHeight - interbedHeight2;                             // primary interbed

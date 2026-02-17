@@ -1,11 +1,10 @@
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
-import {BASIC_LITHOLOGIES_LABELS, CARBONATE_KEYS, GRAIN_SIZE_KEYS, LITHOLOGIES_KEYS} from './stratSection.constants';
+import {BASIC_LITHOLOGIES_LABELS, CARBONATE_KEYS, EMPTY_LINE_STRING_FEATURE, GRAIN_SIZE_KEYS, LITHOLOGIES_KEYS} from './stratSection.constants';
 import {useForm} from '../../form';
 import useMapCoords from '../useMapCoords';
 
-const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
 const s = 20; // spacing between multiple x axes
 const xCa = 23.3; // Horizontal space between carbonate tick marks
 const xCl = 10;  // Horizontal spacing between clastic tick marks
@@ -22,7 +21,7 @@ const useXAxis = (n) => {
   /* Exported Functions */
 
   const getXAxis = () => {
-    const xAxis = JSON.parse(JSON.stringify(lineString));
+    const xAxis = JSON.parse(JSON.stringify(EMPTY_LINE_STRING_FEATURE));
     xAxis.geometry.coordinates = n === 1 ? [[0, 0], [15 * xCl + 5, 0]] : [[0, -n * s], [15 * xCl + 5, -n * s]];
     return convertImagePixelsToLatLong(xAxis);
   };
@@ -59,7 +58,7 @@ const useXAxis = (n) => {
 
     const tickMarks = [];
     Array.from({length: labels.length}, (_, i) => {
-      const tickMark = JSON.parse(JSON.stringify(lineString));
+      const tickMark = JSON.parse(JSON.stringify(EMPTY_LINE_STRING_FEATURE));
       tickMark.properties.label = labels[i];
       tickMark.geometry.coordinates = n === 1 ? [[x, 0], [x, -5]] : [[x, n * -s], [x, n * -s - 5]];
       tickMarks.push(convertImagePixelsToLatLong(tickMark));
