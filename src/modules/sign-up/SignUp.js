@@ -3,6 +3,7 @@ import {ScrollView, Text, TextInput, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import {formatMessage} from './signUp.helpers';
 import styles from './signUp.styles';
 import useServerRequests from '../../services/useServerRequests';
 import {validate} from '../../shared/Helpers';
@@ -114,21 +115,6 @@ const SignUp = ({navigation}) => {
 
   /* Logic Helpers */
 
-  // Helper function to format success messages
-  const formatMessage = (message, isSuccess = false) => {
-    if (isSuccess) {
-      return message;
-    }
-
-    // Check if it looks like validation errors (contains "cannot be blank" or similar patterns)
-    if (message.includes('cannot be blank') || message.includes('is invalid') || message.includes('must')) {
-      return parseValidationErrors(message);
-    }
-
-    // For other messages, just clean up the formatting
-    return message.replace(/\./g, '.\n');
-  };
-
   const getModalStyles = () => {
     // You can customize modal appearance based on status type
     switch (statusType) {
@@ -145,17 +131,6 @@ const SignUp = ({navigation}) => {
       default:
         return {};
     }
-  };
-
-  // Helper function to parse validation errors
-  const parseValidationErrors = (message) => {
-    if (!message) return [];
-
-    // Split by periods and filter out empty strings
-    const errors = message.split('.').filter(error => error.trim().length > 0);
-
-    // Format as bullet points for better readability
-    return errors.map(error => `• ${error.trim()}`).join('\n');
   };
 
   const signUp = async () => {
