@@ -6,6 +6,14 @@ import {Formik} from 'formik';
 import Toast, {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {
+  SAMPLE_FIRST_KEYS,
+  SAMPLE_FORM_NAME,
+  SAMPLE_INPLACENESS_KEY,
+  SAMPLE_LAST_KEYS,
+  SAMPLE_ORIENTED_KEY,
+  SAMPLE_TYPE_KEY,
+} from './samples.constants';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
@@ -18,15 +26,6 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
-
-const formName = ['general', 'samples'];
-
-// Relevant keys for quick-entry modal
-const sampleTypeKey = ['sample_type', 'material_type'];
-const firstKeys = ['sample_id_name', 'label', 'sample_description'];
-const inplacenessKey = 'inplaceness_of_sample';
-const orientedKey = 'oriented_sample';
-const lastKeys = ['sample_notes'];
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   /* Data Hooks */
@@ -60,10 +59,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const choices = getChoices(formName);
-  const survey = getSurvey(formName);
-  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const choices = getChoices(SAMPLE_FORM_NAME);
+  const survey = getSurvey(SAMPLE_FORM_NAME);
+  const firstKeysFields = SAMPLE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = SAMPLE_LAST_KEYS.map(k => survey.find(f => f.name === k));
 
   /* Side Effects */
 
@@ -112,14 +111,14 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   };
 
   const onOrientedButtonPress = (i) => {
-    if (i === 0 && formRef.current?.values[orientedKey] === 'yes') {
-      formRef.current?.setFieldValue(orientedKey, undefined);
+    if (i === 0 && formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'yes') {
+      formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, undefined);
     }
-    else if (i === 0) formRef.current?.setFieldValue(orientedKey, 'yes');
-    else if (i === 1 && formRef.current?.values[orientedKey] === 'no') {
-      formRef.current?.setFieldValue(orientedKey, undefined);
+    else if (i === 0) formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, 'yes');
+    else if (i === 1 && formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'no') {
+      formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, undefined);
     }
-    else formRef.current?.setFieldValue(orientedKey, 'no');
+    else formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, 'no');
   };
 
   /* Logic Helpers */
@@ -208,21 +207,21 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     return (
       <>
         <MainButtons
-          formName={formName}
+          formName={SAMPLE_FORM_NAME}
           formProps={formProps}
-          mainKeys={sampleTypeKey}
+          mainKeys={SAMPLE_TYPE_KEY}
           setChoicesViewKey={setChoicesViewKey}
         />
         <Form
           {...{
-            formName: formName,
+            formName: SAMPLE_FORM_NAME,
             surveyFragment: firstKeysFields,
             ...formProps,
           }}
         />
         <FormSlider
           choices={choices}
-          fieldKey={inplacenessKey}
+          fieldKey={SAMPLE_INPLACENESS_KEY}
           formProps={formProps}
           labels={['In Place', 'Float']}
           survey={survey}
@@ -234,9 +233,9 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           onPress={onOrientedButtonPress}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           selectedIndex={
-            formRef.current?.values[orientedKey] === 'yes'
+            formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'yes'
               ? 0
-              : formRef.current?.values[orientedKey] === 'no'
+              : formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'no'
                 ? 1
                 : undefined
           }
@@ -244,7 +243,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         />
         <Form
           {...{
-            formName: formName,
+            formName: SAMPLE_FORM_NAME,
             surveyFragment: lastKeysFields,
             ...formProps,
           }}
@@ -284,7 +283,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
+    return <Form {...{formName: SAMPLE_FORM_NAME, surveyFragment: relevantFields, ...formProps}}/>;
   };
 
   /* View */

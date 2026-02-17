@@ -1,12 +1,10 @@
 import {useDispatch, useSelector} from 'react-redux';
 
+import {SAMPLE_FORM_NAME} from './samples.constants';
+import {convertAndBuildSchema, getMaterialName, isTokenExpired, parseXML} from './samples.helpers';
 import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
 import useForm from '../form/useForm';
 import {setSesarToken} from '../user/userProfile.slice';
-
-const formName = ['general', 'samples'];
-const parseString = require('react-native-xml2js').parseString;
 
 const useSamples = () => {
   /* Data Hooks */
@@ -20,52 +18,6 @@ const useSamples = () => {
 
   /* Internal Functions */
 
-  const buildSesarXmlSchema = (data, isUpdating) => {
-    // const userCode = !isUpdating ? <user_code>${data.user_code}</user_code> : ""
-    return `content=<?xml version="1.0" encoding="UTF-8"?>
-  <samples xmlns="http://app.geosamples.org"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://app.geosamples.org/4.0/sample.xsd">
-      <sample>
-           ${!isUpdating ? `<user_code>${data.user_code}</user_code>` : ''}
-           <collector>${data.collector}</collector>
-           ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
-           <longitude>${data.longitude}</longitude>
-           <latitude>${data.latitude}</latitude>
-           ${data.longitude_end ? `<longitude_end>${data.longitude_end}</longitude_end>` : ''}
-           ${data.latitude_end ? `<latitude_end>${data.latitude_end}</latitude_end>` : ''}
-           ${isEmpty(
-      data.collection_start_date) ? `<collection_start_date>${data.collection_start_date}</collection_start_date>` : ''}
-           <purpose>${data.purpose}</purpose>
-           <description>${data.description}</description>
-           <material>${data.material}</material>
-           <sample_type>${data.sample_type}</sample_type>
-           <name>${data.name}</name>
-      </sample>
-  </samples>`;
-  };
-
-  const convertAndBuildSchema = (mappedArray, isUpdating) => {
-    const jsonData = convertToJSON(mappedArray);
-    console.log(jsonData);
-    const collectionDate = !isEmpty(jsonData.collection_start_date) ? truncateDateISOString(
-        jsonData.collection_start_date)
-      : null;
-    const updatedJsonData = {...jsonData, collection_start_date: collectionDate};
-    const xmlSchema = buildSesarXmlSchema(updatedJsonData, isUpdating);
-    console.log('SESAR SCHEMA', xmlSchema);
-    return xmlSchema;
-  };
-
-  const convertToJSON = (mappingArray) => {
-    return mappingArray.slice().reverse().reduce((acc, item) => {
-      if (item.sesarKey && item.value !== undefined) {
-        acc[item.sesarKey] = item.value;
-      }
-      return acc;
-    }, {});
-  };
-
   const getFirstAndLastElementsOfLineArray = () => {
     if (selectedSpot.geometry.type === 'LineString' && selectedSpot.geometry.coordinates.length > 1) {
       const firstElement = selectedSpot.geometry.coordinates[0];
@@ -75,14 +27,6 @@ const useSamples = () => {
     return [];
   };
 
-  const getMaterialName = (materialType) => {
-    if (materialType === 'intact_rock' || materialType === 'fragmented_roc') {
-      return 'Rock';
-    }
-    else if (materialType === 'carbon_or_animal') return 'Organic Material';
-    else return materialType;
-  };
-
   const getValidToken = async (sesarTokens) => {
     let tokens = sesarTokens;
     if (isTokenExpired(tokens.access)) {
@@ -90,26 +34,6 @@ const useSamples = () => {
       tokens = await refreshToken(tokens.refresh);
     }
     return tokens;
-  };
-
-  const isTokenExpired = (accessToken) => {
-    if (!accessToken) return true; // No token = expired
-    try {
-      const accessTokenParsed = JSON.parse(atob(accessToken.split('.')[1]));
-      return accessTokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
-    }
-    catch (error) {
-      return true; // If decoding fails, assume expired
-    }
-  };
-
-  const parseXML = (xmlData) => {
-    let json;
-    parseString(xmlData, {trim: true}, (err, result) => {
-      console.dir(result);
-      json = result;
-    });
-    return json;
   };
 
   const postSampleToSesar = async (xmlSchema, isUpdating) => {
@@ -145,10 +69,6 @@ const useSamples = () => {
       console.error('Token refresh failed:', error);
       return null;
     }
-  };
-
-  const truncateDateISOString = (date) => {
-    return date.slice(0, date.indexOf('.')) + 'Z';
   };
 
   /* Exported Functions */
@@ -211,7 +131,7 @@ const useSamples = () => {
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
       {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
-      {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, formName)}, //required
+      {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, SAMPLE_FORM_NAME)}, //required
       {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
       {label: 'Material:', sesarKey: 'material', value: getMaterialName(sampleValue?.material_type)}, //required
       // {label: 'Classification:', sesarKey: 'classification', value: getRockClassification()}, //required
