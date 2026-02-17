@@ -27,15 +27,20 @@ const ImageInfo = ({
                    }) => {
   console.log('Rendering ImageInfo...');
 
+  /* Data Hooks */
+
+  const {getImageScreenSizedURI, getLocalImageURI} = useImages();
   const {width, height} = useWindowSize();
+
+  /* Local State */
 
   const [isImageDeleteModalVisible, setIsImageDeleteModalVisible] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 
-  const {getImageScreenSizedURI, getLocalImageURI} = useImages();
+  /* Event Handlers */
 
   const handleDeleteImageOnPress = () => {
     setIsImageDeleteModalVisible(true);
@@ -49,9 +54,13 @@ const ImageInfo = ({
     if (isImageDeleted) setIsImageModalVisible(false);
   };
 
+  /* Logic Helpers */
+
   const openInSketch = () => {
     setIsSketchModalVisible(true);
   };
+
+  /* Render Functions */
 
   const renderDeleteImageModal = () => {
     return (
@@ -67,6 +76,8 @@ const ImageInfo = ({
       </DeleteConformationDialogBox>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

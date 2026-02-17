@@ -11,7 +11,11 @@ const FabricListItem = ({
                           editFabric,
                           fabric,
                         }) => {
+  /* Data Hooks */
+
   const {getLabel, getLabels} = useForm();
+
+  /* Logic Helpers */
 
   const getTitle = (fabricObj) => {
     const {type} = fabricObj;
@@ -32,6 +36,8 @@ const FabricListItem = ({
     }
     return labelsArr.join(', ');
   };
+
+  /* View */
 
   return (
     <ListItem

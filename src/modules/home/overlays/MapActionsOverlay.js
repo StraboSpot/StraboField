@@ -16,12 +16,15 @@ const MapActionsOverlay = ({
                              onTouchOutside,
                              visible,
                            }) => {
+  /* Data Hooks */
 
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const stratSection = useSelector(state => state.map.stratSection);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const stratSection = useSelector(state => state.map.stratSection);
+
+  /* Logic Helpers */
 
   const mapActionItem = (item) => {
     const isNative = Platform.OS !== 'web';
@@ -72,6 +75,8 @@ const MapActionsOverlay = ({
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

@@ -21,26 +21,22 @@ const Compass = ({
                    setMeasurements,
                    sliderValue,
                  }) => {
-  let magneticDeclination = useRef(0);
-  let matrixRawData = useRef(null);
-  let hasShownCalibrationAlert = useRef(false);
-
-  const CompassEvents = new NativeEventEmitter(CompassModule);
-  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const compassMeasurements = useSelector(state => state.compass.measurements);
+  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
-  const {
-    cartesianToSpherical,
-    matrixAverage,
-    getStrikeAndDip,
-    getTrendAndPlunge,
-    getUserDeclination,
-  } = useCompass();
+  const {cartesianToSpherical, matrixAverage, getStrikeAndDip, getTrendAndPlunge, getUserDeclination} = useCompass();
   const {playCompassSound} = useCompassSound();
+  const {createNewMeasurement} = useMeasurements();
+
+  /* Local State */
+
+  let hasShownCalibrationAlert = useRef(false);
+  let magneticDeclination = useRef(0);
+  let matrixRawData = useRef(null);
 
   const [compassData, setCompassData] = useState({
     magHeading: 0,
@@ -59,7 +55,13 @@ const Compass = ({
   // const [matrixRotation, setMatrixRotation] = useState({});
   const [showCompassRawDataView, setShowCompassRawDataView] = useState(false);
   // const [userDeclination, setUserDeclination] = useState('');
-  const {createNewMeasurement} = useMeasurements();
+
+  /* Derived Variables */
+
+  const CompassEvents = new NativeEventEmitter(CompassModule);
+  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Compass []');
@@ -85,6 +87,50 @@ const Compass = ({
       dispatch(setCompassMeasurements({}));
     }
   }, [compassMeasurements]);
+
+  /* Event Handlers */
+
+  const handleAppStateChange = (state) => {
+    if (state === 'background' || state === 'inactive') {
+      dispatch(setModalVisible({modal: null}));
+      setShowCompassRawDataView(false);
+      unsubscribeFromSensors();
+    }
+  };
+
+  const handleCalibrationStatus = (data) => {
+    // Reset flag if calibration is now OK
+    if (data.needsCalibration === false) {
+      hasShownCalibrationAlert.current = false;
+      return;
+    }
+
+    // Only show the alert once per compass session - check and set flag atomically
+    if (data.needsCalibration && Platform.OS === 'ios') {
+      if (hasShownCalibrationAlert.current) {
+        return; // Already shown, ignore this event
+      }
+
+      // Set flag IMMEDIATELY before calling alert to prevent race conditions
+      hasShownCalibrationAlert.current = true;
+
+      alert('Compass Calibration Required',
+        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+    }
+  };
+
+  const handleMatrixRotationData = async (matrixData) => {
+    try {
+      // console.log(matrixData);
+      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
+      await getCartesianToSpherical(matrixData);
+    }
+    catch (err) {
+      console.error('Error Getting Matrix', err);
+    }
+  };
+
+  /* Logic Helpers */
 
   const addAttributeMeasurement = (data) => {
     const sliderQuality = sliderValue ? {quality: sliderValue.toString()} : undefined;
@@ -178,46 +224,6 @@ const Compass = ({
     }
   };
 
-  const handleAppStateChange = (state) => {
-    if (state === 'background' || state === 'inactive') {
-      dispatch(setModalVisible({modal: null}));
-      setShowCompassRawDataView(false);
-      unsubscribeFromSensors();
-    }
-  };
-
-  const handleCalibrationStatus = (data) => {
-    // Reset flag if calibration is now OK
-    if (data.needsCalibration === false) {
-      hasShownCalibrationAlert.current = false;
-      return;
-    }
-
-    // Only show the alert once per compass session - check and set flag atomically
-    if (data.needsCalibration && Platform.OS === 'ios') {
-      if (hasShownCalibrationAlert.current) {
-        return; // Already shown, ignore this event
-      }
-
-      // Set flag IMMEDIATELY before calling alert to prevent race conditions
-      hasShownCalibrationAlert.current = true;
-
-      alert('Compass Calibration Required',
-        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
-    }
-  };
-
-  const handleMatrixRotationData = async (matrixData) => {
-    try {
-      // console.log(matrixData);
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
-      await getCartesianToSpherical(matrixData);
-    }
-    catch (err) {
-      console.error('Error Getting Matrix', err);
-    }
-  };
-
   const subscribeToCalibrationStatus = () => {
     if (Platform.OS === 'ios') {
       try {
@@ -262,6 +268,8 @@ const Compass = ({
       console.error('Error unsubscribing to compass events', err);
     }
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

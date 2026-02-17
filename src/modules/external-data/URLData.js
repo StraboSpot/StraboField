@@ -22,21 +22,19 @@ const UrlData = ({
                    initializeDelete,
                    spot,
                  }) => {
-  const dispatch = useDispatch();
+  /* Data Hooks */
 
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [urlToEdit, setUrlToEdit] = useState({});
+  const dispatch = useDispatch();
 
   const {openURL} = useDevice();
   const {saveEdits} = useExternalData();
 
-  const editUrl = (inURLToEdit, i) => {
-    if (editable) {
-      setUrlToEdit({index: i, url: inURLToEdit});
-      setIsEditModalVisible(true);
-    }
-    else dispatch(setNotebookPageVisible(PAGE_KEYS.DATA));
-  };
+  /* Local State */
+
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [urlToEdit, setUrlToEdit] = useState({});
+
+  /* Event Handlers */
 
   const onSaveEdits = () => {
     try {
@@ -51,6 +49,18 @@ const UrlData = ({
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };
+
+  /* Logic Helpers */
+
+  const editUrl = (inURLToEdit, i) => {
+    if (editable) {
+      setUrlToEdit({index: i, url: inURLToEdit});
+      setIsEditModalVisible(true);
+    }
+    else dispatch(setNotebookPageVisible(PAGE_KEYS.DATA));
+  };
+
+  /* Render Functions */
 
   const renderURLEditModal = () => {
     return (
@@ -102,7 +112,9 @@ const UrlData = ({
       </ListItem>
     );
   };
-  
+
+  /* View */
+
   return (
     <View style={{flex: 1}}>
       <FlatList

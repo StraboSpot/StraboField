@@ -13,7 +13,11 @@ const MainButtons = ({
                        mainKeys,
                        setChoicesViewKey,
                      }) => {
+  /* Data Hooks */
+
   const {getLabel, getLabels} = useForm();
+
+  /* Logic Helpers */
 
   const MainButtonsText = ({fieldKey}) => {
     return (
@@ -30,6 +34,8 @@ const MainButtons = ({
       </View>
     );
   };
+
+  /* View */
 
   return (
     <View

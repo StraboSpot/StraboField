@@ -13,9 +13,16 @@ function DataWrapper({
                        spot,
                        urlData,
                      }) {
-  const [itemToDelete, setItemToDelete] = useState({});
-  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+  /* Data Hooks */
+
   const {deleteCSV, deleteURL} = useExternalData();
+
+  /* Local State */
+
+  const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState({});
+
+  /* Logic Helpers */
 
   const deleteSelection = () => {
     itemToDelete.type === 'url' ? deleteURL(itemToDelete.item) : deleteCSV(itemToDelete.item);
@@ -26,6 +33,8 @@ function DataWrapper({
     setItemToDelete({type: type, item: whatToDelete});
     setIsDeleteConfirmModalVisible(true);
   };
+
+  /* Render Functions */
 
   const renderDeleteConformation = () => {
     const title = itemToDelete?.type === 'url' ? `${itemToDelete.item}` : `${itemToDelete.item.name}`;
@@ -43,6 +52,8 @@ function DataWrapper({
       </WarningModal>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

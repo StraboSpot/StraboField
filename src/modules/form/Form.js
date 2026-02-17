@@ -63,24 +63,35 @@ const Form = ({
     );
   };
 
-  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
-
-  const renderTextInput = (field) => {
+  const renderField = (field) => {
+    const fieldType = field.type.split(' ')[0];
     return (
-      <Field
-        appearance={field.appearance}
-        // autoFocus={field.name === 'name'}
-        component={TextInputField}
-        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
-        placeholder={field.hint}
-      />
+      <>
+        {fieldType === 'begin_group' && renderGroupHeading(field)}
+        {(fieldType === 'text' || fieldType === 'integer' || fieldType === 'decimal' || fieldType === 'select_one'
+          || fieldType === 'select_multiple' || fieldType === 'date' || fieldType === 'time'
+          || fieldType === 'acknowledge') && (
+          <>
+            {surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple')
+              && renderSelectInput(field, true)}
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                {fieldType === 'text' && renderTextInput(field)}
+                {(fieldType === 'integer' || fieldType === 'decimal') && renderNumberInput(field)}
+                {(!surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple'))
+                  && renderSelectInput(field)}
+                {fieldType === 'date' && renderDateInput(field)}
+                {fieldType === 'time' && renderDateInput(field, true)}
+                {fieldType === 'acknowledge' && renderAcknowledgeInput(field)}
+              </ListItem.Content>
+            </ListItem>
+          </>
+        )}
+      </>
     );
   };
+
+  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
 
   const renderNumberInput = (field) => {
     return (
@@ -134,33 +145,24 @@ const Form = ({
     );
   };
 
-  const renderField = (field) => {
-    const fieldType = field.type.split(' ')[0];
+  const renderTextInput = (field) => {
     return (
-      <>
-        {fieldType === 'begin_group' && renderGroupHeading(field)}
-        {(fieldType === 'text' || fieldType === 'integer' || fieldType === 'decimal' || fieldType === 'select_one'
-          || fieldType === 'select_multiple' || fieldType === 'date' || fieldType === 'time'
-          || fieldType === 'acknowledge') && (
-          <>
-            {surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple')
-              && renderSelectInput(field, true)}
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                {fieldType === 'text' && renderTextInput(field)}
-                {(fieldType === 'integer' || fieldType === 'decimal') && renderNumberInput(field)}
-                {(!surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple'))
-                  && renderSelectInput(field)}
-                {fieldType === 'date' && renderDateInput(field)}
-                {fieldType === 'time' && renderDateInput(field, true)}
-                {fieldType === 'acknowledge' && renderAcknowledgeInput(field)}
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </>
+      <Field
+        appearance={field.appearance}
+        // autoFocus={field.name === 'name'}
+        component={TextInputField}
+        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
+        onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+      />
     );
   };
+
+  /* View */
 
   return (
     <FlatList

@@ -20,7 +20,11 @@ const TextInputField = ({
                           onShowFieldInfo,
                           placeholder,
                         }) => {
+  /* Local State */
+
   const [isFocused, setIsFocused] = useState(false);
+
+  /* Logic Helpers */
 
   const getInputStyle = () => {
     let style;
@@ -41,6 +45,8 @@ const TextInputField = ({
     return style;
   };
 
+  /* View */
+
   return (
     <>
       {label && (
@@ -48,14 +54,14 @@ const TextInputField = ({
           <Text style={formStyles.fieldLabel}>{label}</Text>
           {placeholder && (
             <Icon
-              color={themes.PRIMARY_ACCENT_COLOR}
-              name={'information-circle-outline'}
-              onPress={() => onShowFieldInfo(label, placeholder)}
-              type={'ionicon'}
             />
           )}
         </View>
       )}
+              color={themes.PRIMARY_ACCENT_COLOR}
+              name={'information-circle-outline'}
+              onPress={() => onShowFieldInfo(label, placeholder)}
+              type={'ionicon'}
       <TextInput
         autoCapitalize={autoCapitalize}
         editable={editable}

@@ -19,11 +19,22 @@ const DateInputField = ({
                           onMyChange,
                           setFieldValue,
                         }) => {
-  const [isDatePickerModalVisible, setIsDatePickerModalVisible] = useState(false);
-  const [date, setDate] = useState(Date.parse(value) ? new Date(value) : new Date());
-  const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
+
+  const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
+  const [date, setDate] = useState(Date.parse(value) ? new Date(value) : new Date());
+  const [isDatePickerModalVisible, setIsDatePickerModalVisible] = useState(false);
+
+  /* Derived Variables */
+
+  let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a') : isShowTime ? moment(value).format(
+    'MM/DD/YYYY, h:mm:ss a') : moment(value).format('MM/DD/YYYY') : undefined;
+
+  /* Side Effects */
 
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({colorScheme: newColorScheme}) => {
@@ -32,44 +43,17 @@ const DateInputField = ({
     return () => subscription.remove();
   }, [colorScheme]);
 
-  let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a') : isShowTime ? moment(value).format(
-    'MM/DD/YYYY, h:mm:ss a') : moment(value).format('MM/DD/YYYY') : undefined;
-
-  const changeDate = (event, selectedDate) => {
-    Platform.OS === 'ios' ? setDate(selectedDate) : saveDate(event, selectedDate);
-  };
+  /* Event Handlers */
 
   const onSavePressed = async () => {
     await saveDate(null, date);
     setIsDatePickerModalVisible(false);
   };
 
-  const renderDatePicker = () => {
-    return (
-      // <View style={{}}>
-      <DateTimePicker
-        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-        mode={isShowTimeOnly ? 'time' : 'date'}
-        neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
-        onChange={changeDate}
-        textColor={colorScheme === 'dark' && 'black'}
-        value={date}
-      />
-      // </View>
-    );
-  };
+  /* Logic Helpers */
 
-  const renderDatePickerDialogBox = () => {
-    return (<ModalWrapper
-      actionTitle={'Set Date'}
-      headerTitle={'Pick ' + label}
-      isVisible={isDatePickerModalVisible}
-      onActionPressed={onSavePressed}
-      overlayStyleOverride={{width: 350, maxHeight: 350}}
-      showCancelButton={false}
-    >
-      {renderDatePicker()}
-    </ModalWrapper>);
+  const changeDate = (event, selectedDate) => {
+    Platform.OS === 'ios' ? setDate(selectedDate) : saveDate(event, selectedDate);
   };
 
   const saveDate = async (event, selectedDate) => {
@@ -110,6 +94,38 @@ const DateInputField = ({
     else setFieldValue(name, selectedDate);
     console.log('After setFieldValue, name:', name, 'selectedDate:', selectedDate);
   };
+
+  /* Render Functions */
+
+  const renderDatePicker = () => {
+    return (
+      // <View style={{}}>
+      <DateTimePicker
+        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+        mode={isShowTimeOnly ? 'time' : 'date'}
+        neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
+        onChange={changeDate}
+        textColor={colorScheme === 'dark' && 'black'}
+        value={date}
+      />
+      // </View>
+    );
+  };
+
+  const renderDatePickerDialogBox = () => {
+    return (<ModalWrapper
+      actionTitle={'Set Date'}
+      headerTitle={'Pick ' + label}
+      isVisible={isDatePickerModalVisible}
+      onActionPressed={onSavePressed}
+      overlayStyleOverride={{width: 350, maxHeight: 350}}
+      showCancelButton={false}
+    >
+      {renderDatePicker()}
+    </ModalWrapper>);
+  };
+
+  /* View */
 
   return (<>
     {label && (<View style={formStyles.fieldLabelContainer}>

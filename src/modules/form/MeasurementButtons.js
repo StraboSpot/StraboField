@@ -17,11 +17,17 @@ const MeasurementButtons = ({
                               setMeasurementsGroupField,
                               survey,
                             }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
 
   const {getGroupFields} = useForm();
 
+  /* Derived Variables */
+
   const groupFields = Object.keys(measurementsKeys).map(k => survey.find(f => f.name === k));
+
+  /* Logic Helpers */
 
   const addMeasurement = (groupField) => {
     setIsMeasurementsModalVisible(true);
@@ -29,11 +35,6 @@ const MeasurementButtons = ({
     const groupKeys = measurementsKeys[groupField.name];
     if (groupKeys.strike) dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.PLANAR]));
     else dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.LINEAR]));
-  };
-
-  const isGroupEmpty = (groupField) => {
-    const relevantFields = getGroupFields(survey, groupField.name);
-    return !relevantFields.some(f => !isEmpty(formProps.values[f.name]));
   };
 
   const ButtonText = ({field}) => {
@@ -75,14 +76,21 @@ const MeasurementButtons = ({
     );
   };
 
+  const isGroupEmpty = (groupField) => {
+    const relevantFields = getGroupFields(survey, groupField.name);
+    return !relevantFields.some(f => !isEmpty(formProps.values[f.name]));
+  };
+
+  /* View */
+
   return (
     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', paddingLeft: 10, paddingRight: 10}}>
       {groupFields.map((field) => {
         return (
           <Button
             buttonStyle={[formStyles.formButtonSmall, {
-              height: 60,
               backgroundColor: isGroupEmpty(field) ? SECONDARY_BACKGROUND_COLOR : PRIMARY_ACCENT_COLOR,
+              height: 60,
               padding: 1,
             }]}
             containerStyle={{flex: 1, padding: 2}}
