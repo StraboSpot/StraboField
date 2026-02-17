@@ -4,6 +4,7 @@ import {Text, View} from 'react-native';
 import {Image, Slider} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {convertMillisecondsToSliderValue} from './preferences.helpers';
 import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
 import {convertMillisecondsToTime, convertSliderValueToMilliseconds} from '../../shared/Helpers';
@@ -49,17 +50,6 @@ const Geolocate = () => {
     let b = interpolate(0, 0);
     return `rgb(${r},${g},${b})`;
   };
-
-  function convertMillisecondsToSliderValue(milliseconds) {
-    const timeMap = {
-      [2 * 60 * 1000]: 0,
-      [5 * 60 * 1000]: 1,
-      [20 * 60 * 1000]: 2,
-      [40 * 60 * 1000]: 3,
-      [null]: 4,
-    };
-    return timeMap[milliseconds];
-  }
 
   const interpolate = (start, end) => {
     let k = (value - 0) / 4; // 0 =>min  && 4 => MAX
