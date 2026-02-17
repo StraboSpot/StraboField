@@ -230,16 +230,16 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
             <ListItem containerStyle={commonStyles.listItemFormField} key={'tag_color'}>
               <>
                 <ListItem.Content>
-                  <ListItem.Title style={commonStyles.listItemTitle}>Tag Colors</ListItem.Title>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Geologic Unit / Tag Colors</ListItem.Title>
                 </ListItem.Content>
                 <SwitchWrapper onValueChange={toggleShowTagColor} value={tagTypeForColor !== undefined}/>
               </>
             </ListItem>
             {tagTypeForColor && (
               <ButtonGroup
-                buttons={['Geologic Unit', 'Conceptual']}
+                buttons={['Geologic Unit', 'Tag']}
                 containerStyle={styles.measurementDetailSwitches}
-                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
+                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'tag'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
                 selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
                 textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}

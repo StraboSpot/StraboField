@@ -281,12 +281,13 @@ const useMapSymbology = () => {
     }
   };
 
-  // If feature has a tag of the type specified in the Map Symbols dialog (geologic unit or concept)
+  // If feature has a tag of the type specified in the Map Symbols dialog (geologic unit or tag)
   // and that tag has a color assigned to then apply that color first
   const getTagColor = (feature) => {
     let color;
     let tagsAtSpot = getTagsAtSpot(feature.properties.id);
-    const tagsForColor = tagsAtSpot.filter(tag => tag.type === tagTypeForColor);
+    const tagsForColor = tagsAtSpot.filter(tag => tag.type === tagTypeForColor
+      || (tagTypeForColor === 'tag' && tag.type !== 'geologic_unit'));
     if (!isEmpty(tagsForColor) && tagsForColor[0].color) {
       const rgbColor = hexToRgb(tagsForColor[0].color);
       color = 'rgba(' + rgbColor.r + ', ' + rgbColor.g + ', ' + rgbColor.b + ', 0.4)';
