@@ -661,15 +661,30 @@ for (const file of files) {
 
   for (let i = 0; i < lines.length; i++) {
     if (varDefRegex.test(lines[i]) || funcDefRegex.test(lines[i])) {
+      // Skip past the parameter list before looking for the body `{`.
+      // This avoids matching `{` inside destructured params like ({prop1, prop2}).
+      let parenDepth = 0;
+      let pastParams = false;
       for (let j = i; j < lines.length; j++) {
-        if (lines[j].includes('{')) {
-          bodyStart = j + 1;
-          break;
+        for (let ci = 0; ci < lines[j].length; ci++) {
+          if (lines[j][ci] === '(') parenDepth++;
+          if (lines[j][ci] === ')') {
+            parenDepth--;
+            if (parenDepth === 0) pastParams = true;
+          }
+          // Only match body `{` after we've closed the parameter list
+          if (pastParams && lines[j][ci] === '{') {
+            bodyStart = j + 1;
+            break;
+          }
         }
+        if (bodyStart >= 0) break;
       }
       break;
     }
   }
+
+  if (bodyStart < 0) continue;
 
   // Determine body indentation level
   let bodyIndent = '';
