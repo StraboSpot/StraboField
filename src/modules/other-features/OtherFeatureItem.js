@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import OtherFeatureLabel from './OtherFeatureLabel';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../../shared/ui/FeatureTagsList';
+import FeatureTagsList from '../tags/FeatureTagsList';
 import {useTags} from '../tags';
 
 const OtherFeatureItem = ({editFeature, feature}) => {

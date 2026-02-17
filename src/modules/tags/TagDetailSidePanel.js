@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ColorPickerModal from '../../shared/ColorPickerModal';
+import ColorPickerModal from './ColorPickerModal';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';

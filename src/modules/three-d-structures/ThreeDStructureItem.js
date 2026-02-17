@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import ThreeDStructureLabel from './ThreeDStructureLabel';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../../shared/ui/FeatureTagsList';
+import FeatureTagsList from '../tags/FeatureTagsList';
 import {useTags} from '../tags';
 
 function ThreeDStructureItem({
