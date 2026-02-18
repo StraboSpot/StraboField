@@ -4,8 +4,7 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES} from './directories.constants';
-import {APP_EXPORT_DIRECTORY} from './directories.constants';
+import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
 import useDevice from './useDevice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';

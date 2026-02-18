@@ -6,8 +6,8 @@ import {useSelector} from 'react-redux';
 import ThreeDStructureLabel from './ThreeDStructureLabel';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../tags/FeatureTagsList';
 import {useTags} from '../tags';
+import FeatureTagsList from '../tags/FeatureTagsList';
 
 function ThreeDStructureItem({
                                edit3dStructure,
