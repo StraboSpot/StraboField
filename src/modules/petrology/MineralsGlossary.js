@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {FlatList, Linking, Text, View} from 'react-native';
 
-import {MINERAL_GLOSSARY_INFO} from './minerals.constants';
+import {MINERAL_GLOSSARY_INFO} from './mineralsGlossary.constants';
 import {chunk} from './petrology.helpers';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
@@ -32,10 +32,9 @@ const MineralsGlossary = ({addMineral}) => {
         {Object.entries(activeMineralInfo).map(([field, value]) => {
           if (field === 'mindat.org link') {
             return (
-              <View style={{padding: 10}}>
+              <View key={activeMineralInfo.Name + 'MindatLink'} style={{padding: 10}}>
                 <ClearButton
                   icon={{name: 'globe-outline', type: 'ionicon', color: themes.PRIMARY_ACCENT_COLOR}}
-                  key={activeMineralInfo.Name + 'MindatLink'}
                   onPress={() => Linking.openURL(value)}
                   title={'Find more information on ' + activeMineralInfo.Label + ' at Mindat.org'}
                 />
