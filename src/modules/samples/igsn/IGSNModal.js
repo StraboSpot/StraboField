@@ -4,14 +4,14 @@ import {ScrollView, Text, View} from 'react-native';
 import {Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
-import {formatContentItems} from './samples.helpers';
-import useSamples from './useSamples';
-import SesarLogo from '../../assets/images/logos/sesar2_logo.png';
-import {isEmpty} from '../../shared/Helpers';
-import Loading from '../../shared/ui/Loading';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {updatedKey} from '../user/userProfile.slice';
+import useIGSN from './useIGSN';
+import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
+import {isEmpty} from '../../../shared/Helpers';
+import Loading from '../../../shared/ui/Loading';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {updatedKey} from '../../user/userProfile.slice';
 
 const IGSNModal = forwardRef(({
                                 isVisible,
@@ -23,7 +23,7 @@ const IGSNModal = forwardRef(({
   const dispatch = useDispatch();
   const {sesar} = useSelector(state => state.user);
 
-  const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useSamples();
+  const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useIGSN();
 
   /* Local State */
 

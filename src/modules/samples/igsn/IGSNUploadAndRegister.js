@@ -5,17 +5,17 @@ import {Button, CheckBox, Icon} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import sampleStyles from './samples.styles';
-import useSamples from './useSamples';
-import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
-import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
-import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
-import {setLoadingStatus} from '../home/home.slice';
-import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../user/userProfile.slice';
+import igsnStyles from './igsn.styles';
+import useIGSN from './useIGSN';
+import useServerRequests from '../../../services/useServerRequests';
+import {isEmpty} from '../../../shared/Helpers';
+import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import alert from '../../../shared/ui/alert';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
+import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
+import {setLoadingStatus} from '../../home/home.slice';
+import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../../user/userProfile.slice';
 
 const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
   /* Data Hooks */
@@ -24,7 +24,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
 
-  const {authenticateWithSesar, getAndSaveSesarCode} = useSamples();
+  const {authenticateWithSesar, getAndSaveSesarCode} = useIGSN();
   const {getSesarToken, getOrcidToken} = useServerRequests();
   const toast = useToast();
 
@@ -138,7 +138,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       <View style={{justifyContent: 'flex-start', alignItems: 'center'}}>
         {!selectedFeature.isOnMySesar && (
           <>
-            <Text style={sampleStyles.mySesarUpdateDisclaimer}>
+            <Text style={igsnStyles.mySesarUpdateDisclaimer}>
               To upload to your SESAR account and obtain an IGSN check below:
             </Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -214,7 +214,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const renderOrcidSignInButton = () => (
     <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 20}}>
       <OutlineButton onPress={orcidAuthentication} title={'Sign into MySESAR'}/>
-      <Text style={sampleStyles.mySesarUpdateDisclaimer}>
+      <Text style={igsnStyles.mySesarUpdateDisclaimer}>
         ⚠️ Authenticate your SESAR account to upload a sample.
       </Text>
     </View>
@@ -224,7 +224,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     if (!isInternetReachable) {
       return (
         <View style={{padding: 10}}>
-          <Text style={sampleStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
+          <Text style={igsnStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
             account with an IGSN number and needs to sync. You will need to be online make any updates.</Text>
         </View>
       );
@@ -232,7 +232,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     else {
       return (
         <View style={{padding: 10}}>
-          <Text style={sampleStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
+          <Text style={igsnStyles.mySesarUpdateDisclaimer}>This sample has already been registered in your MYSESAR
             account. Any changes will be automatically updated.</Text>
         </View>
       );
