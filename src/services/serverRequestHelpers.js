@@ -5,6 +5,8 @@ import {isEmpty} from '../shared/Helpers';
 
 const DEFAULT_TIMEOUT = 60000;
 
+/* Internal Functions */
+
 const buildAuthHeader = (auth) => {
   if (!auth) return {};
   return {Authorization: `${auth.type === 'bearer' ? 'Bearer' : 'Basic'} ${auth.token}`};
@@ -15,6 +17,8 @@ const buildHeaders = (auth, customHeaders = {}) => ({
   ...buildAuthHeader(auth),
   ...customHeaders,
 });
+
+/* Exported Functions */
 
 export const deleteRequest = async (url, auth) => {
   try {
