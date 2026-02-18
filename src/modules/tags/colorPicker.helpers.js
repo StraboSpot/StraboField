@@ -1,9 +1,13 @@
 import {hexToRgb} from '../../shared/Helpers';
 
+/* Internal Functions */
+
 const componentToHex = (c) => {
   const hex = c.toString(16);
   return hex.length == 1 ? '0' + hex : hex;
 };
+
+/* Exported Functions */
 
 export const getRGBString = (hex) => {
   if (hex) {

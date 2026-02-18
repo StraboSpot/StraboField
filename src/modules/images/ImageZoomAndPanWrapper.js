@@ -14,9 +14,6 @@ const ImageZoomAndPanWrapper = ({children}) => {
 
   // Zoom and Pan state
   const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
@@ -30,6 +27,10 @@ const ImageZoomAndPanWrapper = ({children}) => {
       ],
     };
   });
+
+  const savedScale = useSharedValue(1);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
 
   /* Derived Variables */
 

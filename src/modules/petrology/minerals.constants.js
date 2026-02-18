@@ -1,3 +1,20 @@
+export const ABBREVIATIONS_WITH_LABELS = (
+  MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
+    if (mineral.Abbreviation) {
+      mineral.Abbreviation.split(', ').forEach(abb => acc[abb] = mineral.Label);
+    }
+    return acc;
+  }, {})
+);
+console.log('ABBREVIATIONS_WITH_LABELS', ABBREVIATIONS_WITH_LABELS);
+
+export const LABELS_WITH_ABBREVIATIONS = (
+  MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
+    return mineral.Abbreviation ? {...acc, [mineral.Label]: mineral.Abbreviation} : acc;
+  }, {})
+);
+console.log('LABELS_WITH_ABBREVIATIONS', LABELS_WITH_ABBREVIATIONS);
+
 export const MINERAL_GLOSSARY_INFO = [
   {
     'Name': 'aegirine',
@@ -1277,23 +1294,6 @@ export const MINERAL_GLOSSARY_INFO = [
     'mindat.org link': 'https://www.mindat.org/min-4430.html',
   },
 ];
-
-export const ABBREVIATIONS_WITH_LABELS = (
-  MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
-    if (mineral.Abbreviation) {
-      mineral.Abbreviation.split(', ').forEach(abb => acc[abb] = mineral.Label);
-    }
-    return acc;
-  }, {})
-);
-console.log('ABBREVIATIONS_WITH_LABELS', ABBREVIATIONS_WITH_LABELS);
-
-export const LABELS_WITH_ABBREVIATIONS = (
-  MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
-    return mineral.Abbreviation ? {...acc, [mineral.Label]: mineral.Abbreviation} : acc;
-  }, {})
-);
-console.log('LABELS_WITH_ABBREVIATIONS', LABELS_WITH_ABBREVIATIONS);
 
 export const MINERALS_BY_CLASS = (
   MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {

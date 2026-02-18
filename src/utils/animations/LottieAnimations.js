@@ -5,7 +5,6 @@ import LottieView from 'lottie-react-native';
 import {getAnimationType} from './animations.helpers';
 
 const LottieAnimation = ({animationStyle, type, doesLoop}) => {
-
   /* View */
 
   return (

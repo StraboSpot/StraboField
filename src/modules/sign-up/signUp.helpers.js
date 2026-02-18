@@ -1,5 +1,5 @@
 // Helper function to format success messages
-const formatMessage = (message, isSuccess = false) => {
+export const formatMessage = (message, isSuccess = false) => {
   if (isSuccess) {
     return message;
   }
@@ -14,7 +14,7 @@ const formatMessage = (message, isSuccess = false) => {
 };
 
 // Helper function to parse validation errors
-const parseValidationErrors = (message) => {
+export const parseValidationErrors = (message) => {
   if (!message) return [];
 
   // Split by periods and filter out empty strings
@@ -23,5 +23,3 @@ const parseValidationErrors = (message) => {
   // Format as bullet points for better readability
   return errors.map(error => `• ${error.trim()}`).join('\n');
 };
-
-export {formatMessage, parseValidationErrors};

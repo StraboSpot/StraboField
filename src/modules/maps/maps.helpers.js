@@ -8,7 +8,7 @@ import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.consta
 import {isEmpty} from '../../shared/Helpers';
 
 // Add a new vertex to a line
-const addVertexToLine = (line, newVertex) => {
+export const addVertexToLine = (line, newVertex) => {
   console.log('Adding vertex to selected line feature...');
   const newPointOnLine = turf.nearestPointOnLine(line, newVertex);
   const i = newPointOnLine.properties.index;
@@ -17,7 +17,7 @@ const addVertexToLine = (line, newVertex) => {
 };
 
 // Add a new vertex to a polygon
-const addVertexToPolygon = (polygon, newVertex) => {
+export const addVertexToPolygon = (polygon, newVertex) => {
   console.log('Adding vertex to selected polygon feature...');
 
   // Get all the lines that make up the polygon
@@ -39,7 +39,7 @@ const addVertexToPolygon = (polygon, newVertex) => {
 };
 
 // Convert coordinates of a feature from one projection to another
-const convertCoords = (feature, fromProjection, toProjection) => {
+export const convertCoords = (feature, fromProjection, toProjection) => {
   if (feature.geometry.type === 'Point') {
     feature.geometry.coordinates = proj4(fromProjection, toProjection, feature.geometry.coordinates);
   }
@@ -69,13 +69,14 @@ const convertCoords = (feature, fromProjection, toProjection) => {
 };
 
 // Convert WGS84 to image x,y pixels, assuming x,y are web mercator
-const convertFeatureGeometryToImagePixels = feature => convertCoords(feature, GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION);
+export const convertFeatureGeometryToImagePixels = feature => convertCoords(feature, GEO_LAT_LNG_PROJECTION,
+  PIXEL_PROJECTION);
 
 // Convert image x,y pixels to WGS84, assuming x,y are web mercator
-const convertImagePixelsToLatLong = feature => convertCoords(feature, PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION);
+export const convertImagePixelsToLatLong = feature => convertCoords(feature, PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION);
 
 // Get a pixel bounding box with padding around a point pressed on screen
-const getBBoxPaddedInPixels = ([x, y]) => {
+export const getBBoxPaddedInPixels = ([x, y]) => {
   const pixelRatio = PixelRatio.get();
   const r = 15;  // padding
   const maxX = x + r;
@@ -88,7 +89,7 @@ const getBBoxPaddedInPixels = ([x, y]) => {
 };
 
 // Get geographic bounds with padding around a point
-const getBoundsPadded = ([x, y]) => {
+export const getBoundsPadded = ([x, y]) => {
   const r = 0.01;  // padding
   const maxX = x + r;
   const minX = x - r;
@@ -98,7 +99,7 @@ const getBoundsPadded = ([x, y]) => {
 };
 
 // Get the closest spot distance and index from an array of distances
-const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
+export const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
   let minDistance = Number.MAX_VALUE;
   let minIndex = -1;
   for (let j = 0; j < distancesFromSpot.length; j++) {
@@ -111,7 +112,7 @@ const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
 };
 
 // Identify the coordinate span for the image basemap adjusted by the given [x,y] (adjustment used for strat sections)
-const getCoordQuad = (imageBasemapProps, altOrigin) => {
+export const getCoordQuad = (imageBasemapProps, altOrigin) => {
   if (!imageBasemapProps || !imageBasemapProps.width || !imageBasemapProps.height) return undefined;
   // identify the [lat,lng] corners of the image basemap
   const x = altOrigin && altOrigin.x || 0;
@@ -126,14 +127,14 @@ const getCoordQuad = (imageBasemapProps, altOrigin) => {
   return coordQuad;
 };
 
-const getSetInCurrentViewButtonIcon = (button) => {
+export const getSetInCurrentViewButtonIcon = (button) => {
   return button === 'LineString' ? require('../../assets/icons/LineButton.png')
     : button === 'Point' ? require('../../assets/icons/PointButton.png')
       : button === 'Polygon' ? require('../../assets/icons/PolygonButton.png')
         : null;
 };
 
-const getTimeAndDateFromModifiedTimestamp = (field) => {
+export const getTimeAndDateFromModifiedTimestamp = (field) => {
   return {
     time: moment(field).format('HH:mm:ss'),
     day: moment(field).format('D'),
@@ -142,37 +143,18 @@ const getTimeAndDateFromModifiedTimestamp = (field) => {
   };
 };
 
-const getVertexActionButtonIcon = (button) => {
+export const getVertexActionButtonIcon = (button) => {
   return button === 'Add Vertex' ? require('../../assets/icons/LineButton.png')
     : button === 'Delete Vertex' ? require('../../assets/icons/PointButton.png')
       : button === 'Split Line' ? require('../../assets/icons/PolygonButton.png')
         : null;
 };
 
-const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
+export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 
-const isOnGeoMap = feature => isEmpty(feature) ? false
+export const isOnGeoMap = feature => isEmpty(feature) ? false
   : !feature.properties.image_basemap && !feature.properties.strat_section_id;
 
-const isOnImageBasemap = feature => feature.properties?.image_basemap;
+export const isOnImageBasemap = feature => feature.properties?.image_basemap;
 
-const isOnStratSection = feature => feature.properties?.strat_section_id;
-
-export {
-  addVertexToLine,
-  addVertexToPolygon,
-  convertCoords,
-  convertFeatureGeometryToImagePixels,
-  convertImagePixelsToLatLong,
-  getBBoxPaddedInPixels,
-  getBoundsPadded,
-  getClosestSpotDistanceAndIndex,
-  getCoordQuad,
-  getSetInCurrentViewButtonIcon,
-  getTimeAndDateFromModifiedTimestamp,
-  getVertexActionButtonIcon,
-  isDrawMode,
-  isOnGeoMap,
-  isOnImageBasemap,
-  isOnStratSection,
-};
+export const isOnStratSection = feature => feature.properties?.strat_section_id;

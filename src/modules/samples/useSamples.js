@@ -1,5 +1,4 @@
 const useSamples = () => {
-
   /* Exported Functions */
 
   const onSampleFormChange = (formCurrent, name, value) => {

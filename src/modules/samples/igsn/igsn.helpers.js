@@ -49,40 +49,6 @@ export const convertToJSON = (mappingArray) => {
   }, {});
 };
 
-export const getMaterialName = (materialType) => {
-  if (materialType === 'intact_rock' || materialType === 'fragmented_roc') {
-    return 'Rock';
-  }
-  else if (materialType === 'carbon_or_animal') return 'Organic Material';
-  else return materialType;
-};
-
-export const isTokenExpired = (accessToken) => {
-  if (!accessToken) return true; // No token = expired
-  try {
-    const accessTokenParsed = JSON.parse(atob(accessToken.split('.')[1]));
-    return accessTokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
-  }
-  catch (error) {
-    return true; // If decoding fails, assume expired
-  }
-};
-
-export const isoToLocalDateTime = (isoString, type) => {
-  const date = new Date(isoString);
-  const timeAndDate = type === 'time' ? date.toLocaleTimeString('en-US') : date.toLocaleDateString('en-US');
-  return timeAndDate;
-};
-
-export const parseXML = (xmlData) => {
-  let json;
-  parseString(xmlData, {trim: true}, (err, result) => {
-    console.dir(result);
-    json = result;
-  });
-  return json;
-};
-
 export const formatContentItems = (item) => {
   if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude'
     || item.sesarKey === 'longitude_end' || item.sesarKey === 'latitude_end') {
@@ -96,6 +62,40 @@ export const formatContentItems = (item) => {
   }
   if (item.sesarKey === 'description') return truncateText(item.value, 30);
   else return item.value;
+};
+
+export const getMaterialName = (materialType) => {
+  if (materialType === 'intact_rock' || materialType === 'fragmented_roc') {
+    return 'Rock';
+  }
+  else if (materialType === 'carbon_or_animal') return 'Organic Material';
+  else return materialType;
+};
+
+export const isoToLocalDateTime = (isoString, type) => {
+  const date = new Date(isoString);
+  const timeAndDate = type === 'time' ? date.toLocaleTimeString('en-US') : date.toLocaleDateString('en-US');
+  return timeAndDate;
+};
+
+export const isTokenExpired = (accessToken) => {
+  if (!accessToken) return true; // No token = expired
+  try {
+    const accessTokenParsed = JSON.parse(atob(accessToken.split('.')[1]));
+    return accessTokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
+  }
+  catch (error) {
+    return true; // If decoding fails, assume expired
+  }
+};
+
+export const parseXML = (xmlData) => {
+  let json;
+  parseString(xmlData, {trim: true}, (err, result) => {
+    console.dir(result);
+    json = result;
+  });
+  return json;
 };
 
 export const truncateDateISOString = (date) => {

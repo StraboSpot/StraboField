@@ -4,7 +4,7 @@
  * @param {Array} features - Array of GeoJSON features
  * @returns {Array} - Array of features that have samples
  */
-const getFeaturesWithSamples = (features) => {
+export const getFeaturesWithSamples = (features) => {
   return features.reduce((acc, feature) => {
     return feature.properties?.samples && feature.properties.samples.length >= 1 ? [...acc, feature] : acc;
   }, []);
@@ -17,9 +17,7 @@ const getFeaturesWithSamples = (features) => {
  * @param {Array} features - Array of GeoJSON features
  * @returns {Array} - Array of unique features by properties.id
  */
-const getUniqFeatures = (features) => {
+export const getUniqFeatures = (features) => {
   return features.reduce((acc, f) =>
     acc.map(f1 => f1.properties.id).includes(f.properties.id) ? acc : [...acc, f], []);
 };
-
-export {getFeaturesWithSamples, getUniqFeatures};
