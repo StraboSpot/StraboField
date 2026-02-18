@@ -26,18 +26,24 @@ const useMapPressEvents = ({
                              setMeasureFeatures,
                              switchToEditing,
                            }) => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const dispatch = useDispatch();
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
-  const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotAtPress} = useMapFeaturesCalculated(mapRef);
+  const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
 
+  /* Local State */
+
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
+
+  /* Exported Functions */
 
   // Handle a long press on the map by making the point or vertex at the point "selected"
   const handleMapLongPress = async (e) => {
@@ -92,9 +98,9 @@ const useMapPressEvents = ({
   };
 
   return {
-    handleMapLongPress: handleMapLongPress,
-    handleMapPress: handleMapPress,
-    location: location,
+    handleMapLongPress,
+    handleMapPress,
+    location,
   };
 };
 

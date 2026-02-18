@@ -16,11 +16,12 @@ import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useMapLocation from '../../maps/useMapLocation';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
+import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
@@ -33,13 +34,13 @@ const NotebookHeader = ({
                           setSelectedSample,
                           zoomToSpots,
                         }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
-
+  const {getCurrentLocation} = useMapLocation();
   const {
     checkSpotName,
     getRootSpot,
@@ -48,12 +49,34 @@ const NotebookHeader = ({
     getSpotWithThisSample,
     getSpotWithThisStratSection,
   } = useSpots();
-  const {getCurrentLocation} = useMapLocation();
   const toast = useToast();
+
+  /* Local State */
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
+
+  /* Derived Variables */
 
   const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
   const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
   const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id) : null;
+
+  /* Event Handlers */
+
+  const onSpotEdit = async (field, value) => {
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: field, value: value}));
+    if (spot.properties?.isSample) {
+      const sampleMetadataCopy = isEmpty(spot.properties?.samples?.[0]) ? {id: spot.properties.id}
+        : JSON.parse(JSON.stringify(spot.properties.samples[0]));
+      sampleMetadataCopy.sample_id_name = value;
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [sampleMetadataCopy]}));
+    }
+    await checkSpotName(value);
+  };
+
+  /* Logic Helpers */
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -111,8 +134,7 @@ const NotebookHeader = ({
     const key = spot.properties.trace.trace_type;
     let traceText = traceDictionary[key] || key.replace(/_/g, ' ');
     traceText = toTitleCase(traceText) + ' Trace';
-    const traceSubTypeFields = ['contact_type', 'geologic_structure_type', 'geomorphic_feature', 'antropogenic_feature', 'other_feature'];
-    const subType = traceSubTypeFields.find(subTypeField => spot.properties.trace[subTypeField]);
+    const subType = TRACE_SUB_TYPE_FIELDS.find(subTypeField => spot.properties.trace[subTypeField]);
     if (subType) {
       const subTypeValue = spot.properties.trace[subType];
       const subTypeLabel = traceDictionary[subTypeValue];
@@ -137,17 +159,18 @@ const NotebookHeader = ({
     if (openMainMenuPanel) openMainMenuPanel();
   };
 
-  const onSpotEdit = async (field, value) => {
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: field, value: value}));
-    if (spot.properties?.isSample) {
-      const sampleMetadataCopy = isEmpty(spot.properties?.samples?.[0]) ? {id: spot.properties.id}
-        : JSON.parse(JSON.stringify(spot.properties.samples[0]));
-      sampleMetadataCopy.sample_id_name = value;
-      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [sampleMetadataCopy]}));
-    }
-    await checkSpotName(value);
+  const setToCurrentLocation = async () => {
+    const currentLocation = await getCurrentLocation();
+    let editedSpot = JSON.parse(JSON.stringify(spot));
+    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
+    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
+    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
+    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+    dispatch(editedOrCreatedSpot(editedSpot));
+    dispatch(setSelectedSpot(editedSpot));
   };
+
+  /* Render Functions */
 
   const renderCoordsText = () => {
     return (
@@ -159,41 +182,6 @@ const NotebookHeader = ({
         />
       </View>
     );
-  };
-
-  const renderSetCoordsText = () => {
-    return (
-      <View style={{flexDirection: 'row'}}>
-        {!spot.properties.trace && !spot.properties.surface_feature && (
-          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5, paddingRight: 15}}>
-            <ClearButton
-              onPress={setToCurrentLocation}
-              title={'Set To Current Location'}
-            />
-          </View>
-        )}
-        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
-          <ClearButton
-            onPress={() => {
-              createDefaultGeom();
-              closeNotebookPanel();
-            }}
-            title={'Set in Current View'}
-          />
-        </View>
-      </View>
-    );
-  };
-
-  const setToCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
-    let editedSpot = JSON.parse(JSON.stringify(spot));
-    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
-    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
-    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
-    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
-    dispatch(editedOrCreatedSpot(editedSpot));
-    dispatch(setSelectedSpot(editedSpot));
   };
 
   const renderNotebookHeaderContent = () => {
@@ -295,6 +283,32 @@ const NotebookHeader = ({
       </>
     );
   };
+
+  const renderSetCoordsText = () => {
+    return (
+      <View style={{flexDirection: 'row'}}>
+        {!spot.properties.trace && !spot.properties.surface_feature && (
+          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5, paddingRight: 15}}>
+            <ClearButton
+              onPress={setToCurrentLocation}
+              title={'Set To Current Location'}
+            />
+          </View>
+        )}
+        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+          <ClearButton
+            onPress={() => {
+              createDefaultGeom();
+              closeNotebookPanel();
+            }}
+            title={'Set in Current View'}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  /* View */
 
   return (
     <>

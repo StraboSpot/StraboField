@@ -4,15 +4,23 @@ import {Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {TERNARY_MINERALS} from './petrology.constants';
+import {TERNARY_MINERALS} from './minerals.constants';
 import {roundToDecimalPlaces} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import PageHeader from '../page/PageHeader';
 
 const TernaryPage = () => {
+  /* Data Hooks */
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const gatherTernaryValues = () => {
+  /* Derived Variables */
+
+  const ternary = gatherTernaryValues();
+
+  /* Logic Helpers */
+
+  function gatherTernaryValues() {
     let ternaryTemp = {};
     if (spot.properties.pet && spot.properties.pet.minerals && Array.isArray(spot.properties.pet.minerals)) {
       console.log('Calculating ternary values...');
@@ -33,9 +41,9 @@ const TernaryPage = () => {
       ternaryTemp.oph_sum = ternaryTemp.ol + ternaryTemp.pyx + ternaryTemp.hbl;
     }
     return ternaryTemp;
-  };
+  }
 
-  const ternary = gatherTernaryValues();
+  /* View */
 
   return (
     <>

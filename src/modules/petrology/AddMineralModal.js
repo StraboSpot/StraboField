@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
@@ -15,42 +16,45 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
+const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
+
+let tempValues = {};
+
 const AddMineralModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [initialValues, setInitialValues] = useState({id: getNewId()});
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
-  const [isShowTemplates, setIsShowTemplates] = useState(false);
-
   const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {onMineralChange, savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
 
+  /* Local State */
+
   const formRef = useRef(null);
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['mineral_abbrev', 'full_mineral_name'];
-  const igOrMetKey = 'igneous_or_metamorphic';
-  const igButtonsKeys = ['habit', 'textural_setting_igneous'];
-  const metButtonsKeys = ['habit_met', 'textural_setting_metamorphic'];
-  const lastKeys = ['average_grain_size_mm', 'maximum_grain_size_mm', 'modal', 'mineral_notes'];
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [initialValues, setInitialValues] = useState({id: getNewId()});
+  const [isShowTemplates, setIsShowTemplates] = useState(false);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.MINERALS;
+  const areMultipleTemplates = templates[petKey] && templates[petKey].isInUse && templates[petKey].active
+    && templates[petKey].active.length > 1;
   const formName = ['pet', petKey];
-  const survey = getSurvey(formName);
   const choices = getChoices(formName);
+  const survey = getSurvey(formName);
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
 
-  const areMultipleTemplates = templates[petKey] && templates[petKey].isInUse && templates[petKey].active
-    && templates[petKey].active.length > 1;
-  let tempValues = {};
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddMineralModal [templates]', templates);
@@ -61,15 +65,7 @@ const AddMineralModal = () => {
     return () => dispatch(setModalValues({}));
   }, [templates]);
 
-  const addMineral = (mineralInfo) => {
-    setInitialValues({
-      ...tempValues,
-      id: getNewId(),
-      mineral_abbrev: mineralInfo.Abbreviation,
-      full_mineral_name: mineralInfo.Label,
-    });
-    setSelectedTypeIndex(null);
-  };
+  /* Event Handlers */
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
@@ -95,6 +91,27 @@ const AddMineralModal = () => {
     if (selectedTypeIndex === i) setSelectedTypeIndex(null);
     else setSelectedTypeIndex(i);
   };
+
+  /* Logic Helpers */
+
+  const addMineral = (mineralInfo) => {
+    setInitialValues({
+      ...tempValues,
+      id: getNewId(),
+      mineral_abbrev: mineralInfo.Abbreviation,
+      full_mineral_name: mineralInfo.Label,
+    });
+    setSelectedTypeIndex(null);
+  };
+
+  const saveMineral = () => {
+    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
+    else savePetFeature(petKey, spot, formRef.current);
+    formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) onCloseModalPressed();
+  };
+
+  /* Render Functions */
 
   const renderAddMineral = () => {
     tempValues = formRef.current?.values || {};
@@ -192,12 +209,7 @@ const AddMineralModal = () => {
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
 
-  const saveMineral = () => {
-    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
-    else savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) onCloseModalPressed();
-  };
+  /* View */
 
   return (
     <ModalWrapper

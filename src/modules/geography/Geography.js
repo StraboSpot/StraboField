@@ -7,6 +7,7 @@ import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import GeoFieldInputs from './GeoFieldInputs';
+import {GEOGRAPHY_FORM_NAME} from './geography.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -18,21 +19,73 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
 const Geography = ({isReadOnly}) => {
-  const {showErrors, validateForm} = useForm();
-  const {isOnGeoMap} = useMapView();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {showErrors, validateForm} = useForm();
+  const {isOnGeoMap} = useMapView();
+
+  /* Local State */
+
   const formRef = useRef(null);
   const geomFormRef = useRef(null);
+
+  /* Logic Helpers */
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisibleToPrev());
   };
 
+  const saveForm = async () => {
+    try {
+      await geomFormRef.current.submitForm();
+      const editedGeomFormData = showErrors(geomFormRef.current);
+      await formRef.current.submitForm();
+      let geographyProperties = showErrors(formRef.current);
+      console.log('Saving form data to Spot ...');
+      let geometry = spot.geometry;
+      if (isOnGeoMap(spot)) {
+        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
+          const point = turf.point([editedGeomFormData.longitude, editedGeomFormData.latitude]);
+          geometry = point.geometry;
+        }
+      }
+      else if (!isOnGeoMap(spot)) {
+        if (!isEmpty(editedGeomFormData.x_pixels) && !isEmpty(editedGeomFormData.y_pixels)) {
+          const point = turf.point([editedGeomFormData.x_pixels, editedGeomFormData.y_pixels]);
+          geometry = point.geometry;
+        }
+        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
+          geographyProperties.lng = editedGeomFormData.longitude;
+          geographyProperties.lat = editedGeomFormData.latitude;
+        }
+      }
+      const editedSpot = {geometry: geometry, properties: {...geographyProperties}, type: spot.type};
+      dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+      dispatch(editedOrCreatedSpot(editedSpot));
+      return Promise.resolve();
+    }
+    catch (e) {
+      console.log('Error submitting form', e);
+      return Promise.reject();
+    }
+  };
+
+  const saveFormAndGo = () => {
+    saveForm().then(() => {
+      console.log('Finished saving form data to Spot');
+      dispatch(setNotebookPageVisibleToPrev());
+    }, () => {
+      console.log('Error saving form data to Spot');
+    });
+  };
+
+  /* Render Functions */
+
   const renderFormFields = () => {
-    const formName = ['general', 'geography'];
+    const formName = GEOGRAPHY_FORM_NAME;
     console.log('Rendering Form:', formName[0] + '.' + formName[1], 'with', spot.properties);
     return (
       <View style={{flex: 1}}>
@@ -46,6 +99,34 @@ const Geography = ({isReadOnly}) => {
           validate={values => validateForm({formName: formName, values: values})}
         />
       </View>
+    );
+  };
+
+  const renderGeoCoords = (initialGeomValues) => {
+    return (
+      <>
+        {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
+          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
+          : renderGeoFieldText(initialGeomValues)
+        }
+      </>
+    );
+  };
+
+  const renderGeoFieldText = () => {
+    return (
+      <ListItem containerStyle={commonStyles.listItemFormField}>
+        <ListItem.Content>
+          <Field
+            appearance={'multiline'}
+            component={TextInputField}
+            editable={false}
+            key={'coordsString'}
+            label={'Coordinates as [Longitude, Latitude]'}
+            name={'coordsString'}
+          />
+        </ListItem.Content>
+      </ListItem>
     );
   };
 
@@ -127,34 +208,6 @@ const Geography = ({isReadOnly}) => {
           </View>
         )}
       </Formik>
-    );
-  };
-
-  const renderGeoCoords = (initialGeomValues) => {
-    return (
-      <>
-        {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
-          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
-          : renderGeoFieldText(initialGeomValues)
-        }
-      </>
-    );
-  };
-
-  const renderGeoFieldText = () => {
-    return (
-      <ListItem containerStyle={commonStyles.listItemFormField}>
-        <ListItem.Content>
-          <Field
-            appearance={'multiline'}
-            component={TextInputField}
-            editable={false}
-            key={'coordsString'}
-            label={'Coordinates as [Longitude, Latitude]'}
-            name={'coordsString'}
-          />
-        </ListItem.Content>
-      </ListItem>
     );
   };
 
@@ -247,49 +300,7 @@ const Geography = ({isReadOnly}) => {
     );
   };
 
-  const saveForm = async () => {
-    try {
-      await geomFormRef.current.submitForm();
-      const editedGeomFormData = showErrors(geomFormRef.current);
-      await formRef.current.submitForm();
-      let geographyProperties = showErrors(formRef.current);
-      console.log('Saving form data to Spot ...');
-      let geometry = spot.geometry;
-      if (isOnGeoMap(spot)) {
-        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
-          const point = turf.point([editedGeomFormData.longitude, editedGeomFormData.latitude]);
-          geometry = point.geometry;
-        }
-      }
-      else if (!isOnGeoMap(spot)) {
-        if (!isEmpty(editedGeomFormData.x_pixels) && !isEmpty(editedGeomFormData.y_pixels)) {
-          const point = turf.point([editedGeomFormData.x_pixels, editedGeomFormData.y_pixels]);
-          geometry = point.geometry;
-        }
-        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
-          geographyProperties.lng = editedGeomFormData.longitude;
-          geographyProperties.lat = editedGeomFormData.latitude;
-        }
-      }
-      const editedSpot = {geometry: geometry, properties: {...geographyProperties}, type: spot.type};
-      dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
-      dispatch(editedOrCreatedSpot(editedSpot));
-      return Promise.resolve();
-    }
-    catch (e) {
-      console.log('Error submitting form', e);
-      return Promise.reject();
-    }
-  };
-
-  const saveFormAndGo = () => {
-    saveForm().then(() => {
-      console.log('Finished saving form data to Spot');
-      dispatch(setNotebookPageVisibleToPrev());
-    }, () => {
-      console.log('Error saving form data to Spot');
-    });
-  };
+  /* View */
 
   return (
     <>

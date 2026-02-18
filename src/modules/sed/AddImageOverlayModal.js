@@ -5,6 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {showFieldInfo, validateImageOverlay} from './sed.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
@@ -20,13 +21,38 @@ const AddImageOverlayModal = ({
                                 image,
                                 isReadOnly,
                               }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {showErrors} = useForm();
 
+  /* Local State */
+
   const overlayFormRef = useRef(null);
+
+  /* Event Handlers */
+
+  // Resize image preserving image ratio
+  const onMyChange = async (name, value) => {
+    const img = spot.properties.images.find(i => i.id === overlayFormRef.current?.values?.id);
+    if (value && name === 'image_width') {
+      overlayFormRef.current.setFieldValue('image_width', value);
+      overlayFormRef.current.setFieldValue('image_height', Math.round(img.height / img.width * value));
+    }
+    else if (value && name === 'image_height') {
+      overlayFormRef.current.setFieldValue('image_height', value);
+      overlayFormRef.current.setFieldValue('image_width', Math.round(img.width / img.height * value));
+    }
+    else if (name === 'image_width' || name === 'image_height') {
+      overlayFormRef.current?.setFieldValue('image_height', undefined);
+      overlayFormRef.current?.setFieldValue('image_width', undefined);
+    }
+  };
+
+  /* Logic Helpers */
 
   const deleteImageOverlay = () => {
     let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
@@ -77,22 +103,33 @@ const AddImageOverlayModal = ({
     })) || [];
   };
 
-  // Resize image preserving image ratio
-  const onMyChange = async (name, value) => {
-    const img = spot.properties.images.find(i => i.id === overlayFormRef.current?.values?.id);
-    if (value && name === 'image_width') {
-      overlayFormRef.current.setFieldValue('image_width', value);
-      overlayFormRef.current.setFieldValue('image_height', Math.round(img.height / img.width * value));
+  const saveImageOverlay = async () => {
+    await overlayFormRef.current.submitForm();
+    const editedImageOverlayData = showErrors(overlayFormRef.current);
+    // console.log('Image Overlay Data', editedImageOverlayData);
+    if (!isEmpty(editedImageOverlayData) && editedImageOverlayData.id) {
+      let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
+      let editedStratSectionData = editedSedData.strat_section ? JSON.parse(
+        JSON.stringify(editedSedData.strat_section)) : {};
+      let editedImageOverlaysData = editedStratSectionData.images ? JSON.parse(
+        JSON.stringify(editedStratSectionData.images)) : [];
+      editedImageOverlaysData = editedImageOverlaysData.filter(i => i.id !== editedImageOverlayData.id);
+      editedImageOverlaysData.push(editedImageOverlayData);
+      editedStratSectionData = {...editedStratSectionData, images: editedImageOverlaysData};
+      editedSedData = {...editedSedData, strat_section: editedStratSectionData};
+      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+
+      // Update strat section for map if matches edited strat section
+      const stratSectionSettings = editedSedData.strat_section || {};
+      if (stratSectionSettings.strat_section_id
+        && stratSection?.strat_section_id === stratSectionSettings.strat_section_id) {
+        dispatch(setStratSection(stratSectionSettings));
+      }
     }
-    else if (value && name === 'image_height') {
-      overlayFormRef.current.setFieldValue('image_height', value);
-      overlayFormRef.current.setFieldValue('image_width', Math.round(img.width / img.height * value));
-    }
-    else if (name === 'image_width' || name === 'image_height') {
-      overlayFormRef.current?.setFieldValue('image_height', undefined);
-      overlayFormRef.current?.setFieldValue('image_width', undefined);
-    }
+    closeModal();
   };
+
+  /* Render Functions */
 
   const renderAddImageOverlayModal = () => {
     return (
@@ -224,68 +261,7 @@ const AddImageOverlayModal = ({
     );
   };
 
-  const saveImageOverlay = async () => {
-    await overlayFormRef.current.submitForm();
-    const editedImageOverlayData = showErrors(overlayFormRef.current);
-    // console.log('Image Overlay Data', editedImageOverlayData);
-    if (!isEmpty(editedImageOverlayData) && editedImageOverlayData.id) {
-      let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
-      let editedStratSectionData = editedSedData.strat_section ? JSON.parse(
-        JSON.stringify(editedSedData.strat_section)) : {};
-      let editedImageOverlaysData = editedStratSectionData.images ? JSON.parse(
-        JSON.stringify(editedStratSectionData.images)) : [];
-      editedImageOverlaysData = editedImageOverlaysData.filter(i => i.id !== editedImageOverlayData.id);
-      editedImageOverlaysData.push(editedImageOverlayData);
-      editedStratSectionData = {...editedStratSectionData, images: editedImageOverlaysData};
-      editedSedData = {...editedSedData, strat_section: editedStratSectionData};
-      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-
-      // Update strat section for map if matches edited strat section
-      const stratSectionSettings = editedSedData.strat_section || {};
-      if (stratSectionSettings.strat_section_id
-        && stratSection?.strat_section_id === stratSectionSettings.strat_section_id) {
-        dispatch(setStratSection(stratSectionSettings));
-      }
-    }
-    closeModal();
-  };
-
-  const showFieldInfo = (label, info) => {
-    alert(label, info);
-  };
-
-  const validateImageOverlay = (values) => {
-    let errors = {};
-    // console.log('Values before image overlay validation:', values);
-    if ((values.image_height && !values.image_width) || (values.image_width && !values.image_height)) {
-      delete values.image_height;
-      delete values.image_width;
-    }
-    Object.entries(values).forEach(([key, value]) => {
-      switch (key) {
-        case 'id':
-          break;
-        case 'image_height':
-        case 'image_width':
-          if (parseFloat(value) > 0) values[key] = parseFloat(value);
-          else {
-            delete values.image_height;
-            delete values.image_width;
-          }
-          break;
-        case 'image_opacity':
-          if (parseFloat(value) < 0 || parseFloat(value) > 1) errors[key] = 'Opacity must be between 0 and 1.';
-          else values[key] = parseFloat(value);
-          break;
-        default:
-          if (parseFloat(value)) values[key] = parseFloat(value);
-          else delete values[key];
-          break;
-      }
-    });
-    // console.log('Values after image overlay validation:', values);
-    return errors;
-  };
+  /* View */
 
   return renderAddImageOverlayModal();
 };

@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {USER_CONVENTIONS_FORM_NAME} from './user.constants';
 import userStyles from './user.styles';
 import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/useDownload';
@@ -20,26 +21,40 @@ import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const UserProfile = () => {
-  const formRef = useRef(null);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
-  const userData = useSelector(state => state.user);
   const spots = useSelector(state => state.spot.spots);
-
-  const [isDownloading, setIsDownloading] = useState(false);
+  const userData = useSelector(state => state.user);
 
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {uploadProfile} = useUpload();
   const toast = useToast();
+  const {uploadProfile} = useUpload();
 
-  const formName = ['general', 'user_conventions'];
+  /* Local State */
+
+  const formRef = useRef(null);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
+
+  /* Event Handlers */
+
+  const onDownloadUserProfile = async () => {
+    setIsDownloading(true);
+    await downloadUserProfile();
+    setIsDownloading(false);
+  };
+
+  /* Logic Helpers */
 
   const convertStrikeDipDirection = () => {
     if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
@@ -97,30 +112,6 @@ const UserProfile = () => {
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
 
-  const onDownloadUserProfile = async () => {
-    setIsDownloading(true);
-    await downloadUserProfile();
-    setIsDownloading(false);
-  };
-
-  const renderBulkUpdatesSection = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Convert Measurements'}/>
-        <OutlineButton
-          onPress={convertStrikeDipDirection}
-          title={'Convert Strike <-> Dip Direction'}
-        />
-        <View style={{paddingHorizontal: 10}}>
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
-            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
-            updated.
-          </Text>
-        </View>
-      </>
-    );
-  };
-
   const saveForm = async () => {
     try {
       const formCurrent = formRef.current;
@@ -142,6 +133,28 @@ const UserProfile = () => {
     }
   };
 
+  /* Render Functions */
+
+  const renderBulkUpdatesSection = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Convert Measurements'}/>
+        <OutlineButton
+          onPress={convertStrikeDipDirection}
+          title={'Convert Strike <-> Dip Direction'}
+        />
+        <View style={{paddingHorizontal: 10}}>
+          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
+            updated.
+          </Text>
+        </View>
+      </>
+    );
+  };
+
+  /* View */
+
   return (
     <>
       <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
@@ -149,12 +162,12 @@ const UserProfile = () => {
           ListHeaderComponent={
             <>
               <Formik
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                component={formProps => Form({formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
                 enableReinitialize={true}  // Update values if preferences change while form open
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
+                validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
               {renderBulkUpdatesSection()}

@@ -1,23 +1,22 @@
 import {useSelector} from 'react-redux';
 
 import {
-  NOTEBOOK_PAGES,
-  PAGE_KEYS,
-  PAGES_HIDDEN_IN_SAMPLE,
-  PET_PAGES,
-  PRIMARY_PAGES,
-  SECONDARY_PAGES,
-  SED_PAGES,
+  NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PET_PAGES, PRIMARY_PAGES, SECONDARY_PAGES, SED_PAGES,
 } from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/Helpers';
 import {useTags} from '../tags';
 
 const usePage = () => {
+  /* Data Hooks */
+
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {getTagsAtSpot} = useTags();
+
+  /* Exported Functions */
 
   // Return the keys for the Spot pages that are populated with data
   const getPopulatedPagesKeys = (spot) => {
@@ -141,11 +140,11 @@ const usePage = () => {
   };
 
   return {
-    getPopulatedPagesKeys: getPopulatedPagesKeys,
-    getRelevantGeneralPages: getRelevantGeneralPages,
-    getRelevantPetPages: getRelevantPetPages,
-    getRelevantSedPages: getRelevantSedPages,
-    getSpotDataIconSource: getSpotDataIconSource,
+    getPopulatedPagesKeys,
+    getRelevantGeneralPages,
+    getRelevantPetPages,
+    getRelevantSedPages,
+    getSpotDataIconSource,
   };
 };
 

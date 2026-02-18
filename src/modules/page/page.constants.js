@@ -1,5 +1,6 @@
 import BasicOverviewList from './BasicOverviewList';
 import Overview from './Overview';
+import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
 import DailyNotesModal from '../daily-notes/DailyNotesModal';
 import DataOverview from '../external-data/DataOverview';
 import ExternalData from '../external-data/ExternalData';
@@ -57,48 +58,6 @@ import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';
 import ThreeDStructuresPage from '../three-d-structures/ThreeDStructuresPage';
-
-// Called in Dialog.js
-
-export const PAGE_KEYS = {
-  BEDDING: 'bedding',
-  DATA: 'data',
-  DIAGENESIS: 'diagenesis',
-  EARTHQUAKES: 'earthquakes',
-  FABRICS: 'fabrics',
-  FOSSILS: 'fossils',
-  GEOGRAPHY: 'geography',
-  GEOLOGIC_UNITS: 'geologic_unit',
-  IGSN: 'igsn',
-  IMAGES: 'images',
-  INTERPRETATIONS: 'interpretations',
-  INTERVAL: 'interval',
-  LITHOLOGIES: 'lithologies',
-  MEASUREMENTS: 'orientation_data',
-  METADATA: 'metadata',
-  MINERALS: 'minerals',
-  NESTING: 'nesting',
-  NOTES: 'notes',
-  OTHER_FEATURES: 'other_features',
-  OVERVIEW: 'overview',
-  REACTIONS: 'reactions',
-  REPORTS: 'reports',
-  ROCK_TYPE_ALTERATION_ORE: 'alteration_or',
-  ROCK_TYPE_FAULT: 'fault',
-  ROCK_TYPE_IGNEOUS: 'igneous',
-  ROCK_TYPE_METAMORPHIC: 'metamorphic',
-  ROCK_TYPE_SEDIMENTARY: 'sedimentary',
-  SAMPLES: 'samples',
-  SITE_SAFETY: 'site_safety',
-  STRAT_SECTION: 'strat_section',
-  STRUCTURES: 'structures',
-  TAGS: 'tags',
-  TEPHRA: 'tephra',
-  TERNARY: 'ternary',
-  THREE_D_STRUCTURES: '_3d_structures',
-};
-
-console.log('PAGE_KEYS', PAGE_KEYS);
 
 export const OVERVIEW_PAGE = {
   key: PAGE_KEYS.OVERVIEW,
@@ -397,32 +356,6 @@ export const SED_PAGES = [
 ];
 
 export const NOTEBOOK_PAGES = [OVERVIEW_PAGE, ...PRIMARY_PAGES, ...SECONDARY_PAGES, ...SUBPAGES, ...PET_PAGES, ...SED_PAGES];
-
-export const MODAL_KEYS = {
-  // Get the notebook modal keys from the notebook constants
-  NOTEBOOK: NOTEBOOK_PAGES.reduce((acc, p) => {
-    const key = Object.keys(PAGE_KEYS).find(k => PAGE_KEYS[k] === p.key);
-    return p.modal_component ? {...acc, [key]: p.key} : acc;
-  }, {}),
-  SHORTCUTS: {
-    GEOLOGIC_UNITS: 'geologic_units',
-    MEASUREMENT: 'measurement',
-    SAMPLE: 'sample',
-    NOTE: 'note',
-    TAG: 'tag',
-    SKETCH: 'sketch',
-    PHOTO: 'photo',
-  },
-  OTHER: {
-    ADD_INTERVAL: 'add_interval',
-    ADD_SPOTS_TO_REPORTS: 'AddSpotsToReports',
-    ADD_SPOTS_TO_QAQC: 'AddSpotsToQAQC',
-    ADD_TAGS_TO_SPOTS: 'AddTagsToSpots',
-    DAILY_NOTES: 'daily_setup',
-    FEATURE_TAGS: 'FeatureTags',
-    GEOLOGIC_UNITS: 'geologic_unit',
-  },
-};
 
 export const NOTEBOOK_MODELS = NOTEBOOK_PAGES.reduce((acc, p) => p.modal_component ? [...acc, p] : acc, []);
 

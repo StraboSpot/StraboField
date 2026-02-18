@@ -9,7 +9,11 @@ import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 const DatasetList = ({setDatasetToView}) => {
   console.log('Rendering DatasetList...');
 
+  /* Data Hooks */
+
   const datasets = useSelector(state => state.project.datasets) || {};
+
+  /* View */
 
   return (
     <FlatList

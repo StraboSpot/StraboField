@@ -20,7 +20,11 @@ const TextInputField = ({
                           onShowFieldInfo,
                           placeholder,
                         }) => {
+  /* Local State */
+
   const [isFocused, setIsFocused] = useState(false);
+
+  /* Logic Helpers */
 
   const getInputStyle = () => {
     let style;
@@ -40,6 +44,8 @@ const TextInputField = ({
 
     return style;
   };
+
+  /* View */
 
   return (
     <>

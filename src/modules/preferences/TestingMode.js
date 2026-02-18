@@ -13,20 +13,35 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {setTestingMode} from '../project/projects.slice';
 
+const errorMessage = 'Wrong Password!';
+const testingModePassword = 'Strab0R0cks';
+
 const TestingMode = ({isTestingMode, textStyles}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
 
-  const testingModePassword = 'Strab0R0cks';
-  const errorMessage = 'Wrong Password!';
+  /* Local State */
 
-  const [password, setPassword] = useState(__DEV__ ? testingModePassword : '');
-  const [isTestingModalVisible, setIsTestingModalVisible] = useState(false);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
+  const [isTestingModalVisible, setIsTestingModalVisible] = useState(false);
+  const [password, setPassword] = useState(__DEV__ ? testingModePassword : '');
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Miscellaneous [password]', password);
     if (isEmpty(password)) setIsErrorMessage(false);
   }, [password]);
+
+  /* Event Handlers */
+
+  const onTestingSwitchChange = (value) => {
+    setIsTestingModalVisible(value);
+    dispatch(setTestingMode(value));
+  };
+
+  /* Logic Helpers */
 
   const closeModal = () => {
     setIsTestingModalVisible(false);
@@ -38,17 +53,14 @@ const TestingMode = ({isTestingMode, textStyles}) => {
     setPassword(value);
   };
 
-  const onTestingSwitchChange = (value) => {
-    setIsTestingModalVisible(value);
-    dispatch(setTestingMode(value));
-  };
-
   const verifyPassword = () => {
     if (password === testingModePassword) {
       setIsTestingModalVisible(false);
     }
     else setIsErrorMessage(true);
   };
+
+  /* Render Functions */
 
   const renderPrompt = () => (
     <ModalWrapper
@@ -72,6 +84,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
     </ModalWrapper>
   );
 
+  /* View */
 
   return (
     <>

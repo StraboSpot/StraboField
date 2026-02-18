@@ -10,12 +10,15 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const DailyNotes = () => {
-  const dispatch = useDispatch();
+  /* Data Hooks */
 
+  const dispatch = useDispatch();
   const dailyNotes = useSelector(state => state.project.project?.description?.daily_setup) || [];
+
+  /* Logic Helpers */
 
   const addDailyNote = () => {
     dispatch(setModalValues({}));
@@ -26,6 +29,8 @@ const DailyNotes = () => {
     dispatch(setModalValues(item));
     dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
   };
+
+  /* Render Functions */
 
   const renderDailyNotesListItem = (item) => {
     const title = moment(item.date).format('MM/DD/YYYY, h:mm:ss a');
@@ -41,6 +46,8 @@ const DailyNotes = () => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1, flexDirection: 'column'}}>

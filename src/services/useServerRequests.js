@@ -9,22 +9,27 @@ import {userAgent} from './userAgent';
 import alert from '../shared/ui/alert';
 
 const useServerRequests = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
-  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const {encoded_login, sesar} = useSelector(state => state.user);
+  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+
+  /* Derived Variables */
 
   // URL Helpers
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;
   const domain = endpoint && isSelected ? endpoint : STRABO_APIS.STRABO;
   const tilehost = STRABO_APIS.TILE_HOST;
-  const getImageBaseUrl = () => isSelected ? baseUrl.replace('/db', '/pi/') : `${STRABO_APIS.STRABO}/pi/`;
-  const getTileBaseUrl = () => isSelected ? endpoint.replace('/db', '/strabotiles') : tilehost;
 
-  // Auth Helpers
+  /* Internal Functions */
+
   const basicAuth = (token = encoded_login) => ({type: 'basic', token});
+
   const bearerAuth = token => ({type: 'bearer', token});
 
-  // SESAR Helper
+  const getImageBaseUrl = () => isSelected ? baseUrl.replace('/db', '/pi/') : `${STRABO_APIS.STRABO}/pi/`;
+
   const sendToSesar = async (data, path) => {
     try {
       return await postRequest(`${SESAR_PATHS.SESAR_API}${path}`, data, bearerAuth(sesar.sesarToken.access),
@@ -36,7 +41,7 @@ const useServerRequests = () => {
     }
   };
 
-  // API Methods
+  /* Exported Functions */
 
   const addDatasetToProject = (projectId, datasetId) =>
     postRequest(`${baseUrl}/projectDatasets/${projectId}`, {id: datasetId}, basicAuth());
@@ -131,6 +136,8 @@ const useServerRequests = () => {
       bearerAuth(accessToken), {responseType: 'text'});
     return response.text();
   };
+
+  const getTileBaseUrl = () => isSelected ? endpoint.replace('/db', '/strabotiles') : tilehost;
 
   const getTilesFromHost = async (url) => {
     const response = await timeoutPromise(fetch(url));

@@ -9,7 +9,7 @@ import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {useTags} from '../tags';

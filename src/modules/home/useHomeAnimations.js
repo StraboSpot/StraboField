@@ -7,18 +7,31 @@ import {setIsMainMenuPanelVisible} from './home.slice';
 import {MAIN_MENU_DRAWER_WIDTH, NOTEBOOK_DRAWER_WIDTH, SMALL_SCREEN} from '../../shared/styles.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {setIsNotebookPanelVisible, setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 // Animations for Drawers & Keyboard
 const useHomeAnimations = ({navigation}) => {
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
 
   const animatedValueLeftSide = useRef(new Animated.Value(0)).current;
   const animatedValueMainMenuDrawer = useRef(new Animated.Value(-MAIN_MENU_DRAWER_WIDTH)).current;
   const animatedValueNotebookDrawer = useRef(new Animated.Value(NOTEBOOK_DRAWER_WIDTH)).current;
   const animatedValueRightSide = useRef(new Animated.Value(0)).current;
   const animatedValueTextInputs = useRef(new Animated.Value(0)).current;
+
+  /* Derived Variables */
+
+  const animateLeftSide = {transform: [{translateX: animatedValueLeftSide}]};
+  const animateMainMenuDrawer = {transform: [{translateX: animatedValueMainMenuDrawer}]};
+  const animateNotebookDrawer = {transform: [{translateX: animatedValueNotebookDrawer}]};
+  const animateRightSide = {transform: [{translateX: animatedValueRightSide}]};
+  const animateTextInputs = {transform: [{translateY: animatedValueTextInputs}]};
+
+  /* Side Effects */
 
   // Cleanup: Stop all animations when component unmounts to prevent KERN_PROTECTION_FAILURE crashes
   useEffect(() => {
@@ -31,11 +44,7 @@ const useHomeAnimations = ({navigation}) => {
     };
   }, []);
 
-  const animateLeftSide = {transform: [{translateX: animatedValueLeftSide}]};
-  const animateMainMenuDrawer = {transform: [{translateX: animatedValueMainMenuDrawer}]};
-  const animateNotebookDrawer = {transform: [{translateX: animatedValueNotebookDrawer}]};
-  const animateRightSide = {transform: [{translateX: animatedValueRightSide}]};
-  const animateTextInputs = {transform: [{translateY: animatedValueTextInputs}]};
+  /* Internal Functions */
 
   // Used to animate open and close of Settings Panel and Notebook Panel
   const animateDrawer = (animatedState, toValue) => {
@@ -46,6 +55,8 @@ const useHomeAnimations = ({navigation}) => {
       useNativeDriver: Platform.OS !== 'web',
     }).start();
   };
+
+  /* Exported Functions */
 
   const closeMainMenuPanel = () => {
     console.log('Closing Main Menu Panel...');
@@ -83,15 +94,15 @@ const useHomeAnimations = ({navigation}) => {
   };
 
   return {
-    animateLeftSide: animateLeftSide,
-    animateMainMenuDrawer: animateMainMenuDrawer,
-    animateNotebookDrawer: animateNotebookDrawer,
-    animateRightSide: animateRightSide,
-    animateTextInputs: animateTextInputs,
-    closeMainMenuPanel: closeMainMenuPanel,
-    closeNotebookPanel: closeNotebookPanel,
-    openMainMenuPanel: openMainMenuPanel,
-    openNotebookPanel: openNotebookPanel,
+    animateLeftSide,
+    animateMainMenuDrawer,
+    animateNotebookDrawer,
+    animateRightSide,
+    animateTextInputs,
+    closeMainMenuPanel,
+    closeNotebookPanel,
+    openMainMenuPanel,
+    openNotebookPanel,
   };
 };
 

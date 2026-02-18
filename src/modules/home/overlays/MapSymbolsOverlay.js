@@ -24,6 +24,8 @@ import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
 
 const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
@@ -33,16 +35,50 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
+  const {getMeasurementLabel} = useMeasurements();
+
+  /* Local State */
+
   const [isFeatureTypesExpanded, setFeatureTypesExpanded] = useState(true);
   const [isGeometryTypesExpanded, setGeometryTypesExpanded] = useState(true);
 
-  const {getMeasurementLabel} = useMeasurements();
-
-  const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
+  /* Event Handlers */
 
   const handleShowOnly1stMeas = () => dispatch(setIsShowOnly1stMeas(!isShowOnly1stMeas));
 
   const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
+
+  /* Logic Helpers */
+
+  const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
+
+  const toggleFeatureTypesOff = (featureType) => {
+    let featureTypesOffCopy = [...featureTypesOff];
+    const i = featureTypesOffCopy.indexOf(featureType);
+    if (i === -1) featureTypesOffCopy.push(featureType);
+    else featureTypesOffCopy.splice(i, 1);
+    dispatch(setFeatureTypesOff(featureTypesOffCopy));
+  };
+
+  const toggleGeometryTypesOff = (geometryType) => {
+    let geometryTypesOffCopy = [...geometryTypesOff];
+    const i = geometryTypesOffCopy.indexOf(geometryType);
+    if (i === -1) geometryTypesOffCopy.push(geometryType);
+    else geometryTypesOffCopy.splice(i, 1);
+    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
+  };
+
+  const toggleLabelTypeOn = () => {
+    if (labelTypeOn) dispatch(setLabelTypeOn(undefined));
+    else dispatch(setLabelTypeOn('dip'));
+  };
+
+  const toggleShowTagColor = () => {
+    if (tagTypeForColor) dispatch(setTagTypeForColor(undefined));
+    else dispatch(setTagTypeForColor('geologic_unit'));
+  };
+
+  /* Render Functions */
 
   const renderGeometryTypesList = ({item}) => {
     return (
@@ -96,31 +132,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
     );
   };
 
-  const toggleGeometryTypesOff = (geometryType) => {
-    let geometryTypesOffCopy = [...geometryTypesOff];
-    const i = geometryTypesOffCopy.indexOf(geometryType);
-    if (i === -1) geometryTypesOffCopy.push(geometryType);
-    else geometryTypesOffCopy.splice(i, 1);
-    dispatch(setGeometryTypesOff(geometryTypesOffCopy));
-  };
-
-  const toggleFeatureTypesOff = (featureType) => {
-    let featureTypesOffCopy = [...featureTypesOff];
-    const i = featureTypesOffCopy.indexOf(featureType);
-    if (i === -1) featureTypesOffCopy.push(featureType);
-    else featureTypesOffCopy.splice(i, 1);
-    dispatch(setFeatureTypesOff(featureTypesOffCopy));
-  };
-
-  const toggleLabelTypeOn = () => {
-    if (labelTypeOn) dispatch(setLabelTypeOn(undefined));
-    else dispatch(setLabelTypeOn('dip'));
-  };
-
-  const toggleShowTagColor = () => {
-    if (tagTypeForColor) dispatch(setTagTypeForColor(undefined));
-    else dispatch(setTagTypeForColor('geologic_unit'));
-  };
+  /* View */
 
   return (
     <ModalWrapper
@@ -218,16 +230,16 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
             <ListItem containerStyle={commonStyles.listItemFormField} key={'tag_color'}>
               <>
                 <ListItem.Content>
-                  <ListItem.Title style={commonStyles.listItemTitle}>Tag Colors</ListItem.Title>
+                  <ListItem.Title style={commonStyles.listItemTitle}>Geologic Unit / Tag Colors</ListItem.Title>
                 </ListItem.Content>
                 <SwitchWrapper onValueChange={toggleShowTagColor} value={tagTypeForColor !== undefined}/>
               </>
             </ListItem>
             {tagTypeForColor && (
               <ButtonGroup
-                buttons={['Geologic Unit', 'Conceptual']}
+                buttons={['Geologic Unit', 'Tag']}
                 containerStyle={styles.measurementDetailSwitches}
-                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'concept'))}
+                onPress={i => dispatch(setTagTypeForColor(i === 0 ? 'geologic_unit' : 'tag'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
                 selectedIndex={tagTypeForColor === 'geologic_unit' ? 0 : 1}
                 textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}

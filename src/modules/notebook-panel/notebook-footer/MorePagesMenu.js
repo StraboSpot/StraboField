@@ -11,7 +11,6 @@ import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import {PAGE_KEYS} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
 
@@ -20,14 +19,20 @@ const MorePagesMenu = ({
                          isRichSample,
                          visible,
                        }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
 
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
 
+  /* Derived Variables */
+
   const generalPagesToShow = getRelevantGeneralPages(isRichSample);
   const petPagesToShow = getRelevantPetPages(isRichSample);
   const sedPagesToShow = getRelevantSedPages(isRichSample);
+
+  /* Logic Helpers */
 
   const switchPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -38,6 +43,8 @@ const MorePagesMenu = ({
     if (notebookPagesOn.includes(key)) dispatch(removedNotebookPageOn(key));
     else dispatch(addedNotebookPageOn(key));
   };
+
+  /* Render Functions */
 
   const renderMenuItem = (page, isShowBottomDivider) => {
     return (
@@ -65,6 +72,8 @@ const MorePagesMenu = ({
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

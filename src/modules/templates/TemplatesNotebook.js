@@ -4,6 +4,8 @@ import {FlatList, ScrollView, Text, TextInput, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
+import {getLinearTemplates, getPlanarTemplates} from './templates.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
@@ -20,7 +22,8 @@ import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import NoteForm from '../notes/NoteForm';
 import BasicPageDetail from '../page/BasicPageDetail';
-import {MODAL_KEYS, MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const TemplatesNotebook = ({
@@ -30,9 +33,15 @@ const TemplatesNotebook = ({
                              setIsShowTemplates,
                              typeKey,
                            }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const templates = useSelector(state => state.project.project?.templates);
+
+  /* Local State */
+
+  const notesTemplateFormRef = useRef(null);
 
   const [activeTemplatesForKey, setActiveTemplatesForKey] = useState([]);
   const [isShowForm, setIsShowForm] = useState(false);
@@ -43,23 +52,24 @@ const TemplatesNotebook = ({
   const [templatesForKey, setTemplatesForKey] = useState([]);
   const [templateType, setTemplateType] = useState(null);
 
-  const notesTemplateFormRef = useRef(null);
+  /* Derived Variables */
 
-  const measurementKey = 'measurementTemplates';
   let templateKey = page.key || undefined;
   if (isEmpty(page) && modalVisible) {
     page = MODALS.find(p => p.key === modalVisible);
     templateKey = modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
-    || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? measurementKey
+    || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? MEASUREMENT_TEMPLATE_KEY
       : modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS
       || modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_SEDIMENTARY ? rockKey
         : page.notebook_modal_key ? page.notebook_modal_key
           : modalVisible;
   }
 
+  /* Side Effects */
+
   useEffect(() => {
     console.log('UE TemplatesNotebook [templates, templateKey, typeKey]', templates, templateKey, typeKey);
-    if (templateKey === measurementKey) {
+    if (templateKey === MEASUREMENT_TEMPLATE_KEY) {
       setIsTemplateInUse(templates.useMeasurementTemplates || false);
       let activeTemplatesTemp = templates.activeMeasurementTemplates || [];
       let templatesForKeyTemp = templates.measurementTemplates || [];
@@ -72,6 +82,8 @@ const TemplatesNotebook = ({
       setActiveTemplatesForKey((templates[templateKey] && templates[templateKey].active) || []);
     }
   }, [templates, templateKey, typeKey]);
+
+  /* Logic Helpers */
 
   const clearTemplate = () => {
     if (templateType === 'planar_orientation') {
@@ -99,7 +111,7 @@ const TemplatesNotebook = ({
   const createNewTemplate = () => {
     setIsShowNameInput(true);
     setName('');
-    if (templateKey === measurementKey) setSelectedTemplate({values: {type: templateType}});
+    if (templateKey === MEASUREMENT_TEMPLATE_KEY) setSelectedTemplate({values: {type: templateType}});
     else if (modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) {
       setSelectedTemplate({values: {igneous_rock_class: templateType}});
     }
@@ -130,22 +142,66 @@ const TemplatesNotebook = ({
     setName(template.name);
   };
 
-  const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation'
-      || t.type === 'planar_orientation');
+  const saveTemplate = (values) => {
+    let templateObject;
+    if (isEmpty(name)) alert('Template name empty', 'Provide a template name.');
+    else {
+      let existingTemplatesCopy = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
+      if (!isEmpty(selectedTemplate.id)) {
+        templateObject = {
+          'id': selectedTemplate.id,
+          'name': name,
+          'values': values,
+        };
+        existingTemplatesCopy = existingTemplatesCopy.filter(templateId => templateObject.id !== templateId.id);
+      }
+      else {
+        templateObject = {
+          'id': getNewUUID(),
+          'name': name,
+          'values': values,
+        };
+      }
+      existingTemplatesCopy.push(templateObject);
+      existingTemplatesCopy = existingTemplatesCopy.sort(
+        (templateA, templateB) => templateA.name.localeCompare(templateB.name));
+      dispatch(addedTemplates({key: templateKey, templates: existingTemplatesCopy}));
 
-  const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-    t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
+      // Update active templates so updated template becomes active
+      const templatesUpdated = activeTemplatesForKey?.filter(t => t.id !== templateObject.id) || [];
+      dispatch(setActiveTemplates({key: templateKey, templates: [...templatesUpdated, templateObject]}));
+
+      closeTemplates();
+    }
+  };
+
+  const setAsTemplate = (template) => {
+    const activeTemplatesForKeyCopy = !isEmpty(activeTemplatesForKey)
+      ? JSON.parse(JSON.stringify(activeTemplatesForKey)) : [];
+    const foundTemplate = activeTemplatesForKeyCopy.find(t => t.id === template.id);
+    if (foundTemplate) {
+      const templatesUpdated = activeTemplatesForKeyCopy.filter(t => t.id !== template.id);
+      dispatch(setActiveTemplates({key: templateKey, templates: templatesUpdated}));
+    }
+    else dispatch(setActiveTemplates({key: templateKey, templates: [...activeTemplatesForKeyCopy, template]}));
+  };
+
+  const toggleUseTemplateSwitch = (value) => {
+    setIsTemplateInUse(value);
+    dispatch(setUseTemplate({key: templateKey, bool: value}));
+  };
+
+  /* Render Functions */
 
   const renderFormFields = () => {
     return (
       <FlatList
         ListHeaderComponent={
           <View style={{flex: 1}}>
-            {templateKey === measurementKey ? renderMeasurementsForm() : renderNonMeasurementsForm()}
+            {templateKey === MEASUREMENT_TEMPLATE_KEY ? renderMeasurementsForm() : renderNonMeasurementsForm()}
           </View>
         }
-        listKey={'form' + measurementKey}
+        listKey={'form' + MEASUREMENT_TEMPLATE_KEY}
       />
     );
   };
@@ -239,37 +295,6 @@ const TemplatesNotebook = ({
     );
   };
 
-  const renderTemplatesList = () => {
-    let label = modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
-      : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
-
-    let relevantTemplates = templatesForKey;
-    if (templateType === 'planar_orientation') {
-      relevantTemplates = getPlanarTemplates(relevantTemplates);
-      label = 'Planar';
-    }
-    else if (templateType === 'linear_orientation') {
-      relevantTemplates = getLinearTemplates(relevantTemplates);
-      label = 'Linear';
-    }
-
-    return (
-      <>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'There are no templates defined yet.'}/>}
-          data={relevantTemplates}
-          keyExtractor={item => item.id.toString()}
-          listKey={JSON.stringify(relevantTemplates)}
-          renderItem={({item}) => renderTemplateListItem(item)}
-        />
-        <ClearButton onPress={closeTemplates} title={'Done'}/>
-        {!isEmpty(relevantTemplates) && <ClearButton onPress={clearTemplate} title={'Clear Selected Template'}/>}
-        <ClearButton onPress={createNewTemplate} title={'Define New ' + label + ' Template'}/>
-      </>
-    );
-  };
-
   const renderTemplateNameInput = () => {
     return (
       <>
@@ -292,21 +317,6 @@ const TemplatesNotebook = ({
     );
   };
 
-  const renderTemplatesSelected = () => {
-    if (templateKey === measurementKey) {
-      if (!typeKey || (typeKey && typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR)) {
-        return (
-          <>
-            {renderTemplateSelection('planar_orientation')}
-            {renderTemplateSelection('linear_orientation')}
-          </>
-        );
-      }
-      else return renderTemplateSelection(typeKey);
-    }
-    else return renderTemplateSelection(templateKey);
-  };
-
   const renderTemplateSelection = (type) => {
     let activeTemplates = activeTemplatesForKey;
     let label = page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
@@ -320,7 +330,8 @@ const TemplatesNotebook = ({
     }
     else if (modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) label = toTitleCase(type);
 
-    const title = templateKey === measurementKey ? 'Select ' + label + ' Template' : 'Select ' + label + ' Template(s)';
+    const title = templateKey === MEASUREMENT_TEMPLATE_KEY ? 'Select ' + label + ' Template'
+      : 'Select ' + label + ' Template(s)';
 
     return (
       <View>
@@ -361,6 +372,52 @@ const TemplatesNotebook = ({
     );
   };
 
+  const renderTemplatesList = () => {
+    let label = modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
+      : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
+
+    let relevantTemplates = templatesForKey;
+    if (templateType === 'planar_orientation') {
+      relevantTemplates = getPlanarTemplates(relevantTemplates);
+      label = 'Planar';
+    }
+    else if (templateType === 'linear_orientation') {
+      relevantTemplates = getLinearTemplates(relevantTemplates);
+      label = 'Linear';
+    }
+
+    return (
+      <>
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={'There are no templates defined yet.'}/>}
+          data={relevantTemplates}
+          keyExtractor={item => item.id.toString()}
+          listKey={JSON.stringify(relevantTemplates)}
+          renderItem={({item}) => renderTemplateListItem(item)}
+        />
+        <ClearButton onPress={closeTemplates} title={'Done'}/>
+        {!isEmpty(relevantTemplates) && <ClearButton onPress={clearTemplate} title={'Clear Selected Template'}/>}
+        <ClearButton onPress={createNewTemplate} title={'Define New ' + label + ' Template'}/>
+      </>
+    );
+  };
+
+  const renderTemplatesSelected = () => {
+    if (templateKey === MEASUREMENT_TEMPLATE_KEY) {
+      if (!typeKey || (typeKey && typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR)) {
+        return (
+          <>
+            {renderTemplateSelection('planar_orientation')}
+            {renderTemplateSelection('linear_orientation')}
+          </>
+        );
+      }
+      else return renderTemplateSelection(typeKey);
+    }
+    else return renderTemplateSelection(templateKey);
+  };
+
   const renderTemplateToggle = () => {
     return (
       <View>
@@ -377,54 +434,7 @@ const TemplatesNotebook = ({
     );
   };
 
-  const saveTemplate = (values) => {
-    let templateObject;
-    if (isEmpty(name)) alert('Template name empty', 'Provide a template name.');
-    else {
-      let existingTemplatesCopy = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
-      if (!isEmpty(selectedTemplate.id)) {
-        templateObject = {
-          'id': selectedTemplate.id,
-          'name': name,
-          'values': values,
-        };
-        existingTemplatesCopy = existingTemplatesCopy.filter(templateId => templateObject.id !== templateId.id);
-      }
-      else {
-        templateObject = {
-          'id': getNewUUID(),
-          'name': name,
-          'values': values,
-        };
-      }
-      existingTemplatesCopy.push(templateObject);
-      existingTemplatesCopy = existingTemplatesCopy.sort(
-        (templateA, templateB) => templateA.name.localeCompare(templateB.name));
-      dispatch(addedTemplates({key: templateKey, templates: existingTemplatesCopy}));
-
-      // Update active templates so updated template becomes active
-      const templatesUpdated = activeTemplatesForKey?.filter(t => t.id !== templateObject.id) || [];
-      dispatch(setActiveTemplates({key: templateKey, templates: [...templatesUpdated, templateObject]}));
-
-      closeTemplates();
-    }
-  };
-
-  const setAsTemplate = (template) => {
-    const activeTemplatesForKeyCopy = !isEmpty(activeTemplatesForKey)
-      ? JSON.parse(JSON.stringify(activeTemplatesForKey)) : [];
-    const foundTemplate = activeTemplatesForKeyCopy.find(t => t.id === template.id);
-    if (foundTemplate) {
-      const templatesUpdated = activeTemplatesForKeyCopy.filter(t => t.id !== template.id);
-      dispatch(setActiveTemplates({key: templateKey, templates: templatesUpdated}));
-    }
-    else dispatch(setActiveTemplates({key: templateKey, templates: [...activeTemplatesForKeyCopy, template]}));
-  };
-
-  const toggleUseTemplateSwitch = (value) => {
-    setIsTemplateInUse(value);
-    dispatch(setUseTemplate({key: templateKey, bool: value}));
-  };
+  /* View */
 
   return (
     <>

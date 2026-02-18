@@ -3,9 +3,12 @@ import useDevice from '../../services/useDevice';
 import useServerRequests from '../../services/useServerRequests';
 
 const useMicro = () => {
+  /* Data Hooks */
 
   const {doesMicroProjectPDFExist, getMicroProjectName, readDirectory} = useDevice();
   const {getMyMicroProjects} = useServerRequests();
+
+  /* Exported Functions */
 
   const getAllLocalMicroProjects = async () => {
     const localMicroProjects = await readDirectory(APP_DIRECTORIES.MICRO);
@@ -35,8 +38,8 @@ const useMicro = () => {
   };
 
   return {
-    getAllLocalMicroProjects: getAllLocalMicroProjects,
-    getAllServerMicroProjects: getAllServerMicroProjects,
+    getAllLocalMicroProjects,
+    getAllServerMicroProjects,
   };
 };
 

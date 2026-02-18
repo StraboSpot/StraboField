@@ -9,14 +9,18 @@ import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import Overview from '../page/Overview';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE SamplesPage []');
@@ -38,6 +42,8 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
     setSelectedSample({});
   };
 
+  /* Logic Helpers */
+
   const editSample = (sampleToEdit) => {
     if (sampleToEdit.properties?.isSample) {
       dispatch(setSelectedSpot(sampleToEdit));
@@ -49,6 +55,8 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
       dispatch(setModalVisible({modal: null}));
     }
   };
+
+  /* Render Functions */
 
   const renderSampleDetail = () => {
     if (spot.properties?.isSample && !selectedSample) return <Overview/>;
@@ -72,6 +80,8 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
       <SamplesList onPress={editSample}/>
     </View>
   );
+
+  /* View */
 
   if (isEmpty(selectedSample)) return renderSamplesMain();
   return renderSampleDetail();

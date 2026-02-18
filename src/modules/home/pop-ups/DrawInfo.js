@@ -20,9 +20,13 @@ const DrawInfo = ({
                     onEndDrawPressed,
                     selectingMode,
                   }) => {
+  /* Data Hooks */
+
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {getTargetDatasetFromId} = useProject();
+
+  /* View */
 
   return (
     !isEmpty(targetDatasetId)

@@ -5,7 +5,13 @@ import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
+import {
+  ALTERATION_ORE_SECTION_TITLE,
+  FAULT_SECTION_TITLE,
+  IGNEOUS_SECTION_TITLES,
+  METAMORPHIC_SECTION_TITLE,
+  SEDIMENTARY_SECTION_TITLE,
+} from './petrology.constants';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
@@ -17,13 +23,15 @@ import {SelectInputField, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const RockPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -31,45 +39,26 @@ const RockPage = ({isReadOnly, page}) => {
   const {getSurvey} = useForm();
   const {getSpotById, getSpotsWithKey} = useSpots();
 
+  /* Local State */
+
+  const preFormRef = useRef(null);
+
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedRock, setSelectedRock] = useState({});
   const [spotsWithRockType, setSpotsWithRockType] = useState([]);
 
-  const preFormRef = useRef(null);
+  /* Derived Variables */
 
   const groupKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
   const pageKey = page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
+  const pageSectionsTitles = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTION_TITLES
+    : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTION_TITLE
+      : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTION_TITLE
+        : pageKey === PAGE_KEYS.ROCK_TYPE_FAULT ? FAULT_SECTION_TITLE
+          : SEDIMENTARY_SECTION_TITLE;
   const rockData = spot.properties[groupKey] || {};
 
-  const IGNEOUS_SECTIONS = {
-    PLUTONIC: {title: 'Plutonic Rocks', key: IGNEOUS_ROCK_CLASSES.PLUTONIC},
-    VOLCANIC: {title: 'Volcanic Rocks', key: IGNEOUS_ROCK_CLASSES.VOLCANIC},
-    DEPRECATED: {title: 'Igneous Rocks (Deprecated Version)', key: null},
-  };
-
-  const METAMORPHIC_SECTIONS = {
-    PLUTONIC: {title: 'Metamorphic Rocks', key: PAGE_KEYS.ROCK_TYPE_METAMORPHIC},
-    DEPRECATED: {title: 'Metamorphic Rocks (Deprecated Version)', key: null},
-  };
-
-  const ALTERATION_ORE_SECTIONS = {
-    ALTERATION_ORE: {title: 'Alteration, Ore Rocks', key: PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE},
-    DEPRECATED: {title: 'Alteration, Ore Rocks (Deprecated Version)', key: null},
-  };
-
-  const SEDIMENTARY_SECTIONS = {
-    SEDIMENTARY: {title: 'Sedimentary Rocks', key: PAGE_KEYS.LITHOLOGIES},
-  };
-
-  const FAULT_SECTIONS = {
-    FAULT: {title: 'Fault & Shear Zone Rocks', key: PAGE_KEYS.ROCK_TYPE_FAULT},
-  };
-
-  const pageSections = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? IGNEOUS_SECTIONS
-    : pageKey === PAGE_KEYS.ROCK_TYPE_METAMORPHIC ? METAMORPHIC_SECTIONS
-      : pageKey === PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE ? ALTERATION_ORE_SECTIONS
-        : pageKey === PAGE_KEYS.ROCK_TYPE_FAULT ? FAULT_SECTIONS
-          : SEDIMENTARY_SECTIONS;
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE RockPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -81,24 +70,13 @@ const RockPage = ({isReadOnly, page}) => {
     getSpotsWithRockType();
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const addRock = (sectionKey) => {
     let newRock = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: sectionKey}
       : {id: getNewUUID()};
     dispatch(setModalValues(newRock));
     dispatch(setModalVisible({modal: page.key}));
-  };
-
-  const editRock = (rock, i) => {
-    if (!rock.id) {
-      let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-      rock = {...rock, id: getNewUUID()};
-      editedSedData[pageKey].splice(i, 1, rock);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    }
-    setIsDetailView(true);
-    setSelectedRock(rock);
-    dispatch(setModalVisible({modal: null}));
   };
 
   const copyPetData = (spotId) => {
@@ -155,12 +133,27 @@ const RockPage = ({isReadOnly, page}) => {
     else console.log('Spot to copy is empty. Aborting copying.');
   };
 
+  const editRock = (rock, i) => {
+    if (!rock.id) {
+      let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
+      rock = {...rock, id: getNewUUID()};
+      editedSedData[pageKey].splice(i, 1, rock);
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    }
+    setIsDetailView(true);
+    setSelectedRock(rock);
+    dispatch(setModalVisible({modal: null}));
+  };
+
   const getSpotsWithRockType = () => {
     const allActiveSpotsWithGroupKey = getSpotsWithKey(groupKey);
     setSpotsWithRockType(allActiveSpotsWithGroupKey.filter(s => s.properties.id !== spot.properties.id
       && (s.properties[groupKey]
         && (s.properties[groupKey].rock_type?.includes(pageKey) || s.properties[groupKey][pageKey]))));
   };
+
+  /* Render Functions */
 
   const renderCopySelect = () => {
     // Sort reverse chronologically
@@ -194,55 +187,6 @@ const RockPage = ({isReadOnly, page}) => {
     );
   };
 
-  const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(pageSections).reduce((acc, {title, key}) => {
-        return sectionTitle === title ? key : acc;
-      },
-      '');
-    if (sectionKey && !isReadOnly) {
-      return (
-        <SectionDividerWithRightButton
-          dividerText={sectionTitle}
-          onPress={() => addRock(sectionKey)}
-        />
-      );
-    }
-    else return <SectionDivider dividerText={sectionTitle}/>;
-  };
-
-  const renderSections = () => {
-    const rocksGrouped = Object.values(pageSections).reduce((acc, {title, key}) => {
-      const data = key ? spot?.properties[groupKey] && spot?.properties[groupKey][pageKey]
-        && Array.isArray(spot?.properties[groupKey][pageKey])
-        && spot?.properties[groupKey][pageKey].filter(
-          rock => key === pageKey || rock.igneous_rock_class === key) || []
-        : spot?.properties[groupKey] && spot?.properties[groupKey].rock_type?.includes(pageKey)
-          ? [spot.properties[groupKey]]
-          : [];
-      return !key && isEmpty(data) ? acc : [...acc, {title: title, data: data.reverse()}];
-    }, []);
-
-    return (
-      <SectionList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({item, index}) => (
-          <BasicListItem
-            editItem={itemToEdit => editRock(itemToEdit, index)}
-            item={item}
-            page={page}
-          />
-        )}
-        renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
-        }}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        sections={rocksGrouped}
-        stickySectionHeadersEnabled={true}
-      />
-    );
-  };
-
   const renderRockDetail = () => {
     return (
       <BasicPageDetail
@@ -264,6 +208,53 @@ const RockPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  const renderSectionHeader = (sectionTitle, sectionKey) => {
+    if (sectionKey !== 'deprecated' && !isReadOnly) {
+      return (
+        <SectionDividerWithRightButton
+          dividerText={sectionTitle}
+          onPress={() => addRock(sectionKey)}
+        />
+      );
+    }
+    else return <SectionDivider dividerText={sectionTitle}/>;
+  };
+
+  const renderSections = () => {
+    const rocksGrouped = Object.entries(pageSectionsTitles).reduce((acc, [key, title]) => {
+      const data = key !== 'deprecated' ? spot?.properties[groupKey] && spot?.properties[groupKey][pageKey]
+        && Array.isArray(spot?.properties[groupKey][pageKey])
+        && spot?.properties[groupKey][pageKey].filter(
+          rock => key === pageKey || rock.igneous_rock_class === key) || []
+        : spot?.properties[groupKey] && spot?.properties[groupKey].rock_type?.includes(pageKey)
+          ? [spot.properties[groupKey]]
+          : [];
+      return key === 'deprecated' && isEmpty(data) ? acc : [...acc, {title, key, data: data.reverse()}];
+    }, []);
+
+    return (
+      <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({item, index}) => (
+          <BasicListItem
+            editItem={itemToEdit => editRock(itemToEdit, index)}
+            item={item}
+            page={page}
+          />
+        )}
+        renderSectionFooter={({section}) => {
+          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+        }}
+        renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
+        sections={rocksGrouped}
+        stickySectionHeadersEnabled={true}
+      />
+    );
+  };
+
+  /* View */
 
   return isDetailView ? renderRockDetail() : renderRockMain();
 };

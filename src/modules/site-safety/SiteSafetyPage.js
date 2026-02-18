@@ -13,35 +13,44 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS, SECONDARY_PAGES} from '../page/page.constants';
+import {SECONDARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const formName = ['general', 'site_safety'];
+
 const SiteSafetyPage = ({isReadOnly}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
   const toast = useToast();
 
-  const formRef = useRef(null);
-  const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
-  const formName = ['general', 'site_safety'];
+  /* Local State */
 
-  let initialValues = spot.properties?.site_safety || {};
+  const formRef = useRef(null);
+
+  /* Derived Variables */
+
   const coord = spot?.geometry?.type === 'Point' ? turf.getCoord(spot) : undefined;
+  let initialValues = spot.properties?.site_safety || {};
   if (isEmpty(initialValues) && !isEmpty(coord)) {
-    initialValues = {
-      latitude: coord[1].toString(),
-      longitude: coord[0].toString(),
-    };
+    initialValues = {latitude: coord[1].toString(), longitude: coord[0].toString()};
   }
+  const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE SiteSafetyPage []');
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
@@ -64,16 +73,6 @@ const SiteSafetyPage = ({isReadOnly}) => {
     }
   };
 
-  const saveFormAndGo = async (currentForm = formRef.current) => {
-    try {
-      await saveForm(currentForm);
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
   const saveForm = async (currentForm) => {
     try {
       await currentForm.submitForm();
@@ -89,6 +88,18 @@ const SiteSafetyPage = ({isReadOnly}) => {
       return Promise.reject();
     }
   };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
+    try {
+      await saveForm(currentForm);
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
+    }
+  };
+
+  /* Render Functions */
 
   const renderCancelSaveButtons = () => {
     return (
@@ -116,6 +127,8 @@ const SiteSafetyPage = ({isReadOnly}) => {
       </Formik>
     );
   };
+
+  /* View */
 
   return (
     <>

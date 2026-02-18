@@ -1,6 +1,7 @@
 import SoundPlayer from 'react-native-sound-player';
 
 const useCompassSound = () => {
+  /* Exported Functions */
 
   const playCompassSound = () => {
     try {
@@ -13,7 +14,7 @@ const useCompassSound = () => {
   };
 
   return {
-    playCompassSound: playCompassSound,
+    playCompassSound,
   };
 
 };

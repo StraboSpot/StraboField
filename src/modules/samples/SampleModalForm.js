@@ -6,45 +6,46 @@ import {Formik} from 'formik';
 
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
-
-const FORM_NAME = ['general', 'samples'];
-const FIRST_KEYS = ['sample_id_name', 'sample_description'];
-const INPLACENESS_KEY = 'inplaceness_of_sample';
-const ORIENTED_KEY = 'oriented_sample';
-const SAMPLE_TYPE_KEYS = ['sample_type', 'material_type'];
+import {
+  SAMPLE_FIRST_KEYS,
+  SAMPLE_FORM_NAME,
+  SAMPLE_INPLACENESS_KEY,
+  SAMPLE_ORIENTED_KEY,
+  SAMPLE_TYPE_KEY,
+} from './samples.constants';
 
 const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setChoicesViewKey, startingNumber}) => {
   const {getChoices, getRelevantFields, getSurvey} = useForm();
 
-  const choices = getChoices(FORM_NAME);
-  const survey = getSurvey(FORM_NAME);
-  const firstKeysFields = FIRST_KEYS.map(k => survey.find(f => f.name === k));
+  const choices = getChoices(SAMPLE_FORM_NAME);
+  const survey = getSurvey(SAMPLE_FORM_NAME);
+  const firstKeysFields = SAMPLE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
 
   const getSelectedOrientedIndex = () => {
-    const value = formRef.current?.values[ORIENTED_KEY];
+    const value = formRef.current?.values[SAMPLE_ORIENTED_KEY];
     if (value === 'yes') return 0;
     if (value === 'no') return 1;
     return undefined;
   };
 
   const onOrientedButtonPress = (i) => {
-    const currentValue = formRef.current?.values[ORIENTED_KEY];
-    if (i === 0) formRef.current?.setFieldValue(ORIENTED_KEY, currentValue === 'yes' ? undefined : 'yes');
-    else formRef.current?.setFieldValue(ORIENTED_KEY, currentValue === 'no' ? undefined : 'no');
+    const currentValue = formRef.current?.values[SAMPLE_ORIENTED_KEY];
+    if (i === 0) formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'yes' ? undefined : 'yes');
+    else formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'no' ? undefined : 'no');
   };
 
   const renderForm = formProps => (
     <>
       <MainButtons
-        formName={FORM_NAME}
+        formName={SAMPLE_FORM_NAME}
         formProps={formProps}
-        mainKeys={SAMPLE_TYPE_KEYS}
+        mainKeys={SAMPLE_TYPE_KEY}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form formName={FORM_NAME} surveyFragment={firstKeysFields} {...formProps}/>
+      <Form formName={SAMPLE_FORM_NAME} surveyFragment={firstKeysFields} {...formProps}/>
       <FormSlider
         choices={choices}
-        fieldKey={INPLACENESS_KEY}
+        fieldKey={SAMPLE_INPLACENESS_KEY}
         formProps={formProps}
         labels={['In Place', 'Float']}
         survey={survey}
@@ -62,7 +63,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
   );
 
   const renderSubform = formProps => (
-    <Form formName={FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)} {...formProps}/>
+    <Form formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)} {...formProps}/>
   );
 
   const formatNumber = num => num < 10 ? '0' + num : num;

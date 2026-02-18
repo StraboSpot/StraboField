@@ -14,11 +14,17 @@ const ChoiceButtons = ({
                          size,
                          survey,
                        }) => {
+  /* Data Hooks */
+
   const {getChoicesByKey} = useForm();
+
+  /* Derived Variables */
 
   const buttonStyle = size === 'small' ? formStyles.formButtonSmall
     : size === 'large' ? formStyles.formButtonLarge
       : formStyles.formButton;
+
+  /* View */
 
   return (
     <View style={formStyles.halfWidthButtonsContainer}>
@@ -26,8 +32,7 @@ const ChoiceButtons = ({
         return (
           <Button
             buttonStyle={[buttonStyle, {
-              backgroundColor: formProps?.values[choiceFieldKey]?.includes(choice.name)
-                ? PRIMARY_ACCENT_COLOR
+              backgroundColor: formProps?.values[choiceFieldKey]?.includes(choice.name) ? PRIMARY_ACCENT_COLOR
                 : SECONDARY_BACKGROUND_COLOR,
             }]}
             containerStyle={formStyles.halfWidthButtonContainer}

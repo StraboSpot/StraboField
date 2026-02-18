@@ -9,15 +9,22 @@ import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
+  /* Data Hooks */
+
   const {getActiveSpotsObj} = useSpots();
+
+  /* Local State */
+
+  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
   const spotsWithSamples = activeSpots.filter(spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsWithSamplesSorted, setSpotsWithSamplesSorted] = useState(spotsWithSamples);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+
+  /* Render Functions */
 
   const renderSamples = () => {
     const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
@@ -52,6 +59,8 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
       </View>
     );
   };
+
+  /* View */
 
   if (isEmpty(spotsWithSamplesSorted)) return <ListEmptyText text={'No Samples in Active Datasets'}/>;
   return renderSamples();

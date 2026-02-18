@@ -12,12 +12,18 @@ import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import useProject from '../project/useProject';
 
 const MainMenuPanelListItem = ({onPress, title}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
 
   const {getTargetDatasetFromId} = useProject();
 
+  /* Event Handlers */
+
   const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
+
+  /* Logic Helpers */
 
   const getTitle = () => {
     let subtitle;
@@ -36,6 +42,8 @@ const MainMenuPanelListItem = ({onPress, title}) => {
       </ListItem.Title>
     );
   };
+
+  /* View */
 
   return (
     <ListItem containerStyle={commonStyles.listItem} onPress={onPress || handleMenuItemPress}>

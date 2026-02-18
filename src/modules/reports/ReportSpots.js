@@ -3,6 +3,7 @@ import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-nati
 
 import {useSelector} from 'react-redux';
 
+import {REPORT_ITEM_WIDTH} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -15,20 +16,28 @@ import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
 const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
-
-  const {width} = useWindowSize();
-  const itemWidth = 300;
-  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
-
-  const [isSpotsListModalVisible, setIsSpotsListModalVisible] = useState(false);
+  /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
 
-  const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
+  const {width} = useWindowSize();
+
+  /* Local State */
+
+  const [isSpotsListModalVisible, setIsSpotsListModalVisible] = useState(false);
+
+  /* Derived Variables */
 
   const checkedSpots = Object.entries(spots).reduce((acc, [spotId, spotObj]) => {
     return checkedSpotsIds.find(id => id.toString() === spotId) ? [...acc, spotObj] : acc;
   }, []);
+  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+
+  /* Logic Helpers */
+
+  const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
+
+  /* View */
 
   return (
     <>
@@ -52,7 +61,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
           {checkedSpots.map(d => (
             <TouchableOpacity
               key={d.properties.id.toString()}
-              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : itemWidth}}
+              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : REPORT_ITEM_WIDTH}}
             >
               <SpotsListItem onPress={handleSpotPressed} spot={d}/>
             </TouchableOpacity>

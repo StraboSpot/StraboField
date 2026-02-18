@@ -14,13 +14,21 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
 const DailyNotesModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalValues = useSelector(state => state.home.modalValues);
   const projectDescription = useSelector(state => state.project.project?.description);
 
+  /* Local State */
+
   const formRef = useRef(null);
 
+  /* Derived Variables */
+
   const initialValues = {...modalValues, date: modalValues.date || new Date().toISOString()};
+
+  /* Logic Helpers */
 
   const close = () => {
     dispatch(setModalValues({}));
@@ -58,6 +66,8 @@ const DailyNotesModal = () => {
     dispatch(setModalValues({}));
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderDailyNotesModal = () => {
     return (
@@ -106,6 +116,8 @@ const DailyNotesModal = () => {
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return renderDailyNotesModal();
 };

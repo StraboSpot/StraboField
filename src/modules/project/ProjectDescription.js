@@ -3,34 +3,40 @@ import React, {useLayoutEffect, useRef} from 'react';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {PROJECT_DESCRIPTION_FORM_NAME} from './project.constants';
 import {updatedProject} from './projects.slice';
 import alert from '../../shared/ui/alert';
 import {Form, useForm} from '../form';
 
+let timeout;
+
 const ProjectDescription = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const project = useSelector(state => state.project.project);
 
   const {getLabel, hasErrors, validateForm} = useForm();
 
-  const descriptionFormRef = useRef(null);
-  let timeout;
+  /* Local State */
 
-  const formName = ['general', 'project_description'];
+  const descriptionFormRef = useRef(null);
+
+  /* Derived Variables */
+
   const projectDescription = {
     ...project.description,
     gps_datum: project.description?.gps_datum || 'WGS84 (Default)',
     magnetic_declination: project.description?.magnetic_declination || 0,
   };
 
+  /* Side Effects */
+
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
 
-  const doCleanup = () => {
-    if (hasErrors(descriptionFormRef.current)) showErrors(descriptionFormRef.current);
-    else if (descriptionFormRef.current?.dirty) saveForm(descriptionFormRef.current);
-  };
+  /* Event Handlers */
 
   const onMyChange = async (name, value) => {
     await descriptionFormRef.current.setFieldValue(name, value);
@@ -44,12 +50,11 @@ const ProjectDescription = () => {
     }, 2000);
   };
 
-  const showErrors = (descriptionCurrent) => {
-    const errorMessages = Object.entries(descriptionCurrent.errors).map(([key, value]) => (
-      getLabel(key, formName) + ': ' + value
-    ));
-    alert('Project Description Errors!', 'Changes in the following fields were not saved.'
-      + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
+  /* Logic Helpers */
+
+  const doCleanup = () => {
+    if (hasErrors(descriptionFormRef.current)) showErrors(descriptionFormRef.current);
+    else if (descriptionFormRef.current?.dirty) saveForm(descriptionFormRef.current);
   };
 
   const saveForm = async (descriptionCurrent) => {
@@ -58,15 +63,25 @@ const ProjectDescription = () => {
     dispatch(updatedProject({field: 'description', value: descriptionCurrent.values}));
   };
 
+  const showErrors = (descriptionCurrent) => {
+    const errorMessages = Object.entries(descriptionCurrent.errors).map(([key, value]) => (
+      getLabel(key, PROJECT_DESCRIPTION_FORM_NAME) + ': ' + value
+    ));
+    alert('Project Description Errors!', 'Changes in the following fields were not saved.'
+      + ' Please fix the errors:\n\n' + errorMessages.join('\n'));
+  };
+
+  /* View */
+
   return (
     <Formik
       component={formProps => Form(
-        {...formProps, formName: formName, onMyChange: onMyChange, setFieldValue: onMyChange})}
+        {...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME, onMyChange: onMyChange, setFieldValue: onMyChange})}
       enableReinitialize={true}
       initialValues={projectDescription}
       innerRef={descriptionFormRef}
       onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: formName, values: values})}
+      validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
       validateOnChange={true}
     />
   );

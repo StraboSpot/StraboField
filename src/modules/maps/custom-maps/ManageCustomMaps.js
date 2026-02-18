@@ -4,6 +4,7 @@ import {FlatList, Text} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {getMapTypeName} from './customMaps.helpers';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
@@ -17,17 +18,25 @@ import useMap from '../useMap';
 const ManageCustomMaps = ({zoomToCustomMap}) => {
   // console.log('Rendering ManageCustomMaps...');
 
-  const customMaps = useSelector(state => state.map.customMaps);
-  const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
-  const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const isOnline = useSelector(state => state.connections.isOnline);
+  /* Data Hooks */
 
-  const [filteredMaps, setFilteredMaps] = useState([]);
+  const currentBasemap = useSelector(state => state.map.currentBasemap);
+  const customMaps = useSelector(state => state.map.customMaps);
+  const isOnline = useSelector(state => state.connections.isOnline);
+  const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
   const {getCustomMapDetails, updateMap} = useCustomMap();
   const {setBasemap} = useMap();
 
+  /* Local State */
+
+  const [filteredMaps, setFilteredMaps] = useState([]);
+
+  /* Derived Variables */
+
   const {isInternetReachable, isConnected} = isOnline;
+
+  /* Side Effects */
 
   useEffect(() => {
     const maps = isSelected ? filterCustomEndpointCustomMaps() : filterDefaultCustomMaps();
@@ -35,20 +44,27 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     console.log('MAPS', maps);
   }, []);
 
-  const filterDefaultCustomMaps = () => {
-    return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
-  };
+  /* Logic Helpers */
 
   const filterCustomEndpointCustomMaps = () => {
     return Object.values(customMaps).filter(map => map.url[0].includes('http://'));
   };
 
-  const mapTypeName = (source) => {
-    let name;
-    if (source === 'mapbox_styles') name = 'Mapbox Styles';
-    if (source === 'strabospot_mymaps') name = 'Strabo MyMaps';
-    return name;
+  const filterDefaultCustomMaps = () => {
+    return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
   };
+
+  const viewCustomMap = async (item) => {
+    let basemap = item;
+    if (item.overlay) {
+      updateMap({...basemap, isViewable: true});
+      if (DEFAULT_MAPS.every(map => currentBasemap.id !== map.id)) basemap = await setBasemap();
+    }
+    else basemap = await setBasemap(item.id);
+    basemap.bbox && setTimeout(() => zoomToCustomMap(basemap.bbox), 1000);
+  };
+
+  /* Render Functions */
 
   const renderCustomMapListItem = (item) => {
     console.log(item);
@@ -60,7 +76,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
-          <ListItem.Subtitle>({mapTypeName(item.source)} - {item.id})</ListItem.Subtitle>
+          <ListItem.Subtitle>({getMapTypeName(item.source)} - {item.id})</ListItem.Subtitle>
         </ListItem.Content>
         {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
           <Icon
@@ -78,15 +94,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
     );
   };
 
-  const viewCustomMap = async (item) => {
-    let basemap = item;
-    if (item.overlay) {
-      updateMap({...basemap, isViewable: true});
-      if (DEFAULT_MAPS.every(map => currentBasemap.id !== map.id)) basemap = await setBasemap();
-    }
-    else basemap = await setBasemap(item.id);
-    basemap.bbox && setTimeout(() => zoomToCustomMap(basemap.bbox), 1000);
-  };
+  /* View */
 
   return (
     <>

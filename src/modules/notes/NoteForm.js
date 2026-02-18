@@ -8,12 +8,12 @@ import commonStyles from '../../shared/common.styles';
 import {TextInputField} from '../form';
 
 const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight}) => {
-  const scrollViewRef = useRef(null);
-  const isFirstFocusRef = useRef(true);
+  /* Local State */
 
-  useEffect(() => {
-    console.log('Keyboard Events', KeyboardController.state());
-  }, []);
+  const isFirstFocusRef = useRef(true);
+  const scrollViewRef = useRef(null);
+
+  /* Derived State */
 
   const handleInputFocus = useCallback(() => {
     // Only scroll to bottom on first focus
@@ -21,7 +21,6 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full',
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({animated: true});
       }, 100);
-
       isFirstFocusRef.current = false;
     }
   }, []);
@@ -30,6 +29,14 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full',
     // Reset flag when input loses focus
     isFirstFocusRef.current = true;
   }, []);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    console.log('Keyboard Events', KeyboardController.state());
+  }, []);
+
+  /* View */
 
   return (
     <>

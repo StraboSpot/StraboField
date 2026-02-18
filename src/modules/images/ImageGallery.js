@@ -11,28 +11,36 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
+let sortedSpotsWithImages = [];
+
 const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   console.log('Rendering ImageGallery...');
+
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
 
   const navigate = useNavigation();
   const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
 
-  const dispatch = useDispatch();
+  /* Local State */
+
+  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
+  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
-  let sortedSpotsWithImages = [];
+  /* Logic Helpers */
 
   const openImage = async (image) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -40,6 +48,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     navigate.navigate('ImageSlider', {selectedImage: image, sortedSpotsWithImages: sortedSpotsWithImages});
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
+
+  /* Render Functions */
 
   const renderImagesInSpot = (images, section) => {
     const isReadOnly = !isEmpty(section.spot) && isSpotInReadOnlyDataset(section.spot.properties.id);
@@ -102,6 +112,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       </>
     );
   };
+
+  /* View */
 
   return isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages();
 };

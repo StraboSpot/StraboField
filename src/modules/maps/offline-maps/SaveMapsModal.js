@@ -25,6 +25,13 @@ import {calculateScaleRatio} from './scale';
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   // console.log('Rendering SaveMapsModal...');
 
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
+  const currentBasemap = useSelector(state => state.map.currentBasemap);
+  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const statusMessages = useSelector(state => state.home.statusMessages);
+
   const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
   const {
     checkTileZipFileExistence,
@@ -37,13 +44,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   } = useMapsOffline();
   const {getTileBaseUrl} = useServerRequests();
 
-  const dispatch = useDispatch();
-  const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
-  const statusMessages = useSelector(state => state.home.statusMessages);
-
-  const currentMapName = currentBasemap && currentBasemap.title;
-  const maxZoom = MAP_PROVIDERS[currentBasemap.source]?.maxZoom;
+  /* Local State */
 
   const [downloadZoom, setDownloadZoom] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
@@ -60,6 +61,13 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const [tileCount, setTileCount] = useState(0);
   const [tilesToInstall, setTilesToInstall] = useState(0);
   const [zoomLevels, setZoomLevels] = useState([]);
+
+  /* Derived Variables */
+
+  const currentMapName = currentBasemap && currentBasemap.title;
+  const maxZoom = MAP_PROVIDERS[currentBasemap.source]?.maxZoom;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE SaveMapsModal []');
@@ -78,15 +86,12 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
         let initialZoom = [];
         let currentZoom = Math.round(zoom);
         setDownloadZoom(Math.round(zoom));
-
         const numZoomLevels = maxZoom ? Math.min(maxZoom - currentZoom + 1, 6) : 5;
-
         for (let i = 0; i < numZoomLevels; i++) {
           initialZoom.push(currentZoom + i);
         }
         setZoomLevels(initialZoom);
       });
-
       getExtentString().then((ex) => {
         console.log('Extent String', ex);
         setExtentString(ex);
@@ -99,6 +104,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     console.log('extentString is UE', extentString);
     shouldDownload().catch(err => console.error('Error in SaveMapsModal shouldDownload()', err));
   }, [downloadZoom]);
+
+  /* Logic Helpers */
 
   const downloadZip = async (zipUID) => {
     try {
@@ -241,6 +248,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   const updatePicker = async zoomValue => setDownloadZoom(zoomValue);
+
+  /* View */
 
   return (
     <ModalWrapper

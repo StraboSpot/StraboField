@@ -1,7 +1,11 @@
 import {useSelector} from 'react-redux';
 
 const useMapURL = () => {
+  /* Data Hooks */
+
   const userMapboxToken = useSelector(state => state.user.mapboxToken);
+
+  /* Exported Functions */
 
   const buildStyleURL = (map) => {
     let tileURL;
@@ -54,8 +58,8 @@ const useMapURL = () => {
   };
 
   return {
-    buildStyleURL: buildStyleURL,
-    buildTileURL: buildTileURL,
+    buildStyleURL,
+    buildTileURL,
   };
 };
 

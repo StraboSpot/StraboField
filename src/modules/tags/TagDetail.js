@@ -10,7 +10,7 @@ import {NotebookPageAvatar} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {deletedSpotIdFromTags} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import SamplesSectionList from '../samples/SamplesSectionList';
@@ -26,26 +26,31 @@ const TagDetail = ({
                      openSpotInNotebook,
                      setIsDetailModalVisible,
                    }) => {
+  /* Data Hooks */
   const dispatch = useDispatch();
-
-  const {getSpotById, getSpotWithThisSample} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
-
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const [refresh, setRefresh] = useState(false);
-
   const {isSpotInReadOnlyDataset} = useProject();
+  const {getSpotById, getSpotWithThisSample} = useSpots();
+  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+
+  /* Local State */
+
+  const [refresh, setRefresh] = useState(false);
 
   // console.log('selectedTag', selectedTag);
   // selectedTag.spots.map((spotId, index) => console.log(index, spotId, getSpotById(spotId)));
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE TagDetail [selectedTag]', selectedTag);
     setRefresh(!refresh); // #TODO : Current hack to render two different FlatListComponents when selectedTag Changes.
                           //         To handle the navigation issue from 0 tagged features to non zero tagged features.
   }, [selectedTag]);
+
+  /* Render Functions */
 
   const renderSpotFeatureItem = (feature) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -135,6 +140,8 @@ const TagDetail = ({
       />
     );
   };
+
+  /* View */
 
   return (
     <FlatList

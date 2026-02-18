@@ -8,12 +8,17 @@ import UrlLinkButton from './UrlLinkButton';
 import {SUPPORT_PATHS} from '../../services/urls.constants';
 
 const IssuesAndRequests = () => {
+  /* Data Hooks */
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
+
+  /* Derived Variables */
 
   const message = isOnline ? 'Found a bug or want to suggest an improvement?\n'
     + '        You can report issues directly on GitHub (preferred method) or email our team!'
     : 'You must be online in order to submit an issue.';
+
+  /* View */
 
   return (
     <View style={issuesAndRequestsStyles.container}>

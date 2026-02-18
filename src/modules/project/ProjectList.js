@@ -17,16 +17,22 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
 const ProjectList = ({doRefresh, onProjectPress, source}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
+
+  const {getAllDeviceProjects, getAllServerProjects} = useProject();
+
+  /* Local State */
 
   const [errorMessage, setErrorMessage] = useState(null);
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projectsArr, setProjectsArr] = useState([]);
 
-  const {getAllDeviceProjects, getAllServerProjects} = useProject();
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ProjectList []');
@@ -43,11 +49,15 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
     getAllProjects().then(() => console.log('OK got projects'));
   }, [doRefresh]);
 
+  /* Event Handlers */
+
   const handleStateChange = async (state) => {
     if (state === 'active' && source === 'device') {
       getAllProjects().then(() => console.log('Updated Project List'));
     }
   };
+
+  /* Logic Helpers */
 
   const getAllProjects = async () => {
     let projectsResponse;
@@ -70,6 +80,8 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
       setLoading(false);
     }
   };
+
+  /* Render Functions */
 
   const renderErrorMessage = () => {
     return (
@@ -126,6 +138,8 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
       );
     }
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

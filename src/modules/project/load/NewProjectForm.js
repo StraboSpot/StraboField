@@ -10,38 +10,29 @@ import {Form, useForm} from '../../form';
 import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {PROJECT_DESCRIPTION_FORM_NAME} from '../project.constants';
 import useProject from '../useProject';
 
+const initialValues = {
+  start_date: new Date().toISOString(),
+  gps_datum: 'WGS84 (Default)',
+  magnetic_declination: 0,
+};
+
 const NewProjectForm = ({openMainMenuPanel}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
   const {showErrors, validateForm} = useForm();
   const {initializeNewProject} = useProject();
 
+  /* Local State */
+
   const formRef = useRef(null);
 
-  const initialValues = {
-    start_date: new Date().toISOString(),
-    gps_datum: 'WGS84 (Default)',
-    magnetic_declination: 0,
-  };
-
-  const renderFormFields = () => {
-    const formName = ['general', 'project_description'];
-    console.log('Rendering form:', formName.join('.'), 'with values:', initialValues);
-    return (
-      <Formik
-        component={formProps => Form({...formProps, formName: formName})}
-        enableReinitialize={false}
-        initialStatus={{formName: formName}}
-        initialValues={initialValues}
-        innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: formName, values: values})}
-      />
-    );
-  };
+  /* Logic Helpers */
 
   const saveForm = async () => {
     try {
@@ -61,6 +52,25 @@ const NewProjectForm = ({openMainMenuPanel}) => {
       return Promise.reject();
     }
   };
+
+  /* Render Functions */
+
+  const renderFormFields = () => {
+    console.log('Rendering form:', PROJECT_DESCRIPTION_FORM_NAME.join('.'), 'with values:', initialValues);
+    return (
+      <Formik
+        component={formProps => Form({...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME})}
+        enableReinitialize={false}
+        initialStatus={{formName: PROJECT_DESCRIPTION_FORM_NAME}}
+        initialValues={initialValues}
+        innerRef={formRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
+      />
+    );
+  };
+
+  /* View */
 
   return (
     <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>

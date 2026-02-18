@@ -7,28 +7,28 @@ import {v4 as uuidv4} from 'uuid';
 const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 
-// Check if an array, object, string or number is empty and if so return true
-export const isEmpty = (value) => {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value)) return value.length === 0;
-  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
-  else if (typeof value === 'string') return value.length === 0;
-  else if (typeof value === 'number') return false;
-  else if (!value) return true;
-  return false;
+/* Internal Functions */
+
+// return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+const emailValidator = val => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  .test(val);
+
+const equalToValidator = (val, checkValue) => val === checkValue;
+
+const getOrientation = window => window.width < window.height ? 'portrait' : 'landscape';
+
+const minLengthValidator = (val, minLength) => val.length >= minLength;
+
+const notEmptyValidator = val => val.trim() !== '';
+
+const passwordValidation = (val) => {
+  schema.has().digits().uppercase();
+  schema.has().not().spaces();
+  schema.min(8);
+  return schema.validate(val);
 };
 
-export const convertSliderValueToMilliseconds = (sliderValue) => {
-  const timeMap = {
-    0: 2 * 60 * 1000,     // 2 min = 120,000 ms
-    1: 5 * 60 * 1000,     // 5 min = 300,000 ms
-    2: 20 * 60 * 1000,    // 20 min = 1,200,000 ms
-    3: 40 * 60 * 1000,    // 40 min = 2,400,000 ms
-    4: null,              // 'ON' = no timeout
-  };
-
-  return timeMap[sliderValue];
-};
+/* Exported Functions */
 
 export const convertMillisecondsToTime = (milliseconds) => {
   const seconds = Math.floor(milliseconds / 1000);
@@ -45,6 +45,17 @@ export const convertMillisecondsToTime = (milliseconds) => {
   }
 };
 
+export const convertSliderValueToMilliseconds = (sliderValue) => {
+  const timeMap = {
+    0: 2 * 60 * 1000,     // 2 min = 120,000 ms
+    1: 5 * 60 * 1000,     // 5 min = 300,000 ms
+    2: 20 * 60 * 1000,    // 20 min = 1,200,000 ms
+    3: 40 * 60 * 1000,    // 40 min = 2,400,000 ms
+    4: null,              // 'ON' = no timeout
+  };
+
+  return timeMap[sliderValue];
+};
 
 // Parsing CSV Strings With Javascript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
@@ -153,24 +164,6 @@ export const deepObjectExtend = (target, source) => {
   return target;
 };
 
-export const hasSpace = (filename) => {
-  return filename.includes(' ');
-};
-
-export const getNewId = () => {
-  return Math.floor((new Date().getTime() + Math.random()) * 10);
-  // return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-  //   c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-};
-
-// Ids are generated in such quick succession when copying that using
-// the getNewId doesn't work since that is based on a timestamp
-export const getNewCopyId = () => Math.floor(10000000000000 + Math.random() * 90000000000000);
-
-export const getNewUUID = () => {
-  return uuidv4();
-};
-
 export const getFontSizeByWindowWidth = (window, fontSize) => {
   const baseWidth = 320; // width of smallest iPhone
   const width = getOrientation(window) === 'portrait' ? window.width : window.height;
@@ -185,9 +178,17 @@ export const getLatLngText = (lat, lng) => {
     + toFixedInteger(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
 };
 
-function getOrientation(window) {
-  return window.width < window.height ? 'portrait' : 'landscape';
-}
+// Ids are generated in such quick succession when copying that using
+// the getNewId doesn't work since that is based on a timestamp
+export const getNewCopyId = () => Math.floor(10000000000000 + Math.random() * 90000000000000);
+
+// return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+//   c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+export const getNewId = () => Math.floor((new Date().getTime() + Math.random()) * 10);
+
+export const getNewUUID = () => uuidv4();
+
+export const hasSpace = filename => filename.includes(' ');
 
 export const hexToRgb = (hex) => {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -204,49 +205,36 @@ export const hexToRgb = (hex) => {
   } : null;
 };
 
-export const padWithLeadingZeros = (number, length) => {
-  return number.toString().padStart(length, '0');
+// Check if an array, object, string or number is empty and if so return true
+export const isEmpty = (value) => {
+  if (value === null || value === undefined) return true;
+  if (Array.isArray(value)) return value.length === 0;
+  else if (typeof value === 'object') return Object.getOwnPropertyNames(value).length < 1;
+  else if (typeof value === 'string') return value.length === 0;
+  else if (typeof value === 'number') return false;
+  else if (!value) return true;
+  return false;
 };
 
-// Round value to the number of decimal places in the variable places
-export const roundToDecimalPlaces = (value, places) => {
-  const multiplier = Math.pow(10, places);
-  return (Math.round(value * multiplier) / multiplier);
-};
-
-export const toDegrees = (radians) => {
-  return radians * 180 / Math.PI;
-};
-
-export const toNumberFixedValue = (number, decPlaces) => {
-  return Number(number).toLocaleString(undefined, {style: 'percent', minimumFractionDigits: decPlaces});
-};
-
-export const toRadians = (deg) => {
-  return deg * (Math.PI / 180);
-};
-
-export const truncateText = (str, maxLength) => {
-  if (str?.length > maxLength) return str.substring(0, maxLength) + '...';
-  else return str;
-};
-
-export { isEqual };
+export {isEqual};
 
 // Compare two arrays regardless of order
 export const isEqualUnordered = (a, b) => {
   return JSON.stringify(JSON.parse(JSON.stringify(a)).sort()) === JSON.stringify(JSON.parse(JSON.stringify(b)).sort());
 };
 
-// Convert a string to title case and properly handles (s) in a word by keeping the s lowercase
-export function toTitleCase(str) {
-  return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-}
+// Convert 1 to A, 2 to B, ... 27 to AA, 28 to AB, etc
+export const numToLetter = num => num <= 0 ? '' : numToLetter(Math.floor((num - 1) / 26)) + String.fromCharCode(
+  (num - 1) % 26 + 65);
 
 export const openUrl = async (url) => {
   const canOpenUrl = await Linking.canOpenURL(url);
   if (!canOpenUrl) throw Error('Unable to open url!');
   else await Linking.openURL(url);
+};
+
+export const padWithLeadingZeros = (number, length) => {
+  return number.toString().padStart(length, '0');
 };
 
 export const readDataUrl = (file, callback) => {
@@ -258,13 +246,41 @@ export const readDataUrl = (file, callback) => {
   reader.readAsDataURL(file);
 };
 
+// Round value to the number of decimal places in the variable places
+export const roundToDecimalPlaces = (value, places) => {
+  const multiplier = Math.pow(10, places);
+  return (Math.round(value * multiplier) / multiplier);
+};
+
 export const sleep = (delay) => {
   return new Promise(resolve => setTimeout(resolve, delay));
+};
+
+export const toDegrees = (radians) => {
+  return radians * 180 / Math.PI;
 };
 
 export const toFixedInteger = (value, dp) => {
   // Returns an integer instead of a string
   return +parseFloat(value).toFixed(dp);
+};
+
+export const toNumberFixedValue = (number, decPlaces) => {
+  return Number(number).toLocaleString(undefined, {style: 'percent', minimumFractionDigits: decPlaces});
+};
+
+export const toRadians = (deg) => {
+  return deg * (Math.PI / 180);
+};
+
+// Convert a string to title case and properly handles (s) in a word by keeping the s lowercase
+export function toTitleCase(str) {
+  return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+export const truncateText = (str, maxLength) => {
+  if (str?.length > maxLength) return str.substring(0, maxLength) + '...';
+  else return str;
 };
 
 export const unixToDateTime = (unixTimestamp) => {
@@ -306,33 +322,3 @@ export const validate = (val, rules, connectedValue) => {
   }
   return isValid;
 };
-
-const passwordValidation = (val) => {
-  schema.has().digits().uppercase();
-  schema.has().not().spaces();
-  schema.min(8);
-  return schema.validate(val);
-};
-
-const emailValidator = (val) => {
-  // return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-  return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    .test(val);
-};
-
-const minLengthValidator = (val, minLength) => {
-  return val.length >= minLength;
-};
-
-const equalToValidator = (val, checkValue) => {
-  return val === checkValue;
-};
-
-const notEmptyValidator = (val) => {
-  // console.log(val);
-  return val.trim() !== '';
-};
-
-// Convert 1 to A, 2 to B, ... 27 to AA, 28 to AB, etc
-export const numToLetter = num => num <= 0 ? '' : numToLetter(Math.floor((num - 1) / 26)) + String.fromCharCode(
-  (num - 1) % 26 + 65);

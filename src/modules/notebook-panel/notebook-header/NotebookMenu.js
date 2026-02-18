@@ -12,7 +12,7 @@ import {WarningModal} from '../../../shared/ui/modals';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSamples from '../../samples/useSamples';
 import {useSpots} from '../../spots';
 import {setNotebookPageVisible} from '../notebook.slice';
@@ -27,16 +27,22 @@ const NotebookMenu = ({
                         parentSpot,
                         zoomToSpots,
                       }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const navigation = useNavigation();
   const {deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
-  const navigation = useNavigation();
   const {deleteInterval} = useStratSection();
+
+  /* Local State */
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+
+  /* Derived State */
 
   const type = isSample ? 'Sample' : 'Spot';
   const actions = [
@@ -49,21 +55,7 @@ const NotebookMenu = ({
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
 
-  const continueDeleteSelectedSpot = () => {
-    if (errorMessage) {
-      setErrorMessage('');
-      setIsDeleteSpotModalVisible(false);
-    }
-    else if (spot.properties?.isSample) deleteRichSample(spot, parentSpot);
-    else if (isStratInterval(spot)) deleteInterval(spot);
-    else deleteSpot(spot);
-  };
-
-  const deleteSelectedSpot = () => {
-    const safeDeleteMessage = checkIsSafeDelete(spot);
-    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
-    setIsDeleteSpotModalVisible(true);
-  };
+  /* Event Handlers */
 
   const onPress = (key) => {
     if (key === 'copy') {
@@ -85,6 +77,26 @@ const NotebookMenu = ({
     else closeNotebookPanel();
     closeNotebookMenu();
   };
+
+  /* Logic Helpers */
+
+  const continueDeleteSelectedSpot = () => {
+    if (errorMessage) {
+      setErrorMessage('');
+      setIsDeleteSpotModalVisible(false);
+    }
+    else if (spot.properties?.isSample) deleteRichSample(spot, parentSpot);
+    else if (isStratInterval(spot)) deleteInterval(spot);
+    else deleteSpot(spot);
+  };
+
+  const deleteSelectedSpot = () => {
+    const safeDeleteMessage = checkIsSafeDelete(spot);
+    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
+    setIsDeleteSpotModalVisible(true);
+  };
+
+  /* Render Functions */
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && item.key === 'delete') return;
@@ -111,6 +123,8 @@ const NotebookMenu = ({
         )
     );
   };
+
+  /* View */
 
   return (
     <>

@@ -4,27 +4,32 @@ import {Platform, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
+import {formatDeg} from './compass.helpers';
 import compassStyles from './compass.styles';
 import {roundToDecimalPlaces} from '../../shared/Helpers';
 import {overlayStyles} from '../home/overlays';
 
 const CompassDebug = ({compassData, matrixRotation}) => {
+  /* Data Hooks */
+
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('Compass Debug MOUNTED');
     return () => console.log('Compass Debug UNMOUNTED');
   }, []);
 
+  /* Logic Helpers */
+
+  const Col = ({children, flex = 1}) => <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>;
+
   const Row = ({children}) => (
     <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
   );
 
-  const Col = ({children, flex = 1}) => (
-    <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
-  );
-
-  const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
+  /* Render Functions */
 
   const renderCompassData = () => (
     <View style={compassStyles.compassDataGridContainer}>
@@ -91,6 +96,8 @@ const CompassDebug = ({compassData, matrixRotation}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

@@ -3,15 +3,16 @@ import {View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import sampleStyles from '../samples.styles';
+import igsnStyles from './igsn.styles';
+import IGSNLogoSource from '../../../assets/images/logos/IGSN_Logo_200.jpg';
 
 const IGSNLogo = ({item}) => {
   return (
-    <View style={sampleStyles.logoDisplayContainer}>
+    <View style={igsnStyles.logoDisplayContainer}>
       {item.isOnMySesar && (
         <Image
-          source={IGSNLogo}
-          style={sampleStyles.IGSNLogo}
+          source={IGSNLogoSource}
+          style={igsnStyles.IGSNLogo}
         />
       )}
     </View>

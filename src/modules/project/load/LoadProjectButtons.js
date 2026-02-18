@@ -13,8 +13,12 @@ const LoadProjectButtons = ({
                               onLoadProjectsFromServer,
                               onStartNewProject,
                             }) => {
+  /* Data Hooks */
+
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
+
+  /* View */
 
   return (
     <>

@@ -15,7 +15,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setModalVisible} from '../home/home.slice';
 import Overview from '../page/Overview';
-import {MODAL_KEYS, NOTEBOOK_PAGES, PAGE_KEYS, SUBPAGES} from '../page/page.constants';
+import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import useProject from '../project/useProject';
@@ -23,6 +24,8 @@ import {SpotsListItem, useSpots} from '../spots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
   console.log('Rendering NotebookContent...');
+
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -35,11 +38,17 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const {isSpotInReadOnlyDataset} = useProject();
   const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
 
+  /* Local State */
+
   const [selectedSample, setSelectedSample] = useState({});
+
+  /* Derived Variables */
 
   const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
@@ -48,6 +57,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
   }, [pageVisible, spot]);
+
+  /* Logic Helpers */
 
   const openPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -60,6 +71,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     }
     else dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderNotebookContent = () => {
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
@@ -174,6 +187,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       </View>
     );
   };
+
+  /* View */
 
   return isEmpty(spot) ? renderNotebookContentNoSpot() : renderNotebookContent();
 };

@@ -5,7 +5,7 @@ import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MapLayers} from './layers';
-import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
+import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import {setIsMapMoved} from './maps.slice';
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
@@ -48,13 +48,6 @@ const Map = ({
   const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
   const {getInitialViewState} = useMapView();
 
-  const layerIdsNotSelected = ['polygonLayerNotSelected', 'polygonLayerWithPatternNotSelected',
-    'polygonLayerNotSelectedBorder', 'polygonLabelLayerNotSelected', 'lineLayerNotSelected',
-    'lineLayerNotSelectedDotted', 'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed',
-    'lineLabelLayerNotSelected', 'pointLayerNotSelected'];
-  const layerIdsSelected = ['polygonLayerSelected', 'polygonLayerWithPatternSelected',
-    'polygonLayerSelectedBorder', 'polygonLabelLayerSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
-    'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'lineLabelLayerSelected', 'pointLayerSelectedHalo'];
   const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
 
   useEffect(() => {
@@ -97,7 +90,7 @@ const Map = ({
       dragPan={allowMapViewMove}
       dragRotate={false}
       id={currentMapId}
-      interactiveLayerIds={[...layerIdsNotSelected, ...layerIdsSelected]}
+      interactiveLayerIds={[...LAYER_IDS_NOT_SELECTED, ...LAYER_IDS_SELECTED]}
       key={`web-map-${mapKey}-${currentMapId}`}
       mapStyle={currentImageBasemap || stratSection ? BACKGROUND : basemap}
       mapboxAccessToken={MAPBOX_TOKEN}

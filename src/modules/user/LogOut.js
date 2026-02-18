@@ -16,13 +16,23 @@ import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
 
 const LogOut = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const userData = useSelector(state => state.user);
+
+  const {clearUser} = useResetState();
+
+  /* Local State */
 
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
-  const {clearUser} = useResetState();
+  /* Event Handlers */
+
+  const handleDeleteDataPressed = () => setIsDeleteConfirmModalVisible(true);
+
+  /* Logic Helpers */
 
   const goToBackupPage = () => {
     setIsLogoutModalVisible(false);
@@ -31,9 +41,7 @@ const LogOut = () => {
     }, 200);
   };
 
-  const handleDeleteDataPressed = () => {
-    setIsDeleteConfirmModalVisible(true);
-  };
+  /* Render Functions */
 
   const renderDeleteConfirmationModal = () => {
     return (
@@ -83,6 +91,8 @@ const LogOut = () => {
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return (
     <>

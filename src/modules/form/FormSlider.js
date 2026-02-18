@@ -23,12 +23,20 @@ const FormSlider = ({
                     }) => {
   // console.log('Rendering FormSlider...');
 
+  /* Data Hooks */
+
   const {getChoicesByKey} = useForm();
 
-  const field = survey.find(f => f.name === fieldKey);
-  const choicesList = getChoicesByKey(survey, choices, fieldKey);
+  /* Local State */
 
   const [sliderValue, setSliderValue] = useState(5);
+
+  /* Derived Variables */
+
+  const choicesList = getChoicesByKey(survey, choices, fieldKey);
+  const field = survey.find(f => f.name === fieldKey);
+
+  /* Event Handlers */
 
   const handleSliderValue = () => {
     const value = choicesList.map(c => c.name);
@@ -53,6 +61,8 @@ const FormSlider = ({
       setSliderValue(undefined);
     }
   };
+
+  /* View */
 
   return (
     <>

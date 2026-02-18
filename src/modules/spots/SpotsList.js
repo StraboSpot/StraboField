@@ -11,13 +11,20 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
   // console.log('Rendering SpotsList...');
 
+  /* Data Hooks */
+
   const {getVisibleSpots} = useSpots();
+
+  /* Local State */
+
+  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpots = getVisibleSpots();
 
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+
+  /* Render Functions */
 
   const renderNoSpotsText = () => <ListEmptyText text={textNoSpots}/>;
 
@@ -56,6 +63,8 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

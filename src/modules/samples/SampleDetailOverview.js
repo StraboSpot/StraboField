@@ -8,7 +8,7 @@ import {truncateText} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SampleDetailOverview = () => {

@@ -6,15 +6,41 @@ const IGSNModalStyles = {
     flex: 1,
     justifyContent: 'center',
   },
+  contentContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    width: 400,
+  },
+  errorContainer: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: themes.RED,
+    borderRadius: 10,
+  },
   errorMessageText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  fieldRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: themes.LIST_BORDER_COLOR,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  fieldValueText: {
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontWeight: '400',
+  },
   headerText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     margin: 10,
+  },
+  labelColumn: {
+    flex: 1.5, // Controls the width of the left side
   },
   sesarAuthText: {
     fontSize: 20,
@@ -44,35 +70,9 @@ const IGSNModalStyles = {
     fontWeight: 'bold',
     padding: 5,
   },
-  contentContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    width: 400,
-  },
-  fieldRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 0.5,
-    borderBottomColor: themes.LIST_BORDER_COLOR,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  labelColumn: {
-    flex: 1.5, // Controls the width of the left side
-  },
   valueColumn: {
     flex: 2,   // Controls the width of the right side
     paddingLeft: 10,
-  },
-  fieldValueText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    color: themes.PRIMARY_TEXT_COLOR,
-    fontWeight: '400',
-  },
-  errorContainer: {
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: themes.RED,
-    borderRadius: 10,
   },
 };
 

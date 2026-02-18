@@ -19,8 +19,11 @@ const ActionButtonsSmallScreen = ({
                                     selectingMode,
                                     toggleDialog,
                                   }) => {
+  /* Data Hooks */
 
   const {height, width} = useWindowSize();
+
+  /* View */
 
   return (
     <View>

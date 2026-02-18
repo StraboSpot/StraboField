@@ -13,18 +13,25 @@ import {isEmpty} from '../../Helpers';
 import OutlineButton from '../buttons/OutlineButton';
 
 const StatusModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
   const isModalLoading = useSelector(state => state.home.loading.modal);
-  const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
-  const statusMessages = useSelector(state => state.home.statusMessages);
-  const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
-
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
+  const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
+  const statusMessages = useSelector(state => state.home.statusMessages);
+
+  /* Local State */
+
+  const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
+
+  /* Derived Variables */
 
   const isLoadingProject = mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS;
 
-  const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
+  /* Side Effects */
 
   useEffect(() => {
     if (isProjectLoadSelectionModalVisible && !isEmpty(currentProjectId)) {
@@ -33,6 +40,8 @@ const StatusModal = () => {
     if (Platform.OS === 'web' && isLoadingProject) setIsShowingDatasetPreferences(true);
     else setIsShowingDatasetPreferences(false);
   }, [isStatusMessagesModalVisible, isLoadingProject, dispatch, isProjectLoadSelectionModalVisible]);
+
+  /* Logic Helpers */
 
   const closeModal = () => {
     // Reset dataset preferences view before closing
@@ -56,6 +65,8 @@ const StatusModal = () => {
       width: Platform.OS === 'web' ? 400 : '40%',
     };
   };
+
+  /* View */
 
   return (
     <ModalWrapper

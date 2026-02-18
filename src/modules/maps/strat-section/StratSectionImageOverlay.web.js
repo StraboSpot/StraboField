@@ -5,6 +5,8 @@ import {Layer, Source} from 'react-map-gl/mapbox';
 const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
   console.log('Rendering StratSectionImageOverlay...');
 
+  /* View */
+
   return (
     <Source
       coordinates={coordQuad}

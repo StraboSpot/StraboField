@@ -20,18 +20,24 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const MineralsPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {getMineralTitle} = usePetrology();
+  const {getSpotById, getSpotsWithKey} = useSpots();
+
+  /* Local State */
+
+  const preFormRef = useRef(null);
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedMineral, setSelectedMineral] = useState({});
   const [spotsWithMinerals, setSpotsWithMinerals] = useState([]);
 
-  const preFormRef = useRef(null);
-
-  const {getSpotById, getSpotsWithKey} = useSpots();
-  const {getMineralTitle} = usePetrology();
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE MineralsPage []');
@@ -47,6 +53,8 @@ const MineralsPage = ({isReadOnly, page}) => {
     }
     getSpotsWithMinerals();
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const addMineral = () => {
     dispatch(setModalVisible({modal: page.key}));
@@ -82,6 +90,8 @@ const MineralsPage = ({isReadOnly, page}) => {
       && s.properties.pet && s.properties.pet[page.key]));
   };
 
+  /* Render Functions */
+
   const renderCopyDataSelectBox = () => {
     return (
       <Formik
@@ -108,6 +118,18 @@ const MineralsPage = ({isReadOnly, page}) => {
     );
   };
 
+  const renderMineralDetail = () => {
+    return (
+      <BasicPageDetail
+        closeDetailView={() => setIsDetailView(false)}
+        groupKey={'pet'}
+        isReadOnly={isReadOnly}
+        page={page}
+        selectedFeature={selectedMineral}
+      />
+    );
+  };
+
   const renderMineralsList = () => {
     let mineralData = spot.properties.pet && spot.properties.pet[page.key] || [];
     if (!Array.isArray(mineralData)) mineralData = [];
@@ -123,18 +145,6 @@ const MineralsPage = ({isReadOnly, page}) => {
     );
   };
 
-  const renderMineralDetail = () => {
-    return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
-        groupKey={'pet'}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedMineral}
-      />
-    );
-  };
-
   const renderMineralsMain = () => {
     return (
       <View style={{flex: 1}}>
@@ -144,6 +154,8 @@ const MineralsPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderMineralDetail() : renderMineralsMain();
 };

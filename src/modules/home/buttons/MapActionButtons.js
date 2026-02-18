@@ -10,17 +10,23 @@ import homeStyles from '../home.style';
 import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay} from '../overlays';
 
 const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
-  const {updateFeatureTypes} = useMapFeatures();
+  /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {updateFeatureTypes} = useMapFeatures();
+
+  /* Logic Helpers */
+
   const toggleMapSymbolsOverlay = () => {
     if (!dialogs.mapSymbolsMenuVisible) updateFeatureTypes();
     toggleDialog('mapSymbolsMenuVisible');
   };
+
+  /* View */
 
   return (
     <>

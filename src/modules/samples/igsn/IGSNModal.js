@@ -2,36 +2,42 @@ import React, {forwardRef, useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
-import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
+import useIGSN from './useIGSN';
 import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
-import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/Helpers';
 import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {updatedKey} from '../../user/userProfile.slice';
-import useSamples from '../useSamples';
 
 const IGSNModal = forwardRef(({
                                 isVisible,
                                 onModalCancel,
                                 onSampleSaved,
                               }, formRef) => {
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useSamples();
-
   const {sesar} = useSelector(state => state.user);
 
+  const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useIGSN();
+
+  /* Local State */
+
   const formValues = formRef.current?.values || {};
-  const [errorMessages, setErrorMessages] = useState([]);
-  const [errorView, setErrorView] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
+  const [errorView, setErrorView] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isUploaded, setIsUploaded] = useState(false);
-  const [mappedSesarValues, setMappedSesarValues] = useState({});
-  const [modalPage, setModalPage] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
+  const [modalPage, setModalPage] = useState(null);
+  const [mappedSesarValues, setMappedSesarValues] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
@@ -56,10 +62,14 @@ const IGSNModal = forwardRef(({
     }
   }, [formValues, sesar]);
 
+  /* Event Handlers */
+
   const handleConfirmOnPress = () => {
     if (formRef.current) onSampleSaved(formRef.current);
     onModalCancel();
   };
+
+  /* Logic Helpers */
 
   const registerSample = async () => {
     try {
@@ -90,16 +100,12 @@ const IGSNModal = forwardRef(({
     }
   };
 
-  const isoToLocalDateTime = (isoString, type) => {
-    const date = new Date(isoString);
-    const timeAndDate = type === 'time' ? date.toLocaleTimeString('en-US') : date.toLocaleDateString('en-US');
-    return timeAndDate;
-  };
-
   const setPage = () => {
     if (modalPage === 'error') return renderErrorView();
     return renderUploadContent();
   };
+
+  /* Render Functions */
 
   const renderErrorView = () => {
     return (
@@ -109,23 +115,6 @@ const IGSNModal = forwardRef(({
       </View>
     );
   };
-
-  const formatContentItems = (item) => {
-    if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude'
-      || item.sesarKey === 'longitude_end' || item.sesarKey === 'latitude_end') {
-      return item.value;
-    }
-    if (item.sesarKey === 'collection_start_date') {
-      return moment(item.value).format('MM-DD-YYYY (h:mm:ss a)');
-      // return isoToLocalDateTime(item.value);
-    }
-    if (item.sesarKey === 'collection_time') {
-      return isoToLocalDateTime(item.value, 'time');
-    }
-    if (item.sesarKey === 'description') return truncateText(item.value, 30);
-    return item.value;
-  };
-
   const renderContentItems = () => {
     return (
       <View style={IGSNModalStyles.contentContainer}>

@@ -33,3 +33,41 @@ export const MAP_SYMBOLS = {
 
   'starburst': require('../../../assets/symbols/starburst.png'),
 };
+
+export const LINE_PATTERNS = {
+  solid: [1, 0],
+  dotted: [0.5, 2],
+  dashed: [5, 2],
+  dotDashed: [5, 2, 0.5, 2],
+};
+
+export const LAYOUT_PROPERTIES_MAP = {
+  iconAllowOverlap: 'icon-allow-overlap',
+  iconIgnorePlacement: 'icon-ignore-placement',
+  iconImage: 'icon-image',
+  iconRotate: 'icon-rotate',
+  iconSize: 'icon-size',
+  symbolPlacement: 'symbol-placement',
+  symbolSpacing: 'symbol-spacing',
+  textAnchor: 'text-anchor',
+  textField: 'text-field',
+  textIgnorePlacement: 'text-ignore-placement',
+  textOffset: 'text-offset',
+  textRotate: 'text-rotate',
+  textSize: 'text-size',
+};
+
+export const PAINT_PROPERTIES_MAP = {
+  circleColor: 'circle-color',
+  circleOpacity: 'circle-opacity',
+  circleRadius: 'circle-radius',
+  circleStrokeColor: 'circle-stroke-color',
+  circleStrokeWidth: 'circle-stroke-width',
+  fillColor: 'fill-color',
+  fillOpacity: 'fill-opacity',
+  fillOutlineColor: 'fill-outline-color',
+  fillPattern: 'fill-pattern',
+  lineColor: 'line-color',
+  lineDasharray: 'line-dasharray',
+  lineWidth: 'line-width',
+};

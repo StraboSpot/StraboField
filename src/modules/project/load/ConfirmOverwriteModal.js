@@ -18,13 +18,21 @@ const ConfirmOverwriteModal = ({
                                  project,
                                  textOverride,
                                }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProjectName = useSelector(state => state.project.project?.description?.project_name);
   const sidePanelView = useSelector(state => state.mainMenu?.sidePanelView);
 
+  /* Derived Variables */
+
   const modalText = textOverride ? textOverride
     : `You are going to overwrite the project \n${currentProjectName} \nwith the project 
     ${(project?.name || project?.fileName)}.`;
+
+  /* Logic Helpers */
+
+  const actionButtonTitle = () => sidePanelView === 'New Project' ? 'Continue' : 'Overwrite Project';
 
   const goToBackupPage = () => {
     closeModal();
@@ -32,13 +40,9 @@ const ConfirmOverwriteModal = ({
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP}));
   };
 
-  const headerTitle = () => {
-    return `Overwrite Project ${currentProjectName}?`;
-  };
+  const headerTitle = () => `Overwrite Project ${currentProjectName}?`;
 
-  const actionButtonTitle = () => {
-    return sidePanelView === 'New Project' ? 'Continue' : 'Overwrite Project';
-  };
+  /* View */
 
   return (
     <ModalWrapper

@@ -4,7 +4,11 @@ import {AvatarWrapper} from './';
 import {useSpots} from '../../../modules/spots';
 
 const SpotGeometryAvatar = ({spot}) => {
+  /* Data Hooks */
+
   const {getSpotGeometryIconSource} = useSpots();
+
+  /* View */
 
   return (
     <AvatarWrapper

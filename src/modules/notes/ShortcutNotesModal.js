@@ -5,13 +5,18 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 
 const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
+  /* Data Hooks */
 
   const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+
+  /* Side Effects */
 
   useEffect(() => {
     lockToPortrait();
     return () => unlockOrientation();
   }, []);
+
+  /* View */
 
   return (
     <ModalWrapper

@@ -14,14 +14,20 @@ import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 
 const AddImageButtons = ({saveImages}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
 
   const {getImagesFromCameraRoll, launchCameraFromNotebook} = useImages();
   const {uploadFromWeb} = useUpload();
 
+  /* Local State */
+
   const inputRef = useRef(null);
 
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     () => {
@@ -29,9 +35,7 @@ const AddImageButtons = ({saveImages}) => {
     };
   }, []);
 
-  const clickedFileInput = () => {
-    window.addEventListener('focus', handleFocusBack);
-  };
+  /* Event Handlers */
 
   const handleFileChange = async (e) => {
     try {
@@ -83,6 +87,12 @@ const AddImageButtons = ({saveImages}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
+  /* Logic Helpers */
+
+  const clickedFileInput = () => {
+    window.addEventListener('focus', handleFocusBack);
+  };
+
   const importImages = async () => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     if (Platform.OS !== 'web') {
@@ -102,6 +112,8 @@ const AddImageButtons = ({saveImages}) => {
     const imagesSavedLength = newImages.length;
     if (imagesSavedLength > 0) saveImages(newImages);
   };
+
+  /* View */
 
   return (
     <>

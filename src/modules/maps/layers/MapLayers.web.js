@@ -28,10 +28,13 @@ const MapLayers = ({
                      spotsNotSelected,
                      spotsSelected,
                    }) => {
+  /* Data Hooks */
 
   const {currentImageBasemap, stratSection} = useSelector(state => state.map);
 
   const useDimensions = useWindowSize();
+
+  /* View */
 
   return (
     <>

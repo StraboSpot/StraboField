@@ -15,24 +15,34 @@ import usePage from '../../page/usePage';
 import useSamples from '../../samples/useSamples';
 
 const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
+  /* Data Hooks */
+
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isMorePagesMenuVisible, setIsMorePagesMenuVisible] = useState(false);
-
   const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
   const {createRichSample} = useSamples();
 
-  const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
+  /* Local State */
+
+  const [isMorePagesMenuVisible, setIsMorePagesMenuVisible] = useState(false);
+
+  /* Derived Variables */
+
   const pagesToShow = [...getRelevantGeneralPages(isRichSample), ...getRelevantPetPages(isRichSample),
     ...getRelevantSedPages(isRichSample)];
   const notebookPagesValidOn = notebookPagesOn.filter(i => pagesToShow.find(p => p.key === i));
+  const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
+
+  /* Logic Helpers */
 
   const getPageIcon = (key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     return notebookPageVisible === key ? page.icon_pressed_src : page.icon_src;
   };
+
+  /* View */
 
   return (
     <View style={footerStyle.footerContainer}>

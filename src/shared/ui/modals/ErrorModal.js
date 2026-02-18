@@ -8,11 +8,17 @@ import overlayStyles from './overlay.styles';
 import {setIsErrorMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const ErrorModal = ({children, headerTitle, isVisible, onActionPressed}) => {
-  const scrollView = useRef(null);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const isErrorMessagesModalVisible = useSelector(state => state.home.isErrorMessagesModalVisible);
   const statusMessages = useSelector(state => state.home.statusMessages);
+
+  /* Local State */
+
+  const scrollView = useRef(null);
+
+  /* View */
 
   return (
     <ModalWrapper

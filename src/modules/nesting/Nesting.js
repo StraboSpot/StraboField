@@ -8,83 +8,83 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {ImageCard, useImages, useImageThumbnails} from '../images';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
 
 const Nesting = () => {
   console.log('Rendering Nesting');
-  const [childrenGenerations, setChildrenGenerations] = useState(null);
-  const [images, setImages] = useState([]);
-  const [parentGenerations, setParentGenerations] = useState(null);
 
-  const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {getSpotWithThisSample, handleSpotSelected} = useSpots();
-  const {getImageByImageId} = useImages();
-  const {
-    areImageThumbnailsLoading,
-    imageThumbnailURIs,
-    setAreImageThumbnailsLoading,
-    setImageThumbnailURIs,
-  } = useImageThumbnails({images});
+  /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
+  const {getImageByImageId} = useImages();
+  const [images, setImages] = useState([]);
+  const {
+    areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
+  } = useImageThumbnails({images});
+  const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
+  const {getSpotWithThisSample, handleSpotSelected} = useSpots();
+
+  /* Local State */
+
+  const [childrenGenerations, setChildrenGenerations] = useState(null);
+  const [parentGenerations, setParentGenerations] = useState(null);
+
+  /* Derived Variables */
+
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
 
   const targetSpot = selectedSpot?.properties?.isSample ? getSpotWithThisSample(selectedSpot.properties.id)
     : selectedSpot;
+
+  /* Derived State */
+
+  const reversedParentGenerations = useMemo(
+    () => parentGenerations ? [...parentGenerations].reverse() : null,
+    [parentGenerations],
+  );
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Nesting [spots, selectedSpot]', spots, selectedSpot);
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
-  const renderImage = (image, index) => {
-    return (
-      <ImageCard
-        areImageThumbnailsLoading={areImageThumbnailsLoading}
-        image={image}
-        imageThumbnailURIs={imageThumbnailURIs}
-        index={index}
-        isThumbnailOnly
-        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
-        setImageThumbnailURIs={setImageThumbnailURIs}
-      />
-    );
-  };
+  /* Logic Helpers */
 
-  const renderItem = (spot) => {
-    if (spot && spot.properties) {
-      if (spot.properties.image_basemap) {
-        const image = getImageByImageId(spot.properties.image_basemap);
-        return (
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{alignSelf: 'center'}}>
-              {renderImage(image, 0)}
-            </View>
-            <View style={{flex: 1, alignSelf: 'center'}}>
-              {renderName(spot)}
-            </View>
-          </View>
-        );
-      }
-      else return renderName(spot);
+  const updateNest = () => {
+    if (!isEmpty(targetSpot)) {
+      console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
+        targetSpot, '...');
+      const parentSpots = getParentGenerationsSpots(targetSpot, 10);
+      setParentGenerations(parentSpots);
+      const childrenSpots = getChildrenGenerationsSpots(targetSpot, 10);
+      setChildrenGenerations(childrenSpots);
+
+      // Get All Images (Image Basemaps) Used in Nest
+      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), targetSpot];
+      console.log(allSpotsInNest);
+      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
+        const imageBasemapId = spot.properties?.image_basemap;
+        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
+          const image = getImageByImageId(spot.properties.image_basemap);
+          return isEmpty(image) ? acc : [...acc, image];
+        }
+        else return acc;
+      }, []);
+      const newImageIds = allImagesInNest.map(img => img.id).sort().join(',');
+      const currentImageIds = images.map(img => img.id).sort().join(',');
+      if (newImageIds !== currentImageIds) setImages(allImagesInNest);
     }
   };
 
-  const renderName = (spot) => {
-    return (
-      <SpotsListItem
-        doShowSamples
-        onPress={() => handleSpotSelected(spot)}
-        spot={spot}
-      />
-    );
-  };
+  /* Render Functions */
 
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
@@ -110,11 +110,6 @@ const Nesting = () => {
       </>
     );
   };
-
-  const reversedParentGenerations = useMemo(
-    () => parentGenerations ? [...parentGenerations].reverse() : null,
-    [parentGenerations],
-  );
 
   const renderGenerations = (type) => {
     const generationData = type === 'Parents' ? reversedParentGenerations : childrenGenerations;
@@ -165,6 +160,49 @@ const Nesting = () => {
     );
   };
 
+  const renderImage = (image, index) => {
+    return (
+      <ImageCard
+        areImageThumbnailsLoading={areImageThumbnailsLoading}
+        image={image}
+        imageThumbnailURIs={imageThumbnailURIs}
+        index={index}
+        isThumbnailOnly
+        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
+        setImageThumbnailURIs={setImageThumbnailURIs}
+      />
+    );
+  };
+
+  const renderItem = (spot) => {
+    if (spot && spot.properties) {
+      if (spot.properties.image_basemap) {
+        const image = getImageByImageId(spot.properties.image_basemap);
+        return (
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{alignSelf: 'center'}}>
+              {renderImage(image, 0)}
+            </View>
+            <View style={{flex: 1, alignSelf: 'center'}}>
+              {renderName(spot)}
+            </View>
+          </View>
+        );
+      }
+      else return renderName(spot);
+    }
+  };
+
+  const renderName = (spot) => {
+    return (
+      <SpotsListItem
+        doShowSamples
+        onPress={() => handleSpotSelected(spot)}
+        spot={spot}
+      />
+    );
+  };
+
   const renderSelf = (self) => {
     return (
       <View style={{borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'black'}}>
@@ -173,31 +211,7 @@ const Nesting = () => {
     );
   };
 
-  const updateNest = () => {
-    if (!isEmpty(targetSpot)) {
-      console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
-        targetSpot, '...');
-      const parentSpots = getParentGenerationsSpots(targetSpot, 10);
-      setParentGenerations(parentSpots);
-      const childrenSpots = getChildrenGenerationsSpots(targetSpot, 10);
-      setChildrenGenerations(childrenSpots);
-
-      // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), targetSpot];
-      console.log(allSpotsInNest);
-      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
-        const imageBasemapId = spot.properties?.image_basemap;
-        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
-          const image = getImageByImageId(spot.properties.image_basemap);
-          return isEmpty(image) ? acc : [...acc, image];
-        }
-        else return acc;
-      }, []);
-      const newImageIds = allImagesInNest.map(img => img.id).sort().join(',');
-      const currentImageIds = images.map(img => img.id).sort().join(',');
-      if (newImageIds !== currentImageIds) setImages(allImagesInNest);
-    }
-  };
+  /* View */
 
   return (
     <View style={{flex: 1}}>

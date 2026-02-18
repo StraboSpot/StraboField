@@ -10,65 +10,67 @@ import {BLACK, BLUE} from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
+const files = [
+  {
+    id: 1,
+    platform: ['ios', 'android'],
+    label: 'userGuide',
+    name: 'User Guide',
+    icon: 'book-outline',
+    file: Platform.OS === 'ios' ? require('../../assets/documents/StraboField_User_Manual.pdf')
+      : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
+  },
+  {
+    id: 2,
+    platform: ['ios', 'android'],
+    label: 'sharingProjects',
+    name: 'Sharing Projects \nBetween Devices',
+    icon: 'share-outline',
+    file: Platform.OS === 'ios' ? require('../../assets/documents/Updated_Sharing_Projects_Between_Devices.pdf')
+      : {uri: 'bundle-assets://Updated_Sharing_Projects_Between_Devices.pdf'},
+  },
+  {
+    id: 3,
+    platform: ['ios', 'android'],
+    label: 'moveFiles',
+    name: 'Exporting Project \nBackups',
+    icon: 'share-outline',
+    file: Platform.OS === 'ios' ? require('../../assets/documents/Updated_Moving_StraboField_Project_Backups.pdf')
+      : {uri: 'bundle-assets://Updated_Moving_StraboField_Project_Backups.pdf'},
+  },
+];
+
+const links = [
+  {
+    id: 1,
+    title: 'Online Help Page',
+    url: STRABO_APIS.STRABO + '/help',
+    icon: 'globe-outline',
+    color: BLUE,
+  },
+  {
+    id: 2,
+    title: 'YouTube Tutorials',
+    url: 'https://youtube.com/playlist?list=PL3jEmSMv6rzHysg-mEVx_yhaXStgK8MV5&si=sv_i9YayDdv_LfYf',
+    icon: 'logo-youtube',
+    color: 'red',
+  },
+];
+
 const Documentation = ({navigation}) => {
+  /* Data Hooks */
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
+  /* Local State */
+
   const [isSpotDataModelModalVisible, setIsSpotDataModelModalVisible] = useState(false);
 
-  const files = [
-    {
-      id: 1,
-      platform: ['ios', 'android'],
-      label: 'userGuide',
-      name: 'User Guide',
-      icon: 'book-outline',
-      file: Platform.OS === 'ios'
-        ? require('../../assets/documents/StraboField_User_Manual.pdf')
-        : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
-    },
-    {
-      id: 2,
-      platform: ['ios', 'android'],
-      label: 'sharingProjects',
-      name: 'Sharing Projects \nBetween Devices',
-      icon: 'share-outline',
-      file: Platform.OS === 'ios'
-        ? require('../../assets/documents/Updated_Sharing_Projects_Between_Devices.pdf')
-        : {uri: 'bundle-assets://Updated_Sharing_Projects_Between_Devices.pdf'},
-    },
-    {
-      id: 3,
-      platform: ['ios', 'android'],
-      label: 'moveFiles',
-      name: 'Exporting Project \nBackups',
-      icon: 'share-outline',
-      file: Platform.OS === 'ios'
-        ? require('../../assets/documents/Updated_Moving_StraboField_Project_Backups.pdf')
-        : {uri: 'bundle-assets://Updated_Moving_StraboField_Project_Backups.pdf'},
-    },
-  ];
+  /* Event Handlers */
 
-  const links = [
-    {
-      id: 1,
-      title: 'Online Help Page',
-      url: STRABO_APIS.STRABO + '/help',
-      icon: 'globe-outline',
-      color: BLUE,
-    },
-    {
-      id: 2,
-      title: 'YouTube Tutorials',
-      url: 'https://youtube.com/playlist?list=PL3jEmSMv6rzHysg-mEVx_yhaXStgK8MV5&si=sv_i9YayDdv_LfYf',
-      icon: 'logo-youtube',
-      color: 'red',
-    },
-  ];
+  const handlePress = document => navigation.navigate('DocumentationScreen', {document});
 
-  const handlePress = (document) => {
-    navigation.navigate('DocumentationScreen', {document});
-  };
+  /* Render Functions */
 
   const renderDocumentButton = item => (
     <OutlineButton
@@ -95,6 +97,8 @@ const Documentation = ({navigation}) => {
       url={item.url}
     />
   );
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

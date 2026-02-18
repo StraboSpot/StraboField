@@ -9,25 +9,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {formStyles} from '../../form';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
-
-  const renderFoldGeometryIcons = () => {
-    let foldGeometryData = [];
-    FOLD_GEOMETRY_KEYS.forEach((key) => {
-      if (formProps?.values[key]) {
-        const iconSource = FOLD_ICONS[key] && FOLD_ICONS[key].PRESSED
-          && FOLD_ICONS[key].PRESSED[formProps?.values[key]]
-          && (
-            <IconButton
-              imageStyle={{margin: -5}}
-              key={key}
-              source={FOLD_ICONS[key].PRESSED[formProps?.values[key]]}
-            />
-          );
-        if (iconSource) foldGeometryData.push(iconSource);
-      }
-    });
-    return foldGeometryData;
-  };
+  /* Logic Helpers */
 
   const FoldGeometryEditButton = () => (
     <Button
@@ -48,6 +30,29 @@ const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
       type={'outline'}
     />
   );
+
+  /* Render Functions */
+
+  const renderFoldGeometryIcons = () => {
+    let foldGeometryData = [];
+    FOLD_GEOMETRY_KEYS.forEach((key) => {
+      if (formProps?.values[key]) {
+        const iconSource = FOLD_ICONS[key] && FOLD_ICONS[key].PRESSED
+          && FOLD_ICONS[key].PRESSED[formProps?.values[key]]
+          && (
+            <IconButton
+              imageStyle={{margin: -5}}
+              key={key}
+              source={FOLD_ICONS[key].PRESSED[formProps?.values[key]]}
+            />
+          );
+        if (iconSource) foldGeometryData.push(iconSource);
+      }
+    });
+    return foldGeometryData;
+  };
+
+  /* View */
 
   return (
     <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', padding: 10, paddingTop: 2.5, paddingBottom: 5}}>

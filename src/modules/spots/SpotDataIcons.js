@@ -4,7 +4,7 @@ import {FlatList} from 'react-native';
 import {Icon} from '@rn-vui/base';
 
 import {NotebookPageAvatar} from '../../shared/ui/avatars';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 
 const SpotDataIcons = ({isReadOnly, spot}) => {

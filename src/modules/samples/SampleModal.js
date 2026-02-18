@@ -15,10 +15,9 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
-  const dispatch = useDispatch();
+  /* Data Hooks */
 
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const {
     checkedTagsIds,
@@ -36,7 +35,16 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     toastRef,
   } = useSampleModal({setIsWarningModalVisible, zoomToCurrentLocation});
 
+  /* Local State */
+
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+
+  /* Event Handlers */
+
   const onCloseModalPressed = () => choicesViewKey ? setChoicesViewKey(null) : confirmCloseModal();
+
+  /* View */
 
   return (
     <ModalWrapper

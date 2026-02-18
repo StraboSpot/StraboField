@@ -18,8 +18,12 @@ const LeftSideButtons = ({
                          }) => {
   console.log('Rendering LeftSideButtons...');
 
+  /* Data Hooks */
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  /* View */
 
   return (
     <>

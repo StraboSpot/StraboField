@@ -5,6 +5,8 @@ import alert from '../shared/ui/alert';
 
 const baseUrl = STRABO_APIS.DB;
 
+/* Internal Functions */
+
 const handleError = async (response) => {
   console.log('RESPONSE', response);
   if (response.status === 401) {
@@ -59,6 +61,8 @@ const post = async (urlPart, login, data) => {
     alert('Error', `${err.toString()}`);
   }
 };
+
+/* Exported Functions */
 
 // Delete dataset
 export const deleteDataset = async (datasetId, encodedLogin) => {

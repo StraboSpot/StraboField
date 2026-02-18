@@ -8,7 +8,8 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {useImages} from '../../images';
 import useMapLocation from '../../maps/useMapLocation';
-import {MODAL_KEYS, SHORTCUT_MODALS} from '../../page/page.constants';
+import {SHORTCUT_MODALS} from '../../page/page.constants';
+import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
@@ -17,16 +18,22 @@ import {setLoadingStatus, setModalVisible} from '../home.slice';
 const ShortcutButtons = ({openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
 
-  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
 
-  const toast = useToast();
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const toast = useToast();
+
+  /* Local State */
+
+  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+
+  /* Logic Helpers */
 
   const saveImagesToSpot = (newImages) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
@@ -68,9 +75,11 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
+  /* View */
+
   return (
     <>
-      {SHORTCUT_MODALS.reduce((acc, sm) => {
+      {SHORTCUT_MODALS?.reduce((acc, sm) => {
         if (shortcutSwitchPositions[sm.key] && (Platform.OS !== 'web' || (Platform.OS === 'web'
           && sm.key !== MODAL_KEYS.SHORTCUTS.PHOTO && sm.key !== MODAL_KEYS.SHORTCUTS.SKETCH))) {
           return [...acc, (

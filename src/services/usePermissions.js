@@ -2,38 +2,12 @@ import {PermissionsAndroid} from 'react-native';
 
 import DeviceInfo from 'react-native-device-info';
 
+import {permissionsRequestType} from './services.helpers';
 import {isEmpty} from '../shared/Helpers';
 import alert from '../shared/ui/alert';
 
 const usePermissions = () => {
-
-  const permissionsRequestType = (permission) => {
-    switch (permission) {
-      case PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE:
-        return {
-          title: 'WRITE To External Storage',
-          message: 'StraboSpot needs permission access the external storage to save files',
-        };
-      case PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE:
-        return {
-          title: 'READ External Storage',
-          message: 'StraboSpot needs permission access the external storage to read files',
-        };
-      case PermissionsAndroid.PERMISSIONS.CAMERA:
-        return {
-          title: 'CAMERA',
-          message: 'StraboSpot needs permission to use the camera take pictures',
-        };
-      case PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION:
-        return {
-          title: 'Location Permission',
-          message: 'App needs access to your location',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        };
-    }
-  };
+  /* Exported Functions */
 
   const checkPermission = async (permission) => {
     let granted;
@@ -76,10 +50,10 @@ const usePermissions = () => {
   };
 
   return {
-    checkPermission: checkPermission,
-    hasLocationPermission: hasLocationPermission,
-    requestPermission: requestPermission,
-    requestPermissions: requestPermissions,
+    checkPermission,
+    hasLocationPermission,
+    requestPermission,
+    requestPermissions,
   };
 };
 

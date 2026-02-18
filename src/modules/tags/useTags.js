@@ -5,11 +5,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {tagsStyles} from './index';
 import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
+import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedSpotToTags,
   addedTagToSelectedSpot,
@@ -21,6 +22,8 @@ import {setSelectedAttributes} from '../spots/spots.slice';
 import ThreeDStructureLabel from '../three-d-structures/ThreeDStructureLabel';
 
 const useTags = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
@@ -32,19 +35,7 @@ const useTags = () => {
 
   const {getLabel} = useForm();
 
-  // link unlink given tag and spot feature.
-  const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
-    const featureData = feature.id;
-    if (!tag.features) tag.features = {};
-    if (isEmpty(tag.features[spotId])) tag.features[spotId] = [featureData];
-    else {
-      let featureTagsForSpot = tag.features[spotId];
-      const index = featureTagsForSpot.findIndex(id => id === feature.id);
-      if (index === -1) featureTagsForSpot.push(featureData);
-      else featureTagsForSpot.splice(index, 1);
-    }
-    saveTag(tag);
-  };
+  /* Internal Functions */
 
   // link unlink multiple tags and spot features.
   const addRemoveSpotFeaturesFromTag = (tag, features, spotId, isAlreadyChecked) => {
@@ -61,6 +52,38 @@ const useTags = () => {
       }
     });
     tag.features[spotId] = featureTagsForSpot;
+    saveTag(tag);
+  };
+
+  const getFeature = (spotId, featureId) => {
+    const spot = spots[spotId];
+    if (!isEmpty(spot) && !isEmpty(spot.properties)) {
+      let foundFeature = deepFindFeatureById(spot.properties, featureId);
+      return JSON.parse(JSON.stringify(foundFeature));
+    }
+  };
+
+  const getFeatureTagsAtSpot = (featuresAtSpot) => {
+    if (isEmpty(selectedSpot)) return [];
+    let spotId = selectedSpot.properties.id;
+    let featureIds = featuresAtSpot.map(feature => feature.id);
+    return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
+      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
+  };
+
+  /* Exported Functions */
+
+  // link unlink given tag and spot feature.
+  const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
+    const featureData = feature.id;
+    if (!tag.features) tag.features = {};
+    if (isEmpty(tag.features[spotId])) tag.features[spotId] = [featureData];
+    else {
+      let featureTagsForSpot = tag.features[spotId];
+      const index = featureTagsForSpot.findIndex(id => id === feature.id);
+      if (index === -1) featureTagsForSpot.push(featureData);
+      else featureTagsForSpot.splice(index, 1);
+    }
     saveTag(tag);
   };
 
@@ -138,12 +161,6 @@ const useTags = () => {
     dispatch(setSelectedTag({}));
   };
 
-  const filterTagsByTagType = (tags, tagType) => {
-    if (isEmpty(tagType)) return tags;
-    const tagsByTagsType = tags.filter(tag => tag.type.toUpperCase().startsWith(tagType.toUpperCase()));
-    return tagsByTagsType;
-  };
-
   // to display all features that are currently tagged to the provided tag
   const getAllTaggedFeatures = (tag) => {
     if (isEmpty(tag)) return [];
@@ -164,14 +181,6 @@ const useTags = () => {
     return allTaggedFeatures;
   };
 
-  const getFeature = (spotId, featureId) => {
-    const spot = spots[spotId];
-    if (!isEmpty(spot) && !isEmpty(spot.properties)) {
-      let foundFeature = deepFindFeatureById(spot.properties, featureId);
-      return JSON.parse(JSON.stringify(foundFeature));
-    }
-  };
-
   const getFeatureDisplayComponent = (featureType, spotFeature) => {
     switch (featureType) {
       case PAGE_KEYS.MEASUREMENTS:
@@ -183,18 +192,6 @@ const useTags = () => {
       default:
         return <Text>{spotFeature.label}</Text>;
     }
-  };
-
-  const getFeatureLabel = (feature) => {
-    return feature && (feature.label || feature.name_of_experiment || 'Unknown Name');
-  };
-
-  const getFeatureTagsAtSpot = (featuresAtSpot) => {
-    if (isEmpty(selectedSpot)) return [];
-    let spotId = selectedSpot.properties.id;
-    let featureIds = featuresAtSpot.map(feature => feature.id);
-    return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
-      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
   };
 
   const getGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
@@ -303,12 +300,6 @@ const useTags = () => {
     }
   };
 
-  const tagSpotExists = (tag, spot) => {
-    if (isEmpty(tag.spots)) return false;
-    const i = tag.spots.indexOf(spot.properties.id);
-    return i !== -1;
-  };
-
   const toggleContinuousTagging = (tag) => {
     let tagCopy = JSON.parse(JSON.stringify(tag));
     tagCopy.continuousTagging = !tag.continuousTagging;
@@ -316,32 +307,32 @@ const useTags = () => {
   };
 
   return {
-    addRemoveSpotFeatureFromTag: addRemoveSpotFeatureFromTag,
-    addRemoveSpotFromTag: addRemoveSpotFromTag,
-    addRemoveTag: addRemoveTag,
-    addSpotToTags: addSpotToTags,
-    addSpotsToTags: addSpotsToTags,
-    addTag: addTag,
-    deleteFeatureTags: deleteFeatureTags,
-    deleteTag: deleteTag,
-    filterTagsByTagType: filterTagsByTagType,
-    getAllTaggedFeatures: getAllTaggedFeatures,
-    getFeatureDisplayComponent: getFeatureDisplayComponent,
-    getGeologicUnitFeatureTagsAtSpot: getGeologicUnitFeatureTagsAtSpot,
-    getGeologicUnitTagsAtSpot: getGeologicUnitTagsAtSpot,
-    getNonGeologicUnitFeatureTagsAtSpot: getNonGeologicUnitFeatureTagsAtSpot,
-    getNonGeologicUnitTagsAtSpot: getNonGeologicUnitTagsAtSpot,
-    getSamplesWithThisTag: getSamplesWithThisTag,
-    getSpotsWithThisTagCount: getSpotsWithThisTagCount,
-    getTagFeaturesCount: getTagFeaturesCount,
-    getTagLabel: getTagLabel,
-    getTagsAtFeature: getTagsAtFeature,
-    getTagsAtSpot: getTagsAtSpot,
-    renderTagInfo: renderTagInfo,
-    saveTag: saveTag,
-    setFeaturesSelectedForMultiTagging: setFeaturesSelectedForMultiTagging,
-    tagSpotExists: tagSpotExists,
-    toggleContinuousTagging: toggleContinuousTagging,
+    addRemoveSpotFeatureFromTag,
+    addRemoveSpotFromTag,
+    addRemoveTag,
+    addSpotToTags,
+    addSpotsToTags,
+    addTag,
+    deleteFeatureTags,
+    deleteTag,
+    filterTagsByTagType,
+    getAllTaggedFeatures,
+    getFeatureDisplayComponent,
+    getGeologicUnitFeatureTagsAtSpot,
+    getGeologicUnitTagsAtSpot,
+    getNonGeologicUnitFeatureTagsAtSpot,
+    getNonGeologicUnitTagsAtSpot,
+    getSamplesWithThisTag,
+    getSpotsWithThisTagCount,
+    getTagFeaturesCount,
+    getTagLabel,
+    getTagsAtFeature,
+    getTagsAtSpot,
+    renderTagInfo,
+    saveTag,
+    setFeaturesSelectedForMultiTagging,
+    tagSpotExists,
+    toggleContinuousTagging,
   };
 };
 

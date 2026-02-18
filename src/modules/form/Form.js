@@ -5,12 +5,11 @@ import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
+import {showFieldInfo} from './form.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
 
 const Form = ({
                 fieldCustomHeights,
@@ -25,9 +24,15 @@ const Form = ({
                 surveyFragment,
                 values,
               }) => {
+  /* Data Hooks */
+
   const {getChoices, getSurvey, isRelevant} = useForm();
 
+  /* Derived Variables */
+
   const survey = surveyFragment || getSurvey(formName);
+
+  /* Render Functions */
 
   const renderAcknowledgeInput = (field) => {
     return (
@@ -59,25 +64,35 @@ const Form = ({
     );
   };
 
-  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
-
-  const renderTextInput = (field) => {
+  const renderField = (field) => {
+    const fieldType = field.type.split(' ')[0];
     return (
-      <Field
-        appearance={field.appearance}
-        // autoFocus={field.name === 'name'}
-        component={TextInputField}
-        // customHeight={fieldCustomHeights?.[field.name]} //Creates a custom height for textboxes (i.e. description multilines)
-        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
-        placeholder={field.hint}
-      />
+      <>
+        {fieldType === 'begin_group' && renderGroupHeading(field)}
+        {(fieldType === 'text' || fieldType === 'integer' || fieldType === 'decimal' || fieldType === 'select_one'
+          || fieldType === 'select_multiple' || fieldType === 'date' || fieldType === 'time'
+          || fieldType === 'acknowledge') && (
+          <>
+            {surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple')
+              && renderSelectInput(field, true)}
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                {fieldType === 'text' && renderTextInput(field)}
+                {(fieldType === 'integer' || fieldType === 'decimal') && renderNumberInput(field)}
+                {(!surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple'))
+                  && renderSelectInput(field)}
+                {fieldType === 'date' && renderDateInput(field)}
+                {fieldType === 'time' && renderDateInput(field, true)}
+                {fieldType === 'acknowledge' && renderAcknowledgeInput(field)}
+              </ListItem.Content>
+            </ListItem>
+          </>
+        )}
+      </>
     );
   };
+
+  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
 
   const renderNumberInput = (field) => {
     return (
@@ -131,42 +146,24 @@ const Form = ({
     );
   };
 
-  const renderField = (field) => {
-    const fieldType = field.type.split(' ')[0];
+  const renderTextInput = (field) => {
     return (
-      <>
-        {fieldType === 'begin_group' && renderGroupHeading(field)}
-        {(fieldType === 'text' || fieldType === 'integer' || fieldType === 'decimal' || fieldType === 'select_one'
-          || fieldType === 'select_multiple' || fieldType === 'date' || fieldType === 'time'
-          || fieldType === 'acknowledge') && (
-          <>
-            {surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple')
-              && renderSelectInput(field, true)}
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                {fieldType === 'text' && renderTextInput(field)}
-                {(fieldType === 'integer' || fieldType === 'decimal') && renderNumberInput(field)}
-                {(!surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple'))
-                  && renderSelectInput(field)}
-                {fieldType === 'date' && renderDateInput(field)}
-                {fieldType === 'time' && renderDateInput(field, true)}
-                {fieldType === 'acknowledge' && renderAcknowledgeInput(field)}
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </>
+      <Field
+        appearance={field.appearance}
+        // autoFocus={field.name === 'name'}
+        component={TextInputField}
+        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
+        onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+      />
     );
   };
 
-  const showFieldInfo = (label, info) => {
-    if (label === 'Mineral Name Abbreviation') {
-      info += '\n\n';
-      const arr = Object.entries(LABELS_WITH_ABBREVIATIONS).map(([key, value]) => key + ': ' + value);
-      info += arr.join('\n');
-    }
-    alert(label, info);
-  };
+  /* View */
 
   return (
     <FlatList

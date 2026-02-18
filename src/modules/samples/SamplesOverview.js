@@ -5,12 +5,16 @@ import {useDispatch, useSelector} from 'react-redux';
 import SampleDetailOverview from './SampleDetailOverview';
 import SamplesList from './SamplesList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
 const SamplesOverview = ({page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Event Handlers */
 
   const onPressed = (item) => {
     if (item.properties?.isSample && !spot.properties?.isSample) {
@@ -22,6 +26,8 @@ const SamplesOverview = ({page}) => {
       dispatch(setNotebookPageVisible(page.key));
     }
   };
+
+  /* View */
 
   if (spot.properties?.isSample) return <SampleDetailOverview/>;
   return <SamplesList onPress={onPressed}/>;

@@ -6,27 +6,39 @@ import {useSelector} from 'react-redux';
 import ThreeDStructureLabel from './ThreeDStructureLabel';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../../shared/ui/FeatureTagsList';
 import {useTags} from '../tags';
+import FeatureTagsList from '../tags/FeatureTagsList';
 
 function ThreeDStructureItem({
                                edit3dStructure,
                                item,
                              }) {
-  const {setFeaturesSelectedForMultiTagging} = useTags();
-  const spot = useSelector(state => state.spot.selectedSpot);
+  /* Data Hooks */
+
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {setFeaturesSelectedForMultiTagging} = useTags();
+
+  /* Local State */
+
   const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ThreeDStructureItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
     if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
   }, [isMultipleFeaturesTaggingEnabled]);
 
+  /* Logic Helpers */
+
   const editFeature = (feature) => {
     if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(feature));
     else edit3dStructure(feature);
   };
+
+  /* View */
 
   return (
     <ListItem

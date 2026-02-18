@@ -10,20 +10,27 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {NOTEBOOK_PAGES, PAGE_KEYS} from '../page/page.constants';
+import {NOTEBOOK_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
 
 const TagDetailModal = ({closeModal}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
-  const selectedTag = useSelector(state => state.project.selectedTag);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {deleteTag, saveTag} = useTags();
   const {validateForm, showErrors} = useForm();
+  const {deleteTag, saveTag} = useTags();
+
+  /* Local State */
 
   const formRef = useRef(null);
+
+  /* Derived Variables */
 
   const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
   const tagType = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
@@ -75,6 +82,8 @@ const TagDetailModal = ({closeModal}) => {
       console.log('Error saving tag data', e);
     }
   };
+
+  /* View */
 
   return (
     <ModalWrapper

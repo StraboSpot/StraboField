@@ -8,33 +8,39 @@ import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const IntervalPage = ({isReadOnly, page}) => {
-  const dispatch = useDispatch();
+const formName = ['sed', 'interval'];
 
+const IntervalPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
 
+  /* Local State */
+
   const intervalRef = useRef(null);
+
+  /* Derived Variables */
 
   const character = spot.properties?.sed?.character || undefined;
   const interval = spot.properties?.sed?.interval || {};
 
-  const formName = ['sed', 'interval'];
+  /* Side Effects */
 
   useLayoutEffect(() => {
     // console.log('ULE IntervalPage []');
     // console.log('Spot:', spot);
     // console.log('Interval:', interval);
     // console.log('Character:', character);
-
     if (spot.properties?.sed?.interval_type) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
       editedSedData.character = spot.properties?.sed?.interval_type;
@@ -44,6 +50,8 @@ const IntervalPage = ({isReadOnly, page}) => {
     }
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const confirmLeavePage = () => {
     if (intervalRef.current && intervalRef.current.dirty) {
@@ -64,6 +72,8 @@ const IntervalPage = ({isReadOnly, page}) => {
     await formCurrent.resetForm();
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1, justifyContent: 'flex-start'}}>

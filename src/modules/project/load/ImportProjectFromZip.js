@@ -23,12 +23,10 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 
 const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-
-  const [importComplete, setIsImportComplete] = useState(false);
-  const [importedProject, setImportedProject] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     doesBackupFileExist,
@@ -39,11 +37,21 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
   } = useDevice();
   const toast = useToast();
 
+  /* Local State */
+
+  const [importComplete, setIsImportComplete] = useState(false);
+  const [importedProject, setImportedProject] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  /* Side Effects */
+
   useEffect(() => {
     console.log('UE MyStraboSpot []');
     checkBackupDir().catch(err => console.error('Error checking for backup dir', err));
     getZippedProject();
   }, []);
+
+  /* Logic Helpers */
 
   const checkAndroidDownloadDir = async () => {
     const exists = await doesDeviceBackupDirExist(undefined, true);
@@ -79,21 +87,6 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS}));
     }
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OPEN_PROJECT}));
-  };
-
-  const renderImportComplete = () => {
-    return (
-      <View>
-        <View style={{padding: 10}}>
-          <Text style={{textAlign: 'center'}}>
-            Project has been saved to the app under MyStraboSpot --&gt; Projects on Device
-          </Text>
-        </View>
-        <View style={{alignItems: 'center'}}>
-          <OutlineButton onPress={goToSavedProjects} title={'Go to saved projects'}/>
-        </View>
-      </View>
-    );
   };
 
   const saveToDevice = async () => {
@@ -141,6 +134,25 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
       }
     }
   };
+
+  /* Render Functions */
+
+  const renderImportComplete = () => {
+    return (
+      <View>
+        <View style={{padding: 10}}>
+          <Text style={{textAlign: 'center'}}>
+            Project has been saved to the app under MyStraboSpot --&gt; Projects on Device
+          </Text>
+        </View>
+        <View style={{alignItems: 'center'}}>
+          <OutlineButton onPress={goToSavedProjects} title={'Go to saved projects'}/>
+        </View>
+      </View>
+    );
+  };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

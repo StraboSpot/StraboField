@@ -11,12 +11,16 @@ import {setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/h
 import {login, logout} from '../user/userProfile.slice';
 
 const useSignIn = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
   const userEmail = useSelector(state => state.user.email);
 
-  const {clearUser} = useResetState();
   const {downloadUserProfile} = useDownload();
+  const {clearUser} = useResetState();
+
+  /* Exported Functions */
 
   const guestSignIn = async () => {
     Sentry.setUser({'id': 'GUEST'});
@@ -58,8 +62,8 @@ const useSignIn = () => {
   };
 
   return {
-    guestSignIn: guestSignIn,
-    signIn: signIn,
+    guestSignIn,
+    signIn,
   };
 };
 

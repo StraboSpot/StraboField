@@ -14,8 +14,11 @@ const ImageThumbnail = ({
                           onFinishedLoading,
                           onImagePressed,
                         }) => {
+  /* Derived Variables */
 
   const height = isThumbnailOnly && Platform.OS === 'web' ? 87 : isThumbnailOnly ? 90 : 150;
+
+  /* View */
 
   return (
     <Image

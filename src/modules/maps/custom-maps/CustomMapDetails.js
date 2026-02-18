@@ -29,17 +29,23 @@ import {selectedCustomMapToEdit} from '../maps.slice';
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 
 const CustomMapDetails = () => {
-  const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-  const MBAccessToken = useSelector(state => state.user.mapboxToken);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
+  const MBAccessToken = useSelector(state => state.user.mapboxToken);
+
+  const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
+
+  /* Local State */
 
   const [editableCustomMapData, setEditableCustomMapData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
   const [message, setMessage] = useState('Starting...');
-  const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
+
+  /* Side Effects */
 
   useEffect(() => {
     if (!isEmpty(customMapToEdit)) setEditableCustomMapData(customMapToEdit);
@@ -54,6 +60,35 @@ const CustomMapDetails = () => {
       });
     }
   }, [customMapToEdit]);
+
+  /* Event Handlers */
+
+  const handlePress = () => {
+    setIsLoadingModalVisible(false);
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
+  };
+
+  /* Logic Helpers */
+
+  const confirmDeleteMap = async () => {
+    alert(
+      'Delete Custom Map',
+      'Are your sure you want to delete ' + customMapToEdit.title + '?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => deleteMap(customMapToEdit.id),
+        },
+      ],
+      {cancelable: false},
+    );
+  };
 
   const saveMap = async () => {
     try {
@@ -81,30 +116,7 @@ const CustomMapDetails = () => {
     }
   };
 
-  const confirmDeleteMap = async () => {
-    alert(
-      'Delete Custom Map',
-      'Are your sure you want to delete ' + customMapToEdit.title + '?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () => deleteMap(customMapToEdit.id),
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
-  const handlePress = () => {
-    setIsLoadingModalVisible(false);
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
-  };
+  /* Render Functions */
 
   const renderCustomMapName = (item) => {
     const radioSelected = <Icon color={BLUE} name={'radiobox-marked'} type={'material-community'}/>;
@@ -198,23 +210,6 @@ const CustomMapDetails = () => {
     );
   };
 
-  const renderTitle = () => {
-    return (
-      <>
-        <SectionDivider dividerText={'Custom Map Title'}/>
-        <Input
-          containerStyle={{paddingHorizontal: 10}}
-          errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
-          errorStyle={customMapStyles.requiredMessage}
-          inputContainerStyle={{borderBottomWidth: 0}}
-          inputStyle={formStyles.fieldValue}
-          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
-          value={editableCustomMapData?.title || ''}
-        />
-      </>
-    );
-  };
-
   const renderOverlaySection = () => {
     const opacity = editableCustomMapData?.opacity && typeof (editableCustomMapData.opacity) === 'number'
     && editableCustomMapData.opacity >= 0 && editableCustomMapData.opacity <= 1 ? editableCustomMapData.opacity : 1;
@@ -268,6 +263,25 @@ const CustomMapDetails = () => {
       />
     );
   };
+
+  const renderTitle = () => {
+    return (
+      <>
+        <SectionDivider dividerText={'Custom Map Title'}/>
+        <Input
+          containerStyle={{paddingHorizontal: 10}}
+          errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.title) && 'Title is required'}
+          errorStyle={customMapStyles.requiredMessage}
+          inputContainerStyle={{borderBottomWidth: 0}}
+          inputStyle={formStyles.fieldValue}
+          onChangeText={text => setEditableCustomMapData({...editableCustomMapData, title: text})}
+          value={editableCustomMapData?.title || ''}
+        />
+      </>
+    );
+  };
+
+  /* View */
 
   return (
     <>

@@ -20,9 +20,14 @@ const TagsListItem = ({
                         openMainMenuPanel,
                         tag,
                       }) => {
-  const {getTagLabel} = useTags();
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isMainMenuPanelVisible = useSelector(state => state.home.isMainMenuPanelVisible);
+
+  const {getTagLabel} = useTags();
+
+  /* Logic Helpers */
 
   const openTag = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
@@ -33,6 +38,8 @@ const TagsListItem = ({
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
     if (!isMainMenuPanelVisible) openMainMenuPanel();
   };
+
+  /* View */
 
   return (
     <ListItem

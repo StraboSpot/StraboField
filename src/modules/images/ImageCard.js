@@ -10,7 +10,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -29,31 +29,36 @@ const ImageCard = ({
                      setImageToView,
                      setIsImageModalVisible,
                    }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const placeholderTitle = `Untitled ${index + 1}`;
-
-  const getDisplayTitle = () => {
-    return image.title && typeof image.title === 'string' && image.title.trim() !== ''
-      ? image.title.toString()
-      : placeholderTitle;
-  };
-
-  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
-  const [title, setTitle] = useState(getDisplayTitle);
-  const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    setTitle(getDisplayTitle());
-  }, [image.title, placeholderTitle]);
 
   const {downloadImageAndSave} = useDevice();
   const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  /* Local State */
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
+
+  const placeholderTitle = `Untitled ${index + 1}`;
+  const getDisplayTitle = () => {
+    return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
+      : placeholderTitle;
+  };
+
+  const [title, setTitle] = useState(getDisplayTitle);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    setTitle(getDisplayTitle());
+  }, [image.title, placeholderTitle]);
+
+  /* Event Handlers */
 
   const handleEditImageName = (value) => {
     if (value && value !== '') setTitle(value);
@@ -72,6 +77,10 @@ const ImageCard = ({
       }
     }
     setIsEditing(false);
+  };
+
+  const handleImageFinishedLoading = () => {
+    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
   };
 
   const handleImagePressed = async () => {
@@ -96,9 +105,11 @@ const ImageCard = ({
     }
   };
 
-  const handleImageFinishedLoading = () => {
-    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
-  };
+  /* Logic Helpers */
+
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+
+  /* View */
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>

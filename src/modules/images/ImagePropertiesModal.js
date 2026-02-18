@@ -4,33 +4,24 @@ import {FlatList, Text, View} from 'react-native';
 import {Formik} from 'formik';
 
 import {imageStyles} from '.';
+import {IMAGE_PROPERTIES_FORM_NAME} from './images.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
-
-  const [isAnnotated, setIsAnnotated] = useState(image.annotated);
+  /* Data Hooks */
 
   const {showErrors, validateForm} = useForm();
 
+  /* Local State */
+
   const formRef = useRef(null);
 
-  const renderFormFields = () => {
-    const formName = ['general', 'images'];
-    console.log('Rendering form:', formName.join('.'), 'with selected image:', image);
-    return (
-      <Formik
-        component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-        initialStatus={{formName: formName}}
-        initialValues={image}
-        innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-      />
-    );
-  };
+  const [isAnnotated, setIsAnnotated] = useState(image.annotated);
+
+  /* Logic Helpers */
 
   const saveFormAndGo = async () => {
     try {
@@ -48,6 +39,24 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       return Promise.reject();
     }
   };
+
+  /* Render Functions */
+
+  const renderFormFields = () => {
+    console.log('Rendering form:', IMAGE_PROPERTIES_FORM_NAME.join('.'), 'with selected image:', image);
+    return (
+      <Formik
+        component={formProps => Form({formName: IMAGE_PROPERTIES_FORM_NAME, isReadOnly: isReadOnly, ...formProps})}
+        initialStatus={{formName: IMAGE_PROPERTIES_FORM_NAME}}
+        initialValues={image}
+        innerRef={formRef}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
+      />
+    );
+  };
+
+  /* View */
 
   return (
     <ModalWrapper

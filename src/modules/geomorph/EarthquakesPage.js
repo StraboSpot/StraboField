@@ -14,14 +14,22 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const EarthquakesPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Local State */
+
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
 
+  /* Derived Variables */
+
   const attributes = spot && spot.properties && spot.properties[page.key] || [];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE EarthquakesPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -30,6 +38,8 @@ const EarthquakesPage = ({isReadOnly, page}) => {
       setIsDetailView(true);
     }
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const addAttribute = () => {
     dispatch(setModalVisible({modal: page.key}));
@@ -47,6 +57,8 @@ const EarthquakesPage = ({isReadOnly, page}) => {
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderAttributeDetail = () => {
     return (
@@ -80,6 +92,8 @@ const EarthquakesPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

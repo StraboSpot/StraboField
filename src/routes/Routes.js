@@ -9,9 +9,12 @@ const Routes = () => {
   // console.log('Rendering Routes...');
   // console.count('Rendering Routes...');
 
-  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+  /* Data Hooks */
 
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
   // console.log('Is user authenticated?', isAuthenticated);
+
+  /* View */
 
   return isAuthenticated ? <AppStack/> : <AuthStack/>;
 };

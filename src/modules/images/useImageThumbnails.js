@@ -4,15 +4,23 @@ import {useImages} from './index';
 import {isEmpty} from '../../shared/Helpers';
 
 const useImageThumbnails = ({images}) => {
+  /* Data Hooks */
+
   const {getImageThumbnailURIs} = useImages();
+
+  /* Local State */
 
   const [areImageThumbnailsLoading, setAreImageThumbnailsLoading] = useState({});
   const [imageThumbnailURIs, setImageThumbnailURIs] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ImageThumbnail []');
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
   }, [images]);
+
+  /* Internal Functions */
 
   const loadImageThumbnailURIs = async () => {
     try {

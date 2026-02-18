@@ -4,6 +4,7 @@ import MapboxGL from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
+import {getFeaturesWithSamples} from './layers.helpers';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const SampleLayers = ({features}) => {
@@ -11,11 +12,7 @@ const SampleLayers = ({features}) => {
 
   const {getMapSymbology} = useMapSymbology();
 
-  const featuresWithSamples = features.reduce((acc, feature) => {
-    return feature.properties?.isSample || (feature.properties?.samples && feature.properties.samples.length >= 1)
-      ? [...acc, feature]
-      : acc;
-  }, []);
+  const featuresWithSamples = getFeaturesWithSamples(features);
 
   if (isShowSamplesOn) {
     return (

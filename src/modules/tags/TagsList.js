@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useTags} from '.';
 import TagColorIcon from './TagColorIcon';
 import {TAG_SECTIONS} from './tags.constants';
+import {getTagTitle} from './tags.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -14,7 +15,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag} from '../project/projects.slice';
 
 const TagsList = ({type, selectedIndex}) => {
@@ -32,8 +34,6 @@ const TagsList = ({type, selectedIndex}) => {
   const label = page.label;
   const SECTIONS = type === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_SECTIONS.GEOLOGIC_UNITS
     : TAG_SECTIONS.DEFAULT;
-
-  const getTagTitle = tag => tag.name || '';
 
   const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 

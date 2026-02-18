@@ -13,21 +13,29 @@ import TruncatedText from '../../shared/ui/TruncatedText';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import {PAGE_KEYS} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const BasicSedPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
 
+  /* Derived Variables */
+
   const attributes = spot && spot.properties && spot.properties.sed && spot.properties.sed[page.key] || [];
+
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE BasicSedPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -36,6 +44,8 @@ const BasicSedPage = ({isReadOnly, page}) => {
       setIsDetailView(true);
     }
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const addAttribute = () => {
     setIsDetailView(true);
@@ -55,6 +65,8 @@ const BasicSedPage = ({isReadOnly, page}) => {
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderAttributeDetail = () => {
     const subpages = page.key === PAGE_KEYS.LITHOLOGIES ? LITHOLOGY_SUBPAGES
@@ -119,6 +131,8 @@ const BasicSedPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

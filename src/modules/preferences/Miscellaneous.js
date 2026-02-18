@@ -11,12 +11,20 @@ import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const Miscellaneous = () => {
-  const isTestingMode = useSelector(state => state.project.isTestingMode);
+  /* Data Hooks */
+
   const {endpoint} = useSelector(state => state.connections.databaseEndpoint);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
+
+  /* Local State */
 
   const formRef = useRef('null');
 
+  /* Derived Variables */
+
   const initialValues = {database_endpoint: endpoint};
+
+  /* Render Functions */
 
   const renderPreferences = () => {
     return (
@@ -31,6 +39,8 @@ const Miscellaneous = () => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

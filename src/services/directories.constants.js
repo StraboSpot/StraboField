@@ -22,6 +22,9 @@ const microDirectory = appDirectory + '/Micro/';
 const microExportsPath = exportPath + '/StraboMicro Projects/';
 const microZipsDirectory = appDirectory + '/Micro/Zips/';
 
+export const APP_EXPORT_DIRECTORY = Platform.OS === 'ios' ? appDirectoryForDistributedBackups : androidExportPath;
+export const TEMP_IMAGES_DOWNSIZED_DIRECTORY = appDirectory + '/TempImages';
+
 export const APP_DIRECTORIES = {
   ROOT_PATH: devicePath,
   APP_DIR: appDirectory,

@@ -1,6 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import {SET_IN_CURRENT_VIEW_BUTTONS} from './maps.constants';
+import {getSetInCurrentViewButtonIcon} from './maps.helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -12,20 +14,14 @@ const SetInCurrentViewOverlay = ({
                                    setShowSetInCurrentViewModal,
                                    showSetInCurrentViewModal,
                                  }) => {
-
-  const buttons = ['Point', 'LineString', 'Polygon'];
-
-  const buttonIcon = (button) => {
-    return button === 'LineString' ? require('../../assets/icons/LineButton.png')
-      : button === 'Point' ? require('../../assets/icons/PointButton.png')
-        : button === 'Polygon' ? require('../../assets/icons/PolygonButton.png')
-          : null;
-  };
+  /* Logic Helpers */
 
   const updateDefaultGeomType = (geomType) => {
     setShowSetInCurrentViewModal(false);
     createDefaultGeomContinued(geomType);
   };
+
+  /* View */
 
   return (
     <ModalWrapper
@@ -37,12 +33,12 @@ const SetInCurrentViewOverlay = ({
       showCloseButton
     >
       <View style={overlayStyles.selectGeometryTypeContent}>
-        {buttons.map(button =>
+        {SET_IN_CURRENT_VIEW_BUTTONS.map(button =>
           <ClearButton
             icon={
               <IconButton
                 onPress={() => updateDefaultGeomType(button)}
-                source={buttonIcon(button)}
+                source={getSetInCurrentViewButtonIcon(button)}
                 style={{paddingRight: 10}}
               />
             }

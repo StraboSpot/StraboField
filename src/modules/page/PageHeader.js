@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {MODAL_KEYS, PAGE_KEYS} from './page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {
@@ -28,12 +28,19 @@ const PageHeader = ({
                       showAddButton,
                       showFeaturesTagButton,
                     }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const isRichSample = spot.properties?.isSample;
+
+  /* Logic Helpers */
+
   const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
 
   const selectTagsForFeatures = () => {
@@ -47,6 +54,8 @@ const PageHeader = ({
   const toggleFeaturesTagButton = () => {
     dispatch(setMultipleFeaturesTaggingEnabled(!isMultipleFeaturesTaggingEnabled));
   };
+
+  /* View */
 
   return (
     <>

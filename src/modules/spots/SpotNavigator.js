@@ -5,6 +5,7 @@ import {Picker} from '@react-native-picker/picker';
 import {useSelector} from 'react-redux';
 
 import {SpotsList, SpotsListItem} from './index';
+import {PICKER_KEYS, PICKER_LABELS} from './spots.constants';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {PRIMARY_BACKGROUND_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
@@ -18,24 +19,24 @@ import Samples from '../samples/Samples';
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {
   console.log('Rendering SpotsNavigator...');
 
+  /* Data Hooks */
+
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const pickerRef = useRef();
 
-  const pickerKeys = {SPOTS: 'spots', IMAGES: 'images', SAMPLES: 'samples', REPORTS: 'reports'};
-  const [pickerKey, setPickerKey] = useState(pickerKeys.SPOTS);
+  const [pickerKey, setPickerKey] = useState(PICKER_KEYS.SPOTS);
 
-  const pickerLabels = {
-    [pickerKeys.SPOTS]: 'SPOTS LISTS',
-    [pickerKeys.SAMPLES]: 'SAMPLES',
-    [pickerKeys.IMAGES]: 'IMAGE GALLERY',
-    [pickerKeys.REPORTS]: 'REPORTS',
-  };
+  /* Logic Helpers */
 
   const openSpotInNotebookFromNavigator = (spot, notebookPage, attributes) => {
     closeSpotsNavigator();
     openSpotInNotebook(spot, notebookPage, attributes);
   };
+
+  /* View */
 
   return (
     <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR, flex: 1}}>
@@ -49,20 +50,20 @@ const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebo
         selectedValue={pickerKey}
         style={[styles.sectionDividerText, {backgroundColor: PRIMARY_BACKGROUND_COLOR}]}
       >
-        <Picker.Item label={pickerLabels[pickerKeys.SPOTS]} value={pickerKeys.SPOTS}/>
-        <Picker.Item label={pickerLabels[pickerKeys.IMAGES]} value={pickerKeys.IMAGES}/>
-        <Picker.Item label={pickerLabels[pickerKeys.SAMPLES]} value={pickerKeys.SAMPLES}/>
-        <Picker.Item label={pickerLabels[pickerKeys.REPORTS]} value={pickerKeys.REPORTS}/>
+        <Picker.Item label={PICKER_LABELS[PICKER_KEYS.SPOTS]} value={PICKER_KEYS.SPOTS}/>
+        <Picker.Item label={PICKER_LABELS[PICKER_KEYS.IMAGES]} value={PICKER_KEYS.IMAGES}/>
+        <Picker.Item label={PICKER_LABELS[PICKER_KEYS.SAMPLES]} value={PICKER_KEYS.SAMPLES}/>
+        <Picker.Item label={PICKER_LABELS[PICKER_KEYS.REPORTS]} value={PICKER_KEYS.REPORTS}/>
       </Picker>
-      {pickerKey === pickerKeys.SPOTS && <SpotsList onPress={openSpotInNotebook}/>}
-      {pickerKey === pickerKeys.IMAGES && <ImageGallery openSpotInNotebook={openSpotInNotebook}/>}
-      {pickerKey === pickerKeys.SAMPLES && (
+      {pickerKey === PICKER_KEYS.SPOTS && <SpotsList onPress={openSpotInNotebook}/>}
+      {pickerKey === PICKER_KEYS.IMAGES && <ImageGallery openSpotInNotebook={openSpotInNotebook}/>}
+      {pickerKey === PICKER_KEYS.SAMPLES && (
         <Samples
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebookFromNavigator}
         />
       )}
-      {pickerKey === pickerKeys.REPORTS && <ReportsList openSpotInNotebook={openSpotInNotebook}/>}
+      {pickerKey === PICKER_KEYS.REPORTS && <ReportsList openSpotInNotebook={openSpotInNotebook}/>}
     </View>
   );
 };

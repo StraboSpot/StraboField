@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon, ListItem} from '@rn-vui/base';
 
-import {PAGE_KEYS} from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import {useForm} from '../form';
@@ -17,9 +17,13 @@ const BasicListItem = ({
                          item,
                          page,
                        }) => {
+  /* Data Hooks */
+
+  const {getLabel} = useForm();
   const {getMineralTitle, getPetRockTitle, getReactionTextureTitle} = usePetrology();
   const {getBeddingTitle, getSedRockTitle, getStratSectionTitle} = useSed();
-  const {getLabel} = useForm();
+
+  /* Logic Helpers */
 
   const getTitle = () => {
     switch (page.key) {
@@ -54,6 +58,8 @@ const BasicListItem = ({
         return 'Unknown';
     }
   };
+
+  /* View */
 
   return (
     <ListItem

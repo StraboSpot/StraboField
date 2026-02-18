@@ -15,20 +15,42 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import TextInputModal from '../../shared/ui/TextInputModal';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const UrlData = ({
                    editable,
                    initializeDelete,
                    spot,
                  }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+
+  const {openURL} = useDevice();
+  const {saveEdits} = useExternalData();
+
+  /* Local State */
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [urlToEdit, setUrlToEdit] = useState({});
 
-  const {openURL} = useDevice();
-  const {saveEdits} = useExternalData();
+  /* Event Handlers */
+
+  const onSaveEdits = () => {
+    try {
+      setIsEditModalVisible(false);
+      if (urlValidator(urlToEdit.url)) saveEdits(urlToEdit);
+      else throw Error('Not valid URL.');
+    }
+    catch (err) {
+      console.error('Error saving edits', err);
+      dispatch(clearedStatusMessages());
+      dispatch(addedStatusMessage('Please make sure you enter a valid url. ' + err));
+      dispatch(setIsErrorMessagesModalVisible(true));
+    }
+  };
+
+  /* Logic Helpers */
 
   const editUrl = (inURLToEdit, i) => {
     if (editable) {
@@ -37,6 +59,8 @@ const UrlData = ({
     }
     else dispatch(setNotebookPageVisible(PAGE_KEYS.DATA));
   };
+
+  /* Render Functions */
 
   const renderURLEditModal = () => {
     return (
@@ -89,19 +113,7 @@ const UrlData = ({
     );
   };
 
-  const onSaveEdits = () => {
-    try {
-      setIsEditModalVisible(false);
-      if (urlValidator(urlToEdit.url)) saveEdits(urlToEdit);
-      else throw Error('Not valid URL.');
-    }
-    catch (err) {
-      console.error('Error saving edits', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Please make sure you enter a valid url. ' + err));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
-  };
+  /* View */
 
   return (
     <View style={{flex: 1}}>

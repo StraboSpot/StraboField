@@ -8,6 +8,7 @@ import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const ImagesInSpot = ({isReadOnly, saveImages}) => {
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const images = useSelector(state => state.spot.selectedSpot.properties?.images) || [];
@@ -15,6 +16,8 @@ const ImagesInSpot = ({isReadOnly, saveImages}) => {
 
   const {deleteImageFromSpot} = useImages();
   const {getSpotByImageId} = useSpots();
+
+  /* Logic Helpers */
 
   const deleteImage = async (image) => {
     const isImageDeleted = await deleteImageFromSpot(image.id, getSpotByImageId(image.id));
@@ -27,6 +30,8 @@ const ImagesInSpot = ({isReadOnly, saveImages}) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
+
+  /* View */
 
   return (
     <ImagesList

@@ -14,6 +14,8 @@ import CheckboxList from '../../shared/ui/CheckboxList';
 const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
+  /* Data Hooks */
+
   const {isSpotInReadOnlyDataset} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
@@ -22,9 +24,13 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
+  /* Event Handlers */
+
   const handleCheckBoxPressed = () => {
     return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
   };
+
+  /* Render Functions */
 
   const renderSamplesText = () => {
     const sampleNames = spot.properties?.samples?.reduce(
@@ -38,6 +44,8 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
     const tagsString = tags.map(tag => tag.name).sort().join(', ');
     return !isEmpty(tagsString) && <ListItem.Subtitle>{tagsString}</ListItem.Subtitle>;
   };
+
+  /* View */
 
   return (
     <ListItem

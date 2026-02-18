@@ -10,9 +10,11 @@ import {NumberInputField} from '../form';
 import useMapLocation from '../maps/useMapLocation';
 
 const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
+  /* Data Hooks */
 
   const {getCurrentLocation} = useMapLocation();
 
+  /* Logic Helpers */
 
   const fillWithCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();
@@ -26,6 +28,8 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
       }
     }
   };
+
+  /* View */
 
   return (
     <ListItem containerStyle={commonStyles.listItemFormField}>

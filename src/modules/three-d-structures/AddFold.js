@@ -1,27 +1,32 @@
 import React, {useState} from 'react';
 
 import {FoldGeometryButtons} from './fold-geometry';
-import {FOLD_MEASUREMENTS_KEYS} from './threeDStructures.constants';
+import {
+  ADD_FOLD_FIRST_KEYS,
+  ADD_FOLD_LAST_KEYS,
+  ADD_FOLD_MAIN_BUTTONS_KEYS,
+  ADD_FOLD_TIGHTNESS_KEY,
+  ADD_FOLD_VERGENCE_KEY,
+  FOLD_MEASUREMENTS_KEYS,
+} from './threeDStructures.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import {Form, FormSlider, MainButtons} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
 const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
+  /* Local State */
 
-  const [isFoldMeasurementsModalVisible, setIsFoldMeasurementsModalVisible] = useState(false);
   const [foldMeasurementsGroupField, setFoldMeasurementsGroupField] = useState({});
+  const [isFoldMeasurementsModalVisible, setIsFoldMeasurementsModalVisible] = useState(false);
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['label'];
-  const mainButtonsKeys = ['feature_type'];
-  const tightnessKey = 'tightness';
-  const vergenceKey = 'vergence';
-  const lastKeys = ['fold_notes'];
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const firstKeysFields = ADD_FOLD_FIRST_KEYS.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = ADD_FOLD_LAST_KEYS.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>
@@ -29,7 +34,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
       <MainButtons
         formName={formName}
         formProps={formProps}
-        mainKeys={mainButtonsKeys}
+        mainKeys={ADD_FOLD_MAIN_BUTTONS_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
       <MeasurementButtons
@@ -45,7 +50,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
       />
       <FormSlider
         choices={choices}
-        fieldKey={tightnessKey}
+        fieldKey={ADD_FOLD_TIGHTNESS_KEY}
         formProps={formProps}
         hasNoneChoice={true}
         hasRotatedLabels={true}
@@ -55,7 +60,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
       />
       <FormSlider
         choices={choices}
-        fieldKey={vergenceKey}
+        fieldKey={ADD_FOLD_VERGENCE_KEY}
         formProps={formProps}
         hasNoneChoice={true}
         hasRotatedLabels={true}

@@ -5,6 +5,8 @@ import MapboxGL from '@rnmapbox/maps';
 const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
   console.log('Rendering StratSectionImageOverlay...');
 
+  /* View */
+
   return (
     <MapboxGL.ImageSource
       coordinates={coordQuad}

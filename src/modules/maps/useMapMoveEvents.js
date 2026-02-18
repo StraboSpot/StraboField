@@ -6,14 +6,20 @@ import {setIsMapMoved, setZoom} from './maps.slice';
 import useMapView from './useMapView';
 
 const useMapMoveEvents = ({mapRef}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {setMapView} = useMapView();
+
+  /* Local State */
+
   const cameraChangedTimestampRef = useRef(0);
 
-  const {setMapView} = useMapView();
+  /* Exported Functions */
 
   // Update spots in extent and saved view (center and zoom)
   const handleMapMoved = async (e) => {
@@ -33,7 +39,7 @@ const useMapMoveEvents = ({mapRef}) => {
   };
 
   return {
-    handleMapMoved: handleMapMoved,
+    handleMapMoved,
   };
 
 };

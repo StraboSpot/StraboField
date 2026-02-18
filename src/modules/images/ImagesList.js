@@ -13,8 +13,7 @@ const ImagesList = ({
                       saveImages,
                       saveUpdatedImage,
                     }) => {
-  const [imageToView, setImageToView] = useState({});
-  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  /* Data Hooks */
 
   const {
     areImageThumbnailsLoading,
@@ -22,6 +21,13 @@ const ImagesList = ({
     setAreImageThumbnailsLoading,
     setImageThumbnailURIs,
   } = useImageThumbnails({images});
+
+  /* Local State */
+
+  const [imageToView, setImageToView] = useState({});
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+
+  /* Render Functions */
 
   const renderImageCard = (image, index) => {
     return (
@@ -62,6 +68,8 @@ const ImagesList = ({
       />
     );
   };
+
+  /* View */
 
   return (
     <>

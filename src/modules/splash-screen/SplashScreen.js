@@ -14,12 +14,18 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const SplashScreen = ({children}) => {
+  /* Data Hooks */
+
+  const loading = useSelector(state => state.home.loading.home);
+
   const {width, height} = useWindowSize();
+
+  /* Derived Variables */
 
   const fontSize = getFontSizeByWindowWidth({width, height}, 40);
   const titleStyles = [splashScreenStyles.title, {fontSize}];
 
-  const loading = useSelector(state => state.home.loading.home);
+  /* View */
 
   return (
     <ImageBackground

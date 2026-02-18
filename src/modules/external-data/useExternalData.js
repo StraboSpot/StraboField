@@ -10,17 +10,20 @@ import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../ho
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+let CSVData = '';
+let csvObject = {};
+
 const useExternalData = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {pickCSV, readFile} = useDevice();
   const toast = useToast();
 
-  let csvObject = {};
-  let CSVData = '';
+  /* Internal Functions */
 
-  // INTERNAL
   const createCSVObject = (CSVFile, data) => {
     csvObject.name = CSVFile.name.substring(0, CSVFile.name.lastIndexOf('.'));
     csvObject.size = CSVFile.size;
@@ -29,6 +32,8 @@ const useExternalData = () => {
     console.log('CSV Object', csvObject);
     return csvObject;
   };
+
+  /* Exported Functions */
 
   const deleteCSV = (tableToDelete) => {
     const CSVcopy = JSON.parse(JSON.stringify(spot.properties.data.tables));
@@ -148,12 +153,12 @@ const useExternalData = () => {
   };
 
   return {
-    deleteCSV: deleteCSV,
-    deleteURL: deleteURL,
-    readCSV: readCSV,
-    saveCSV: saveCSV,
-    saveEdits: saveEdits,
-    saveURL: saveURL,
+    deleteCSV,
+    deleteURL,
+    readCSV,
+    saveCSV,
+    saveEdits,
+    saveURL,
   };
 };
 

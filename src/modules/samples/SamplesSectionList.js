@@ -9,7 +9,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmptyText, openSpotInNotebook}) => {
   const spots = useSelector(state => state.spot.spots);

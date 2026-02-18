@@ -21,9 +21,13 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const TephraPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Local State */
 
   const [data1, setData] = useState([]);
   const [isDetailView, setIsDetailView] = useState(false);
@@ -31,7 +35,11 @@ const TephraPage = ({isReadOnly, page}) => {
   const [selectedAttribute, setSelectedAttribute] = useState({});
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
 
+  /* Derived Variables */
+
   const attributes = spot && spot.properties && spot.properties.tephra || [];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE TephraPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -48,6 +56,8 @@ const TephraPage = ({isReadOnly, page}) => {
       setIsReorderingActive(false);
     };
   }, []);
+
+  /* Logic Helpers */
 
   const addAttribute = () => {
     setIsReorderingActive(false);
@@ -72,6 +82,14 @@ const TephraPage = ({isReadOnly, page}) => {
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));
   };
+
+  const updateOrder = () => {
+    setIsReorderingActive(false);
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
+  };
+
+  /* Render Functions */
 
   const renderAttributeDetail = () => {
     const subpages = TEPHRA_SUBPAGES;
@@ -138,11 +156,7 @@ const TephraPage = ({isReadOnly, page}) => {
     );
   };
 
-  const updateOrder = () => {
-    setIsReorderingActive(false);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
-  };
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

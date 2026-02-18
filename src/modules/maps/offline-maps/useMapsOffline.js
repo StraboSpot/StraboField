@@ -1,6 +1,7 @@
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {checkIfZipStatusReady, getMedian, tile2lat, tile2long} from './offlineMaps.helpers';
 import {addMapFromDevice, clearedMapsFromRedux, setOfflineMap} from './offlineMaps.slice';
 import {APP_DIRECTORIES} from '../../../services/directories.constants';
 import {STRABO_APIS} from '../../../services/urls.constants';
@@ -14,34 +15,34 @@ import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
 import useMapURL from '../useMapURL';
 
+let fileCount = 0;
+let neededTiles = 0;
+let notNeededTiles = 0;
+let zipUID;
+
 const useMapsOffline = () => {
-  let zipUID;
-  let fileCount = 0;
-  let neededTiles = 0;
-  let notNeededTiles = 0;
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
-  const customMaps = useSelector(state => state.map.customMaps);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
+  const customMaps = useSelector(state => state.map.customMaps);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const user = useSelector(state => state.user);
 
-  const source = currentBasemap && currentBasemap.source;
-  const url = 'file://' + APP_DIRECTORIES.TILE_CACHE;
-
   const {
-    deleteFromDevice,
-    doesDeviceDirExist,
-    makeDirectory,
-    moveFile,
-    readDirectoryForMapFiles,
-    readDirectoryForMapTiles,
+    deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectoryForMapFiles, readDirectoryForMapTiles,
   } = useDevice();
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl, getTilesFromHost, zipURLStatus} = useServerRequests();
 
-  //INTERNAL
+  /* Derived Variables */
+
+  const source = currentBasemap && currentBasemap.source;
+  const url = 'file://' + APP_DIRECTORIES.TILE_CACHE;
+
+  /* Internal Functions */
+
   const adjustTileCount = async (files) => {
     console.log(`Adjusting Tile Count... ${files}`);
     for (const file of files) {
@@ -55,6 +56,50 @@ const useMapsOffline = () => {
       else await addMapFromDeviceToRedux(file);
     }
   };
+
+  const createOfflineMapObject = async (mapId, customMap) => {
+    let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
+    tileCount = tileCount.length;
+
+    let map = {
+      id: mapId,
+      name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
+      count: tileCount,
+      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
+      source: !mapId ? source : 'direct from filesystem',
+      mapId: zipUID,
+      date: new Date().toLocaleString(),
+      isOfflineMapVisible: false,
+      version: 8,
+      sources: {
+        'raster-tiles': {
+          type: 'raster',
+          tiles: ['file://' + APP_DIRECTORIES.TILE_CACHE + mapId + '/tiles/{z}_{x}_{y}.png'],
+          tileSize: 256,
+        },
+      },
+      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      layers: [{
+        id: mapId,
+        type: 'raster',
+        source: 'raster-tiles',
+        minzoom: 0,
+      }],
+    };
+    console.log(map);
+    return map;
+  };
+
+  const getMapNameFromId = (mapID) => {
+    const mapObj = DEFAULT_MAPS.find(mapType => mapType.id === mapID);
+    if (!mapObj) {
+      const name = customMaps[mapID]?.title ? customMaps[mapID].title : mapID;
+      return name;
+    }
+    return mapObj.title;
+  };
+
+  /* Exported Functions */
 
   const addMapFromDeviceToRedux = async (mapId) => {
     const map = await createOfflineMapObject(mapId);
@@ -91,10 +136,6 @@ const useMapsOffline = () => {
     }
   };
 
-  const checkIfZipStatusReady = (data) => {
-    return data.status === 'Zip File Ready.';
-  };
-
   const checkZipStatus = async (zipId) => {
     return new Promise((resolve, reject) => {
       const interval = setInterval(async () => {
@@ -113,39 +154,6 @@ const useMapsOffline = () => {
       console.error('Error:', error);
       return Promise.reject(error);
     });
-  };
-
-  const createOfflineMapObject = async (mapId, customMap) => {
-    let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
-    tileCount = tileCount.length;
-
-    let map = {
-      id: mapId,
-      name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
-      count: tileCount,
-      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
-      source: !mapId ? source : 'direct from filesystem',
-      mapId: zipUID,
-      date: new Date().toLocaleString(),
-      isOfflineMapVisible: false,
-      version: 8,
-      sources: {
-        'raster-tiles': {
-          type: 'raster',
-          tiles: ['file://' + APP_DIRECTORIES.TILE_CACHE + mapId + '/tiles/{z}_{x}_{y}.png'],
-          tileSize: 256,
-        },
-      },
-      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
-      layers: [{
-        id: mapId,
-        type: 'raster',
-        source: 'raster-tiles',
-        minzoom: 0,
-      }],
-    };
-    console.log(map);
-    return map;
   };
 
   const doUnzip = async () => {
@@ -213,15 +221,6 @@ const useMapsOffline = () => {
     }
   };
 
-  const getMapNameFromId = (mapID) => {
-    const mapObj = DEFAULT_MAPS.find(mapType => mapType.id === mapID);
-    if (!mapObj) {
-      const name = customMaps[mapID]?.title ? customMaps[mapID].title : mapID;
-      return name;
-    }
-    return mapObj.title;
-  };
-
   // Start getting the tiles to download by creating a zip url
   const getMapTiles = async (extentString, downloadZoom) => {
     try {
@@ -270,15 +269,6 @@ const useMapsOffline = () => {
       console.error('Error Getting Map Tiles.', err);
       throw new Error(err);
     }
-  };
-
-  const getMedian = (arr) => {
-    arr = arr.slice(0); // create copy
-    const middle = (arr.length + 1) / 2,
-      sorted = arr.sort(function (a, b) {
-        return a - b;
-      });
-    return (sorted.length % 2) ? sorted[middle - 1] : (sorted[middle - 1.5] + sorted[middle - 0.5]) / 2;
   };
 
   const getSavedMapsFromDevice = async () => {
@@ -386,17 +376,6 @@ const useMapsOffline = () => {
     }
   };
 
-  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-  const tile2long = (x, z) => {
-    return (x / Math.pow(2, z) * 360 - 180);
-  };
-
-  // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-  const tile2lat = (y, z) => {
-    const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
-    return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
-  };
-
   const updateMapTileCountWhenSaving = async (mapId) => {
     try {
       const mapID = mapId ? mapId : currentBasemap.id;
@@ -404,7 +383,7 @@ const useMapsOffline = () => {
       console.log(customMap);
       const newOfflineMapsData = await createOfflineMapObject(mapID, customMap);
       console.log(newOfflineMapsData);
-      await dispatch(setOfflineMap(newOfflineMapsData));
+      dispatch(setOfflineMap(newOfflineMapsData));
       console.log('Map to save to Redux', newOfflineMapsData);
     }
     catch (err) {
@@ -413,21 +392,21 @@ const useMapsOffline = () => {
   };
 
   return {
-    addMapFromDeviceToRedux: addMapFromDeviceToRedux,
-    checkIfTileZipFolderExists: checkIfTileZipFolderExists,
-    checkTileZipFileExistence: checkTileZipFileExistence,
-    checkZipStatus: checkZipStatus,
-    doUnzip: doUnzip,
-    getMapCenterTile: getMapCenterTile,
-    getMapTiles: getMapTiles,
-    getSavedMapsFromDevice: getSavedMapsFromDevice,
-    initializeSaveMap: initializeSaveMap,
-    moveFiles: moveFiles,
-    moveTile: moveTile,
-    saveZipMap: saveZipMap,
-    setOfflineMapTiles: setOfflineMapTiles,
-    switchToOfflineMap: switchToOfflineMap,
-    updateMapTileCountWhenSaving: updateMapTileCountWhenSaving,
+    addMapFromDeviceToRedux,
+    checkIfTileZipFolderExists,
+    checkTileZipFileExistence,
+    checkZipStatus,
+    doUnzip,
+    getMapCenterTile,
+    getMapTiles,
+    getSavedMapsFromDevice,
+    initializeSaveMap,
+    moveFiles,
+    moveTile,
+    saveZipMap,
+    setOfflineMapTiles,
+    switchToOfflineMap,
+    updateMapTileCountWhenSaving,
   };
 };
 

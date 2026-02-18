@@ -4,6 +4,7 @@ import {Text, View} from 'react-native';
 import {Image, Slider} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {convertMillisecondsToSliderValue} from './preferences.helpers';
 import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
 import {convertMillisecondsToTime, convertSliderValueToMilliseconds} from '../../shared/Helpers';
@@ -12,30 +13,37 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setGeolocationTimeout} from '../home/home.slice';
 
+const batteryImg = require('../../assets/icons/battery-full-outline.png');
+const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
+
 const Geolocate = () => {
-  const batteryImg = require('../../assets/icons/battery-full-outline.png');
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
 
-  const convertMillisecondsToSliderValue = (milliseconds) => {
-    const timeMap = {
-      [2 * 60 * 1000]: 0,
-      [5 * 60 * 1000]: 1,
-      [20 * 60 * 1000]: 2,
-      [40 * 60 * 1000]: 3,
-      [null]: 4,
-    };
-    return timeMap[milliseconds];
-  };
+  /* Local State */
 
-  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
   const [isGeolocationVisible, setIsGeolocationVisible] = useState(false);
+  const [value, setValue] = useState(convertMillisecondsToSliderValue(currentTimeout));
+
+  /* Side Effects */
 
   useEffect(() => {
     setValue(convertMillisecondsToSliderValue(currentTimeout));
   }, [currentTimeout]);
 
-  const labels = ['2 min', '5 min', '20 min', '40 min', 'ON'];
+  /* Event Handlers */
+
+  const onSliderChange = (sliderValue) => {
+    console.log('SLIDER CHANGE', sliderValue);
+    const timeout = convertSliderValueToMilliseconds(sliderValue);
+    console.log('TIMEOUT', timeout);
+    dispatch(setGeolocationTimeout(timeout));
+  };
+
+  /* Logic Helpers */
+
   const color = () => {
     let r = interpolate(255, 0);
     let g = interpolate(0, 255);
@@ -48,12 +56,7 @@ const Geolocate = () => {
     return Math.ceil((1 - k) * end + k * start) % 256;
   };
 
-  const onSliderChange = (sliderValue) => {
-    console.log('SLIDER CHANGE', sliderValue);
-    const timeout = convertSliderValueToMilliseconds(sliderValue);
-    console.log('TIMEOUT', timeout);
-    dispatch(setGeolocationTimeout(timeout));
-  };
+  /* View */
 
   return (
     <>

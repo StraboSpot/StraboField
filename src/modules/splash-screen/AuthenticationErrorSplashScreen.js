@@ -5,7 +5,11 @@ import SplashScreen from './SplashScreen';
 import {WHITE} from '../../shared/styles.constants';
 
 const AuthenticationErrorSplashScreen = () => {
+  /* Derived Variables */
+
   console.count('Rendering AuthenticationErrorSplashScreen ...');
+
+  /* View */
 
   return (
     <SplashScreen>
