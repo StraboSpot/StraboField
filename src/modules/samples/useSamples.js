@@ -268,7 +268,7 @@ const useSamples = () => {
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
       {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
       {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, formName)}, //required
-      {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
+      {label: 'Sample Name:', sesarKey: 'name', value: sampleValue?.sample_id_name}, //required
       {label: 'Material:', sesarKey: 'material', value: getMaterialName(sampleValue?.material_type)}, //required
       // {label: 'Classification:', sesarKey: 'classification', value: getRockClassification()}, //required
       {label: 'Description:', sesarKey: 'description', value: sampleValue?.sample_description},

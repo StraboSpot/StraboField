@@ -122,12 +122,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
 
   const onUserCodeSelect = async (userCode) => {
     dispatch(setSelectedUserCode(userCode));
+    closePicker();
   };
 
   const renderIGSNUploadCheckbox = () => {
     return (
       <View style={{alignItems: 'center', justifyContent: 'flex-start'}}>
-        {!selectedFeature.isOnMySesar && (
+        {!selectedFeature?.isOnMySesar && (
           <>
             <Text style={sampleStyles.mySesarUpdateDisclaimer}>
               To upload to your SESAR account and obtain an IGSN check below:
@@ -162,7 +163,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       <View style={{marginLeft: 20, padding: 10}}>
         {/*{!isEmpty(userCodes)*/}
         {/*  && (*/}
-        {selectedFeature.Sample_IGSN ? (
+        {selectedFeature?.Sample_IGSN ? (
           <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
             {/*<Text style={{fontSize: MEDIUM_TEXT_SIZE, marginRight: 20}}>*/}
             {/*  SESAR User Code: {selectedFeature.sesarUserCode}*/}
@@ -173,7 +174,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
             <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start'}}>
               <Text style={{fontSize: MEDIUM_TEXT_SIZE, marginRight: 20}}>SESAR User Code:</Text>
               <Button
-                disabled={selectedFeature.isOnMySesar}
+                disabled={selectedFeature?.isOnMySesar}
                 disabledTitleStyle={{color: BLACK}}
                 icon={{
                   containerStyle: {paddingLeft: 5},
