@@ -36,13 +36,13 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
     else setSelectedSample(selectedAttributes[0]);
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const closeDetailView = () => {
     if (spot.properties?.isSample) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     console.log('closeDetailView');
     setSelectedSample({});
   };
-
-  /* Logic Helpers */
 
   const editSample = (sampleToEdit) => {
     if (sampleToEdit.properties?.isSample) {
@@ -84,6 +84,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   /* View */
 
   if (isEmpty(selectedSample)) return renderSamplesMain();
+
   return renderSampleDetail();
 };
 
