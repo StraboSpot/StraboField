@@ -13,14 +13,25 @@ import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
 const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
-  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+  /* Data Hooks */
 
   const tags = useSelector(state => state.project.project?.tags) || [];
+
+  /* Local State */
+
+  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+
+  /* Derived Variables */
+
   const checkedTags = Object.values(tags).filter(
     tag => checkedTagsIds.find(id => id.toString() === tag.id.toString()),
   );
 
+  /* Event Handlers */
+
   const handleAddGeologicUnitsPressed = () => setIsTagsListModalVisible(true);
+
+  /* View */
 
   return (
     <>

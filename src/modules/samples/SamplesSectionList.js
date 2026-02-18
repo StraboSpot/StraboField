@@ -12,12 +12,18 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmptyText, openSpotInNotebook}) => {
+  /* Data Hooks */
+
   const spots = useSelector(state => state.spot.spots);
+
+  /* Event Handlers */
 
   const handleSamplePress = (sample, parentSpot) => {
     if (sample.properties?.isSample) openSpotInNotebook(sample, PAGE_KEYS.OVERVIEW, [sample]);
     else openSpotInNotebook(parentSpot, PAGE_KEYS.SAMPLES, [sample]);
   };
+
+  /* Render Functions */
 
   const renderSampleListItem = (sample, parentSpot) => {
     const richSample = spots[sample.id];
@@ -46,6 +52,8 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
       );
     }
   };
+
+  /* View */
 
   return (
     <SectionList

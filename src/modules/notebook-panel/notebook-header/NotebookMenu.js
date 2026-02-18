@@ -42,7 +42,7 @@ const NotebookMenu = ({
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
 
-  /* Derived State */
+  /* Derived Variables */
 
   const type = isSample ? 'Sample' : 'Spot';
   const actions = [

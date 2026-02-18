@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
-import moment from 'moment/moment';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
+import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
 import {isEmpty} from '../../../shared/Helpers';
 import PageHeader from '../../page/PageHeader';
@@ -11,12 +11,18 @@ import useSamples from '../useSamples';
 
 
 const IGSNPage = (props) => {
-  const dispatch = useDispatch();
-  const {straboSesarMapping} = useSamples();
+  /* Data Hooks */
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [statusMessage, setStatusMessage] = useState('');
+  const {straboSesarMapping} = useSamples();
+
+  /* Local State */
+
   const [mappedSesarValues, setMappedSesarValues] = useState({});
+  const [statusMessage, setStatusMessage] = useState('');
+
+  /* Side Effects */
 
   useEffect(() => {
     const sesarMappedObj = straboSesarMapping(spot.properties.samples[0] || {});
@@ -24,27 +30,7 @@ const IGSNPage = (props) => {
     setMappedSesarValues(sesarMappedObj);
   }, []);
 
-  const isoToLocalDateTime = (isoString, type) => {
-    const date = new Date(isoString);
-    const timeAndDate = type === 'time' ? date.toLocaleTimeString('en-US') : date.toLocaleDateString('en-US');
-    return timeAndDate;
-  };
-
-  const formatContentItems = (item) => {
-    if (item.sesarKey === 'longitude' || item.sesarKey === 'latitude'
-      || item.sesarKey === 'longitude_end' || item.sesarKey === 'latitude_end') {
-      return item.value;
-    }
-    if (item.sesarKey === 'collection_start_date') {
-      return moment(item.value).format('MM-DD-YYYY (h:mm:ss a)');
-      // return isoToLocalDateTime(item.value);
-    }
-    if (item.sesarKey === 'collection_time') {
-      return isoToLocalDateTime(item.value, 'time');
-    }
-    // if (item.sesarKey === 'description') return truncateText(item.value, 300);
-    return item.value;
-  };
+  /* Render Functions */
 
   const renderContentItems = () => {
     return (
@@ -69,11 +55,14 @@ const IGSNPage = (props) => {
     );
   };
 
+  /* View */
+
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={'IGSN'}/>
-      <Text style={{textAlign: 'center', marginTop: 10, fontWeight: '600', fontSize: 18}}>Recorded IGSN Metadata on
-        SESAR</Text>
+      <Text style={{textAlign: 'center', marginTop: 10, fontWeight: '600', fontSize: 18}}>
+        Recorded IGSN Metadata on SESAR
+      </Text>
       {/*<Image source={require('../../../assets/images/logos/IGSN_Logo_200.jpg')} style={{width: 200, height: 200}}/>*/}
       {renderContentItems()}
     </View>

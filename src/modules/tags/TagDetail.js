@@ -27,6 +27,7 @@ const TagDetail = ({
                      setIsDetailModalVisible,
                    }) => {
   /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
@@ -51,6 +52,42 @@ const TagDetail = ({
   }, [selectedTag]);
 
   /* Render Functions */
+
+  const renderSamples = () => {
+    const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
+      const spot = spots[spotId];
+      if (spot?.properties?.isSample) {
+        const parentSpot = getSpotWithThisSample(spotId);
+        if (!parentSpot) {
+          console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
+          // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
+          return acc;
+        }
+        const parentSpotId = parentSpot?.properties?.id;
+        return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
+          : {...acc, [parentSpotId]: [spot]};
+      }
+      else if (!isEmpty(spot?.properties?.samples)) {
+        return {...acc, [spot.properties.id]: spot.properties.samples};
+      }
+      else return acc;
+    }, {});
+
+    let dataSectioned = [];
+    if (!isEmpty(sampleSpots)) {
+      dataSectioned = Object.keys(sampleSpots).map((parentId) => {
+        const parentSpot = spots[parentId];
+        return {title: parentSpot.properties.name, data: sampleSpots[parentId], spot: parentSpot};
+      });
+    }
+    return (
+      <SamplesSectionList
+        dataSectioned={dataSectioned}
+        listEmptyText={'No Samples'}
+        openSpotInNotebook={openSpotInNotebook}
+      />
+    );
+  };
 
   const renderSpotFeatureItem = (feature) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -90,42 +127,6 @@ const TagDetail = ({
   const renderSpotItem = ({item}) => {
     const spot = getSpotById(item);
     if (!isEmpty(spot)) return <SpotsListItem doShowTags={true} onPress={openSpot} spot={spot}/>;
-  };
-
-  const renderSamples = () => {
-    const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
-      const spot = spots[spotId];
-      if (spot?.properties?.isSample) {
-        const parentSpot = getSpotWithThisSample(spotId);
-        if (!parentSpot) {
-          console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
-          // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
-          return acc;
-        }
-        const parentSpotId = parentSpot?.properties?.id;
-        return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
-          : {...acc, [parentSpotId]: [spot]};
-      }
-      else if (!isEmpty(spot?.properties?.samples)) {
-        return {...acc, [spot.properties.id]: spot.properties.samples};
-      }
-      else return acc;
-    }, {});
-
-    let dataSectioned = [];
-    if (!isEmpty(sampleSpots)) {
-      dataSectioned = Object.keys(sampleSpots).map((parentId) => {
-        const parentSpot = spots[parentId];
-        return {title: parentSpot.properties.name, data: sampleSpots[parentId], spot: parentSpot};
-      });
-    }
-    return (
-      <SamplesSectionList
-        dataSectioned={dataSectioned}
-        listEmptyText={'No Samples'}
-        openSpotInNotebook={openSpotInNotebook}
-      />
-    );
   };
 
   const renderTaggedFeaturesList = () => {

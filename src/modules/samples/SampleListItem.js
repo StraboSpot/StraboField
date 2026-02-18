@@ -24,20 +24,28 @@ const SampleListItem = ({
                           parentSpot,
                           sample,
                         }) => {
+  /* Data Hooks */
+
+  const selectedTag = useSelector(state => state.project.selectedTag);
+
   const {isSpotInReadOnlyDataset} = useProject();
   const {getSampleSpotIconSource} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
-  const selectedTag = useSelector(state => state.project.selectedTag);
+  /* Derived Variables */
 
   const isReadOnly = isSpotInReadOnlyDataset(parentSpot.properties?.id);
   const sampleMetadata = sample.properties?.isSample ? sample.properties.samples[0] : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
+  /* Event Handlers */
+
   const handleCheckBoxPressed = () => {
     return addRemoveSpotFromTag(sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id,
       selectedTag);
   };
+
+  /* View */
 
   return (
     <ListItem

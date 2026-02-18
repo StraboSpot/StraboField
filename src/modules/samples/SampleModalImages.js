@@ -4,6 +4,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {AddImageButtons, ImagesList} from '../images';
 
 const SampleModalImages = ({sampleImages, setSampleImages}) => {
+  /* Logic Helpers */
 
   const deleteImage = (imageToDelete) => {
     const imagesUpdated = sampleImages.filter(image => image.id !== imageToDelete.id);
@@ -24,6 +25,8 @@ const SampleModalImages = ({sampleImages, setSampleImages}) => {
       setSampleImages(imagesUpdated);
     }
   };
+
+  /* View */
 
   return (
     <>

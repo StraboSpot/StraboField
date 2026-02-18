@@ -15,30 +15,36 @@ import {useSpots} from '../spots';
 import {useTags} from '../tags';
 
 const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {setPointAtCurrentLocation} = useMapLocation();
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
-  const {setPointAtCurrentLocation} = useMapLocation();
   const {addSpotToTags} = useTags();
-
   const toast = useToast();
+
+  /* Local State */
 
   const formRef = useRef(null);
   const toastRef = useRef(null);
-
-  const initialNamePrefix = preferences.sample_prefix || '';
 
   const [checkedTagsIds, setCheckedTagsIds] = useState([]);
   const [currentForm, setCurrentForm] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [namePostfix, setNamePostfix] = useState(null);
+
+  const initialNamePrefix = preferences.sample_prefix || '';
+
   const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
   const [sampleImages, setSampleImages] = useState([]);
   const [startingNumber, setStartingNumber] = useState(null);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE SampleModal []');
@@ -71,7 +77,11 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
     }
   }, [spot]);
 
+  /* Internal Functions */
+
   const closeModal = () => dispatch(setModalVisible({modal: null}));
+
+  /* Exported Functions */
 
   const confirmCloseModal = () => {
     if (formRef.current?.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {

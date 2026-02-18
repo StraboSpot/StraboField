@@ -19,6 +19,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
 
   const dispatch = useDispatch();
 
+  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
   const {
     checkedTagsIds,
     confirmCloseModal,
@@ -38,7 +39,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   /* Local State */
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
 
   /* Event Handlers */
 

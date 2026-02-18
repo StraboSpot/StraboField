@@ -10,7 +10,7 @@ const useNesting = () => {
   /* Internal Functions */
 
   // Get the children (not Samples) of an array of Spots
-  function getChildrenOfSpots(spots1, activeSpots) {
+  const getChildrenOfSpots = (spots1, activeSpots) => {
     let allChildrenSpots = [];
     spots1.forEach((spot) => {
       if (!spot.properties?.isSample) {
@@ -19,7 +19,7 @@ const useNesting = () => {
       }
     });
     return allChildrenSpots.flat();
-  }
+  };
 
   // Get all the children Spots of thisSpot, based on image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
@@ -65,7 +65,7 @@ const useNesting = () => {
   };
 
   // Get the parents (not Samples) of an array of Spots
-  function getParentsOfSpots(spots1, activeSpots) {
+  const getParentsOfSpots = (spots1, activeSpots) => {
     let allParentSpots = [];
     spots1.forEach((spot) => {
       if (!spot.properties?.isSample) {
@@ -74,11 +74,11 @@ const useNesting = () => {
       }
     });
     return allParentSpots.flat();
-  }
+  };
 
   // Get all the parent Spots of thisSpot, based on image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
-  function getParentSpots(thisSpot, activeSpots) {
+  const getParentSpots = (thisSpot, activeSpots) => {
     console.log('Getting Parent Spots...');
     let parentSpots = [];
     // Find active parent spots based on image basemap
@@ -109,7 +109,7 @@ const useNesting = () => {
       });
     }
     return parentSpots;
-  }
+  };
 
   /* Exported Functions */
 

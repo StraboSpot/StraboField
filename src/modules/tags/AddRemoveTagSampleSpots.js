@@ -11,8 +11,12 @@ import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 import Samples from '../samples/Samples';
 
 const AddRemoveTagSampleSpots = ({updateSpotsInMapExtent}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

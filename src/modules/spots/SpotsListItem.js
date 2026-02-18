@@ -16,13 +16,15 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
 
   /* Data Hooks */
 
+  const selectedTag = useSelector(state => state.project.selectedTag);
+  const spots = useSelector(state => state.spot.spots);
+
   const {isSpotInReadOnlyDataset} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
-  const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+  /* Derived Variables */
 
-  const selectedTag = useSelector(state => state.project.selectedTag);
-  const spots = useSelector(state => state.spot.spots);
+  const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
 
   /* Event Handlers */
 

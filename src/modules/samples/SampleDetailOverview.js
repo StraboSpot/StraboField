@@ -12,15 +12,19 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SampleDetailOverview = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
 
-  const formName = ['general', 'samples'];
+  /* Derived Variables */
+
   let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0])) || {};
   delete sampleDetail.id;
 
+  const formName = ['general', 'samples'];
   // Order fields to match sample form survey order
   const fieldOrder = getSurvey(formName)
     .filter(field => field.type !== 'start' && field.type !== 'end')
@@ -29,6 +33,19 @@ const SampleDetailOverview = () => {
     if (key in sampleDetail) ordered[key] = sampleDetail[key];
     return ordered;
   }, {});
+
+  /* Event Handlers */
+
+  const onIGSNPressed = () => {
+    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+  };
+
+  const onViewDetailPressed = () => {
+    dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
+    dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
+  };
+
+  /* Logic Helpers */
 
   const getDate = (value) => {
     const dateObject = new Date(value);
@@ -40,14 +57,7 @@ const SampleDetailOverview = () => {
     return dateObject.toLocaleTimeString();
   };
 
-  const onViewDetailPressed = () => {
-    dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
-    dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
-  };
-
-  const onIGSNPressed = () => {
-    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-  };
+  /* View */
 
   return (
     <View style={{padding: 10, gap: 5, flex: 1, flexDirection: 'column'}}>

@@ -56,6 +56,15 @@ const useSpots = () => {
 
   /* Internal Functions */
 
+  const deleteRichSamples = (spotToDelete) => {
+    spotToDelete.properties?.samples?.map((sample) => {
+      if (sample.id !== spotToDelete.properties.id) {
+        const sampleSpot = spots[sample.id];
+        if (sampleSpot) deleteSpot(sampleSpot);
+      }
+    });
+  };
+
   const getNewSpotNameObj = (newSpot) => {
     let namePrefix = preferences.spot_prefix || '';
     if (newSpot && preferences.nested_spot_prefix && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
@@ -270,15 +279,6 @@ const useSpots = () => {
     return newSpot;
   };
 
-  const deleteRichSamples = (spotToDelete) => {
-    spotToDelete.properties?.samples?.map((sample) => {
-      if (sample.id !== spotToDelete.properties.id) {
-        const sampleSpot = spots[sample.id];
-        if (sampleSpot) deleteSpot(sampleSpot);
-      }
-    });
-  };
-
   const deleteSpot = (spotToDelete) => {
     const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
@@ -427,11 +427,6 @@ const useSpots = () => {
     });
   };
 
-  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
-  const getSpotWithThisSample = (sampleId) => {
-    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
-  };
-
   const getSpotsByIds = (spotIds) => {
     const foundSpots = [];
     Object.entries(spots).forEach((obj) => {
@@ -478,6 +473,11 @@ const useSpots = () => {
       const spotFound = spot.properties?.images?.find(image => image.id === imageBasemapId);
       return spotFound ? spot : undefined;
     });
+  };
+
+  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
+  const getSpotWithThisSample = (sampleId) => {
+    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
   };
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
@@ -546,9 +546,6 @@ const useSpots = () => {
     getSpotById,
     getSpotByImageId,
     getSpotGeometryIconSource,
-    getSpotWithThisImageBasemap,
-    getSpotWithThisSample,
-    getSpotWithThisStratSection,
     getSpotsByIds,
     getSpotsInMapExtent,
     getSpotsMappedOnGivenImageBasemap,
@@ -557,6 +554,9 @@ const useSpots = () => {
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,
+    getSpotWithThisImageBasemap,
+    getSpotWithThisSample,
+    getSpotWithThisStratSection,
     getVisibleSpots,
     handleSpotSelected,
     isOnGeoMap,

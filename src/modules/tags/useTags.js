@@ -110,10 +110,6 @@ const useTags = () => {
     else addRemoveSpotFeaturesFromTag(tag, selectedFeaturesForTagging, spotId, isAlreadyChecked);
   };
 
-  const addSpotToTags = (spotId, tagIds) => {
-    dispatch(addedSpotToTags({spotId: spotId, tagIds: tagIds}));
-  };
-
   const addSpotsToTags = (tagsList, spotsList) => {
     let tagsToUpdate = [];
     tagsList.map((tag) => {
@@ -126,6 +122,10 @@ const useTags = () => {
       tagsToUpdate.push(tagCopy);
     });
     saveTag(tagsToUpdate);
+  };
+
+  const addSpotToTags = (spotId, tagIds) => {
+    dispatch(addedSpotToTags({spotId: spotId, tagIds: tagIds}));
   };
 
   const addTag = () => {
@@ -214,11 +214,6 @@ const useTags = () => {
     return tagsAtSpot.filter(tag => tag.type !== 'geologic_unit');
   };
 
-  const getTagFeaturesCount = (tag) => {
-    const validSpots = isEmpty(tag.features) ? [] : Object.keys(tag.features).filter(spotIds => spots[spotIds]);
-    return validSpots.reduce((acc, spotId) => acc + tag.features[spotId].length, 0);
-  };
-
   const getSamplesWithThisTag = (tag) => {
     return isEmpty(tag.spots) ? []
       : tag.spots.filter(spotId => spots[spotId] && !isEmpty(spots[spotId].properties.samples));
@@ -228,6 +223,17 @@ const useTags = () => {
     const validSpots = isEmpty(tag.spots) ? []
       : tag.spots.filter(spotId => spots[spotId] && !spots[spotId].properties?.isSample);
     return validSpots.length;
+  };
+
+  const getTagFeaturesCount = (tag) => {
+    const validSpots = isEmpty(tag.features) ? [] : Object.keys(tag.features).filter(spotIds => spots[spotIds]);
+    return validSpots.reduce((acc, spotId) => acc + tag.features[spotId].length, 0);
+  };
+
+  const getTagLabel = (key) => {
+    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
+    if (key) return getLabel(key, formName);
+    return 'No Type Specified';
   };
 
   // to display all tags at given feature.
@@ -243,12 +249,6 @@ const useTags = () => {
   const getTagsAtSpot = (spotId) => {
     if (!spotId && !isEmpty(selectedSpot)) spotId = selectedSpot.properties.id;
     return projectTags.filter(tag => tag.spots && tag.spots.includes(spotId));
-  };
-
-  const getTagLabel = (key) => {
-    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
-    if (key) return getLabel(key, formName);
-    return 'No Type Specified';
   };
 
   const renderTagInfo = () => {
@@ -310,8 +310,8 @@ const useTags = () => {
     addRemoveSpotFeatureFromTag,
     addRemoveSpotFromTag,
     addRemoveTag,
-    addSpotToTags,
     addSpotsToTags,
+    addSpotToTags,
     addTag,
     deleteFeatureTags,
     deleteTag,

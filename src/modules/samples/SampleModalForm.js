@@ -15,11 +15,27 @@ import {
 } from './samples.constants';
 
 const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setChoicesViewKey, startingNumber}) => {
+  /* Data Hooks */
+
   const {getChoices, getRelevantFields, getSurvey} = useForm();
+
+  /* Derived Variables */
 
   const choices = getChoices(SAMPLE_FORM_NAME);
   const survey = getSurvey(SAMPLE_FORM_NAME);
   const firstKeysFields = SAMPLE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
+
+  /* Event Handlers */
+
+  const onOrientedButtonPress = (i) => {
+    const currentValue = formRef.current?.values[SAMPLE_ORIENTED_KEY];
+    if (i === 0) formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'yes' ? undefined : 'yes');
+    else formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'no' ? undefined : 'no');
+  };
+
+  /* Logic Helpers */
+
+  const formatNumber = num => num < 10 ? '0' + num : num;
 
   const getSelectedOrientedIndex = () => {
     const value = formRef.current?.values[SAMPLE_ORIENTED_KEY];
@@ -28,11 +44,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
     return undefined;
   };
 
-  const onOrientedButtonPress = (i) => {
-    const currentValue = formRef.current?.values[SAMPLE_ORIENTED_KEY];
-    if (i === 0) formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'yes' ? undefined : 'yes');
-    else formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, currentValue === 'no' ? undefined : 'no');
-  };
+  /* Render Functions */
 
   const renderForm = formProps => (
     <>
@@ -66,7 +78,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
     <Form formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)} {...formProps}/>
   );
 
-  const formatNumber = num => num < 10 ? '0' + num : num;
+  /* View */
 
   return (
     <Formik

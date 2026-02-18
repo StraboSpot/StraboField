@@ -40,9 +40,9 @@ const TagsModal = ({
   const selectedSpotsForTagging = useSelector(state => state.spot.intersectedSpotsForTagging);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
-  const toast = useToast();
-  const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const {addRemoveTag, addSpotsToTags, filterTagsByTagType, getTagLabel, saveTag} = useTags();
+  const toast = useToast();
 
   /* Local State */
 

@@ -38,6 +38,8 @@ const TagDetailModal = ({closeModal}) => {
   const label = NOTEBOOK_PAGES.find(p => p.key === tagType).label.slice(0, -1);
   const modalHeight = tagType === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
 
+  /* Logic Helpers */
+
   const confirmDeleteTag = () => {
     alert(
       'Delete ' + label,

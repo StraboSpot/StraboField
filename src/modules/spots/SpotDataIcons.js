@@ -8,13 +8,18 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 
 const SpotDataIcons = ({isReadOnly, spot}) => {
+  /* Data Hooks */
 
   const {getPopulatedPagesKeys} = usePage();
+
+  /* Logic Helpers */
 
   const getSpotDataIcons = () => {
     const populatedPagesKeys = spot ? getPopulatedPagesKeys(spot) : [PAGE_KEYS.SAMPLES];
     return isReadOnly ? ['isReadOnly', ...populatedPagesKeys] : populatedPagesKeys;
   };
+
+  /* Render Functions */
 
   const renderSpotDataIcon = ({item}) => {
     if (item === 'isReadOnly') {
@@ -29,6 +34,8 @@ const SpotDataIcons = ({isReadOnly, spot}) => {
     }
     else return <NotebookPageAvatar pageKey={item}/>;
   };
+
+  /* View */
 
   return (
     <FlatList

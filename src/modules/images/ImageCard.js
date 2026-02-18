@@ -43,14 +43,11 @@ const ImageCard = ({
 
   const [isEditing, setIsEditing] = useState(false);
   const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
+  const [title, setTitle] = useState(getDisplayTitle);
+
+  /* Derived Variables */
 
   const placeholderTitle = `Untitled ${index + 1}`;
-  const getDisplayTitle = () => {
-    return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
-      : placeholderTitle;
-  };
-
-  const [title, setTitle] = useState(getDisplayTitle);
 
   /* Side Effects */
 
@@ -106,6 +103,11 @@ const ImageCard = ({
   };
 
   /* Logic Helpers */
+
+  function getDisplayTitle() {
+    return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
+      : placeholderTitle;
+  }
 
   const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
 
