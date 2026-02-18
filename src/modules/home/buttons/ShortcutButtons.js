@@ -79,7 +79,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
 
   return (
     <>
-      {SHORTCUT_MODALS.reduce((acc, sm) => {
+      {SHORTCUT_MODALS?.reduce((acc, sm) => {
         if (shortcutSwitchPositions[sm.key] && (Platform.OS !== 'web' || (Platform.OS === 'web'
           && sm.key !== MODAL_KEYS.SHORTCUTS.PHOTO && sm.key !== MODAL_KEYS.SHORTCUTS.SKETCH))) {
           return [...acc, (
