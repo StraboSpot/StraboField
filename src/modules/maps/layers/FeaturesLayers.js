@@ -27,15 +27,13 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   /* Derived Variables */
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
-  console.log('Getting Spots Not Selected as Features...');
   const spotsNotSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsNotSelected)));
-  const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);
-  const featuresNotSelectedUniq = getUniqFeatures(featuresNotSelected);
-
-  console.log('Getting Spots Selected as Features...');
   const spotsSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsSelected)));
+
+  console.log('Getting Spots Not Selected as Features...');
+  const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);
+  console.log('Getting Spots Selected as Features...');
   const featuresSelected = getSpotsAsFeatures(spotsSelectedWithSymbology);
-  const featuresSelectedUniq = getUniqFeatures(featuresSelected);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
@@ -50,6 +48,9 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       else featuresEditable.push(f);
     });
   }
+
+  const featuresNotSelectedUniq = getUniqFeatures(featuresNotSelected);
+  const featuresSelectedUniq = getUniqFeatures(featuresSelected);
 
   /* View */
 

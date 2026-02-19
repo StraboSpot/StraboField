@@ -33,6 +33,18 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
   const [deleteProfileInputValue, setDeleteProfileInputValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  /* Derived Variables */
+
+  const deleteModalText = (
+    <View>
+      <Text style={userStyles.deleteProfileText}>
+        Deleting your account will<Text style={overlayStyles.importantText}> PERMANENTLY </Text>
+        remove all data for user{'\n'}{email}{'\n'}from StraboSpot!
+      </Text>
+      <Text style={userStyles.deleteProfileText}>Enter password to delete:</Text>
+    </View>
+  );
+
   /* Event Handlers */
 
   const handleDeleteModalClose = () => {
@@ -71,16 +83,6 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
     }
     else setErrorMessage('Need to enter your password');
   };
-
-  const deleteModalText = (
-    <View>
-      <Text style={userStyles.deleteProfileText}>
-        Deleting your account will<Text style={overlayStyles.importantText}> PERMANENTLY </Text>
-        remove all data for user{'\n'}{email}{'\n'}from StraboSpot!
-      </Text>
-      <Text style={userStyles.deleteProfileText}>Enter password to delete:</Text>
-    </View>
-  );
 
   const goBack = () => {
     setConfirmDeleteMessageVisible(false);
