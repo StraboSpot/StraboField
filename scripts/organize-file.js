@@ -97,11 +97,46 @@ const FUNC_PATTERNS = {
 // /* */ block comments, and // line comments so that braces inside
 // JSX comments (e.g. {/*{!isEmpty(x)*/}) or strings (e.g. 'file://')
 // don't throw off depth tracking.
-function countBracketsInLine(line, openCh, closeCh, startCol = 0) {
+function countBracketsInLine(line, openCh, closeCh, startCol = 0, inTemplate = false) {
   let depth = 0;
   let foundOpen = false;
   let i = startCol;
   while (i < line.length) {
+    // Inside a template literal — skip content until closing backtick or ${
+    if (inTemplate) {
+      if (line[i] === '\\') { i += 2; continue; }
+      if (line[i] === '$' && i + 1 < line.length && line[i + 1] === '{') {
+        // Template expression — track its own brace depth without affecting outer depth
+        i += 2;
+        let exprDepth = 1;
+        while (i < line.length && exprDepth > 0) {
+          if (line[i] === '\'' || line[i] === '"') {
+            const q = line[i]; i++;
+            while (i < line.length && line[i] !== q) { if (line[i] === '\\') i++; i++; }
+            if (i < line.length) i++;
+            continue;
+          }
+          if (line[i] === '`') {
+            // Nested template literal inside expression
+            i++;
+            while (i < line.length && line[i] !== '`') {
+              if (line[i] === '\\') i++;
+              i++;
+            }
+            if (i < line.length) i++;
+            continue;
+          }
+          if (line[i] === '{') exprDepth++;
+          if (line[i] === '}') exprDepth--;
+          if (exprDepth > 0) i++;
+        }
+        if (i < line.length) i++; // skip closing }
+        continue;
+      }
+      if (line[i] === '`') { inTemplate = false; i++; continue; }
+      i++;
+      continue;
+    }
     // Skip string literals (must come before // check to avoid
     // treating '//' inside strings as a comment)
     if (line[i] === '\'' || line[i] === '"') {
@@ -114,6 +149,8 @@ function countBracketsInLine(line, openCh, closeCh, startCol = 0) {
       if (i < line.length) i++;
       continue;
     }
+    // Template literal start
+    if (line[i] === '`') { inTemplate = true; i++; continue; }
     if (line[i] === '/' && i + 1 < line.length && line[i + 1] === '/') break;
     if (line[i] === '/' && i + 1 < line.length && line[i + 1] === '*') {
       i += 2;
@@ -127,7 +164,7 @@ function countBracketsInLine(line, openCh, closeCh, startCol = 0) {
     if (line[i] === closeCh) depth--;
     i++;
   }
-  return {depth, foundOpen};
+  return {depth, foundOpen, inTemplate};
 }
 
 function isFuncLine(trimmedLine) {
@@ -143,6 +180,47 @@ function getFuncName(trimmedLine) {
     || trimmedLine.match(FUNC_PATTERNS.functionDecl)
     || trimmedLine.match(FUNC_PATTERNS.singleParamArrow);
   return m ? m[1] : null;
+}
+
+// Verify that `=>` follows the closing `)` of the parameter list at paren depth 0,
+// distinguishing real arrow functions from parenthesized expressions like `const X = (\n expr \n);`
+function isArrowAfterParams(allLines, startIdx) {
+  const line = allLines[startIdx];
+  const openIdx = line.indexOf('(', line.indexOf('='));
+  if (openIdx < 0) return true;
+  let parenDepth = 0;
+  for (let j = startIdx; j < allLines.length; j++) {
+    const startCol = (j === startIdx) ? openIdx : 0;
+    for (let ci = startCol; ci < allLines[j].length; ci++) {
+      const ch = allLines[j][ci];
+      if (ch === '\'' || ch === '"' || ch === '`') {
+        ci++;
+        while (ci < allLines[j].length && allLines[j][ci] !== ch) {
+          if (allLines[j][ci] === '\\') ci++;
+          ci++;
+        }
+        continue;
+      }
+      if (ch === '/' && ci + 1 < allLines[j].length && allLines[j][ci + 1] === '/') break;
+      if (ch === '(') parenDepth++;
+      if (ch === ')') {
+        parenDepth--;
+        if (parenDepth === 0) {
+          const rest = allLines[j].substring(ci + 1).trimStart();
+          if (rest.startsWith('=>')) return true;
+          if (rest === '' || rest.startsWith('//')) {
+            for (let k = j + 1; k < allLines.length; k++) {
+              const nt = allLines[k].trim();
+              if (nt === '') continue;
+              return nt.startsWith('=>');
+            }
+          }
+          return false;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 // Convert a const arrow/expression function chunk to a function declaration
@@ -190,6 +268,7 @@ function convertToFunctionDecl(chunk) {
   if (codeIdx === arrowIdx) {
     // Declaration and arrow on the same line
     const hasBlock = firstLine.trim().endsWith('{');
+    const hasParenBody = /\)\s*=>\s*\(/.test(firstLine);
     if (hasBlock) {
       // const name = [async] (params) => {
       lines[codeIdx] = firstLine
@@ -205,6 +284,24 @@ function convertToFunctionDecl(chunk) {
           break;
         }
       }
+    } else if (hasParenBody) {
+      // Multi-line expression body: const name = [async] (params) => (\n  expr\n);
+      lines[codeIdx] = firstLine
+        .replace(/const\s+(\w+)\s*=\s*async\s*\(/, 'async function $1(')
+        .replace(/const\s+(\w+)\s*=\s*\(/, 'function $1(')
+        .replace(/\)\s*=>\s*\(/, ') { return (');
+      lines[codeIdx] = indentStr + lines[codeIdx].trimStart();
+      for (let j = lines.length - 1; j >= 0; j--) {
+        const t = lines[j].trim();
+        if (t === ');') {
+          lines[j] = lines[j].replace(');', '); }');
+          break;
+        }
+        if (t === '};') {
+          lines[j] = lines[j].replace('};', '); }');
+          break;
+        }
+      }
     } else {
       // Single-line: const name = [async] (params) => expr;
       lines[codeIdx] = firstLine
@@ -214,17 +311,33 @@ function convertToFunctionDecl(chunk) {
       lines[codeIdx] = indentStr + lines[codeIdx].trimStart();
     }
   } else {
-    // Multi-line params: const name = [async] ( ... \n ) => {
+    // Multi-line params: const name = [async] ( ... \n ) => ...
     lines[codeIdx] = firstLine
       .replace(/const\s+(\w+)\s*=\s*async\s*\(/, 'async function $1(')
       .replace(/const\s+(\w+)\s*=\s*\(/, 'function $1(');
     lines[codeIdx] = indentStr + lines[codeIdx].trimStart();
-    lines[arrowIdx] = lines[arrowIdx].replace(/\)\s*=>\s*\{/, ') {');
-    // Fix trailing }; → }
-    for (let j = lines.length - 1; j >= 0; j--) {
-      if (lines[j].trim() === '};') {
-        lines[j] = lines[j].replace('};', '}');
-        break;
+    const hasParenBodyMulti = /\)\s*=>\s*\(/.test(lines[arrowIdx]);
+    if (hasParenBodyMulti) {
+      lines[arrowIdx] = lines[arrowIdx].replace(/\)\s*=>\s*\(/, ') { return (');
+      for (let j = lines.length - 1; j >= 0; j--) {
+        const t = lines[j].trim();
+        if (t === ');') {
+          lines[j] = lines[j].replace(');', '); }');
+          break;
+        }
+        if (t === '};') {
+          lines[j] = lines[j].replace('};', '); }');
+          break;
+        }
+      }
+    } else {
+      lines[arrowIdx] = lines[arrowIdx].replace(/\)\s*=>\s*\{/, ') {');
+      // Fix trailing }; → }
+      for (let j = lines.length - 1; j >= 0; j--) {
+        if (lines[j].trim() === '};') {
+          lines[j] = lines[j].replace('};', '}');
+          break;
+        }
       }
     }
   }
@@ -295,6 +408,60 @@ function convertToArrowFunction(chunk) {
   return lines;
 }
 
+// Preserve original blank line spacing around unmoved content using LCS matching.
+// For lines that stayed in the same relative order (in the LCS), use original blank
+// line counts. For moved/added lines, use the script's new blank line counts.
+function mergeBlankLines(oldLines, newLines) {
+  function extractContent(lines) {
+    const result = [];
+    let blanks = 0;
+    for (const line of lines) {
+      if (line.trim() === '') {
+        blanks++;
+      } else {
+        result.push({text: line, blanksBefore: blanks});
+        blanks = 0;
+      }
+    }
+    return result;
+  }
+  const oldContent = extractContent(oldLines);
+  const newContent = extractContent(newLines);
+  const m = oldContent.length;
+  const n = newContent.length;
+  const dp = Array.from({length: m + 1}, () => Array(n + 1).fill(0));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (oldContent[i - 1].text === newContent[j - 1].text) {
+        dp[i][j] = dp[i - 1][j - 1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+      }
+    }
+  }
+  const lcsMap = new Map();
+  let i = m, j = n;
+  while (i > 0 && j > 0) {
+    if (oldContent[i - 1].text === newContent[j - 1].text) {
+      lcsMap.set(j - 1, i - 1);
+      i--; j--;
+    } else if (dp[i - 1][j] > dp[i][j - 1]) {
+      i--;
+    } else {
+      j--;
+    }
+  }
+  const result = [];
+  for (let k = 0; k < newContent.length; k++) {
+    const blanks = lcsMap.has(k)
+      ? oldContent[lcsMap.get(k)].blanksBefore
+      : newContent[k].blanksBefore;
+    for (let b = 0; b < blanks; b++) result.push('');
+    result.push(newContent[k].text);
+  }
+  return result;
+}
+
 // Strip arrow function block bodies from text, leaving only the top-level
 // code that executes synchronously at definition time. This prevents
 // false-positive hoisting of functions only referenced inside deferred
@@ -340,14 +507,15 @@ const PREAMBLE_HEADERS = {
 };
 const PREAMBLE_HEADER_RE = /^\s*\/\*\s*(Data Hooks\s*\/?\s*State|Data Hooks|Local State|Derived Variables|Derived State|Side Effects|Event Handlers|Logic Helpers|Internal Functions|Exported Functions|Render Functions|View)\s*\*\/\s*$/;
 
-// Categorize a preamble statement by the hook it contains
+// Categorize a preamble statement by the hook it contains.
 function categorizePreambleStatement(stmtLines) {
   const text = stmtLines.join(' ');
-  if (/^\s*(\/\/\s*)?console\.log\b/.test(stmtLines[0])) return 'consoleLogs';
   if (/\buseEffect\b|\buseLayoutEffect\b/.test(text)) return 'sideEffects';
   if (/\buseMemo\b|\buseCallback\b/.test(text)) return 'derivedState';
   if (/\b(useState|useRef|useReducer|useSharedValue|useAnimatedStyle)\b/.test(text)) return 'localState';
-  if (/\buse[A-Z]\w*\b/.test(text)) return 'dataHooks';
+  // Generic hook pattern — require call syntax (followed by `(`) or assignment
+  // (preceded by `= `) to avoid matching hook-like names in string literals.
+  if (/\buse[A-Z]\w*\s*\(/.test(text) || /=\s*use[A-Z]\w*\b/.test(text)) return 'dataHooks';
   return 'derivedVars';
 }
 
@@ -372,22 +540,46 @@ function parsePreambleStatements(preambleChunks, indent) {
   }
 
   const statements = [];
+  const topOfBodyConsoleLogs = []; // console.logs at very top of body with no surrounding code
   let pending = []; // comment lines waiting to attach to next statement
-
+  let seenChunkSeparator = false; // have we passed a null (chunk boundary)?
   let i = 0;
   while (i < allLines.length) {
-    if (allLines[i] === null) { i++; continue; }
+    if (allLines[i] === null) { seenChunkSeparator = true; i++; continue; }
     const trimmed = allLines[i].trim();
     if (trimmed === '') { i++; continue; }
 
     // Skip old section headers (will be regenerated)
     if (PREAMBLE_HEADER_RE.test(allLines[i])) { i++; continue; }
 
-    // Console.log (active or commented-out) — treat as its own standalone statement
-    // so it stays in place rather than attaching to and moving with the next statement
-    if (/^\s*(\/\/\s*)?console\.log\b/.test(allLines[i])) {
-      if (pending.length > 0) { statements.push(pending); pending = []; }
-      statements.push([allLines[i]]);
+    // Console.log (active or commented-out) — attach to the following statement
+    // so it only moves when the line below it moves. But only if the very next
+    // line is code (not a blank line, section header, or chunk separator).
+    // If the next line is NOT code, attach to the preceding statement instead
+    // so the console.log stays near its original position.
+    if (/^\s*(\/\/\s*)?console\.(log|count|warn|error)\b/.test(allLines[i])) {
+      const nextLine = i + 1 < allLines.length ? allLines[i + 1] : null;
+      const nextIsCode = nextLine !== null && nextLine !== undefined
+        && nextLine.trim() !== '' && !PREAMBLE_HEADER_RE.test(nextLine);
+      if (nextIsCode) {
+        pending.push(allLines[i]);
+      } else if (statements.length > 0) {
+        // Attach to preceding statement (from any chunk) so it stays in the same section.
+        // Also flush any pending console.logs that were waiting for a following line.
+        for (const p of pending) statements[statements.length - 1].push(p);
+        pending = [];
+        statements[statements.length - 1].push(allLines[i]);
+      } else if (!seenChunkSeparator) {
+        // At very top of body (first chunk, no code seen yet) — keep at top
+        // Pending console.logs also stay at top (they were waiting for this line)
+        for (const p of pending) topOfBodyConsoleLogs.push([p]);
+        pending = [];
+        topOfBodyConsoleLogs.push([allLines[i]]);
+      } else {
+        // In a later section with no preceding statements — treat as regular statement
+        if (pending.length > 0) { statements.push(pending); pending = []; }
+        statements.push([allLines[i]]);
+      }
       i++;
       continue;
     }
@@ -404,20 +596,39 @@ function parsePreambleStatements(preambleChunks, indent) {
     pending = [];
     stmtLines.push(allLines[i]);
 
-    // Track bracket depth to find end of multi-line statement
+    // Track bracket depth and backtick state to find end of multi-line statement
     let depth = 0;
+    let backtickCount = 0;
     for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
       depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+    }
+    for (let ci = 0; ci < allLines[i].length; ci++) {
+      if (allLines[i][ci] === '`' && (ci === 0 || allLines[i][ci - 1] !== '\\')) backtickCount++;
     }
     i++;
 
     while (i < allLines.length) {
-      if (allLines[i] === null) { i++; continue; }
+      if (allLines[i] === null) break; // Don't span across chunk boundaries
+      // Inside unclosed template literal — keep accumulating
+      if (backtickCount % 2 !== 0) {
+        stmtLines.push(allLines[i]);
+        for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
+          depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+        }
+        for (let ci = 0; ci < allLines[i].length; ci++) {
+          if (allLines[i][ci] === '`' && (ci === 0 || allLines[i][ci - 1] !== '\\')) backtickCount++;
+        }
+        i++;
+        continue;
+      }
       // Continue if brackets are still open
       if (depth > 0) {
         stmtLines.push(allLines[i]);
         for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
           depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+        }
+        for (let ci = 0; ci < allLines[i].length; ci++) {
+          if (allLines[i][ci] === '`' && (ci === 0 || allLines[i][ci - 1] !== '\\')) backtickCount++;
         }
         i++;
         continue;
@@ -428,6 +639,9 @@ function parsePreambleStatements(preambleChunks, indent) {
         stmtLines.push(allLines[i]);
         for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
           depth += countBracketsInLine(allLines[i], pair[0], pair[1]).depth;
+        }
+        for (let ci = 0; ci < allLines[i].length; ci++) {
+          if (allLines[i][ci] === '`' && (ci === 0 || allLines[i][ci - 1] !== '\\')) backtickCount++;
         }
         i++;
         continue;
@@ -441,7 +655,7 @@ function parsePreambleStatements(preambleChunks, indent) {
   // Trailing comments become their own statement
   if (pending.length > 0) statements.push(pending);
 
-  return statements;
+  return {statements, topOfBodyConsoleLogs};
 }
 
 // Extract the hook name (e.g. "useSelector") from a statement, or null
@@ -470,9 +684,18 @@ function getPreambleSortKey(stmtLines) {
 // Extract all variable names declared by a preamble statement
 function getDeclaredVars(stmtLines) {
   const vars = [];
+  // Only extract declarations from the top-level indent of the statement,
+  // not from inside nested callbacks/arrow functions.
+  const firstCodeLine = stmtLines.find(l => {
+    const t = l.trim();
+    return t && !t.startsWith('//') && !t.startsWith('/*') && !t.startsWith('*');
+  });
+  const topIndent = firstCodeLine ? firstCodeLine.match(/^(\s*)/)[1].length : 0;
   for (const line of stmtLines) {
     const trimmed = line.trim();
     if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+    const lineIndent = line.match(/^(\s*)/)[1].length;
+    if (lineIndent > topIndent + 2) continue; // Skip deeply nested lines (inside callbacks)
     // Destructured: const {a, b} = ... or const [a, b] = ...
     const destructM = trimmed.match(/(?:const|let|var)\s+[\[{]([^}\]]+)[}\]]/);
     if (destructM) {
@@ -492,6 +715,8 @@ function getDeclaredVars(stmtLines) {
 // Get the right-hand side text of a statement (everything after the = sign on declaration lines),
 // excluding comments. Used to detect references to other variables.
 function getRhsText(stmtLines) {
+  // Scan ALL lines for references (including inside callbacks) to detect
+  // dependencies on variables used in nested scopes.
   const parts = [];
   for (const line of stmtLines) {
     const trimmed = line.trim();
@@ -538,7 +763,7 @@ function dependencyAwareSort(statements) {
       const rhs = getRhsText(sorted[i]);
       for (const [varName, declIdx] of declMap) {
         // If this statement references a variable declared later, move the declaration before this one
-        if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+        if (declIdx > i && new RegExp('(?<!\\w\\.)\\b' + varName + '\\b').test(rhs)) {
           const [moved] = sorted.splice(declIdx, 1);
           sorted.splice(i, 0, moved);
           changed = true;
@@ -633,7 +858,9 @@ function processHelperFile(fullPath, content, file) {
     if (PREAMBLE_HEADER_RE.test(lines[i])) { i++; continue; }
 
     // Check if this line starts a function (with or without `export`)
-    if (isTopLevelFuncLine(trimmed)) {
+    const withoutExportTrimmed = trimmed.replace(/^export\s+/, '');
+    if (isTopLevelFuncLine(trimmed)
+      && !(FUNC_PATTERNS.constArrow.test(withoutExportTrimmed) && !isArrowAfterParams(lines, i))) {
       // Collect preceding comment lines
       let commentStart = i;
       while (commentStart > importEnd
@@ -677,6 +904,7 @@ function processHelperFile(fullPath, content, file) {
         const isArrowFunc = FUNC_PATTERNS.constArrow.test(lineWithoutExport)
           || FUNC_PATTERNS.singleParamArrow.test(lineWithoutExport);
 
+        let isExpressionBody = false;
         if (isArrowFunc) {
           for (let j = i; j < lines.length; j++) {
             const arrowIdx = lines[j].indexOf('=>');
@@ -687,6 +915,8 @@ function processHelperFile(fullPath, content, file) {
               if (afterArrow.startsWith('(')) {
                 trackOpen = '(';
                 trackClose = ')';
+              } else if (afterArrow.startsWith('{')) {
+                // block body, use default { } tracking
               } else if (afterArrow === '') {
                 for (let k = j + 1; k < lines.length; k++) {
                   const nt = lines[k].trim();
@@ -694,36 +924,51 @@ function processHelperFile(fullPath, content, file) {
                   if (nt.startsWith('(')) {
                     trackOpen = '(';
                     trackClose = ')';
+                  } else if (!nt.startsWith('{')) {
+                    isExpressionBody = true;
                   }
                   break;
                 }
+              } else {
+                isExpressionBody = true;
               }
               break;
             }
           }
         }
 
-        let depth = 0;
-        let foundOpen = false;
-        for (let j = scanStartLine; j < lines.length; j++) {
-          const startCol = (j === scanStartLine) ? scanStartCol : 0;
-          const scan = countBracketsInLine(lines[j], trackOpen, trackClose, startCol);
-          depth += scan.depth;
-          if (scan.foundOpen) foundOpen = true;
-          if (foundOpen && depth === 0) {
-            funcEnd = j;
-            break;
-          }
-          if (j > i && lines[j].trim().endsWith(';') && !foundOpen) {
-            funcEnd = j;
-            break;
-          }
-        }
-        if (!foundOpen && depth === 0) {
+        if (isExpressionBody) {
           for (let j = i; j < lines.length; j++) {
             if (lines[j].trim().endsWith(';')) {
               funcEnd = j;
               break;
+            }
+          }
+        } else {
+          let depth = 0;
+          let foundOpen = false;
+          let templateState = false;
+          for (let j = scanStartLine; j < lines.length; j++) {
+            const startCol = (j === scanStartLine) ? scanStartCol : 0;
+            const scan = countBracketsInLine(lines[j], trackOpen, trackClose, startCol, templateState);
+            depth += scan.depth;
+            templateState = scan.inTemplate;
+            if (scan.foundOpen) foundOpen = true;
+            if (foundOpen && depth === 0) {
+              funcEnd = j;
+              break;
+            }
+            if (j > i && lines[j].trim().endsWith(';') && !foundOpen) {
+              funcEnd = j;
+              break;
+            }
+          }
+          if (!foundOpen && depth === 0) {
+            for (let j = i; j < lines.length; j++) {
+              if (lines[j].trim().endsWith(';')) {
+                funcEnd = j;
+                break;
+              }
             }
           }
         }
@@ -746,7 +991,9 @@ function processHelperFile(fullPath, content, file) {
           || lines[lookAhead].trim() === '')) {
           lookAhead++;
         }
-        if (lookAhead < lines.length && isTopLevelFuncLine(lines[lookAhead].trim())) {
+        const laWithoutExport = lookAhead < lines.length ? lines[lookAhead].trim().replace(/^export\s+/, '') : '';
+        if (lookAhead < lines.length && isTopLevelFuncLine(lines[lookAhead].trim())
+          && !(FUNC_PATTERNS.constArrow.test(laWithoutExport) && !isArrowAfterParams(lines, lookAhead))) {
           // This comment belongs to a function; skip and let the function parser grab it
           preambleLines.push(lines[i]);
           i++;
@@ -762,7 +1009,21 @@ function processHelperFile(fullPath, content, file) {
 
   if (funcChunks.length === 0) return false;
 
-  // 3. Separate into internal (non-exported) and exported function groups
+  // 3. Move functions referenced by preamble code back into preamble
+  // (e.g. `const persistedReducer = persistReducer(persistConfig, rootReducer);`
+  // needs rootReducer to be defined before it)
+  const preambleText = preambleLines.join('\n');
+  for (let fi = funcChunks.length - 1; fi >= 0; fi--) {
+    const funcName = funcChunks[fi].name;
+    if (funcName && new RegExp('\\b' + funcName + '\\b').test(preambleText)) {
+      for (const line of funcChunks[fi].lines) preambleLines.push(line);
+      preambleLines.push('');
+      funcChunks.splice(fi, 1);
+    }
+  }
+  if (funcChunks.length === 0) return false;
+
+  // 4. Separate into internal (non-exported) and exported function groups
   const internalFuncs = funcChunks.filter(c => !c.hasExport);
   const exportedFuncs = funcChunks.filter(c => c.hasExport);
 
@@ -811,6 +1072,16 @@ function processHelperFile(fullPath, content, file) {
   }
 
   // Ensure file ends with newline
+  if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
+    newLines.push('');
+  }
+
+  // Merge blank lines: preserve original spacing around unmoved content
+  const oldPostImport = lines.slice(importEnd);
+  const newPostImport = newLines.slice(importEnd);
+  const mergedPostImport = mergeBlankLines(oldPostImport, newPostImport);
+  newLines = [...lines.slice(0, importEnd), ...mergedPostImport];
+  // Ensure trailing newline
   if (newLines.length > 0 && newLines[newLines.length - 1].trim() !== '') {
     newLines.push('');
   }
@@ -1025,13 +1296,15 @@ for (const file of files) {
         || lines[lookAhead].trim() === '')) {
         lookAhead++;
       }
-      if (lookAhead < returnStart && isFuncLine(lines[lookAhead].trim())) {
+      if (lookAhead < returnStart && isFuncLine(lines[lookAhead].trim())
+        && !(FUNC_PATTERNS.constArrow.test(lines[lookAhead].trim()) && !isArrowAfterParams(lines, lookAhead))) {
         i++;
         continue;
       }
     }
 
-    if (isFuncLine(trimmed)) {
+    if (isFuncLine(trimmed)
+      && !(FUNC_PATTERNS.constArrow.test(trimmed) && !isArrowAfterParams(lines, i))) {
       const funcName = getFuncName(trimmed);
 
       // Check for preceding comment lines
@@ -1069,6 +1342,7 @@ for (const file of files) {
         const isArrowFunc = FUNC_PATTERNS.constArrow.test(trimmed)
           || FUNC_PATTERNS.singleParamArrow.test(trimmed);
 
+        let isExpressionBody = false;
         if (isArrowFunc) {
           for (let j = i; j < returnStart; j++) {
             const arrowIdx = lines[j].indexOf('=>');
@@ -1079,6 +1353,8 @@ for (const file of files) {
               if (afterArrow.startsWith('(')) {
                 trackOpen = '(';
                 trackClose = ')';
+              } else if (afterArrow.startsWith('{')) {
+                // block body, use default { } tracking
               } else if (afterArrow === '') {
                 for (let k = j + 1; k < returnStart; k++) {
                   const nt = lines[k].trim();
@@ -1086,34 +1362,49 @@ for (const file of files) {
                   if (nt.startsWith('(')) {
                     trackOpen = '(';
                     trackClose = ')';
+                  } else if (!nt.startsWith('{')) {
+                    isExpressionBody = true;
                   }
                   break;
                 }
+              } else {
+                isExpressionBody = true;
               }
               break;
             }
           }
         }
 
-        for (let j = scanStartLine; j < returnStart; j++) {
-          const startCol = (j === scanStartLine) ? scanStartCol : 0;
-          const scan = countBracketsInLine(lines[j], trackOpen, trackClose, startCol);
-          depth += scan.depth;
-          if (scan.foundOpen) foundOpen = true;
-          if (foundOpen && depth === 0) {
-            funcEnd = j;
-            break;
-          }
-          if (j > i && lines[j].trim().endsWith(';') && !foundOpen) {
-            funcEnd = j;
-            break;
-          }
-        }
-        if (!foundOpen && depth === 0) {
+        if (isExpressionBody) {
           for (let j = i; j < returnStart; j++) {
             if (lines[j].trim().endsWith(';')) {
               funcEnd = j;
               break;
+            }
+          }
+        } else {
+          let templateState2 = false;
+          for (let j = scanStartLine; j < returnStart; j++) {
+            const startCol = (j === scanStartLine) ? scanStartCol : 0;
+            const scan = countBracketsInLine(lines[j], trackOpen, trackClose, startCol, templateState2);
+            depth += scan.depth;
+            templateState2 = scan.inTemplate;
+            if (scan.foundOpen) foundOpen = true;
+            if (foundOpen && depth === 0) {
+              funcEnd = j;
+              break;
+            }
+            if (j > i && lines[j].trim().endsWith(';') && !foundOpen) {
+              funcEnd = j;
+              break;
+            }
+          }
+          if (!foundOpen && depth === 0) {
+            for (let j = i; j < returnStart; j++) {
+              if (lines[j].trim().endsWith(';')) {
+                funcEnd = j;
+                break;
+              }
             }
           }
         }
@@ -1130,10 +1421,16 @@ for (const file of files) {
     } else {
       let blockStart = i;
       let blockEnd = i;
+      // Track bracket depth so blank lines inside nested blocks don't break the statement
+      let blockDepth = 0;
+      for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
+        blockDepth += countBracketsInLine(lines[i], pair[0], pair[1]).depth;
+      }
       while (blockEnd + 1 < returnStart) {
         const nextTrimmed = lines[blockEnd + 1].trim();
-        if (nextTrimmed === '') break;
-        if (isFuncLine(nextTrimmed)) break;
+        if (nextTrimmed === '' && blockDepth <= 0) break;
+        if (isFuncLine(nextTrimmed)
+          && !(FUNC_PATTERNS.constArrow.test(nextTrimmed) && !isArrowAfterParams(lines, blockEnd + 1))) break;
         if (nextTrimmed.startsWith('//') || nextTrimmed.startsWith('/*')) {
           let lookAhead = blockEnd + 2;
           while (lookAhead < returnStart && (lines[lookAhead].trim().startsWith('//')
@@ -1141,9 +1438,13 @@ for (const file of files) {
             || lines[lookAhead].trim() === '')) {
             lookAhead++;
           }
-          if (lookAhead < returnStart && isFuncLine(lines[lookAhead].trim())) break;
+          if (lookAhead < returnStart && isFuncLine(lines[lookAhead].trim())
+            && !(FUNC_PATTERNS.constArrow.test(lines[lookAhead].trim()) && !isArrowAfterParams(lines, lookAhead))) break;
         }
         blockEnd++;
+        for (const pair of [['{', '}'], ['(', ')'], ['[', ']']]) {
+          blockDepth += countBracketsInLine(lines[blockEnd], pair[0], pair[1]).depth;
+        }
       }
 
       let chunkLines = [];
@@ -1151,7 +1452,16 @@ for (const file of files) {
         chunkLines.push(lines[j]);
       }
 
-      chunks.push({type: 'other', name: '', lines: chunkLines});
+      // Classify: control flow at body indent level → preReturn (stays near View/return)
+      const firstCodeLine = chunkLines.find(l => {
+        const t = l.trim();
+        return t && !t.startsWith('//') && !t.startsWith('/*') && !t.startsWith('*');
+      });
+      const firstCodeIndent = firstCodeLine ? firstCodeLine.match(/^(\s*)/)[1] : '';
+      const isControlFlow = firstCodeLine
+        && firstCodeIndent === bodyIndent
+        && /^(if|switch|for|while|throw|try|return)\b/.test(firstCodeLine.trim());
+      chunks.push({type: isControlFlow ? 'preReturn' : 'other', name: '', lines: chunkLines});
       i = blockEnd + 1;
     }
   }
@@ -1161,10 +1471,11 @@ for (const file of files) {
   const firstFunc = chunks.find(c => c.type === 'function');
   const indent = firstFunc ? firstFunc.lines[0].match(/^(\s*)/)[1] : '  ';
 
-  // Separate into non-function preamble, internal functions, and exported functions
+  // Separate into non-function preamble, internal functions, exported functions, and preReturn
   let preambleChunks = [];
   let internalFuncs = [];
   let exportedFuncs = [];
+  let preReturnChunks = [];
   let seenFunction = false;
 
   for (const chunk of chunks) {
@@ -1175,6 +1486,8 @@ for (const file of files) {
       } else {
         internalFuncs.push(chunk);
       }
+    } else if (chunk.type === 'preReturn') {
+      preReturnChunks.push(chunk);
     } else {
       // Non-function chunks after functions start should stay in preamble
       // (they're typically between declarations and functions)
@@ -1258,9 +1571,8 @@ for (const file of files) {
   }
 
   // === PART 4: Organize preamble into sections ===
-  const preambleStatements = parsePreambleStatements(preambleChunks, indent);
+  const {statements: preambleStatements, topOfBodyConsoleLogs} = parsePreambleStatements(preambleChunks, indent);
   const preambleGroups = {};
-  preambleGroups.consoleLogs = [];
   for (const cat of PREAMBLE_CATEGORIES) preambleGroups[cat] = [];
 
   for (const stmt of preambleStatements) {
@@ -1279,7 +1591,7 @@ for (const file of files) {
         for (let si = preambleGroups[laterCat].length - 1; si >= 0; si--) {
           const laterStmt = preambleGroups[laterCat][si];
           const declVars = getDeclaredVars(laterStmt);
-          if (declVars.some(v => new RegExp('(?<!\\.)\\b' + v + '\\b').test(rhs))) {
+          if (declVars.some(v => new RegExp('(?<!\\w\\.)\\b' + v + '\\b').test(rhs))) {
             preambleGroups[laterCat].splice(si, 1);
             preambleGroups[cat].push(laterStmt);
           }
@@ -1291,9 +1603,10 @@ for (const file of files) {
   // Build new body
   let newBodyLines = [];
 
-  // Console logs stay at top of body (not moved into sections)
-  if (preambleGroups.consoleLogs.length > 0) {
-    for (const stmt of preambleGroups.consoleLogs) {
+  // Console.logs that were at the very top of the body (before any sections/code)
+  // stay at the top — they are not moved into any preamble section.
+  if (topOfBodyConsoleLogs.length > 0) {
+    for (const stmt of topOfBodyConsoleLogs) {
       for (const line of stmt) newBodyLines.push(line);
     }
   }
@@ -1332,7 +1645,7 @@ for (const file of files) {
         for (let i = 0; i < flatOrdered.length; i++) {
           const rhs = getRhsText(flatOrdered[i]);
           for (const [varName, declIdx] of declPositions) {
-            if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+            if (declIdx > i && new RegExp('(?<!\\w\\.)\\b' + varName + '\\b').test(rhs)) {
               const [dep] = flatOrdered.splice(declIdx, 1);
               flatOrdered.splice(i, 0, dep);
               moved = true;
@@ -1377,7 +1690,7 @@ for (const file of files) {
         for (let i = 0; i < flatOrdered.length; i++) {
           const rhs = getRhsText(flatOrdered[i]);
           for (const [varName, declIdx] of declPositions) {
-            if (declIdx > i && new RegExp('(?<!\\.)\\b' + varName + '\\b').test(rhs)) {
+            if (declIdx > i && new RegExp('(?<!\\w\\.)\\b' + varName + '\\b').test(rhs)) {
               const [dep] = flatOrdered.splice(declIdx, 1);
               flatOrdered.splice(i, 0, dep);
               moved = true;
@@ -1492,6 +1805,14 @@ for (const file of files) {
     newBodyLines.push('');
   }
 
+  // Emit preReturn chunks (control flow at body indent level) before the return
+  for (const chunk of preReturnChunks) {
+    for (const line of chunk.lines) newBodyLines.push(line);
+    if (newBodyLines.length > 0 && newBodyLines[newBodyLines.length - 1].trim() !== '') {
+      newBodyLines.push('');
+    }
+  }
+
   // Compare with old body
   let oldBodyLines = lines.slice(bodyStart, returnStart);
   while (oldBodyLines.length > 0 && oldBodyLines[oldBodyLines.length - 1].trim() === '') oldBodyLines.pop();
@@ -1503,9 +1824,14 @@ for (const file of files) {
     const oldNonBlank = oldBodyLines.filter(l => l.trim() !== '').join('\n');
     const newNonBlank = newBodyTrimmed.filter(l => l.trim() !== '').join('\n');
     if (oldNonBlank !== newNonBlank) {
+      const mergedBody = mergeBlankLines(oldBodyLines, newBodyTrimmed);
+      // Ensure trailing blank line before return
+      if (mergedBody.length > 0 && mergedBody[mergedBody.length - 1].trim() !== '') {
+        mergedBody.push('');
+      }
       let finalLines = [
         ...lines.slice(0, bodyStart),
-        ...newBodyLines,
+        ...mergedBody,
         ...lines.slice(returnStart),
       ];
       lines = finalLines;
