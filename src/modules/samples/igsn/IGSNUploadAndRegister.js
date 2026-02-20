@@ -28,6 +28,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+  const {isSample} = useSelector(state => state.spot.selectedSpot.properties) || {};
 
   const {authenticateWithSesar, getAndSaveSesarCode} = useIGSN();
   const {getOrcidToken, getSesarToken} = useServerRequests();
@@ -84,7 +85,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   };
 
   const onUserCodeSelect = async (userCode) => {
-    dispatch(setSelectedUserCode(userCode));
+    dispatch(setSelectedUserCode(userCode?.sesar_code || userCode));
     closePicker();
   };
 
@@ -205,7 +206,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
             </View>
             <PickerOverlay
               closePicker={closePicker}
-              data={[...userCodes, undefined]}
+              data={[...userCodes.map(c => c?.sesar_code || c), undefined]}
               dividerText={'Select User Code'}
               isPickerVisible={isPickerVisible}
               onSelect={onUserCodeSelect}
@@ -236,18 +237,19 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       </View>
     );
   };
-  
+
   /* View */
 
   return (
     <View>
       {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
-      {renderIGSNUploadCheckbox()}
+      {!isSample && renderIGSNUploadCheckbox()}
       {isIGSNChecked && (
         <View>
           {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
           {!isEmpty(sesarToken?.access) && renderIGSNUserCodePicker()}
-          {!isEmpty(sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
+          {!isSample && !isEmpty(sesarToken?.access)
+            && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
         </View>
       )}
     </View>

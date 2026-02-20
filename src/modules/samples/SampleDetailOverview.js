@@ -1,27 +1,35 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {isEmpty, truncateText} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
+import IGSNModal from './igsn/IGSNModal';
+import ClearButton from '../../shared/ui/buttons/ClearButton';
+import {setInitialSesarState} from '../user/userProfile.slice';
 
 const SampleDetailOverview = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {sesarToken} = useSelector(state => state.user.sesar);
 
   const {getLabel, getSurvey} = useForm();
+  const toast = useToast();
+
+  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
-  let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0])) || {};
+  let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples[0])) || {};
   delete sampleDetail.id;
 
   const formName = ['general', 'samples'];
@@ -37,7 +45,22 @@ const SampleDetailOverview = () => {
   /* Event Handlers */
 
   const onIGSNPressed = () => {
-    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    sampleDetail?.Sample_IGSN
+      ? dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))
+      // : console.log('SESAR LOGIN  MODAL');
+      : openIGSNModal();
+  };
+
+  const openIGSNModal = () => {
+    dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
+    setIsIGSNModalVisible(true);
+  };
+
+  const onReset = () => {
+    dispatch(setInitialSesarState());
+    console.log('Sesar credentials have beed reset');
+    toast.show('Sesar credentials have beed reset', {type: 'success'});
+    // handleIGSNChecked(false);
   };
 
   const onViewDetailPressed = () => {
@@ -91,6 +114,16 @@ const SampleDetailOverview = () => {
           </Text>
         </Pressable>
       </View>
+      {!isEmpty(sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
+      {isIGSNModalVisible && (
+        <IGSNModal
+          isVisible={isIGSNModalVisible}
+          onModalCancel={() => setIsIGSNModalVisible(false)}
+          // onSampleSaved={onSampleSaved}
+          // ref={formRef}
+          // sampleValues={formRef.current?.values}
+        />
+      )}
     </View>
   );
 };

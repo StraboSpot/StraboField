@@ -18,7 +18,6 @@ import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
-import IGSNUploadAndRegister from '../samples/igsn/IGSNUploadAndRegister';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
@@ -96,9 +95,9 @@ const BasicPageDetail = ({
       if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
     }, [selectedFeature]);
 
-    useEffect(() => {
-      checkIfIsDisabled();
-    }, [sesar.sesarToken.access]);
+    // useEffect(() => {
+    //   checkIfIsDisabled();
+    // }, [sesar.sesarToken.access]);
 
     /* Event Handlers */
 
@@ -125,20 +124,20 @@ const BasicPageDetail = ({
       closeDetailView();
     };
 
-    const checkIfIsDisabled = () => {
-      console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
-      console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
-
-      if (!isIGSNChecked) return false;
-
-      if (!sesar.sesarToken.access) return true;
-
-      if (isEmpty(sesar.selectedUserCode)) {
-        return !(selectedFeature.isOnMySesar && isInternetReachable);
-      }
-
-      return false;
-    };
+    // const checkIfIsDisabled = () => {
+    //   console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
+    //   console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
+    //
+    //   if (!isIGSNChecked) return false;
+    //
+    //   if (!sesar.sesarToken.access) return true;
+    //
+    //   if (isEmpty(sesar.selectedUserCode)) {
+    //     return !(selectedFeature.isOnMySesar && isInternetReachable);
+    //   }
+    //
+    //   return false;
+    // };
 
     const confirmLeavePage = () => {
       const description = isIGSNChecked
@@ -248,22 +247,30 @@ const BasicPageDetail = ({
 
     const saveForm = async (formCurrent) => {
       try {
-        if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
-        else {
-          if (groupKey === 'pet') {
-            await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed' && pageKey === 'bedding') {
-            await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed') {
-            await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else await saveFeature(formCurrent);
-          closeDetailView();
-          if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-          console.log('Done');
+        console.log('Saving form...', formCurrent);
+        // if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
+        // else {
+        if (groupKey === 'pet') {
+          await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
         }
+        else if (groupKey === 'sed' && pageKey === 'bedding') {
+          await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else if (groupKey === 'sed') {
+          await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else await saveFeature(formCurrent);
+        // closeDetailView();
+        if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
+        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
+          alert('Changes Saved!',
+            'Do you want to update the IGSN with SESAR?',
+            [{text: 'Yes', onPress: () => updateIGSNAndShowModal(formCurrent)}, {text: 'No', style: 'cancel'}],
+            {cancelable: false});
+        }
+        else closeDetailView();
+        console.log('Done');
+        // }
       }
       catch (err) {
         toast.show('Error Saving Changes', {type: 'danger'});
@@ -290,7 +297,8 @@ const BasicPageDetail = ({
       const formName = getFormName();
       return (
         <View style={{flex: 1}}>
-          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && !spot.properties.isSample && renderIGSNUpload()}
+          {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'*/}
+          {/*  && !spot.properties.isSample && renderIGSNUpload()}*/}
           <Formik
             enableReinitialize={true}
             initialStatus={{formName: formName}}
@@ -330,23 +338,23 @@ const BasicPageDetail = ({
       );
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
-    };
+    // const renderIGSNUpload = () => {
+    //   return (
+    //     <>
+    //       {!isEmpty(encoded_login) ? (
+    //         <IGSNUploadAndRegister
+    //           handleIGSNChecked={handleIGSNChecked}
+    //           isIGSNChecked={isIGSNChecked}
+    //           selectedFeature={selectedFeature}
+    //         />
+    //       ) : (
+    //         <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+    //           You need to login to StraboSpot to upload to SESAR
+    //         </Text>
+    //       )}
+    //     </>
+    //   );
+    // };
 
     /* View */
 
@@ -364,7 +372,7 @@ const BasicPageDetail = ({
               {!isReadOnly && (
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={checkIfIsDisabled()}
+                  // getIsDisabled={!formRef?.current?.dirty}
                   save={saveButtonOnPress}
                 />
               )}
