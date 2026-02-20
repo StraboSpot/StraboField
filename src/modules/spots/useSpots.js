@@ -451,10 +451,6 @@ const useSpots = () => {
     }, []);
   };
 
-  const getSpotsWithImages = () => {
-    return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties.images));
-  };
-
   const getSpotsWithKey = (key) => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties[key]));
   };
@@ -550,7 +546,6 @@ const useSpots = () => {
     getSpotsInMapExtent,
     getSpotsMappedOnGivenImageBasemap,
     getSpotsMappedOnGivenStratSection,
-    getSpotsWithImages,
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,

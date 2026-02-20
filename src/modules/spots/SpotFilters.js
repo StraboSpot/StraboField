@@ -116,44 +116,48 @@ const SpotFilters = ({
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
       )}
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
-        <SearchBar
-          containerStyle={{
-            backgroundColor: SECONDARY_BACKGROUND_COLOR,
-            borderBottomColor: 'transparent',
-            borderTopColor: 'transparent',
-            flex: 1,
-            padding: 0,
-          }}
-          inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
-          inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
-          onChangeText={updateSearch}
-          placeholder={isSamplesSearch ? 'Search Samples' : 'Search Spots'}
-          placeholderTextColor={DARKGREY}
-          platform={'default'}
-          value={searchState}
-        />
-        <View style={{marginHorizontal: -10}}>
-          <ClearButton
-            icon={{name: 'sort', type: 'material'}}
-            onPress={openPicker}
+      {!isEmpty(activeSpots) && (
+        <>
+          <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
+            <SearchBar
+              containerStyle={{
+                backgroundColor: SECONDARY_BACKGROUND_COLOR,
+                borderBottomColor: 'transparent',
+                borderTopColor: 'transparent',
+                flex: 1,
+                padding: 0,
+              }}
+              inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
+              inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
+              onChangeText={updateSearch}
+              placeholder={isSamplesSearch ? 'Search Samples' : 'Search Spots'}
+              placeholderTextColor={DARKGREY}
+              platform={'default'}
+              value={searchState}
+            />
+            <View style={{marginHorizontal: -10}}>
+              <ClearButton
+                icon={{name: 'sort', type: 'material'}}
+                onPress={openPicker}
+              />
+            </View>
+            <View style={{marginHorizontal: -10}}>
+              <ClearButton
+                icon={{name: 'swap-vert', type: 'material'}}
+                onPress={toggleReverseSort}
+              />
+            </View>
+          </View>
+          <PickerOverlay
+            closePicker={closePicker}
+            data={Object.values(SORT_ORDER)}
+            dividerText={'Sort'}
+            isPickerVisible={isPickerVisible}
+            onSelect={item => updateSort(item)}
+            value={sortOrder}
           />
-        </View>
-        <View style={{marginHorizontal: -10}}>
-          <ClearButton
-            icon={{name: 'swap-vert', type: 'material'}}
-            onPress={toggleReverseSort}
-          />
-        </View>
-      </View>
-      <PickerOverlay
-        closePicker={closePicker}
-        data={Object.values(SORT_ORDER)}
-        dividerText={'Sort'}
-        isPickerVisible={isPickerVisible}
-        onSelect={item => updateSort(item)}
-        value={sortOrder}
-      />
+        </>
+      )}
     </>
   );
 };

@@ -27,7 +27,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const navigate = useNavigation();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
+  const {getActiveSpotsObj} = useSpots();
 
   /* Local State */
 
@@ -39,6 +39,22 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
+
+  /* Derived Variables */
+
+  const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
+  sortedSpotsWithImages = spotsWithImages.map((spot) => {
+    const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
+      .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+        .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
+    return {...spot, properties: {...spot.properties, images: sortedImages}};
+  });
+  if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
+  let count = 0;
+  const spotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
+    count += spot.properties.images.length;
+    return [...acc, {spot: spot, data: [spot.properties.images]}];
+  }, []);
 
   /* Logic Helpers */
 
@@ -56,10 +72,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     return <ImagesList images={images} isReadOnly={isReadOnly} isThumbnailOnly openImage={openImage}/>;
   };
 
-  const renderNoImagesText = () => {
-    return <ListEmptyText text={'No Images in Active Datasets'}/>;
-  };
-
   const renderSectionHeader = ({spot}) => {
     return (
       <SectionDividerWithRightButton
@@ -70,30 +82,18 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     );
   };
 
-  const renderSpotsWithImages = () => {
-    const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
-    sortedSpotsWithImages = spotsWithImages.map((spot) => {
-      const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
-        .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
-          .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
-      return {...spot, properties: {...spot.properties, images: sortedImages}};
-    });
-    if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
-    let count = 0;
-    const spotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
-      count += spot.properties.images.length;
-      return [...acc, {spot: spot, data: [spot.properties.images]}];
-    }, []);
+  /* View */
 
-    return (
-      <>
-        <SpotFilters
-          activeSpots={activeSpots}
-          setIsReverseSort={setIsReverseSort}
-          setSpotsSorted={setSpotsSorted}
-          setTextNoSpots={setTextNoSpots}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
-        />
+  return (
+    <>
+      <SpotFilters
+        activeSpots={activeSpots}
+        setIsReverseSort={setIsReverseSort}
+        setSpotsSorted={setSpotsSorted}
+        setTextNoSpots={setTextNoSpots}
+        updateSpotsInMapExtent={updateSpotsInMapExtent}
+      />
+      {count === 0 ? <ListEmptyText text={'No Images in Active Datasets'}/> : (
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
@@ -101,7 +101,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           </Text>
           <LittleSpacer/>
           <SectionList
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with Images Found'}/>}
             keyExtractor={(item, index) => item + index}
             renderItem={({item, section}) => renderImagesInSpot(item, section)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
@@ -109,13 +108,9 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
             stickySectionHeadersEnabled={true}
           />
         </View>
-      </>
-    );
-  };
-
-  /* View */
-
-  return isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages();
+      )}
+    </>
+  );
 };
 
 export default ImageGallery;

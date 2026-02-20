@@ -1,5 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
+
+import {useSelector} from 'react-redux';
 
 import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
@@ -10,6 +12,8 @@ import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Data Hooks */
+
+  const sortedView = useSelector(state => state.mainMenu.sortedView);
 
   const {getActiveSpotsObj} = useSpots();
 
@@ -24,28 +28,40 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
   const [spotsWithSamplesSorted, setSpotsWithSamplesSorted] = useState(spotsWithSamples);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
-  /* Render Functions */
+  /* Derived Variables */
 
-  const renderSamples = () => {
-    const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
-    let samplesCount = 0;
-    const dataSectioned = sampleSpotsSorted.map((s) => {
-      samplesCount += s.properties.samples.length;
-      return {title: s.properties.name, data: s.properties.samples, spot: s};
+  const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
+  let samplesCount = 0;
+  let dataSectioned;
+  if (!isEmpty(sampleSpotsSorted)) {
+    dataSectioned = sampleSpotsSorted.map((s) => {
+      samplesCount += s.properties?.samples?.length;
+      return {title: s.properties?.name, data: s.properties?.samples, spot: s};
     });
+  }
 
-    return (
-      <View style={{flex: 1}}>
-        <SpotFilters
-          activeSpots={spotsWithSamplesSorted}
-          isSamplesSearch={true}
-          setIsReverseSort={setIsReverseSort}
-          setSpotsSorted={setSpotsWithSamplesSorted}
-          setTextNoSpots={setTextNoSpots}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
-        />
+  /* Side Effects */
+
+  useEffect(() => {
+    setSpotsWithSamplesSorted(spotsWithSamples);
+  }, [sortedView]);
+
+  /* View */
+
+  return (
+    <View style={{flex: 1}}>
+      <SpotFilters
+        activeSpots={spotsWithSamplesSorted}
+        isSamplesSearch={true}
+        setIsReverseSort={setIsReverseSort}
+        setSpotsSorted={setSpotsWithSamplesSorted}
+        setTextNoSpots={setTextNoSpots}
+        updateSpotsInMapExtent={updateSpotsInMapExtent}
+      />
+      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={'No Samples in Active Datasets'}/> : (
         <View style={{flex: 1}}>
-          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
+          <Text
+            style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
             Found {samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')} in Active Datasets
           </Text>
           <SamplesSectionList
@@ -56,14 +72,9 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
             openSpotInNotebook={openSpotInNotebook}
           />
         </View>
-      </View>
-    );
-  };
-
-  /* View */
-
-  if (isEmpty(spotsWithSamplesSorted)) return <ListEmptyText text={'No Samples in Active Datasets'}/>;
-  return renderSamples();
+      )}
+    </View>
+  );
 };
 
 export default Samples;
