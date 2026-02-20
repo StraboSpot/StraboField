@@ -5,17 +5,16 @@ import {useSelector} from 'react-redux';
 
 import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
+import useIGSN from './useIGSN';
 import {isEmpty} from '../../../shared/Helpers';
 import PageHeader from '../../page/PageHeader';
-import useSamples from '../useSamples';
-
 
 const IGSNPage = (props) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {straboSesarMapping} = useSamples();
+  const {straboSesarMapping} = useIGSN();
 
   /* Local State */
 
