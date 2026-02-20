@@ -82,14 +82,14 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        <Pressable onPress={onIGSNPressed}>
+        {sampleDetail.Sample_IGSN && <Pressable onPress={onIGSNPressed}>
           <Text style={[commonStyles.listItemTitle, {
             color: PRIMARY_ACCENT_COLOR,
             paddingTop: 5,
           }]}>
-            {sampleDetail.Sample_IGSN ? 'View IGSN Data' : 'Get IGSN'}
+            View IGSN Data
           </Text>
-        </Pressable>
+        </Pressable>}
       </View>
     </View>
   );
