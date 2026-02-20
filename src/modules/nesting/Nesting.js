@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 
 import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
+import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {ImageCard, useImages, useImageThumbnails} from '../images';
 import PageHeader from '../page/PageHeader';
@@ -28,7 +29,7 @@ const Nesting = () => {
     areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
   } = useImageThumbnails({images});
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {getSpotWithThisSample, handleSpotSelected} = useSpots();
+  const {getSpotWithThisImageBasemap, handleSpotSelected} = useSpots();
 
   /* Local State */
 
@@ -38,9 +39,6 @@ const Nesting = () => {
   /* Derived Variables */
 
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
-
-  const targetSpot = selectedSpot?.properties?.isSample ? getSpotWithThisSample(selectedSpot.properties.id)
-    : selectedSpot;
 
   /* Derived State */
 
@@ -59,16 +57,16 @@ const Nesting = () => {
   /* Logic Helpers */
 
   const updateNest = () => {
-    if (!isEmpty(targetSpot)) {
+    if (!isEmpty(selectedSpot)) {
       console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
-        targetSpot, '...');
-      const parentSpots = getParentGenerationsSpots(targetSpot, 10);
+        selectedSpot, '...');
+      const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
       setParentGenerations(parentSpots);
-      const childrenSpots = getChildrenGenerationsSpots(targetSpot, 10);
+      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
       setChildrenGenerations(childrenSpots);
 
       // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), targetSpot];
+      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
       console.log(allSpotsInNest);
       const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
         const imageBasemapId = spot.properties?.image_basemap;
@@ -91,7 +89,6 @@ const Nesting = () => {
     const generationText = `${levelNum}${levelNum === 1 ? ' Level' : ' Levels'}${type === 'Parents' ? ' Up' : ' Down'}`;
     const groupedGeneration = generation.reduce(
       (r, v, i, a, k = v.properties.image_basemap) => ((r[k] || (r[k] = [])).push(v), r), {});
-    console.log('groupedGeneration', groupedGeneration);
     return (
       <>
         {type === 'Children' && (
@@ -114,28 +111,29 @@ const Nesting = () => {
   const renderGenerations = (type) => {
     const generationData = type === 'Parents' ? reversedParentGenerations : childrenGenerations;
     if (!isEmpty(generationData)) {
-      const sourceData = type === 'Parents' ? parentGenerations : childrenGenerations;
       return (
         <FlatList
           data={generationData}
           keyExtractor={(item, index) => `${type}${index}`}
           listKey={type}
-          renderItem={({item, index}) => renderGeneration(type, item, index, sourceData.length)}
+          renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
         />
       );
     }
   };
 
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
-    console.log('renderGroup', type, i, group, b);
+    console.log('renderGroup', type, i, imageBasemapKey, group, b);
     const image = getImageByImageId(imageBasemapKey);
+    const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImageBasemap(imageBasemapKey);
+    const isGroupNestedInSample = spotWithThisImageBasemap?.properties?.isSample;
     return (
       <View
         style={{
           flex: 1,
           flexDirection: 'row',
-          borderWidth: 1,
-          borderColor: 'black',
+          borderWidth: imageBasemapKey !== 'undefined' && isGroupNestedInSample ? 2.5 : 1,
+          borderColor: isGroupNestedInSample ? SAMPLES_COLOR : BLACK,
           marginLeft: 10,
           marginRight: 10,
           marginTop: 2,
@@ -196,7 +194,7 @@ const Nesting = () => {
   const renderName = (spot) => {
     return (
       <SpotsListItem
-        doShowSamples
+        isSample={spot.properties?.isSample}
         onPress={() => handleSpotSelected(spot)}
         spot={spot}
       />
@@ -204,8 +202,14 @@ const Nesting = () => {
   };
 
   const renderSelf = (self) => {
+    const spotWithThisImageBasemap = getSpotWithThisImageBasemap(self.properties?.image_basemap);
+    const isSampleORSampleChild = self.properties?.isSample || spotWithThisImageBasemap?.properties?.isSample;
     return (
-      <View style={{borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'black'}}>
+      <View style={{
+        borderTopWidth: isSampleORSampleChild ? 2.5 : 1,
+        borderBottomWidth: isSampleORSampleChild ? 2.5 : 1,
+        borderColor: isSampleORSampleChild ? SAMPLES_COLOR : BLACK,
+      }}>
         {renderItem(self)}
       </View>
     );
@@ -219,7 +223,7 @@ const Nesting = () => {
       <FlatList
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}
-        data={[targetSpot]}
+        data={[selectedSpot]}
         keyExtractor={item => `NestedItem${item.properties.id}`}
         renderItem={({item}) => renderSelf(item)}
       />

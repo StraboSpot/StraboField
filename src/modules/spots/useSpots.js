@@ -470,7 +470,7 @@ const useSpots = () => {
 
   const getSpotWithThisImageBasemap = (imageBasemapId) => {
     return Object.values(getActiveSpotsObj()).find((spot) => {
-      const spotFound = spot.properties?.images?.find(image => image.id === imageBasemapId);
+      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageBasemapId?.toString());
       return spotFound ? spot : undefined;
     });
   };

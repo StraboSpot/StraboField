@@ -1,31 +1,45 @@
+import {useSelector} from 'react-redux';
+
 import {isWithin} from './nesting.helpers';
 import {isEmpty} from '../../shared/Helpers';
 import {useSpots} from '../spots';
 
 const useNesting = () => {
   /* Data Hooks */
+  const spots = useSelector(state => state.spot.spots);
 
-  const {getActiveSpotsObj, getSpotById, isOnGeoMap, isOnSameImageBasemap, isOnSameStratSection} = useSpots();
+  const {
+    getActiveSpotsObj,
+    getSpotById,
+    getSpotWithThisSample,
+    isOnGeoMap,
+    isOnSameImageBasemap,
+    isOnSameStratSection,
+  } = useSpots();
 
   /* Internal Functions */
 
-  // Get the children (not Samples) of an array of Spots
+  // Get the children of an array of Spots
   const getChildrenOfSpots = (spots1, activeSpots) => {
     let allChildrenSpots = [];
     spots1.forEach((spot) => {
-      if (!spot.properties?.isSample) {
-        const childrenSpots = getChildrenSpots(spot, activeSpots);
-        if (!isEmpty(childrenSpots)) allChildrenSpots.push(childrenSpots);
-      }
+      const childrenSpots = getChildrenSpots(spot, activeSpots);
+      if (!isEmpty(childrenSpots)) allChildrenSpots.push(childrenSpots);
     });
     return allChildrenSpots.flat();
   };
 
-  // Get all the children Spots of thisSpot, based on image basemaps, strat sections and geometry
+  // Get all the children Spots of thisSpot, based on sample, image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
   const getChildrenSpots = (thisSpot, activeSpots) => {
     console.log('Getting Children Spots...');
     let childrenSpots = [];
+    // Find active children spots based on sample
+    if (!thisSpot.properties.isSample && thisSpot.properties.samples) {
+      const sampleIds = thisSpot.properties.samples.map(sample => sample.id);
+      const sampleChildrenSpots = sampleIds.map(sampleId => spots[sampleId]);
+      childrenSpots.push(sampleChildrenSpots);
+    }
     // Find active children spots based on image basemap
     if (thisSpot.properties.images) {
       const imageBasemaps = thisSpot.properties.images.map(image => image.id);
@@ -53,7 +67,8 @@ const useNesting = () => {
     }
     childrenSpots = childrenSpots.flat();
     // Find active children spots (not Samples) based on geometry *Only polygon features can have children
-    if (thisSpot.geometry?.type === 'Polygon' || thisSpot.geometry?.type === 'MultiPolygon') {
+    if (!thisSpot.properties.isSample
+      && (thisSpot.geometry?.type === 'Polygon' || thisSpot.geometry?.type === 'MultiPolygon')) {
       const otherSpots = activeSpots.filter(
         spot => spot.geometry && spot.properties.id !== thisSpot.properties.id && !spot.properties?.isSample);
       otherSpots.forEach((spot) => {
@@ -68,19 +83,22 @@ const useNesting = () => {
   const getParentsOfSpots = (spots1, activeSpots) => {
     let allParentSpots = [];
     spots1.forEach((spot) => {
-      if (!spot.properties?.isSample) {
-        const parentSpots = getParentSpots(spot, activeSpots);
-        if (!isEmpty(parentSpots)) allParentSpots.push(parentSpots);
-      }
+      const parentSpots = getParentSpots(spot, activeSpots);
+      if (!isEmpty(parentSpots)) allParentSpots.push(parentSpots);
     });
     return allParentSpots.flat();
   };
 
-  // Get all the parent Spots of thisSpot, based on image basemaps, strat sections and geometry
+  // Get all the parent Spots of thisSpot, based on sample, image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
   const getParentSpots = (thisSpot, activeSpots) => {
     console.log('Getting Parent Spots...');
     let parentSpots = [];
+    // Find active parent spots based on sample
+    if (thisSpot?.properties.isSample) {
+      const parentSpot = getSpotWithThisSample(thisSpot.properties.id);
+      parentSpots.push(parentSpot);
+    }
     // Find active parent spots based on image basemap
     if (thisSpot?.properties.image_basemap) {
       const parentImageBasemapSpot = activeSpots.find(spot => spot.properties.images && spot.properties.images.find(
@@ -99,7 +117,7 @@ const useNesting = () => {
     if (!isEmpty(parentNonGeomSpot)) parentSpots.push(parentNonGeomSpot);
     parentSpots = parentSpots.flat();
     // Find active parent spots (not Samples) based on geometry *The parent must be a polygon
-    if (thisSpot.geometry) {
+    if (thisSpot.geometry && !thisSpot.properties.isSample) {
       const otherSpots = activeSpots.filter(
         spot => spot.geometry && spot.properties.id !== thisSpot.properties.id && !spot.properties?.isSample);
       otherSpots.forEach((spot) => {

@@ -5,13 +5,23 @@ import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import {SpotGeometryAvatar} from '../../shared/ui/avatars';
 import useProject from '../project/useProject';
 import {useTags} from '../tags';
 import SpotDataIcons from './SpotDataIcons';
 import CheckboxList from '../../shared/ui/CheckboxList';
 
-const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
+const SpotsListItem = ({
+                         doShowSamples,
+                         doShowTags,
+                         isCheckedList,
+                         isItemChecked,
+                         isSample,
+                         onChecked,
+                         onPress,
+                         spot,
+                       }) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
   /* Data Hooks */
@@ -51,7 +61,7 @@ const SpotsListItem = ({doShowSamples, doShowTags, isCheckedList, isItemChecked,
 
   return (
     <ListItem
-      containerStyle={commonStyles.listItem}
+      containerStyle={[commonStyles.listItem, isSample && {borderColor: SAMPLES_COLOR, borderWidth: 2.5}]}
       keyExtractor={(item, index) => item?.properties?.id?.toString() || index.toString()}
       onPress={() => onPress && ((isCheckedList && !isReadOnly) || !isCheckedList) && onPress(spot)}
     >
