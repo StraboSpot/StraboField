@@ -29,7 +29,7 @@ const NotebookHeader = ({
                           closeNotebookPanel,
                           createDefaultGeom,
                           isReadOnly,
-                          isSample,
+                          isSampleOrSampleChild,
                           openMainMenuPanel,
                           setSelectedSample,
                           zoomToSpots,
@@ -46,6 +46,7 @@ const NotebookHeader = ({
     getRootSpot,
     getSampleSpotIconSource,
     getSpotGeometryIconSource,
+    getSpotWithThisImageBasemap,
     getSpotWithThisSample,
     getSpotWithThisStratSection,
   } = useSpots();
@@ -60,7 +61,11 @@ const NotebookHeader = ({
 
   const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
   const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
-  const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id) : null;
+  const spotWithThisImageBasemap = spot.properties?.image_basemap
+    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+  const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id)
+    : !isEmpty(spotWithThisImageBasemap) ? spotWithThisImageBasemap
+      : null;
 
   /* Event Handlers */
 
@@ -145,7 +150,7 @@ const NotebookHeader = ({
 
   const goBackToParentSpot = () => {
     setSelectedSample({});
-    if (spot.properties.isSample && !isEmpty(parentSpot)) {
+    if (!isEmpty(parentSpot)) {
       dispatch(setSelectedSpot(parentSpot));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
@@ -191,7 +196,7 @@ const NotebookHeader = ({
           <Image
             onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
             resizeMode={'contain'}
-            source={isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
+            source={spot.properties.isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
             style={notebookHeaderStyles.headerImage}
           />
         </View>
@@ -244,7 +249,7 @@ const NotebookHeader = ({
           closeNotebookPanel={closeNotebookPanel}
           isNotebookMenuVisible={isNotebookMenuVisible}
           isReadOnly={isReadOnly}
-          isSample={isSample}
+          isSample={spot.properties.isSample}
           overlayStyle={notebookStyles.dialogBoxPosition}
           parentSpot={parentSpot}
           zoomToSpots={zoomToSpots}
@@ -267,12 +272,14 @@ const NotebookHeader = ({
             onPress={goBackToParentSpot}
             title={parentSpot?.properties?.name || spot.properties.name || ''}
           />
-          <View style={[{width: '100%'}, isSample && notebookHeaderStyles.sampleSideBorders]}>
-            {isSample && (
+          <View style={[{width: '100%'}, isSampleOrSampleChild && notebookHeaderStyles.sampleSideBorders]}>
+            {isSampleOrSampleChild && (
               <View style={notebookHeaderStyles.sampleBanner}>
-                <Text style={notebookHeaderStyles.sampleBannerText}>
-                  {'S      A      M      P      L      E'}
-                </Text>
+                {spot.properties.isSample && (
+                  <Text style={notebookHeaderStyles.sampleBannerText}>
+                    {'S      A      M      P      L      E'}
+                  </Text>
+                )}
               </View>
             )}
             <View style={{alignItems: 'center', flexDirection: 'row'}}>
@@ -312,7 +319,7 @@ const NotebookHeader = ({
 
   return (
     <>
-      {isSample ? renderNotebookSampleHeaderContent() : renderNotebookHeaderContent()}
+      {isSampleOrSampleChild ? renderNotebookSampleHeaderContent() : renderNotebookHeaderContent()}
     </>
   );
 };

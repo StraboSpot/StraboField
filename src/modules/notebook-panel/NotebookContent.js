@@ -36,7 +36,14 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
+  const {
+    getActiveSpotsObj,
+    getRecentSpots,
+    getRootSpot,
+    getSpotWithThisImageBasemap,
+    handleSpotSelected,
+    sortSpotsByDateCreated,
+  } = useSpots();
 
   /* Local State */
 
@@ -46,6 +53,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
+  const spotWithThisImageBasemap = spot.properties?.image_basemap
+    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+  const isSampleOrSampleChild = isSample || spotWithThisImageBasemap?.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
 
   /* Side Effects */
@@ -101,13 +111,13 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             closeNotebookPanel={closeNotebookPanel}
             createDefaultGeom={createDefaultGeom}
             isReadOnly={isReadOnly}
-            isSample={isSample}
+            isSampleOrSampleChild={isSampleOrSampleChild}
             openMainMenuPanel={openMainMenuPanel}
             setSelectedSample={setSelectedSample}
             zoomToSpots={zoomToSpots}
           />
         </View>
-        <View style={[{flex: 1}, isSample && notebookStyles.sampleBorder]}>
+        <View style={[{flex: 1}, isSampleOrSampleChild && notebookStyles.sampleBorder]}>
           <View style={notebookStyles.centerContainer}>
             <Page {...pageProps}/>
           </View>
