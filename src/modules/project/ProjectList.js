@@ -16,7 +16,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
-const ProjectList = ({doRefresh, onProjectPress, source}) => {
+const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -114,6 +114,15 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
         <ListItem.Chevron/>
       </ListItem>
     );
+  };
+
+  const filteredProjectsList = () => {
+    let myProjectsArr = [];
+    let collaborationArr = [];
+    projectsArr.projects.forEach((project) => {
+      return project?.isOwner ? myProjectsArr.push(project) : collaborationArr.push(project);
+    });
+    return selectedButtonIndex === 0 ? myProjectsArr : collaborationArr;
   };
 
   const renderProjectsList = () => {

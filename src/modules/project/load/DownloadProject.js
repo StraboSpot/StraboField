@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 
+import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDownload from '../../../services/useDownload';
@@ -8,6 +9,7 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
+import {PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 
 const source = 'server';
 
@@ -25,6 +27,7 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
 
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
 
   /* Logic Helpers */
 
@@ -59,11 +62,24 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
             backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-            headerTitle={'Download Project'}
+            // headerTitle={'Download Project'}
             title={'My StraboField Projects'}
           />
         )}
-        <ProjectList onProjectPress={confirmDownloadProject} source={source}/>
+        <ButtonGroup
+          // buttonStyle={{padding: 5}}
+          buttons={['My Projects', 'Collaboration Projects']}
+          containerStyle={{height: 50, borderRadius: 10}}
+          onPress={(index) => {
+            console.log('Selected index:', index);
+            setSelectedButtonIndex(index);
+          }}
+          selectedButtonStyle={{backgroundColor: '#007AFF'}}
+          selectedIndex={selectedButtonIndex}
+          textStyle={{color: PRIMARY_TEXT_COLOR, textAlign: 'center'}}
+
+        />
+        <ProjectList onProjectPress={confirmDownloadProject} selectedButtonIndex={selectedButtonIndex} source={source}/>
       </View>
 
       {/* Modal */}
