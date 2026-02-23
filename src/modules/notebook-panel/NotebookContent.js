@@ -47,6 +47,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
+    const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
+      || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
+      || getRelevantPetPages().map(p => p.key).includes(pageVisible)
+      || getRelevantSedPages().map(p => p.key).includes(pageVisible)
+      || SUBPAGES.map(p => p.key).includes(pageVisible);
+    if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   }, [pageVisible, spot]);
 
   /* Logic Helpers */
@@ -66,18 +72,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   /* Render Functions */
 
   const renderNotebookContent = () => {
-    const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
-      || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
-      || getRelevantPetPages().map(p => p.key).includes(pageVisible)
-      || getRelevantSedPages().map(p => p.key).includes(pageVisible)
-      || SUBPAGES.map(p => p.key).includes(pageVisible);
-    if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-
-    let pageKey = isRelevantPage ? pageVisible : PAGE_KEYS.OVERVIEW;
-    const page = NOTEBOOK_PAGES.find(p => p.key === pageKey);
+    const page = NOTEBOOK_PAGES.find(p => p.key === pageVisible);
     const Page = page?.page_component || Overview;
     let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
-    if (page.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
+    if (page?.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
     return (
       <>
         <View style={notebookStyles.headerContainer}>
