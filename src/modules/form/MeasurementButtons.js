@@ -37,19 +37,25 @@ const MeasurementButtons = ({
     else dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.LINEAR]));
   };
 
-  const ButtonText = ({field}) => {
+  const isGroupEmpty = (groupField) => {
+    const relevantFields = getGroupFields(survey, groupField.name);
+    return !relevantFields.some(f => !isEmpty(formProps.values[f.name]));
+  };
+
+  /* Render Functions */
+
+  const renderButtonText = (field) => {
     const getValueText = () => {
-      const values = formProps.values;
       const groupKeys = measurementsKeys[field.name];
       if (groupKeys.strike) {
-        const strike = values[groupKeys.strike];
-        const dip = values[groupKeys.dip];
+        const strike = formProps.values[groupKeys.strike];
+        const dip = formProps.values[groupKeys.dip];
         return (isEmpty(strike) ? '?' : padWithLeadingZeros(strike, 3)) + '/'
           + (isEmpty(dip) ? '?' : padWithLeadingZeros(dip, 2));
       }
       else {
-        const plunge = values[groupKeys.plunge];
-        const trend = values[groupKeys.trend];
+        const plunge = formProps.values[groupKeys.plunge];
+        const trend = formProps.values[groupKeys.trend];
         return (isEmpty(plunge) ? '?' : padWithLeadingZeros(plunge, 2)) + '\u2192'
           + (isEmpty(trend) ? '?' : padWithLeadingZeros(trend, 3));
       }
@@ -76,11 +82,6 @@ const MeasurementButtons = ({
     );
   };
 
-  const isGroupEmpty = (groupField) => {
-    const relevantFields = getGroupFields(survey, groupField.name);
-    return !relevantFields.some(f => !isEmpty(formProps.values[f.name]));
-  };
-
   /* View */
 
   return (
@@ -96,7 +97,7 @@ const MeasurementButtons = ({
             containerStyle={{flex: 1, padding: 2}}
             key={field.name}
             onPress={() => addMeasurement(field)}
-            title={<ButtonText field={field}/>}
+            title={renderButtonText(field)}
             type={'outline'}
           />
         );

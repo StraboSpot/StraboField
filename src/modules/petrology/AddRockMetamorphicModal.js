@@ -40,23 +40,6 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     else formProps.setFieldValue('facies', updatedFacies);
   };
 
-  const FaciesButton = (faciesProps) => {
-    return (
-      <Button
-        buttonStyle={[formStyles.formButtonLarge, {
-          backgroundColor: formProps?.values?.facies?.includes(faciesProps.faciesKey)
-            ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
-          height: '100%',
-        }]}
-        containerStyle={{padding: 2.5}}
-        onPress={() => addFacies(faciesProps.faciesKey)}
-        type={'outline'}
-      >
-        {faciesButtonText(faciesProps.faciesKey)}
-      </Button>
-    );
-  };
-
   const faciesButtonText = (key) => {
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
@@ -70,6 +53,21 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
   };
 
   /* Render Functions */
+
+  const renderFaciesButton = faciesKey => (
+    <Button
+      buttonStyle={[formStyles.formButtonLarge, {
+        backgroundColor: formProps?.values?.facies?.includes(
+          faciesKey) ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
+        height: '100%',
+      }]}
+      containerStyle={{padding: 2.5}}
+      onPress={() => addFacies(faciesKey)}
+      type={'outline'}
+    >
+      {faciesButtonText(faciesKey)}
+    </Button>
+  );
 
   const renderFaciesModal = () => {
     const faciesModalWidth = width > 520 ? 700 : '90%';
@@ -114,32 +112,32 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
                     <View style={{flex: 2, flexDirection: 'row'}}>
                       <View style={{flex: 4}}/>
                       <View style={{flex: 5}}>
-                        <FaciesButton faciesKey={'eclogite'}/>
+                        {renderFaciesButton('eclogite')}
                       </View>
                     </View>
                     <View style={{flex: 4, flexDirection: 'row'}}>
                       <View style={{flex: 5, flexDirection: 'column'}}>
                         <View style={{flex: 2, flexDirection: 'row'}}>
                           <View style={{flex: 2}}/>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'blueschist'}/></View>
+                          <View style={{flex: 2}}>{renderFaciesButton('blueschist')}</View>
                           <View style={{flex: 1}}/>
                         </View>
                         <View style={{flex: 2, flexDirection: 'row'}}>
                           <View style={{flex: 1}}/>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'prehnite_pumpy'}/></View>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'greenschist'}/></View>
+                          <View style={{flex: 2}}>{renderFaciesButton('prehnite_pumpy')}</View>
+                          <View style={{flex: 2}}>{renderFaciesButton('greenschist')}</View>
                         </View>
                       </View>
-                      <View style={{flex: 2}}><FaciesButton faciesKey={'amphibolite'}/></View>
-                      <View style={{flex: 2}}><FaciesButton faciesKey={'upper_amph'}/></View>
+                      <View style={{flex: 2}}>{renderFaciesButton('amphibolite')}</View>
+                      <View style={{flex: 2}}>{renderFaciesButton('upper_amph')}</View>
                     </View>
                   </View>
-                  <View style={{flex: 2}}><FaciesButton faciesKey={'granulite'}/></View>
+                  <View style={{flex: 2}}>{renderFaciesButton('granulite')}</View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                  <View style={{flex: 2}}><FaciesButton faciesKey={'zeolite'}/></View>
+                  <View style={{flex: 2}}>{renderFaciesButton('zeolite')}</View>
                   <View style={{flex: 2}}/>
-                  <View style={{flex: 5}}><FaciesButton faciesKey={'hornfels'}/></View>
+                  <View style={{flex: 5}}>{renderFaciesButton('hornfels')}</View>
                   <View style={{flex: 2}}/>
                 </View>
               </View>
@@ -149,12 +147,8 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
             <Text style={formStyles.formButtonTitle}>Temperature</Text>
           </View>
           <View style={{flexDirection: 'row', height: 40, paddingBottom: 0}}>
-            <View style={{width: '50%'}}>
-              <FaciesButton faciesKey={'ultra_high_pre'}/>
-            </View>
-            <View style={{width: '50%'}}>
-              <FaciesButton faciesKey={'ultra_high_tem'}/>
-            </View>
+            <View style={{width: '50%'}}>{renderFaciesButton('ultra_high_pre')}</View>
+            <View style={{width: '50%'}}>{renderFaciesButton('ultra_high_tem')}</View>
           </View>
         </View>
       </ModalWrapper>
