@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
   },
   fieldLabelContainer: {
     flexDirection: 'row',
-    flex: 1,
     width: '100%',
   },
   fieldValue: {
