@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -30,6 +30,21 @@ const Form = ({
   /* Derived Variables */
 
   const survey = surveyFragment || getSurvey(formName);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    // Set default values
+    survey.filter(item => isRelevant(item, values)).forEach((field) => {
+      const [fieldType, choicesListName] = field.type.split(' ');
+      if (fieldType === 'select_one' || fieldType === 'select_multiple') {
+        const choiceValues = getChoices(formName).filter(c => c.list_name === choicesListName).map(c => c.name);
+        if (isEmpty(values[field.name]) && field.default && choiceValues.includes(field.default)) {
+          setFieldValue(field.name, field.default, false);
+        }
+      }
+    });
+  }, []);
 
   /* Render Functions */
 
@@ -119,12 +134,6 @@ const Form = ({
       delete choice.name;
       return choice;
     });
-
-    // Set default values
-    if (isEmpty(values[field.name]) && field.default
-      && fieldChoicesCopy.map(c => c.value).includes(field.default)) {
-      setFieldValue(field.name, field.default, false);
-    }
 
     return (
       <Field
