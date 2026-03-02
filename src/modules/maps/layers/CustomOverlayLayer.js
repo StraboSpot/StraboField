@@ -32,6 +32,7 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
     <MapboxGL.RasterSource
       id={customMap.id}
       key={customMap.id}
+      tileSize={256}
       tileUrlTemplates={[buildTileURL(customMap)]}
     >
       <MapboxGL.RasterLayer
