@@ -27,8 +27,8 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   /* Derived Variables */
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
-  const spotsNotSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsNotSelected)));
-  const spotsSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsSelected)));
+  const spotsNotSelectedWithSymbology = addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}})));
+  const spotsSelectedWithSymbology = addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}})));
 
   console.log('Getting Spots Not Selected as Features...');
   const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);

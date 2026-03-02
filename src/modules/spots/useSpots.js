@@ -342,8 +342,7 @@ const useSpots = () => {
 
   // Get Active Spots with Valid Geometry
   const getMappableSpots = () => {
-    const allSpotsCopy = JSON.parse(JSON.stringify(Object.values(getActiveSpotsObj())));
-    const allSpotsCopyFiltered = allSpotsCopy.filter((spot) => {
+    const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
       const geometries = spot.geometry?.geometries || [spot.geometry] || [];
       let hasValidGeometry = true;
       geometries.forEach((g) => {
@@ -407,11 +406,8 @@ const useSpots = () => {
   };
 
   const getSpotsByIds = (spotIds) => {
-    const foundSpots = [];
-    Object.entries(spots).forEach((obj) => {
-      if (spotIds.includes(obj[1].properties.id)) foundSpots.push(obj[1]);
-    });
-    return foundSpots;
+    const idsSet = new Set(spotIds);
+    return Object.values(spots).filter(spot => idsSet.has(spot.properties.id));
   };
 
   const getSpotsInMapExtent = () => spotsInMapExtentIds.map(id => spots[id]);
@@ -487,12 +483,9 @@ const useSpots = () => {
   // Don't use viewed_timestamp as this is supposed to be removed from Spot objects. Updating viewed_timestamp
   // in slice requires entire spots object to update in redux which breaks editing a feature on the map.
   const sortSpotsByRecentlyViewed = (spotsToSort) => {
-    const spotsToSortIds = spotsToSort.map(spot => spot.properties.id);
-    let spotsToSortInRecentViewsIds = recentViews.reduce((acc, spotId) => {
-      return spotsToSortIds.includes(spotId) ? [...acc, spotId] : acc;
-    }, []);
-    const spotsSortedByRecentlyViewedIds = [...new Set([...spotsToSortInRecentViewsIds, ...spotsToSortIds])];
-    return spotsSortedByRecentlyViewedIds.map(spotId => spotsToSort.find(spot => spot.properties.id === spotId));
+    const spotsById = new Map(spotsToSort.map(spot => [spot.properties.id, spot]));
+    const recentIds = new Set(recentViews.filter(id => spotsById.has(id)));
+    return [...recentIds].map(id => spotsById.get(id)).concat(spotsToSort.filter(s => !recentIds.has(s.properties.id)));
   };
 
   return {
