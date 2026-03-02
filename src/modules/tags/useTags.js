@@ -65,9 +65,9 @@ const useTags = () => {
   const getFeatureTagsAtSpot = (featuresAtSpot) => {
     if (isEmpty(selectedSpot)) return [];
     let spotId = selectedSpot.properties.id;
-    let featureIds = featuresAtSpot.map(feature => feature.id);
+    const featureIdSet = new Set(featuresAtSpot.map(feature => feature.id));
     return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
-      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
+      && tag.features[spotId].some(featureId => featureIdSet.has(featureId)));
   };
 
   /* Exported Functions */
@@ -87,18 +87,8 @@ const useTags = () => {
   };
 
   const addRemoveSpotFromTag = (spotId, tag) => {
-    let selectedTagCopy = JSON.parse(JSON.stringify(tag));
-    if (selectedTagCopy.spots) {
-      if (selectedTagCopy.spots.includes(spotId)) {
-        selectedTagCopy.spots = selectedTagCopy.spots.filter(id => spotId !== id);
-      }
-      else selectedTagCopy.spots.push(spotId);
-    }
-    else {
-      selectedTagCopy.spots = [];
-      selectedTagCopy.spots.push(spotId);
-    }
-    saveTag(selectedTagCopy);
+    const spots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId) : [...(tag.spots ?? []), spotId];
+    saveTag({...tag, spots});
   };
 
   // tag modal - add remove tags (wrapper method for feature level tagging and spot level tagging).
@@ -266,8 +256,8 @@ const useTags = () => {
       updatedTags.push(tagToSave);
     }
     else {
-      let tagIdsToSave = tagToSave.map(tag => tag.id);
-      updatedTags = projectTags.filter(tag => !tagIdsToSave.includes(tag.id));
+      const tagIdsToSave = new Set(tagToSave.map(tag => tag.id));
+      updatedTags = projectTags.filter(tag => !tagIdsToSave.has(tag.id));
       updatedTags = tagToSave.concat(updatedTags);
     }
     updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
@@ -275,24 +265,19 @@ const useTags = () => {
   };
 
   const setFeaturesSelectedForMultiTagging = (feature) => {
-    let selectedFeaturesForTaggingCopy = JSON.parse(JSON.stringify(selectedFeaturesForTagging));
-    let index = selectedFeaturesForTagging.findIndex(obj => obj.id === feature.id);
+    const index = selectedFeaturesForTagging.findIndex(obj => obj.id === feature.id);
     if (index === -1) {
-      selectedFeaturesForTaggingCopy.push(feature);
-      dispatch(setSelectedAttributes(selectedFeaturesForTaggingCopy));
+      dispatch(setSelectedAttributes([...selectedFeaturesForTagging, feature]));
       return true;
     }
     else {
-      selectedFeaturesForTaggingCopy.splice(index, 1);
-      dispatch(setSelectedAttributes(selectedFeaturesForTaggingCopy));
+      dispatch(setSelectedAttributes(selectedFeaturesForTagging.filter(obj => obj.id !== feature.id)));
       return false;
     }
   };
 
   const toggleContinuousTagging = (tag) => {
-    let tagCopy = JSON.parse(JSON.stringify(tag));
-    tagCopy.continuousTagging = !tag.continuousTagging;
-    saveTag(tagCopy);
+    saveTag({...tag, continuousTagging: !tag.continuousTagging});
   };
 
   return {
