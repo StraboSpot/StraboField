@@ -15,8 +15,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
-  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+  const {targetDatasetId} = useSelector(state => state.project);
+  const {isOwner} = useSelector(state => state.project.project);
 
   const {makeDatasetCurrent, setSwitchValue} = useProject();
 
@@ -26,7 +26,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
+  const isReadOnly = isOwner === false && !dataset.isCollaborativeDataset;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */

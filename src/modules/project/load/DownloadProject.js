@@ -9,7 +9,7 @@ import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import {PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
+import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
 
 const source = 'server';
 
@@ -67,17 +67,15 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
           />
         )}
         <ButtonGroup
-          // buttonStyle={{padding: 5}}
-          buttons={['My Projects', 'Collaboration Projects']}
-          containerStyle={{height: 50, borderRadius: 10}}
+          buttons={['My Projects', 'Collaborative Projects']}
+          containerStyle={buttonStyles.buttonGroupContainer}
           onPress={(index) => {
             console.log('Selected index:', index);
             setSelectedButtonIndex(index);
           }}
           selectedButtonStyle={{backgroundColor: '#007AFF'}}
           selectedIndex={selectedButtonIndex}
-          textStyle={{color: PRIMARY_TEXT_COLOR, textAlign: 'center'}}
-
+          textStyle={buttonStyles.buttonGroupText}
         />
         <ProjectList onProjectPress={confirmDownloadProject} selectedButtonIndex={selectedButtonIndex} source={source}/>
       </View>

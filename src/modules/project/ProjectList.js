@@ -119,7 +119,7 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
   const filteredProjectsList = () => {
     let myProjectsArr = [];
     let collaborationArr = [];
-    projectsArr.projects.forEach((project) => {
+    projectsArr.projects?.forEach((project) => {
       return project?.isOwner ? myProjectsArr.push(project) : collaborationArr.push(project);
     });
     return selectedButtonIndex === 0 ? myProjectsArr : collaborationArr;
@@ -140,7 +140,8 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
                 {isError && renderErrorMessage()}
               </View>
             }
-            data={projectsArr.projects}
+            // data={projectsArr.projects}
+            data={filteredProjectsList()}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderProjectItem(item)}/>
         </View>

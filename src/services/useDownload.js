@@ -46,7 +46,7 @@ const useDownload = () => {
 
   const dispatch = useDispatch();
   const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
-  const encodedLogin = useSelector(state => state.user.encoded_login);
+  const {encoded_login: encodedLogin, name: userName, email: userEmail} = useSelector(state => state.user);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
@@ -294,6 +294,15 @@ const useDownload = () => {
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
+      if (selectedProject.isOwner === false) {
+        const hasUnlockedDataset = Object.values(datasetsObjToSave).some(d => d.isCollaborativeDataset);
+        if (!hasUnlockedDataset) {
+          const collaborativeDataset = {...createDataset('Collaborative 1'), isCollaborativeDataset: true, owner_name: userName, owner_email: userEmail};
+          dispatch(addedDataset(collaborativeDataset));
+          dispatch(setActiveDatasets({bool: true, dataset: collaborativeDataset.id}));
+          dispatch(setTargetDataset(collaborativeDataset.id));
+        }
+      }
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
