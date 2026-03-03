@@ -84,7 +84,10 @@ const path = require('path');
 const glob = require('glob');
 
 const ROOT = path.resolve(__dirname, '..');
-const files = glob.sync('src/**/*.js', {cwd: ROOT});
+const argFiles = process.argv.slice(2);
+const files = argFiles.length > 0
+  ? argFiles
+  : glob.sync('src/**/*.js', {cwd: ROOT});
 
 const FUNC_PATTERNS = {
   constArrow: /^const\s+(\w+)\s*=\s*(?:async\s*)?\(/,
@@ -1115,7 +1118,8 @@ for (const file of files) {
     continue;
   }
 
-  const exportDefaultMatch = content.match(/export default (\w+)/);
+  const exportDefaultMatch = content.match(/export default \w+\((\w+)\)/)
+    || content.match(/export default (\w+)/);
   if (!exportDefaultMatch) continue;
   const exportedName = exportDefaultMatch[1];
 
