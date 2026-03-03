@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
 import {isEmpty} from '../../../shared/Helpers';
@@ -19,13 +19,15 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Derived Variables */
 
   // Get selected and not selected Spots as map features, split into multiple features if multiple orientations
-  const spotsNotSelectedWithSymbology = addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}})));
-  const spotsSelectedWithSymbology = addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}})));
+  const featuresNotSelected = useMemo(() => {
+    console.log('Getting Spots Not Selected as Features...');
+    return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
+  }, [spotsNotSelected]);
 
-  console.log('Getting Spots Not Selected as Features...');
-  const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);
-  console.log('Getting Spots Selected as Features...');
-  const featuresSelected = getSpotsAsFeatures(spotsSelectedWithSymbology);
+  const featuresSelected = useMemo(() => {
+    console.log('Getting Spots Selected as Features...');
+    return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
+  }, [spotsSelected]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around

@@ -14,7 +14,7 @@ import useMapCoords from './useMapCoords';
 import useMapFeatures from './useMapFeatures';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
 import useStereonet from './useStereonet';
-import {getNewId, getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewId, getNewUUID, isEmpty, isEqual} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -64,7 +64,7 @@ const useMapFeaturesDraw = ({
 
   /* Local State */
 
-  const [allowMapViewMove, setAllowMapViewMove] = useState(false);
+  const [allowMapViewMove, setAllowMapViewMove] = useState(true); // VIEW mode (initial) allows map movement
   const [drawFeatures, setDrawFeatures] = useState([]);
   const [editFeatureVertex, setEditFeatureVertex] = useState([]);
   const [spotEditing, setSpotEditing] = useState({});
@@ -366,19 +366,21 @@ const useMapFeaturesDraw = ({
   // Set selected and not selected Spots to display when not editing
   const setDisplayedSpots = (selectedSpots) => {
     let [selectedDisplayedSpots, notSelectedDisplayedSpots] = getDisplayedSpots(selectedSpots);
-    let selectedMappableSpotsCopy = JSON.parse(JSON.stringify(selectedDisplayedSpots));
-    let notSelectedMappableSpotsCopy = JSON.parse(JSON.stringify(notSelectedDisplayedSpots));
 
     // Convert image pixels to lat, lng
     if (currentImageBasemap || stratSection) {
-      selectedMappableSpotsCopy = selectedMappableSpotsCopy.map(spot => convertImagePixelsToLatLong(spot));
-      notSelectedMappableSpotsCopy = notSelectedMappableSpotsCopy.map(spot => convertImagePixelsToLatLong(spot));
+      selectedDisplayedSpots = selectedDisplayedSpots.map(spot => convertImagePixelsToLatLong(spot));
+      notSelectedDisplayedSpots = notSelectedDisplayedSpots.map(spot => convertImagePixelsToLatLong(spot));
     }
 
-    console.log('Selected Spots:', selectedMappableSpotsCopy);
-    setSpotsSelected([...selectedMappableSpotsCopy]);
-    console.log('Not Selected Spots:', notSelectedMappableSpotsCopy);
-    setSpotsNotSelected([...notSelectedMappableSpotsCopy]);
+    if (!isEqual(spotsSelected, selectedDisplayedSpots)) {
+      console.log('Selected Spots:', selectedDisplayedSpots);
+      setSpotsSelected(selectedDisplayedSpots);
+    }
+    if (!isEqual(spotsNotSelected, notSelectedDisplayedSpots)) {
+      console.log('Not Selected Spots:', notSelectedDisplayedSpots);
+      setSpotsNotSelected(notSelectedDisplayedSpots);
+    }
   };
 
   // Set selected and not selected Spots to display while editing

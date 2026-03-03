@@ -14,6 +14,8 @@ import useMapMouseActions from './useMapMouseActions.web';
 import useMapMoveEvents from './useMapMoveEvents';
 import useMapView from './useMapView';
 
+const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
+
 const Map = ({
                allowMapViewMove,
                basemap,
@@ -30,6 +32,8 @@ const Map = ({
              }, forwardedRef) => {
   // console.log('Rendering Map...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
@@ -37,18 +41,22 @@ const Map = ({
 
   const {mapRef} = forwardedRef;
 
-  const [viewState, setViewState] = React.useState({});
+  const {isDrawMode} = useMap();
+  const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
+  const {getInitialViewState} = useMapView();
+
+  /* Local State */
+
+  const [viewState, setViewState] = useState({});
+  const {handleMapMoved} = useMapMoveEvents({setViewState});
   const [mapKey, setMapKey] = useState(0);
+
+  /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
   const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
 
-  const {isDrawMode} = useMap();
-  const {handleMapMoved} = useMapMoveEvents({setViewState});
-  const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
-  const {getInitialViewState} = useMapView();
-
-  const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
+  /* Side Effects */
 
   useEffect(() => {
       // console.log('UE Map', viewState);
@@ -64,22 +72,27 @@ const Map = ({
     console.log('Web Map ID changed to:', currentMapId);
   }, [currentMapId]);
 
-  // Add the image to the map style.
-  mapRef.current?.on('styleimagemissing', (e) => {
-    const id = e.id;  // id of the missing image
-    if (!mapRef.current?.hasImage(id)) {
-      mapRef.current?.loadImage(
-        symbols[id],
-        (error, image) => {
+  // Add the image to the map style — registered once on mount to avoid duplicate listeners.
+  useEffect(() => {
+    const mapRefCurrent = mapRef.current;
+    if (!mapRefCurrent) return;
+    const handleStyleImageMissing = (e) => {
+      const id = e.id;
+      if (!mapRefCurrent.hasImage(id)) {
+        mapRefCurrent.loadImage(symbols[id], (error, image) => {
           if (error) throw error;
-          if (!mapRef.current?.hasImage(id)) {
-            mapRef.current?.addImage(id, image);
-            if (mapRef.current?.hasImage(id)) console.log('Added Image:', id);
+          if (!mapRefCurrent.hasImage(id)) {
+            mapRefCurrent.addImage(id, image);
+            if (mapRefCurrent.hasImage(id)) console.log('Added Image:', id);
           }
-        },
-      );
-    }
-  });
+        });
+      }
+    };
+    mapRefCurrent.on('styleimagemissing', handleStyleImageMissing);
+    return () => mapRefCurrent.off('styleimagemissing', handleStyleImageMissing);
+  }, []);
+
+  /* View */
 
   return (
     <ReactMapGL
