@@ -3847,12 +3847,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/netinfo@npm:11.4.1":
-  version: 11.4.1
-  resolution: "@react-native-community/netinfo@npm:11.4.1"
+"@react-native-community/netinfo@npm:12.0.1":
+  version: 12.0.1
+  resolution: "@react-native-community/netinfo@npm:12.0.1"
   peerDependencies:
+    react: "*"
     react-native: ">=0.59"
-  checksum: 10c0/118ba6d495bd14c2dab3d228a0c1857620a293ae8592d170d70eaf88a6ac6a4e35c7f84527975a9054e36891a9694aacc8ec053326b5f05961459ed08a70dd35
+  checksum: 10c0/66c5fab04ef3ffe9b1f2e3578e7d3052a8c3ae327d94fa41f7d95ec4db3de4dd4017bf486013f031cb1aa12909002492474f259ea6212471f730cca39239dd35
   languageName: node
   linkType: hard
 
@@ -17191,7 +17192,7 @@ __metadata:
     "@react-native-community/cli-platform-ios": "npm:20.1.1"
     "@react-native-community/datetimepicker": "npm:8.6.0"
     "@react-native-community/geolocation": "npm:3.4.0"
-    "@react-native-community/netinfo": "npm:11.4.1"
+    "@react-native-community/netinfo": "npm:12.0.1"
     "@react-native-community/slider": "npm:5.1.2"
     "@react-native-documents/picker": "npm:12.0.1"
     "@react-native-picker/picker": "npm:2.11.4"
