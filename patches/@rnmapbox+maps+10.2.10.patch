@@ -1,0 +1,19 @@
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt b/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt
+@@ -1,4 +1,6 @@
+ package com.rnmapbox.rnmbx.v11compat.layer;
+
+ import com.mapbox.maps.extension.style.layers.Layer
++
++@Suppress("unused") internal val _v11LayerCompat: Unit = Unit
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/style.kt b/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/style.kt
+index 1234568..abcdefh 100644
+--- a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/style.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/style.kt
+@@ -1,3 +1,5 @@
+ package com.rnmapbox.rnmbx.v11compat.style;
+
++@Suppress("unused") internal val _v11StyleCompat: Unit = Unit
++
