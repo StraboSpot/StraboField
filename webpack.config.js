@@ -24,6 +24,15 @@ const compileNodeModules = [
   'react-native-vector-icons',
 ].map(moduleName => path.resolve(__dirname, `node_modules/${moduleName}`));
 
+// async-storage v3+ only ships ESM (lib/module has {"type":"module"}), but babel-loader
+// transforms it to CommonJS. This rule overrides the module type so webpack doesn't try
+// to evaluate the CommonJS output as an ES module (which would cause "exports is not defined").
+const asyncStorageModuleTypeOverride = {
+  test: /\.js$/,
+  include: path.resolve(__dirname, 'node_modules/@react-native-async-storage/async-storage/lib/module'),
+  type: 'javascript/auto',
+};
+
 const babelLoaderConfiguration = {
   test: /\.(jsx?|tsx?)$/,
   // Add every directory that needs to be compiled by Babel during the build.
@@ -124,14 +133,13 @@ module.exports = (env, argv) => {
         '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
           'src/modules/images/react-native-image-resizer.web.js'),
         '@react-native-async-storage/async-storage': path.resolve(__dirname,
-          'node_modules/@react-native-async-storage/async-storage/src/index.ts'),
-        'react-native-tab-view': path.resolve(__dirname,
-          'node_modules/react-native-tab-view/src/index.tsx'),
+          'node_modules/@react-native-async-storage/async-storage'),
+        'react-native-tab-view': path.resolve(__dirname, 'node_modules/react-native-tab-view/src/index.tsx'),
       },
     },
     module: {
-      rules: [babelLoaderConfiguration, imageLoaderConfiguration, ttfLoaderConfiguration, cssLoaderConfiguration,
-        addedForReactNavigation],
+      rules: [asyncStorageModuleTypeOverride, babelLoaderConfiguration, imageLoaderConfiguration,
+        ttfLoaderConfiguration, cssLoaderConfiguration, addedForReactNavigation],
     },
     devServer: {
       allowedHosts: 'all',
