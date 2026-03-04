@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
@@ -39,22 +39,37 @@ const Map = ({
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {mapRef} = forwardedRef;
-
   const {isDrawMode} = useMap();
+  const {mapRef} = forwardedRef;
   const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
-  const {getInitialViewState} = useMapView();
-
-  /* Local State */
 
   const [viewState, setViewState] = useState({});
   const {handleMapMoved} = useMapMoveEvents({setViewState});
+  const {getInitialViewState} = useMapView();
+
+  /* Local State */
   const [mapKey, setMapKey] = useState(0);
 
   /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
   const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
+
+  /* Derived State */
+
+  // Preload all symbol images when the map style finishes loading.
+  const handleMapLoad = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    Object.entries(symbols).forEach(([id, url]) => {
+      if (!map.hasImage(id)) {
+        map.loadImage(url, (error, image) => {
+          if (error) { console.error('Error loading image:', id, error); return; }
+          if (!map.hasImage(id)) map.addImage(id, image);
+        });
+      }
+    });
+  }, []);
 
   /* Side Effects */
 
@@ -71,26 +86,6 @@ const Map = ({
     setMapKey(prev => prev + 1);
     console.log('Web Map ID changed to:', currentMapId);
   }, [currentMapId]);
-
-  // Add the image to the map style — registered once on mount to avoid duplicate listeners.
-  useEffect(() => {
-    const mapRefCurrent = mapRef.current;
-    if (!mapRefCurrent) return;
-    const handleStyleImageMissing = (e) => {
-      const id = e.id;
-      if (!mapRefCurrent.hasImage(id)) {
-        mapRefCurrent.loadImage(symbols[id], (error, image) => {
-          if (error) throw error;
-          if (!mapRefCurrent.hasImage(id)) {
-            mapRefCurrent.addImage(id, image);
-            if (mapRefCurrent.hasImage(id)) console.log('Added Image:', id);
-          }
-        });
-      }
-    };
-    mapRefCurrent.on('styleimagemissing', handleStyleImageMissing);
-    return () => mapRefCurrent.off('styleimagemissing', handleStyleImageMissing);
-  }, []);
 
   /* View */
 
@@ -109,6 +104,7 @@ const Map = ({
       mapboxAccessToken={MAPBOX_TOKEN}
       onClick={handleMapPress}
       onDblClick={handleMapLongPress}
+      onLoad={handleMapLoad}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
