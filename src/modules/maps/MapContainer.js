@@ -287,8 +287,8 @@ const MapContainer = forwardRef(({
         mapRef.current.flyTo({
           animate: true,
           center: center,
+          duration: 2000,
           essential: true,
-          maxDuration: 2000,
           zoom: newZoom,
         });
       }
