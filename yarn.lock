@@ -4361,17 +4361,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry-internal/tracing@npm:7.120.4":
-  version: 7.120.4
-  resolution: "@sentry-internal/tracing@npm:7.120.4"
-  dependencies:
-    "@sentry/core": "npm:7.120.4"
-    "@sentry/types": "npm:7.120.4"
-    "@sentry/utils": "npm:7.120.4"
-  checksum: 10c0/da2d8a3e8ccad4525d27794f157800fdc8c4bf694c6e2ef86f1aa9ae0f6a9ea5eb062e2e08b55bb8ecfc399e8a2aec458886d6e53d687d7a26bae6d257dc8031
-  languageName: node
-  linkType: hard
-
 "@sentry/babel-plugin-component-annotate@npm:4.9.1":
   version: 4.9.1
   resolution: "@sentry/babel-plugin-component-annotate@npm:4.9.1"
@@ -4589,16 +4578,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:7.120.4":
-  version: 7.120.4
-  resolution: "@sentry/core@npm:7.120.4"
-  dependencies:
-    "@sentry/types": "npm:7.120.4"
-    "@sentry/utils": "npm:7.120.4"
-  checksum: 10c0/bc1f5bc41cade04c8ce8361ec67d87e415a7bc7fb2e965c3084ec1b634969c5abed7f247ba6311722e5c0ce487509079acd64bd78dfa7ca56f3c0b32c4800011
-  languageName: node
-  linkType: hard
-
 "@sentry/react-native@npm:8.2.0":
   version: 8.2.0
   resolution: "@sentry/react-native@npm:8.2.0"
@@ -4634,37 +4613,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/tracing@npm:7.120.4":
-  version: 7.120.4
-  resolution: "@sentry/tracing@npm:7.120.4"
-  dependencies:
-    "@sentry-internal/tracing": "npm:7.120.4"
-  checksum: 10c0/d2a85d896acb229ca40ace559b65087f9b0a41f7596b5a015c4ac4533d4344410d858b1723c0eebffb0d6acdf01be558dfb4d85258652d3e1cdac8c207612319
-  languageName: node
-  linkType: hard
-
 "@sentry/types@npm:10.39.0":
   version: 10.39.0
   resolution: "@sentry/types@npm:10.39.0"
   dependencies:
     "@sentry/core": "npm:10.39.0"
   checksum: 10c0/cf29f486b442705feada836500a2142f22eaa648baec7997f1494e5e16cc697e3baaca11c65d13186038912b20b1598340c6ecbf8c94a2cad81a36e275483586
-  languageName: node
-  linkType: hard
-
-"@sentry/types@npm:7.120.4":
-  version: 7.120.4
-  resolution: "@sentry/types@npm:7.120.4"
-  checksum: 10c0/7d286b2b849f00a8a3370926203e5aa5fb66f39bb6dec89442f81da799d06cd2b0d2bb38176d31bbbc7b14b082172ee531258085e03eb4a9c4c99443bc53f52f
-  languageName: node
-  linkType: hard
-
-"@sentry/utils@npm:7.120.4":
-  version: 7.120.4
-  resolution: "@sentry/utils@npm:7.120.4"
-  dependencies:
-    "@sentry/types": "npm:7.120.4"
-  checksum: 10c0/0a7e7b9bf1cd89c7106010d40f9d298d614865c5b5bafc3aace9591a629c62119026a085cefcf21f0fd936ee4136bbf6bb6b881c65aa9ccf562482f178602f71
   languageName: node
   linkType: hard
 
@@ -10340,19 +10294,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-ft-flow@npm:^3.0.11":
-  version: 3.0.11
-  resolution: "eslint-plugin-ft-flow@npm:3.0.11"
-  dependencies:
-    lodash: "npm:^4.17.21"
-    string-natural-compare: "npm:^3.0.1"
-  peerDependencies:
-    eslint: ^8.56.0 || ^9.0.0
-    hermes-eslint: ">=0.15.0"
-  checksum: 10c0/025b3736d99d2831c6d493421fbfa880b0aeef9752d3b677972c7100e5ba424368525bc15b34604f02d18807bfa7b1bcaa2c3f37552381f2ce45283faa5989d5
-  languageName: node
-  linkType: hard
-
 "eslint-plugin-import@npm:^2.32.0":
   version: 2.32.0
   resolution: "eslint-plugin-import@npm:2.32.0"
@@ -10804,17 +10745,6 @@ __metadata:
   version: 3.0.5
   resolution: "fast-uri@npm:3.0.5"
   checksum: 10c0/f5501fd849e02f16f1730d2c8628078718c492b5bc00198068bc5c2880363ae948287fdc8cebfff47465229b517dbeaf668866fbabdff829b4138a899e5c2ba3
-  languageName: node
-  linkType: hard
-
-"fast-xml-parser@npm:5.3.4":
-  version: 5.3.4
-  resolution: "fast-xml-parser@npm:5.3.4"
-  dependencies:
-    strnum: "npm:^2.1.0"
-  bin:
-    fxparser: src/cli/cli.js
-  checksum: 10c0/d77866ca860ad185153e12f6ba12274d32026319ad8064e4681342b8a8e1ffad3f1f98daf04d77239fb12eb1d906ee7185fd328deda74529680e8dae0f3e9327
   languageName: node
   linkType: hard
 
@@ -15502,13 +15432,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-devsettings@npm:^1.0.5":
-  version: 1.0.5
-  resolution: "react-native-devsettings@npm:1.0.5"
-  checksum: 10c0/13e9b8138baceb123830dbf1a36c1e8da8d314edf1b84fa4087f21768d6631e9bf9b7506568aae6b80dec2de14010f7e1f2cc4040c2d4343113836057812e3a4
-  languageName: node
-  linkType: hard
-
 "react-native-draggable-flatlist@npm:4.0.3":
   version: 4.0.3
   resolution: "react-native-draggable-flatlist@npm:4.0.3"
@@ -17217,7 +17140,6 @@ __metadata:
     "@rnmapbox/maps": "npm:10.2.10"
     "@sentry/cli": "npm:3.2.3"
     "@sentry/react-native": "npm:8.2.0"
-    "@sentry/tracing": "npm:7.120.4"
     "@turf/turf": "npm:7.3.4"
     "@types/jest": "npm:^30.0.0"
     "@types/react": "npm:^19.2.10"
@@ -17232,11 +17154,9 @@ __metadata:
     concurrently: "npm:^9.2.1"
     css-loader: "npm:^7.1.3"
     eslint: "npm:^8.57.1"
-    eslint-plugin-ft-flow: "npm:^3.0.11"
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-react-native: "npm:^5.0.0"
     fast-deep-equal: "npm:3.1.3"
-    fast-xml-parser: "npm:5.3.4"
     formik: "npm:2.4.9"
     generate-changelog: "npm:1.8.0"
     geomagnetism: "npm:0.2.0"
@@ -17260,7 +17180,6 @@ __metadata:
     react-native-blob-util: "npm:0.24.7"
     react-native-check-version: "npm:1.4.0"
     react-native-device-info: "npm:15.0.2"
-    react-native-devsettings: "npm:^1.0.5"
     react-native-draggable-flatlist: "npm:4.0.3"
     react-native-fs: "npm:2.20.0"
     react-native-gesture-handler: "npm:2.30.0"
@@ -17294,7 +17213,6 @@ __metadata:
     redux-persist: "npm:6.0.0"
     style-loader: "npm:^4.0.0"
     terser-webpack-plugin: "npm:^5.3.17"
-    types: "npm:^0.1.1"
     typescript: "npm:^5.9.3"
     url-loader: "npm:^4.1.1"
     uuid: "npm:13.0.0"
@@ -17512,13 +17430,6 @@ __metadata:
   version: 1.0.5
   resolution: "strnum@npm:1.0.5"
   checksum: 10c0/64fb8cc2effbd585a6821faa73ad97d4b553c8927e49086a162ffd2cc818787643390b89d567460a8e74300148d11ac052e21c921ef2049f2987f4b1b89a7ff1
-  languageName: node
-  linkType: hard
-
-"strnum@npm:^2.1.0":
-  version: 2.1.2
-  resolution: "strnum@npm:2.1.2"
-  checksum: 10c0/4e04753b793540d79cd13b2c3e59e298440477bae2b853ab78d548138385193b37d766d95b63b7046475d68d44fb1fca692f0a3f72b03f4168af076c7b246df9
   languageName: node
   linkType: hard
 
@@ -17981,13 +17892,6 @@ __metadata:
     possible-typed-array-names: "npm:^1.0.0"
     reflect.getprototypeof: "npm:^1.0.6"
   checksum: 10c0/e38f2ae3779584c138a2d8adfa8ecf749f494af3cd3cdafe4e688ce51418c7d2c5c88df1bd6be2bbea099c3f7cea58c02ca02ed438119e91f162a9de23f61295
-  languageName: node
-  linkType: hard
-
-"types@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "types@npm:0.1.1"
-  checksum: 10c0/200b11ea12b7ef9449a74e32f5dd1f93c426f89369f1eaa7af9c5ecf59e011ab014544d4b09cc4ef7ffab05143f3eadb42ea3ff2f5b10d8d4246b193869d8bed
   languageName: node
   linkType: hard
 
