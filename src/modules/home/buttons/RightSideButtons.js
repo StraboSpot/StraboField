@@ -31,7 +31,7 @@ const RightSideButtons = ({
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
-
+  const {isReadOnly} = useSelector(state => state.project?.project);
   /* View */
 
   return (
@@ -69,10 +69,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        <DrawActionButtons
-          clickHandler={clickHandler}
-          mapMode={mapMode}
-        />
+        {!isReadOnly && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );

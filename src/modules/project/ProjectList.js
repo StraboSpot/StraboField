@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {AppState, FlatList, Text, View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -103,7 +103,7 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>
-            {source === 'server' ? item.name : item.fileName}
+            <Text>{source === 'server' ? item.name : item.fileName}</Text>
           </ListItem.Title>
           {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
@@ -111,6 +111,7 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
             </ListItem.Subtitle>
           )}
         </ListItem.Content>
+        {item.isReadOnly && <Icon name={'lock-closed'} type={'ionicon'}/>}
         <ListItem.Chevron/>
       </ListItem>
     );
