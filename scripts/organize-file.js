@@ -366,6 +366,10 @@ function convertToArrowFunction(chunk) {
   // Only convert function declarations (not already arrow functions)
   if (!FUNC_PATTERNS.functionDecl.test(firstLine.trim())) return lines;
 
+  // Skip if any preceding comment mentions hoisting
+  const commentLines = lines.slice(0, codeIdx).join('\n');
+  if (/hoist/i.test(commentLines)) return lines;
+
   const indentStr = firstLine.match(/^(\s*)/)[1];
 
   // Check if the function declaration spans multiple lines (params across lines)
