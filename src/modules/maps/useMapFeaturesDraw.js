@@ -367,10 +367,12 @@ const useMapFeaturesDraw = ({
   const setDisplayedSpots = (selectedSpots) => {
     let [selectedDisplayedSpots, notSelectedDisplayedSpots] = getDisplayedSpots(selectedSpots);
 
-    // Convert image pixels to lat, lng
+    // Convert image pixels to lat, lng (deep copy first to avoid mutating Redux state)
     if (currentImageBasemap || stratSection) {
-      selectedDisplayedSpots = selectedDisplayedSpots.map(spot => convertImagePixelsToLatLong(spot));
-      notSelectedDisplayedSpots = notSelectedDisplayedSpots.map(spot => convertImagePixelsToLatLong(spot));
+      selectedDisplayedSpots = JSON.parse(JSON.stringify(selectedDisplayedSpots)).map(
+        spot => convertImagePixelsToLatLong(spot));
+      notSelectedDisplayedSpots = JSON.parse(JSON.stringify(notSelectedDisplayedSpots)).map(
+        spot => convertImagePixelsToLatLong(spot));
     }
 
     if (!isEqual(spotsSelected, selectedDisplayedSpots)) {
