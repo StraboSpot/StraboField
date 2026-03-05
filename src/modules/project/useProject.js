@@ -34,7 +34,7 @@ const useProject = () => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
   // const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
-  const {isOwner} = useSelector(state => state.project.project);
+  const {isOwner, isReadOnly} = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -83,10 +83,17 @@ const useProject = () => {
 
   const addDataset = async (name) => {
     let datasetObj = createDataset(name);
-    if (isOwner === false) datasetObj = {...datasetObj, isCollaborativeDataset: true, owner_name: user.name, owner_email: user.email};
+    if (isOwner === false) {
+      datasetObj = {
+        ...datasetObj,
+        isReadOnly: isReadOnly,
+        owner_name: user.name,
+        owner_email: user.email,
+      };
+    }
     dispatch(addedDataset(datasetObj));
     console.log('Added datasets', datasets);
-    return Promise.resolve();
+    return datasetObj;
   };
 
   const checkValidDateTime = (spot) => {
@@ -212,7 +219,7 @@ const useProject = () => {
   const isSpotInReadOnlyDataset = (spotId) => {
     if (isOwner !== false) return false;
     const datasetId = getDatasetIdFromSpotId(spotId);
-    return !datasets[datasetId]?.isCollaborativeDataset;
+    return !datasets[datasetId]?.isReadOnly;
   };
 
   const makeDatasetCurrent = (datasetId) => {

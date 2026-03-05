@@ -4,12 +4,17 @@ import {View} from 'react-native';
 import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/useDownload';
-import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
+import TextInputModal from '../../../shared/ui/TextInputModal';
+import {setIsStatusMessagesModalVisible} from '../../home/home.slice';
+import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
-import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
+import {setActiveDatasets, setTargetDataset} from '../projects.slice';
+import useProject from '../useProject';
 
 const source = 'server';
 
@@ -22,10 +27,13 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const project = useSelector(state => state.project.project);
 
   const {initializeDownload} = useDownload();
+  const {addDataset} = useProject();
 
   /* Local State */
 
+  const [collaborativeDatasetName, setCollaborativeDatasetName] = useState('');
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
+  const [isDatasetNameModalVisible, setIsDatasetNameModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
 
@@ -42,8 +50,23 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const downloadProject = async (inProjectToDownload) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
-    await initializeDownload(inProjectToDownload);
-    closeMainMenuPanel();
+    await initializeDownload(inProjectToDownload, undefined);
+    if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
+      dispatch(setIsStatusMessagesModalVisible(false));
+      setIsDatasetNameModalVisible(true);
+    }
+    else {
+      closeMainMenuPanel();
+    }
+  };
+
+  const onDatasetNameConfirm = async () => {
+    const newDataset = await addDataset(collaborativeDatasetName || 'My Dataset');
+    dispatch(setActiveDatasets({bool: true, dataset: newDataset.id}));
+    dispatch(setTargetDataset(newDataset.id));
+    setIsDatasetNameModalVisible(false);
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
   };
 
   const getTextOverride = () => {
@@ -80,7 +103,20 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         <ProjectList onProjectPress={confirmDownloadProject} selectedButtonIndex={selectedButtonIndex} source={source}/>
       </View>
 
-      {/* Modal */}
+      {/* Modals */}
+      <TextInputModal
+        buttonText={'Create Dataset'}
+        dialogTitle={'Name Your Dataset'}
+        onActionPressed={onDatasetNameConfirm}
+        onCancelPress={() => {
+          setIsDatasetNameModalVisible(false);
+          closeMainMenuPanel();
+        }}
+        onChangeText={text => setCollaborativeDatasetName(text)}
+        placeholder={'Enter dataset name...'}
+        value={collaborativeDatasetName}
+        visible={isDatasetNameModalVisible}
+      />
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}
