@@ -77,8 +77,12 @@ const Nesting = () => {
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
     const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
-    const groupedGeneration = generation.reduce(
-      (r, v, i, a, k = v.properties.image_basemap) => ((r[k] || (r[k] = [])).push(v), r), {});
+    const groupedGeneration = generation.reduce((r, v) => {
+      const k = v.properties.image_basemap;
+      if (!r[k]) r[k] = [];
+      r[k].push(v);
+      return r;
+    }, {});
     console.log('groupedGeneration', groupedGeneration);
     return (
       <>

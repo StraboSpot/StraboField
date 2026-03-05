@@ -452,9 +452,8 @@ const useSpots = () => {
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
   const getSpotWithThisStratSection = (stratSectionId) => {
-    // Comparing int to string so use only 2 equal signs
     return Object.values(getActiveSpotsObj()).find(
-      spot => spot?.properties?.sed?.strat_section?.strat_section_id == stratSectionId);
+      spot => spot?.properties?.sed?.strat_section?.strat_section_id?.toString() === stratSectionId?.toString());
   };
 
   const handleSpotSelected = (spot) => {

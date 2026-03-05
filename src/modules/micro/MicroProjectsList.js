@@ -24,7 +24,7 @@ const MicroProjectsList = () => {
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
 
-  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp, deleteFromDevice} = useDevice();
+  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
   const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
   const {
     clearStatus,

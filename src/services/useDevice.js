@@ -1,6 +1,6 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
-import {isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
+import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';

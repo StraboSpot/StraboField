@@ -1,13 +1,10 @@
 import React from 'react';
-import {Dimensions, Platform, Text} from 'react-native';
+import {Text} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
 import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-
-const platform = Platform.OS === 'ios' ? 'window' : 'screen';
-const {height} = Dimensions.get(platform);
 
 const WarningModal = ({
                         cancelTitle,

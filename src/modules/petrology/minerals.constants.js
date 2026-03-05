@@ -2,7 +2,11 @@ import {MINERAL_GLOSSARY_INFO} from './mineralsGlossary.constants';
 
 export const ABBREVIATIONS_WITH_LABELS = (
   MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
-    if (mineral.Abbreviation) mineral.Abbreviation.split(', ').forEach(abb => acc[abb] = mineral.Label);
+    if (mineral.Abbreviation) {
+      mineral.Abbreviation.split(', ').forEach((abb) => {
+        acc[abb] = mineral.Label;
+      });
+    }
     return acc;
   }, {})
 );

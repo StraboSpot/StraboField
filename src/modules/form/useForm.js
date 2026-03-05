@@ -98,6 +98,7 @@ const useForm = () => {
     const relevantLogicJS = convertXLSFormLogicToJS(field.relevant);
     // console.log(field.name, 'relevant:', relevantLogicJS);
 
+    // eslint-disable-next-line no-new-func -- required for dynamic evaluation of XLSForm logic strings
     const F = new Function('values', 'return ' + relevantLogicJS);
     return F(values);
   };
@@ -133,7 +134,7 @@ const useForm = () => {
       }
       else if (values[key]) {
         if (fieldModel.type === 'integer') {
-          values[key] = isNaN(parseInt(values[key])) ? undefined : parseInt(values[key]);
+          values[key] = isNaN(parseInt(values[key], 10)) ? undefined : parseInt(values[key], 10);
         }
         else if (fieldModel.type === 'decimal') {
           values[key] = isNaN(parseFloat(values[key])) ? undefined : parseFloat(values[key]);

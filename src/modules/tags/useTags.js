@@ -87,8 +87,8 @@ const useTags = () => {
   };
 
   const addRemoveSpotFromTag = (spotId, tag) => {
-    const spots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId) : [...(tag.spots ?? []), spotId];
-    saveTag({...tag, spots});
+    const updatedSpots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId) : [...(tag.spots ?? []), spotId];
+    saveTag({...tag, spots: updatedSpots});
   };
 
   // tag modal - add remove tags (wrapper method for feature level tagging and spot level tagging).
