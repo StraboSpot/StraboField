@@ -26,7 +26,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = isOwner === false && !dataset.isCollaborativeDataset;
+  const isReadOnly = isOwner === false && dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */
@@ -70,7 +70,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         <Icon
           color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
             : themes.SECONDARY_BACKGROUND_COLOR}
-          disabled={!isActive}
+          disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
           onPress={() => makeDatasetCurrent(dataset.id)}

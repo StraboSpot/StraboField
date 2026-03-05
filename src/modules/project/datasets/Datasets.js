@@ -13,11 +13,13 @@ const Datasets = () => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const datasets = useSelector(state => state.project.datasets);
+  const {isOwner} = useSelector(state => state.project.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   /* Local State */
 
   const [datasetToView, setDatasetToView] = useState(null);
+  const [isAddDatasetModalVisible, setIsAddDatasetModalVisible] = useState(false);
 
   /* Side Effects */
 
@@ -32,6 +34,13 @@ const Datasets = () => {
     }
   }, [datasets]);
 
+  useEffect(() => {
+    if (isOwner === false) {
+      const hasWritableDataset = Object.values(datasets).some(d => d.isReadOnly);
+      if (!hasWritableDataset) setIsAddDatasetModalVisible(true);
+    }
+  }, []);
+
   /* Logic Helpers */
 
   const closeDetailView = () => setDatasetToView(null);
@@ -39,7 +48,11 @@ const Datasets = () => {
   /* View */
 
   return datasetToView ? <DatasetDetail closeDetailView={closeDetailView} dataset={datasetToView}/>
-    : <DatasetsOverview setDatasetToView={setDatasetToView}/>;
+    : <DatasetsOverview
+      isAddDatasetModalVisible={isAddDatasetModalVisible}
+      setDatasetToView={setDatasetToView}
+      setIsAddDatasetModalVisible={setIsAddDatasetModalVisible}
+    />;
 };
 
 export default Datasets;

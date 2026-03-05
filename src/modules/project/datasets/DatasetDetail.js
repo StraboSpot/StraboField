@@ -9,22 +9,19 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
-import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
-import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
+import {updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
+  const {activeDatasetsIds, project, readOnlyDatasetsIds} = useSelector(state => state.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
@@ -38,8 +35,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   /* Derived Variables */
 
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-  const isTarget = targetDatasetId === dataset.id;
+  const isOwnerOfDataset = project.isOwner !== false || dataset.isReadOnly === true;
+  const isReadOnly = !isOwnerOfDataset || readOnlyDatasetsIds.includes(dataset.id);
 
   /* Event Handlers */
 
@@ -52,8 +49,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   };
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
-
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
   /* Logic Helpers */
 
@@ -233,6 +228,33 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
+  // Dataset Creator Field (shown for collaborative datasets)
+  const renderOwnerField = () => {
+    if (!dataset.owner_name) return null;
+    return (
+      <ListItem containerStyle={commonStyles.listItemFormField}>
+        <ListItem.Content>
+          <View style={formStyles.fieldLabelContainer}>
+            <Text style={formStyles.fieldLabel}>{'Owner'}</Text>
+          </View>
+          <TextInput
+            editable={false}
+            style={formStyles.fieldValue}
+            value={dataset.owner_name}
+          />
+          <View style={formStyles.fieldLabelContainer}>
+            <Text style={formStyles.fieldLabel}>{'Email'}</Text>
+          </View>
+          <TextInput
+            editable={false}
+            style={formStyles.fieldValue}
+            value={dataset.owner_email}
+          />
+        </ListItem.Content>
+      </ListItem>
+    );
+  };
+
   // Dataset Name Field
   const renderNameField = () => {
     return (
@@ -253,25 +275,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
               />
             </View>
           </ListItem.Content>
-        </ListItem>
-      </View>
-    );
-  };
-
-  const renderReadOnlyDatasetButton = () => {
-    return (
-      <View style={{alignContent: 'flex-start'}}>
-        <ListItem containerStyle={commonStyles.listItemFormField}>
-          <ListItem.Content
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-          >
-            <View style={{flex: 1}}>
-              <View style={formStyles.fieldLabelContainer}>
-                <Text style={formStyles.fieldLabel}>{'Read Only'}</Text>
-              </View>
-            </View>
-          </ListItem.Content>
-          <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
         </ListItem>
       </View>
     );
@@ -309,11 +312,9 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
       {renderNameField()}
       {renderMetadataForm()}
+      {renderOwnerField()}
       {renderSpotsField()}
       {renderImagesField()}
-      <LittleSpacer/>
-      {renderReadOnlyDatasetButton()}
-      <LittleSpacer/>
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 
       {/* Child Modal */}
