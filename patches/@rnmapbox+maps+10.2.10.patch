@@ -1,3 +1,74 @@
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
+@@ -19,7 +19,7 @@ open class RNMBXImages : UIView, RNMBXMapComponent {
+-  @objc public weak var bridge : RCTBridge! = nil
++  @objc public weak var bridge : RCTBridge? = nil
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
+@@ -11,7 +11,7 @@ class RNMBXUtils {
+-  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
++  static func fetchImages(_ bridge: RCTBridge?, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
+@@ -143,9 +143,9 @@ class RNMBXImageQueue {
+-  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge, handler: ...) {
++  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge?, handler: ...) {
+-  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge, handler: ...) {
++  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge?, handler: ...) {
+-  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge, handler: ...) {
++  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge?, handler: ...) {
+@@ -65,14 +65,26 @@ class RNMBXImageQueueOperation : Operation {
+     DispatchQueue.global(qos: .default).async {
+-      if let weakSelf = weakSelf {
+-        let loader : RCTImageLoaderProtocol = weakSelf.bridge!.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
++      guard let weakSelf = weakSelf else { return }
++      if let bridge = weakSelf.bridge {
++        let loader : RCTImageLoaderProtocol = bridge.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
+         ...
++      } else {
++        // Bridgeless fallback: load via URLSession (file:// and http:// both work)
++        _ = weakSelf.setState(state:.Executing, only:.Initial)
++        URLSession.shared.dataTask(with: weakSelf.urlRequest) { data, _, error in
++          guard let weakSelf = weakSelf else { return }
++          let image = data.flatMap { UIImage(data: $0, scale: CGFloat(weakSelf.scale ?? 1.0)) }
++          weakSelf.completionHandler?(error, image)
++          _ = weakSelf.setState(state:.Finished, except:.Finished)
++        }.resume()
++      }
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
+@@ -499,7 +499,7 @@ class RNMBXStyleValue {
+   func setImage(
+-    bridge: RCTBridge,
++    bridge: RCTBridge?,
+     style: Style,
+     oldValue: Any?,
+     setImageOnLayer: (_: RNMBXStyleValue) -> Void,
+@@ -508,6 +508,11 @@ class RNMBXStyleValue {
+     if (!shouldAddImage()) {
+       setImageOnLayer(self)
+     } else {
++      guard let bridge = bridge else {
++        Logger.log(level: .warn, message: "setImage: bridge is nil (bridgeless mode), skipping remote image load for \(name)")
++        return
++      }
+       let imageURI = getImageURI()
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
+index 1234567..abcdefg 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
+@@ -53,14 +53,14 @@ class RNMBXStyle {
+-        bridge: bridge!,
++        bridge: bridge,
+ (repeated for all 9 occurrences of bridge: bridge! → bridge: bridge)
 diff --git a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt b/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt
 index 1234567..abcdefg 100644
 --- a/node_modules/@rnmapbox/maps/android/src/main/mapbox-v11-compat/v11/com/rnmapbox/rnmbx/v11compat/Layer.kt
