@@ -1,13 +1,17 @@
 import React from 'react';
 
 import {Icon} from '@rn-vui/base';
-import {Marker} from 'react-map-gl';
+import {Marker} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/Helpers';
 
 const MacrostratMarkerLayer = ({location}) => {
+  /* Data Hooks */
+
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  /* Logic Helpers */
 
   const setCoords = () => {
     if (!isEmpty(selectedSpot) && selectedSpot.geometry.type === 'Point') {
@@ -15,6 +19,8 @@ const MacrostratMarkerLayer = ({location}) => {
     }
     return location.coords;
   };
+
+  /* View */
 
   return (
     <Marker

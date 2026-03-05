@@ -7,20 +7,26 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setVertexEndCoords} from './maps.slice';
 import mapStyles from './maps.styles';
 
+const selectedVertexOffset = 10;
+
 const VertexDrag = () => {
   // console.log('Rendering VertexDrag...');
+
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const vertexStartCoords = useSelector(state => state.map.vertexStartCoords);
 
-  const selectedVertexOffset = 10;
+  /* Local State */
+
+  const isPressed = useSharedValue(false);
+
   const vertexStartCoordsObj = {
     x: vertexStartCoords[0] - selectedVertexOffset,
     y: vertexStartCoords[1] - selectedVertexOffset,
   };
-  const isPressed = useSharedValue(false);
+
   const offset = useSharedValue(vertexStartCoordsObj);
-  const start = useSharedValue(vertexStartCoordsObj);
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
@@ -29,9 +35,9 @@ const VertexDrag = () => {
     };
   });
 
-  const saveEnd = (endCoords) => {
-    dispatch(setVertexEndCoords(endCoords));
-  };
+  const start = useSharedValue(vertexStartCoordsObj);
+
+  /* Derived Variables */
 
   const gesture = Gesture.Pan()
     .onBegin(() => {
@@ -58,6 +64,15 @@ const VertexDrag = () => {
       // console.log('onFinalize');
       isPressed.value = false;
     });
+
+  /* Logic Helpers */
+
+  // Using function declaration (not const) so it is hoisted and available to runOnJS above
+  function saveEnd(endCoords) {
+    dispatch(setVertexEndCoords(endCoords));
+  }
+
+  /* View */
 
   return (
     <GestureDetector gesture={gesture}>

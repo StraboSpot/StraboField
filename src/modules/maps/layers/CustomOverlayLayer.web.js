@@ -1,12 +1,15 @@
 import React, {useEffect, memo} from 'react';
 
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 
 import useMapURL from '../useMapURL';
 
 const CustomOverlayLayer = ({customMap}) => {
+  /* Data Hooks */
 
   const {buildTileURL} = useMapURL();
+
+  /* Side Effects */
 
   useEffect(() => {
     return () => {
@@ -14,6 +17,8 @@ const CustomOverlayLayer = ({customMap}) => {
       console.log('CustomMapLayer (web) unmounting for map:', customMap.id);
     };
   }, [customMap.id]);
+
+  /* View */
 
   // Defensive check to ensure customMap is valid
   if (!customMap || !customMap.id) {

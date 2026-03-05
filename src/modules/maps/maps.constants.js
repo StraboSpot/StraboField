@@ -161,3 +161,63 @@ export const BACKGROUND = {
   }],
   version: 8,
 };
+
+export const SPOT_LAYERS = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
+  'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
+  'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
+  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
+
+export const STEREONET_HEADERS = [
+  'No.',
+  'Type',
+  'Structure',
+  'Color',
+  'Trd/Strk',
+  'Plg/Dip',
+  'Longitude',
+  'Latitude',
+  'Horiz ± m',
+  'Elevation',
+  'Elev ± m',
+  'Time',
+  'Day',
+  'Month',
+  'Year',
+  'Notes', //Everything below 'Notes' is new for v4 of Stereonet
+  'Checked',
+  'Strabo Type',
+  'Strabo Quality',
+  'Strabo Plane Detail',
+  'Strabo Plane Addl Detail',
+  'Plane Thickness',
+  'Plane Length',
+  'Geologist',
+  'UnixTimeStamp',
+  'ModifiedTimeStamp',
+  'Associated Obs',
+  'Method',
+];
+
+export const GLYPH_CENTER_COORDINATE = [-71.416555631, 42.662938497];
+
+export const GLYPH_TEXT_SHAPE = {
+  'type': 'Feature',
+  'properties': {},
+  'geometry': {
+    'type': 'Point',
+    'coordinates': GLYPH_CENTER_COORDINATE,
+  },
+};
+
+export const LAYER_IDS_NOT_SELECTED = ['polygonLayerNotSelected', 'polygonLayerWithPatternNotSelected',
+  'polygonLayerNotSelectedBorder', 'polygonLabelLayerNotSelected', 'lineLayerNotSelected',
+  'lineLayerNotSelectedDotted', 'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed',
+  'lineLabelLayerNotSelected', 'pointLayerNotSelected'];
+
+export const LAYER_IDS_SELECTED = ['polygonLayerSelected', 'polygonLayerWithPatternSelected',
+  'polygonLayerSelectedBorder', 'polygonLabelLayerSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
+  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'lineLabelLayerSelected', 'pointLayerSelectedHalo'];
+
+export const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
+
+export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line'];

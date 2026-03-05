@@ -3,13 +3,11 @@ import {FlatList, Text, View} from 'react-native';
 
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
-import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
+import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
-
-  const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  /* Data Hooks */
 
   const {
     checkIsSafeDelete,
@@ -28,10 +26,19 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     updatedImages,
   } = useReportModal({openSpotInNotebook: openSpotInNotebook});
 
+  /* Local State */
+
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
+
+  /* Event Handlers */
+
   const handleDeletePressed = () => {
     setErrorMessage(checkIsSafeDelete());
     setIsDeleteReportModalVisible(true);
   };
+
+  /* View */
 
   return (
     <>
@@ -48,7 +55,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} ref={formRef}/> \\ Not used yet
+              <ReportForm initialValues={initialValues} ref={formRef}/>
               <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <View style={{paddingTop: 10}}/>
               <ReportSpots
@@ -68,18 +75,19 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           }
           bounces={false}
         />
-
-        <DeleteConformationDialogBox
-          headerTitle={'Delete Report?'}
+        <WarningModal
+          cancelTitle={errorMessage ? 'Ok' : 'Cancel'}
           isVisible={isDeleteReportModalVisible}
-          onActionPressed={deleteReport}
           onCancelPress={() => setIsDeleteReportModalVisible(false)}
-          showActionButton={isDeleteReportModalVisible && !errorMessage}
+          onConfirmPress={deleteReport}
+          overlayStyleOverride={{height: '30%'}}
           showCancelButton={true}
+          showConfirmButton={isDeleteReportModalVisible && !errorMessage}
+          title={'Delete Report?'}
         >
           {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
             : <Text>Are you sure you want to delete this report?</Text>}
-        </DeleteConformationDialogBox>
+        </WarningModal>
       </ModalWrapper>
 
     </>

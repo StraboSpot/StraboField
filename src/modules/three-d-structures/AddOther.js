@@ -1,33 +1,38 @@
 import React, {useState} from 'react';
 
-import {BOUDINAGE_MEASUREMENTS_KEYS, MULLION_MEASUREMENTS_KEYS} from './threeDStructures.constants';
+import {
+  ADD_OTHER_BOUDINAGE_FIRST_KEYS,
+  ADD_OTHER_BOUDINAGE_THIRD_KEYS,
+  ADD_OTHER_FIRST_KEYS,
+  ADD_OTHER_LABEL_KEY,
+  ADD_OTHER_LAST_KEYS,
+  ADD_OTHER_LOBATE_CUSPATE_KEYS,
+  ADD_OTHER_MULLION_FIRST_KEYS,
+  ADD_OTHER_MULLION_THIRD_KEYS,
+  BOUDINAGE_MEASUREMENTS_KEYS,
+  MULLION_MEASUREMENTS_KEYS,
+} from './threeDStructures.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import {Form, MainButtons} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
 const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Local State */
+
   const [isOtherMeasurementsModalVisible, setIsOtherMeasurementsModalVisible] = useState(false);
   const [otherMeasurementsGroupField, setOtherMeasurementsGroupField] = useState({});
 
-  // Relevant keys for quick-entry modal
-  const labelKey = ['label'];
-  const firstKeys = ['feature_type'];
-  const boudinageFirstKeys = ['boudinage_geometry', 'boudinage_shape'];
-  const boudinageThirdKeys = ['boudinage_competent', 'boudinage_incompetent', 'average_width_of_boudin_neck',
-    'number_of_necks_measured', 'boudinage_wavelength_m', 'boudinaged_layer_thickness_m'];
-  const mullionFirstKeys = ['mullion_geometry', 'mullion_symmetry'];
-  const mullionThirdKeys = ['mullion_competent_material', 'mullion_incompetent_material', 'mullion_wavelength_m',
-    'mullion_layer_thickness_m'];
-  const lobateCuspateKeys = ['approximate_scale_m_lobate', 'lobate_competent_material', 'lobate_incompetent_material'];
-  const lastKeys = ['struct_notes'];
+  /* Derived Variables */
 
+  const boudinageKeysFields = ADD_OTHER_BOUDINAGE_THIRD_KEYS.map(k => survey.find(f => f.name === k));
   // Relevant fields for quick-entry modal
-  const labelField = labelKey.map(k => survey.find(f => f.name === k));
-  const boudinageKeysFields = boudinageThirdKeys.map(k => survey.find(f => f.name === k));
-  const mullionKeysFields = mullionThirdKeys.map(k => survey.find(f => f.name === k));
-  const lobateCuspateKeysFields = lobateCuspateKeys.map(k => survey.find(f => f.name === k));
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const labelField = ADD_OTHER_LABEL_KEY.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = ADD_OTHER_LAST_KEYS.map(k => survey.find(f => f.name === k));
+  const lobateCuspateKeysFields = ADD_OTHER_LOBATE_CUSPATE_KEYS.map(k => survey.find(f => f.name === k));
+  const mullionKeysFields = ADD_OTHER_MULLION_THIRD_KEYS.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>
@@ -35,7 +40,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
       <MainButtons
         formName={formName}
         formProps={formProps}
-        mainKeys={firstKeys}
+        mainKeys={ADD_OTHER_FIRST_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
       {formProps.values.feature_type === 'boudinage' && (
@@ -43,7 +48,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
           <MainButtons
             formName={formName}
             formProps={formProps}
-            mainKeys={boudinageFirstKeys}
+            mainKeys={ADD_OTHER_BOUDINAGE_FIRST_KEYS}
             setChoicesViewKey={setChoicesViewKey}
           />
           <MeasurementButtons
@@ -70,7 +75,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
           <MainButtons
             formName={formName}
             formProps={formProps}
-            mainKeys={mullionFirstKeys}
+            mainKeys={ADD_OTHER_MULLION_FIRST_KEYS}
             setChoicesViewKey={setChoicesViewKey}
           />
           <MeasurementButtons

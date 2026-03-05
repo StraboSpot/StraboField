@@ -1,9 +1,12 @@
 import useStratSection from './useStratSection';
-import useSedValidation from '../../sed/useSedValidation';
+import {getSiliciclasticGrainSize} from '../../sed/sed.helpers';
 
 const useStratSectionSymbology = () => {
-  const {getSiliciclasticGrainSize} = useSedValidation();
+  /* Data Hooks */
+
   const {getStratSectionSettings} = useStratSection();
+
+  /* Internal Functions */
 
   const getGrainSize = (lithology) => {
     if (lithology.primary_lithology === 'limestone' || lithology.primary_lithology === 'dolostone') {
@@ -14,6 +17,8 @@ const useStratSectionSymbology = () => {
     }
     return lithology.primary_lithology;
   };
+
+  /* Exported Functions */
 
   const getStratIntervalFill = (featureProperties) => {
     let fill;
@@ -143,7 +148,7 @@ const useStratSectionSymbology = () => {
   };
 
   return {
-    getStratIntervalFill: getStratIntervalFill,
+    getStratIntervalFill,
   };
 };
 

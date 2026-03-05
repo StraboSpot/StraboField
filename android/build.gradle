@@ -1,11 +1,11 @@
 buildscript {
     ext {
-        buildToolsVersion = "35.0.0"
+        buildToolsVersion = "36.0.0"
         minSdkVersion = 24
-        compileSdkVersion = 35
+        compileSdkVersion = 36
         targetSdkVersion = 35
         ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.0.21"
+        kotlinVersion = "2.1.20"
         RNMapboxMapsImpl = "mapbox" // required for v10
     }
     repositories {
@@ -35,6 +35,9 @@ allprojects {
                 // Use the secret token you stored in gradle.properties as the password
                 password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
              }
+        }
+        maven {
+            url "$rootDir/../node_modules/@react-native-async-storage/async-storage/android/local_repo"
         }
     }
 }

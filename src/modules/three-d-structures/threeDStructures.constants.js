@@ -1,3 +1,11 @@
+export const THREE_D_STRUCTURE_SECTIONS = {
+  // FABRICS: {title: 'Fabrics', key: 'fabric'}, // Hidden here and displayed on Fabrics page as deprecated
+  FOLDS: {title: 'Folds', key: 'fold'},
+  FAULTS: {title: 'Faults', key: 'fault'},
+  TENSORS: {title: 'Tensors', key: 'tensor'},
+  OTHER: {title: 'Other', key: 'other'},
+};
+
 export const THREE_D_STRUCTURE_TYPES = {
   FOLD: 'fold',
   FAULT: 'fault',
@@ -62,3 +70,28 @@ export const MULLION_MEASUREMENTS_KEYS = {
     quality: 'mullion_linear_measure_quality',
   },
 };
+
+// AddFault keys
+export const ADD_FAULT_FIRST_KEYS = ['label'];
+export const ADD_FAULT_MAIN_BUTTONS_KEYS = ['fault_or_sz_type'];
+export const ADD_FAULT_SECOND_BUTTON_KEYS = ['movement', 'movement_justification', 'directional_indicators'];
+export const ADD_FAULT_LAST_KEYS = ['movement_amount_m', 'amplitude_m', 'folded_layer_thickness_m', 'fault_notes'];
+
+// AddFold keys
+export const ADD_FOLD_FIRST_KEYS = ['label'];
+export const ADD_FOLD_MAIN_BUTTONS_KEYS = ['feature_type'];
+export const ADD_FOLD_TIGHTNESS_KEY = 'tightness';
+export const ADD_FOLD_VERGENCE_KEY = 'vergence';
+export const ADD_FOLD_LAST_KEYS = ['fold_notes'];
+
+// AddOther keys
+export const ADD_OTHER_LABEL_KEY = ['label'];
+export const ADD_OTHER_FIRST_KEYS = ['feature_type'];
+export const ADD_OTHER_BOUDINAGE_FIRST_KEYS = ['boudinage_geometry', 'boudinage_shape'];
+export const ADD_OTHER_BOUDINAGE_THIRD_KEYS = ['boudinage_competent', 'boudinage_incompetent', 'average_width_of_boudin_neck',
+  'number_of_necks_measured', 'boudinage_wavelength_m', 'boudinaged_layer_thickness_m'];
+export const ADD_OTHER_MULLION_FIRST_KEYS = ['mullion_geometry', 'mullion_symmetry'];
+export const ADD_OTHER_MULLION_THIRD_KEYS = ['mullion_competent_material', 'mullion_incompetent_material', 'mullion_wavelength_m',
+  'mullion_layer_thickness_m'];
+export const ADD_OTHER_LOBATE_CUSPATE_KEYS = ['approximate_scale_m_lobate', 'lobate_competent_material', 'lobate_incompetent_material'];
+export const ADD_OTHER_LAST_KEYS = ['struct_notes'];

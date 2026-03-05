@@ -4,13 +4,15 @@ import {View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import documentationStyles from './documentation.styles';
+import {HELP_URL} from './help.constants';
 import UrlLinkButton from './UrlLinkButton';
-import {STRABO_APIS} from '../../services/urls.constants';
 
 const Documentation = () => {
+  /* Data Hooks */
+
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
-  const helpUrl = STRABO_APIS.STRABO + '/help';
+  /* View */
 
   return (
     <View style={documentationStyles.container}>
@@ -18,7 +20,7 @@ const Documentation = () => {
         <UrlLinkButton
           icon={'globe-outline'}
           title={'Online Help Page'}
-          url={helpUrl}
+          url={HELP_URL}
         />
       )}
     </View>

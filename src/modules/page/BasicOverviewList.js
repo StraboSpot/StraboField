@@ -4,7 +4,8 @@ import {FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BasicListItem from './BasicListItem';
-import {PAGE_KEYS, PET_PAGES, SED_PAGES} from './page.constants';
+import {PET_PAGES, SED_PAGES} from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import {getNewUUID, isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -13,11 +14,38 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const BasicOverviewList = ({page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const isPet = PET_PAGES.find(p => p.key === page.key);
   const isSed = SED_PAGES.find(p => p.key === page.key);
+
+  /* Event Handlers */
+
+  const onItemPressed = (item, i) => {
+    if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
+      addIdForSS1ImportedSedData(item, i);
+    }
+    else dispatch(setSelectedAttributes([item]));
+    dispatch(setNotebookPageVisible(page.key));
+  };
+
+  /* Logic Helpers */
+
+  const addIdForSS1ImportedSedData = (item, i) => {
+    let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
+    item = {...item, id: getNewUUID()};
+    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) editedSedData[PAGE_KEYS.LITHOLOGIES].splice(i, 1, item);
+    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, item);
+    else editedSedData[page.key].splice(i, 1, item);
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    dispatch(setSelectedAttributes([item]));
+  };
 
   const getData = () => {
     let data = spot.properties[page.key] || [];
@@ -38,24 +66,7 @@ const BasicOverviewList = ({page}) => {
     return data;
   };
 
-  const addIdForSS1ImportedSedData = (item, i) => {
-    let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-    item = {...item, id: getNewUUID()};
-    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) editedSedData[PAGE_KEYS.LITHOLOGIES].splice(i, 1, item);
-    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, item);
-    else editedSedData[page.key].splice(i, 1, item);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    dispatch(setSelectedAttributes([item]));
-  };
-
-  const onItemPressed = (item, i) => {
-    if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
-      addIdForSS1ImportedSedData(item, i);
-    }
-    else dispatch(setSelectedAttributes([item]));
-    dispatch(setNotebookPageVisible(page.key));
-  };
+  /* View */
 
   return (
     <FlatList

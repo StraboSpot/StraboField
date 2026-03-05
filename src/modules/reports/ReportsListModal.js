@@ -6,17 +6,22 @@ import {ReportsList} from '.';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsListModal = () => {
-  const dispatch = useDispatch();
+  /* Data Hooks */
 
+  const dispatch = useDispatch();
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
+
+  /* Logic Helpers */
 
   const addReport = () => {
     dispatch(setModalValues({spots: selectedSpots.map(s => s.properties.id)}));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
+
+  /* View */
 
   return (
     <ModalWrapper>

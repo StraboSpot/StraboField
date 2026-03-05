@@ -4,7 +4,11 @@ import {AvatarWrapper} from './';
 import usePage from '../../../modules/page/usePage';
 
 const NotebookPageAvatar = ({pageKey}) => {
+  /* Data Hooks */
+
   const {getSpotDataIconSource} = usePage();
+
+  /* View */
 
   return (
     <AvatarWrapper

@@ -1,11 +1,10 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import noteStyle from './notes.styles';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
@@ -15,27 +14,37 @@ import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
-import {MODAL_KEYS, PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
+  const {setPointAtCurrentLocation} = useMapLocation();
+  const toast = useToast();
+
+  /* Local State */
+
+  const formRef = useRef(null);
+
   const [initialNotesValues, setInitialNotesValues] = useState({note: initialNote});
   const [isShowTemplates, setIsShowTemplates] = useState(false);
 
-  const toast = useToast();
-  const {setPointAtCurrentLocation} = useMapLocation();
+  /* Derived Variables */
 
-  const formRef = useRef(null);
   const page = PRIMARY_PAGES.find(p => p.key === PAGE_KEYS.NOTES);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE Notes [templates]', templates);
@@ -46,6 +55,8 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
     return () => confirmLeavePage();
   }, [templates]);
+
+  /* Logic Helpers */
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
@@ -66,15 +77,6 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
         {cancelable: false},
       );
     }
-  };
-
-  const renderCancelSaveButtons = () => {
-    return (
-      <View>
-        <NotebookPageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
-      </View>
-    );
   };
 
   const saveForm = async (currentForm) => {
@@ -120,6 +122,19 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
     }
   };
 
+  /* Render Functions */
+
+  const renderCancelSaveButtons = () => {
+    return (
+      <View>
+        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
+      </View>
+    );
+  };
+
+  /* View */
+
   return (
     <View style={{flex: 1}}>
       {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE ? (
@@ -151,14 +166,13 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       <FlatListItemSeparator/>
       {!isShowTemplates && (
         <>
-          <ScrollView style={noteStyle.noteContainer}>
-            <NoteForm
-              formRef={formRef}
-              initialNotesValues={initialNotesValues}
-              isReadOnly={isReadOnly}
-            />
-          </ScrollView>
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
+          <NoteForm
+            formRef={formRef}
+            initialNotesValues={initialNotesValues}
+            isReadOnly={isReadOnly}
+          />
+          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE
+            && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
         </>
       )}
     </View>

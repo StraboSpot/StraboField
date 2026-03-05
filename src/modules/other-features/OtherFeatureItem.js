@@ -6,24 +6,36 @@ import {useSelector} from 'react-redux';
 import OtherFeatureLabel from './OtherFeatureLabel';
 import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../../shared/ui/FeatureTagsList';
 import {useTags} from '../tags';
+import FeatureTagsList from '../tags/FeatureTagsList';
 
 const OtherFeatureItem = ({editFeature, feature}) => {
-  const spot = useSelector(state => state.spot.selectedSpot);
-  const {setFeaturesSelectedForMultiTagging} = useTags();
+  /* Data Hooks */
+
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {setFeaturesSelectedForMultiTagging} = useTags();
+
+  /* Local State */
+
   const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE OtherFeatureItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
     if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
   }, [isMultipleFeaturesTaggingEnabled]);
 
+  /* Logic Helpers */
+
   const editFeatureItem = (featureItem) => {
     if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(featureItem));
     else editFeature(featureItem);
   };
+
+  /* View */
 
   return (
     <ListItem

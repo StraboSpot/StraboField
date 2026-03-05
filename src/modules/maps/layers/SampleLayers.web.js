@@ -1,9 +1,10 @@
 import React from 'react';
 
 import * as turf from '@turf/turf';
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
+import {getFeaturesWithSamples} from './layers.helpers';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const SampleLayers = ({features}) => {
@@ -11,9 +12,7 @@ const SampleLayers = ({features}) => {
 
   const {getLayoutSymbology, getPaintSymbology} = useMapSymbology();
 
-  const featuresWithSamples = features.reduce((acc, feature) => {
-    return feature.properties?.samples && feature.properties.samples.length >= 1 ? [...acc, feature] : acc;
-  }, []);
+  const featuresWithSamples = getFeaturesWithSamples(features);
 
   if (isShowSamplesOn) {
     return (

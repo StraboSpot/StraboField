@@ -12,7 +12,11 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 const DatasetPreferences = () => {
   console.log('Rendering DatasetPreferencesModal...');
 
+  /* Data Hooks */
+
   const {datasets, project} = useSelector(state => state.project) || {};
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

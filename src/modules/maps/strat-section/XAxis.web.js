@@ -1,13 +1,17 @@
 import React from 'react';
 
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 
 import useXAxis from './useXAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const XAxis = ({n = 1}) => {
+  /* Data Hooks */
+
   const {getLayoutSymbology} = useMapSymbology();
   const {getXAxis, getXAxisTickMarks} = useXAxis(n);
+
+  /* View */
 
   return (
     <>

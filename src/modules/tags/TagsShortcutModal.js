@@ -7,6 +7,7 @@ const TagsShortcutModal = ({
                              onPress,
                              zoomToCurrentLocation,
                            }) => {
+  /* Render Functions */
 
   const renderTagsShortcutModal = (closeModal) => {
     return (
@@ -22,6 +23,8 @@ const TagsShortcutModal = ({
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return renderTagsShortcutModal();
 };

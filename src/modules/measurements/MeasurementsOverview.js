@@ -10,13 +10,19 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsOverview = ({page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const orientationsData = useSelector(state => state.spot.selectedSpot.properties.orientation_data);
+
+  /* Event Handlers */
 
   const onMeasurementPressed = (item) => {
     dispatch(setSelectedAttributes([item]));
     dispatch(setNotebookPageVisible(page.key));
   };
+
+  /* View */
 
   return (
     <FlatList

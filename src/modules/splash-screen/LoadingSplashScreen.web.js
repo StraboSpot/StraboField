@@ -7,7 +7,11 @@ import SplashScreen from './SplashScreen';
 import splashScreenStyles from './splashScreen.styles';
 
 const LoadingSplashScreen = () => {
+  /* Derived Variables */
+
   console.count('Rendering LoadingSplashScreen...');
+
+  /* View */
 
   return (
     <SplashScreen>

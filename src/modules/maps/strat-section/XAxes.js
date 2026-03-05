@@ -5,7 +5,11 @@ import {useSelector} from 'react-redux';
 import XAxis from './XAxis';
 
 const XAxes = () => {
+  /* Data Hooks */
+
   const stratSection = useSelector(state => state.map.stratSection);
+
+  /* View */
 
   return (
     <>

@@ -1,16 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
+import {showFieldInfo} from './form.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/petrology.constants';
 
 const Form = ({
                 getIsDisabled,
@@ -18,14 +17,64 @@ const Form = ({
                 formName,
                 isReadOnly,
                 onMyChange,
+                scrollEnabled = true,
                 setFieldValue,
                 subkey,
                 surveyFragment,
                 values,
               }) => {
+  /* Data Hooks */
+
   const {getChoices, getSurvey, isRelevant} = useForm();
 
+  /* Derived Variables */
+
   const survey = surveyFragment || getSurvey(formName);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    // Set default values
+    survey.filter(item => isRelevant(item, values)).forEach((field) => {
+      const [fieldType, choicesListName] = field.type.split(' ');
+      if (fieldType === 'select_one' || fieldType === 'select_multiple') {
+        const choiceValues = getChoices(formName).filter(c => c.list_name === choicesListName).map(c => c.name);
+        if (isEmpty(values[field.name]) && field.default && choiceValues.includes(field.default)) {
+          setFieldValue(field.name, field.default, false);
+        }
+      }
+    });
+  }, []);
+
+  /* Logic Helpers */
+
+  // Wrap setFieldValue to also clear fields that become irrelevant after a change
+  const setFieldValueAndClearIrrelevant = (name, value, shouldValidate) => {
+    let newValues = {...values, [name]: value};
+
+    // Iteratively clear fields that now have values but are no longer relevant
+    let changed = true;
+    while (changed) {
+      changed = false;
+      survey.forEach((field) => {
+        if (field.name !== name && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
+          newValues = {...newValues, [field.name]: undefined};
+          changed = true;
+        }
+      });
+    }
+
+    // Apply clears for fields that became irrelevant
+    survey.forEach((field) => {
+      if (field.name !== name && values[field.name] !== undefined && newValues[field.name] === undefined) {
+        setFieldValue(field.name, undefined, false);
+      }
+    });
+
+    setFieldValue(name, value, shouldValidate);
+  };
+
+  /* Render Functions */
 
   const renderAcknowledgeInput = (field) => {
     return (
@@ -37,7 +86,7 @@ const Form = ({
         name={field.name}
         onShowFieldInfo={showFieldInfo}
         placeholder={field.hint}
-        setFieldValue={setFieldValue}
+        setFieldValue={setFieldValueAndClearIrrelevant}
       />
     );
   };
@@ -52,78 +101,7 @@ const Form = ({
         label={field.label}
         name={field.name}
         onMyChange={onMyChange}
-        setFieldValue={setFieldValue}
-      />
-    );
-  };
-
-  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
-
-  const renderTextInput = (field) => {
-    return (
-      <Field
-        appearance={field.appearance}
-        // autoFocus={field.name === 'name'}
-        component={TextInputField}
-        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
-        placeholder={field.hint}
-      />
-    );
-  };
-
-  const renderNumberInput = (field) => {
-    return (
-      <Field
-        component={NumberInputField}
-        editable={!isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
-        placeholder={field.hint}
-      />
-    );
-  };
-
-  const renderSelectInput = (field, isExpanded) => {
-    const isDisabled = getIsDisabled ? getIsDisabled(field.name) : isReadOnly;
-    const [fieldType, choicesListName] = field.type.split(' ');
-    const fieldChoices = getChoices(formName).filter(choice => choice.list_name === choicesListName);
-    const fieldChoicesCopy = JSON.parse(JSON.stringify(fieldChoices));
-    fieldChoicesCopy.map((choice) => {
-      choice.value = choice.name;
-      choice.disabled = isDisabled;
-      delete choice.name;
-      return choice;
-    });
-
-    // Set default values
-    if (isEmpty(values[field.name]) && field.default
-      && fieldChoicesCopy.map(c => c.value).includes(field.default)) {
-      setFieldValue(field.name, field.default, false);
-    }
-
-    return (
-      <Field
-        as={SelectInputField}
-        choices={fieldChoicesCopy}
-        errors={errors}
-        isReadOnly={isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
-        label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
-        placeholder={field.hint}
-        setFieldValue={setFieldValue}
-        showExpandedChoices={isExpanded}
-        single={fieldType === 'select_one'}
+        setFieldValue={setFieldValueAndClearIrrelevant}
       />
     );
   };
@@ -156,14 +134,72 @@ const Form = ({
     );
   };
 
-  const showFieldInfo = (label, info) => {
-    if (label === 'Mineral Name Abbreviation') {
-      info += '\n\n';
-      const arr = Object.entries(LABELS_WITH_ABBREVIATIONS).map(([key, value]) => key + ': ' + value);
-      info += arr.join('\n');
-    }
-    alert(label, info);
+  const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
+
+  const renderNumberInput = (field) => {
+    return (
+      <Field
+        component={NumberInputField}
+        editable={!isReadOnly}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
+        onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+      />
+    );
   };
+
+  const renderSelectInput = (field, isExpanded) => {
+    const isDisabled = getIsDisabled ? getIsDisabled(field.name) : isReadOnly;
+    const [fieldType, choicesListName] = field.type.split(' ');
+    const fieldChoices = getChoices(formName).filter(choice => choice.list_name === choicesListName);
+    const fieldChoicesCopy = JSON.parse(JSON.stringify(fieldChoices));
+    fieldChoicesCopy.map((choice) => {
+      choice.value = choice.name;
+      choice.disabled = isDisabled;
+      delete choice.name;
+      return choice;
+    });
+
+    return (
+      <Field
+        as={SelectInputField}
+        choices={fieldChoicesCopy}
+        errors={errors}
+        isReadOnly={isReadOnly}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
+        onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+        setFieldValue={setFieldValueAndClearIrrelevant}
+        showExpandedChoices={isExpanded}
+        single={fieldType === 'select_one'}
+      />
+    );
+  };
+
+  const renderTextInput = (field) => {
+    return (
+      <Field
+        appearance={field.appearance}
+        // autoFocus={field.name === 'name'}
+        component={TextInputField}
+        editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
+        key={subkey ? subkey + '[0].' + field.name : field.name}
+        label={field.label}
+        name={subkey ? subkey + '[0].' + field.name : field.name}
+        onMyChange={onMyChange}
+        onShowFieldInfo={showFieldInfo}
+        placeholder={field.hint}
+      />
+    );
+  };
+
+  /* View */
 
   return (
     <FlatList
@@ -171,6 +207,7 @@ const Form = ({
       keyExtractor={(item, index) => index.toString()}
       listKey={JSON.stringify(survey)}
       renderItem={({item}) => renderField(item)}
+      scrollEnabled={scrollEnabled}
     />
   );
 };

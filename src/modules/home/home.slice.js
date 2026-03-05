@@ -16,7 +16,6 @@ const initialHomeState = {
   isBackupModalVisible: false,
   isStatusMessagesModalVisible: false,
   isErrorMessagesModalVisible: false,
-  isWarningMessagesModalVisible: false,
   isProgressModalVisible: false,
   isProjectLoadSelectionModalVisible: false,
   isOfflineMapModalVisible: false,
@@ -84,9 +83,6 @@ const homeSlice = createSlice({
     },
     setIsUploadModalVisible(state, action) {
       state.isUploadModalVisible = action.payload;
-    },
-    setIsWarningMessagesModalVisible(state, action) {
-      state.isWarningMessagesModalVisible = action.payload;
     },
     setLoadingStatus(state, action) {
       const {bool, view} = action.payload;

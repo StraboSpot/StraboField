@@ -6,15 +6,23 @@ import {useSpots} from '../spots';
 const ImageBasemapsList = ({closeManMenuPanel}) => {
   console.log('Rendering ImageBasemaps...');
 
-  const {getActiveImageBasemaps} = useSpots();
+  /* Data Hooks */
+
   const {getImageBasemap} = useImages();
+  const {getActiveImageBasemaps} = useSpots();
+
+  /* Derived Variables */
 
   const imageBasemaps = getActiveImageBasemaps();
+
+  /* Logic Helpers */
 
   const openImage = (image) => {
     closeManMenuPanel();
     getImageBasemap(image);
   };
+
+  /* View */
 
   return <ImagesList images={imageBasemaps} isThumbnailOnly openImage={openImage}/>;
 };

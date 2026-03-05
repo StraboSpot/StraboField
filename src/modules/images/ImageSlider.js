@@ -12,7 +12,7 @@ import {MEDIUMGREY} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedSpot} from '../spots/spots.slice';
 
 const ImageSlider = ({route, navigation}) => {

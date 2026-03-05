@@ -3,28 +3,31 @@ import {ScrollView, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import {isEmpty} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {Form, formStyles, MainButtons, useForm} from '../form';
 
+const {firstKeys, secondKeys, thirdKeys, fourthKeys, lastKeys} = ADD_ROCK_KEYS.metamorphic;
+
 const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Data Hooks */
+
+  const {getLabel} = useForm();
   const {width} = useWindowSize();
+
+  /* Local State */
 
   const [isFaciesModalVisible, setIsFaciesModalVisible] = useState(false);
 
-  const {getLabel} = useForm();
-
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['metamorphic_rock_type'];
-  const secondKeys = ['protolith'];
-  const thirdKeys = ['facies'];
-  const fourthKeys = ['zone'];
-  const lastKeys = ['notes_metamorphic'];
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* Logic Helpers */
 
   const addFacies = (faciesPressed) => {
     const currentFacies = JSON.parse(JSON.stringify(formProps.values?.facies || []));
@@ -49,22 +52,22 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
     );
   };
 
-  const FaciesButton = (faciesProps) => {
-    return (
-      <Button
-        buttonStyle={[formStyles.formButtonLarge, {
-          backgroundColor: formProps?.values?.facies?.includes(faciesProps.faciesKey)
-            ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
-          height: '100%',
-        }]}
-        containerStyle={{padding: 2.5}}
-        onPress={() => addFacies(faciesProps.faciesKey)}
-        type={'outline'}
-      >
-        {faciesButtonText(faciesProps.faciesKey)}
-      </Button>
-    );
-  };
+  /* Render Functions */
+
+  const renderFaciesButton = faciesKey => (
+    <Button
+      buttonStyle={[formStyles.formButtonLarge, {
+        backgroundColor: formProps?.values?.facies?.includes(
+          faciesKey) ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
+        height: '100%',
+      }]}
+      containerStyle={{padding: 2.5}}
+      onPress={() => addFacies(faciesKey)}
+      type={'outline'}
+    >
+      {faciesButtonText(faciesKey)}
+    </Button>
+  );
 
   const renderFaciesModal = () => {
     const faciesModalWidth = width > 520 ? 700 : '90%';
@@ -109,32 +112,32 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
                     <View style={{flex: 2, flexDirection: 'row'}}>
                       <View style={{flex: 4}}/>
                       <View style={{flex: 5}}>
-                        <FaciesButton faciesKey={'eclogite'}/>
+                        {renderFaciesButton('eclogite')}
                       </View>
                     </View>
                     <View style={{flex: 4, flexDirection: 'row'}}>
                       <View style={{flex: 5, flexDirection: 'column'}}>
                         <View style={{flex: 2, flexDirection: 'row'}}>
                           <View style={{flex: 2}}/>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'blueschist'}/></View>
+                          <View style={{flex: 2}}>{renderFaciesButton('blueschist')}</View>
                           <View style={{flex: 1}}/>
                         </View>
                         <View style={{flex: 2, flexDirection: 'row'}}>
                           <View style={{flex: 1}}/>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'prehnite_pumpy'}/></View>
-                          <View style={{flex: 2}}><FaciesButton faciesKey={'greenschist'}/></View>
+                          <View style={{flex: 2}}>{renderFaciesButton('prehnite_pumpy')}</View>
+                          <View style={{flex: 2}}>{renderFaciesButton('greenschist')}</View>
                         </View>
                       </View>
-                      <View style={{flex: 2}}><FaciesButton faciesKey={'amphibolite'}/></View>
-                      <View style={{flex: 2}}><FaciesButton faciesKey={'upper_amph'}/></View>
+                      <View style={{flex: 2}}>{renderFaciesButton('amphibolite')}</View>
+                      <View style={{flex: 2}}>{renderFaciesButton('upper_amph')}</View>
                     </View>
                   </View>
-                  <View style={{flex: 2}}><FaciesButton faciesKey={'granulite'}/></View>
+                  <View style={{flex: 2}}>{renderFaciesButton('granulite')}</View>
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                  <View style={{flex: 2}}><FaciesButton faciesKey={'zeolite'}/></View>
+                  <View style={{flex: 2}}>{renderFaciesButton('zeolite')}</View>
                   <View style={{flex: 2}}/>
-                  <View style={{flex: 5}}><FaciesButton faciesKey={'hornfels'}/></View>
+                  <View style={{flex: 5}}>{renderFaciesButton('hornfels')}</View>
                   <View style={{flex: 2}}/>
                 </View>
               </View>
@@ -144,17 +147,15 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
             <Text style={formStyles.formButtonTitle}>Temperature</Text>
           </View>
           <View style={{flexDirection: 'row', height: 40, paddingBottom: 0}}>
-            <View style={{width: '50%'}}>
-              <FaciesButton faciesKey={'ultra_high_pre'}/>
-            </View>
-            <View style={{width: '50%'}}>
-              <FaciesButton faciesKey={'ultra_high_tem'}/>
-            </View>
+            <View style={{width: '50%'}}>{renderFaciesButton('ultra_high_pre')}</View>
+            <View style={{width: '50%'}}>{renderFaciesButton('ultra_high_tem')}</View>
           </View>
         </View>
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return (
     <>

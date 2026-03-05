@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon, ListItem} from '@rn-vui/base';
 
-import {PAGE_KEYS} from './page.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import {useForm} from '../form';
@@ -17,9 +17,13 @@ const BasicListItem = ({
                          item,
                          page,
                        }) => {
+  /* Data Hooks */
+
+  const {getLabel} = useForm();
   const {getMineralTitle, getPetRockTitle, getReactionTextureTitle} = usePetrology();
   const {getBeddingTitle, getSedRockTitle, getStratSectionTitle} = useSed();
-  const {getLabel} = useForm();
+
+  /* Logic Helpers */
 
   const getTitle = () => {
     switch (page.key) {
@@ -46,7 +50,8 @@ const BasicListItem = ({
       case PAGE_KEYS.INTERPRETATIONS:
         return 'Lithology ' + (index + 1);
       case PAGE_KEYS.TEPHRA:
-        return (index + 1) + '. ' + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_description']);
+        return (item?.label || (index + 1)) + ' - '
+          + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_basic']);
       case PAGE_KEYS.EARTHQUAKES:
         return getLabel(item?.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
       default:
@@ -54,13 +59,15 @@ const BasicListItem = ({
     }
   };
 
+  /* View */
+
   return (
     <ListItem
       containerStyle={commonStyles.listItem}
       delayLongPress={500}
       key={item.id}
       onLongPress={drag}
-      onPress={() => !isReorderingActive && editItem(item)}
+      onPress={() => !isReorderingActive && editItem(item, index)}
     >
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>{getTitle()}</ListItem.Title>

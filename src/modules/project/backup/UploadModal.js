@@ -21,19 +21,13 @@ import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.
 import {setIsImageTransferring} from '../projects.slice';
 
 const UploadModal = ({closeModal, isVisible}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
-
-  const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
-  const [imageUploadStatus, setImageUploadStatus] = useState({});
-  const [modalTitle, setModalTitle] = useState('Upload Project');
-  const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
-  const [uploadState, setUploadState] = useState('not started');
-  const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
 
   const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
   const {
@@ -45,11 +39,30 @@ const UploadModal = ({closeModal, isVisible}) => {
     resetState,
   } = useUploadImages();
 
+  /* Local State */
+
+  const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
+  const [errorMessage, setErrorMesssage] = useState('');
+  const [imageUploadStatus, setImageUploadStatus] = useState({});
+  const [modalTitle, setModalTitle] = useState('Upload Project');
+  const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
+  const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
+  const [uploadState, setUploadState] = useState('not started');
+
+  /* Side Effects */
+
   useEffect(() => {
     console.log('uploadState', uploadState);
     console.log('Current Image', currentImage);
     console.log('Is Image Transferring', isImageTransferring);
   }, [uploadState, currentImage]);
+
+  /* Event Handlers */
+
+  const handleActionPressed = async () => {
+    if (uploadState === 'not started') await initiateUpload();
+    else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
+  };
 
   const handleClosePress = () => {
     setModalTitle('Upload Project');
@@ -61,10 +74,7 @@ const UploadModal = ({closeModal, isVisible}) => {
     closeModal();
   };
 
-  const handleActionPressed = async () => {
-    if (uploadState === 'not started') await initiateUpload();
-    else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
-  };
+  /* Logic Helpers */
 
   const initiateUpload = async () => {
     try {
@@ -124,6 +134,8 @@ const UploadModal = ({closeModal, isVisible}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderErrorView = () => {
     return (
       <View style={{padding: 10}}>
@@ -136,44 +148,6 @@ const UploadModal = ({closeModal, isVisible}) => {
       </View>
     );
   };
-
-  const renderUploadAnimation = () => {
-    return (
-      <LottieAnimations
-        animationStyle={{height: 50, width: 50}}
-        doesLoop={true}
-        type={'uploadingCloud'}
-      />
-    );
-  };
-
-  const renderUploadCompleteAnimation = () => {
-    return (
-      <LottieAnimations
-        animationStyle={{height: 50, width: 50}}
-        doesLoop={false}
-        type={'complete'}
-      />
-    );
-  };
-
-  const renderInitialUploadView = () => (
-    <View>
-      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
-        {!isEmpty(currentProject) && currentProject.description?.project_name}
-      </Text>
-      {endpoint.isSelected ? <Text style={overlayStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
-        : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
-      <Spacer/>
-      <Text style={[overlayStyles.contentText, {textAlign: 'left', padding: 10}]}>
-        - Geologic units, tags, reports and templates will be merged into the project already on the server.{'\n'}
-        - Newer datasets will <Text style={overlayStyles.importantText}>OVERWRITE</Text> older datasets already on the
-        server.{'\n'}
-        - Read Only datasets will not be affected unless they were removed from Read Only status and modified.
-      </Text>
-      {__DEV__ && <ClearButton onPress={uploadImagesOnly} title={'Upload Images Only (Dev Mode)'}/>}
-    </View>
-  );
 
   const renderImageUploadingProgress = () => {
     return (
@@ -213,9 +187,47 @@ const UploadModal = ({closeModal, isVisible}) => {
     }
   };
 
+  const renderInitialUploadView = () => (
+    <View>
+      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
+        {!isEmpty(currentProject) && currentProject.description?.project_name}
+      </Text>
+      {endpoint.isSelected ? <Text style={overlayStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
+        : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
+      <Spacer/>
+      <Text style={[overlayStyles.contentText, {textAlign: 'left', padding: 10}]}>
+        - Geologic units, tags, reports and templates will be merged into the project already on the server.{'\n'}
+        - Newer datasets will <Text style={overlayStyles.importantText}>OVERWRITE</Text> older datasets already on the
+        server.{'\n'}
+        - Read Only datasets will not be affected unless they were removed from Read Only status and modified.
+      </Text>
+      {__DEV__ && <ClearButton onPress={uploadImagesOnly} title={'Upload Images Only (Dev Mode)'}/>}
+    </View>
+  );
+
+  const renderUploadAnimation = () => {
+    return (
+      <LottieAnimations
+        animationStyle={{height: 50, width: 50}}
+        doesLoop={true}
+        type={'uploadingCloud'}
+      />
+    );
+  };
+
+  const renderUploadCompleteAnimation = () => {
+    return (
+      <LottieAnimations
+        animationStyle={{height: 50, width: 50}}
+        doesLoop={false}
+        type={'complete'}
+      />
+    );
+  };
+
   const renderUploadProgress = () => {
     return (
-      <View style={{minHeight: 150}}>
+      <View>
         <View style={uploadModalStyles.messageContainer}>
           <Text style={uploadModalStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
         </View>
@@ -244,6 +256,8 @@ const UploadModal = ({closeModal, isVisible}) => {
     );
   };
 
+  /* View */
+
   return (
     <ModalWrapper
       actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
@@ -252,6 +266,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       isVisible={isVisible}
       onActionPressed={handleActionPressed}
       onCancelPress={handleClosePress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
       showCancelButton={uploadState === 'not started'}
     >

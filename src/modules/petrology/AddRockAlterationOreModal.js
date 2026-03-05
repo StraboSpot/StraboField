@@ -1,15 +1,16 @@
 import React from 'react';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import {Form, MainButtons} from '../form';
 
-const AddRockAlterationOreModal = ({formName, formProps, setChoicesViewKey, survey}) => {
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['ore_type'];
-  const secondKeys = ['hydrothermal_alteration'];
-  const lastKeys = ['alteration_host_rock', 'mineralized_elements', 'notes_ore'];
+const {firstKeys, secondKeys, lastKeys} = ADD_ROCK_KEYS.alteration_ore;
 
-  // Relevant fields for quick-entry modal
+const AddRockAlterationOreModal = ({formName, formProps, setChoicesViewKey, survey}) => {
+  /* Derived Variables */
+
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>

@@ -1,39 +1,43 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import ModalWrapper from './ModalWrapper';
 import overlayStyles from './overlay.styles';
-import {setIsWarningMessagesModalVisible} from '../../../modules/home/home.slice';
 
 const WarningModal = ({
+                        cancelTitle,
                         children,
                         closeModal,
                         confirmText,
                         isVisible,
+                        onCancelPress,
                         onConfirmPress,
                         showCancelButton,
+                        showCloseButton,
                         showConfirmButton,
                         title,
                       }) => {
-  const dispatch = useDispatch();
-  const isWarningModalVisible = useSelector(state => state.home.isWarningMessagesModalVisible);
+  /* Data Hooks */
+
   const statusMessages = useSelector(state => state.home.statusMessages);
 
-  const closeWarningModal = () => {
-    dispatch(setIsWarningMessagesModalVisible(false));
-  };
+  /* View */
 
   return (
     <ModalWrapper
       actionTitle={confirmText || 'Ok'}
+      cancelTitle={cancelTitle || 'Cancel'}
+      closeModal={closeModal}
       headerTitle={title || 'Warning!'}
-      isVisible={isVisible || isWarningModalVisible}
-      onActionPressed={onConfirmPress || closeWarningModal}
-      onCancelPress={closeModal}
+      isVisible={isVisible}
+      onActionPressed={onConfirmPress}
+      onCancelPress={onCancelPress}
+      overlayStyleOverride={{height: 'auto'}}
       showActionButton={showConfirmButton}
       showCancelButton={showCancelButton}
+      showCloseButton={showCloseButton}
     >
       <Text style={overlayStyles.statusMessageText}>{children || statusMessages.join('\n')}</Text>
     </ModalWrapper>

@@ -6,18 +6,23 @@ import {useDispatch, useSelector} from 'react-redux';
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/Helpers';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SamplesPage = ({isReadOnly, page}) => {
-  const dispatch = useDispatch();
+  /* Data Hooks */
 
+  const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Local State */
+
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedSample, setSelectedSample] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE SamplesPage []');
@@ -33,11 +38,15 @@ const SamplesPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const editSample = (sample) => {
     setIsDetailView(true);
     setSelectedSample(sample);
     dispatch(setModalVisible({modal: null}));
   };
+
+  /* Render Functions */
 
   const renderSamplesDetail = () => {
     return (
@@ -58,7 +67,7 @@ const SamplesPage = ({isReadOnly, page}) => {
   const renderSamplesMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader
+        <PageHeader
           onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
           pageTitle={page.label}
           showAddButton={!isReadOnly}
@@ -67,6 +76,8 @@ const SamplesPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

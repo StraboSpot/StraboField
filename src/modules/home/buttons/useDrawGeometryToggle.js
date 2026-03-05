@@ -6,10 +6,14 @@ import {MAP_MODES} from '../../maps/maps.constants';
 import {setDrawGeometries} from '../../maps/maps.slice';
 
 const useDrawGeometryToggle = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const drawGeometries = useSelector(state => state.map.drawGeometries);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  /* Exported Functions */
 
   const handleLineLongPressed = () => {
     console.log('long press');
@@ -40,9 +44,9 @@ const useDrawGeometryToggle = () => {
   };
 
   return {
-    handleLineLongPressed: handleLineLongPressed,
-    handlePointLongPressed: handlePointLongPressed,
-    handlePolygonLongPressed: handlePolygonLongPressed,
+    handleLineLongPressed,
+    handlePointLongPressed,
+    handlePolygonLongPressed,
   };
 };
 

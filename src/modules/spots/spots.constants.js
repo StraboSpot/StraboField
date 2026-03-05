@@ -1,3 +1,12 @@
+export const PICKER_KEYS = {SPOTS: 'spots', IMAGES: 'images', SAMPLES: 'samples', REPORTS: 'reports'};
+
+export const PICKER_LABELS = {
+  [PICKER_KEYS.SPOTS]: 'SPOTS LISTS',
+  [PICKER_KEYS.SAMPLES]: 'SAMPLES',
+  [PICKER_KEYS.IMAGES]: 'IMAGE GALLERY',
+  [PICKER_KEYS.REPORTS]: 'REPORTS',
+};
+
 export const SORT_ORDER = {
   ALPHABETICAL: 'Alphabetical',
   DATE_CREATED: 'Date Created',

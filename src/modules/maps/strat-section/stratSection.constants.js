@@ -1,5 +1,7 @@
 import * as forms from '../../../assets/forms';
 
+export const EMPTY_LINE_STRING_FEATURE = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
+
 export const GRAIN_SIZE_KEYS = ['mud_silt_grain_size', 'sand_grain_size', 'congl_grain_size']; // breccia_grain_size same as congl_grain_size
 export const CARBONATE_KEYS = ['dunham_classification'];
 export const LITHOLOGIES_KEYS = ['primary_lithology'];

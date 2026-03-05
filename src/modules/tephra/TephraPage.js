@@ -14,24 +14,32 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const TephraPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [data, setData] = useState([]);
+  /* Local State */
+
+  const [data1, setData] = useState([]);
   const [isDetailView, setIsDetailView] = useState(false);
   const [isReorderingActive, setIsReorderingActive] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
 
+  /* Derived Variables */
+
   const attributes = spot && spot.properties && spot.properties.tephra || [];
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE TephraPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -42,9 +50,24 @@ const TephraPage = ({isReadOnly, page}) => {
     setData(attributes);
   }, [selectedAttributes, spot]);
 
+  // Cleanup animations when component unmounts to prevent memory corruption
+  useEffect(() => {
+    return () => {
+      setIsReorderingActive(false);
+    };
+  }, []);
+
+  /* Logic Helpers */
+
   const addAttribute = () => {
     setIsReorderingActive(false);
-    dispatch(setModalVisible({modal: page.key}));
+    const initialValues = {
+      label: spot.properties.name + '-' + ((spot.properties?.tephra?.length || 0) + 1),
+      id: getNewUUID(),
+    };
+    setSelectedAttribute(initialValues);
+    setIsDetailView(true);
+    dispatch(setModalVisible({modal: null}));
   };
 
   const editAttribute = (attribute, i) => {
@@ -60,19 +83,29 @@ const TephraPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: null}));
   };
 
+  const updateOrder = () => {
+    setIsReorderingActive(false);
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'tephra', value: data1}));
+  };
+
+  /* Render Functions */
+
   const renderAttributeDetail = () => {
     const subpages = TEPHRA_SUBPAGES;
     return (
       <>
-        <ButtonGroup
-          buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
-          containerStyle={tephraStyles.buttonGroupContainer}
-          onPress={i => setSelectedTypeIndex(i)}
-          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-          selectedIndex={selectedTypeIndex}
-          textStyle={{color: PRIMARY_TEXT_COLOR}}
-        />
         <BasicPageDetail
+          PageTabsComponent={
+            <ButtonGroup
+              buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
+              containerStyle={tephraStyles.buttonGroupContainer}
+              onPress={i => setSelectedTypeIndex(i)}
+              selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+              selectedIndex={selectedTypeIndex}
+              textStyle={{color: PRIMARY_TEXT_COLOR}}
+            />
+          }
           closeDetailView={() => setIsDetailView(false)}
           isReadOnly={isReadOnly}
           page={{...page, key: 'tephra', subkey: Object.values(subpages)[selectedTypeIndex]}}
@@ -85,16 +118,17 @@ const TephraPage = ({isReadOnly, page}) => {
   const renderAttributesMain = () => {
     return (
       <View style={tephraStyles.mainAttributesContainer}>
-        <NotebookPageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
+        <PageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <View style={tephraStyles.draggableListContainer}>
-          {data.length > 1 && (
-            <Text
-              style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>Top</Text>
+          {data1.length > 1 && (
+            <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>
+              Top
+            </Text>
           )}
           <DraggableFlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
-            data={data}
+            data={data1}
             keyExtractor={item => item.id}
             onDragBegin={() => setIsReorderingActive(true)}
             onDragEnd={({data}) => setData(data)}
@@ -111,7 +145,7 @@ const TephraPage = ({isReadOnly, page}) => {
               </ShadowDecorator>
             )}
           />
-          {data.length > 1 && (
+          {data1.length > 1 && (
             <Text style={{...commonStyles.listItemTitle, ...commonStyles.textBold, ...tephraStyles.textAlign}}>
               Bottom
             </Text>
@@ -122,11 +156,7 @@ const TephraPage = ({isReadOnly, page}) => {
     );
   };
 
-  const updateOrder = () => {
-    setIsReorderingActive(false);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'tephra', value: data}));
-  };
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

@@ -9,20 +9,20 @@
       "name": "end"
     },
     {
-      "type": "text",
-      "name": "layer_color",
-      "label": "Layer Color",
+      "type": "select_one uu5sd70",
+      "name": "bottom_contact",
+      "label": "Bottom Contact",
       "required": "false"
     },
     {
-      "type": "select_one qr36o66",
-      "name": "layer_sorting",
-      "label": "Sorting",
+      "type": "select_one uu5sd70",
+      "name": "top_contact",
+      "label": "Top Contact",
       "required": "false"
     },
     {
       "type": "select_one ds0ex44",
-      "name": "layer_support",
+      "name": "grain_support",
       "label": "Grain Support",
       "required": "false"
     },
@@ -30,12 +30,6 @@
       "type": "select_multiple kc0hp09",
       "name": "grain_angularity",
       "label": "Grain Angularity",
-      "required": "false"
-    },
-    {
-      "type": "select_multiple ye44h22",
-      "name": "components",
-      "label": "Defining Component(s)",
       "required": "false"
     },
     {
@@ -48,6 +42,7 @@
       "type": "text",
       "name": "layer_description",
       "label": "Layer Description",
+      "hint": "Componentry, clast size measurements, mineralogy, etc.",
       "required": "false",
       "appearance": "multiline"
     },
@@ -59,36 +54,46 @@
     },
     {
       "type": "text",
-      "name": "unit_id",
+      "name": "tephra_name",
       "label": "Tephra Name",
       "required": "false"
     }
   ],
   "choices": [
     {
-      "list_name": "qr36o66",
-      "name": "very_well_sorted",
-      "label": "very well sorted"
+      "list_name": "uu5sd70",
+      "name": "sharp",
+      "label": "sharp"
     },
     {
-      "list_name": "qr36o66",
-      "name": "well_sorted",
-      "label": "well sorted"
+      "list_name": "uu5sd70",
+      "name": "gradational",
+      "label": "gradational"
     },
     {
-      "list_name": "qr36o66",
-      "name": "poorly_sorted",
-      "label": "poorly sorted"
+      "list_name": "uu5sd70",
+      "name": "reworked",
+      "label": "reworked"
     },
     {
-      "list_name": "qr36o66",
-      "name": "very_poorly_sorted",
-      "label": "very poorly sorted"
+      "list_name": "uu5sd70",
+      "name": "erosional",
+      "label": "erosional"
     },
     {
-      "list_name": "qr36o66",
-      "name": "unsorted",
-      "label": "unsorted"
+      "list_name": "uu5sd70",
+      "name": "bioturbated",
+      "label": "bioturbated"
+    },
+    {
+      "list_name": "uu5sd70",
+      "name": "cross_bedded",
+      "label": "cross-bedded"
+    },
+    {
+      "list_name": "uu5sd70",
+      "name": "planar_parallel",
+      "label": "planar parallel"
     },
     {
       "list_name": "ds0ex44",
@@ -119,36 +124,6 @@
       "list_name": "kc0hp09",
       "name": "round",
       "label": "round"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "pumice",
-      "label": "pumice"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "accidental_lithic",
-      "label": "accidental lithic"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "accessory_lithic",
-      "label": "accessory lithic"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "glass_obsidian",
-      "label": "glass/obsidian"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "crystals",
-      "label": "crystals"
-    },
-    {
-      "list_name": "ye44h22",
-      "name": "accretionary_lapilli",
-      "label": "accretionary lapilli"
     },
     {
       "list_name": "vn0qh36",

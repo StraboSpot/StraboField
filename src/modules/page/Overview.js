@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
+import PageHeader from './PageHeader';
 import usePage from './usePage';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {SwitchWrapper} from '../../shared/ui';
@@ -18,21 +19,26 @@ import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, openMainMenuPanel}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
-  const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
+  const {showErrors, validateForm} = useForm();
+  const {getPopulatedPagesKeys} = usePage();
+
+  /* Local State */
 
   const formRef = useRef(null);
 
-  const {showErrors, validateForm} = useForm();
-  const {getPopulatedPagesKeys} = usePage();
+  const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
+  const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
+
+  /* Derived Variables */
 
   const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
   const sections = visiblePagesKeys.reduce((acc, key) => {
@@ -41,12 +47,14 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       const SectionOverview = page.overview_component;
       const sectionOverview = {
         title: page,
-        data: [<SectionOverview isReadOnly={isReadOnly} key={key} openMainMenuPanel={openMainMenuPanel} page={page}/>],
+        data: [<SectionOverview isReadOnly={isReadOnly} openMainMenuPanel={openMainMenuPanel} page={page}/>],
       };
       return [...acc, sectionOverview];
     }
     else return acc;
   }, []);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Overview [spot]', spot);
@@ -54,22 +62,11 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     setIsTraceSurfaceFeatureEdit(false);
   }, [spot]);
 
-  const cancelFormAndGo = () => {
-    setIsTraceSurfaceFeatureEdit(false);
-    if (isTraceSurfaceFeatureEnabled && !spot.properties.trace && !spot.properties.surface_feature) {
-      setIsTraceSurfaceFeatureEnabled(false);
-    }
-  };
+  /* Event Handlers */
 
   const handleToggleShowTraceSurfaceFeatureForm = () => {
     if (isTraceSurfaceFeatureEdit) setIsTraceSurfaceFeatureEdit(false);
     else setIsTraceSurfaceFeatureEdit(true);
-  };
-
-  const openPage = (page) => {
-    dispatch(setNotebookPageVisible(page.key));
-    if (page.modal) dispatch(setModalVisible({modal: page.modal}));
-    else dispatch(setModalVisible({modal: null}));
   };
 
   // What happens after submitting the form is handled in saveFormAndGo since we want to show
@@ -78,57 +75,19 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     console.log('In onSubmitForm');
   };
 
-  const renderTraceSurfaceFeatureForm = () => {
-    const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
-      ? ['general', 'trace'] : ['general', 'surface_feature'];
-    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
-    let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
-    if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
-      initialValues = {...initialValues, 'trace_feature': true};
+  /* Logic Helpers */
+
+  const cancelFormAndGo = () => {
+    setIsTraceSurfaceFeatureEdit(false);
+    if (isTraceSurfaceFeatureEnabled && !spot.properties.trace && !spot.properties.surface_feature) {
+      setIsTraceSurfaceFeatureEnabled(false);
     }
-    return (
-      <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={pageTitle}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
-        <FlatList
-          ListHeaderComponent={
-            <Formik
-              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
-              enableReinitialize={true}
-              initialStatus={{formName: formName}}
-              initialValues={initialValues}
-              innerRef={formRef}
-              onSubmit={onSubmitForm}
-              validate={values => validateForm({formName: formName, values: values})}
-            />
-          }
-        />
-      </View>
-    );
   };
 
-  const renderSectionHeader = (page) => {
-    return (
-      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
-      </Pressable>
-    );
-  };
-
-  const renderSections = () => {
-    return (
-      <View style={{flex: 1}}>
-        <NotebookPageHeader hideBackButton pageTitle={'Spot Overview'}/>
-        <SectionList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => item}
-          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-          sections={sections}
-          stickySectionHeadersEnabled={true}
-        />
-      </View>
-    );
+  const openPage = (page) => {
+    dispatch(setNotebookPageVisible(page.key));
+    if (page.modal) dispatch(setModalVisible({modal: page.modal}));
+    else dispatch(setModalVisible({modal: null}));
   };
 
   const saveForm = async () => {
@@ -193,6 +152,63 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     }
     else continueToggleTraceSurfaceFeature();
   };
+
+  /* Render Functions */
+
+  const renderSectionHeader = (page) => {
+    return (
+      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
+        <SectionDivider dividerText={page.label}/>
+      </Pressable>
+    );
+  };
+
+  const renderSections = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <SectionList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          keyExtractor={(item, index) => item + index}
+          renderItem={({item}) => item}
+          renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
+          sections={sections}
+          stickySectionHeadersEnabled={true}
+        />
+      </View>
+    );
+  };
+
+  const renderTraceSurfaceFeatureForm = () => {
+    const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
+      ? ['general', 'trace'] : ['general', 'surface_feature'];
+    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
+    let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
+    if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
+      initialValues = {...initialValues, 'trace_feature': true};
+    }
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader hideBackButton pageTitle={pageTitle}/>
+        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
+        <FlatList
+          ListHeaderComponent={
+            <Formik
+              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+              enableReinitialize={true}
+              initialStatus={{formName: formName}}
+              initialValues={initialValues}
+              innerRef={formRef}
+              onSubmit={onSubmitForm}
+              validate={values => validateForm({formName: formName, values: values})}
+            />
+          }
+        />
+      </View>
+    );
+  };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

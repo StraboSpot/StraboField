@@ -27,6 +27,8 @@ import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap}
 import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -37,10 +39,46 @@ const useProject = () => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const user = useSelector(state => state.user);
 
-  const toast = useToast();
   const {doesDeviceBackupDirExist, readDirectory} = useDevice();
   const {clearProject} = useResetState();
   const {getMyProjects} = useServerRequests();
+  const toast = useToast();
+
+  /* Internal Functions */
+
+  const createProject = async (descriptionData) => {
+    const newDate = new Date().toISOString();
+    const id = getNewId();
+    const currentProject = {
+      id: id,
+      description: descriptionData,
+      date: newDate,
+      modified_timestamp: Date.now(),
+      other_features: DEFAULT_GEOLOGIC_TYPES,
+      relationship_types: DEFAULT_RELATIONSHIP_TYPES,
+      templates: {},
+      useContinuousTagging: false,
+    };
+    dispatch(addedProjectDescription(currentProject));
+    const defaultDataset = createDataset();
+    dispatch(addedDataset(defaultDataset));
+  };
+
+  const getDatasetIdFromSpotId = (spotId) => {
+    let datasetIdFound;
+    for (const dataset of Object.values(datasets)) {
+      const spotIdFound = dataset.spotIds?.find(id => id === spotId);
+      if (spotIdFound) {
+        datasetIdFound = dataset.id;
+        break;
+      }
+    }
+    console.log('HERE IS THE DATASET', datasetIdFound);
+    if (!datasetIdFound) console.error('Dataset for Spot ' + spotId + ' not found');
+    return datasetIdFound;
+  };
+
+  /* Exported Functions */
 
   const addDataset = async (name) => {
     const datasetObj = createDataset(name);
@@ -77,24 +115,6 @@ const useProject = () => {
         imageIds: [],
       },
     };
-  };
-
-  const createProject = async (descriptionData) => {
-    const newDate = new Date().toISOString();
-    const id = getNewId();
-    const currentProject = {
-      id: id,
-      description: descriptionData,
-      date: newDate,
-      modified_timestamp: Date.now(),
-      other_features: DEFAULT_GEOLOGIC_TYPES,
-      relationship_types: DEFAULT_RELATIONSHIP_TYPES,
-      templates: {},
-      useContinuousTagging: false,
-    };
-    dispatch(addedProjectDescription(currentProject));
-    const defaultDataset = createDataset();
-    dispatch(addedDataset(defaultDataset));
   };
 
   const destroyDataset = async (id) => {
@@ -158,20 +178,6 @@ const useProject = () => {
     catch (err) {
       console.error(err);
     }
-  };
-
-  const getDatasetIdFromSpotId = (spotId) => {
-    let datasetIdFound;
-    for (const dataset of Object.values(datasets)) {
-      const spotIdFound = dataset.spotIds?.find(id => id === spotId);
-      if (spotIdFound) {
-        datasetIdFound = dataset.id;
-        break;
-      }
-    }
-    console.log('HERE IS THE DATASET', datasetIdFound);
-    if (!datasetIdFound) console.error('Dataset for Spot ' + spotId + ' not found');
-    return datasetIdFound;
   };
 
   // Get target dataset, if none selected make one
@@ -238,18 +244,18 @@ const useProject = () => {
   };
 
   return {
-    addDataset: addDataset,
-    checkValidDateTime: checkValidDateTime,
-    createDataset: createDataset,
-    destroyDataset: destroyDataset,
-    getActiveDatasets: getActiveDatasets,
-    getAllDeviceProjects: getAllDeviceProjects,
-    getAllServerProjects: getAllServerProjects,
-    getTargetDatasetFromId: getTargetDatasetFromId,
-    initializeNewProject: initializeNewProject,
-    isSpotInReadOnlyDataset: isSpotInReadOnlyDataset,
-    makeDatasetCurrent: makeDatasetCurrent,
-    setSwitchValue: setSwitchValue,
+    addDataset,
+    checkValidDateTime,
+    createDataset,
+    destroyDataset,
+    getActiveDatasets,
+    getAllDeviceProjects,
+    getAllServerProjects,
+    getTargetDatasetFromId,
+    initializeNewProject,
+    isSpotInReadOnlyDataset,
+    makeDatasetCurrent,
+    setSwitchValue,
   };
 };
 

@@ -16,22 +16,37 @@ import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useMapLocation from '../../maps/useMapLocation';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
+import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
 const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, openMainMenuPanel, zoomToSpots}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {getCurrentLocation} = useMapLocation();
+  const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
+  const toast = useToast();
+
+  /* Local State */
+
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
 
-  const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
-  const {getCurrentLocation} = useMapLocation();
-  const toast = useToast();
+  /* Event Handlers */
+
+  const onSpotEdit = async (field, value) => {
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: field, value: value}));
+    await checkSpotName(value);
+  };
+
+  /* Logic Helpers */
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -73,21 +88,6 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     else return undefined;
   };
 
-  const getTraceText = () => {
-    const traceDictionary = LABEL_DICTIONARY.general.trace;
-    const key = spot.properties.trace.trace_type;
-    let traceText = traceDictionary[key] || key.replace(/_/g, ' ');
-    traceText = toTitleCase(traceText) + ' Trace';
-    const traceSubTypeFields = ['contact_type', 'geologic_structure_type', 'geomorphic_feature', 'antropogenic_feature', 'other_feature'];
-    const subType = traceSubTypeFields.find(subTypeField => spot.properties.trace[subTypeField]);
-    if (subType) {
-      const subTypeValue = spot.properties.trace[subType];
-      const subTypeLabel = traceDictionary[subTypeValue];
-      if (subTypeLabel) traceText = traceText + ' - ' + subTypeLabel.toUpperCase();
-    }
-    return traceText;
-  };
-
   const getSurfaceFeatureText = () => {
     const surfaceFeatureDictionary = LABEL_DICTIONARY.general.surface_feature;
     const key = spot.properties.surface_feature.surface_feature_type;
@@ -99,11 +99,40 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return toTitleCase(surfaceFeatureText);
   };
 
-  const onSpotEdit = async (field, value) => {
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: field, value: value}));
-    await checkSpotName(value);
+  const getTraceText = () => {
+    const traceDictionary = LABEL_DICTIONARY.general.trace;
+    const key = spot.properties.trace.trace_type;
+    let traceText = traceDictionary[key] || key.replace(/_/g, ' ');
+    traceText = toTitleCase(traceText) + ' Trace';
+    const subType = TRACE_SUB_TYPE_FIELDS.find(subTypeField => spot.properties.trace[subTypeField]);
+    if (subType) {
+      const subTypeValue = spot.properties.trace[subType];
+      const subTypeLabel = traceDictionary[subTypeValue];
+      if (subTypeLabel) traceText = traceText + ' - ' + subTypeLabel.toUpperCase();
+    }
+    return traceText;
   };
+
+  const goToDatasetsPage = () => {
+    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
+      {duration: 4000, placement: 'top', type: 'warning'});
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
+  };
+
+  const setToCurrentLocation = async () => {
+    const currentLocation = await getCurrentLocation();
+    let editedSpot = JSON.parse(JSON.stringify(spot));
+    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
+    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
+    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
+    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+    dispatch(editedOrCreatedSpot(editedSpot));
+    dispatch(setSelectedSpot(editedSpot));
+  };
+
+  /* Render Functions */
 
   const renderCoordsText = () => {
     return (
@@ -141,25 +170,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     );
   };
 
-  const setToCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
-    let editedSpot = JSON.parse(JSON.stringify(spot));
-    editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
-    if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
-    if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
-    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
-    dispatch(editedOrCreatedSpot(editedSpot));
-    dispatch(setSelectedSpot(editedSpot));
-  };
-
-
-  const goToDatasetsPage = () => {
-    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
-      {duration: 4000, placement: 'top', type: 'warning'});
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
-    if (openMainMenuPanel) openMainMenuPanel();
-  };
+  /* View */
 
   return (
     <>
@@ -203,6 +214,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       </View>
       <NotebookMenu
         closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
+        closeNotebookPanel={closeNotebookPanel}
         isNotebookMenuVisible={isNotebookMenuVisible}
         isReadOnly={isReadOnly}
         overlayStyle={notebookStyles.dialogBoxPosition}

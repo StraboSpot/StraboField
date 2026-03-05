@@ -17,16 +17,21 @@ function TablesData({
                       initializeDelete,
                       spot,
                     }) {
+  /* Local State */
 
   const [isTableVisible, setIsTableVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedTable, setSelectedTable] = useState({});
   const [tableData, setTableData] = useState([]);
-  const [loading, setLoading] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE TablesData [isTableVisible]', isTableVisible);
     !isTableVisible && setSelectedTable({});
   }, [isTableVisible]);
+
+  /* Logic Helpers */
 
   const closeTable = () => {
     setTableData([]);
@@ -47,6 +52,20 @@ function TablesData({
 
     return {cellWidths: cellWidths, tableDataTrimmed: tableDataTrimmed, totalTableWidth: totalTableWidth};
   };
+
+  const selectTable = (table) => {
+    setSelectedTable(table);
+    setTableData([]); // clear old
+    setIsTableVisible(true); // open immediately
+    setLoading(true);
+
+    setTimeout(() => {
+      setTableData(table.data || []);
+      setLoading(false);
+    }, [0]);
+  };
+
+  /* Render Functions */
 
   const renderTable = async () => {
     const {cellWidths, tableDataTrimmed, totalTableWidth} = await getTableData();
@@ -125,17 +144,7 @@ function TablesData({
     );
   };
 
-  const selectTable = (table) => {
-    setSelectedTable(table);
-    setTableData([]); // clear old
-    setIsTableVisible(true); // open immediately
-    setLoading(true);
-
-    setTimeout(() => {
-      setTableData(table.data || []);
-      setLoading(false);
-    }, [0]);
-  };
+  /* View */
 
   return (
     <View>

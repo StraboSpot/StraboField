@@ -10,7 +10,11 @@ const FoldGeometryChoices = ({
                                formProps,
                                survey,
                              }) => {
+  /* Data Hooks */
+
   const {getChoicesByKey, getRelevantFields} = useForm();
+
+  /* Event Handlers */
 
   const onGeometryChoiceButtonPress = (key, value) => {
     let updatedFormData = JSON.parse(JSON.stringify(formProps.values));
@@ -18,6 +22,8 @@ const FoldGeometryChoices = ({
     else updatedFormData[key] = value;
     formProps.setValues(updatedFormData);
   };
+
+  /* View */
 
   return FOLD_GEOMETRY_KEYS.map((key) => {
     const foldGeometryField = getRelevantFields(survey, key)[0];

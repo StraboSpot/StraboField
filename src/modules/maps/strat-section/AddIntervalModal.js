@@ -18,25 +18,32 @@ import {updatedProject} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {setSelectedSpot} from '../../spots/spots.slice';
 
+const formName = ['sed', 'add_interval'];
+
 const AddIntervalModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
-
-  const [initialFormValues, setInitialFormValues] = useState({});
-  const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
 
+  /* Local State */
+
   const formRef = useRef(null);
   const preFormRef = useRef(null);
 
-  const formName = ['sed', 'add_interval'];
+  const [intervalToCopy, setIntervalToCopy] = useState(null);
+
+  /* Derived Variables */
 
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+
+  /* Side Effects */
 
   useEffect(() => {
     const initialValues = {};
@@ -58,7 +65,6 @@ const AddIntervalModal = () => {
       initialValues.package_thickness_units = stratSection.column_y_axis_units;
       initialValues.interbed_thickness_units = stratSection.column_y_axis_units;
     }
-
     // Testing Data
     /*      vm.intervalName = 'Interval Inserting';
      initialValues.interval_thickness = 2;
@@ -71,9 +77,10 @@ const AddIntervalModal = () => {
      initialValues.interbed_proportion_change = 'no_change';
      initialValues.avg_thickness = 5;
      initialValues.avg_thickness_1 = 8;*/
-
-    setInitialFormValues(initialValues);
+    formRef.current.setValues(initialValues);
   }, []);
+
+  /* Logic Helpers */
 
   const close = () => {
     dispatch(setModalValues({}));
@@ -87,7 +94,7 @@ const AddIntervalModal = () => {
       const sedData = JSON.parse(JSON.stringify(copyInterval.properties.sed));
       let copiedData = extractAddIntervalData(sedData);
       delete copiedData.interval_thickness;
-      setInitialFormValues(copiedData);
+      formRef.current.setValues(copiedData);
     }
     else setIntervalToCopy(null);
   };
@@ -145,6 +152,87 @@ const AddIntervalModal = () => {
     return data;
   };
 
+  const saveInterval = async () => {
+    try {
+      await formRef.current.submitForm();
+      const intervalData = showErrors(formRef.current);
+      if (doUnitsFieldsMatch(intervalData)) {
+        let newInterval = createInterval(stratSection.strat_section_id, intervalData);
+        if (preFormRef.current?.values?.intervalName) {
+          newInterval.properties.name = preFormRef.current.values.intervalName;
+        }
+        if (intervalToCopy) newInterval = copyRestOfInterval(newInterval);
+        const newSpot = await createSpot({type: 'Feature', ...newInterval});
+        if (preFormRef.current?.values?.intervalToInsertAfter) {
+          const intervalToInsertAfterObj = intervals.find(
+            i => i.properties.id === preFormRef.current.values.intervalToInsertAfter);
+          console.log('Insert after', preFormRef.current.values.intervalToInsertAfter, intervalToInsertAfterObj);
+          moveIntervalToAfter(newSpot, intervalToInsertAfterObj);
+        }
+        dispatch(setSelectedSpot(newSpot));
+        dispatch(setModalValues({}));
+        dispatch(setModalVisible({modal: null}));
+        if (preferences.starting_number_for_spot) {
+          const updatedPreferences = {
+            ...preferences,
+            starting_number_for_spot: preferences.starting_number_for_spot + 1,
+          };
+          dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
+        }
+      }
+    }
+    catch (e) {
+      console.log('Error saving interval', e);
+    }
+  };
+
+  const validatePreForm = (values) => {
+    console.log('Values before geometry validation:', values);
+    let errors = {};
+    if (values.intervalToCopyId) {
+      const copyInterval = intervals.find(i => i.properties.id === values.intervalToCopyId);
+      copyIntervalLithology(copyInterval);
+    }
+    else setIntervalToCopy(null);
+    console.log('Values after geometry validation:', values);
+    return errors;
+  };
+
+  /* Render Functions */
+
+  const renderAddIntervalFormFields = () => {
+    return (
+      <Formik
+        initialStatus={{formName: formName}}
+        initialValues={{}}
+        innerRef={formRef}
+        onSubmit={() => console.log('Submitting form...')}
+        validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={true}
+      >
+        {formProps => <Form {...{...formProps, formName: formName}}/>}
+      </Formik>
+    );
+  };
+
+  const renderAddIntervalModal = () => {
+    return (
+      <ModalWrapper
+        closeModal={close}
+        headerTitle={'Add Interval'}
+        showActionButton={false}
+        showCancelButton={false}
+        showCloseButton
+      >
+        <FlatList
+          ListFooterComponent={renderAddIntervalFormFields()}
+          ListHeaderComponent={renderAddIntervalNameField()}
+        />
+        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
+      </ModalWrapper>
+    );
+  };
+
   const renderAddIntervalNameField = () => {
     const initialIntervalName = {
       intervalName: (preferences.spot_prefix || '') + (preferences.starting_number_for_spot || ''),
@@ -153,7 +241,6 @@ const AddIntervalModal = () => {
     const intervalsForInsert = [...orderedIntervals, {properties: {name: '-- Bottom --', id: 1}}];
     return (
       <Formik
-        enableReinitialize={false}
         initialValues={initialIntervalName}
         innerRef={preFormRef}
         onSubmit={() => console.log('Submitting form...')}
@@ -206,84 +293,7 @@ const AddIntervalModal = () => {
     );
   };
 
-  const renderAddIntervalFormFields = () => {
-    return (
-      <Formik
-        enableReinitialize={true}
-        initialStatus={{formName: formName}}
-        initialValues={initialFormValues}
-        innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-      >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
-      </Formik>
-    );
-  };
-
-  const renderAddIntervalModal = () => {
-    return (
-      <ModalWrapper
-        closeModal={close}
-        headerTitle={'Add Interval'}
-        showActionButton={false}
-        showCancelButton={false}
-        showCloseButton
-      >
-        <FlatList
-          ListFooterComponent={renderAddIntervalFormFields()}
-          ListHeaderComponent={renderAddIntervalNameField()}
-        />
-        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
-      </ModalWrapper>
-    );
-  };
-
-  const saveInterval = async () => {
-    try {
-      await formRef.current.submitForm();
-      const intervalData = showErrors(formRef.current);
-      if (doUnitsFieldsMatch(intervalData)) {
-        let newInterval = createInterval(stratSection.strat_section_id, intervalData);
-        if (preFormRef.current?.values?.intervalName) {
-          newInterval.properties.name = preFormRef.current.values.intervalName;
-        }
-        if (intervalToCopy) newInterval = copyRestOfInterval(newInterval);
-        const newSpot = await createSpot({type: 'Feature', ...newInterval});
-        if (preFormRef.current?.values?.intervalToInsertAfter) {
-          const intervalToInsertAfterObj = intervals.find(
-            i => i.properties.id === preFormRef.current.values.intervalToInsertAfter);
-          console.log('Insert after', preFormRef.current.values.intervalToInsertAfter, intervalToInsertAfterObj);
-          moveIntervalToAfter(newSpot, intervalToInsertAfterObj);
-        }
-        dispatch(setSelectedSpot(newSpot));
-        dispatch(setModalValues({}));
-        dispatch(setModalVisible({modal: null}));
-        if (preferences.starting_number_for_spot) {
-          const updatedPreferences = {
-            ...preferences,
-            starting_number_for_spot: preferences.starting_number_for_spot + 1,
-          };
-          dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
-        }
-      }
-    }
-    catch (e) {
-      console.log('Error saving interval', e);
-    }
-  };
-
-  const validatePreForm = (values) => {
-    console.log('Values before geometry validation:', values);
-    let errors = {};
-    if (values.intervalToCopyId) {
-      const copyInterval = intervals.find(i => i.properties.id === values.intervalToCopyId);
-      copyIntervalLithology(copyInterval);
-    }
-    else setIntervalToCopy(null);
-    console.log('Values after geometry validation:', values);
-    return errors;
-  };
+  /* View */
 
   return renderAddIntervalModal();
 };

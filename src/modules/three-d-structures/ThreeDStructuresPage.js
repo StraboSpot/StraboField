@@ -4,6 +4,7 @@ import {SectionList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ThreeDStructureItem from './ThreeDStructureItem';
+import {THREE_D_STRUCTURE_SECTIONS} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -11,28 +12,26 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ThreeDStructuresPage = ({isReadOnly, page}) => {
-  const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
-  const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const spot = useSelector(state => state.spot.selectedSpot);
+  /* Data Hooks */
 
-  const [selected3dStructure, setSelected3dStructure] = useState({});
-  const [isDetailView, setIsDetailView] = useState(false);
+  const dispatch = useDispatch();
+  const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel} = useForm();
 
-  const SECTIONS = {
-    // FABRICS: {title: 'Fabrics', key: 'fabric'}, // Hidden here and displayed on Fabrics page as deprecated
-    FOLDS: {title: 'Folds', key: 'fold'},
-    FAULTS: {title: 'Faults', key: 'fault'},
-    TENSORS: {title: 'Tensors', key: 'tensor'},
-    OTHER: {title: 'Other', key: 'other'},
-  };
+  /* Local State */
+
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selected3dStructure, setSelected3dStructure] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ThreeDStructuresPage []');
@@ -47,6 +46,8 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
       setIsDetailView(true);
     }
   }, [selectedAttributes, spot]);
+
+  /* Logic Helpers */
 
   const add3dStructure = (type) => {
     const new3dStructure = {id: getNewId(), type: type};
@@ -67,12 +68,14 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
       || '';
   };
 
+  /* Render Functions */
+
   const render3dStructure = (threeDStructure) => {
     return <ThreeDStructureItem edit3dStructure={item => edit3dStructure((item))} item={threeDStructure}/>;
   };
 
   const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(SECTIONS).reduce(
+    const sectionKey = Object.values(THREE_D_STRUCTURE_SECTIONS).reduce(
       (acc, {title, key}) => sectionTitle === title ? key : acc, '');
     return (
       <>
@@ -89,7 +92,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   };
 
   const renderSections = () => {
-    const dataSectioned = Object.values(SECTIONS).reduce((acc, {title, key}) => {
+    const dataSectioned = Object.values(THREE_D_STRUCTURE_SECTIONS).reduce((acc, {title, key}) => {
       const data = spot?.properties?._3d_structures?.filter(d => d.type === key) || [];
       const dataSorted = data.slice().sort((a, b) => get3dStructureTitle(a).localeCompare(get3dStructureTitle(b)));
       return [...acc, {title: title, data: dataSorted}];
@@ -110,11 +113,13 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
     );
   };
 
+  /* View */
+
   return (
     <>
       {!isDetailView && (
         <View>
-          <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
+          <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly}/>
           {renderSections()}
         </View>
       )}

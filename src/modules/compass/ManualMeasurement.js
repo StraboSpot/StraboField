@@ -12,7 +12,7 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
 import {NumberInputField} from '../form';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ManualMeasurement = ({
                              addAttributeMeasurement,
@@ -21,9 +21,15 @@ const ManualMeasurement = ({
                              setSliderValue,
                              sliderValue,
                            }) => {
+  /* Data Hooks */
+
   const modalVisible = useSelector(state => state.home.modalVisible);
 
+  /* Local State */
+
   const manualFormRef = useRef(null);
+
+  /* View */
 
   return (
     <Formik

@@ -1,14 +1,18 @@
-import {PixelRatio, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
+import {SPOT_LAYERS} from './maps.constants';
+import {getClosestSpotDistanceAndIndex} from './maps.helpers';
 import useMapCoords from './useMapCoords';
 import {isEmpty} from '../../shared/Helpers';
 import useNesting from '../nesting/useNesting';
 import {useSpots} from '../spots';
 
 const useMapFeaturesCalculated = (mapRef) => {
+  /* Data Hooks */
+
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -16,22 +20,7 @@ const useMapFeaturesCalculated = (mapRef) => {
   const {getChildrenGenerationsSpots} = useNesting();
   const {getSpotById, getSpotsByIds} = useSpots();
 
-  const spotLayers = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
-    'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
-    'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
-    'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
-
-  const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
-    let minDistance = Number.MAX_VALUE;
-    let minIndex = -1;
-    for (let j = 0; j < distancesFromSpot.length; j++) {
-      if (minDistance > distancesFromSpot[j]) { // trying to get the minimum distance
-        minDistance = distancesFromSpot[j];
-        minIndex = j;
-      } // else we can ignore that feature.
-    }
-    return [minDistance, minIndex];
-  };
+  /* Internal Functions */
 
   const getDistancesFromSpot = async (screenPointX, screenPointY, featuresInRect) => {
     const dummyFeature = {
@@ -60,16 +49,20 @@ const useMapFeaturesCalculated = (mapRef) => {
         screenCoords = Platform.OS === 'web' ? mapRef.current.project(eachFeature.geometry.coordinates)
           : await mapRef.current.getPointInView(eachFeature.geometry.coordinates);
         if (Platform.OS === 'web') screenCoords = [screenCoords.x, screenCoords.y];
-        else if (Platform.OS === 'android') {
-          const pixelRatio = PixelRatio.get();
-          screenCoords = [screenCoords[0] / pixelRatio, screenCoords[1] / pixelRatio];
-        }
+        // getPointInView seems to include pixel ratio adjustment for Android
+        // now after updating @rnmapbox/maps from v10.1.39 to v10.2.10
+        // else if (Platform.OS === 'android') {
+        //   const pixelRatio = PixelRatio.get();
+        //   screenCoords = [screenCoords[0] / pixelRatio, screenCoords[1] / pixelRatio];
+        // }
         eachFeature.geometry.coordinates = screenCoords;
         distances[i] = turf.distance(dummyFeature, eachFeature);
       }
     }
     return distances;
   };
+
+  /* Exported Functions */
 
   // Get the nearest draw feature from the draw layer where the screen was pressed
   const getDrawFeatureAtPress = async (screenPointX, screenPoint) => {
@@ -130,7 +123,7 @@ const useMapFeaturesCalculated = (mapRef) => {
 
   // Get the Spot where screen was pressed
   const getSpotAtPress = async (screenPointX, screenPointY) => {
-    const nearestFeature = await getNearestFeatureInBBox([screenPointX, screenPointY], spotLayers);
+    const nearestFeature = await getNearestFeatureInBBox([screenPointX, screenPointY], SPOT_LAYERS);
     const nearestSpot = nearestFeature?.properties?.id ? getSpotById(
       nearestFeature.properties.id) || nearestFeature : {};
     if (isEmpty(nearestSpot)) console.log('No spots near press.');
@@ -157,11 +150,11 @@ const useMapFeaturesCalculated = (mapRef) => {
   };
 
   return {
-    getDrawFeatureAtPress: getDrawFeatureAtPress,
-    getLassoedSpots: getLassoedSpots,
-    getNearestFeatureInBBox: getNearestFeatureInBBox,
-    getSpotAtPress: getSpotAtPress,
-    identifyClosestVertexOnSpotPress: identifyClosestVertexOnSpotPress,
+    getDrawFeatureAtPress,
+    getLassoedSpots,
+    getNearestFeatureInBBox,
+    getSpotAtPress,
+    identifyClosestVertexOnSpotPress,
   };
 };
 

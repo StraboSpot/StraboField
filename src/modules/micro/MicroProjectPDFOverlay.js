@@ -14,29 +14,27 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
+  /* Data Hooks */
+
   const {exportMicroProjectPDF} = useDevice();
+
+  /* Local State */
+
   // const toast = useToast();
   const toastRef = useRef(null);
 
-  const showToast = (message, type) => {
-    const toastOptions = {
-      type: type,
-      placement: 'top',
-      duration: 2000,
-    };
-    // Fallback to alert on web since react-native-toast-notifications may not work
-    if (Platform.OS === 'web') alert(message);
-    else toastRef.current.show(message, toastOptions);
-  };
-
-  const [wasExported, setWasExported] = useState(false);
   const [isExportError, setIsExportError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [wasExported, setWasExported] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     setWasExported(false);
     setIsExportError(false);
   }, [visible]);
+
+  /* Event Handlers */
 
   const handleExport = async () => {
     try {
@@ -54,6 +52,21 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
       setLoading(false);
     }
   };
+
+  /* Logic Helpers */
+
+  const showToast = (message, type) => {
+    const toastOptions = {
+      type: type,
+      placement: 'top',
+      duration: 2000,
+    };
+    // Fallback to alert on web since react-native-toast-notifications may not work
+    if (Platform.OS === 'web') alert(message);
+    else toastRef.current.show(message, toastOptions);
+  };
+
+  /* View */
 
   return (
     <ModalWrapper
@@ -94,6 +107,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
         </View>
         {!isEmpty(doc) && (
           <Pdf
+            enablePaging
+            maxScale={3}
             onError={error => console.log(error)}
             onLoadComplete={numberOfPages => console.log(`Number of pages: ${numberOfPages}`)}
             onPressLink={async (uri) => {

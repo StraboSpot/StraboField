@@ -9,20 +9,27 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
 const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+  /* Data Hooks */
+
   const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
+
+  /* Local State */
+
+  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+
+  /* Render Functions */
 
   const renderNoSamplesText = () => {
     return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
@@ -91,6 +98,8 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <>

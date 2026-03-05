@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
 import moment from 'moment';
-import DatePicker from 'react-datepicker';
+import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {useDispatch} from 'react-redux';
 
@@ -17,14 +17,22 @@ const DateInputField = ({
                           isShowTimeOnly,
                           label,
                         }) => {
-  const [date, setDate] = useState(Date.parse(value) ? new Date(value) : undefined);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+
+  /* Local State */
+
+  const [date, setDate] = useState(Date.parse(value) ? new Date(value) : undefined);
+
+  /* Derived Variables */
 
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
         : moment(value).format('MM/DD/YYYY')
     : undefined;
+
+  /* Logic Helpers */
 
   const changeDate = (selectedDate) => {
     console.log('Change Date', name, selectedDate);
@@ -51,6 +59,8 @@ const DateInputField = ({
     }
     else setFieldValue(name, selectedDate);
   };
+
+  /* Render Functions */
 
   const renderDatePickerWeb = () => {
     if (isShowTimeOnly) {
@@ -79,6 +89,8 @@ const DateInputField = ({
       );
     }
   };
+
+  /* View */
 
   return (
     <>

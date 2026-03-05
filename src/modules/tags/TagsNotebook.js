@@ -7,29 +7,38 @@ import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
-import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
 const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
+  /* Local State */
+
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
-  const firstDividerText = pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units';
+  /* Derived Variables */
 
   const pageVisible = pagesStack.slice(-1)[0];
+  const firstDividerText = pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units';
+
+  /* Logic Helpers */
 
   const closeTagDetailModal = () => {
     setIsDetailModalVisible(false);
     dispatch(addedTagToSelectedSpot(false));
   };
 
+  /* View */
+
   return (
     <>
-      <NotebookPageHeader pageTitle={page.label}/>
+      <PageHeader pageTitle={page.label}/>
       <FlatList
         ListFooterComponent={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS && (
           <>
@@ -47,7 +56,7 @@ const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
                   onPress={() => dispatch(setModalVisible({modal: pageVisible}))}
                 />
               )}
-              <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
+            <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
           </>
         }
       />

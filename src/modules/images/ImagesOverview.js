@@ -10,16 +10,22 @@ import {editedSpotImages} from '../spots/spots.slice';
 const ImagesOverview = ({isReadOnly}) => {
   console.log('Rendering ImagesOverview...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const toast = useToast();
+
+  /* Logic Helpers */
 
   const saveImagesToSpot = (newImages) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
     dispatch(editedSpotImages(newImages));
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
+
+  /* View */
 
   return <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>;
 };

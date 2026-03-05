@@ -6,7 +6,11 @@ import * as turf from '@turf/turf';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
+  /* Data Hooks */
+
   const {getMapSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <>

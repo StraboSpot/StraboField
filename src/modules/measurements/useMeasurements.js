@@ -5,22 +5,55 @@ import alert from '../../shared/ui/alert';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 
 const useMeasurements = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
-  const activeMeasurementTemplates = useSelector(
-    state => state.project.project?.templates?.activeMeasurementTemplates) || [];
-  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+  const activeMeasurementTemplates = useSelector(state => state.project.project?.templates?.activeMeasurementTemplates)
+    || [];
   const compassMeasurements = useSelector(state => state.compass.measurements);
+  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const spot = useSelector(state => state.spot.selectedSpot);
-  const useMeasurementTemplates = useSelector(state => state.project.project?.templates?.useMeasurementTemplates);
 
   const {getLabel} = useForm();
+  const useMeasurementTemplates = useSelector(state => state.project.project?.templates?.useMeasurementTemplates);
   const {deleteFeatureTags} = useTags();
+
+  /* Internal Functions */
+
+  const removeMeasurementFromObj = (currentOrientationData, measurementToDelete) => {
+    let aborted = false;
+    let orientationDataCopy = JSON.parse(JSON.stringify(currentOrientationData));
+    orientationDataCopy.forEach((measurement, i) => {
+      if (measurementToDelete.id === measurement.id && !measurement.associated_orientation) orientationDataCopy[i] = {};
+      else if (measurementToDelete.id === measurement.id && measurement.associated_orientation) {
+        alert('Unable to Delete', 'Please delete the associated features before deleting the primary feature.');
+        aborted = true;
+        throw Error;
+      }
+      else if (measurement.associated_orientation) {
+        measurement.associated_orientation.forEach((associatedMeasurement, j) => {
+          if (measurementToDelete.id === associatedMeasurement.id) orientationDataCopy[i].associated_orientation[j] = {};
+        });
+        orientationDataCopy[i].associated_orientation = orientationDataCopy[i].associated_orientation.filter(
+          associatedMeasurement => !isEmpty(associatedMeasurement));
+      }
+      if (measurement.associated_orientation && isEmpty(measurement.associated_orientation)) {
+        delete orientationDataCopy[i].associated_orientation;
+      }
+    });
+    if (!aborted) {
+      orientationDataCopy = orientationDataCopy.filter(measurement => !isEmpty(measurement));
+      return orientationDataCopy;
+    }
+  };
+
+  /* Exported Functions */
 
   const createNewMeasurement = () => {
     let measurements = [];
@@ -117,37 +150,10 @@ const useMeasurements = () => {
     return getLabel(key, ['measurement']);
   };
 
-  const removeMeasurementFromObj = (currentOrientationData, measurementToDelete) => {
-    let aborted = false;
-    let orientationDataCopy = JSON.parse(JSON.stringify(currentOrientationData));
-    orientationDataCopy.forEach((measurement, i) => {
-      if (measurementToDelete.id === measurement.id && !measurement.associated_orientation) orientationDataCopy[i] = {};
-      else if (measurementToDelete.id === measurement.id && measurement.associated_orientation) {
-        alert('Unable to Delete', 'Please delete the associated features before deleting the primary feature.');
-        aborted = true;
-        throw Error;
-      }
-      else if (measurement.associated_orientation) {
-        measurement.associated_orientation.forEach((associatedMeasurement, j) => {
-          if (measurementToDelete.id === associatedMeasurement.id) orientationDataCopy[i].associated_orientation[j] = {};
-        });
-        orientationDataCopy[i].associated_orientation = orientationDataCopy[i].associated_orientation.filter(
-          associatedMeasurement => !isEmpty(associatedMeasurement));
-      }
-      if (measurement.associated_orientation && isEmpty(measurement.associated_orientation)) {
-        delete orientationDataCopy[i].associated_orientation;
-      }
-    });
-    if (!aborted) {
-      orientationDataCopy = orientationDataCopy.filter(measurement => !isEmpty(measurement));
-      return orientationDataCopy;
-    }
-  };
-
   return {
-    createNewMeasurement: createNewMeasurement,
-    deleteMeasurements: deleteMeasurements,
-    getMeasurementLabel: getMeasurementLabel,
+    createNewMeasurement,
+    deleteMeasurements,
+    getMeasurementLabel,
   };
 };
 

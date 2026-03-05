@@ -14,12 +14,20 @@ const ModalWrapperHeader = ({
                               showCloseButton = false,
                               headerTitle,
                             }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
 
+  /* Derived Variables */
+
   const modalInfo = MODALS.find(p => p.key === modalVisible);
 
+  /* Logic Helpers */
+
   const getTitle = () => modalInfo && (modalInfo.action_label || modalInfo.label);
+
+  /* View */
 
   return (
     <View style={modalStyles.modalTop}>

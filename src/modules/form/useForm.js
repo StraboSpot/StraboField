@@ -1,24 +1,13 @@
 import moment from 'moment';
 
+import {convertXLSFormLogicToJS, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
 import {isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {LABEL_DICTIONARY} from '../form';
 
 const useForm = () => {
-
-  const covertXLSFormLogicToJS = (logic) => {
-    logic = logic.replace(/not/g, '!');
-    logic = logic.replace(/selected\(\${(.*?)}, /g, 'values?.$1?.includes(');
-    logic = logic.replace(/\$/g, '');
-    logic = logic.replace(/{/g, 'values?.');
-    logic = logic.replace(/}/g, '');
-    logic = logic.replace(/''/g, 'undefined');
-    logic = logic.replace(/ = /g, ' == ');
-    logic = logic.replace(/ or /g, ' || ');
-    logic = logic.replace(/ and /g, ' && ');
-    return logic;
-  };
+  /* Exported Functions */
 
   // Return the choices object given the form category and name
   const getChoices = ([category, name]) => {
@@ -106,23 +95,12 @@ const useForm = () => {
   const isRelevant = (field, values) => {
     //console.log('values', values);
     if (isEmpty(field.relevant)) return true;
-    const relevantLogicJS = covertXLSFormLogicToJS(field.relevant);
+    const relevantLogicJS = convertXLSFormLogicToJS(field.relevant);
     // console.log(field.name, 'relevant:', relevantLogicJS);
 
+    // eslint-disable-next-line no-new-func -- required for dynamic evaluation of XLSForm logic strings
     const F = new Function('values', 'return ' + relevantLogicJS);
     return F(values);
-  };
-
-  const isRequired = (field, values) => {
-    if (field.required === 'true' || field.required === true) return true;
-    else if (field.required === 'false' || field.required === false || isEmpty(field.required)) return false;
-    else {
-      const requiredLogicJS = covertXLSFormLogicToJS(field.required);
-      // console.log(field.name, 'required:', requiredLogicJS);
-
-      const F = new Function('values', 'return ' + requiredLogicJS);
-      return F(values);
-    }
   };
 
   // Remove errors from data, if any, and show alert. Throw error if not leaving page.
@@ -156,7 +134,7 @@ const useForm = () => {
       }
       else if (values[key]) {
         if (fieldModel.type === 'integer') {
-          values[key] = isNaN(parseInt(values[key])) ? undefined : parseInt(values[key]);
+          values[key] = isNaN(parseInt(values[key], 10)) ? undefined : parseInt(values[key], 10);
         }
         else if (fieldModel.type === 'decimal') {
           values[key] = isNaN(parseFloat(values[key])) ? undefined : parseFloat(values[key]);
@@ -215,17 +193,17 @@ const useForm = () => {
   };
 
   return {
-    getChoices: getChoices,
-    getChoicesByKey: getChoicesByKey,
-    getGroupFields: getGroupFields,
-    getLabel: getLabel,
-    getLabels: getLabels,
-    getRelevantFields: getRelevantFields,
-    getSurvey: getSurvey,
-    hasErrors: hasErrors,
-    isRelevant: isRelevant,
-    showErrors: showErrors,
-    validateForm: validateForm,
+    getChoices,
+    getChoicesByKey,
+    getGroupFields,
+    getLabel,
+    getLabels,
+    getRelevantFields,
+    getSurvey,
+    hasErrors,
+    isRelevant,
+    showErrors,
+    validateForm,
   };
 };
 

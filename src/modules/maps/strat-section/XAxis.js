@@ -6,8 +6,12 @@ import useXAxis from './useXAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const XAxis = ({n = 1}) => {
+  /* Data Hooks */
+
   const {getMapSymbology} = useMapSymbology();
   const {getXAxis, getXAxisTickMarks} = useXAxis(n);
+
+  /* View */
 
   return (
     <>

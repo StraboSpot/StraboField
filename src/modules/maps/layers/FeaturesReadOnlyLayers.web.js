@@ -1,13 +1,16 @@
 import React from 'react';
 
 import * as turf from '@turf/turf';
-import {Layer, Source} from 'react-map-gl';
+import {Layer, Source} from 'react-map-gl/mapbox';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const FeaturesNotSelectedLayers = ({features}) => {
+  /* Data Hooks */
 
   const {getPaintSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <Source

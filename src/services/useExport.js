@@ -1,27 +1,27 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES} from './directories.constants';
+import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
 import useDevice from './useDevice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
 import {setBackupFileName} from '../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../shared/Helpers';
 
+let imageBackupFailures = 0;
+let imageSuccess = 0;
+
 const useExport = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const mapNamesDb = useSelector(state => state.offlineMap.offlineMaps);
   const otherMapsDb = useSelector(state => state.map.customMaps);
   const projectDb = useSelector(state => state.project);
   const spotsDb = useSelector(state => state.spot.spots);
   const userDb = useSelector(state => state.user);
-
-  const appExportDirectory = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.EXPORT_FILES_ANDROID;
-
-  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
-  const userDbCopy = JSON.parse(JSON.stringify(userDb));
-  const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
 
   const {
     copyFiles,
@@ -33,9 +33,12 @@ const useExport = () => {
     readFile,
     writeFileToDevice,
   } = useDevice();
-  let imageBackupFailures = 0;
-  let imageSuccess = 0;
 
+  /* Derived Variables */
+
+  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
+  const userDbCopy = JSON.parse(JSON.stringify(userDb));
+  const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
   let dataForExport = {
     mapNamesDb: mapNamesDb,
     mapTilesDb: {},
@@ -43,6 +46,8 @@ const useExport = () => {
     projectDb: projectDb,
     spotsDb: spotsDb,
   };
+
+  /* Internal Functions */
 
   const backupProjectToDevice = async (fileName) => {
     await gatherDataForBackup(fileName);
@@ -78,7 +83,7 @@ const useExport = () => {
 
   const gatherImagesForDistribution = async (data, fileName, isBeingExported) => {
     try {
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       console.log('data:', data);
       await doesDeviceDirectoryExist(deviceDir + fileName + '/images');
       dispatch(removedLastStatusMessage());
@@ -135,7 +140,7 @@ const useExport = () => {
     try {
       const maps = data.mapNamesDb;
       const mapCount = Object.values(maps).length;
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Offline Maps...'));
       if (!isEmpty(maps)) {
@@ -160,7 +165,7 @@ const useExport = () => {
   const gatherOtherMapsForDistribution = async (exportedFileName, isBeingExported) => {
     try {
       console.log(configDb);
-      const deviceDir = isBeingExported ? appExportDirectory : APP_DIRECTORIES.BACKUP_DIR;
+      const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Custom Maps...'));
       if (!isEmpty(configDb.other_maps)) {
@@ -179,6 +184,25 @@ const useExport = () => {
       dispatch(addedStatusMessage('Error Backing Up Custom Maps!' + err));
     }
   };
+
+  const moveDistributedImage = async (image_id, fileName, directory) => {
+    try {
+      const imageExists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES + image_id + '.jpg');
+      if (imageExists) {
+        await copyFiles(APP_DIRECTORIES.IMAGES + image_id + '.jpg',
+          directory + fileName + '/images/' + image_id + '.jpg');
+        imageSuccess++;
+        console.log(imageSuccess, 'Copied image to backup:', image_id);
+      }
+      else throw Error('Image not found.');
+    }
+    catch (err) {
+      imageBackupFailures++;
+      console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
+    }
+  };
+
+  /* Exported Functions */
 
   const initializeBackup = async (fileName) => {
     try {
@@ -202,56 +226,17 @@ const useExport = () => {
     }
   };
 
-  const moveDistributedImage = async (image_id, fileName, directory) => {
-    try {
-      const imageExists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES + image_id + '.jpg');
-      if (imageExists) {
-        await copyFiles(APP_DIRECTORIES.IMAGES + image_id + '.jpg',
-          directory + fileName + '/images/' + image_id + '.jpg');
-        imageSuccess++;
-        console.log(imageSuccess, 'Copied image to backup:', image_id);
-      }
-      else throw Error('Image not found.');
-    }
-    catch (err) {
-      imageBackupFailures++;
-      console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
-    }
-  };
-
-  const requestWriteDirectoryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: 'Need permission to read Downloads Folder',
-          message:
-            'StraboField needs permission to access your Downloads Folder to save backups,',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) console.log('You can read the folder');
-      else console.log('Folder read permission denied');
-    }
-    catch (err) {
-      console.warn(err);
-    }
-  };
-
-  const zipAndExportProjectFolder = async (selectedBackupFile, exportedFilename, isBeingExported) => {
+  const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported) => {
     // try {
     // dispatch(setLoadingStatus({view: 'modal', bool: true}));
-    await makeDirectory(appExportDirectory + selectedBackupFile);
+    await makeDirectory(APP_EXPORT_DIRECTORY + selectedBackupFile);
 
     // Make temp directory for the export files to be zipped up.
-    console.log('Directory made:', appExportDirectory);
+    console.log('Directory made:', APP_EXPORT_DIRECTORY);
 
     // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
     const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
-    const destination = appExportDirectory + selectedBackupFile;
-    Platform.OS === 'android' && await requestWriteDirectoryPermission();
+    const destination = APP_EXPORT_DIRECTORY + selectedBackupFile;
     console.log(selectedBackupFile);
 
     const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
@@ -264,13 +249,39 @@ const useExport = () => {
     await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
     console.log('Map tiles copied to:', destination);
     await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
-    const zipPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
-    const path = await zip(appExportDirectory + selectedBackupFile,
-      zipPath + exportedFilename + '.zip');
 
-    const deleteTempFolder = deleteFromDevice(appExportDirectory, selectedBackupFile);
+    const zipFileName = selectedBackupFile + '.zip';
+
+    if (Platform.OS === 'ios') {
+      // iOS: Zip directly to Distribution folder
+      const zipPath = APP_DIRECTORIES.EXPORT_FILES_IOS;
+      const path = await zip(APP_EXPORT_DIRECTORY + selectedBackupFile, zipPath + zipFileName);
+      console.log(`zip completed at ${path}`);
+    }
+    else {
+      // Android: Zip to private directory first, then copy to Downloads via MediaStore
+      const tempZipPath = APP_EXPORT_DIRECTORY + zipFileName;
+      await zip(APP_EXPORT_DIRECTORY + selectedBackupFile, tempZipPath);
+      console.log(`zip completed at ${tempZipPath}`);
+
+      // Copy to Downloads folder using MediaStore (required for Android 11+)
+      const result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+        {
+          name: zipFileName,
+          parentFolder: 'StraboSpot2/Backups',
+          mimeType: 'application/zip',
+        },
+        'Download',
+        tempZipPath,
+      );
+      console.log('File copied to Downloads:', result);
+
+      // Clean up temp zip file
+      await deleteFromDevice(APP_EXPORT_DIRECTORY, zipFileName);
+    }
+
+    const deleteTempFolder = await deleteFromDevice(APP_EXPORT_DIRECTORY, selectedBackupFile);
     console.log('Folder', deleteTempFolder);
-    console.log(`zip completed at ${path}`);
     console.log('All Done Exporting');
     dispatch(clearedStatusMessages());
     // throw Error('This is an ERROR YEEHAW');
@@ -287,8 +298,8 @@ const useExport = () => {
   };
 
   return {
-    initializeBackup: initializeBackup,
-    zipAndExportProjectFolder: zipAndExportProjectFolder,
+    initializeBackup,
+    zipAndExportProjectFolder,
   };
 };
 

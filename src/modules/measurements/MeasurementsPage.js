@@ -18,22 +18,28 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
-  const spot = useSelector(state => state.spot.selectedSpot);
   const compassMeasurements = useSelector(state => state.compass.measurements);
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const modalVisible = useSelector(state => state.home.modalVisible);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {createNewMeasurement, deleteMeasurements} = useMeasurements();
+
+  /* Local State */
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [multiSelectMode, setMultiSelectMode] = useState();
   const [selectedFeaturesTemp, setSelectedFeaturesTemp] = useState([]);
 
-  const {createNewMeasurement, deleteMeasurements} = useMeasurements();
+  /* Derived Variables */
 
   const SECTIONS = {
     PLANAR: {
@@ -52,6 +58,8 @@ const MeasurementsPage = ({isReadOnly, page}) => {
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR, COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
   };
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE MeasurementsPage []');
@@ -74,43 +82,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
     }
   }, [compassMeasurements]);
 
-  const addMeasurement = (type) => {
-    dispatch(setCompassMeasurementTypes(SECTIONS[type].compass_toggles));
-    dispatch(setModalVisible({modal: page.key}));
-  };
-
-  const deleteMeasurementsConfirm = (measurementsToDelete) => {
-    const deleteText = 'Are you sure you want to delete '
-      + (measurementsToDelete.length === 1 ? 'this measurement' : 'these measurements') + '?';
-    alert(
-      'Delete Measurement',
-      deleteText,
-      [{
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      }, {
-        text: 'OK',
-        onPress: () => deleteMeasurementsCont(measurementsToDelete),
-      }],
-      {cancelable: false},
-    );
-  };
-
-  const deleteMeasurementsCont = (measurementsToDelete) => {
-    deleteMeasurements(measurementsToDelete);
-    onSelectingCancel();
-  };
-
-  const editMeasurement = (measurements) => {
-    setIsDetailView(true);
-    dispatch(setSelectedAttributes(measurements));
-    if (measurements.length > 1) dispatch(setModalVisible({modal: null}));
-  };
-
-  const getIdsOfSelected = () => {
-    return selectedFeaturesTemp.map(value => value.id);
-  };
+  /* Event Handlers */
 
   const onIdentifyAll = (type, data) => {
     console.log('Identify All:', data);
@@ -152,6 +124,75 @@ const MeasurementsPage = ({isReadOnly, page}) => {
     console.log('Start Selecting for', type, ' ...');
     setSelectedFeaturesTemp([]);
     setMultiSelectMode(type);
+  };
+
+  /* Logic Helpers */
+
+  const addMeasurement = (type) => {
+    dispatch(setCompassMeasurementTypes(SECTIONS[type].compass_toggles));
+    dispatch(setModalVisible({modal: page.key}));
+  };
+
+  const deleteMeasurementsConfirm = (measurementsToDelete) => {
+    const deleteText = 'Are you sure you want to delete '
+      + (measurementsToDelete.length === 1 ? 'this measurement' : 'these measurements') + '?';
+    alert(
+      'Delete Measurement',
+      deleteText,
+      [{
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      }, {
+        text: 'OK',
+        onPress: () => deleteMeasurementsCont(measurementsToDelete),
+      }],
+      {cancelable: false},
+    );
+  };
+
+  const deleteMeasurementsCont = (measurementsToDelete) => {
+    deleteMeasurements(measurementsToDelete);
+    onSelectingCancel();
+  };
+
+  const editMeasurement = (measurements) => {
+    setIsDetailView(true);
+    dispatch(setSelectedAttributes(measurements));
+    if (measurements.length > 1) dispatch(setModalVisible({modal: null}));
+  };
+
+  const getIdsOfSelected = () => {
+    return selectedFeaturesTemp.map(value => value.id);
+  };
+
+  /* Render Functions */
+
+  const renderMeasurementDetail = () => {
+    return (
+      <MeasurementDetail
+        closeDetailView={() => setIsDetailView(false)}
+        isReadOnly={isReadOnly}
+        page={page}
+      />
+    );
+  };
+
+  const renderMeasurementsMain = () => {
+    return (
+      <View style={{flex: 1}}>
+        <PageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
+        {renderSections()}
+        {selectedFeaturesTemp.length >= 1 && (
+          <View>
+            <DeleteButton
+              onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
+              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
+            />
+          </View>
+        )}
+      </View>
+    );
   };
 
   const renderSectionHeader = ({title, data}) => {
@@ -238,32 +279,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
     );
   };
 
-  const renderMeasurementDetail = () => {
-    return (
-      <MeasurementDetail
-        closeDetailView={() => setIsDetailView(false)}
-        isReadOnly={isReadOnly}
-        page={page}
-      />
-    );
-  };
-
-  const renderMeasurementsMain = () => {
-    return (
-      <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label} showFeaturesTagButton={!isReadOnly && !multiSelectMode}/>
-        {renderSections()}
-        {selectedFeaturesTemp.length >= 1 && (
-          <View>
-            <DeleteButton
-              onPress={() => deleteMeasurementsConfirm(selectedFeaturesTemp)}
-              title={'Delete Measurement' + (selectedFeaturesTemp.length === 1 ? '' : 's')}
-            />
-          </View>
-        )}
-      </View>
-    );
-  };
+  /* View */
 
   return isDetailView ? renderMeasurementDetail() : renderMeasurementsMain();
 };

@@ -11,15 +11,22 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
   // console.log('Rendering SpotsList...');
 
+  /* Data Hooks */
+
   const {getActiveSpotsObj} = useSpots();
+
+  /* Local State */
+
+  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
 
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+
+  /* Render Functions */
 
   const renderNoSpotsText = () => <ListEmptyText text={textNoSpots}/>;
 
@@ -59,6 +66,8 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

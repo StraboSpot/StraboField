@@ -3,8 +3,12 @@ import {useSelector} from 'react-redux';
 import {isEmpty, truncateText} from '../../shared/Helpers';
 
 const useUserProfile = () => {
-  const userData = useSelector(state => state.user);
+  /* Data Hooks */
+
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
+  const userData = useSelector(state => state.user);
+
+  /* Exported Functions */
 
   const getEmail = () => {
     return !customDatabaseEndpoint.isSelected && !isEmpty(userData.email) && truncateText(userData.email, 16);
@@ -22,9 +26,9 @@ const useUserProfile = () => {
   };
 
   return {
-    getEmail: getEmail,
-    getInitials: getInitials,
-    getName: getName,
+    getEmail,
+    getInitials,
+    getName,
   };
 };
 

@@ -11,21 +11,29 @@ import ProjectList from '../ProjectList';
 import SaveAndExportModal from './SaveAndExportModal';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 
+const source = 'device';
+
 // Export a saved project on device in StraboSpot app directory
 const ExportProject = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+
+  const {openURL} = useDevice();
+
+  /* Local State */
 
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
   const [projectToExportFilename, setProjectToExportFilename] = useState(null);
 
-  const {openURL} = useDevice();
-
-  const source = 'device';
+  /* Event Handlers */
 
   const onSelectedProjectForExport = (project) => {
     setProjectToExportFilename(project.fileName);
     setIsSaveAndExportModalVisible(true);
   };
+
+  /* View */
 
   return (
     <>

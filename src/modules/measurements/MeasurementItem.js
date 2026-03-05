@@ -7,8 +7,8 @@ import MeasurementLabel from './MeasurementLabel';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
-import FeatureTagsList from '../../shared/ui/FeatureTagsList';
 import {useTags} from '../tags';
+import FeatureTagsList from '../tags/FeatureTagsList';
 
 // Render a measurement item in a list
 const MeasurementItem = ({

@@ -10,12 +10,17 @@ import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
 const Templates = () => {
+  /* Data Hooks */
+
+  const {getTemplateTitle} = useTemplates();
+
+  /* Local State */
 
   const [isNewTemplateListVisible, setIsNewTemplateListVisible] = useState(false);
   const [templateType, setTemplateType] = useState(null);
   const [templateVisible, setTemplateVisible] = useState(null);
 
-  const {getTemplateTitle} = useTemplates();
+  /* Event Handlers */
 
   const handleBackPressed = () => {
     setTemplateVisible(null);
@@ -36,6 +41,8 @@ const Templates = () => {
     setTemplateType(section.title);
     setTemplateVisible(templatePressed);
   };
+
+  /* Render Functions */
 
   const renderNewTemplateSectionList = () => {
     return (
@@ -73,6 +80,7 @@ const Templates = () => {
     );
   };
 
+  /* View */
 
   return (
     <>

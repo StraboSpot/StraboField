@@ -5,6 +5,9 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
+import TagColorIcon from './TagColorIcon';
+import {TAG_SECTIONS} from './tags.constants';
+import {getTagTitle} from './tags.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -12,7 +15,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag} from '../project/projects.slice';
 
 const TagsList = ({type, selectedIndex}) => {
@@ -28,16 +32,8 @@ const TagsList = ({type, selectedIndex}) => {
   const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
-  const SECTIONS = type === PAGE_KEYS.GEOLOGIC_UNITS ? [{title: 'Geologic Units', key: 'geologic_unit'}] : [
-    {title: 'Concepts', key: 'concept'},
-    {title: 'Documentation', key: 'documentation'},
-    {title: 'Rosetta', key: 'rosetta'},
-    {title: 'Experimental Apparatus', key: 'experimental_apparatus'},
-    {title: 'Other', key: 'other'},
-    {title: 'No Type Specified', key: undefined},
-  ];
-
-  const getTagTitle = tag => tag.name || '';
+  const SECTIONS = type === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_SECTIONS.GEOLOGIC_UNITS
+    : TAG_SECTIONS.DEFAULT;
 
   const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 
@@ -54,6 +50,7 @@ const TagsList = ({type, selectedIndex}) => {
           dispatch(setSelectedTag(tag));
         }}
       >
+        <TagColorIcon color={tag.color}/>
         {useContinuousTagging && (
           <ListItem.CheckBox
             checked={tag.continuousTagging}

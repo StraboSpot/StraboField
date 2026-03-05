@@ -1,4 +1,5 @@
 import React from 'react';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -14,6 +15,7 @@ import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 const ModalWrapper = ({
                         actionTitle,
+                        backdropStyle,
                         buttonTitleRight,
                         cancelTitle,
                         children,
@@ -38,6 +40,8 @@ const ModalWrapper = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+
+  const isAutoHeight = overlayStyleOverride?.height === 'auto';
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
@@ -69,21 +73,30 @@ const ModalWrapper = ({
   return (
     <Overlay
       animationType={'fade'}
-      backdropStyle={overlayStyles.backdropStyles}
+      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
       fullScreen={fullscreen || SMALL_SCREEN}
       isVisible={isVisible}
       onBackdropPress={onBackdropPress}
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
-      <ModalWrapperHeader
-        buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal}
-        headerTitle={headerTitle}
-        showCloseButton={showCloseButton}
-      />
-      {children}
-      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
+        style={isAutoHeight ? undefined : {flex: 1}}
+      >
+        <ModalWrapperHeader
+          buttonTitleRight={buttonTitleRight}
+          closeModal={closeModal}
+          headerTitle={headerTitle}
+          showCloseButton={showCloseButton}
+        />
+
+        <View style={isAutoHeight ? undefined : {flex: 1}}>
+          {children}
+        </View>
+        {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+      </KeyboardAvoidingView>
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}

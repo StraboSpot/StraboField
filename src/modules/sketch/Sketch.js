@@ -8,8 +8,11 @@ import alert from '../../shared/ui/alert';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
+  /* Data Hooks */
 
   const {getLocalImageURI, saveFile} = useImages();
+
+  /* Logic Helpers */
 
   const saveSketch = async (success, path) => {
     try {
@@ -41,6 +44,8 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
       );
     }
   };
+
+  /* View */
 
   return (
     <View style={styles.container}>
@@ -81,19 +86,17 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
             };
           }}
           strokeComponent={color => <View style={[{backgroundColor: color}, styles.strokeColorButton]}/>}
-          strokeSelectedComponent={(color) => {
-            return <View style={[{backgroundColor: color, borderWidth: 2}, styles.strokeColorButton]}/>;
-          }}
-          strokeWidthComponent={(w) => {
-            return (
-              <View style={styles.strokeWidthButton}>
-                <View style={{
-                  backgroundColor: 'white', marginHorizontal: 2.5,
-                  width: Math.sqrt(w / 3) * 10, height: Math.sqrt(w / 3) * 10, borderRadius: Math.sqrt(w / 3) * 10 / 2,
-                }}/>
-              </View>
-            );
-          }}
+          strokeSelectedComponent={color => (
+            <View style={[{backgroundColor: color, borderWidth: 2}, styles.strokeColorButton]}/>
+          )}
+          strokeWidthComponent={w => (
+            <View style={styles.strokeWidthButton}>
+              <View style={{
+                backgroundColor: 'white', marginHorizontal: 2.5,
+                width: Math.sqrt(w / 3) * 10, height: Math.sqrt(w / 3) * 10, borderRadius: Math.sqrt(w / 3) * 10 / 2,
+              }}/>
+            </View>
+          )}
           strokeWidthStep={1}
           undoComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Undo</Text></View>}
         />

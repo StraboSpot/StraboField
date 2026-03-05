@@ -19,22 +19,28 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const groupKey = '_3d_structures';
+const types = Object.values(THREE_D_STRUCTURE_TYPES);
+
 const AddThreeDStructureModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [survey, setSurvey] = useState({});
-  const [choices, setChoices] = useState({});
-  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
-
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+
+  /* Local State */
 
   const formRef = useRef(null);
 
-  const types = Object.values(THREE_D_STRUCTURE_TYPES);
-  const groupKey = '_3d_structures';
+  const [choices, setChoices] = useState({});
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+  const [survey, setSurvey] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddThreeDStructureModal []');
@@ -52,6 +58,8 @@ const AddThreeDStructureModal = () => {
     setChoices(getChoices(formName));
   }, [modalValues]);
 
+  /* Logic Helpers */
+
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const on3DStructureTypePress = (i) => {
@@ -66,6 +74,25 @@ const AddThreeDStructureModal = () => {
       setChoices(getChoices(formName));
     }
   };
+
+  const save3DStructure = async () => {
+    try {
+      await formRef.current.submitForm();
+      const edited3DStructureData = showErrors(formRef.current);
+      console.log('Saving 3D Structure data to Spot ...');
+      let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
+        : [];
+      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
+      if (SMALL_SCREEN) closeModal();
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+    }
+  };
+
+  /* Render Functions */
 
   const renderForm = (formProps) => {
     if (formProps && formProps.status && formProps.status.formName) {
@@ -168,22 +195,7 @@ const AddThreeDStructureModal = () => {
     }
   };
 
-  const save3DStructure = async () => {
-    try {
-      await formRef.current.submitForm();
-      const edited3DStructureData = showErrors(formRef.current);
-      console.log('Saving 3D Structure data to Spot ...');
-      let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
-        : [];
-      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
-      if (SMALL_SCREEN) closeModal();
-    }
-    catch (err) {
-      console.log('Error submitting form', err);
-    }
-  };
+  /* View */
 
   return renderNotebookThreeDStructureModalContent();
 };

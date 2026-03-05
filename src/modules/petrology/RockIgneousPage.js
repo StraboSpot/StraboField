@@ -6,12 +6,18 @@ import RockPage from './RockPage';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const RockIgneousPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE RockIgneousPage [page]', page);
     return () => dispatch(setSelectedAttributes([]));
   }, [page]);
+
+  /* View */
 
   return (
     <RockPage isReadOnly={isReadOnly} page={page}/>

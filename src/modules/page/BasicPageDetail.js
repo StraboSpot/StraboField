@@ -1,23 +1,24 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, KeyboardAvoidingView, Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {PAGE_KEYS} from './page.constants';
+import PageHeader from './PageHeader';
+import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {overlayStyles} from '../home/overlays';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import IGSNModal from '../samples/IGSNModal';
-import IGSNUploadAndRegister from '../samples/IGSNUploadAndRegister';
+import IGSNModal from '../samples/igsn/IGSNModal';
+import IGSNUploadAndRegister from '../samples/igsn/IGSNUploadAndRegister';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
@@ -25,10 +26,10 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 
 
 const BasicPageDetail = ({
+                           PageTabsComponent,
                            closeDetailView,
                            deleteTemplate,
                            groupKey = 'general',
@@ -37,14 +38,12 @@ const BasicPageDetail = ({
                            saveTemplate,
                            selectedFeature,
                          }) => {
+    /* Data Hooks */
+
     const dispatch = useDispatch();
-    const spot = useSelector(state => state.spot.selectedSpot);
     const {isInternetReachable} = useSelector(state => state.connections.isOnline);
     const {sesar, encoded_login} = useSelector(state => state.user);
-
-    const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
-    const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
-    const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+    const spot = useSelector(state => state.spot.selectedSpot);
 
     const {showErrors, validateForm} = useForm();
     const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
@@ -52,11 +51,18 @@ const BasicPageDetail = ({
     const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
     const {checkSampleName} = useSpots();
     const {deleteFeatureTags} = useTags();
-
-    const formRef = useRef(null);
     const toast = useToast();
 
+    /* Local State */
+
+    const formRef = useRef(null);
+
     const [initialValues, setInitialValues] = useState({});
+    const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+    const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
+    const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+
+    /* Derived Variables */
 
     const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
       : page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
@@ -65,12 +71,13 @@ const BasicPageDetail = ({
       if (spot.properties[groupKey] && spot.properties[groupKey][pageKey]) pageData = spot.properties[groupKey][pageKey];
       else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
     }
+    const isTemplate = saveTemplate;
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
       : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
-    const isTemplate = saveTemplate;
+    /* Side Effects */
 
     useLayoutEffect(() => {
       console.log('ULE BasicPageDetail []');
@@ -92,6 +99,27 @@ const BasicPageDetail = ({
     useEffect(() => {
       checkIfIsDisabled();
     }, [sesar.sesarToken.access]);
+
+    /* Event Handlers */
+
+    const handleIGSNChecked = (value) => {
+      setIsIGSNChecked(value);
+    };
+
+    const onSampleSaved = async (formCurrent) => {
+      console.log('Saving Sample To SESAR', formRef.current?.values);
+      await saveFeature(formCurrent);
+      closeDetailView();
+    };
+
+    const onSubmitForm = (values, {resetForm}) => {
+      console.log('Submitting form...', values);
+      setInitialValues(values);
+      resetForm({values});
+      console.log('Reset form...');
+    };
+
+    /* Logic Helpers */
 
     const cancelForm = async () => {
       closeDetailView();
@@ -168,10 +196,6 @@ const BasicPageDetail = ({
       }
     };
 
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
     const getFormName = () => {
       let formName = [groupKey, pageKey];
       if (groupKey === 'pet' && selectedFeature.rock_type) formName = ['pet_deprecated', pageKey];
@@ -192,30 +216,72 @@ const BasicPageDetail = ({
       }
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
+    const saveButtonOnPress = () => {
+      isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
     };
 
-    const onSubmitForm = (values, {resetForm}) => {
-      console.log('Submitting form...', values);
-      setInitialValues(values);
-      resetForm({values});
-      console.log('Reset form...');
+    const saveFeature = async (formCurrent) => {
+      try {
+        await formCurrent.submitForm();
+        const editedFeatureData = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+        console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
+        let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
+        const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
+        if (i === -1) editedPageData.push(editedFeatureData);
+        else editedPageData.splice(i, 1, editedFeatureData);
+        const spotId = spot.properties.id;
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+
+        if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
+          await checkSampleName(editedFeatureData.sample_id_name);
+        }
+      }
+      catch (err) {
+        console.log('Error saving', pageKey, err);
+        throw Error;
+      }
     };
+
+    const saveForm = async (formCurrent) => {
+      try {
+        if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
+        else {
+          if (groupKey === 'pet') {
+            await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else if (groupKey === 'sed' && pageKey === 'bedding') {
+            await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else if (groupKey === 'sed') {
+            await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else await saveFeature(formCurrent);
+          closeDetailView();
+          if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
+          console.log('Done');
+        }
+      }
+      catch (err) {
+        toast.show('Error Saving Changes', {type: 'danger'});
+        console.error('ERROR saving form', err);
+      }
+    };
+
+    const saveTemplateForm = async (formCurrent) => {
+      await formCurrent.submitForm();
+      const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      saveTemplate(formValues);
+    };
+
+    const updateIGSNAndShowModal = async (formCurrent) => {
+      setIsIGSNModalVisible(true);
+      console.log('setting form values for IGSN modals');
+      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
+      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
+    };
+
+    /* Render Functions */
 
     const renderFormFields = () => {
       const formName = getFormName();
@@ -260,128 +326,85 @@ const BasicPageDetail = ({
       );
     };
 
-    const saveButtonOnPress = () => {
-      isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
+    const renderIGSNUpload = () => {
+      return (
+        <>
+          {!isEmpty(encoded_login) ? (
+            <IGSNUploadAndRegister
+              handleIGSNChecked={handleIGSNChecked}
+              isIGSNChecked={isIGSNChecked}
+              selectedFeature={selectedFeature}
+            />
+          ) : (
+            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+              You need to login to StraboSpot to upload to SESAR
+            </Text>
+          )}
+        </>
+      );
     };
 
-    const updateIGSNAndShowModal = async (formCurrent) => {
-      setIsIGSNModalVisible(true);
-      console.log('setting form values for IGSN modals');
-      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
-      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
-    };
-
-    const saveFeature = async (formCurrent) => {
-      try {
-        await formCurrent.submitForm();
-        const editedFeatureData = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
-        console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
-        let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
-        editedPageData = editedPageData.filter(f => f.id !== editedFeatureData.id);
-        editedPageData.push(editedFeatureData);
-        const spotId = spot.properties.id;
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
-        dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
-
-        if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
-          await checkSampleName(editedFeatureData.sample_id_name);
-        }
-      }
-      catch (err) {
-        console.log('Error saving', pageKey, err);
-        throw Error;
-      }
-    };
-
-    const saveForm = async (formCurrent) => {
-      try {
-        if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
-        else {
-          if (groupKey === 'pet') {
-            await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed' && pageKey === 'bedding') {
-            await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed') {
-            await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else await saveFeature(formCurrent);
-          closeDetailView();
-          if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-          console.log('Done');
-        }
-      }
-      catch (err) {
-        toast.show('Error Saving Changes', {type: 'danger'});
-        console.error('ERROR saving form', err);
-      }
-    };
-
-    const onSampleSaved = async (formCurrent) => {
-      console.log('Saving Sample To SESAR', formRef.current?.values);
-      await saveFeature(formCurrent);
-      closeDetailView();
-    };
-
-    const saveTemplateForm = async (formCurrent) => {
-      await formCurrent.submitForm();
-      const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
-      saveTemplate(formValues);
-    };
+    /* View */
 
     return (
       <>
-        {(isTemplate || !isEmpty(selectedFeature)) && (
-          <>
-            <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
-            {!isReadOnly && (
-              <SaveAndCancelButtons
-                cancel={cancelForm}
-                getIsDisabled={checkIfIsDisabled()}
-                save={saveButtonOnPress}
-              />
-            )}
-            <FlatList
-              ListHeaderComponent={renderFormFields()}
-              contentContainerStyle={{paddingBottom: 200}}
-            />
-          </>
-        )}
-        {/*{isIGSNModalVisible && (*/}
-        <IGSNModal
-          isVisible={isIGSNModalVisible}
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-          sampleValues={formRef.current?.values}
-        />
-        {/*)}*/}
-        {/*Modal when deleting a sample with an IGSN attached*/}
-        <ModalWrapper
-          actionTitle={'Delete'}
-          headerTitle={'Delete Sample'}
-          isVisible={isDeleteOverlayVisible}
-          onActionPressed={deleteFeature}
-          onCancelPress={() => setIsDeleteOverlayVisible(false)}
-          overlayStyleOverride={{height: '40%'}}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Adjust offset as needed
+          style={{flex: 1}} // Important for padding behavior
         >
-          <View style={{
-            flex: 1,
-            paddingVertical: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'yellow',
-          }}>
-            <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
-            <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
-          </View>
-          <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
-            <Text
-              style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
-            </Text>
-          </View>
-        </ModalWrapper>
+          {(isTemplate || !isEmpty(selectedFeature)) && (
+            <>
+              <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+              {PageTabsComponent && PageTabsComponent}
+              {!isReadOnly && (
+                <SaveAndCancelButtons
+                  cancel={cancelForm}
+                  getIsDisabled={checkIfIsDisabled()}
+                  save={saveButtonOnPress}
+                />
+              )}
+              <FlatList
+                ListHeaderComponent={renderFormFields()}
+                contentContainerStyle={{paddingBottom: 200}}
+              />
+            </>
+          )}
+          {/*{isIGSNModalVisible && (*/}
+          <IGSNModal
+            isVisible={isIGSNModalVisible}
+            onModalCancel={() => setIsIGSNModalVisible(false)}
+            onSampleSaved={onSampleSaved}
+            ref={formRef}
+            sampleValues={formRef.current?.values}
+          />
+          {/*)}*/}
+          {/*Modal when deleting a sample with an IGSN attached*/}
+          <ModalWrapper
+            actionTitle={'Delete'}
+            headerTitle={'Delete Sample'}
+            isVisible={isDeleteOverlayVisible}
+            onActionPressed={deleteFeature}
+            onCancelPress={() => setIsDeleteOverlayVisible(false)}
+            overlayStyleOverride={{height: '40%'}}
+          >
+            <View style={{
+              flex: 1,
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'yellow',
+            }}>
+              <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
+              <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
+            </View>
+            <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
+              <Text
+                style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
+              </Text>
+            </View>
+          </ModalWrapper>
+        </KeyboardAvoidingView>
       </>
     );
   }

@@ -10,46 +10,30 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../../shared/ui/modals';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
-import {PAGE_KEYS} from '../../page/page.constants';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {useSpots} from '../../spots';
+import {NOTEBOOK_MENU_ACTIONS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const navigation = useNavigation();
+  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
-  const actions = [
-    {key: 'copy', title: 'Copy this Spot'},
-    {key: 'zoom', title: 'Zoom to this Spot'},
-    {key: 'delete', title: 'Delete this Spot'},
-    {key: 'nesting', title: 'Show Nesting'},
-  ];
+  /* Local State */
 
-  const continueDeleteSelectedSpot = () => {
-    if (errorMessage) {
-      setErrorMessage('');
-      setIsDeleteSpotModalVisible(false);
-    }
-    else if (isStratInterval(spot)) deleteInterval(spot);
-    else deleteSpot(spot.properties.id);
-  };
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
 
-  const deleteSelectedSpot = () => {
-    const safeDeleteMessage = checkIsSafeDelete(spot);
-    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
-    setIsDeleteSpotModalVisible(true);
-  };
+  /* Event Handlers */
 
   const onPress = (key) => {
     if (key === 'copy') {
@@ -66,8 +50,30 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
     }
     else if (key === 'delete') deleteSelectedSpot();
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
+    else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
+    else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else closeNotebookPanel();
     closeNotebookMenu();
   };
+
+  /* Logic Helpers */
+
+  const continueDeleteSelectedSpot = () => {
+    if (errorMessage) {
+      setErrorMessage('');
+      setIsDeleteSpotModalVisible(false);
+    }
+    else if (isStratInterval(spot)) deleteInterval(spot);
+    else deleteSpot(spot.properties.id);
+  };
+
+  const deleteSelectedSpot = () => {
+    const safeDeleteMessage = checkIsSafeDelete(spot);
+    if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
+    setIsDeleteSpotModalVisible(true);
+  };
+
+  /* Render Functions */
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && item.key === 'delete') return;
@@ -91,6 +97,8 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
     );
   };
 
+  /* View */
+
   return (
     <>
       <ModalWrapper
@@ -106,15 +114,15 @@ const NotebookMenu = ({closeNotebookMenu, isNotebookMenuVisible, isReadOnly, zoo
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           contentContainerStyle={{alignItems: 'center'}}
-          data={actions}
+          data={NOTEBOOK_MENU_ACTIONS}
           key={'notebookActions'}
           renderItem={renderActionItem}
         />
       </ModalWrapper>
       <WarningModal
-        closeModal={() => setIsDeleteSpotModalVisible(false)}
         confirmText={errorMessage ? 'Ok' : 'Delete'}
         isVisible={isDeleteSpotModalVisible}
+        onCancelPress={() => setIsDeleteSpotModalVisible(false)}
         onConfirmPress={continueDeleteSelectedSpot}
         showCancelButton={!errorMessage}
         title={errorMessage ? 'Can\'t Delete Spot' : 'Delete Spot?'}

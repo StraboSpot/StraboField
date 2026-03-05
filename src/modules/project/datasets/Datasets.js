@@ -8,13 +8,18 @@ import DatasetDetail from './DatasetDetail';
 import DatasetsOverview from './DatasetsOverview';
 
 const Datasets = () => {
-
-  const [datasetToView, setDatasetToView] = useState(null);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const datasets = useSelector(state => state.project.datasets);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+
+  /* Local State */
+
+  const [datasetToView, setDatasetToView] = useState(null);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE DatasetsPage [datasets]', datasets);
@@ -27,7 +32,11 @@ const Datasets = () => {
     }
   }, [datasets]);
 
+  /* Logic Helpers */
+
   const closeDetailView = () => setDatasetToView(null);
+
+  /* View */
 
   return datasetToView ? <DatasetDetail closeDetailView={closeDetailView} dataset={datasetToView}/>
     : <DatasetsOverview setDatasetToView={setDatasetToView}/>;

@@ -5,6 +5,7 @@ import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import drawGeometryTogglesStyles from './drawGeometryToggles.styles';
+import {DEFAULT_GEOMETRIES, POINT_BUTTONS_TEXT, SHARP_CURVED_BUTTONS_TEXT} from './preferences.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/Helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
@@ -15,11 +16,13 @@ import useDrawGeometryToggle from '../home/buttons/useDrawGeometryToggle';
 import {MAP_MODES} from '../maps/maps.constants';
 
 const DrawGeometryToggles = () => {
+  /* Data Hooks */
+
   const drawGeometries = useSelector(state => state.map.drawGeometries);
 
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
-  const defaultGeometries = [MAP_MODES.DRAW.POINT, MAP_MODES.DRAW.LINE, MAP_MODES.DRAW.POLYGON];
+  /* Event Handlers */
 
   const handleTogglePressed = (item, i) => {
     if (item === MAP_MODES.DRAW.POINT) handlePointLongPressed();
@@ -27,9 +30,9 @@ const DrawGeometryToggles = () => {
     else handlePolygonLongPressed();
   };
 
+  /* Render Functions */
+
   const renderDrawGeometryToggleButtons = ({item}) => {
-    const buttonsText = ['Sharp Vertices', 'Curved Vertices'];
-    const pointButtonsText = ['Place on Map', 'Add to Current Location'];
     const itemEnum = item.toUpperCase();
     return (
       <ListItem containerStyle={commonStyles.listItem}>
@@ -41,7 +44,7 @@ const DrawGeometryToggles = () => {
               source={DRAW_ACTION_IMAGES[itemEnum].BUTTON}
             />
             <ButtonGroup
-              buttons={item === MAP_MODES.DRAW.POINT ? pointButtonsText : buttonsText}
+              buttons={item === MAP_MODES.DRAW.POINT ? POINT_BUTTONS_TEXT : SHARP_CURVED_BUTTONS_TEXT}
               containerStyle={drawGeometryTogglesStyles.drawGeometrySwitch}
               onPress={i => handleTogglePressed(item, i)}
               selectedButtonStyle={drawGeometryTogglesStyles.selectedButton}
@@ -59,12 +62,14 @@ const DrawGeometryToggles = () => {
     );
   };
 
+  /* View */
+
   return (
     <>
       <SectionDivider dividerText={'Feature Geometry'} subtitle={'Toggle here or long press icons on map'}/>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        data={defaultGeometries}
+        data={DEFAULT_GEOMETRIES}
         keyExtractor={item => item}
         renderItem={renderDrawGeometryToggleButtons}
       />

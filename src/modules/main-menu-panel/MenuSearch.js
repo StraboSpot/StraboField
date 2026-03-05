@@ -10,8 +10,11 @@ import {
 } from '../../shared/styles.constants';
 
 const MenuSearch = ({searchState, setSearchState}) => {
+  /* Event Handlers */
 
   const handleSearch = searchText => setSearchState(searchText.toLowerCase().trim());
+
+  /* View */
 
   return (
     <SearchBar

@@ -11,12 +11,18 @@ import LoadingSplashScreen from '../modules/splash-screen/LoadingSplashScreen.we
 const Routes = () => {
   console.count('Rendering Routes...');
 
-  const {autoLogIn} = useAutoLogIn();
-  useAuthentication();
+  /* Data Hooks */
 
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
 
+  useAuthentication();
+  const {autoLogIn} = useAutoLogIn();
+
+  /* Local State */
+
   const [isLoading, setIsLoading] = useState(true);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Routes');
@@ -36,6 +42,8 @@ const Routes = () => {
 
   console.log('Is still loading?', isLoading);
   console.log('Is user authenticated?', isAuthenticated);
+
+  /* View */
 
   if (isLoading) return <LoadingSplashScreen/>;
   else if (isAuthenticated) return <AppStack/>;

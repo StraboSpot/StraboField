@@ -9,10 +9,22 @@
       "name": "end"
     },
     {
+      "type": "text",
+      "name": "label",
+      "label": "Layer Label",
+      "required": "false"
+    },
+    {
       "type": "select_one ou9ax73",
       "name": "layer_type",
       "label": "Layer Type",
       "required": "true"
+    },
+    {
+      "type": "text",
+      "name": "layer_color",
+      "label": "Layer Color",
+      "required": "false"
     },
     {
       "type": "select_one ay7bp40",
@@ -40,18 +52,6 @@
       "required": "${thickness_typical} = '' and ${thickness_minimum} = ''"
     },
     {
-      "type": "select_one uu5sd70",
-      "name": "contact_bottom",
-      "label": "Bottom Contact",
-      "required": "false"
-    },
-    {
-      "type": "select_one tv9gx70",
-      "name": "contact_top",
-      "label": "Top Contact",
-      "required": "false"
-    },
-    {
       "type": "select_one lv1et65",
       "name": "grainsize_bottom",
       "label": "Bottom Grainsize",
@@ -70,9 +70,9 @@
       "required": "false"
     },
     {
-      "type": "text",
-      "name": "grainsize_maximum",
-      "label": "Maximum Grainsize",
+      "type": "select_one qr36o66",
+      "name": "layer_sorting",
+      "label": "Sorting",
       "required": "false"
     }
   ],
@@ -222,88 +222,18 @@
     },
     {
       "list_name": "ay7bp40",
-      "name": "millimeters",
+      "name": "mm",
       "label": "mm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "centimeters",
+      "name": "cm",
       "label": "cm"
     },
     {
       "list_name": "ay7bp40",
-      "name": "meters",
+      "name": "m",
       "label": "m"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "sharp",
-      "label": "sharp"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "gradational",
-      "label": "gradational"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "reworked",
-      "label": "reworked"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "erosional",
-      "label": "erosional"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "bioturbated",
-      "label": "bioturbated"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "cross_bedded",
-      "label": "cross-bedded"
-    },
-    {
-      "list_name": "uu5sd70",
-      "name": "planar_parallel",
-      "label": "planar parallel"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "sharp",
-      "label": "sharp"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "gradational",
-      "label": "gradational"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "reworked",
-      "label": "reworked"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "erosional",
-      "label": "erosional"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "bioturbated",
-      "label": "bioturbated"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "cross_bedded",
-      "label": "cross-bedded"
-    },
-    {
-      "list_name": "tv9gx70",
-      "name": "planar_parallel",
-      "label": "planar parallel"
     },
     {
       "list_name": "lv1et65",
@@ -475,6 +405,31 @@
       "name": "density_grading",
       "label": "Density grading",
       "order": 6
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "very_well_sorted",
+      "label": "very well sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "well_sorted",
+      "label": "well sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "poorly_sorted",
+      "label": "poorly sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "very_poorly_sorted",
+      "label": "very poorly sorted"
+    },
+    {
+      "list_name": "qr36o66",
+      "name": "unsorted",
+      "label": "unsorted"
     }
   ]
 }

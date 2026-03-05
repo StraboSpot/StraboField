@@ -1,6 +1,8 @@
 import React from 'react';
 import {ScrollView, Text, View} from 'react-native';
 
+import DeviceInfo from 'react-native-device-info';
+
 import styles from './about.styles';
 import {VERSION_NUMBER} from '../../shared/app.constants';
 
@@ -8,6 +10,7 @@ const About = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.versionText}>Version: {VERSION_NUMBER}</Text>
+      <Text style={styles.buildText}>Build: {DeviceInfo.getBuildNumber()}</Text>
       <ScrollView>
         <Text style={styles.heading}>📌 About StraboField</Text>
         <Text style={styles.paragraph}>

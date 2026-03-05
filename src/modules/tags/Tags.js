@@ -10,23 +10,37 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
-import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
 
 const Tags = ({type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const tags = useSelector(state => state.project.project?.tags) || [];
+
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
+
+  /* Local State */
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  /* Derived Variables */
+
   const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+
+  /* Event Handlers */
+
+  const handleContinuousTaggingSwitched = value => dispatch(setUseContinuousTagging(value));
+
+  /* Logic Helpers */
 
   const addTag = () => {
     const newTag = type === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'};
@@ -41,7 +55,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
     return ['Categorized', 'Map Extent'];
   };
 
-  const handleContinuousTaggingSwitched = value => dispatch(setUseContinuousTagging(value));
+  /* View */
 
   return (
     <View style={{flex: 1}}>

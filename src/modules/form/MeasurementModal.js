@@ -22,12 +22,18 @@ const MeasurementModal = ({
                             measurementsGroupLabel,
                             setIsMeasurementModalVisible,
                           }) => {
+  /* Data Hooks */
+
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+
+  const {getChoices, getChoicesByKey, getSurvey} = useForm();
+
+  /* Local State */
 
   const [isManualMeasurement, setIsManualMeasurement] = useState(Platform.OS !== 'ios');
   const [sliderValue, setSliderValue] = useState(6);
 
-  const {getChoices, getChoicesByKey, getSurvey} = useForm();
+  /* Logic Helpers */
 
   const addAttributeMeasurement = (data) => {
     const sliderQuality = sliderValue ? {quality: sliderValue.toString()} : undefined;
@@ -62,6 +68,8 @@ const MeasurementModal = ({
       formProps.setValues({...formProps.values, ...renamedCompassData});
     }
   };
+
+  /* View */
 
   return (
     <ModalWrapper

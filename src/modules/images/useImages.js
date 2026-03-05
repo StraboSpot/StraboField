@@ -1,8 +1,8 @@
 import {Image, PermissionsAndroid, Platform} from 'react-native';
 
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import ImageResizer from 'react-native-image-resizer';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -24,12 +24,11 @@ import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {clearedSelectedSpots, editedSpotImage, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 
+let imageCount = 0;
+let newImages = [];
+
 const useImages = () => {
-  const navigation = useNavigation();
-  const toast = useToast();
-  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
-  const {checkPermission, requestPermission} = usePermissions();
-  const {width, height} = useWindowSize();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -37,8 +36,27 @@ const useImages = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  let imageCount = 0;
-  let newImages = [];
+  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
+  const navigation = useNavigation();
+  const {checkPermission, requestPermission} = usePermissions();
+  const toast = useToast();
+  const {width, height} = useWindowSize();
+
+  /* Internal Functions */
+
+  const resizeImageIfNecessary = async (imageData) => {
+    let imgHeight = imageData.height;
+    let imgWidth = imageData.width;
+    const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
+    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
+    let resizedImage, createResizedImageProps;
+    createResizedImageProps = (imgHeight > 4096 || imgWidth > 4096) ? [tempImageURI, 4096, 4096, 'JPEG', 100, 0]
+      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
+    resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
+    return resizedImage;
+  };
+
+  /* Exported Functions */
 
   const deleteImageFile = async (imageId) => {
     if (Platform.OS !== 'web') {
@@ -114,6 +132,14 @@ const useImages = () => {
     }
   };
 
+  // Get images from Spots and Reports
+  const getAllImages = () => {
+    const images = [];
+    Object.values(spots).forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
+    if (!isEmpty(project.reports)) project.reports.forEach(report => report.images?.map(image => images.push(image)));
+    return images;
+  };
+
   // INTERNAL
   const getAllImagesIds = (spotsArray) => {
     let imageIds = [];
@@ -121,14 +147,6 @@ const useImages = () => {
       if (spot.properties.images) spot.properties.images.map(image => imageIds.push(image.id));
     });
     return imageIds;
-  };
-
-  // Get images from Spots and Reports
-  const getAllImages = () => {
-    const images = [];
-    Object.values(spots).forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
-    if (!isEmpty(project.reports)) project.reports.forEach(report => report.images?.map(image => images.push(image)));
-    return images;
   };
 
   const getImageBasemap = (image) => {
@@ -185,36 +203,6 @@ const useImages = () => {
     return STRABO_APIS.PUBLIC_IMAGE_RESIZED + Math.max(width, height) + '/' + id;
   };
 
-  const getImageThumbnailURI = (id) => {
-    return STRABO_APIS.PUBLIC_IMAGE_THUMBNAIL + id;
-  };
-
-  const getImageThumbnailURIs = async (images) => {
-    try {
-      let imageThumbnailURIs = {};
-      await Promise.all(images.map(async (image) => {
-        if (Platform.OS === 'web') {
-          imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: getImageThumbnailURI(image.id)};
-        }
-        else {
-          const imageUri = getLocalImageURI(image.id);
-          const exists = await doesDeviceDirExist(imageUri);
-          if (exists) {
-            const createResizedImageProps = [imageUri, 200, 200, 'JPEG', 100, 0];
-            const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
-            imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: resizedImage.uri};
-          }
-          else imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: undefined};
-        }
-      }));
-      return imageThumbnailURIs;
-    }
-    catch (err) {
-      console.error('Error creating thumbnails', err);
-      // throw Error(err);
-    }
-  };
-
   const getImagesFromCameraRoll = async () => {
     return new Promise((res, rej) => {
       try {
@@ -247,6 +235,36 @@ const useImages = () => {
         rej('Error saving image.');
       }
     });
+  };
+
+  const getImageThumbnailURI = (id) => {
+    return STRABO_APIS.PUBLIC_IMAGE_THUMBNAIL + id;
+  };
+
+  const getImageThumbnailURIs = async (images) => {
+    try {
+      let imageThumbnailURIs = {};
+      await Promise.all(images.map(async (image) => {
+        if (Platform.OS === 'web') {
+          imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: getImageThumbnailURI(image.id)};
+        }
+        else {
+          const imageUri = getLocalImageURI(image.id);
+          const exists = await doesDeviceDirExist(imageUri);
+          if (exists) {
+            const createResizedImageProps = [imageUri, 200, 200, 'JPEG', 100, 0];
+            const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
+            imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: resizedImage.uri};
+          }
+          else imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: undefined};
+        }
+      }));
+      return imageThumbnailURIs;
+    }
+    catch (err) {
+      console.error('Error creating thumbnails', err);
+      // throw Error(err);
+    }
   };
 
   const getLocalImageURI = (id) => {
@@ -313,18 +331,6 @@ const useImages = () => {
     catch (err) {
       console.warn(err);
     }
-  };
-
-  const resizeImageIfNecessary = async (imageData) => {
-    let imgHeight = imageData.height;
-    let imgWidth = imageData.width;
-    const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
-    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
-    let resizedImage, createResizedImageProps;
-    createResizedImageProps = (imgHeight > 4096 || imgWidth > 4096) ? [tempImageURI, 4096, 4096, 'JPEG', 100, 0]
-      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
-    resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
-    return resizedImage;
   };
 
   const saveFile = async (imageData) => {
@@ -432,27 +438,27 @@ const useImages = () => {
   };
 
   return {
-    deleteImageFile: deleteImageFile,
-    deleteImageFromSpot: deleteImageFromSpot,
-    doesImageExistOnDevice: doesImageExistOnDevice,
-    gatherNeededImages: gatherNeededImages,
-    getAllImages: getAllImages,
-    getAllImagesIds: getAllImagesIds,
-    getImageBasemap: getImageBasemap,
-    getImageByImageId: getImageByImageId,
-    getImageHeightAndWidth: getImageHeightAndWidth,
-    getImageScreenSizedURI: getImageScreenSizedURI,
-    getImageThumbnailURI: getImageThumbnailURI,
-    getImageThumbnailURIs: getImageThumbnailURIs,
-    getImagesFromCameraRoll: getImagesFromCameraRoll,
-    getLocalImageURI: getLocalImageURI,
-    launchCameraFromNotebook: launchCameraFromNotebook,
-    requestCameraPermission: requestCameraPermission,
-    saveFile: saveFile,
-    saveImageFromDownloadsDir: saveImageFromDownloadsDir,
-    setAnnotation: setAnnotation,
-    setImageHeightAndWidth: setImageHeightAndWidth,
-    takePicture: takePicture,
+    deleteImageFile,
+    deleteImageFromSpot,
+    doesImageExistOnDevice,
+    gatherNeededImages,
+    getAllImages,
+    getAllImagesIds,
+    getImageBasemap,
+    getImageByImageId,
+    getImageHeightAndWidth,
+    getImageScreenSizedURI,
+    getImagesFromCameraRoll,
+    getImageThumbnailURI,
+    getImageThumbnailURIs,
+    getLocalImageURI,
+    launchCameraFromNotebook,
+    requestCameraPermission,
+    saveFile,
+    saveImageFromDownloadsDir,
+    setAnnotation,
+    setImageHeightAndWidth,
+    takePicture,
   };
 };
 

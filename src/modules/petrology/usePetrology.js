@@ -1,20 +1,21 @@
 import {useDispatch} from 'react-redux';
 
-import {
-  ABBREVIATIONS_WITH_LABELS,
-  LABELS_WITH_ABBREVIATIONS,
-  ROCK_FIRST_ORDER_CLASS_FIELDS,
-} from './petrology.constants';
+import {ROCK_FIRST_ORDER_CLASS_FIELDS} from './petrology.constants';
+import {getAbbrevFromFullMineralName, getFullMineralNameFromAbbrev} from './petrology.helpers';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
 import {useForm} from '../form';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const usePetrology = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
 
   const {getLabel, getLabels, getSurvey, showErrors} = useForm();
+
+  /* Exported Functions */
 
   const deletePetFeature = (key, spot, selectedFeature) => {
     let editedPetData = spot.properties.pet ? JSON.parse(JSON.stringify(spot.properties.pet)) : {};
@@ -35,24 +36,9 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
-  const getAbbrevFromFullMineralName = (name) => {
-    const keyMatch = Object.keys(LABELS_WITH_ABBREVIATIONS).find(key => key.toLowerCase() === name.toLowerCase());
-    if (keyMatch) return LABELS_WITH_ABBREVIATIONS[keyMatch].split(',')[0];
-  };
-
-  const getFullMineralNameFromAbbrev = (abbrev) => {
-    return ABBREVIATIONS_WITH_LABELS[abbrev.toLowerCase()];
-  };
-
   const getMineralTitle = (item) => {
     if (item.full_mineral_name && item.mineral_abbrev) return item.full_mineral_name + ' (' + item.mineral_abbrev + ')';
     else return item.full_mineral_name || '(' + item.mineral_abbrev + ')' || 'Unknown';
-  };
-
-  const getReactionTextureTitle = (item) => {
-    const formName = ['pet', 'reactions'];
-    return (item.reactions || 'Unknown')
-      + (item.based_on && (' - ' + getLabels(item.based_on, formName).toUpperCase()));
   };
 
   const getPetRockTitle = (rock, type) => {
@@ -72,6 +58,12 @@ const usePetrology = () => {
       return toTitleCase(getLabel(defaultTitle + ' Rock', formName));
     }
     else return labelsArr.join(', ');
+  };
+
+  const getReactionTextureTitle = (item) => {
+    const formName = ['pet', 'reactions'];
+    return (item.reactions || 'Unknown')
+      + (item.based_on && (' - ' + getLabels(item.based_on, formName).toUpperCase()));
   };
 
   const onMineralChange = async (formCurrent, name, value) => {
@@ -126,13 +118,13 @@ const usePetrology = () => {
   };
 
   return {
-    deletePetFeature: deletePetFeature,
-    getMineralTitle: getMineralTitle,
-    getReactionTextureTitle: getReactionTextureTitle,
-    getPetRockTitle: getPetRockTitle,
-    onMineralChange: onMineralChange,
-    savePetFeature: savePetFeature,
-    savePetFeatureValuesFromTemplates: savePetFeatureValuesFromTemplates,
+    deletePetFeature,
+    getMineralTitle,
+    getPetRockTitle,
+    getReactionTextureTitle,
+    onMineralChange,
+    savePetFeature,
+    savePetFeatureValuesFromTemplates,
   };
 };
 

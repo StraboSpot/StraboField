@@ -7,10 +7,16 @@ import useTemplates from './useTemplates';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 
 const NewTemplateSectionList = ({handleNewTemplatePressed}) => {
+  /* Data Hooks */
+
   const {getNewTemplatesList, getTemplateTitle} = useTemplates();
+
+  /* Derived Variables */
 
   const newTemplatesListSectioned = getNewTemplatesList();
   const newTemplatesListSectionedSorted = newTemplatesListSectioned.sort((a, b) => a.title.localeCompare(b.title));
+
+  /* Render Functions */
 
   const renderTemplateListItem = ({item, section}) => {
     const title = getTemplateTitle(item);
@@ -22,6 +28,8 @@ const NewTemplateSectionList = ({handleNewTemplatePressed}) => {
       />
     );
   };
+
+  /* View */
 
   return (
     <SectionList

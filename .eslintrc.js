@@ -38,6 +38,8 @@ module.exports = {
     'react/jsx-sort-props': 'error',
 
     // StraboSpot2 Override Import rules
+    'import/namespace': 'off', // Too many false positives with React Native namespace imports (e.g. MapboxGL)
+    'import/no-unresolved': ['error', {ignore: ['react-map-gl/mapbox', 'uuid']}],
     'import/order': ['error', {
       'groups': ['builtin', 'external', 'internal'],
       'pathGroups': [{pattern: '{react,react-native}', group: 'external', position: 'before'}],
@@ -51,8 +53,9 @@ module.exports = {
 
     // StraboSpot2 Override React rules
     'react/jsx-filename-extension': [1, {extensions: ['.js', '.jsx']}], // allow .js files to contain JSX code
+    'react/no-unstable-nested-components': ['error', {allowAsProps: true}],
   },
   settings: {
-    'import/ignore': ['react-native'],
+    'import/ignore': ['react-native', 'react-map-gl', '@rnmapbox/maps', 'uuid'],
   },
 };

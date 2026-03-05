@@ -9,15 +9,20 @@ import useMap from './useMap';
 import {isEmpty} from '../../shared/Helpers';
 
 const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
+
+  const {isDrawMode} = useMap();
+
+  /* Local State */
+
+  const pointMoving = useRef(null);
 
   const [cursor, setCursor] = useState('');
   const [prevMapMode, setPrevMapMode] = useState(mapMode);
 
-  const dispatch = useDispatch();
-
-  const pointMoving = useRef(null);
-
-  const {isDrawMode} = useMap();
+  /* Derived Variables */
 
   if (mapMode !== prevMapMode) {
     // console.log('MapMode changed from', prevMapMode, 'to', mapMode);
@@ -25,6 +30,8 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     if (isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT) setCursor('pointer');
     else setCursor('');
   }
+
+  /* Event Handlers */
 
   //When the cursor enters a feature in the point edit layer, prepare for dragging.
   mapRef.current?.on('mouseenter', 'pointLayerEdit', () => {
@@ -43,15 +50,7 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     mapRef.current?.once('mouseup', onUp);
   });
 
-  const handleMouseEnter = () => {
-    if (mapMode === MAP_MODES.VIEW || mapMode === MAP_MODES.EDIT) setCursor('pointer');
-  };
-
-  const handleMouseLeave = () => {
-    if (mapMode === MAP_MODES.VIEW) setCursor('');
-    else if (isDrawMode(mapMode)) setCursor('pointer');
-    else if (mapMode === MAP_MODES.EDIT) setCursor('default');
-  };
+  /* Internal Functions */
 
   const onPointMove = (e) => {
     setCursor('grabbing'); // Set a UI indicator for dragging
@@ -77,10 +76,22 @@ const useMapPressEvents = ({editFeatureVertex, mapRef, mapMode}) => {
     dispatch(setVertexEndCoords([vertexScreenCoords.x, vertexScreenCoords.y]));
   };
 
+  /* Exported Functions */
+
+  const handleMouseEnter = () => {
+    if (mapMode === MAP_MODES.VIEW || mapMode === MAP_MODES.EDIT) setCursor('pointer');
+  };
+
+  const handleMouseLeave = () => {
+    if (mapMode === MAP_MODES.VIEW) setCursor('');
+    else if (isDrawMode(mapMode)) setCursor('pointer');
+    else if (mapMode === MAP_MODES.EDIT) setCursor('default');
+  };
+
   return {
-    cursor: cursor,
-    handleMouseEnter: handleMouseEnter,
-    handleMouseLeave: handleMouseLeave,
+    cursor,
+    handleMouseEnter,
+    handleMouseLeave,
   };
 
 };

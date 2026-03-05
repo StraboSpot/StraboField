@@ -12,20 +12,26 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [selectedReaction, setSelectedReaction] = useState({});
-  const [isDetailView, setIsDetailView] = useState(false);
-
   const {getMineralTitle} = usePetrology();
+
+  /* Local State */
+
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedReaction, setSelectedReaction] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ReactionTexturesPage []');
@@ -41,9 +47,9 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
-  const addReaction = () => {
-    dispatch(setModalVisible({modal: page.key}));
-  };
+  /* Logic Helpers */
+
+  const addReaction = () => dispatch(setModalVisible({modal: page.key}));
 
   const editReaction = (reaction) => {
     setIsDetailView(true);
@@ -62,6 +68,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderReactionDetail = () => {
     return (
       <BasicPageDetail
@@ -77,7 +85,7 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const renderReactionsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         <View>
           <SectionDivider
             dividerText={'Minerals Added to this Spot'}
@@ -106,6 +114,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
       </View>
     );
   };
+
+  /* View */
 
   return isDetailView ? renderReactionDetail() : renderReactionsMain();
 };
