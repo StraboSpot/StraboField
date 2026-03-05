@@ -7,10 +7,10 @@ import {useSelector} from 'react-redux';
 import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import {ImageCard, useImages, useImageThumbnails} from '../images';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
+import NestingImageCard from './NestingImageCard';
 
 const Nesting = () => {
   console.log('Rendering Nesting');
@@ -22,11 +22,6 @@ const Nesting = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  const {getImageByImageId} = useImages();
-  const [images, setImages] = useState([]);
-  const {
-    areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
-  } = useImageThumbnails({images});
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {handleSpotSelected} = useSpots();
 
@@ -56,19 +51,6 @@ const Nesting = () => {
       setParentGenerations(parentSpots);
       const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
       setChildrenGenerations(childrenSpots);
-
-      // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
-      console.log(allSpotsInNest);
-      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
-        const imageBasemapId = spot.properties?.image_basemap;
-        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
-          const image = getImageByImageId(spot.properties.image_basemap);
-          return isEmpty(image) ? acc : [...acc, image];
-        }
-        else return acc;
-      }, []);
-      setImages(allImagesInNest);
     }
   };
 
@@ -108,7 +90,7 @@ const Nesting = () => {
     if (!isEmpty(generationData)) {
       return (
         <FlatList
-          data={type === 'Parents' ? generationData.reverse() : generationData}
+          data={type === 'Parents' ? [...generationData].reverse() : generationData}
           keyExtractor={(item, index) => type + index}
           listKey={type}
           renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
@@ -119,7 +101,6 @@ const Nesting = () => {
 
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
     console.log('renderGroup', type, i, group, b);
-    const image = getImageByImageId(imageBasemapKey);
     return (
       <View
         style={{
@@ -133,11 +114,7 @@ const Nesting = () => {
           marginBottom: 2,
         }}
       >
-        {imageBasemapKey !== 'undefined' && (
-          <View style={{alignSelf: 'center'}}>
-            {renderImage(image, b)}
-          </View>
-        )}
+        {imageBasemapKey !== 'undefined' && <NestingImageCard imageBasemapId={imageBasemapKey} index={b}/>}
         <View style={{flex: 1}}>
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -151,29 +128,12 @@ const Nesting = () => {
     );
   };
 
-  const renderImage = async (image, index) => {
-    return (
-      <ImageCard
-        areImageThumbnailsLoading={areImageThumbnailsLoading}
-        image={image}
-        imageThumbnailURIs={imageThumbnailURIs}
-        index={index}
-        isThumbnailOnly
-        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
-        setImageThumbnailURIs={setImageThumbnailURIs}
-      />
-    );
-  };
-
   const renderItem = (spot) => {
     if (spot && spot.properties) {
       if (spot.properties.image_basemap) {
-        const image = getImageByImageId(spot.properties.image_basemap);
         return (
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{alignSelf: 'center'}}>
-              {renderImage(image, 0)}
-            </View>
+            <NestingImageCard imageBasemapId={spot.properties.image_basemap} index={0}/>
             <View style={{flex: 1, alignSelf: 'center'}}>
               {renderName(spot)}
             </View>
