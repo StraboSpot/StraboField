@@ -224,65 +224,66 @@ const UserProfile = () => {
 
   return (
     <>
-      <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
-        <FlatList
-          ListHeaderComponent={
-            <>
-              <View style={{alignItems: 'center', marginTop: 15}}>
-                <UserProfileAvatar
-                  isEditable={true}
-                  openProfileImageModal={openProfileImageModal}
-                  shouldUpdateImage={shouldUpdateImage}
-                  size={200}
-                />
-              </View>
-              <View style={{alignItems: 'center', padding: 10}}>
-                <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
-              </View>
-              <Formik
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
-                enableReinitialize={true}  // Update values if preferences change while form open
-                initialValues={userData}
-                innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={true}
-              />
-              {isOnline.isInternetReachable && !isEmpty(userData.email) && !isEmpty(userData.encoded_login) ? (
-                <View style={userStyles.saveButtonContainer}>
-                  {Platform.OS !== 'web' && (
-                    <OutlineButton
-                      loading={isDownloading}
-                      onPress={onDownloadUserProfile}
-                      title={'Download User Profile'}
-                    />
-                  )}
-                  <DeleteButton
-                    onPress={() => setDeleteProfileModalVisible(true)}
-                    title={'Delete Account'}
+      {!isEmpty(userData.email) && !isEmpty(userData.encoded_login) && (
+        <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
+          <FlatList
+            ListHeaderComponent={
+              <>
+                <View style={{alignItems: 'center', marginTop: 15}}>
+                  <UserProfileAvatar
+                    isEditable={true}
+                    openProfileImageModal={openProfileImageModal}
+                    shouldUpdateImage={shouldUpdateImage}
+                    size={200}
                   />
-                  {__DEV__ && <OutlineButton
-                    onPress={purgeRedux}
-                    title={'Purge Redux Store'}
-                  />}
                 </View>
-              ) : (
-                <Text style={commonStyles.noValueText}>
-                  Must be online to save changes to profile or delete profile.
-                </Text>
-              )}
-              {renderProfileImageModal()}
-              <DeleteProfileModal
-                email={userData.email}
-                isDeleteProfileModalVisible={isDeleteProfileModalVisible}
-                isOnline={isOnline}
-                setDeleteProfileModalVisible={val => setDeleteProfileModalVisible(val)}
-              />
-            </>
-          }
-        />
-      </View>
-
+                <View style={{alignItems: 'center', padding: 10}}>
+                  <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
+                </View>
+                <Formik
+                  component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                  enableReinitialize={true}  // Update values if preferences change while form open
+                  initialValues={userData}
+                  innerRef={formRef}
+                  onSubmit={values => console.log('Submitting form...', values)}
+                  validate={values => validateForm({formName: formName, values: values})}
+                  validateOnChange={true}
+                />
+                {isOnline.isInternetReachable ? (
+                  <View style={userStyles.saveButtonContainer}>
+                    {Platform.OS !== 'web' && (
+                      <OutlineButton
+                        loading={isDownloading}
+                        onPress={onDownloadUserProfile}
+                        title={'Download User Profile'}
+                      />
+                    )}
+                    <DeleteButton
+                      onPress={() => setDeleteProfileModalVisible(true)}
+                      title={'Delete Account'}
+                    />
+                    {__DEV__ && <OutlineButton
+                      onPress={purgeRedux}
+                      title={'Purge Redux Store'}
+                    />}
+                  </View>
+                ) : (
+                  <Text style={commonStyles.noValueText}>
+                    Must be online to save changes to profile or delete profile.
+                  </Text>
+                )}
+                {renderProfileImageModal()}
+                <DeleteProfileModal
+                  email={userData.email}
+                  isDeleteProfileModalVisible={isDeleteProfileModalVisible}
+                  isOnline={isOnline}
+                  setDeleteProfileModalVisible={val => setDeleteProfileModalVisible(val)}
+                />
+              </>
+            }
+          />
+        </View>
+      )}
       {Platform.OS !== 'web' && <LogOut/>}
     </>
   );

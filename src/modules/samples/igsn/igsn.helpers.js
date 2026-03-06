@@ -92,8 +92,11 @@ export const isTokenExpired = (accessToken) => {
 export const parseXML = (xmlData) => {
   let json;
   parseString(xmlData, {trim: true}, (err, result) => {
-    console.dir(result);
-    json = result;
+    if (err) console.error('Error parsing XML', err);
+    else {
+      console.dir(result);
+      json = result;
+    }
   });
   return json;
 };

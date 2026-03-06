@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {ScaleControl} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
@@ -34,6 +34,13 @@ const MapLayers = ({
 
   const useDimensions = useWindowSize();
 
+  /* Derived State */
+
+  const spotsDisplayed = useMemo(
+    () => [...spotsNotSelected, ...spotsSelected],
+    [spotsNotSelected, spotsSelected],
+  );
+
   /* View */
 
   return (
@@ -53,7 +60,7 @@ const MapLayers = ({
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}
 
       {/* Strat Section Background Layer */}
-      {stratSection && <StratSectionBackground spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <StratSectionBackground spotsDisplayed={spotsDisplayed}/>}
 
       {/* Image Basemap Layer */}
       <ImageBasemapLayer/>
@@ -68,7 +75,7 @@ const MapLayers = ({
       <EditLayers editFeatureVertex={editFeatureVertex}/>
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
-      {stratSection && <CoveredIntervalsXLines spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>

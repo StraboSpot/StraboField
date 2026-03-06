@@ -34,8 +34,7 @@ const Map = ({
              }, forwardedRef) => {
   // console.log('Rendering Map...');
 
-  const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
-    : homeStyles.currentZoomTextBlack;
+  /* Data Hooks */
 
   const {currentImageBasemap, zoom, stratSection, vertexStartCoords} = useSelector(state => state.map);
 
@@ -43,10 +42,18 @@ const Map = ({
 
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
+  /* Local State */
+
   const [isStratStyleLoaded, setIsStratStyleLoaded] = useState(false);
+
+  /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
   const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
+  const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
+    : homeStyles.currentZoomTextBlack;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('isShowMacrostratOverlay', isShowMacrostratOverlay);
@@ -67,12 +74,16 @@ const Map = ({
     };
   }, [mapRef]);
 
+  /* Event Handlers */
+
   // Set flag for when the map has been loaded
   // This is a fix for patterns loading too slowly after v10 update
   // ToDo: Check if this bug is fixed in rnmapbox and therefore can be removed
   const onDidFinishLoadingMap = () => {
     stratSection ? setIsStratStyleLoaded(true) : setIsStratStyleLoaded(false);
   };
+
+  /* View */
 
   return (
     <>

@@ -73,11 +73,11 @@ const IGSNModal = forwardRef(({
 
   const registerSample = async () => {
     try {
-      const formValues = formRef.current?.values || {};
+      const currentFormValues = formRef.current?.values || {};
       console.log('Updated FormRef', formRef.current?.values);
       setIsLoading(true);
-      const res = formValues.isOnMySesar ? await updateSampleIsSesar(mappedSesarValues) : await uploadSample(
-        mappedSesarValues);
+      const res = currentFormValues.isOnMySesar ? await updateSampleIsSesar(mappedSesarValues)
+        : await uploadSample(mappedSesarValues);
       if (res.error && res.error.length > 0) {
         console.log(res.error[0]);
         setModalPage('error');

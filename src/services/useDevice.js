@@ -1,6 +1,6 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
-import {isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
+import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -228,18 +228,16 @@ const useDevice = () => {
     try {
       const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
       const imageBlob = await getImage(imageId);
-      if (imageBlob) {
-        const reader = new FileReader();
-        const base64Data = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
-          reader.onerror = error => reject(error);
-          reader.readAsDataURL(imageBlob); // Read the blob as base64
-        });
-        await RNFS.writeFile(path, base64Data, 'base64');
-        console.log('Image saved to:', path);
-        return true;
-      }
-      throw Error;
+      if (!imageBlob) return false;
+      const reader = new FileReader();
+      const base64Data = await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(imageBlob); // Read the blob as base64
+      });
+      await RNFS.writeFile(path, base64Data, 'base64');
+      console.log('Image saved to:', path);
+      return true;
     }
     catch (err) {
       console.error('Error downloading or saving file:', err);

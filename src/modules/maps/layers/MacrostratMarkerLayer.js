@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {PointAnnotation} from '@rnmapbox/maps';
+import {MarkerView} from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/Helpers';
@@ -24,7 +24,7 @@ const MacrostratMarkerLayer = ({location}) => {
   /* View */
 
   return (
-    <PointAnnotation coordinate={setCoords()} id={'marker'}>
+    <MarkerView coordinate={setCoords()} id={'marker'}>
       <View style={{backgroundColor: 'transparent', padding: 5}}>
         <Icon
           name={'map-marker'}
@@ -32,7 +32,7 @@ const MacrostratMarkerLayer = ({location}) => {
           type={'material-community'}
         />
       </View>
-    </PointAnnotation>
+    </MarkerView>
   );
 };
 

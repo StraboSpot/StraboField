@@ -26,7 +26,15 @@ const MicroProjectsList = () => {
 
   const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
   const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
-  const {clearStatus, downloadZip, isLoadingWave, percentDone, showComplete, showLoadingBar} = useMicroZips();
+  const {
+    clearStatus,
+    downloadZip,
+    isLoadingWave,
+    percentDone,
+    projectName,
+    showComplete,
+    showLoadingBar,
+  } = useMicroZips();
 
   /* Local State */
 
@@ -50,7 +58,8 @@ const MicroProjectsList = () => {
 
   useEffect(() => {
     console.log('UE ProjectList [showComplete, isConnected, isInternetReachable]');
-    getAllMicroProjects().then(() => console.log('OK got projects'));
+    // deleteFromDevice(APP_DIRECTORIES.MICRO);  // Delete Micro folder (for testing)
+    getAllMicroProjects().then(() => console.log('Got StraboMico Projects'));
   }, [showComplete, isConnected, isInternetReachable]);
 
   /* Logic Helpers */
@@ -59,7 +68,7 @@ const MicroProjectsList = () => {
     if (!projectsExistsArr[i] || (isConnected && isInternetReachable && projectsUpdateAvailableArr[i])) {
       console.log('Need to download project');
       try {
-        await downloadZip(item.id);
+        await downloadZip(item.id, item.name);
       }
       catch (err) {
         clearStatus();
@@ -197,6 +206,7 @@ const MicroProjectsList = () => {
         isError={isError}
         isLoadingWave={isLoadingWave}
         percentDone={percentDone}
+        projectName={projectName}
         showComplete={showComplete}
         showLoadingBar={showLoadingBar}
       />
