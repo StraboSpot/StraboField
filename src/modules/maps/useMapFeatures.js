@@ -70,15 +70,10 @@ const useMapFeatures = () => {
   /* Exported Functions */
 
   const filterFeatures = (mappedFeatures) => {
-    let filteredFeatures = JSON.parse(JSON.stringify(mappedFeatures));
-    if (!isEmpty(filteredFeatures) && !isEmpty(featureTypesOff)) {
-      filteredFeatures = filterByFeatureType(filteredFeatures);
-    }
-    if (!isEmpty(filteredFeatures) && !isEmpty(geometryTypesOff)) {
-      filteredFeatures = filterByGeometryType(filteredFeatures);
-    }
-    // console.log('Mapped Features after fitlering:', filteredFeatures);
-    return filteredFeatures;
+    if (!isEmpty(mappedFeatures) && !isEmpty(featureTypesOff)) mappedFeatures = filterByFeatureType(mappedFeatures);
+    if (!isEmpty(mappedFeatures) && !isEmpty(geometryTypesOff)) mappedFeatures = filterByGeometryType(mappedFeatures);
+    // console.log('Mapped Features after fitlering:', mappedFeatures);
+    return mappedFeatures;
   };
 
   // All Spots mapped on current map
@@ -108,9 +103,9 @@ const useMapFeatures = () => {
     let mappedSpots = getAllMappedSpots();
 
     // Separate selected Spots and not selected Spots
-    const selectedIds = selectedSpots.map(sel => sel.properties.id);
-    const selectedMappedSpots = mappedSpots.filter(spot => selectedIds.includes(spot.properties.id));
-    const notSelectedMappedSpots = mappedSpots.filter(spot => !selectedIds.includes(spot.properties.id));
+    const selectedIds = new Set(selectedSpots.map(sel => sel.properties.id));
+    const selectedMappedSpots = mappedSpots.filter(spot => selectedIds.has(spot.properties.id));
+    const notSelectedMappedSpots = mappedSpots.filter(spot => !selectedIds.has(spot.properties.id));
 
     // console.log('Selected Spots to Display on this Map:', selectedMappedSpots);
     // console.log('Not Selected Spots to Display on this Map:', notSelectedMappedSpots);
@@ -120,36 +115,30 @@ const useMapFeatures = () => {
   // Spots with multiple measurements become multiple features, one feature for each measurement
   const getSpotsAsFeatures = (spotsToFeatures) => {
     let mappedFeatures = [];
-    spotsToFeatures.map((spot) => {
+    spotsToFeatures.forEach((spot) => {
       if ((spot.geometry.type === 'Point' || spot.geometry.type === 'MultiPoint')
         && !isEmpty(spot.properties.orientation_data)) {
         const measurements = isShowOnly1stMeas ? [spot.properties.orientation_data[0]]
           : spot.properties.orientation_data;
-        measurements.map((orientation) => {
+        const {orientation_data: _od, ...baseProps} = spot.properties;
+        measurements.forEach((orientation) => {
           if (!isEmpty(orientation)) {
-            const feature = JSON.parse(JSON.stringify(spot));
-            delete feature.properties.orientation_data;
-            !isEmpty(orientation.associated_orientation)
-            && orientation.associated_orientation.map((associatedOrientation) => {
-              feature.properties.orientation = associatedOrientation;
-              mappedFeatures.push(JSON.parse(JSON.stringify(feature)));
-            });
-            feature.properties.orientation = orientation;
-            //feature.properties.orientation_num = i.toString();
-            mappedFeatures.push(JSON.parse(JSON.stringify(feature)));
+            if (!isEmpty(orientation.associated_orientation)) {
+              orientation.associated_orientation.forEach((associatedOrientation) => {
+                mappedFeatures.push({...spot, properties: {...baseProps, orientation: associatedOrientation}});
+              });
+            }
+            mappedFeatures.push({...spot, properties: {...baseProps, orientation}});
           }
           else console.log('Stupid spot', spot.properties.id);
         });
       }
       else if (spot.geometry.type === 'GeometryCollection') {
         spot.geometry.geometries.forEach((g, i) => {
-          const feature = JSON.parse(JSON.stringify(spot));
-          feature.geometry = g;
-          feature.properties.symbology = spot.properties.symbology[i];
-          mappedFeatures.push(feature);
+          mappedFeatures.push({...spot, geometry: g, properties: {...spot.properties, symbology: spot.properties.symbology[i]}});
         });
       }
-      else mappedFeatures.push(JSON.parse(JSON.stringify(spot)));
+      else mappedFeatures.push(spot);
     });
     console.log('Mapped Features:', mappedFeatures);
     return filterFeatures(mappedFeatures);

@@ -134,10 +134,10 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     else closeModal();
   };
 
-  const saveForm = async (currentForm) => {
+  const saveForm = async (formSnapshot) => {
     try {
       setIsLoading(true);
-      let newSample = currentForm.values;
+      let newSample = formSnapshot.values;
       const date = new Date().toISOString();
 
       dispatch(setLoadingStatus({view: 'home', bool: true}));

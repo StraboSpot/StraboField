@@ -17,23 +17,20 @@ const MainButtons = ({
 
   const {getLabel, getLabels} = useForm();
 
-  /* Logic Helpers */
+  /* Render Functions */
 
-  const MainButtonsText = ({fieldKey}) => {
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <Text
-          style={formProps?.values[fieldKey] ? formStyles.formButtonSelectedTitle : formStyles.formButtonTitle}>
-          {getLabel(fieldKey, formName)}
+  const renderMainButtonsText = fieldKey => (
+    <View style={{flex: 1, alignItems: 'center'}}>
+      <Text style={formProps?.values?.[fieldKey] ? formStyles.formButtonSelectedTitle : formStyles.formButtonTitle}>
+        {getLabel(fieldKey, formName)}
+      </Text>
+      {formProps?.values?.[fieldKey] && (
+        <Text style={[formStyles.formButtonSelectedTitle, {fontWeight: 'bold'}]}>
+          {truncateText(getLabels(formProps.values[fieldKey], formName, fieldKey), 23)}
         </Text>
-        {formProps?.values[fieldKey] && (
-          <Text style={[formStyles.formButtonSelectedTitle, {fontWeight: 'bold'}]}>
-            {truncateText(getLabels(formProps.values[fieldKey], formName, fieldKey), 23)}
-          </Text>
-        )}
-      </View>
-    );
-  };
+      )}
+    </View>
+  );
 
   /* View */
 
@@ -50,7 +47,7 @@ const MainButtons = ({
             containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
             key={k}
             onPress={() => setChoicesViewKey(k)}
-            title={<MainButtonsText fieldKey={k}/>}
+            title={renderMainButtonsText(k)}
             type={'outline'}
           />
         );

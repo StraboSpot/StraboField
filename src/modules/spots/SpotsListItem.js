@@ -117,4 +117,4 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
   );
 };
 
-export default SpotsListItem;
+export default React.memo(SpotsListItem);

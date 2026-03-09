@@ -10,7 +10,7 @@ const schema = new passwordValidator();
 /* Internal Functions */
 
 // return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-const emailValidator = val => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+const emailValidator = val => /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   .test(val);
 
 const equalToValidator = (val, checkValue) => val === checkValue;
@@ -60,8 +60,7 @@ export const convertSliderValueToMilliseconds = (sliderValue) => {
 // Parsing CSV Strings With Javascript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
 export const csvToArray = (strData, strDelimiter) => {
-  // Check to see if the delimiter is defined. If not,
-  // then default to comma.
+  // Check to see if the delimiter is defined. If not, then default to comma.
   strDelimiter = (strDelimiter || ',');
   // Create a regular expression to parse the CSV values.
   const objPattern = new RegExp(
@@ -77,49 +76,35 @@ export const csvToArray = (strData, strDelimiter) => {
     ),
     'gi',
   );
-  // Create an array to hold our data. Give the array
-  // a default empty first row.
+  // Create an array to hold our data. Give the array a default empty first row.
   const arrData = [[]];
-  // Create an array to hold our individual pattern
-  // matching groups.
-  let arrMatches = null;
-  // Keep looping over the regular expression matches
-  // until we can no longer find a match.
-  while (arrMatches = objPattern.exec(strData)) {
+  // Create an array to hold our individual pattern matching groups.
+  let arrMatches = objPattern.exec(strData);
+  // Keep looping over the regular expression matches until we can no longer find a match.
+  while (arrMatches !== null) {
     // console.log('arrMatches', arrMatches);
     // Get the delimiter that was found.
     const strMatchedDelimiter = arrMatches[1];
-    // Check to see if the given delimiter has a length
-    // (is not the start of string) and if it matches
-    // field delimiter. If id does not, then we know
-    // that this delimiter is a row delimiter.
-    if (
-      strMatchedDelimiter.length
-      && strMatchedDelimiter !== strDelimiter
-    ) {
-      // Since we have reached a new row of data,
-      // add an empty row to our data array.
+    // Check to see if the given delimiter has a length (is not the start of string) and if it matches
+    // field delimiter. If id does not, then we know that this delimiter is a row delimiter.
+    if (strMatchedDelimiter.length && strMatchedDelimiter !== strDelimiter) {
+      // Since we have reached a new row of data, add an empty row to our data array.
       arrData.push([]);
     }
     let strMatchedValue;
-    // Now that we have our delimiter out of the way,
-    // let's check to see which kind of value we
+    // Now that we have our delimiter out of the way, let's check to see which kind of value we
     // captured (quoted or unquoted).
     if (arrMatches[2]) {
-      // We found a quoted value. When we capture
-      // this value, unescape any double quotes.
-      strMatchedValue = arrMatches[2].replace(
-        new RegExp('""', 'g'),
-        '"',
-      );
+      // We found a quoted value. When we capture this value, unescape any double quotes.
+      strMatchedValue = arrMatches[2].replace(new RegExp('""', 'g'), '"');
     }
     else {
       // We found a non-quoted value.
       strMatchedValue = arrMatches[3];
     }
-    // Now that we have our value string, let's add
-    // it to the data array.
+    // Now that we have our value string, let's add it to the data array.
     arrData[arrData.length - 1].push(strMatchedValue);
+    arrMatches = objPattern.exec(strData);
   }
   // Return the parsed data.
   return (arrData);

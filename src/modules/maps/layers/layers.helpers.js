@@ -18,6 +18,10 @@ export const getFeaturesWithSamples = (features) => {
  * @returns {Array} - Array of unique features by properties.id
  */
 export const getUniqFeatures = (features) => {
-  return features.reduce((acc, f) =>
-    acc.map(f1 => f1.properties.id).includes(f.properties.id) ? acc : [...acc, f], []);
+  const seen = new Set();
+  return features.filter((f) => {
+    if (seen.has(f.properties.id)) return false;
+    seen.add(f.properties.id);
+    return true;
+  });
 };

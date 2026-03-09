@@ -48,7 +48,7 @@ const ColorPickerModal = ({closeModal}) => {
     if (field === 'rgb') {
       formRef.current.setFieldValue('rgb', value);
       const [r, g, b] = value.replaceAll(' ', '').split(',');
-      const hexToTest = rgbToHex(parseInt(r), parseInt(g), parseInt(b));
+      const hexToTest = rgbToHex(parseInt(r, 10), parseInt(g, 10), parseInt(b, 10));
       if (isValidHexColor(hexToTest)) {
         formRef.current.setFieldValue('hex', hexToTest);
         setHexColor(hexToTest);

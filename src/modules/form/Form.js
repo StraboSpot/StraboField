@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -31,6 +31,49 @@ const Form = ({
 
   const survey = surveyFragment || getSurvey(formName);
 
+  /* Side Effects */
+
+  useEffect(() => {
+    // Set default values
+    survey.filter(item => isRelevant(item, values)).forEach((field) => {
+      const [fieldType, choicesListName] = field.type.split(' ');
+      if (fieldType === 'select_one' || fieldType === 'select_multiple') {
+        const choiceValues = getChoices(formName).filter(c => c.list_name === choicesListName).map(c => c.name);
+        if (isEmpty(values[field.name]) && field.default && choiceValues.includes(field.default)) {
+          setFieldValue(field.name, field.default, false);
+        }
+      }
+    });
+  }, []);
+
+  /* Logic Helpers */
+
+  // Wrap setFieldValue to also clear fields that become irrelevant after a change
+  const setFieldValueAndClearIrrelevant = (name, value, shouldValidate) => {
+    let newValues = {...values, [name]: value};
+
+    // Iteratively clear fields that now have values but are no longer relevant
+    let changed = true;
+    while (changed) {
+      changed = false;
+      survey.forEach((field) => {
+        if (field.name !== name && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
+          newValues = {...newValues, [field.name]: undefined};
+          changed = true;
+        }
+      });
+    }
+
+    // Apply clears for fields that became irrelevant
+    survey.forEach((field) => {
+      if (field.name !== name && values[field.name] !== undefined && newValues[field.name] === undefined) {
+        setFieldValue(field.name, undefined, false);
+      }
+    });
+
+    setFieldValue(name, value, shouldValidate);
+  };
+
   /* Render Functions */
 
   const renderAcknowledgeInput = (field) => {
@@ -43,7 +86,7 @@ const Form = ({
         name={field.name}
         onShowFieldInfo={showFieldInfo}
         placeholder={field.hint}
-        setFieldValue={setFieldValue}
+        setFieldValue={setFieldValueAndClearIrrelevant}
       />
     );
   };
@@ -58,7 +101,7 @@ const Form = ({
         label={field.label}
         name={field.name}
         onMyChange={onMyChange}
-        setFieldValue={setFieldValue}
+        setFieldValue={setFieldValueAndClearIrrelevant}
       />
     );
   };
@@ -120,12 +163,6 @@ const Form = ({
       return choice;
     });
 
-    // Set default values
-    if (isEmpty(values[field.name]) && field.default
-      && fieldChoicesCopy.map(c => c.value).includes(field.default)) {
-      setFieldValue(field.name, field.default, false);
-    }
-
     return (
       <Field
         as={SelectInputField}
@@ -138,7 +175,7 @@ const Form = ({
         onMyChange={onMyChange}
         onShowFieldInfo={showFieldInfo}
         placeholder={field.hint}
-        setFieldValue={setFieldValue}
+        setFieldValue={setFieldValueAndClearIrrelevant}
         showExpandedChoices={isExpanded}
         single={fieldType === 'select_one'}
       />

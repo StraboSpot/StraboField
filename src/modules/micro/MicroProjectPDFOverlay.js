@@ -107,6 +107,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
         </View>
         {!isEmpty(doc) && (
           <Pdf
+            enablePaging
+            maxScale={3}
             onError={error => console.log(error)}
             onLoadComplete={numberOfPages => console.log(`Number of pages: ${numberOfPages}`)}
             onPressLink={async (uri) => {

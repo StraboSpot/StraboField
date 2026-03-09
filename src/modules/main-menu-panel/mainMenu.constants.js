@@ -66,6 +66,18 @@ export const MAIN_MENU_DATA_NO_PROJECT = Object.entries(MAIN_MENU_ITEMS).reduce(
   return sectionsToHideIfNoProject.includes(key) ? acc : [...acc, {title: key, data: Object.values(value)}];
 }, []);
 
+const listItemsToHideIfNoUser = [MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS];
+export const MAIN_MENU_DATA_NO_USER = Object.entries(MAIN_MENU_ITEMS).map(([key, value]) => {
+  return {
+    title: key,
+    data: Object.values(value).reduce((acc, val) => listItemsToHideIfNoUser.includes(val) ? acc : [...acc, val], []),
+  };
+});
+
+export const MAIN_MENU_DATA_NO_PROJECT_NO_USER = MAIN_MENU_DATA_NO_PROJECT.map(({title, data}) => {
+  return {title, data: data.filter(val => !listItemsToHideIfNoUser.includes(val))};
+});
+
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',
   DELETE_PROJECT: 'Delete Locally Saved Project',
