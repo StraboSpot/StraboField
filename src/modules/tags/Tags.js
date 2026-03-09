@@ -15,7 +15,7 @@ import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
-import BackupTags from './BackupTags';
+import BackupLoadTags from './BackupLoadTags';
 
 const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
@@ -81,7 +81,7 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
         </>
       )}
       <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
-      <BackupTags isGeologicUnits={isGeologicUnits}/>
+      <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>

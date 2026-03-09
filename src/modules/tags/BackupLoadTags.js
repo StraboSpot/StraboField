@@ -6,15 +6,20 @@ import LoadTagsModal from './LoadTagsModal';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 
-const BackupTags = ({isGeologicUnits}) => {
+const BackupLoadTags = ({isGeologicUnits}) => {
+  /* Local State */
 
-  const [loadTagsModalVisible, setLoadTagsModalVisible] = useState(false);
   const [backupTagsModalVisible, setBackupTagsModalVisible] = useState(false);
+  const [loadTagsModalVisible, setLoadTagsModalVisible] = useState(false);
+
+  /* Event Handlers */
 
   const handleClosePress = () => {
     setLoadTagsModalVisible(false);
     setBackupTagsModalVisible(false);
   };
+
+  /* View */
 
   return (
     <>
@@ -44,10 +49,10 @@ const BackupTags = ({isGeologicUnits}) => {
       </View>
 
       {/* Modals */}
-      {loadTagsModalVisible && <LoadTagsModal closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>}
       {backupTagsModalVisible && <BackupTagsModal closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>}
+      {loadTagsModalVisible && <LoadTagsModal closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>}
     </>
   );
 };
 
-export default BackupTags;
+export default BackupLoadTags;

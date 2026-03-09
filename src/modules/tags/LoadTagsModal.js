@@ -39,23 +39,6 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
         ? `${title} Imported`
         : 'Import Failed';
 
-  /* Logic Helpers */
-
-  const mergeTags = (existingTags, importedTags) => {
-    const merged = [...existingTags];
-    for (const importedTag of importedTags) {
-      const existingIndex = merged.findIndex(t => t.id === importedTag.id);
-      if (existingIndex >= 0) {
-        // Keep existing properties; only add properties missing from the existing tag
-        merged[existingIndex] = {...importedTag, ...merged[existingIndex]};
-      }
-      else {
-        merged.push(importedTag);
-      }
-    }
-    return merged;
-  };
-
   /* Event Handlers */
 
   const handleLoad = async () => {
@@ -105,6 +88,23 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
       setLoadingStatus_(TAG_BACKUP_STATUS.ERROR);
       dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
     }
+  };
+
+  /* Logic Helpers */
+
+  const mergeTags = (existingTags, importedTags) => {
+    const merged = [...existingTags];
+    for (const importedTag of importedTags) {
+      const existingIndex = merged.findIndex(t => t.id === importedTag.id);
+      if (existingIndex >= 0) {
+        // Keep existing properties; only add properties missing from the existing tag
+        merged[existingIndex] = {...importedTag, ...merged[existingIndex]};
+      }
+      else {
+        merged.push(importedTag);
+      }
+    }
+    return merged;
   };
 
   /* Render Functions */

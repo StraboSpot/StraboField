@@ -11,20 +11,25 @@ import {clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
 import SaveAndExportModalContent from '../project/backup/SaveAndExportModalContent';
 
 const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
+  /* Data Hooks */
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
 
-  const actionLabel = Platform.OS === 'iOS' ? 'Backup' : 'Export';
+  const {backupTags} = useExport();
+
+  /* Local State */
+
+  const [backingUpStatus, setBackingUpStatus] = useState('');
   const title = isGeologicUnits ? TAG_BACKUP_MESSAGES.TITLE.GEOLOGIC_UNITS : TAG_BACKUP_MESSAGES.TITLE.TAGS;
   const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + currentProject.description.project_name + '_' + title).replace(/\s/g, '');
-
-  const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
+
+  const actionLabel = Platform.OS === 'iOS' ? 'Backup' : 'Export';
   const [modalTitle, setModalTitle] = useState(actionLabel + ' ' + title);
 
-  const {backupTags} = useExport();
+  /* Event Handlers */
 
   const handleBackup = async () => {
     try {
@@ -48,6 +53,8 @@ const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
       setBackingUpStatus(TAG_BACKUP_STATUS.ERROR);
     }
   };
+
+  /* View */
 
   return (
     <ModalWrapper
