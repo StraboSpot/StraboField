@@ -15,7 +15,7 @@ import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
-import ImportExportTags from './ImportExportTags';
+import BackupTags from './BackupTags';
 
 const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
@@ -81,14 +81,14 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
         </>
       )}
       <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
-      <ImportExportTags isGeologicUnits={isGeologicUnits}/>
+      <BackupTags isGeologicUnits={isGeologicUnits}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
         </ListItem.Content>
         <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
       </ListItem>
-      <TagsList selectedIndex={selectedIndex} type={type}/>
+      <TagsList selectedIndex={selectedIndex} type={isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS}/>
 
       {/* Modal */}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}

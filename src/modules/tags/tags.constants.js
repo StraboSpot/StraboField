@@ -38,8 +38,14 @@ export const TAG_FORM_NAMES = {
   TAGS: ['project', 'tags'],
 };
 
-// Export/Import Messages
-export const TAG_EXPORT_MESSAGES = {
+// Backup Actions
+export const TAG_BACKUP_ACTIONS = {
+  BACKUP_GEOLOGIC_UNITS: 'backupGeologicUnits',
+  BACKUP_TAGS: 'backupTags',
+};
+
+// Backup Messages
+export const TAG_BACKUP_MESSAGES = {
   TITLE: {
     GEOLOGIC_UNITS: 'Geologic Units',
     TAGS: 'Tags',
@@ -51,12 +57,6 @@ export const TAG_EXPORT_MESSAGES = {
     EXPORTED: ' Exported to Zip!',
     FAILED: 'Export Failed!',
   },
-};
-
-// Backup Actions
-export const TAG_BACKUP_ACTIONS = {
-  EXPORT_GEOLOGIC_UNITS: 'exportGeologicUnits',
-  EXPORT_TAGS: 'exportTags',
 };
 
 // Backup Status

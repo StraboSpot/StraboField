@@ -4,6 +4,7 @@ import {Platform, Text, TextInput, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
+import {TAG_BACKUP_ACTIONS} from '../../tags/tags.constants';
 
 const SaveAndExportModalContent = ({
                                      backingUpStatus,
@@ -20,10 +21,13 @@ const SaveAndExportModalContent = ({
   /* Derived Variables */
 
   const backupActionTitle = backupAction === 'export' ? 'project'
-    : backupAction === 'exportTags' ? 'Tags'
+    : backupAction === TAG_BACKUP_ACTIONS.BACKUP_TAGS ? 'Tags'
       : 'Geologic Units';
   const fileExtension = backupAction === 'export' ? '.zip' : '.json';
   const fileName = backupFileName.replace(/\s/g, '_');
+  const subFolder = backupAction === TAG_BACKUP_ACTIONS.BACKUP_TAGS ? 'Tags'
+    : backupAction === TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS ? 'GeologicUnits'
+      : null;
 
   /* Logic Helpers */
 
@@ -59,12 +63,15 @@ const SaveAndExportModalContent = ({
         <View style={{padding: 16}}>
           {/* Instruction Text */}
           <Text style={{fontSize: 16, marginBottom: 12, color: '#444'}}>
-            {backupAction === 'save' ? 'All datasets will be saved locally, along with any images and custom maps.'
-              : 'Your ' + backupActionTitle + ' will be '
-              + (Platform.OS === 'ios' ? 'saved as a ' + fileExtension + ' file into the StraboField/Distribution folder.'
-                + '\n\nMove it out of StraboField using the iOS Files app.'
-                : 'exported as a ' + fileExtension + ' file into the Downloads\\StraboSpot2\\Backups folder.')
-              + '\n\nFile will be saved as:'}
+            {backupAction === 'save'
+              ? 'All datasets will be saved locally, along with any images and custom maps.'
+              : Platform.OS === 'ios'
+                ? `Your ${backupActionTitle} will be saved as a ${fileExtension} file into the `
+                + `StraboField/Distribution${subFolder ? '/' + subFolder : ''} folder.\n\nMove it out of StraboField `
+                + 'using the iOS Files app.\n\nFile will be saved as:'
+                : `Your ${backupActionTitle} will be exported as a ${fileExtension} file into the `
+                + `Downloads\\StraboSpot2\\Backups${subFolder ? '\\' + subFolder : ''} folder.\n\nFile will be `
+                + 'saved as:'}
           </Text>
 
           {/* File Name Input */}

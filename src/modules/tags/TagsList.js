@@ -121,7 +121,11 @@ const TagsList = ({type, selectedIndex}) => {
     );
   };
 
-  if (isEmpty(tags)) return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+  const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
+    : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
+  if (isEmpty(filteredTags)) {
+    return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+  }
   else {
     return (
       <View style={{flex: 1}}>

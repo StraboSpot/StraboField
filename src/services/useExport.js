@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
 import useDevice from './useDevice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
-import {PAGE_KEYS} from '../modules/page/page.constants';
+import {PAGE_KEYS} from '../modules/page/pageKeys.constants';
 import {setBackupFileName} from '../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../shared/Helpers';
 
@@ -205,6 +205,44 @@ const useExport = () => {
 
   /* Exported Functions */
 
+  const backupTags = async (backupFileName, isGeologicUnits) => {
+
+    const tagsToBackup = (projectDb.project.tags || []).reduce((acc, tag) => {
+      const {spots, features, ...rest} = tag;
+      return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
+      || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
+    }, []);
+
+    console.log(isGeologicUnits ? 'Geologic Units' : 'Tags', 'to backup:', tagsToBackup);
+
+    const subFolder = isGeologicUnits ? 'GeologicUnits' : 'Tags';
+    const jsonFileName = backupFileName + '.json';
+
+    if (Platform.OS === 'ios') {
+      const exportPath = APP_DIRECTORIES.EXPORT_FILES_IOS + subFolder + '/';
+      await saveFile(exportPath, tagsToBackup, jsonFileName);
+      console.log('File saved to:', exportPath + jsonFileName);
+    }
+    else {
+      // Write to temp file first, then copy to Downloads via MediaStore (required for Android 11+)
+      const tempPath = APP_DIRECTORIES.EXPORT_FILES_ANDROID + jsonFileName;
+      await saveFile(APP_DIRECTORIES.EXPORT_FILES_ANDROID, tagsToBackup, jsonFileName);
+      const result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+        {
+          name: jsonFileName,
+          parentFolder: 'StraboSpot2/Backups/' + subFolder,
+          mimeType: 'application/json',
+        },
+        'Download',
+        tempPath,
+      );
+      console.log('File written to Downloads:', result);
+      await deleteFromDevice(APP_DIRECTORIES.EXPORT_FILES_ANDROID, jsonFileName);
+    }
+    console.log('Finished Exporting');
+    dispatch(clearedStatusMessages());
+  };
+
   const initializeBackup = async (fileName) => {
     try {
       if (hasSpace(fileName)) fileName = fileName.replaceAll(' ', '_');
@@ -298,42 +336,10 @@ const useExport = () => {
     // }
   };
 
-  const zipAndExportTags = async (backupFileName, isGeologicUnits) => {
-
-    const tagsToExport = projectDb.project.tags.reduce((acc, tag) => {
-      const {spots, features, ...rest} = tag;
-      return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
-      || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
-    }, []);
-
-    console.log('tagsto export', tagsToExport);
-
-    const exportPath = Platform.OS === 'ios' ? APP_DIRECTORIES.EXPORT_FILES_IOS : APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID;
-
-    if (Platform.OS === 'ios') {
-      await saveFile(exportPath, tagsToExport, backupFileName);
-      console.log('File saved to:', backupFileName);
-    }
-    else {
-      // Write to Downloads folder using MediaStore (required for Android 11+)
-      const result = await ReactNativeBlobUtil.MediaCollection.createMediafile(
-        {
-          name: backupFileName,
-          parentFolder: 'StraboSpot2/Backups/Tags',
-          mimeType: 'application/json',
-        },
-        'Download',
-      );
-      console.log('File written to Downloads:', result);
-    }
-    console.log('Finished Exporting');
-    dispatch(clearedStatusMessages());
-  };
-
   return {
+    backupTags,
     initializeBackup,
     zipAndExportProjectFolder,
-    zipAndExportTags,
   };
 };
 
