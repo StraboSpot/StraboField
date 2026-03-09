@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import BackupTagsModal from './BackupTagsModal';
+import LoadTagsModal from './LoadTagsModal';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 
@@ -9,8 +10,6 @@ const BackupTags = ({isGeologicUnits}) => {
 
   const [loadTagsModalVisible, setLoadTagsModalVisible] = useState(false);
   const [backupTagsModalVisible, setBackupTagsModalVisible] = useState(false);
-
-  const action = loadTagsModalVisible ? 'load' : 'backup';
 
   const handleClosePress = () => {
     setLoadTagsModalVisible(false);
@@ -44,10 +43,9 @@ const BackupTags = ({isGeologicUnits}) => {
         />
       </View>
 
-      {/* Modal */}
-      {(loadTagsModalVisible || backupTagsModalVisible) && (
-        <BackupTagsModal action={action} closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>
-      )}
+      {/* Modals */}
+      {loadTagsModalVisible && <LoadTagsModal closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>}
+      {backupTagsModalVisible && <BackupTagsModal closeModal={handleClosePress} isGeologicUnits={isGeologicUnits}/>}
     </>
   );
 };

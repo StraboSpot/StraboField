@@ -10,12 +10,11 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
 import SaveAndExportModalContent from '../project/backup/SaveAndExportModalContent';
 
-const BackupTagsModal = ({action, closeModal, isGeologicUnits}) => {
+const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   const dispatch = useDispatch();
   const currentProject = useSelector(state => state.project.project);
 
-  const actionLabel = action === 'load' ? Platform.OS === 'iOS' ? 'Load' : 'Import'
-    : Platform.OS === 'iOS' ? 'Backup' : 'Export';
+  const actionLabel = Platform.OS === 'iOS' ? 'Backup' : 'Export';
   const title = isGeologicUnits ? TAG_BACKUP_MESSAGES.TITLE.GEOLOGIC_UNITS : TAG_BACKUP_MESSAGES.TITLE.TAGS;
   const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + currentProject.description.project_name + '_' + title).replace(/\s/g, '');
@@ -62,18 +61,16 @@ const BackupTagsModal = ({action, closeModal, isGeologicUnits}) => {
       showCancelButton={backingUpStatus === ''}
       showCloseButton
     >
-      {action === 'backup' && (
-        <SaveAndExportModalContent
-          backingUpStatus={backingUpStatus}
-          backupAction={isGeologicUnits ? TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS : TAG_BACKUP_ACTIONS.BACKUP_TAGS}
-          backupFileName={backupFileName}
-          closeModal={closeModal}
-          defaultFileName={defaultFileName}
-          isFileNameError={isFileNameError}
-          setBackupFileName={setBackupFileName}
-          setIsFileNameError={setIsFileNameError}
-        />
-      )}
+      <SaveAndExportModalContent
+        backingUpStatus={backingUpStatus}
+        backupAction={isGeologicUnits ? TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS : TAG_BACKUP_ACTIONS.BACKUP_TAGS}
+        backupFileName={backupFileName}
+        closeModal={closeModal}
+        defaultFileName={defaultFileName}
+        isFileNameError={isFileNameError}
+        setBackupFileName={setBackupFileName}
+        setIsFileNameError={setIsFileNameError}
+      />
     </ModalWrapper>
   );
 };
