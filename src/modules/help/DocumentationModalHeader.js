@@ -7,29 +7,34 @@ import styles from './documentation.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
+  /* Local State */
+
   const [pickerVisible, setPickerVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+  const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
+
+  /* Event Handlers */
 
   const handleSelectPage = (page) => {
     setPickerVisible(false);
     onJumpToPage(page);
   };
 
-  const pageNumbers = Array.from({length: totalPages}, (_, i) => i + 1);
-
-  const pageHeader = Platform.OS === 'ios' ? `Page ${currentPage} of ${totalPages}` : `Page ${currentPage}`;
+  /* View */
 
   return (
     <>
       <View style={styles.headerContainer}>
-        {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.jumpButton}>
+        <TouchableOpacity onPress={onClose} style={styles.closeButtonContainer}>
+          <Ionicons color={'#333'} name={'arrow-back-outline'} size={24}/>
+        </TouchableOpacity>
+        <Text style={styles.pageText}>{pageHeader}</Text>
+        {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)}>
           <Text style={styles.jumpText}>Jump to page</Text>
         </TouchableOpacity>}
-        <Text style={styles.pageText}>
-          {pageHeader}
-        </Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons color={'#333'} name={'close'} size={24}/>
-        </TouchableOpacity>
       </View>
       <ModalWrapper
         closeModal={() => setPickerVisible(false)}

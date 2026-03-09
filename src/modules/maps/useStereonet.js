@@ -1,47 +1,20 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import moment from 'moment/moment';
 import {useSelector} from 'react-redux';
 
+import {STEREONET_HEADERS} from './maps.constants';
+import {getTimeAndDateFromModifiedTimestamp} from './maps.helpers';
 import alert from '../../shared/ui/alert';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measurements/measurements.constants';
 
 const useStereonet = () => {
+  /* Data Hooks */
+
   const userName = useSelector(state => state.user?.name);
+
+  /* Exported Functions */
 
   const getStereonet = async (spots) => {
     let hasData = false;
-
-    //build data here
-    const headers = [
-      'No.',
-      'Type',
-      'Structure',
-      'Color',
-      'Trd/Strk',
-      'Plg/Dip',
-      'Longitude',
-      'Latitude',
-      'Horiz ± m',
-      'Elevation',
-      'Elev ± m',
-      'Time',
-      'Day',
-      'Month',
-      'Year',
-      'Notes', //Everything below 'Notes' is new for v4 of Stereonet
-      'Checked',
-      'Strabo Type',
-      'Strabo Quality',
-      'Strabo Plane Detail',
-      'Strabo Plane Addl Detail',
-      'Plane Thickness',
-      'Plane Length',
-      'Geologist',
-      'UnixTimeStamp',
-      'ModifiedTimeStamp',
-      'Associated Obs',
-      'Method',
-    ];
 
     let planes = [];
     let lines = [];
@@ -126,7 +99,7 @@ const useStereonet = () => {
 
     if (lines.length > 0 || planes.length > 0) {
       let recordNum = 1;
-      out.push(headers.join('\t'));
+      out.push(STEREONET_HEADERS.join('\t'));
       if (planes.length > 0) {
         planes.forEach((plane) => {
           plane[0] = recordNum;
@@ -155,17 +128,8 @@ const useStereonet = () => {
     }
   };
 
-  const getTimeAndDateFromModifiedTimestamp = (field) => {
-    return {
-      time: moment(field).format('HH:mm:ss'),
-      day: moment(field).format('D'),
-      month: moment(field).format('MM'),
-      year: moment(field).format('YYYY'),
-    };
-  };
-
   return {
-    getStereonet: getStereonet,
+    getStereonet,
   };
 };
 

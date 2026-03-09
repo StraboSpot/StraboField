@@ -1,6 +1,7 @@
 import * as turf from '@turf/turf';
 
 const useCoveredIntervalsXLines = (spotsDisplayed) => {
+  /* Exported Functions */
 
   // Create the X lines for Strat Intervals that are Covered/Unexposed or Not Measured
   const getIntervalsWithX = () => {
@@ -18,7 +19,7 @@ const useCoveredIntervalsXLines = (spotsDisplayed) => {
   };
 
   return {
-    getIntervalsWithX: getIntervalsWithX,
+    getIntervalsWithX,
   };
 };
 

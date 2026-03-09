@@ -9,9 +9,12 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
 const SpotNotesOverview = ({page}) => {
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const savedNote = useSelector(state => state.spot.selectedSpot.properties.notes);
+
+  /* View */
 
   return (
     <>

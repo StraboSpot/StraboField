@@ -5,11 +5,20 @@ import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 
 const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
+  /* Local State */
+
   const [strikeSpinValue] = useState(new Animated.Value(0));
   const [trendSpinValue] = useState(new Animated.Value(0));
 
+  /* Derived Variables */
+
+  // Interpolated angles
   const strike = compassData?.strike ?? 0;
+  const strikeSpin = strikeSpinValue.interpolate({inputRange: [0, strike], outputRange: ['0deg', strike + 'deg']});
   const trend = compassData?.trend ?? 0;
+  const trendSpin = trendSpinValue.interpolate({inputRange: [0, trend], outputRange: ['0deg', trend + 'deg']});
+
+  /* Side Effects */
 
   // Animate STRIKE rotation
   useEffect(() => {
@@ -35,16 +44,17 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
     }
   }, [trend]);
 
-  // Interpolated angles
-  const strikeSpin = strikeSpinValue.interpolate({
-    inputRange: [0, strike],
-    outputRange: ['0deg', strike + 'deg'],
-  });
+  /* Render Functions */
 
-  const trendSpin = trendSpinValue.interpolate({
-    inputRange: [0, trend],
-    outputRange: ['0deg', trend + 'deg'],
-  });
+  const renderCompassSymbols = () => {
+    const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
+    const planarOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
+
+    if (linearOn && planarOn && trend >= 0 && strike >= 0) return [renderTrendSymbol(), renderStrikeDipSymbol()];
+    else if (linearOn) return renderTrendSymbol();
+    else if (planarOn) return renderStrikeDipSymbol();
+    return null;
+  };
 
   const renderStrikeDipSymbol = () => {
     return (
@@ -72,15 +82,7 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
     );
   };
 
-  const renderCompassSymbols = () => {
-    const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
-    const planarOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
-
-    if (linearOn && planarOn && trend >= 0 && strike >= 0) return [renderTrendSymbol(), renderStrikeDipSymbol()];
-    else if (linearOn) return renderTrendSymbol();
-    else if (planarOn) return renderStrikeDipSymbol();
-    return null;
-  };
+  /* View */
 
   return (
     <View style={compassStyles.compassImageContainer}>

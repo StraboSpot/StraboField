@@ -13,13 +13,29 @@ const SaveAndExportModalContent = ({
                                      setBackupFileName,
                                      setIsFileNameError,
                                    }) => {
+  /* Data Hooks */
+
   const statusMessages = useSelector(state => state.home.statusMessages);
+
+  /* Derived Variables */
 
   const backupActionTitle = backupAction === 'export' ? 'project'
     : backupAction === 'exportTags' ? 'Tags'
       : 'Geologic Units';
   const fileExtension = backupAction === 'export' ? '.zip' : '.json';
   const fileName = backupFileName.replace(/\s/g, '_');
+
+  /* Logic Helpers */
+
+  const validateFileName = (filenameChanged) => {
+    const regexp = /^[a-zA-Z0-9-_]*$/; // Check for alphanumeric characters, a dash or underscore (allow empty)
+    const fileNameWithUnderscores = filenameChanged.replace(/\s/g, '_');
+    if (fileNameWithUnderscores.search(regexp) === -1) setIsFileNameError(true);
+    else setIsFileNameError(false);
+    setBackupFileName(filenameChanged);
+  };
+
+  /* Render Functions */
 
   const renderBackingUpView = () => (
     <View style={{padding: 20, alignItems: 'center'}}>
@@ -35,13 +51,7 @@ const SaveAndExportModalContent = ({
     </View>
   );
 
-  const validateFileName = (filenameChanged) => {
-    const regexp = /^[a-zA-Z0-9-_]*$/; // Check for alphanumeric characters, a dash or underscore (allow empty)
-    const fileNameWithUnderscores = filenameChanged.replace(/\s/g, '_');
-    if (fileNameWithUnderscores.search(regexp) === -1) setIsFileNameError(true);
-    else setIsFileNameError(false);
-    setBackupFileName(filenameChanged);
-  };
+  /* View */
 
   return (
     <>

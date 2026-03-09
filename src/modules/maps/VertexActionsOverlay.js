@@ -1,6 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import {VERTEX_ACTION_BUTTONS} from './maps.constants';
+import {getVertexActionButtonIcon} from './maps.helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -15,15 +17,7 @@ const VertexActionsOverlay = ({
                                 splitLine,
                                 vertexActionValues,
                               }) => {
-
-  const buttons = ['Add Vertex', 'Delete Vertex', 'Split Line'];
-
-  const buttonIcon = (button) => {
-    return button === 'Add Vertex' ? require('../../assets/icons/LineButton.png')
-      : button === 'Delete Vertex' ? require('../../assets/icons/PointButton.png')
-        : button === 'Split Line' ? require('../../assets/icons/PolygonButton.png')
-          : null;
-  };
+  /* Event Handlers */
 
   const handleActionPressed = (button) => {
     setIsShowVertexActionsModal(false);
@@ -42,6 +36,8 @@ const VertexActionsOverlay = ({
     }
   };
 
+  /* View */
+
   return (
     <ModalWrapper
       closeModal={() => setIsShowVertexActionsModal(false)}
@@ -54,7 +50,7 @@ const VertexActionsOverlay = ({
       showCloseButton={true}
     >
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
-        {buttons.map((button) => {
+        {VERTEX_ACTION_BUTTONS.map((button) => {
             return (
               ((vertexActionValues.vertexSelected && button !== 'Add Vertex')
                 || (!vertexActionValues.vertexSelected && button !== 'Delete Vertex')) && (
@@ -62,7 +58,7 @@ const VertexActionsOverlay = ({
                   icon={
                     <IconButton
                       onPress={() => handleActionPressed(button)}
-                      source={buttonIcon(button)}
+                      source={getVertexActionButtonIcon(button)}
                       style={{paddingRight: 15}}
                     />
                   }

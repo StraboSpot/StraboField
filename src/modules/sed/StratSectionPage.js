@@ -22,27 +22,51 @@ import {Form, useForm} from '../form';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
-import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const StratSectionPage = ({isReadOnly, page}) => {
   // console.log('Rendering StratSectionPage...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [selectedImage, setSelectedImage] = useState(undefined);
-
-  const stratSectionRef = useRef(null);
 
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
 
+  /* Local State */
+
+  const stratSectionRef = useRef(null);
+
+  const [selectedImage, setSelectedImage] = useState(undefined);
+
+  /* Derived Variables */
+
   const stratSection = spot.properties?.sed?.strat_section || {};
 
-  // console.log('Spot:', spot);
-  // console.log('Strat Section:', stratSection);
+  /* Logic Helpers */
+
+  const getImageLabel = (id) => {
+    const index = spot.properties.images.findIndex(i => id === i.id);
+    const image = spot.properties.images[index];
+    return image && image.title ? image.title : 'Untitled ' + (index + 1);
+  };
+
+  const saveStratSection = async () => {
+    try {
+      await saveSedFeature(page.key, spot, stratSectionRef.current);
+      await stratSectionRef.current.resetForm();
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving strat section', e);
+    }
+  };
+
+  /* Render Functions */
 
   const renderImageItem = (image) => {
     return (
@@ -57,12 +81,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
         <ListItem.Chevron/>
       </ListItem>
     );
-  };
-
-  const getImageLabel = (id) => {
-    const index = spot.properties.images.findIndex(i => id === i.id);
-    const image = spot.properties.images[index];
-    return image && image.title ? image.title : 'Untitled ' + (index + 1);
   };
 
   const renderImageOverlaysSection = () => {
@@ -88,7 +106,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
   };
 
   const renderSectionSettingsSection = () => {
-    const formName = ['sed', 'strat_section'];
+    const stratSectionFormName = ['sed', 'strat_section'];
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
@@ -104,30 +122,11 @@ const StratSectionPage = ({isReadOnly, page}) => {
           innerRef={stratSectionRef}
           onReset={() => console.log('Resetting form...')}
           onSubmit={() => console.log('Submitting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
+          validate={values => validateForm({formName: stratSectionFormName, values: values})}
           validateOnChange={false}
         >
-          {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+          {formProps => <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>}
         </Formik>
-      </View>
-    );
-  };
-
-  const renderStratSectionToggle = () => {
-    return (
-      <View>
-        <ListItem containerStyle={commonStyles.listItem} key={'strat_section_toggle'}>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>
-              Add a Stratigraphic Section at this Spot?
-            </ListItem.Title>
-          </ListItem.Content>
-          <SwitchWrapper
-            disabled={isReadOnly}
-            onValueChange={() => toggleStratSection(spot)}
-            value={!isEmpty(stratSection)}
-          />
-        </ListItem>
       </View>
     );
   };
@@ -135,7 +134,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const renderStratSectionsMain = () => {
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         <View style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={
@@ -183,16 +182,26 @@ const StratSectionPage = ({isReadOnly, page}) => {
     );
   };
 
-  const saveStratSection = async () => {
-    try {
-      await saveSedFeature(page.key, spot, stratSectionRef.current);
-      await stratSectionRef.current.resetForm();
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (e) {
-      console.log('Error saving strat section', e);
-    }
+  const renderStratSectionToggle = () => {
+    return (
+      <View>
+        <ListItem containerStyle={commonStyles.listItem} key={'strat_section_toggle'}>
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>
+              Add a Stratigraphic Section at this Spot?
+            </ListItem.Title>
+          </ListItem.Content>
+          <SwitchWrapper
+            disabled={isReadOnly}
+            onValueChange={() => toggleStratSection(spot)}
+            value={!isEmpty(stratSection)}
+          />
+        </ListItem>
+      </View>
+    );
   };
+
+  /* View */
 
   return (
     <>

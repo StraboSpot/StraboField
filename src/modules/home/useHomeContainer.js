@@ -3,18 +3,20 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {setLoadingStatus} from './home.slice';
 import {isEqual} from '../../shared/Helpers';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
-
-  const {handleSpotSelected} = useSpots();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+
+  const {handleSpotSelected} = useSpots();
   const toast = useToast();
 
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  /* Exported Functions */
 
   const openSpotInNotebook = (spot, notebookPage, attributes) => {
     handleSpotSelected(spot);
@@ -37,8 +39,8 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
   };
 
   return {
-    openSpotInNotebook: openSpotInNotebook,
-    zoomToCurrentLocation: zoomToCurrentLocation,
+    openSpotInNotebook,
+    zoomToCurrentLocation,
   };
 };
 

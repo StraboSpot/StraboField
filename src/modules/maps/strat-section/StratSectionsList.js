@@ -16,12 +16,19 @@ import {setSelectedSpot} from '../../spots/spots.slice';
 import {setStratSection} from '../maps.slice';
 
 const StratSectionsList = ({closeManMenuPanel}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
+
   const navigation = useNavigation();
   const {getSpotsWithStratSection} = useSpots();
 
+  /* Derived Variables */
+
   const spotsWithStratSection = getSpotsWithStratSection();
   console.log('Spots with Strat Section:', spotsWithStratSection);
+
+  /* Event Handlers */
 
   const handleStratSectionPressed = (spot) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -41,6 +48,8 @@ const StratSectionsList = ({closeManMenuPanel}) => {
     }
   };
 
+  /* Render Functions */
+
   const renderStratSectionItem = (spot) => {
     return (
       <ListItem
@@ -56,6 +65,8 @@ const StratSectionsList = ({closeManMenuPanel}) => {
       </ListItem>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

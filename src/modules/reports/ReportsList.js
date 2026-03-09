@@ -8,13 +8,17 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsList = ({isCheckedList, reportsSubset}) => {
   console.log('Rendering ReportsList...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const reports = useSelector(state => state.project.project?.reports) || [];
+
+  /* Derived Variables */
 
   const reportsToList = reportsSubset ? isEmpty(reportsSubset) ? [] : reportsSubset : reports;
   let reportsToListSorted = JSON.parse(JSON.stringify(reportsToList));
@@ -22,10 +26,14 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
     return new Date(b.updated_timestamp) - new Date(a.updated_timestamp);
   });
 
+  /* Event Handlers */
+
   const onShowReport = (report) => {
     dispatch(setModalValues(report));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

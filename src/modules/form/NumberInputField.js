@@ -12,11 +12,14 @@ const NumberInputField = ({
                             form: {errors},
                             editable = true, label, onMyChange, onShowFieldInfo, placeholder,
                           }) => {
+  /* Logic Helpers */
 
   const getDisplayValue = () => {
     if (!isEmpty(value)) return value.toString();
     return value || '';
   };
+
+  /* View */
 
   return (
     <>

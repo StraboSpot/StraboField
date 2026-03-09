@@ -6,15 +6,21 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 
+const formName = ['settings', 'naming_conventions'];
+
 const NamingConventions = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
   const {validateForm} = useForm();
 
+  /* Local State */
+
   const formRef = useRef(null);
 
-  const formName = ['settings', 'naming_conventions'];
+  /* Event Handlers */
 
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
@@ -23,6 +29,8 @@ const NamingConventions = () => {
     console.log('Saving naming convention preferences to Project ...', updatedValues);
     dispatch(updatedProject({field: 'preferences', value: updatedValues}));
   };
+
+  /* View */
 
   return (
     <Formik

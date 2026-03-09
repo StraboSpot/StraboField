@@ -18,20 +18,29 @@ import {setSelectedProject} from '../projects.slice';
 const BackupProject = () => {
   console.log('Rendering BackupProject...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
+  const {openURL} = useDevice();
+
+  /* Local State */
+
   const [backupAction, setBackupAction] = useState(undefined);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
-  const {openURL} = useDevice();
+  /* Event Handlers */
 
-  const saveProject = () => checkForActiveDatasets('save');
+  const onUpload = () => {
+    dispatch(setSelectedProject({source: '', project: ''}));
+    setIsUploadModalVisible(true);
+  };
 
-  const exportProject = () => checkForActiveDatasets('export');
+  /* Logic Helpers */
 
   const checkForActiveDatasets = (backupActionToSet) => {
     if (activeDatasets.length > 0) {
@@ -45,10 +54,11 @@ const BackupProject = () => {
     }
   };
 
-  const onUpload = () => {
-    dispatch(setSelectedProject({source: '', project: ''}));
-    setIsUploadModalVisible(true);
-  };
+  const exportProject = () => checkForActiveDatasets('export');
+
+  const saveProject = () => checkForActiveDatasets('save');
+
+  /* Render Functions */
 
   const renderUploadAndBackupButtons = () => {
     return (
@@ -69,6 +79,8 @@ const BackupProject = () => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

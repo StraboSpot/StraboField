@@ -16,34 +16,28 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {useSpots} from '../spots';
 
 const CustomFeatureTypes = () => {
-  const [refresh] = useState();
-  const {getActiveSpotsObj} = useSpots();
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const projectFeatures = useSelector(state => state.project.project?.other_features);
+
+  const {getActiveSpotsObj} = useSpots();
+
+  /* Local State */
+
+  const [refresh] = useState();
+
+  /* Derived Variables */
+
   const customFeatureTypes = projectFeatures
     && projectFeatures.filter(feature => !DEFAULT_GEOLOGIC_TYPES.includes(feature));
+
+  /* Logic Helpers */
 
   const deleteCustomFeature = (feature) => {
     let projectFeaturesCopy = projectFeatures.filter(projectFeature => feature !== projectFeature);
     dispatch(addedCustomFeatureTypes(projectFeaturesCopy));
     return true;
-  };
-
-  const deleteFeatureConfirm = (feature) => {
-    alert('Delete Feature ' + toTitleCase(feature),
-      'Are you sure you would like to delete ' + feature + '?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => deleteCustomFeature(feature),
-        },
-      ],
-      {cancelable: false},
-    );
   };
 
   const deleteCustomFeatureValidation = (feature) => {
@@ -66,6 +60,25 @@ const CustomFeatureTypes = () => {
     deleteFeatureConfirm(feature);
   };
 
+  const deleteFeatureConfirm = (feature) => {
+    alert('Delete Feature ' + toTitleCase(feature),
+      'Are you sure you would like to delete ' + feature + '?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => deleteCustomFeature(feature),
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  /* Render Functions */
+
   const renderFeature = (feature) => {
     return (
       <View>
@@ -87,6 +100,8 @@ const CustomFeatureTypes = () => {
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

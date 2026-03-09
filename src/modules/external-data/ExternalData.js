@@ -11,16 +11,33 @@ import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {formStyles} from '../form';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
+import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly}) => {
-  const inputRef = useRef(null);
+  /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {readCSV, saveURL} = useExternalData();
+
+  /* Local State */
+
+  const inputRef = useRef(null);
+
   const [error, setError] = useState(false);
   const [protocol, setProtocol] = useState('http://');
   const [url, setUrl] = useState('');
-  const {readCSV, saveURL} = useExternalData();
+
+  /* Event Handlers */
+
+  const handleFileChange = async (e) => {
+    console.log('CSV File', e.target.files[0]);
+    const file = e.target.files[0];
+    await readCSV(file);
+    console.log('CSV From Web Saved');
+  };
+
+  /* Logic Helpers */
 
   const importCSVFile = () => {
     try {
@@ -33,13 +50,6 @@ const ExternalData = ({isReadOnly}) => {
     catch (err) {
       console.error('ERROR selecting .CSV file', err);
     }
-  };
-
-  const handleFileChange = async (e) => {
-    console.log('CSV File', e.target.files[0]);
-    const file = e.target.files[0];
-    await readCSV(file);
-    console.log('CSV From Web Saved');
   };
 
   const saveUrl = async () => {
@@ -55,9 +65,11 @@ const ExternalData = ({isReadOnly}) => {
     }
   };
 
+  /* View */
+
   return (
     <View style={{flex: 1}}>
-      <NotebookPageHeader pageTitle={'External Data'}/>
+      <PageHeader pageTitle={'External Data'}/>
       <SectionDivider dividerText={'Links To Web Resources'}/>
       <View style={{flex: 1}}>
         {!isReadOnly && (

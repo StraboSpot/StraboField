@@ -6,8 +6,11 @@ import {Layer, Source} from 'react-map-gl/mapbox';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const MeasureLayers = ({measureFeatures}) => {
+  /* Data Hooks */
 
   const {getPaintSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <Source

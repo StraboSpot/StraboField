@@ -1,62 +1,70 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Keyboard, Platform, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
 import Toast, {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {
+  SAMPLE_FIRST_KEYS,
+  SAMPLE_FORM_NAME,
+  SAMPLE_INPLACENESS_KEY,
+  SAMPLE_LAST_KEYS,
+  SAMPLE_ORIENTED_KEY,
+  SAMPLE_TYPE_KEY,
+} from './samples.constants';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
+import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds, updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
+  const {setPointAtCurrentLocation} = useMapLocation();
   const {checkSampleName, getNewSpotName} = useSpots();
   const toast = useToast();
-  const {setPointAtCurrentLocation} = useMapLocation();
 
-  const initialNamePrefix = preferences.sample_prefix || '';
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [namePostfix, setNamePostfix] = useState(null);
-  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
-  const [startingNumber, setStartingNumber] = useState(null);
+  /* Local State */
 
   const formRef = useRef(null);
   const toastRef = useRef(null);
 
-  const formName = ['general', 'samples'];
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [currentForm, setCurrentForm] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+  const [namePostfix, setNamePostfix] = useState(null);
 
-  // Relevant keys for quick-entry modal
-  const sampleTypeKey = ['sample_type', 'material_type'];
-  const firstKeys = ['sample_id_name', 'label', 'sample_description'];
-  const inplacenessKey = 'inplaceness_of_sample';
-  const orientedKey = 'oriented_sample';
-  const lastKeys = ['sample_notes'];
+  const initialNamePrefix = preferences.sample_prefix || '';
+
+  const [namePrefix, setNamePrefix] = useState(initialNamePrefix);
+  const [startingNumber, setStartingNumber] = useState(null);
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const survey = getSurvey(formName);
-  const choices = getChoices(formName);
-  const firstKeysFields = firstKeys.map(k =>
-    survey.find(f => f.name === k),
-  );
-  const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+  const choices = getChoices(SAMPLE_FORM_NAME);
+  const survey = getSurvey(SAMPLE_FORM_NAME);
+  const firstKeysFields = SAMPLE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
+  const lastKeysFields = SAMPLE_LAST_KEYS.map(k => survey.find(f => f.name === k));
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE SampleModal []');
@@ -70,7 +78,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         : spot?.properties?.name;
       setNamePrefix(spotName + initialNamePrefix);
     }
-
     if (preferences.sample_postfix_letter) {
       let postfixLetter = 'a';
       if (spot?.properties?.samples && !isEmpty(spot?.properties?.samples)) {
@@ -96,101 +103,41 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     }
   }, [spot]);
 
-  const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
-      const formCurrent = formRef.current;
-      alert(
-        'Unsaved Changes',
-        'Would you like to save your sample before continuing?',
-        [
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => saveForm(formCurrent),
-          },
-        ],
-        {cancelable: false},
-      );
-    }
-  };
+  /* Event Handlers */
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else dispatch(setModalVisible({modal: null}));
+    else confirmLeavePage();
   };
 
   const onOrientedButtonPress = (i) => {
-    if (i === 0 && formRef.current?.values[orientedKey] === 'yes') {
-      formRef.current?.setFieldValue(orientedKey, undefined);
+    if (i === 0 && formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'yes') {
+      formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, undefined);
     }
-    else if (i === 0) formRef.current?.setFieldValue(orientedKey, 'yes');
-    else if (i === 1 && formRef.current?.values[orientedKey] === 'no') {
-      formRef.current?.setFieldValue(orientedKey, undefined);
+    else if (i === 0) formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, 'yes');
+    else if (i === 1 && formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'no') {
+      formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, undefined);
     }
-    else formRef.current?.setFieldValue(orientedKey, 'no');
+    else formRef.current?.setFieldValue(SAMPLE_ORIENTED_KEY, 'no');
   };
 
-  const renderForm = (formProps) => {
-    return (
-      <>
-        <MainButtons
-          formName={formName}
-          formProps={formProps}
-          mainKeys={sampleTypeKey}
-          setChoicesViewKey={setChoicesViewKey}
-        />
-        <Form
-          {...{
-            formName: formName,
-            surveyFragment: firstKeysFields,
-            ...formProps,
-          }}
-        />
-        <FormSlider
-          choices={choices}
-          fieldKey={inplacenessKey}
-          formProps={formProps}
-          labels={['In Place', 'Float']}
-          survey={survey}
-        />
-        <ButtonGroup
-          buttonStyle={{padding: 5}}
-          buttons={['Oriented', 'Unoriented']}
-          containerStyle={{height: 40, borderRadius: 10}}
-          onPress={onOrientedButtonPress}
-          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-          selectedIndex={
-            formRef.current?.values[orientedKey] === 'yes'
-              ? 0
-              : formRef.current?.values[orientedKey] === 'no'
-                ? 1
-                : undefined
-          }
-          textStyle={{color: PRIMARY_TEXT_COLOR}}
-        />
-        <Form
-          {...{
-            formName: formName,
-            surveyFragment: lastKeysFields,
-            ...formProps,
-          }}
-        />
-      </>
-    );
+  /* Logic Helpers */
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
+  const confirmLeavePage = () => {
+    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      const formCurrent = formRef.current;
+      setCurrentForm(formCurrent);
+      setIsWarningModalVisible(true);
+    }
+    else closeModal();
   };
 
-  const renderSubform = (formProps) => {
-    const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
-  };
-
-  const saveForm = async (currentForm) => {
+  const saveForm = async (formSnapshot) => {
     try {
       setIsLoading(true);
-      let newSample = currentForm.values;
+      let newSample = formSnapshot.values;
       const date = new Date().toISOString();
 
       dispatch(setLoadingStatus({view: 'home', bool: true}));
@@ -212,8 +159,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         await zoomToCurrentLocation();
       }
       else {
-        Keyboard.dismiss();
-        dispatch(setModalVisible({modal: null}));
         const samples = spot.properties?.samples
           ? [...spot.properties.samples, newSample]
           : [newSample];
@@ -231,6 +176,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       await currentForm.resetForm();
+      if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
 
       if (newSample.sample_id_name) {
         const foundDuplicateName = await checkSampleName(newSample.sample_id_name);
@@ -253,6 +199,57 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       if (SMALL_SCREEN) toastRef.current?.show(toastMsg, toastOptions);
       else toast.show(toastMsg, toastOptions);
     }
+  };
+
+  /* Render Functions */
+
+  const renderForm = (formProps) => {
+    return (
+      <>
+        <MainButtons
+          formName={SAMPLE_FORM_NAME}
+          formProps={formProps}
+          mainKeys={SAMPLE_TYPE_KEY}
+          setChoicesViewKey={setChoicesViewKey}
+        />
+        <Form
+          {...{
+            formName: SAMPLE_FORM_NAME,
+            surveyFragment: firstKeysFields,
+            ...formProps,
+          }}
+        />
+        <FormSlider
+          choices={choices}
+          fieldKey={SAMPLE_INPLACENESS_KEY}
+          formProps={formProps}
+          labels={['In Place', 'Float']}
+          survey={survey}
+        />
+        <ButtonGroup
+          buttonStyle={{padding: 5}}
+          buttons={['Oriented', 'Unoriented']}
+          containerStyle={{height: 40, borderRadius: 10}}
+          onPress={onOrientedButtonPress}
+          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          selectedIndex={
+            formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'yes'
+              ? 0
+              : formRef.current?.values[SAMPLE_ORIENTED_KEY] === 'no'
+                ? 1
+                : undefined
+          }
+          textStyle={{color: PRIMARY_TEXT_COLOR}}
+        />
+        <Form
+          {...{
+            formName: SAMPLE_FORM_NAME,
+            surveyFragment: lastKeysFields,
+            ...formProps,
+          }}
+        />
+      </>
+    );
   };
 
   const renderSampleMainContent = () => {
@@ -284,17 +281,37 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     );
   };
 
+  const renderSubform = (formProps) => {
+    const relevantFields = getRelevantFields(survey, choicesViewKey);
+    return <Form {...{formName: SAMPLE_FORM_NAME, surveyFragment: relevantFields, ...formProps}}/>;
+  };
+
+  /* View */
+
   return (
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
       onFooterButtonPress={onPress}
+      overlayStyleOverride={{height: '80%'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
     >
       {renderSampleMainContent()}
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
+      <WarningModal
+        cancelTitle={'No'}
+        closeModal={() => setIsWarningModalVisible(false)}
+        confirmText={'Save Changes'}
+        isVisible={isWarningModalVisible}
+        onCancelPress={() => dispatch(setModalVisible({modal: null}))}
+        onConfirmPress={() => saveForm(currentForm)}
+        showCloseButton
+        title={'Unsaved Changes'}
+      >
+        <Text style={{flexWrap: 'wrap'}}>Would you like to save your sample before continuing?</Text>
+      </WarningModal>
     </ModalWrapper>
   );
 };

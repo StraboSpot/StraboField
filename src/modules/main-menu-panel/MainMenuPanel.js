@@ -1,5 +1,5 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -202,7 +202,13 @@ const MainMenuPanel = forwardRef(({
 
   return (
     <View style={mainMenuPanelStyles.container}>
-      {isSidePanelVisible && sidePanelView ? renderSidePanelContent() : renderMainMenuContent()}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        // keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
+        style={{flex: 1}}
+      >
+        {isSidePanelVisible && sidePanelView ? renderSidePanelContent() : renderMainMenuContent()}
+      </KeyboardAvoidingView>
     </View>
   );
 });

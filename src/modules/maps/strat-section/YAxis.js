@@ -6,8 +6,12 @@ import useYAxis from './useYAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const YAxis = ({spotsDisplayed}) => {
+  /* Data Hooks */
+
   const {getMapSymbology} = useMapSymbology();
   const {getYAxis, getYAxisTickMarks} = useYAxis(spotsDisplayed);
+
+  /* View */
 
   return (
     <>

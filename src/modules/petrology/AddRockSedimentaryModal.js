@@ -1,22 +1,20 @@
 import React from 'react';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import {Form, FormSlider, MainButtons} from '../form';
 
+const {
+  firstKeys, siliciclasticKeys, dunhamKeys, evaporiteKeys, organicCoalKeys,
+  volcaniclasticKeys, phosphoriteKeys, weatheringKey, thirdKeys, lastKeys,
+} = ADD_ROCK_KEYS.sedimentary;
+
 const AddRockSedimentaryModal = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['primary_lithology'];
-  const siliciclasticKeys = ['siliciclastic_type'];
-  const dunhamKeys = ['dunham_classification', 'grain_type'];
-  const evaporiteKeys = ['evaporite_type'];
-  const organicCoalKeys = ['organic_coal_lithologies'];
-  const volcaniclasticKeys = ['volcaniclastic_type'];
-  const phosphoriteKeys = ['phosphorite_type'];
-  const weatheringKey = 'relative_resistance_weather';
-  const thirdKeys = ['lithification', 'color_appearance'];
-  const lastKeys = ['fresh_color', 'weathered_color', 'notes'];
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* View */
 
   return (
     <>

@@ -3,6 +3,7 @@ import {FlatList, Platform, ScrollView, TouchableOpacity, View} from 'react-nati
 
 import {useSelector} from 'react-redux';
 
+import {REPORT_ITEM_WIDTH} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -15,20 +16,28 @@ import {imageStyles} from '../images';
 import {TagsListItem, TagsModal} from '../tags';
 
 const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
-
-  const {width} = useWindowSize();
-  const itemWidth = 300;
-  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
-
-  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+  /* Data Hooks */
 
   const tags = useSelector(state => state.project.project?.tags) || [];
 
-  const addAssociatedSpots = () => setIsTagsListModalVisible(true);
+  const {width} = useWindowSize();
+
+  /* Local State */
+
+  const [isTagsListModalVisible, setIsTagsListModalVisible] = useState(false);
+
+  /* Derived Variables */
 
   const checkedTags = Object.values(tags).reduce((acc, tag) => {
     return checkedTagsIds.find(id => id.toString() === tag.id.toString()) ? [...acc, tag] : acc;
   }, []);
+  const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
+
+  /* Logic Helpers */
+
+  const addAssociatedSpots = () => setIsTagsListModalVisible(true);
+
+  /* View */
 
   return (
     <>
@@ -52,7 +61,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
           {checkedTags.map(t => (
             <TouchableOpacity
               key={t.id.toString()}
-              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : itemWidth}}
+              style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : REPORT_ITEM_WIDTH}}
             >
               <TagsListItem isChevronVisible onPress={handleTagPressed} tag={t}/>
             </TouchableOpacity>
@@ -66,6 +75,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
           closeModal={() => setIsTagsListModalVisible(false)}
           headerTitle={'Add/Remove Tags'}
           isVisible={isTagsListModalVisible}
+          overlayStyleOverride={{maxHeight: '60%', flex: 1}}
           showActionButton={false}
           showCancelButton={false}
           showCloseButton

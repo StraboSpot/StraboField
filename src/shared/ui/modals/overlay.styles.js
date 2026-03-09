@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backdropStyles: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   buttonContainer: {
     alignItems: 'center',
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 5,
-    maxHeight: height * 0.80,
+    height: height * 0.80,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: 300,
@@ -88,8 +88,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   overlayMapMenuPosition: {
-    bottom: 100,
-    flex: 1,
     left: 75,
     position: 'absolute',
   },
@@ -103,7 +101,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tagColorPickerColorItem: {
-    borderColor: 'white',
     borderWidth: 1,
     height: 25,
     width: 25,

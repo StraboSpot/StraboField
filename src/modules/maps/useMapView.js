@@ -6,19 +6,16 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  GEO_LAT_LNG_PROJECTION,
-  LATITUDE,
-  LONGITUDE,
-  PIXEL_PROJECTION,
-  STRAT_SECTION_CENTER,
-  ZOOM,
-  ZOOM_STRAT_SECTION,
+  GEO_LAT_LNG_PROJECTION, LATITUDE, LONGITUDE, PIXEL_PROJECTION, STRAT_SECTION_CENTER, ZOOM, ZOOM_STRAT_SECTION,
 } from './maps.constants';
+import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from './maps.helpers';
 import {setCenter, setZoom} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import {isEmpty, isEqual} from '../../shared/Helpers';
 
 const useMapView = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const center = useSelector(state => state.map.center);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -26,15 +23,18 @@ const useMapView = () => {
   const stratSection = useSelector(state => state.map.stratSection);
   const zoom = useSelector(state => state.map.zoom);
 
-  const toast = useToast();
   const {convertImagePixelsToLatLong, getBoundsPadded} = useMapCoords();
+  const toast = useToast();
+
+  /* Exported Functions */
 
   // Evaluate and return appropriate center coordinates
   const getCenterCoordinates = () => {
     // console.log('Getting initial map center...', center);
     if (currentImageBasemap || stratSection) {
       if ((selectedSpot?.properties?.image_basemap && selectedSpot?.properties.image_basemap === currentImageBasemap?.id)
-        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id)) {
+        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id)
+        && selectedSpot.geometry?.coordinates) {
         return proj4(PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION, turf.centroid(selectedSpot).geometry.coordinates);
       }
       if (currentImageBasemap && currentImageBasemap.width && currentImageBasemap.height) {
@@ -68,16 +68,6 @@ const useMapView = () => {
     else if (stratSection) return ZOOM_STRAT_SECTION;
     return zoom;
   };
-
-  // If feature is mapped on geographical map, not an image basemap or strat section
-  const isOnGeoMap = (feature) => {
-    if (isEmpty(feature)) return false;
-    return !feature.properties.image_basemap && !feature.properties.strat_section_id;
-  };
-
-  const isOnImageBasemap = feature => feature.properties?.image_basemap;
-
-  const isOnStratSection = feature => feature.properties?.strat_section_id;
 
   const setMapView = (newCenter, newZoom) => {
     if (!isEqual(center, newCenter)) dispatch(setCenter(newCenter));
@@ -126,12 +116,12 @@ const useMapView = () => {
   };
 
   return {
-    getCenterCoordinates: getCenterCoordinates,
-    getInitialViewState: getInitialViewState,
-    getZoomLevel: getZoomLevel,
-    isOnGeoMap: isOnGeoMap,
-    setMapView: setMapView,
-    zoomToSpotsNow: zoomToSpotsNow,
+    getCenterCoordinates,
+    getInitialViewState,
+    getZoomLevel,
+    isOnGeoMap,
+    setMapView,
+    zoomToSpotsNow,
   };
 };
 

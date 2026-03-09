@@ -117,7 +117,7 @@ const MapContainer = forwardRef(({
   const {getCurrentLocation} = useMapLocation();
   const {setMapView, zoomToSpotsNow} = useMapView();
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
-  const {getTileCountFromHost} = useServerRequests();
+  const {getTilesFromHost} = useServerRequests();
 
   useEffect(() => {
     // console.log('UE MapContainer [featuresSelected, featuresUnselected]');
@@ -139,22 +139,20 @@ const MapContainer = forwardRef(({
 
   useEffect(() => {
     // console.log('UE MapContainer [userEmail, isOnline]');
-    if (isOnline && !currentBasemap) setBasemap().catch(console.error);
-    else if (isOnline && currentBasemap) {
-      // console.log('ITS IN THIS ONE!!!! -isOnline && currentBasemap');
-      setBasemap(currentBasemap.id).catch((error) => {
-        console.log('Error Setting Basemap', error);
-        // Sentry.captureMessage('Something went wrong', error);
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Error setting custom basemap.\n Setting basemap Mapbox Topo.' + error));
-        dispatch(setIsErrorMessagesModalVisible(true));
-        // setBasemap();
-        // Sentry.captureException(error);
-      });
+    if (isOnline) {
+      if (!currentBasemap) setBasemap().catch(console.error);
+      // Only re-apply custom basemaps (URL may need rebuilding); standard basemaps are already correct.
+      else if (customBasemap[currentBasemap.id]) {
+        setBasemap(currentBasemap.id).catch((error) => {
+          console.log('Error Setting Basemap', error);
+          dispatch(clearedStatusMessages());
+          dispatch(addedStatusMessage('Error setting custom basemap.\n Setting basemap Mapbox Topo.' + error));
+          dispatch(setIsErrorMessagesModalVisible(true));
+        });
+      }
     }
-    else if (!isOnline && isOnline !== null && currentBasemap && Platform.OS !== 'web') {
-      console.log('ITS IN THIS ONE!!!! -!isOnline && isOnline !== null && currentBasemap');
-      Object.values(customBasemap).map((map) => {
+    else if (isOnline === false && currentBasemap && Platform.OS !== 'web') {
+      Object.values(customBasemap).forEach((map) => {
         if (offlineMaps[map.id]?.id !== map.id) setCustomMapSwitchValue(false, map);
       });
       switchToOfflineMap().catch(error => console.log('Error Setting Offline Basemap', error));
@@ -227,7 +225,7 @@ const MapContainer = forwardRef(({
       console.log('sending this extent to server: ', extentString);
       console.log('sending zoom to server: ', zoomLevel);
       const tileCallURL = getExtentAndZoomCall(extentString, zoomLevel);
-      const tileCountThisScope = await getTileCountFromHost(tileCallURL);
+      const tileCountThisScope = await getTilesFromHost(tileCallURL);
       console.log('got count from server: ', tileCountThisScope);
       return tileCountThisScope;
     }
@@ -289,8 +287,8 @@ const MapContainer = forwardRef(({
         mapRef.current.flyTo({
           animate: true,
           center: center,
+          duration: 2000,
           essential: true,
-          maxDuration: 2000,
           zoom: newZoom,
         });
       }
@@ -419,4 +417,4 @@ const MapContainer = forwardRef(({
   );
 });
 
-export default MapContainer;
+export default React.memo(MapContainer);

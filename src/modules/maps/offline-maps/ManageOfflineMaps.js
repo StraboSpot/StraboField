@@ -4,6 +4,7 @@ import {Animated, FlatList, Platform, Text, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getOfflineMapTitle} from './offlineMaps.helpers';
 import {editedOfflineMap, setOfflineMapVisible} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
@@ -25,12 +26,18 @@ import useMap from '../useMap';
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   console.log('Rendering ManageOfflineMaps...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
-  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
 
-  const animatedPulse = useMemo(() => new Animated.Value(1), []);
+  const {deleteOfflineMap} = useDevice();
+  const {setBasemap} = useMap();
+  const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
+
+  /* Local State */
 
   const [availableMaps, setAvailableMaps] = useState({});
   const [isNameModalVisible, setIsNameModalVisible] = useState(false);
@@ -38,9 +45,11 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const [loading, setLoading] = useState(false);
   const [selectedMap, setSelectedMap] = useState({});
 
-  const {deleteOfflineMap} = useDevice();
-  const {setBasemap} = useMap();
-  const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
+  /* Derived State */
+
+  const animatedPulse = useMemo(() => new Animated.Value(1), []);
+
+  /* Side Effects */
 
   useEffect(() => {
     Animated.sequence([
@@ -63,6 +72,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     console.log('UE ManageOfflineMaps [offlineMaps]', offlineMaps);
     setAvailableMaps(offlineMaps);
   }, [offlineMaps]);
+
+  /* Logic Helpers */
 
   const confirmDeleteMap = async () => {
     alert(
@@ -92,18 +103,41 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     setIsNameModalVisible(true);
   };
 
-  const getTitle = (map) => {
-    let name = map.name;
-    if (!map.name) {
-      return map.id;
-    }
-    else return name;
-  };
-
   const handDownloadMapTilesPressed = () => {
     closeMainMenuPanel();
     dispatch(setIsOfflineMapsModalVisible(true));
   };
+
+  const saveMapEdits = () => {
+    console.log('Map name saved!', selectedMap.name);
+    dispatch(editedOfflineMap(selectedMap));
+    setIsNameModalVisible(false);
+  };
+
+  const toggleOfflineMap = async (item) => {
+    if (item.isOfflineMapVisible) {
+      dispatch(setOfflineMapVisible({mapId: item.id, viewable: false}));
+      await setBasemap(item.id);
+    }
+    else {
+      dispatch(setOfflineMapVisible({mapId: item.id, viewable: true}));
+      const res = await switchToOfflineMap(item.id);
+      if (!isEmpty(res)) {
+        setSelectedMap(res);
+        setIsWarningModalVisible(true);
+      }
+      else zoomToCenterOfflineTile();
+    }
+  };
+
+  const updateMapsFromDevice = async () => {
+    setLoading(true);
+    await getSavedMapsFromDevice();
+    console.log('Got maps from device');
+    setLoading(false);
+  };
+
+  /* Render Functions */
 
   const renderEditMapModal = () => {
     return (
@@ -148,7 +182,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
         <ListItem.Content style={styles.itemContainer}>
           <View style={{marginLeft: 10}}>
             <ListItem.Title style={commonStyles.listItemTitle}>
-              {`${!isEmpty(item) ? truncateText(getTitle(item), 20) : 'No Name'}`}
+              {`${!isEmpty(item) ? truncateText(getOfflineMapTitle(item), 20) : 'No Name'}`}
             </ListItem.Title>
             <ListItem.Subtitle style={styles.itemSubTextStyle}>{item.count} tiles</ListItem.Subtitle>
           </View>
@@ -192,6 +226,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     return (
       <WarningModal
         isVisible={isWarningModalVisible}
+        onConfirmPress={() => setIsWarningModalVisible(false)}
+        showCancelButton={false}
         title={'Map Not Available!'}
       >
         <Text>Selected map is not available for offline use. Switching to first available map: {selectedMap.name}</Text>
@@ -199,34 +235,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     );
   };
 
-  const saveMapEdits = () => {
-    console.log('Map name saved!', selectedMap.name);
-    dispatch(editedOfflineMap(selectedMap));
-    setIsNameModalVisible(false);
-  };
-
-  const toggleOfflineMap = async (item) => {
-    if (item.isOfflineMapVisible) {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: false}));
-      await setBasemap(item.id);
-    }
-    else {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: true}));
-      const res = await switchToOfflineMap(item.id);
-      if (!isEmpty(res)) {
-        setSelectedMap(res);
-        setIsWarningModalVisible(true);
-      }
-      else zoomToCenterOfflineTile();
-    }
-  };
-
-  const updateMapsFromDevice = async () => {
-    setLoading(true);
-    await getSavedMapsFromDevice();
-    console.log('Got maps from device');
-    setLoading(false);
-  };
+  /* View */
 
   return (
     <>

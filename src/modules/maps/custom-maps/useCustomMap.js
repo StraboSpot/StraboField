@@ -19,6 +19,8 @@ import useMapCoords from '../useMapCoords';
 import useMapURL from '../useMapURL';
 
 const useCustomMap = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
@@ -29,6 +31,27 @@ const useCustomMap = () => {
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildTileURL} = useMapURL();
   const {testCustomMapUrl, getMyMapsBbox} = useServerRequests();
+
+  /* Internal Functions */
+
+  const getProviderInfo = (source) => {
+    let providerInfo = {...MAP_PROVIDERS[source]};
+    if (customDatabaseEndpoint.isSelected) {
+      const serverUrl = customDatabaseEndpoint.endpoint;
+      const lastOccur = serverUrl.lastIndexOf('/');
+      providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
+      return providerInfo;
+    }
+    console.log(providerInfo);
+    return providerInfo;
+  };
+
+  const viewCustomMap = (map) => {
+    console.log('Setting current basemap to a custom basemap...');
+    dispatch(setCurrentBasemap(map));
+  };
+
+  /* Exported Functions */
 
   const deleteMap = async (mapId) => {
     console.log('Deleting Map Here');
@@ -58,18 +81,6 @@ const useCustomMap = () => {
     }
     const response = await getMyMapsBbox(STRABO_APIS.MY_MAPS_BBOX + mapId);
     console.log(response);
-  };
-
-  const getProviderInfo = (source) => {
-    let providerInfo = {...MAP_PROVIDERS[source]};
-    if (customDatabaseEndpoint.isSelected) {
-      const serverUrl = customDatabaseEndpoint.endpoint;
-      const lastOccur = serverUrl.lastIndexOf('/');
-      providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
-      return providerInfo;
-    }
-    console.log(providerInfo);
-    return providerInfo;
   };
 
   const saveCustomMap = async (map) => {
@@ -132,18 +143,13 @@ const useCustomMap = () => {
     dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
   };
 
-  const viewCustomMap = (map) => {
-    console.log('Setting current basemap to a custom basemap...');
-    dispatch(setCurrentBasemap(map));
-  };
-
   return {
-    deleteMap: deleteMap,
-    getCustomMapDetails: getCustomMapDetails,
-    getMyMapsBBox: getMyMapsBBox,
-    saveCustomMap: saveCustomMap,
-    setCustomMapSwitchValue: setCustomMapSwitchValue,
-    updateMap: updateMap,
+    deleteMap,
+    getCustomMapDetails,
+    getMyMapsBBox,
+    saveCustomMap,
+    setCustomMapSwitchValue,
+    updateMap,
   };
 };
 

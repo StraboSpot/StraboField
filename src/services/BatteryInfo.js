@@ -5,11 +5,11 @@ import {useBatteryLevel} from 'react-native-device-info';
 
 import uiStyles from '../shared/ui/ui.styles';
 
-const BatteryInfo = () => {
-  const batteryGreen = require('../assets/icons/BatteryGreenButton.png');
-  const batteryRed = require('../assets/icons/BatteryRedButton.png');
-  const batteryYellow = require('../assets/icons/BatteryYellowButton.png');
+const batteryGreen = require('../assets/icons/BatteryGreenButton.png');
+const batteryRed = require('../assets/icons/BatteryRedButton.png');
+const batteryYellow = require('../assets/icons/BatteryYellowButton.png');
 
+const BatteryInfo = () => {
   const batteryLevel = useBatteryLevel();
 
   const batteryPercentage = (batteryLevel * 100).toFixed(0);

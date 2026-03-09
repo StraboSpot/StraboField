@@ -19,8 +19,24 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
 const MicroProjectsList = () => {
+  /* Data Hooks */
+
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
+
+  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
+  const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
+  const {
+    clearStatus,
+    downloadZip,
+    isLoadingWave,
+    percentDone,
+    projectName,
+    showComplete,
+    showLoadingBar,
+  } = useMicroZips();
+
+  /* Local State */
 
   const [doc, setDoc] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
@@ -31,16 +47,7 @@ const MicroProjectsList = () => {
   const [projectsUpdateAvailableArr, setProjectsUpdateAvailableArr] = useState([]);
   const [visible, setVisible] = useState(false);
 
-  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
-  const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
-  const {
-    clearStatus,
-    downloadZip,
-    isLoadingWave,
-    percentDone,
-    showComplete,
-    showLoadingBar,
-  } = useMicroZips();
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE ProjectList');
@@ -51,14 +58,17 @@ const MicroProjectsList = () => {
 
   useEffect(() => {
     console.log('UE ProjectList [showComplete, isConnected, isInternetReachable]');
-    getAllMicroProjects().then(() => console.log('OK got projects'));
+    // deleteFromDevice(APP_DIRECTORIES.MICRO);  // Delete Micro folder (for testing)
+    getAllMicroProjects().then(() => console.log('Got StraboMico Projects'));
   }, [showComplete, isConnected, isInternetReachable]);
+
+  /* Logic Helpers */
 
   const checkForMicroProject = async (item, i) => {
     if (!projectsExistsArr[i] || (isConnected && isInternetReachable && projectsUpdateAvailableArr[i])) {
       console.log('Need to download project');
       try {
-        await downloadZip(item.id);
+        await downloadZip(item.id, item.name);
       }
       catch (err) {
         clearStatus();
@@ -131,6 +141,8 @@ const MicroProjectsList = () => {
     setLoading(false);
   };
 
+  /* Render Functions */
+
   const renderMicroProjectItem = (item, i) => {
     const modifiedTimeAndDate = moment.unix(item.modifiedtimestamp / 1000).format('MMM Do YYYY, h:mm a');
     return (
@@ -182,6 +194,8 @@ const MicroProjectsList = () => {
     }
   };
 
+  /* View */
+
   return (
     <View style={{flex: 1}}>
       <Loading isLoading={loading} style={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}/>
@@ -192,6 +206,7 @@ const MicroProjectsList = () => {
         isError={isError}
         isLoadingWave={isLoadingWave}
         percentDone={percentDone}
+        projectName={projectName}
         showComplete={showComplete}
         showLoadingBar={showLoadingBar}
       />

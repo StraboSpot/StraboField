@@ -1,6 +1,6 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
-import {isErrorWithCode, keepLocalCopy, types} from '@react-native-documents/picker';
+import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -15,23 +15,16 @@ import useSafeDocumentPicker from '../services/useSafeDocumentPicker';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
-  const {checkPermission} = usePermissions();
-  const {handleError, safePick} = useSafeDocumentPicker();
+  /* Data Hooks */
 
   const dispatch = useDispatch();
 
+  const {checkPermission} = usePermissions();
+  const {handleError, safePick} = useSafeDocumentPicker();
   const {getImage, getProfileImageURL} = useServerRequests();
 
-  const copyFiles = async (source, target) => {
-    try {
-      await RNFS.copyFile(source, target);
-    }
-    catch (err) {
-      throw Error(err);
-    }
-  };
+  /* Internal Functions */
 
-  // INTERNAL
   const createAppDirectory = async (directory) => {
     console.log('Creating directory...', directory);
     return RNFS.mkdir(directory)
@@ -43,6 +36,17 @@ const useDevice = () => {
         console.error('Error creating directory', directory, 'ERROR:', err);
         throw Error(err);
       });
+  };
+
+  /* Exported Functions */
+
+  const copyFiles = async (source, target) => {
+    try {
+      await RNFS.copyFile(source, target);
+    }
+    catch (err) {
+      throw Error(err);
+    }
   };
 
   const createProjectDirectories = async () => {
@@ -157,11 +161,6 @@ const useDevice = () => {
     }
   };
 
-  // TODO: Check to consolidate with doesDeviceDirectoryExist();
-  const doesDeviceDirExist = async (dir) => {
-    return await RNFS.exists(dir);
-  };
-
   // TODO: Check to consolidate with doesDeviceDirExist();
   const doesDeviceDirectoryExist = async (directory) => {
     try {
@@ -178,6 +177,11 @@ const useDevice = () => {
     }
   };
 
+  // TODO: Check to consolidate with doesDeviceDirectoryExist();
+  const doesDeviceDirExist = async (dir) => {
+    return await RNFS.exists(dir);
+  };
+
   const doesFileExist = async (path, file = '') => {
     return await RNFS.exists(path + file);
   };
@@ -187,32 +191,10 @@ const useDevice = () => {
     return await RNFS.exists(microPDF);
   };
 
-  const downloadImageAndSave = async (imageId) => {
-    try {
-      const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
-
-      const response = await getImage(imageId);
-      console.log('Image ID', imageId);
-      console.log('Image Response', response);
-
-      if (response.status === 200) {
-        const imageBlob = await response.blob();
-
-        const reader = new FileReader();
-
-        const base64Data = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
-          reader.onerror = error => reject(error);
-          reader.readAsDataURL(imageBlob); // Read the blob as base64
-        });
-        await RNFS.writeFile(path, base64Data, 'base64');
-        console.log('Image saved to:', path);
-        return response.ok;
-      }
-    }
-    catch (err) {
-      console.error('Error downloading or saving file:', err);
-    }
+  const downloadAndSaveMap = async (downloadOptions) => {
+    const res = await RNFS.downloadFile(downloadOptions).promise;
+    if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
+    else throw Error;
   };
 
   const downloadAndSaveProfileImage = async (encodedLogin) => {
@@ -242,10 +224,24 @@ const useDevice = () => {
       });
   };
 
-  const downloadAndSaveMap = async (downloadOptions) => {
-    const res = await RNFS.downloadFile(downloadOptions).promise;
-    if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
-    else throw Error;
+  const downloadImageAndSave = async (imageId) => {
+    try {
+      const path = APP_DIRECTORIES.IMAGES + imageId + '.jpg';
+      const imageBlob = await getImage(imageId);
+      if (!imageBlob) return false;
+      const reader = new FileReader();
+      const base64Data = await new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64 string from result
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(imageBlob); // Read the blob as base64
+      });
+      await RNFS.writeFile(path, base64Data, 'base64');
+      console.log('Image saved to:', path);
+      return true;
+    }
+    catch (err) {
+      console.error('Error downloading or saving file:', err);
+    }
   };
 
   const exportMicroProjectPDF = async (pdfFile) => {
@@ -378,6 +374,19 @@ const useDevice = () => {
     return res;
   };
 
+  const readDeviceJSONFile = async (fileName) => {
+    try {
+      const dataFile = '/data.json';
+      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
+      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
+      console.log(JSON.parse(response));
+      return JSON.parse(response);
+    }
+    catch (err) {
+      console.error('Error reading JSON file', err);
+    }
+  };
+
   const readDirectory = async (directory) => {
     console.log('Reading directory', directory);
     const exists = await RNFS.exists(directory);
@@ -431,19 +440,6 @@ const useDevice = () => {
         const errorMessage = e2.message || 'Unable to read data file.';
         throw Error(errorMessage);
       }
-    }
-  };
-
-  const readDeviceJSONFile = async (fileName) => {
-    try {
-      const dataFile = '/data.json';
-      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      console.log(JSON.parse(response));
-      return JSON.parse(response);
-    }
-    catch (err) {
-      console.error('Error reading JSON file', err);
     }
   };
 
@@ -513,39 +509,39 @@ const useDevice = () => {
   };
 
   return {
-    copyFiles: copyFiles,
-    createProjectDirectories: createProjectDirectories,
-    deleteFromDevice: deleteFromDevice,
-    deleteOfflineMap: deleteOfflineMap,
-    deleteProfileImageFile: deleteProfileImageFile,
-    deleteTempImagesFolder: deleteTempImagesFolder,
-    doesBackupFileExist: doesBackupFileExist,
-    doesDeviceBackupDirExist: doesDeviceBackupDirExist,
-    doesDeviceDirExist: doesDeviceDirExist,
-    doesDeviceDirectoryExist: doesDeviceDirectoryExist,
-    doesFileExist: doesFileExist,
-    doesMicroProjectPDFExist: doesMicroProjectPDFExist,
-    downloadImageAndSave: downloadImageAndSave,
-    downloadAndSaveProfileImage: downloadAndSaveProfileImage,
-    downloadAndSaveMap: downloadAndSaveMap,
-    exportMicroProjectPDF: exportMicroProjectPDF,
-    getDeviceStorageSpaceInfo: getDeviceStorageSpaceInfo,
-    getExternalProjectData: getExternalProjectData,
-    getMicroProjectName: getMicroProjectName,
-    getSavedMicroProjectModifiedTimestamp: getSavedMicroProjectModifiedTimestamp,
-    isPickDocumentCanceled: isPickDocumentCanceled,
-    makeDirectory: makeDirectory,
-    moveFile: moveFile,
-    openURL: openURL,
-    pickCSV: pickCSV,
-    readDirectory: readDirectory,
-    readDirectoryForMapFiles: readDirectoryForMapFiles,
-    readDirectoryForMapTiles: readDirectoryForMapTiles,
-    readFile: readFile,
-    readDeviceJSONFile: readDeviceJSONFile,
-    requestReadDirectoryPermission: requestReadDirectoryPermission,
-    unZipAndCopyImportedData: unZipAndCopyImportedData,
-    writeFileToDevice: writeFileToDevice,
+    copyFiles,
+    createProjectDirectories,
+    deleteFromDevice,
+    deleteOfflineMap,
+    deleteProfileImageFile,
+    deleteTempImagesFolder,
+    doesBackupFileExist,
+    doesDeviceBackupDirExist,
+    doesDeviceDirectoryExist,
+    doesDeviceDirExist,
+    doesFileExist,
+    doesMicroProjectPDFExist,
+    downloadAndSaveMap,
+    downloadAndSaveProfileImage,
+    downloadImageAndSave,
+    exportMicroProjectPDF,
+    getDeviceStorageSpaceInfo,
+    getExternalProjectData,
+    getMicroProjectName,
+    getSavedMicroProjectModifiedTimestamp,
+    isPickDocumentCanceled,
+    makeDirectory,
+    moveFile,
+    openURL,
+    pickCSV,
+    readDeviceJSONFile,
+    readDirectory,
+    readDirectoryForMapFiles,
+    readDirectoryForMapTiles,
+    readFile,
+    requestReadDirectoryPermission,
+    unZipAndCopyImportedData,
+    writeFileToDevice,
   };
 };
 

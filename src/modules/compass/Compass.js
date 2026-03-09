@@ -13,7 +13,7 @@ import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
-import {MODAL_KEYS} from '../page/page.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const Compass = ({
                    closeCompass,
@@ -21,26 +21,22 @@ const Compass = ({
                    setMeasurements,
                    sliderValue,
                  }) => {
-  let magneticDeclination = useRef(0);
-  let matrixRawData = useRef(null);
-  let hasShownCalibrationAlert = useRef(false);
-
-  const CompassEvents = new NativeEventEmitter(CompassModule);
-  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const compassMeasurements = useSelector(state => state.compass.measurements);
+  const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
-  const {
-    cartesianToSpherical,
-    matrixAverage,
-    getStrikeAndDip,
-    getTrendAndPlunge,
-    getUserDeclination,
-  } = useCompass();
+  const {cartesianToSpherical, matrixAverage, getStrikeAndDip, getTrendAndPlunge, getUserDeclination} = useCompass();
   const {playCompassSound} = useCompassSound();
+  const {createNewMeasurement} = useMeasurements();
+
+  /* Local State */
+
+  let hasShownCalibrationAlert = useRef(false);
+  let magneticDeclination = useRef(0);
+  let matrixRawData = useRef(null);
 
   const [compassData, setCompassData] = useState({
     magHeading: 0,
@@ -59,7 +55,14 @@ const Compass = ({
   // const [matrixRotation, setMatrixRotation] = useState({});
   const [showCompassRawDataView, setShowCompassRawDataView] = useState(false);
   // const [userDeclination, setUserDeclination] = useState('');
-  const {createNewMeasurement} = useMeasurements();
+
+  const CompassEvents = new NativeEventEmitter(CompassModule);
+
+  /* Derived Variables */
+
+  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE Compass []');
@@ -86,55 +89,7 @@ const Compass = ({
     }
   }, [compassMeasurements]);
 
-  const addAttributeMeasurement = (data) => {
-    const sliderQuality = sliderValue ? {quality: sliderValue.toString()} : undefined;
-    setAttributeMeasurements({...data, ...sliderQuality});
-    closeCompass();
-  };
-
-  // const trueNorthButton = () => <Text>True North</Text>;
-  // const magNorthButton = () => <Text>Mag North</Text>;
-  // const groupButtons = [{element: trueNorthButton}, {element: magNorthButton}];
-
-  const getDeclination = async () => {
-    try {
-      const declination = await getUserDeclination();
-      console.log('Declination is:', declination);
-      magneticDeclination.current = declination;
-    }
-    catch (err) {
-      console.error('Magnetic Declination not available', err);
-      const errorMessage = err.message || err;
-      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
-        alert('Location Services Required',
-          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
-      }
-    }
-
-  };
-
-  const grabMeasurements = async (isCompassMeasurement) => {
-    try {
-      if (isCompassMeasurement) {
-        if (playCompassSound) playCompassSound();
-        const unixTimestamp = Date.now();
-        const sliderQuality = !sliderValue || sliderValue === 6 ? {} : {quality: sliderValue.toString()};
-        console.log('Compass measurements', compassData, sliderValue);
-        if (setAttributeMeasurements) addAttributeMeasurement(compassData);
-        else if (setMeasurements) {
-          setMeasurements({...compassData, ...sliderQuality, unix_timestamp: unixTimestamp});
-        }
-        else {
-          dispatch(setCompassMeasurements(compassData.quality ? compassData
-            : {...compassData, ...sliderQuality}));
-        }
-      }
-      else dispatch(setCompassMeasurements({...compassData, manual: true}));
-    }
-    catch (e) {
-      console.log('Error grabbing compass measurement', e);
-    }
-  };
+  /* Event Handlers */
 
   const handleAppStateChange = (state) => {
     if (state === 'background' || state === 'inactive') {
@@ -142,6 +97,46 @@ const Compass = ({
       setShowCompassRawDataView(false);
       unsubscribeFromSensors();
     }
+  };
+
+  const handleCalibrationStatus = (data) => {
+    // Reset flag if calibration is now OK
+    if (data.needsCalibration === false) {
+      hasShownCalibrationAlert.current = false;
+      return;
+    }
+
+    // Only show the alert once per compass session - check and set flag atomically
+    if (data.needsCalibration && Platform.OS === 'ios') {
+      if (hasShownCalibrationAlert.current) {
+        return; // Already shown, ignore this event
+      }
+
+      // Set flag IMMEDIATELY before calling alert to prevent race conditions
+      hasShownCalibrationAlert.current = true;
+
+      alert('Compass Calibration Required',
+        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+    }
+  };
+
+  const handleMatrixRotationData = async (matrixData) => {
+    try {
+      // console.log(matrixData);
+      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
+      await getCartesianToSpherical(matrixData);
+    }
+    catch (err) {
+      console.error('Error Getting Matrix', err);
+    }
+  };
+
+  /* Logic Helpers */
+
+  const addAttributeMeasurement = (data) => {
+    const sliderQuality = sliderValue ? {quality: sliderValue.toString()} : undefined;
+    setAttributeMeasurements({...data, ...sliderQuality});
+    closeCompass();
   };
 
   const getCartesianToSpherical = async (matrixRotationData) => {
@@ -190,35 +185,43 @@ const Compass = ({
     });
   };
 
-  const handleMatrixRotationData = async (matrixData) => {
+  const getDeclination = async () => {
     try {
-      // console.log(matrixData);
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
-      await getCartesianToSpherical(matrixData);
+      const declination = await getUserDeclination();
+      console.log('Declination is:', declination);
+      magneticDeclination.current = declination;
     }
     catch (err) {
-      console.error('Error Getting Matrix', err);
+      console.error('Magnetic Declination not available', err);
+      const errorMessage = err.message || err;
+      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
+        alert('Location Services Required',
+          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
+      }
     }
+
   };
 
-  const handleCalibrationStatus = (data) => {
-    // Reset flag if calibration is now OK
-    if (data.needsCalibration === false) {
-      hasShownCalibrationAlert.current = false;
-      return;
-    }
-
-    // Only show the alert once per compass session - check and set flag atomically
-    if (data.needsCalibration && Platform.OS === 'ios') {
-      if (hasShownCalibrationAlert.current) {
-        return; // Already shown, ignore this event
+  const grabMeasurements = async (isCompassMeasurement) => {
+    try {
+      if (isCompassMeasurement) {
+        if (playCompassSound) playCompassSound();
+        const unixTimestamp = Date.now();
+        const sliderQuality = !sliderValue || sliderValue === 6 ? {} : {quality: sliderValue.toString()};
+        console.log('Compass measurements', compassData, sliderValue);
+        if (setAttributeMeasurements) addAttributeMeasurement(compassData);
+        else if (setMeasurements) {
+          setMeasurements({...compassData, ...sliderQuality, unix_timestamp: unixTimestamp});
+        }
+        else {
+          dispatch(setCompassMeasurements(compassData.quality ? compassData
+            : {...compassData, ...sliderQuality}));
+        }
       }
-
-      // Set flag IMMEDIATELY before calling alert to prevent race conditions
-      hasShownCalibrationAlert.current = true;
-
-      alert('Compass Calibration Required',
-        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+      else dispatch(setCompassMeasurements({...compassData, manual: true}));
+    }
+    catch (e) {
+      console.log('Error grabbing compass measurement', e);
     }
   };
 
@@ -266,6 +269,8 @@ const Compass = ({
       console.error('Error unsubscribing to compass events', err);
     }
   };
+
+  /* View */
 
   return (
     <View style={{flex: 1}}>

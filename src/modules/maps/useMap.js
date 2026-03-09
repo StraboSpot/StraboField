@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {BASEMAPS, MAP_MODES} from './maps.constants';
+import {BASEMAPS} from './maps.constants';
+import {isDrawMode} from './maps.helpers';
 import {setCurrentBasemap} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import useMapURL from './useMapURL';
@@ -14,16 +15,20 @@ import {
 } from '../home/home.slice';
 
 const useMap = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
 
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildStyleURL} = useMapURL();
-  const {getTilehostUrl} = useServerRequests();
+  const {getTileBaseUrl} = useServerRequests();
+
+  /* Exported Functions */
 
   const getExtentAndZoomCall = (extentString, zoomLevel) => {
-    let url = getTilehostUrl();
+    let url = getTileBaseUrl();
     url = customDatabaseEndpoint.isSelected ? url + '/zipcount' : STRABO_APIS.TILE_COUNT;
     console.log(url + '?extent=' + extentString + '&zoom=' + zoomLevel);
     return url + '?extent=' + extentString + '&zoom=' + zoomLevel;
@@ -35,8 +40,6 @@ const useMap = () => {
     dispatch(setIsOfflineMapsModalVisible(false));
     dispatch(setIsErrorMessagesModalVisible(true));
   };
-
-  const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 
   const setBasemap = async (mapId) => {
     try {
@@ -75,10 +78,10 @@ const useMap = () => {
   };
 
   return {
-    getExtentAndZoomCall: getExtentAndZoomCall,
-    handleError: handleError,
-    isDrawMode: isDrawMode,
-    setBasemap: setBasemap,
+    getExtentAndZoomCall,
+    handleError,
+    isDrawMode,
+    setBasemap,
   };
 };
 

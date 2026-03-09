@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {USER_CONVENTIONS_FORM_NAME} from './user.constants';
 import userStyles from './user.styles';
 import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/useDownload';
@@ -20,26 +21,40 @@ import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
 
 const UserProfile = () => {
-  const formRef = useRef(null);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
-  const userData = useSelector(state => state.user);
   const spots = useSelector(state => state.spot.spots);
-
-  const [isDownloading, setIsDownloading] = useState(false);
+  const userData = useSelector(state => state.user);
 
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {uploadProfile} = useUpload();
   const toast = useToast();
+  const {uploadProfile} = useUpload();
 
-  const formName = ['general', 'user_conventions'];
+  /* Local State */
+
+  const formRef = useRef(null);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     return () => doCleanup();
   }, []);
+
+  /* Event Handlers */
+
+  const onDownloadUserProfile = async () => {
+    setIsDownloading(true);
+    await downloadUserProfile();
+    setIsDownloading(false);
+  };
+
+  /* Logic Helpers */
 
   const convertStrikeDipDirection = () => {
     if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
@@ -97,11 +112,34 @@ const UserProfile = () => {
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
 
-  const onDownloadUserProfile = async () => {
-    setIsDownloading(true);
-    await downloadUserProfile();
-    setIsDownloading(false);
+  const saveForm = async () => {
+    try {
+      const formCurrent = formRef.current;
+      await formRef.current.submitForm();
+      let newValues = JSON.parse(JSON.stringify(formCurrent.values));
+      if (hasErrors(formCurrent)) throw Error('Error in form.');
+      const {email, encoded_login, isAuthenticated, sesar, ...userValuesToUpdate} = newValues;
+      dispatch(setUserData(userValuesToUpdate));
+      if (isOnline.isInternetReachable) {
+        if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        else {
+          await uploadProfile(userValuesToUpdate);
+          toast.show('Profile uploaded successfully!', {type: 'success'});
+          toast.show('Changes Saved!', {type: 'success'});
+        }
+      }
+      else {
+        toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
+        toast.show('Changes Saved Locally Only!', {type: 'success'});
+      }
+    }
+    catch (err) {
+      console.error('Error uploading profile', err);
+      toast.show('Error Saving Profile', {type: 'danger'});
+    }
   };
+
+  /* Render Functions */
 
   const renderBulkUpdatesSection = () => {
     return (
@@ -121,26 +159,7 @@ const UserProfile = () => {
     );
   };
 
-  const saveForm = async () => {
-    try {
-      const formCurrent = formRef.current;
-      await formRef.current.submitForm();
-      let newValues = JSON.parse(JSON.stringify(formCurrent.values));
-      if (hasErrors(formCurrent)) throw Error('Error in form.');
-      const {email, encoded_login, isAuthenticated, sesar, ...userValuesToUpdate} = newValues;
-      dispatch(setUserData(userValuesToUpdate));
-      if (isOnline.isInternetReachable) {
-        await uploadProfile(userValuesToUpdate);
-        toast.show('Profile uploaded successfully!', {type: 'success'});
-      }
-      else toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
-      toast.show('Changes Saved!', {type: 'success'});
-    }
-    catch (err) {
-      console.error('Error uploading profile', err);
-      toast.show('Error Saving Profile', {type: 'danger'});
-    }
-  };
+  /* View */
 
   return (
     <>
@@ -149,25 +168,28 @@ const UserProfile = () => {
           ListHeaderComponent={
             <>
               <Formik
-                component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
+                component={formProps => Form(
+                  {formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
                 enableReinitialize={true}  // Update values if preferences change while form open
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
+                validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
               {renderBulkUpdatesSection()}
               {isOnline.isInternetReachable ? (
-                <View style={userStyles.saveButtonContainer}>
-                  {Platform.OS !== 'web' && (
-                    <OutlineButton
-                      loading={isDownloading}
-                      onPress={onDownloadUserProfile}
-                      title={'Download User Conventions'}
-                    />
+                <>
+                  {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
+                    <View style={userStyles.saveButtonContainer}>
+                      <OutlineButton
+                        loading={isDownloading}
+                        onPress={onDownloadUserProfile}
+                        title={'Download User Conventions'}
+                      />
+                    </View>
                   )}
-                </View>
+                </>
               ) : (
                 <Text style={commonStyles.noValueText}>
                   Must be online to save changes to user conventions.

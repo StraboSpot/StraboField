@@ -16,14 +16,19 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
 import LogOut from '../user/LogOut';
 
+const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
+  : 'Downloads/StraboSpot2/Backups';
+
 const StraboFieldProjects = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
+
   const {openURL} = useDevice();
 
-  const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
-    : 'Downloads/StraboSpot2/Backups';
+  /* Event Handlers */
 
   const onDeleteLocalCopy = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DELETE_PROJECT}));
@@ -31,10 +36,6 @@ const StraboFieldProjects = () => {
 
   const onExportOtherSavedProject = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.EXPORT_PROJECT}));
-  };
-
-  const onLoadProjectsFromServer = () => {
-    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT}));
   };
 
   const onLoadProjectsFromDevice = () => {
@@ -45,7 +46,13 @@ const StraboFieldProjects = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.IMPORT_PROJECT}));
   };
 
+  const onLoadProjectsFromServer = () => {
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.DOWNLOAD_PROJECT}));
+  };
+
   const onStartNewProject = () => dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.NEW_PROJECT}));
+
+  /* View */
 
   return (
     <>

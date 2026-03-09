@@ -27,25 +27,29 @@ const ImageCard = ({
                      setImageToView,
                      setIsImageModalVisible,
                    }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {downloadImageAndSave} = useDevice();
+  const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
+  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
+
+  /* Local State */
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
+
   const placeholderTitle = `Untitled ${index + 1}`;
 
-  const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
   const [title, setTitle] = useState(
     image.title && typeof image.title === 'string' && image.title.trim() !== ''
       ? image.title.toString()
       : placeholderTitle,
   );
 
-  const [isEditing, setIsEditing] = useState(false);
-
-  const {downloadImageAndSave} = useDevice();
-  const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
-  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
-
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  /* Event Handlers */
 
   const handleEditImageName = (value) => {
     if (value && value !== '') setTitle(value);
@@ -59,6 +63,10 @@ const ImageCard = ({
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     }
     setIsEditing(false);
+  };
+
+  const handleImageFinishedLoading = () => {
+    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
   };
 
   const handleImagePressed = async () => {
@@ -83,9 +91,11 @@ const ImageCard = ({
     }
   };
 
-  const handleImageFinishedLoading = () => {
-    if (imageThumbnailURIs?.[image.id]) setAreImageThumbnailsLoading(i => ({...i, [image.id]: false}));
-  };
+  /* Logic Helpers */
+
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+
+  /* View */
 
   return (
     <Card containerStyle={imageStyles.cardContainer}>

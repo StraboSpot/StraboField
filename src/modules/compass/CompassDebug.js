@@ -4,27 +4,24 @@ import {Platform, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
+import {formatDeg} from './compass.helpers';
 import compassStyles from './compass.styles';
 import {roundToDecimalPlaces} from '../../shared/Helpers';
 import {overlayStyles} from '../home/overlays';
 
 const CompassDebug = ({compassData, matrixRotation}) => {
+  /* Data Hooks */
+
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('Compass Debug MOUNTED');
     return () => console.log('Compass Debug UNMOUNTED');
   }, []);
 
-  const Row = ({children}) => (
-    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
-  );
-
-  const Col = ({children, flex = 1}) => (
-    <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>
-  );
-
-  const formatDeg = val => `${roundToDecimalPlaces(val ?? 0, 1)}°`;
+  /* Render Functions */
 
   const renderCompassData = () => (
     <View style={compassStyles.compassDataGridContainer}>
@@ -49,17 +46,13 @@ const CompassDebug = ({compassData, matrixRotation}) => {
         (rows, key, idx) => {
           if (idx % 3 === 0) rows.push([]);
           rows[rows.length - 1].push(
-            <Col key={key}>
-              <Text>
-                {key.toUpperCase()}:{'\n'}{roundToDecimalPlaces(matrixRotation?.[key], 3)}
-              </Text>
-            </Col>,
+            renderTableCol(key, (
+              <Text>{key.toUpperCase()}:{'\n'}{roundToDecimalPlaces(matrixRotation?.[key], 3)}</Text>
+            )),
           );
           return rows;
         }, [],
-      ).map((cols, i) => (
-        <Row key={`row-${i}`}>{cols}</Row>
-      ))}
+      ).map((cols, i) => renderTableRow(`row-${i}`, cols))}
     </View>
   );
 
@@ -91,6 +84,18 @@ const CompassDebug = ({compassData, matrixRotation}) => {
       </View>
     );
   };
+
+  const renderTableCol = (key, children) => (
+    <View key={key} style={{flex: 1, alignItems: 'center', padding: 0}}>{children}</View>
+  );
+
+  const renderTableRow = (key, children) => (
+    <View key={key} style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>
+      {children}
+    </View>
+  );
+
+  /* View */
 
   return (
     <>

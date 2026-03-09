@@ -3,6 +3,7 @@ import {SectionList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {DEPRECATED_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_SECTIONS_TITLES} from './fabric.constants';
 import FabricListItem from './FabricListItem';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -10,24 +11,23 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicPageDetail from '../page/BasicPageDetail';
+import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [selectedFabric, setSelectedFabric] = useState({});
-  const [isDetailView, setIsDetailView] = useState(false);
+  /* Local State */
 
-  const FABRIC_SECTIONS = {
-    FAULT_ROCK: {title: 'Structural Fabrics', key: 'fault_rock'},
-    IGNEOUS: {title: 'Igneous Fabrics', key: 'igneous_rock'},
-    METAMORPHIC: {title: 'Metamorphic Fabrics', key: 'metamorphic_rock'},
-    DEPRECATED: {title: 'Fabrics (Deprecated Version)', key: null},
-  };
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedFabric, setSelectedFabric] = useState({});
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE FabricsPage []');
@@ -43,6 +43,8 @@ const FabricsPage = ({isReadOnly, page}) => {
     }
   }, [selectedAttributes, spot]);
 
+  /* Logic Helpers */
+
   const addFabric = (type) => {
     dispatch(setModalValues({type: type}));
     dispatch(setModalVisible({modal: page.key}));
@@ -54,43 +56,7 @@ const FabricsPage = ({isReadOnly, page}) => {
     dispatch(setModalVisible({modal: null}));
   };
 
-  const renderFabricSections = () => {
-    let fabricsGrouped = Object.values(FABRIC_SECTIONS).reduce((acc, {title, key}) => {
-      const data = key ? spot?.properties?.fabrics?.filter(fabric => fabric.type === key) || []
-        : spot?.properties?._3d_structures?.filter(struct => struct.type === 'fabric') || [];
-      return [...acc, {title: title, data: data.reverse()}];
-    }, []);
-
-    return (
-      <SectionList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        keyExtractor={(item, index) => item + index}
-        renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
-        renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
-        }}
-        renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
-        sections={fabricsGrouped}
-        stickySectionHeadersEnabled={true}
-      />
-    );
-  };
-
-  const renderSectionHeader = (sectionTitle) => {
-    const sectionKey = Object.values(FABRIC_SECTIONS).reduce((acc, {title, key}) => {
-        return sectionTitle === title ? key : acc;
-      },
-      '');
-    if (sectionKey && !isReadOnly) {
-      return (
-        <SectionDividerWithRightButton
-          dividerText={sectionTitle}
-          onPress={() => addFabric(sectionKey)}
-        />
-      );
-    }
-    else return <SectionDivider dividerText={sectionTitle}/>;
-  };
+  /* Render Functions */
 
   const renderFabricDetail = () => {
     return (
@@ -103,14 +69,51 @@ const FabricsPage = ({isReadOnly, page}) => {
     );
   };
 
+  const renderFabricSections = () => {
+    let fabricsGrouped = Object.entries(FABRIC_SECTIONS_TITLES).reduce((acc, [key, title]) => {
+      const data = key !== 'deprecated'
+        ? spot?.properties?.[FABRICS_GROUP_KEY]?.filter(fabric => fabric.type === key) || []
+        : spot?.properties?._3d_structures?.filter(struct => struct.type === DEPRECATED_FABRIC_TYPE) || [];
+      return [...acc, {title, key, data: data.reverse()}];
+    }, []);
+
+    return (
+      <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        keyExtractor={(item, index) => item + index}
+        renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
+        renderSectionFooter={({section}) => {
+          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+        }}
+        renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
+        sections={fabricsGrouped}
+        stickySectionHeadersEnabled={true}
+      />
+    );
+  };
+
   const renderFabricsMain = () => {
     return (
       <View style={{flex: 1}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         {renderFabricSections()}
       </View>
     );
   };
+
+  const renderSectionHeader = (sectionTitle, sectionKey) => {
+    if (sectionKey !== 'deprecated' && !isReadOnly) {
+      return (
+        <SectionDividerWithRightButton
+          dividerText={sectionTitle}
+          onPress={() => addFabric(sectionKey)}
+        />
+      );
+    }
+    return <SectionDivider dividerText={sectionTitle}/>;
+  };
+
+  /* View */
 
   return isDetailView ? renderFabricDetail() : renderFabricsMain();
 };

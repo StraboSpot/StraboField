@@ -6,7 +6,11 @@ import {Layer, Source} from 'react-map-gl/mapbox';
 import useCoveredIntervalXLines from './useCoveredIntevalsXLines';
 
 const CoveredIntervalsXLines = ({spotsDisplayed}) => {
+  /* Data Hooks */
+
   const {getIntervalsWithX} = useCoveredIntervalXLines(spotsDisplayed);
+
+  /* View */
 
   return (
     <Source

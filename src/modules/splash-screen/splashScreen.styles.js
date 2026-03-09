@@ -10,6 +10,14 @@ const splashScreenStyles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
   },
+  buildNumberText: {
+    bottom: 20,
+    color: 'white',
+    fontSize: 14,
+    position: 'absolute',
+    right: 20,
+    ...shadow,
+  },
   contentContainer: {
     alignItems: 'center',
     justifyContent: 'center',

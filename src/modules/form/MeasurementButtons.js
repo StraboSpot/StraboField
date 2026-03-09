@@ -17,11 +17,17 @@ const MeasurementButtons = ({
                               setMeasurementsGroupField,
                               survey,
                             }) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
 
   const {getGroupFields} = useForm();
 
+  /* Derived Variables */
+
   const groupFields = Object.keys(measurementsKeys).map(k => survey.find(f => f.name === k));
+
+  /* Logic Helpers */
 
   const addMeasurement = (groupField) => {
     setIsMeasurementsModalVisible(true);
@@ -36,19 +42,20 @@ const MeasurementButtons = ({
     return !relevantFields.some(f => !isEmpty(formProps.values[f.name]));
   };
 
-  const ButtonText = ({field}) => {
+  /* Render Functions */
+
+  const renderButtonText = (field) => {
     const getValueText = () => {
-      const values = formProps.values;
       const groupKeys = measurementsKeys[field.name];
       if (groupKeys.strike) {
-        const strike = values[groupKeys.strike];
-        const dip = values[groupKeys.dip];
+        const strike = formProps.values[groupKeys.strike];
+        const dip = formProps.values[groupKeys.dip];
         return (isEmpty(strike) ? '?' : padWithLeadingZeros(strike, 3)) + '/'
           + (isEmpty(dip) ? '?' : padWithLeadingZeros(dip, 2));
       }
       else {
-        const plunge = values[groupKeys.plunge];
-        const trend = values[groupKeys.trend];
+        const plunge = formProps.values[groupKeys.plunge];
+        const trend = formProps.values[groupKeys.trend];
         return (isEmpty(plunge) ? '?' : padWithLeadingZeros(plunge, 2)) + '\u2192'
           + (isEmpty(trend) ? '?' : padWithLeadingZeros(trend, 3));
       }
@@ -75,20 +82,22 @@ const MeasurementButtons = ({
     );
   };
 
+  /* View */
+
   return (
     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', paddingLeft: 10, paddingRight: 10}}>
       {groupFields.map((field) => {
         return (
           <Button
             buttonStyle={[formStyles.formButtonSmall, {
-              height: 60,
               backgroundColor: isGroupEmpty(field) ? SECONDARY_BACKGROUND_COLOR : PRIMARY_ACCENT_COLOR,
+              height: 60,
               padding: 1,
             }]}
             containerStyle={{flex: 1, padding: 2}}
             key={field.name}
             onPress={() => addMeasurement(field)}
-            title={<ButtonText field={field}/>}
+            title={renderButtonText(field)}
             type={'outline'}
           />
         );

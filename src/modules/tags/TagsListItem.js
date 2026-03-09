@@ -4,6 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
+import TagColorIcon from './TagColorIcon';
 import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/Helpers';
@@ -20,17 +21,26 @@ const TagsListItem = ({
                         openMainMenuPanel,
                         tag,
                       }) => {
-  const {getTagLabel} = useTags();
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const isMainMenuPanelVisible = useSelector(state => state.home.isMainMenuPanelVisible);
+
+  const {getTagLabel} = useTags();
+
+  /* Logic Helpers */
 
   const openTag = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
     dispatch(setSelectedTag(tag));
-    if (tag.type === TAG_TYPES.GEOLOGIC_UNIT) dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
+    if (tag.type === TAG_TYPES.GEOLOGIC_UNIT) {
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
+    }
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
     if (!isMainMenuPanelVisible) openMainMenuPanel();
   };
+
+  /* View */
 
   return (
     <ListItem
@@ -39,6 +49,7 @@ const TagsListItem = ({
       onPress={() => onPress ? onPress(tag) : isChevronVisible ? openTag() : onChecked()}
       pad={5}
     >
+      <TagColorIcon color={tag.color}/>
       <ListItem.Content>
         <ListItem.Title style={commonStyles.listItemTitle}>{tag.name}</ListItem.Title>
       </ListItem.Content>

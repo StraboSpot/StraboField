@@ -17,14 +17,14 @@ import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 
 const HomeContainer = ({navigation, route}) => {
   console.log('Rendering HomeContainer...');
+
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
-  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-
-  const mapComponentRef = useRef(null);
-
-  const projectLoadComplete = useSelector(state => state.home.isProjectLoadComplete);
   const {email, name} = useSelector(state => state.user);
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const projectLoadComplete = useSelector(state => state.home.isProjectLoadComplete);
 
   const {createProjectDirectories} = useDevice();
   const {
@@ -38,7 +38,11 @@ const HomeContainer = ({navigation, route}) => {
     openMainMenuPanel,
     openNotebookPanel,
   } = useHomeAnimations({navigation});
+
+  const mapComponentRef = useRef(null);
   const {openSpotInNotebook, zoomToCurrentLocation} = useHomeContainer({mapComponentRef, openNotebookPanel});
+
+  /* Side Effects */
 
   useEffect(() => {
     if (isEmpty(currentProjectId) || Platform.OS === 'web') dispatch(setIsProjectLoadSelectionModalVisible(true));
@@ -71,6 +75,8 @@ const HomeContainer = ({navigation, route}) => {
       // toggles off whenever new project is loaded successfully to trigger the same for next project load.
     }
   }, [projectLoadComplete]);
+
+  /* View */
 
   return (
     <Animated.View style={[homeStyles.container, animateTextInputs]}>

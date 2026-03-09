@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import signInStyles from './signIn.styles';
 import useSignIn from './useSignIn';
@@ -12,15 +12,18 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import {ErrorModal} from '../../shared/ui/modals';
-import uiStyles from '../../shared/ui/ui.styles';
 import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
+  /* Data Hooks */
 
-  const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
+  const isOnline = useSelector(state => state.connections.isOnline);
+
+  const {guestSignIn, signIn} = useSignIn();
+
+  /* Local State */
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -28,7 +31,14 @@ const SignIn = ({navigation}) => {
   const [password, setPassword] = useState(__DEV__ ? PASSWORD_TEST : '');
   const [username, setUsername] = useState(__DEV__ ? USERNAME_TEST : '');
 
-  const {guestSignIn, signIn} = useSignIn();
+  /* Event Handlers */
+
+  const handleGuestSignIn = async () => {
+    await guestSignIn();
+    console.log('GUEST SIGN IN');
+  };
+
+  const handleRegister = () => navigation.navigate('SignUp');
 
   const handleSignIn = async () => {
     try {
@@ -41,12 +51,7 @@ const SignIn = ({navigation}) => {
     }
   };
 
-  const handleGuestSignIn = async () => {
-    await guestSignIn();
-    console.log('GUEST SIGN IN');
-  };
-
-  const handleRegister = () => navigation.navigate('SignUp');
+  /* Render Functions */
 
   const renderButtons = () => {
     return (
@@ -82,6 +87,7 @@ const SignIn = ({navigation}) => {
   const renderErrorModal = () => {
     return (
       <ErrorModal
+        headerTitle={'Error Signing In!'}
         isVisible={isErrorModalVisible}
         onActionPressed={() => setIsErrorModalVisible(false)}
       >
@@ -89,6 +95,8 @@ const SignIn = ({navigation}) => {
       </ErrorModal>
     );
   };
+
+  /* View */
 
   return (
     <SplashScreen>

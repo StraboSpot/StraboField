@@ -16,11 +16,26 @@ const MacrostratOverlay = ({
                              closeModal,
                              location,
                            }) => {
+  /* Data Hooks */
+
+  const {getMacrostratData} = useServerRequests();
+
+  /* Local State */
 
   const [dataObject, setDataObject] = useState({});
   const [showMore, setShowMore] = useState(false);
 
-  const {getMacrostratData} = useServerRequests();
+  /* Derived State */
+
+  const handleLinkPress = useCallback(async (url) => {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) await Linking.openURL(url);
+    else {
+      alert(`Don't know how to open this URL: ${url}`);
+    }
+  }, []);
+
+  /* Side Effects */
 
   useEffect(() => {
     return () => {
@@ -35,17 +50,11 @@ const MacrostratOverlay = ({
     });
   }, [location]);
 
-  const handleLinkPress = useCallback(async (url) => {
-    const supported = await Linking.canOpenURL(url);
-    if (supported) await Linking.openURL(url);
-    else {
-      alert(`Don't know how to open this URL: ${url}`);
-    }
-  }, []);
+  /* Event Handlers */
 
-  const handleShowMore = () => {
-    setShowMore(!showMore);
-  };
+  const handleShowMore = () => setShowMore(!showMore);
+
+  /* Logic Helpers */
 
   const macrostratDataRequest = async () => {
     try {
@@ -58,6 +67,8 @@ const MacrostratOverlay = ({
       console.error('Error getting Macrostrat Data', err);
     }
   };
+
+  /* Render Functions */
 
   const renderContent = () => {
     const {age, name, rocktype, map_ref} = dataObject;
@@ -150,12 +161,13 @@ const MacrostratOverlay = ({
     );
   };
 
+  /* View */
+
   return (
     <>
       {isVisible && (
-        <Card
-          containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen] : [macrostratOverlayStyles.container]}
-        >
+        <Card containerStyle={SMALL_SCREEN ? [macrostratOverlayStyles.containerPositionSmallScreen]
+          : [macrostratOverlayStyles.container]}>
           <View style={{alignItems: 'flex-end', paddingTop: 5}}>
             <CloseButton onPress={closeModal}/>
           </View>

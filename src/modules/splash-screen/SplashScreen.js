@@ -1,6 +1,7 @@
 import React from 'react';
 import {ImageBackground, Platform, ScrollView, Text, View} from 'react-native';
 
+import DeviceInfo from 'react-native-device-info';
 import {useSelector} from 'react-redux';
 
 import splashScreenStyles from './splashScreen.styles';
@@ -13,12 +14,18 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const SplashScreen = ({children}) => {
+  /* Data Hooks */
+
+  const loading = useSelector(state => state.home.loading.home);
+
   const {width, height} = useWindowSize();
+
+  /* Derived Variables */
 
   const fontSize = getFontSizeByWindowWidth({width, height}, 40);
   const titleStyles = [splashScreenStyles.title, {fontSize}];
 
-  const loading = useSelector(state => state.home.loading.home);
+  /* View */
 
   return (
     <ImageBackground
@@ -55,6 +62,9 @@ const SplashScreen = ({children}) => {
         {/*)}*/}
       </ScrollView>
       <VersionCheckLabel/>
+      <Text style={splashScreenStyles.buildNumberText}>
+        Build: {DeviceInfo.getBuildNumber()}
+      </Text>
       <Loading isLoading={loading} size={60}/>
     </ImageBackground>
   );

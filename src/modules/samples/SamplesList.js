@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import IGSNDisplay from './IGSNDisplay';
+import IGSNDisplay from './igsn/IGSNDisplay';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/Helpers';
@@ -12,9 +12,16 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
 const SamplesList = ({onPress}) => {
+  /* Data Hooks */
+
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const samples = spot?.properties?.samples || [];
+
+  /* Render Functions */
+
   const renderSamplesListItem = (item) => {
     let oriented = item.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
     return (
@@ -43,6 +50,8 @@ const SamplesList = ({onPress}) => {
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

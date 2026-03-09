@@ -3,18 +3,15 @@ import {useToast} from 'react-native-toast-notifications';
 
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 
+const toastOptions = {duration: 1000, placement: 'top'};
+
 const useDeviceOrientation = () => {
-  const {width, height} = useWindowSize();
+  /* Data Hooks */
+
   const toast = useToast();
+  const {width, height} = useWindowSize();
 
-  const toastOptions = {
-    duration: 1000,
-    placement: 'top',
-  };
-
-  const lockToPortrait = () => {
-    RNOrientationDirector.lockTo(Orientation.portrait);
-  };
+  /* Exported Functions */
 
   const lockOrientation = () => {
     const orientation = width > height ? Orientation.landscape : Orientation.portrait;
@@ -24,15 +21,19 @@ const useDeviceOrientation = () => {
       {...toastOptions, type: 'lock'});
   };
 
+  const lockToPortrait = () => {
+    RNOrientationDirector.lockTo(Orientation.portrait);
+  };
+
   const unlockOrientation = () => {
     RNOrientationDirector.unlock();
     toast.show('Screen orientation UNLOCKED', {...toastOptions, type: 'unlock'});
   };
 
   return {
-    lockToPortrait: lockToPortrait,
-    lockOrientation: lockOrientation,
-    unlockOrientation: unlockOrientation,
+    lockOrientation,
+    lockToPortrait,
+    unlockOrientation,
   };
 };
 

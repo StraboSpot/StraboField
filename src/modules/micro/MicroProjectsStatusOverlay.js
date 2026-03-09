@@ -15,15 +15,18 @@ const MicroProjectsStatusOverlay = ({
                                       isError,
                                       isLoadingWave,
                                       percentDone,
+                                      projectName,
                                       showComplete,
                                       showLoadingBar,
                                     }) => {
   return (
     <ModalWrapper
       actionTitle={'OK'}
-      headerTitle={'StraboMicro Project'}
+      disabled={showLoadingBar && !showComplete && !isError}
+      headerTitle={'Downloading StraboMicro Project'}
       isVisible={showLoadingBar || isError || showComplete}
       onActionPressed={closeStatusOverlay}
+      overlayStyleOverride={{height: 'auto'}}
       showCancelButton={false}
     >
       <View>
@@ -54,7 +57,7 @@ const MicroProjectsStatusOverlay = ({
           <View style={overlayStyles.overlayContent}>
             <Text style={overlayStyles.titleText}>Success!</Text>
             <Text style={overlayStyles.contentText}>
-              Your StraboMicro Project has been successfully downloaded to this device.
+              Your StraboMicro Project "{projectName}" has been successfully downloaded to this device.
             </Text>
           </View>
         )}

@@ -5,8 +5,11 @@ import {useSelector} from 'react-redux';
 import {CustomOverlayLayer} from '.';
 
 const CustomOverlayLayers = ({basemap}) => {
+  /* Data Hooks */
 
   const customMaps = useSelector(state => state.map.customMaps);
+
+  /* Derived State */
 
   // Use useMemo to ensure we get a new array reference when isViewable changes
   const visibleOverlays = useMemo(() => {
@@ -18,6 +21,8 @@ const CustomOverlayLayers = ({basemap}) => {
 
     return overlays;
   }, [customMaps]);
+
+  /* View */
 
   return (
     <>

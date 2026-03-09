@@ -4,7 +4,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {setModalVisible} from './home.slice';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {MODAL_KEYS, MODALS, PAGE_KEYS} from '../page/page.constants';
+import {MODALS} from '../page/page.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {clearedSelectedSpots} from '../spots/spots.slice';
 
 const Dialog = ({

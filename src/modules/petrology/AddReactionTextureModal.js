@@ -4,6 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -12,40 +13,44 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
+
+const {firstKeys, basedOnKey, basedOnOtherKey, lastKeys} = ADD_ROCK_KEYS.reaction;
 
 const AddReactionTextureModal = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
-
-  const formRef = useRef(null);
 
   const {getChoices, getSurvey, getRelevantFields} = useForm();
   const {savePetFeature} = usePetrology();
 
-  // Relevant keys for quick-entry modal
-  const firstKeys = ['reactions'];
-  const basedOnKey = 'based_on';
-  const baseOnOtherKey = 'other_based_on';
-  const lastKeys = ['notes'];
+  /* Local State */
+
+  const formRef = useRef(null);
+
+  const [choicesViewKey, setChoicesViewKey] = useState(null);
+
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.REACTIONS;
   const formName = ['pet', petKey];
   const survey = getSurvey(formName);
+  const basedOnOtherField = survey.find(f => f.name === basedOnOtherKey);
   const choices = getChoices(formName);
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
-  const basedOnOtherField = survey.find(f => f.name === baseOnOtherKey);
   const lastKeysFields = lastKeys.map(k => survey.find(f => f.name === k));
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddReactionTextureModal []');
     return () => dispatch(setModalValues({}));
   }, []);
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  /* Event Handlers */
 
   const onMultiChoiceSelected = (fieldKey, choiceName) => {
     const fieldValues = formRef.current?.values[fieldKey] || [];
@@ -61,6 +66,18 @@ const AddReactionTextureModal = () => {
       if (f.name !== fieldKey && formRef.current?.values[f.name]) formRef.current?.setFieldValue(f.name, undefined);
     });
   };
+
+  /* Logic Helpers */
+
+  const closeModal = () => dispatch(setModalVisible({modal: null}));
+
+  const saveReactionTexture = () => {
+    savePetFeature(petKey, spot, formRef.current);
+    formRef.current?.setFieldValue('id', getNewId());
+    if (SMALL_SCREEN) closeModal();
+  };
+
+  /* Render Functions */
 
   const renderAddReactionTextureModalContent = () => {
     return (
@@ -129,11 +146,7 @@ const AddReactionTextureModal = () => {
     return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
 
-  const saveReactionTexture = () => {
-    savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) closeModal();
-  };
+  /* View */
 
   return renderAddReactionTextureModalContent();
 };

@@ -33,3 +33,5 @@ export const DEFAULT_RELATIONSHIP_TYPES = [
   'is included within', 'includes',
   'merges with',
 ];
+
+export const PROJECT_DESCRIPTION_FORM_NAME = ['general', 'project_description'];

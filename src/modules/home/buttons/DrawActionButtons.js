@@ -9,6 +9,7 @@ import useDrawActionButtons from './useDrawActionButtons';
 import useDrawGeometryToggle from './useDrawGeometryToggle';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
+  /* Data Hooks */
 
   const {
     getImageSource,
@@ -18,6 +19,8 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
     handlePolygonPressed,
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
+
+  /* View */
 
   return (
     <View style={homeStyles.drawToolsContainer}>

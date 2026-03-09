@@ -1,17 +1,20 @@
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 
+import {EMPTY_LINE_STRING_FEATURE} from './stratSection.constants';
+import {Y_MULTIPLIER} from '../../sed/sed.constants';
 import {GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION} from '../maps.constants';
 import useMapCoords from '../useMapCoords';
 
 const useYAxis = (spotsDisplayed) => {
+  /* Data Hooks */
+
   const {convertImagePixelsToLatLong} = useMapCoords();
 
-  const lineString = {type: 'Feature', properties: {}, geometry: {type: 'LineString', coordinates: []}};
-  const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+  /* Derived Variables */
+
   const intervals = spotsDisplayed.filter(
     feature => feature?.properties?.surface_feature?.surface_feature_type === 'strat_interval');
-
   // Get max X and max Y for strat intervals
   const maxXY = intervals.reduce((acc, i) => {
     const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
@@ -22,8 +25,10 @@ const useYAxis = (spotsDisplayed) => {
     return [Math.max(acc[0], maxX), Math.max(acc[1], maxY)];
   }, [0, 0]);
 
+  /* Exported Functions */
+
   const getYAxis = () => {
-    const yAxis = JSON.parse(JSON.stringify(lineString));
+    const yAxis = JSON.parse(JSON.stringify(EMPTY_LINE_STRING_FEATURE));
     yAxis.geometry.coordinates = [[0, 0], [0, maxXY[1] + 0.00025]];
     return yAxis;
   };
@@ -34,18 +39,18 @@ const useYAxis = (spotsDisplayed) => {
     const tickMarks = [];
     let y = 0;
     while (y <= yMax) {
-      const tickMark = JSON.parse(JSON.stringify(lineString));
-      tickMark.properties.label = y / yMultiplier;
+      const tickMark = JSON.parse(JSON.stringify(EMPTY_LINE_STRING_FEATURE));
+      tickMark.properties.label = y / Y_MULTIPLIER;
       tickMark.geometry.coordinates = [[0, y], [-5, y]];
       tickMarks.push(convertImagePixelsToLatLong(tickMark));
-      y += yMultiplier;
+      y += Y_MULTIPLIER;
     }
     return turf.featureCollection(tickMarks);
   };
 
   return {
-    getYAxis: getYAxis,
-    getYAxisTickMarks: getYAxisTickMarks,
+    getYAxis,
+    getYAxisTickMarks,
   };
 };
 

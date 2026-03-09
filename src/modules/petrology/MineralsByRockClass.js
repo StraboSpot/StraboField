@@ -1,11 +1,13 @@
 import React from 'react';
 import {FlatList, View} from 'react-native';
 
-import {MINERALS_BY_CLASS} from './petrology.constants';
+import {MINERALS_BY_CLASS} from './minerals.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
 const MineralsByRockClass = ({addMineral}) => {
+  /* View */
+
   return (
     <FlatList ListHeaderComponent={
       <View style={{flex: 1, flexDirection: 'column'}}>

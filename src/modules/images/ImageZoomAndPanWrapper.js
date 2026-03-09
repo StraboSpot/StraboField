@@ -6,38 +6,44 @@ import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-nati
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 
 const ImageZoomAndPanWrapper = ({children}) => {
+  /* Data Hooks */
+
   const {width, height} = useWindowSize();
+
+  /* Local State */
 
   // Zoom and Pan state
   const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+
+  // Animated style for the image
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {translateX: translateX.value},
+        {translateY: translateY.value},
+        {scale: scale.value},
+      ],
+    };
+  });
+
+  const savedScale = useSharedValue(1);
   const savedTranslateX = useSharedValue(0);
   const savedTranslateY = useSharedValue(0);
 
-  // Pinch gesture for zooming with boundary constraints
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
-      const newScale = savedScale.value * e.scale;
-      // Constrain scale between 1x and 5x
-      scale.value = Math.max(1, Math.min(5, newScale));
-    })
+  /* Derived Variables */
+
+  // Double tap to reset zoom
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
     .onEnd(() => {
-      savedScale.value = scale.value;
-
-      // Adjust pan position to stay within bounds after zoom
-      const currentScale = scale.value;
-      const scaledWidth = width * currentScale;
-      const scaledHeight = height * currentScale;
-      const maxTranslateX = Math.max(0, (scaledWidth - width) / 2);
-      const maxTranslateY = Math.max(0, (scaledHeight - height) / 2);
-
-      // Clamp current position to new boundaries
-      translateX.value = Math.max(-maxTranslateX, Math.min(maxTranslateX, translateX.value));
-      translateY.value = Math.max(-maxTranslateY, Math.min(maxTranslateY, translateY.value));
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
+      scale.value = withTiming(1);
+      savedScale.value = 1;
+      translateX.value = withTiming(0);
+      translateY.value = withTiming(0);
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
     });
 
   // Pan gesture for moving the image with boundary constraints
@@ -64,16 +70,28 @@ const ImageZoomAndPanWrapper = ({children}) => {
       savedTranslateY.value = translateY.value;
     });
 
-  // Double tap to reset zoom
-  const doubleTapGesture = Gesture.Tap()
-    .numberOfTaps(2)
+  // Pinch gesture for zooming with boundary constraints
+  const pinchGesture = Gesture.Pinch()
+    .onUpdate((e) => {
+      const newScale = savedScale.value * e.scale;
+      // Constrain scale between 1x and 5x
+      scale.value = Math.max(1, Math.min(5, newScale));
+    })
     .onEnd(() => {
-      scale.value = withTiming(1);
-      savedScale.value = 1;
-      translateX.value = withTiming(0);
-      translateY.value = withTiming(0);
-      savedTranslateX.value = 0;
-      savedTranslateY.value = 0;
+      savedScale.value = scale.value;
+
+      // Adjust pan position to stay within bounds after zoom
+      const currentScale = scale.value;
+      const scaledWidth = width * currentScale;
+      const scaledHeight = height * currentScale;
+      const maxTranslateX = Math.max(0, (scaledWidth - width) / 2);
+      const maxTranslateY = Math.max(0, (scaledHeight - height) / 2);
+
+      // Clamp current position to new boundaries
+      translateX.value = Math.max(-maxTranslateX, Math.min(maxTranslateX, translateX.value));
+      translateY.value = Math.max(-maxTranslateY, Math.min(maxTranslateY, translateY.value));
+      savedTranslateX.value = translateX.value;
+      savedTranslateY.value = translateY.value;
     });
 
   // Combine gestures
@@ -82,16 +100,7 @@ const ImageZoomAndPanWrapper = ({children}) => {
     Gesture.Simultaneous(pinchGesture, panGesture),
   );
 
-  // Animated style for the image
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {translateX: translateX.value},
-        {translateY: translateY.value},
-        {scale: scale.value},
-      ],
-    };
-  });
+  /* View */
 
   return (
     <GestureDetector gesture={composedGesture}>

@@ -1,7 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {MEASUREMENT_KEYS} from './measurements.constants';
+import {
+  LINEAR_FORM_NAME,
+  MANUAL_LABEL_KEY,
+  MANUAL_LINEAR_KEYS,
+  MANUAL_PLANAR_KEYS,
+  MANUAL_QUALITY_KEY,
+  MEASUREMENT_KEYS,
+  PLANAR_FORM_NAME,
+} from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import SliderBar from '../../shared/ui/SliderBar';
 import compassStyles from '../compass/compass.styles';
@@ -9,37 +17,36 @@ import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 
 const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
+  /* Data Hooks */
+
   const {doMeasurementCalculations} = useCompassCalculations();
   const {getSurvey} = useForm();
 
+  /* Local State */
+
   const [sliderValue, setSliderValue] = useState(6);
 
-  const groupKey = 'measurement';
-
-  // Relevant keys for quick-entry modal
-  const labelKey = 'label';
-  const planarKeys = ['strike', 'dip_direction', 'dip'];
-  const linearKeys = ['trend', 'plunge', 'rake'];
-  const qualityKey = 'quality';
+  /* Derived Variables */
 
   // Relevant fields for quick-entry modal
-  const planarFormName = [groupKey, MEASUREMENT_KEYS.PLANAR];
-  const planarSurvey = getSurvey(planarFormName);
-  const planarKeysFields = planarKeys.map(k => planarSurvey.find(f => f.name === k));
-  const linearFormName = [groupKey, MEASUREMENT_KEYS.LINEAR];
-  const linearSurvey = getSurvey(linearFormName);
-  const linearKeysFields = linearKeys.map(k => linearSurvey.find(f => f.name === k));
+  const planarSurvey = getSurvey(PLANAR_FORM_NAME);
+  const labelField = planarSurvey.find(f => f.name === MANUAL_LABEL_KEY);
+  const linearSurvey = getSurvey(LINEAR_FORM_NAME);
+  const linearKeysFields = MANUAL_LINEAR_KEYS.map(k => linearSurvey.find(f => f.name === k));
+  const planarKeysFields = MANUAL_PLANAR_KEYS.map(k => planarSurvey.find(f => f.name === k));
 
-  const labelField = planarSurvey.find(f => f.name === labelKey);
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddManualMeasurements [sliderValue]', sliderValue);
     const sliderValueString = sliderValue <= 5 ? sliderValue.toString() : undefined;
-    formProps.setFieldValue(qualityKey, sliderValueString);
+    formProps.setFieldValue(MANUAL_QUALITY_KEY, sliderValueString);
     if (measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      formProps.setFieldValue('associated_orientation[0].' + qualityKey, sliderValueString);
+      formProps.setFieldValue('associated_orientation[0].' + MANUAL_QUALITY_KEY, sliderValueString);
     }
   }, [sliderValue]);
+
+  /* Event Handlers */
 
   const onMyChange = (name, value) => {
     if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
@@ -52,14 +59,16 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
     else formRefCurrent.setFieldValue(name, value);
   };
 
+  /* View */
+
   return (
     <>
-      <Form {...{...formProps, formName: planarFormName, surveyFragment: [labelField]}}/>
+      <Form {...{...formProps, formName: PLANAR_FORM_NAME, surveyFragment: [labelField]}}/>
       <>
         {(measurementType === MEASUREMENT_KEYS.PLANAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
           <Form {...{
             ...formProps,
-            formName: planarFormName,
+            formName: PLANAR_FORM_NAME,
             surveyFragment: planarKeysFields,
             onMyChange: onMyChange,
           }}/>
@@ -67,7 +76,7 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
         {(measurementType === MEASUREMENT_KEYS.LINEAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
           <Form {...{
             ...formProps,
-            formName: linearFormName,
+            formName: LINEAR_FORM_NAME,
             surveyFragment: linearKeysFields,
             subkey: measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR && 'associated_orientation',
           }}/>

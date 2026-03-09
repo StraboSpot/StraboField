@@ -24,7 +24,19 @@ const SelectInputField = ({
                             single,
                             value,
                           }) => {
+  /* Derived Variables */
+
   const placeholderText = name === 'spot_id_for_pet_copy' ? '-- None --' : `-- Select ${label} --`;
+
+  /* Event Handlers */
+
+  const handleChoicePressed = (item) => {
+    if (single) fieldValueChanged([item.value]);
+    else if (value?.includes(item.value)) fieldValueChanged(value.filter(v => v !== item.value));
+    else fieldValueChanged([...value || [], item.value]);
+  };
+
+  /* Logic Helpers */
 
   const fieldValueChanged = (itemValue) => {
     if (single) {
@@ -44,11 +56,7 @@ const SelectInputField = ({
     return choiceFound ? choiceFound.label : '';
   };
 
-  const handleChoicePressed = (item) => {
-    if (single) fieldValueChanged([item.value]);
-    else if (value?.includes(item.value)) fieldValueChanged(value.filter(v => v !== item.value));
-    else fieldValueChanged([...value || [], item.value]);
-  };
+  /* Render Functions */
 
   const renderChoiceItem = (item, isWrapped) => {
     const radioSelected = <Icon color={PRIMARY_ACCENT_COLOR} name={'radiobox-marked'} type={'material-community'}/>;
@@ -162,6 +170,8 @@ const SelectInputField = ({
       </>
     );
   };
+
+  /* View */
 
   return (
     <>

@@ -14,28 +14,36 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
-import {PAGE_KEYS} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const BeddingPage = ({isReadOnly, page}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState({});
-
   const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
 
+  /* Local State */
+
   const beddingSharedRef = useRef(null);
 
+  const [isDetailView, setIsDetailView] = useState(false);
+  const [selectedAttribute, setSelectedAttribute] = useState({});
+
+  /* Derived Variables */
+
   const bedding = spot.properties?.sed?.bedding || {};
+
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE BeddingPage [selectedAttributes, spot]', selectedAttributes, spot);
@@ -51,19 +59,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     return () => confirmLeavePage();
   }, []);
 
-  const confirmLeavePage = () => {
-    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
-      const formCurrent = beddingSharedRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your interval before continuing?',
-        [
-          {text: 'No', style: 'cancel'},
-          {text: 'Yes', onPress: () => saveBeddingShared(formCurrent)},
-        ],
-        {cancelable: false},
-      );
-    }
-  };
+  /* Logic Helpers */
 
   const addAttribute = async () => {
     if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
@@ -90,6 +86,20 @@ const BeddingPage = ({isReadOnly, page}) => {
     }
   };
 
+  const confirmLeavePage = () => {
+    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
+      const formCurrent = beddingSharedRef.current;
+      alert('Unsaved Changes',
+        'Would you like to save your interval before continuing?',
+        [
+          {text: 'No', style: 'cancel'},
+          {text: 'Yes', onPress: () => saveBeddingShared(formCurrent)},
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
   const editAttribute = (attribute, i) => {
     if (!attribute.id) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
@@ -102,6 +112,14 @@ const BeddingPage = ({isReadOnly, page}) => {
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));
   };
+
+  const saveBeddingShared = async (formCurrent) => {
+    await saveSedFeature(page.key, spot, formCurrent);
+    await formCurrent.resetForm();
+    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  };
+
+  /* Render Functions */
 
   const renderAttributeDetail = () => {
     return (
@@ -119,7 +137,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     const dividerText = 'Beds';
     return (
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <NotebookPageHeader pageTitle={page.label}/>
+        <PageHeader pageTitle={page.label}/>
         {renderBeddingShared()}
         {isReadOnly ? <SectionDivider dividerText={dividerText}/>
           : (
@@ -187,11 +205,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     );
   };
 
-  const saveBeddingShared = async (formCurrent) => {
-    await saveSedFeature(page.key, spot, formCurrent);
-    await formCurrent.resetForm();
-    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-  };
+  /* View */
 
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };

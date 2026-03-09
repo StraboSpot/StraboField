@@ -11,24 +11,38 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
-import {PAGE_KEYS, PRIMARY_PAGES} from '../page/page.constants';
+import {PRIMARY_PAGES} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
 import ImportExportTags from './ImportExportTags';
 
-const Tags = ({isGeologicUnits, updateSpotsInMapExtent}) => {
+const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
+
+  /* Data Hooks */
 
   const dispatch = useDispatch();
   const tags = useSelector(state => state.project.project?.tags) || [];
+
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
+
+  /* Local State */
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  /* Derived Variables */
+
   const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+
+  /* Event Handlers */
+
+  const handleContinuousTaggingSwitched = value => dispatch(setUseContinuousTagging(value));
+
+  /* Logic Helpers */
 
   const addTag = () => {
     const newTag = isGeologicUnits ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: TAG_TYPES.CONCEPT};
@@ -43,18 +57,10 @@ const Tags = ({isGeologicUnits, updateSpotsInMapExtent}) => {
     return ['Categorized', 'Map Extent'];
   };
 
-  const handleContinuousTaggingSwitched = value => dispatch(setUseContinuousTagging(value));
+  /* View */
 
   return (
     <View style={{flex: 1}}>
-      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
-      <ImportExportTags isGeologicUnits={isGeologicUnits}/>
-      <ListItem containerStyle={commonStyles.listItem}>
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
-        </ListItem.Content>
-        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
-      </ListItem>
       {!isEmpty(tags) && (
         <>
           <ButtonGroup
@@ -74,7 +80,15 @@ const Tags = ({isGeologicUnits, updateSpotsInMapExtent}) => {
           )}
         </>
       )}
-      <TagsList selectedIndex={selectedIndex}/>
+      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
+      <ImportExportTags isGeologicUnits={isGeologicUnits}/>
+      <ListItem containerStyle={commonStyles.listItem}>
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
+        </ListItem.Content>
+        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
+      </ListItem>
+      <TagsList selectedIndex={selectedIndex} type={type}/>
 
       {/* Modal */}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}

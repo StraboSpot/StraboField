@@ -1,22 +1,22 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Platform, StatusBar} from 'react-native';
 
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
-import KeyboardManager from 'react-native-keyboard-manager';
+import * as Sentry from '@sentry/react-native';
+import {KeyboardProvider} from 'react-native-keyboard-controller';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
 import Routes from './src/routes/Routes';
 import ConnectionStatus from './src/services/ConnectionStatus';
+import {RELEASE_NAME} from './src/shared/app.constants';
 import {SMALL_SCREEN} from './src/shared/styles.constants';
 import ToastWrapper from './src/shared/ui/ToastWrapper';
-import {persistor, store} from './src/store/ConfigureStore';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
-import config from './src/utils/config';
-import * as Sentry from '@sentry/react-native';
-import {RELEASE_NAME} from './src/shared/app.constants';
 import uiStyles from './src/shared/ui/ui.styles';
+import {persistor, store} from './src/store/ConfigureStore';
+import config from './src/utils/config';
 
 let didInit = false;
 
@@ -24,20 +24,22 @@ if (Platform.OS !== 'web') {
   Sentry.init({
     dsn: config.get('Error_reporting_DSN'),
     enableNative: Platform.OS !== 'web',
-    enableAppHangTracking: true,
+    enableAppHangTracking: false,
     debug: false,
     release: RELEASE_NAME,
     dist: RELEASE_NAME,
     autoSessionTracking: true,
     environment: __DEV__ ? 'development' : 'production',
-    tracesSampleRate: 0.30,
-    _experiments: {
-      profilesSampleRate: 0.50,
-      replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
-      replaysOnErrorSampleRate: 1.0,
-    },
+    tracesSampleRate: 0,
+    enableAutoPerformanceTracing: false,
+    enableAutoSessionTracking: false,
+    // _experiments: {
+    //   profilesSampleRate: 0.50,
+    //   replaysSessionSampleRate: __DEV__ ? 1.0 : 0.5,
+    //   replaysOnErrorSampleRate: 1.0,
+    // },
     integrations: [
-      Sentry.mobileReplayIntegration(),
+      //   Sentry.mobileReplayIntegration(),
     ],
   });
 }
@@ -69,16 +71,6 @@ const linking = Platform.OS !== 'web' && {
 
 
 const App = () => {
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      KeyboardManager.setEnable(true);
-      KeyboardManager.setEnableAutoToolbar(true);
-      KeyboardManager.setToolbarDoneBarButtonItemText('Done');
-      KeyboardManager.setToolbarPreviousNextButtonEnable(true);
-      KeyboardManager.setShouldResignOnTouchOutside(true);
-      KeyboardManager.setKeyboardDistanceFromTextField(10);
-    }
-  }, []);
 
   if (Platform.OS === 'web' && !didInit) {
     console.count('Rendering App...');
@@ -96,9 +88,11 @@ const App = () => {
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
-              <NavigationContainer linking={linking}>
-                <Routes/>
-              </NavigationContainer>
+              <KeyboardProvider>
+                <NavigationContainer linking={linking}>
+                  <Routes/>
+                </NavigationContainer>
+              </KeyboardProvider>
               {/*</Sentry.TouchEventBoundary>*/}
             </PersistGate>
           </ToastWrapper>

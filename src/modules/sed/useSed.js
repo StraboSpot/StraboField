@@ -2,32 +2,39 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
+  BEDDING_FIELDS,
   INTERPRETATIONS_SUBPAGES,
+  INTERVAL_FIELDS,
+  LITHOLOGIES_FIELDS,
   LITHOLOGY_SUBPAGES,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
   STRUCTURE_SUBPAGES,
+  Y_MULTIPLIER,
 } from './sed.constants';
+import {onSedFormChange} from './sed.helpers';
 import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';
 import useStratSectionCalculations from '../maps/strat-section/useStratSectionCalculations';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 
 const useSed = () => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getLabel, getLabels, showErrors} = useForm();
-  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
   const {validateSedData} = useSedValidation();
+  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
   const {moveSpotsUpOrDownByPixels, recalculateIntervalGeometry} = useStratSectionCalculations();
 
-  const yMultiplier = 20;  // 1 m interval thickness = 20 pixels
+  /* Internal Functions */
 
   // Check for any changes we need to make to the Sed fields or geometry when a Spot that is a strat interval
   // has fields that are changed
@@ -48,7 +55,7 @@ const useSed = () => {
             if (!spot.properties.sed.interval) spot.properties.sed.interval = {};
             // console.log('Updating interval thickness ...');
             extent = turf.bbox(spot);
-            let thickness = (extent[3] - extent[1]) / yMultiplier; // 20 is yMultiplier
+            let thickness = (extent[3] - extent[1]) / Y_MULTIPLIER; // 20 is Y_MULTIPLIER
             thickness = roundToDecimalPlaces(thickness, 2);
             spot.properties.sed.interval.interval_thickness = thickness;
             const spotWithThisStratSection = getSpotWithThisStratSection(spot.properties.strat_section_id);
@@ -65,8 +72,7 @@ const useSed = () => {
         // Check for changes to certain fields which would require recalculation of the interval geometry
       // If current page is sed-interval
       else if (pageKey === PAGE_KEYS.INTERVAL) {
-        const intervalFields = ['character', 'interval_thickness', 'thickness_units'];
-        needToRecalculateIntervalGeometry = intervalFields.find((field) => {
+        needToRecalculateIntervalGeometry = INTERVAL_FIELDS.find((field) => {
           if (field === 'character') {
             if ((sedData[field] && !sedDataSaved[field]) || (!sedData[field] && !sedDataSaved[field])) return true;
             return ((sedData[field] === 'bed' || sedData[field] === 'package_succe')
@@ -85,9 +91,7 @@ const useSed = () => {
 
       // If current page is sed-lithologies
       else if (pageKey === PAGE_KEYS.LITHOLOGIES) {
-        const lithologiesFields = ['primary_lithology', 'siliciclastic_type', 'mud_silt_grain_size', 'sand_grain_size',
-          'congl_grain_size', 'breccia_grain_size', 'dunham_classification', 'relative_resistance_weather'];
-        needToRecalculateIntervalGeometry = lithologiesFields.find((field) => {
+        needToRecalculateIntervalGeometry = LITHOLOGIES_FIELDS.find((field) => {
           if ((sedData.lithologies && !sedDataSaved.lithologies)
             || (!sedData.lithologies && sedDataSaved.lithologies)) return true;
           if (sedData.lithologies && sedDataSaved.lithologies
@@ -107,10 +111,7 @@ const useSed = () => {
       }
       // If current page is sed-bedding
       else if (pageKey === PAGE_KEYS.BEDDING) {
-        const beddingFields = ['interbed_proportion_change', 'interbed_proportion', 'lithology_at_bottom_contact',
-          'lithology_at_top_contact', 'thickness_of_individual_beds', 'avg_thickness', 'max_thickness',
-          'min_thickness'];
-        needToRecalculateIntervalGeometry = beddingFields.find((field) => {
+        needToRecalculateIntervalGeometry = BEDDING_FIELDS.find((field) => {
           if ((sedData.bedding && !sedDataSaved.bedding) || (!sedData.bedding && sedDataSaved.bedding)) return true;
           if (sedData.bedding && sedDataSaved.bedding && ((sedData.bedding[field] && !sedDataSaved.bedding[field])
             || (!sedData.bedding[field] && sedDataSaved.bedding[field]))) return true;
@@ -170,6 +171,15 @@ const useSed = () => {
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
 
+  const deleteStratSection = (spot) => {
+    let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
+    delete editedSedData.strat_section;
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+  };
+
+  /* Exported Functions */
+
   const deleteSedFeature = (key, spot, selectedFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
@@ -194,13 +204,6 @@ const useSed = () => {
       editedSedData[pageKey] = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-    dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-  };
-
-  const deleteStratSection = (spot) => {
-    let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
-    delete editedSedData.strat_section;
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
@@ -242,17 +245,6 @@ const useSed = () => {
       ? getLabel(inStratSection.column_y_axis_units, formName) : 'Unknown Units';
     return (inStratSection.section_well_name || 'Unknown Section/Well Name') + ' - ' + columnProfile
       + ' (' + columnYUnits + ')';
-  };
-
-  const onSedFormChange = (formCurrent, name, value) => {
-    // console.log(name, 'changed to', value);
-    if (name === 'siliciclastic_type' && (value === 'claystone' || value === 'mudstone')) {
-      formCurrent.setFieldValue('mud_silt_grain_size', 'clay');
-    }
-    else if (name === 'siliciclastic_type' && value === 'siltstone') {
-      formCurrent.setFieldValue('mud_silt_grain_size', 'silt');
-    }
-    formCurrent.setFieldValue(name, value);
   };
 
   const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage) => {
@@ -364,16 +356,16 @@ const useSed = () => {
   };
 
   return {
-    deleteSedFeature: deleteSedFeature,
-    getBeddingTitle: getBeddingTitle,
-    getIntervalTitle: getIntervalTitle,
-    getSedRockTitle: getSedRockTitle,
-    getStratSectionTitle: getStratSectionTitle,
-    onSedFormChange: onSedFormChange,
-    saveSedBedFeature: saveSedBedFeature,
-    saveSedFeature: saveSedFeature,
-    saveSedFeatureValuesFromTemplates: saveSedFeatureValuesFromTemplates,
-    toggleStratSection: toggleStratSection,
+    deleteSedFeature,
+    getBeddingTitle,
+    getIntervalTitle,
+    getSedRockTitle,
+    getStratSectionTitle,
+    onSedFormChange,
+    saveSedBedFeature,
+    saveSedFeature,
+    saveSedFeatureValuesFromTemplates,
+    toggleStratSection,
   };
 };
 

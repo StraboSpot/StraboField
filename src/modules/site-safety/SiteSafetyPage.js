@@ -1,8 +1,9 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -12,35 +13,44 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import NotebookPageHeader from '../notebook-panel/NotebookPageHeader';
-import {PAGE_KEYS, SECONDARY_PAGES} from '../page/page.constants';
+import {SECONDARY_PAGES} from '../page/page.constants';
+import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
+const formName = ['general', 'site_safety'];
+
 const SiteSafetyPage = ({isReadOnly}) => {
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
   const toast = useToast();
 
-  const formRef = useRef(null);
-  const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
-  const formName = ['general', 'site_safety'];
+  /* Local State */
 
-  let initialValues = spot.properties?.site_safety || {};
+  const formRef = useRef(null);
+
+  /* Derived Variables */
+
   const coord = spot?.geometry?.type === 'Point' ? turf.getCoord(spot) : undefined;
+  let initialValues = spot.properties?.site_safety || {};
   if (isEmpty(initialValues) && !isEmpty(coord)) {
-    initialValues = {
-      latitude: coord[1].toString(),
-      longitude: coord[0].toString(),
-    };
+    initialValues = {latitude: coord[1].toString(), longitude: coord[0].toString()};
   }
+  const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
+
+  /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE SiteSafetyPage []');
     return () => confirmLeavePage();
   }, []);
+
+  /* Logic Helpers */
 
   const cancelFormAndGo = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
@@ -63,16 +73,6 @@ const SiteSafetyPage = ({isReadOnly}) => {
     }
   };
 
-  const saveFormAndGo = async (currentForm = formRef.current) => {
-    try {
-      await saveForm(currentForm);
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (e) {
-      console.log('Error saving form data to Spot');
-    }
-  };
-
   const saveForm = async (currentForm) => {
     try {
       await currentForm.submitForm();
@@ -88,6 +88,18 @@ const SiteSafetyPage = ({isReadOnly}) => {
       return Promise.reject();
     }
   };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
+    try {
+      await saveForm(currentForm);
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
+    }
+  };
+
+  /* Render Functions */
 
   const renderCancelSaveButtons = () => {
     return (
@@ -111,23 +123,23 @@ const SiteSafetyPage = ({isReadOnly}) => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly, scrollEnabled: false}}/>}
       </Formik>
     );
   };
 
+  /* View */
+
   return (
     <>
-      <NotebookPageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <SectionDivider dividerText={page.label}/>
-            {renderSiteSafetyForm()}
-          </>
-        }
-      />
+      <KeyboardAwareScrollView
+        style={{flex: 1}}
+      >
+        <SectionDivider dividerText={page.label}/>
+        {renderSiteSafetyForm()}
+      </KeyboardAwareScrollView>
     </>
   );
 };

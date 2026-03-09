@@ -10,7 +10,7 @@ import {NotebookPageAvatar} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/page.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 import {useTags} from '../tags';
@@ -22,22 +22,30 @@ const TagDetail = ({
                      openSpot,
                      setIsDetailModalVisible,
                    }) => {
-  const {getSpotById} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+  /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
-  const [refresh, setRefresh] = useState(false);
-
-  const {isSpotInReadOnlyDataset} = useProject();
 
   // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
+
+  const {isSpotInReadOnlyDataset} = useProject();
+  const {getSpotById} = useSpots();
+  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+
+  /* Local State */
+
+  const [refresh, setRefresh] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('UE TagDetail [selectedTag]', selectedTag);
     setRefresh(!refresh); // #TODO : Current hack to render two different FlatListComponents when selectedTag Changes.
                           //         To handle the navigation issue from 0 tagged features to non zero tagged features.
   }, [selectedTag]);
+
+  /* Render Functions */
 
   const renderSpotFeatureItem = (feature) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -98,6 +106,8 @@ const TagDetail = ({
     );
   };
 
+  /* View */
+
   return (
     <FlatList
       ListHeaderComponent={
@@ -110,7 +120,7 @@ const TagDetail = ({
           {selectedTag && renderTagInfo()}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots W/Geologic Unit' : 'Tagged Spots'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}
             onPress={addRemoveSpots}
           />
           <FlatList

@@ -12,17 +12,25 @@ import {isEmpty} from '../../shared/Helpers';
 import {AvatarAccessoryWrapper, AvatarWrapper} from '../../shared/ui/avatars';
 
 const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage, size, tempUserProfileImageURI}) => {
-  const isOnline = useSelector(state => state.connections.isOnline);
-  const imageURI = useSelector(state => state.user?.image);
+  /* Data Hooks */
 
-  const {getInitials} = useUserProfile();
+  const imageURI = useSelector(state => state.user?.image);
+  const isOnline = useSelector(state => state.connections.isOnline);
+
   const {doesFileExist} = useDevice();
+  const {getInitials} = useUserProfile();
+
+  /* Local State */
 
   const [source, setSource] = useState(defaultAvatar);
+
+  /* Side Effects */
 
   useEffect(() => {
     getAvatarSource();
   }, [tempUserProfileImageURI, shouldUpdateImage]);
+
+  /* Logic Helpers */
 
   const getAvatarSource = async () => {
     console.log('tempUserProfileImageURI', tempUserProfileImageURI);
@@ -42,6 +50,8 @@ const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage
     }
   };
 
+  /* View */
+
   return (
     <AvatarWrapper
       containerStyle={{backgroundColor: 'darkgrey'}}
@@ -52,7 +62,7 @@ const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage
       titleStyle={userStyles.avatarPlaceholderTitleStyle}
     >
       {isEditable && isOnline.isInternetReachable && Platform.OS !== 'web' && (
-        <View style={{position: 'relative', right: 15, bottom: 15}}>
+        <View>
           <AvatarAccessoryWrapper
             color={'grey'}
             iconStyle={{color: 'white'}}

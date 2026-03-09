@@ -7,9 +7,13 @@ import {useSelector} from 'react-redux';
 import useMapSymbology from '../symbology/useMapSymbology';
 
 const FeaturesSelectedLayers = ({featuresSelected, isStratStyleLoaded}) => {
+  /* Data Hooks */
+
   const {stratSection} = useSelector(state => state.map);
 
   const {getLinesFilteredByPattern, getMapSymbology} = useMapSymbology();
+
+  /* View */
 
   return (
     <MapboxGL.ShapeSource
