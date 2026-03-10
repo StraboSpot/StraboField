@@ -1,4 +1,5 @@
 import * as turf from '@turf/turf';
+import {useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
 import {getNewUUID, isEmpty} from '../../../shared/Helpers';
@@ -7,6 +8,8 @@ import {useSpots} from '../../spots';
 
 const useStratSection = () => {
   /* Data Hooks */
+
+  const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSurvey} = useForm();
   const {deleteSpot, getSpotWithThisStratSection} = useSpots();
@@ -90,13 +93,22 @@ const useStratSection = () => {
     return geojsonObj;
   };
 
-  // Move intervals and Spots in column down to close gap after target interval deleted
+  // Move intervals and Spots in column to close gap after target interval deleted
   const deleteInterval = (targetInterval) => {
     if (turf.getGeom(targetInterval)) {
+      const isCore = stratSection.section_type === 'core';
       const targetIntervalExtent = turf.bbox(targetInterval);
       const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
-      moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[3],
-        -targetIntervalHeight, targetInterval.properties.id);
+      // For core: move spots below the deleted interval up (less negative) to close the gap.
+      // For normal: move spots above the deleted interval down to close the gap.
+      if (isCore) {
+        moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[1],
+          targetIntervalHeight, targetInterval.properties.id);
+      }
+      else {
+        moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[3],
+          -targetIntervalHeight, targetInterval.properties.id);
+      }
     }
     deleteSpot(targetInterval.properties.id);
   };
