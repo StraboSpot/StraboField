@@ -45,25 +45,27 @@ const useUpload = () => {
 
   const uploadDataset = async (dataset) => {
     try {
-      // dispatch(addedStatusMessage(`\n${dataset.name}\n`));
-      setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
-      let datasetCopy = JSON.parse(JSON.stringify(dataset));
-      delete datasetCopy.spotIds;
-      datasetCopy.images && delete datasetCopy.images;
-      const resJSON = await updateDataset(datasetCopy);
-      if (resJSON.modified_on_server) {
-        console.log('Dataset that was uploaded:', resJSON);
-        // console.log(dataset.name + ': Uploading Dataset Properties...');
-        // dispatch(addedStatusMessage('Uploading properties...'));
-        await addDatasetToProject(project.id, dataset.id);
-        setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
-        // dispatch(removedLastStatusMessage());
-        await uploadSpots(dataset);
-      }
-      else {
-        setUploadStatusMessage(`Dataset ${dataset.name} had no changes.`);
-        datasetsNotUploaded.push(datasetCopy);
-        // console.log(`Did not upload: Dataset ${datasetCopy.name} has not changed or is newer.`);
+      if (!dataset.isReadOnly) {
+        // dispatch(addedStatusMessage(`\n${dataset.name}\n`));
+        setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
+        let datasetCopy = JSON.parse(JSON.stringify(dataset));
+        delete datasetCopy.spotIds;
+        datasetCopy.images && delete datasetCopy.images;
+        const resJSON = await updateDataset(datasetCopy);
+        if (resJSON.modified_on_server && !resJSON.isReadOnly) {
+          console.log('Dataset that was uploaded:', resJSON);
+          // console.log(dataset.name + ': Uploading Dataset Properties...');
+          // dispatch(addedStatusMessage('Uploading properties...'));
+          await addDatasetToProject(project.id, dataset.id);
+          setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
+          // dispatch(removedLastStatusMessage());
+          await uploadSpots(dataset);
+        }
+        else {
+          setUploadStatusMessage(`Dataset ${dataset.name} had no changes.`);
+          datasetsNotUploaded.push(datasetCopy);
+          // console.log(`Did not upload: Dataset ${datasetCopy.name} has not changed or is newer.`);
+        }
       }
     }
     catch (err) {
