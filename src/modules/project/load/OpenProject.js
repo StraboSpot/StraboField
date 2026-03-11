@@ -47,12 +47,12 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     closeConfirmOverwriteModal();
     try {
       console.log('Selected Project:', project);
+      if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(setIsStatusMessagesModalVisible(true));
       const res = await loadProjectFromDevice(project.fileName);
       dispatch(setStatusMessageModalTitle(res.project.description.project_name));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
       dispatch(setSidePanelVisible({bool: false}));
       console.log('Done loading project', res);
       closeMainMenuPanel();
