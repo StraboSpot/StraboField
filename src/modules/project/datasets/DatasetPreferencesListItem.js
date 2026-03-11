@@ -111,19 +111,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
     );
   };
 
-  const renderReadOnlyDatasetButton = () => {
-    return (
-      <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
-        <ListItem.Content
-          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-        >
-          <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Read Only?'}</Text>
-        </ListItem.Content>
-        <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
-      </ListItem>
-    );
-  };
-
   const renderStateIcon = () => {
     return (
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -171,7 +158,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
         <View style={{flex: 1, flexDirection: 'column'}}>
           {renderStateIcon()}
           {renderIsActiveDatasetSwitch()}
-          {renderReadOnlyDatasetButton()}
         </View>
       </ListItem>
     </View>

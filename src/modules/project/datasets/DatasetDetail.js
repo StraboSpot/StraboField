@@ -268,7 +268,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
                 <Text style={formStyles.fieldLabel}>{'Name'}</Text>
               </View>
               <TextInput
-                editable={!isReadOnly}
+                editable={isReadOnly}
                 onChangeText={text => setDatasetName(text)}
                 style={formStyles.fieldValue}
                 value={datasetName}

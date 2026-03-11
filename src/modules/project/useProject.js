@@ -217,9 +217,10 @@ const useProject = () => {
   };
 
   const isSpotInReadOnlyDataset = (spotId) => {
-    if (isOwner !== false) return false;
     const datasetId = getDatasetIdFromSpotId(spotId);
-    return !datasets[datasetId]?.isReadOnly;
+    if (isReadOnly) return true;
+    else if (datasets[datasetId].isReadOnly !== undefined) return datasets[datasetId]?.isReadOnly;
+    else return false;
   };
 
   const makeDatasetCurrent = (datasetId) => {
