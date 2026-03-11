@@ -29,6 +29,7 @@ const StatusModal = () => {
 
   /* Derived Variables */
 
+  const isError = statusMessages.some(msg => msg.startsWith('Error:'));
   const isLoadingProject = mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS;
 
   /* Side Effects */
@@ -86,13 +87,13 @@ const StatusModal = () => {
         <View>
           <LottieAnimations
             doesLoop={isModalLoading}
-            show={isModalLoading}
-            type={isModalLoading ? 'loadingFile' : 'complete'}
+            show={isModalLoading || isError}
+            type={isModalLoading ? 'loadingFile' : isError ? 'error' : 'complete'}
           />
           <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
         </View>
       )}
-      {!isModalLoading && isLoadingProject && !isShowingDatasetPreferences && (
+      {!isModalLoading && !isError && isLoadingProject && !isShowingDatasetPreferences && (
         <OutlineButton onPress={() => setIsShowingDatasetPreferences(true)} title={'Show Datasets'}/>
       )}
       {isShowingDatasetPreferences && isLoadingProject && <DatasetPreferences/>}

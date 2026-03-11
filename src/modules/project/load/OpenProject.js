@@ -5,8 +5,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useImport from '../../../services/useImport';
-import alert from '../../../shared/ui/alert';
 import {
+  addedStatusMessage,
+  clearedStatusMessages,
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
@@ -45,11 +46,11 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const openProject = async (project) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
+    if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+    dispatch(setLoadingStatus({view: 'modal', bool: true}));
+    dispatch(setIsStatusMessagesModalVisible(true));
     try {
       console.log('Selected Project:', project);
-      if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
-      dispatch(setLoadingStatus({view: 'modal', bool: true}));
-      dispatch(setIsStatusMessagesModalVisible(true));
       const res = await loadProjectFromDevice(project.fileName);
       dispatch(setStatusMessageModalTitle(res.project.description.project_name));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
@@ -59,9 +60,9 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     }
     catch (err) {
       console.error('Error loading Project.', err);
-      alert('Project not found!', 'Make sure there is a "data.json" file and it is properly named.');
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      dispatch(setIsStatusMessagesModalVisible(false));
+      dispatch(clearedStatusMessages());
+      dispatch(addedStatusMessage('Error: Project file not found.\nMake sure there is a "data.json" file and it is properly named.'));
     }
   };
 
