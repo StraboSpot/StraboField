@@ -204,7 +204,6 @@ const useImages = () => {
   };
 
   const getImagesFromCameraRoll = async () => {
-    newImages = [];
     return new Promise((res, rej) => {
       try {
         const selectionLimitNumber = Platform.OS === 'ios' ? 10 : 0;
@@ -273,51 +272,34 @@ const useImages = () => {
     else return 'file://' + APP_DIRECTORIES.IMAGES + id + '.jpg';
   };
 
-  const launchCameraLoop = async () => {
-    try {
-      const savedPhoto = await takePicture();
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (savedPhoto === 'cancelled') {
-        if (newImages.length > 0) console.log('ALL PHOTOS SAVED', newImages);
-        else toast.show('No Photos Saved', {duration: 2000, type: 'warning'});
-        dispatch(setLoadingStatus({view: 'home', bool: false}));
-        return newImages;
-      }
-      else {
-        const photoProperties = {
-          id: savedPhoto.id,
-          image_type: 'photo',
-          height: savedPhoto.height,
-          width: savedPhoto.width,
-        };
-        console.log('Photos to Save:', [...newImages, photoProperties]);
-        newImages.push(photoProperties);
-        return launchCameraLoop();
-      }
-    }
-    catch (err) {
-      console.error(`Error Taking Picture: ${err}`);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-    }
-  };
-
   const launchCameraFromNotebook = async () => {
     try {
       const permissionResult = Platform.OS === 'ios' ? true
         : await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
       if (permissionResult) {
-        newImages = [];
-        return launchCameraLoop();
+        const savedPhoto = await takePicture();
+        dispatch(setLoadingStatus({view: 'home', bool: true}));
+        if (savedPhoto === 'cancelled') {
+          if (newImages.length > 0) console.log('ALL PHOTOS SAVED', newImages);
+          else toast.show('No Photos Saved', {duration: 2000, type: 'warning'});
+          dispatch(setLoadingStatus({view: 'home', bool: false}));
+          return newImages;
+        }
+        else {
+          const photoProperties = {
+            id: savedPhoto.id,
+            image_type: 'photo',
+            height: savedPhoto.height,
+            width: savedPhoto.width,
+          };
+          console.log('Photos to Save:', [...newImages, photoProperties]);
+          newImages.push(photoProperties);
+          return launchCameraFromNotebook();
+        }
       }
       else {
         const permissionRequestResult = await requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-        if (permissionRequestResult === 'granted' || permissionRequestResult === 'never_ask_again') {
-          newImages = [];
-          return launchCameraLoop();
-        }
+        if (permissionRequestResult === 'granted' || permissionRequestResult === 'never_ask_again') await launchCameraFromNotebook();
         else toast.show('StraboSpot can not access your camera due to permission denial.');
       }
     }
