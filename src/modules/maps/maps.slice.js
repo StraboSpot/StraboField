@@ -15,6 +15,7 @@ const initialMapsState = {
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
+  intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
   labelTypeOn: 'dip',
@@ -111,9 +112,20 @@ const mapsSlice = createSlice({
         }
       }
     },
+    cancelledIntervalDrag(state) {
+      state.isDragIntervalMode = false;
+      state.intervalDragState = null;
+      state.intervalDragSnapshot = null;
+    },
+    setIntervalDragSnapshot(state, action) {
+      state.intervalDragSnapshot = action.payload;
+    },
     setIsDragIntervalMode(state, action) {
       state.isDragIntervalMode = action.payload;
-      if (!action.payload) state.intervalDragState = null;
+      if (!action.payload) {
+        state.intervalDragState = null;
+        state.intervalDragSnapshot = null;
+      }
     },
     setIsMapMoved(state, action) {
       state.isMapMoved = action.payload;
@@ -163,6 +175,7 @@ const mapsSlice = createSlice({
 export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
+  cancelledIntervalDrag,
   clearedIntervalDragState,
   clearedMaps,
   clearedSpotsInMapExtentIds,
@@ -178,6 +191,7 @@ export const {
   setFeatureTypesOff,
   setFreehandFeatureCoords,
   setGeometryTypesOff,
+  setIntervalDragSnapshot,
   setIntervalDragState,
   setIntervalDragTargetSlot,
   setIsDragIntervalMode,

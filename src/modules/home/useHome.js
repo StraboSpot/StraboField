@@ -8,21 +8,23 @@ import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/Helpers';
 import {MAP_MODES} from '../maps/maps.constants';
-import {setFreehandFeatureCoords, setIsDragIntervalMode} from '../maps/maps.slice';
+import {cancelledIntervalDrag, setFreehandFeatureCoords, setIntervalDragSnapshot, setIsDragIntervalMode} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
-import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
+import {clearedSelectedSpots, editedOrCreatedSpots, restoredIntervalDragSnapshot, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 
 const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
+  const spots = useSelector(state => state.spot.spots);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
@@ -51,6 +53,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     if (intervalDragState) lockOrientation();
     else unlockOrientation();
   }, [intervalDragState]);
+
+  useEffect(() => {
+    if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
+  }, [isDragIntervalMode]);
 
   /* Internal Functions */
 
@@ -94,7 +100,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Exported Functions */
 
   const clickHandler = async (name, value) => {
-    dispatch(setIsDragIntervalMode(false));
+    if (name !== 'startIntervalDrag' && name !== 'saveReordering' && name !== 'cancelIntervalDrag') {
+      if (isDragIntervalMode) setMapMode(MAP_MODES.VIEW);
+      dispatch(cancelledIntervalDrag());
+    }
     switch (name) {
       // Map Actions
       case MAP_MODES.DRAW.POINT:
@@ -174,6 +183,26 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         handleSpotSelected(selectedSpotWithThisStratSection);
         openNotebookPanel(PAGE_KEYS.STRAT_SECTION);
         break;
+      case 'startIntervalDrag':
+        dispatch(setIntervalDragSnapshot(
+          Object.values(spots).filter(s => s.properties.strat_section_id === stratSection?.strat_section_id)
+            .map(s => JSON.parse(JSON.stringify(s))),
+        ));
+        dispatch(setIsDragIntervalMode(true));
+        setMapMode(MAP_MODES.INTERVAL_DRAG);
+        break;
+      case 'saveReordering':
+        dispatch(setIsDragIntervalMode(false));
+        setMapMode(MAP_MODES.VIEW);
+        break;
+      case 'cancelIntervalDrag':
+        if (intervalDragSnapshot?.length > 0) {
+          dispatch(restoredIntervalDragSnapshot(intervalDragSnapshot));
+          if (Platform.OS !== 'web') dispatch(editedOrCreatedSpots(intervalDragSnapshot));
+        }
+        dispatch(cancelledIntervalDrag());
+        setMapMode(MAP_MODES.VIEW);
+        break;
     }
   };
 
@@ -214,7 +243,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   // Toggle given dialog between true (visible) and false (hidden)
   const toggleDialog = (dialog) => {
-    dispatch(setIsDragIntervalMode(false));
+    dispatch(cancelledIntervalDrag());
     console.log('Toggle', dialog);
     setDialogs({
       ...dialogs,

@@ -2,7 +2,7 @@ import {createListenerMiddleware, isAnyOf} from '@reduxjs/toolkit';
 import * as turf from '@turf/turf';
 import {Toast} from 'react-native-toast-notifications';
 
-import {setIsDragIntervalMode} from '../modules/maps/maps.slice';
+import {cancelledIntervalDrag, setIsDragIntervalMode} from '../modules/maps/maps.slice';
 import {
   addedCustomFeatureTypes,
   addedDataset,
@@ -271,6 +271,10 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
   }
 };
 
+const cancelledIntervalDragListener = () => {
+  pendingDragSpotIds = new Set();
+};
+
 const listenerMiddleware = createListenerMiddleware();
 
 // Spot, Dataset and Project Updates to Send to Server
@@ -285,6 +289,7 @@ listenerMiddleware.startListening({
 
 // Batch-save interval reorder changes when drag mode ends
 listenerMiddleware.startListening({actionCreator: setIsDragIntervalMode, effect: intervalDragModeEndedListener});
+listenerMiddleware.startListening({actionCreator: cancelledIntervalDrag, effect: cancelledIntervalDragListener});
 
 // Don't need to do addedSpotsFromDevice until can add from device on web
 // listenerMiddleware.startListening({actionCreator: addedSpotsFromDevice, effect: updatedProjectDatasetSpotListener});

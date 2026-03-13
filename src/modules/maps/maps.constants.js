@@ -23,6 +23,7 @@ export const MAP_MODES = {
     MEASURE: 'measure',
   },
   EDIT: 'edit',
+  INTERVAL_DRAG: 'intervalDrag',
 };
 
 export const DEFAULT_MAPS = [

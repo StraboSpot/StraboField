@@ -37,7 +37,7 @@ const useMapPressEvents = ({
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
-
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
@@ -78,7 +78,12 @@ const useMapPressEvents = ({
 
   const startIntervalDrag = async (screenPointX, screenPointY, draggedInterval, startClientY) => {
     const isCore = stratSection.section_type === 'core';
-    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    // Read directly from store so post-reorder calls get fresh positions, not stale selector values
+    const freshSpots = store.getState().spot.spots;
+    const intervals = Object.values(freshSpots).filter(s =>
+      s.properties.strat_section_id === stratSection.strat_section_id
+      && s.properties.surface_feature?.surface_feature_type === 'strat_interval',
+    );
     const sorted = [...intervals].sort((a, b) => {
       const extA = turf.bbox(a);
       const extB = turf.bbox(b);
@@ -128,26 +133,15 @@ const useMapPressEvents = ({
       });
     }
 
-    // Compute center of the target interval for initial snap line position
-    const targetBbox = turf.bbox(targetInterval);
-    const centerCoord = [0, (targetBbox[1] + targetBbox[3]) / 2];
-    let snapLngLat;
-    let snapScreenY = screenPointY;
-    try {
-      const centerMapCoord = {type: 'Feature', geometry: {type: 'Point', coordinates: centerCoord}};
-      const centerLatLngFeature = convertImagePixelsToLatLong(JSON.parse(JSON.stringify(centerMapCoord)));
-      snapLngLat = centerLatLngFeature.geometry.coordinates;
-      if (Platform.OS === 'web') {
-        snapScreenY = mapRef.current.project(snapLngLat).y;
-      }
-      else {
-        const projected = await mapRef.current.getPointInView(snapLngLat);
-        snapScreenY = projected[1];
-      }
-    }
-    catch {
-      snapLngLat = slotMap[0]?.lngLat;
-    }
+    // Position snap line at the middle of the target interval by averaging
+    // the two slot boundaries that bracket it
+    const targetIndex = sorted.findIndex(s => s.properties.id === targetInterval.properties.id);
+    const slotA = slotMap[targetIndex];
+    const slotB = slotMap[targetIndex + 1] ?? slotA;
+    const snapScreenY = slotA && slotB ? (slotA.screenY + slotB.screenY) / 2 : screenPointY;
+    const snapLngLat = slotA?.lngLat && slotB?.lngLat
+      ? [(slotA.lngLat[0] + slotB.lngLat[0]) / 2, (slotA.lngLat[1] + slotB.lngLat[1]) / 2]
+      : slotA?.lngLat ?? slotMap[0]?.lngLat;
 
     dispatch(setIntervalDragState({
       stratSectionId: stratSection.strat_section_id,
@@ -157,19 +151,25 @@ const useMapPressEvents = ({
       slotMap,
       snapLngLat,
       snapScreenY,
-      targetSlotIndex: sorted.findIndex(s => s.properties.id === targetInterval.properties.id),
+      targetSlotIndex: targetIndex,
     }));
   };
 
   // Mapbox: Handle map press
   const handleMapPress = async (e) => {
-    if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.VIEW) {
+    if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
       const [x, y] = getScreenPoint(e);
       const clientY = Platform.OS === 'web' ? (e.originalEvent?.clientY ?? y) : y;
-      const spotToEdit = await getSpotAtPress(x, y);
-      if (spotToEdit?.properties?.surface_feature?.surface_feature_type === 'strat_interval') {
-        await startIntervalDrag(x, y, spotToEdit, clientY);
-      }
+      const spotAtPress = await getSpotAtPress(x, y);
+      const isStratInterval = s => s?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
+      // Fall back to the previously selected interval (e.g. click fired after snap-line drag
+      // lands on a slot boundary where queryRenderedFeatures finds no feature).
+      // Read selectedSpot from store directly to get the post-reorder value on web.
+      const freshSelectedSpot = store.getState().spot.selectedSpot;
+      const intervalToUse = isStratInterval(spotAtPress) ? spotAtPress
+        : isStratInterval(freshSelectedSpot) ? freshSelectedSpot
+          : null;
+      if (intervalToUse) await startIntervalDrag(x, y, intervalToUse, clientY);
       return;
     }
 

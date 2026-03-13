@@ -14,7 +14,8 @@ import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
-import {setIsDragIntervalMode} from '../maps/maps.slice';
+import {cancelledIntervalDrag} from '../maps/maps.slice';
+import {MAP_MODES} from '../maps/maps.constants';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -44,7 +45,6 @@ const HomeViewSmallScreen = forwardRef(({
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -61,14 +61,14 @@ const HomeViewSmallScreen = forwardRef(({
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    if (isDragIntervalMode) lockToPortrait();
+    if (mapMode === MAP_MODES.INTERVAL_DRAG) lockToPortrait();
     else unlockOrientation();
-  }, [isDragIntervalMode]);
+  }, [mapMode]);
 
   const Tab = createMaterialTopTabNavigator();
 
   const toggleSpotNavigator = () => {
-    dispatch(setIsDragIntervalMode(false));
+    dispatch(cancelledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
   };
@@ -114,7 +114,7 @@ const HomeViewSmallScreen = forwardRef(({
         />
       ) : (
         <Tab.Navigator
-          screenListeners={{focus: () => dispatch(setIsDragIntervalMode(false))}}
+          screenListeners={{focus: () => dispatch(cancelledIntervalDrag())}}
           screenOptions={{
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
@@ -160,18 +160,8 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {stratSection && (
                   <IconButton
-                    onPress={() => dispatch(setIsDragIntervalMode(!isDragIntervalMode))}
-                    source={isDragIntervalMode
-                      ? require('../../assets/icons/DragIntervalButton_pressed.png')
-                      : require('../../assets/icons/DragIntervalButton.png')}
-                    style={homeStyles.dragIntervalButton}
-                  />
-                )}
-
-                {stratSection && (
-                  <IconButton
                     onPress={() => {
-                      dispatch(setIsDragIntervalMode(false));
+                      dispatch(cancelledIntervalDrag());
                       dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
                     }}
                     source={require('../../assets/icons/AddIntervalButton.png')}
