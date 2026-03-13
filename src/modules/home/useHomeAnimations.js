@@ -6,6 +6,7 @@ import {useDispatch} from 'react-redux';
 import {setIsMainMenuPanelVisible} from './home.slice';
 import {MAIN_MENU_DRAWER_WIDTH, NOTEBOOK_DRAWER_WIDTH, SMALL_SCREEN} from '../../shared/styles.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import {setIsDragIntervalMode} from '../maps/maps.slice';
 import {setIsNotebookPanelVisible, setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
@@ -76,6 +77,7 @@ const useHomeAnimations = ({navigation}) => {
 
   const openMainMenuPanel = () => {
     console.log('Opening Main Menu Panel...');
+    dispatch(setIsDragIntervalMode(false));
     dispatch(setIsMainMenuPanelVisible(true));
     animateDrawer(animatedValueMainMenuDrawer, 0);
     animateDrawer(animatedValueLeftSide, MAIN_MENU_DRAWER_WIDTH);
@@ -83,6 +85,7 @@ const useHomeAnimations = ({navigation}) => {
 
   const openNotebookPanel = (pageView) => {
     console.log('Opening Notebook Panel...');
+    dispatch(setIsDragIntervalMode(false));
     dispatch(setNotebookPageVisible(pageView || PAGE_KEYS.OVERVIEW));
     dispatch(setIsNotebookPanelVisible(true));
     animateDrawer(animatedValueNotebookDrawer, 0);

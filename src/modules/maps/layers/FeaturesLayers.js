@@ -1,6 +1,7 @@
 import React, {useMemo, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
+import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {isEmpty} from '../../../shared/Helpers';
@@ -16,6 +17,7 @@ import {getUniqFeatures} from './layers.helpers';
 const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
 
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
   const {isSpotInReadOnlyDataset} = useProject();
@@ -60,7 +62,10 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
     <>
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
-      <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+      <FeatureHalosLayers
+        featuresNotSelected={featuresNotSelectedUniq}
+        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
+      />
 
       <SampleLayers features={features}/>
 
@@ -83,7 +88,7 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers featuresSelected={featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>
+      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>
     </>
   );
 };

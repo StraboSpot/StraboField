@@ -15,6 +15,8 @@ import {
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
 import mapStyles from '../maps.styles';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
+import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
+import SnapLineLayer from '../strat-section/SnapLineLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
 
 const MapLayers = ({
@@ -76,6 +78,12 @@ const MapLayers = ({
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
       {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
+
+      {/* Dragged Interval Highlight Layer — orange fill + white border */}
+      {stratSection && <DraggedIntervalLayer/>}
+
+      {/* Snap Line Layer — shown while dragging an interval */}
+      {stratSection && <SnapLineLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>

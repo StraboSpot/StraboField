@@ -8,7 +8,7 @@ import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/Helpers';
 import {MAP_MODES} from '../maps/maps.constants';
-import {setFreehandFeatureCoords} from '../maps/maps.slice';
+import {setFreehandFeatureCoords, setIsDragIntervalMode} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
@@ -20,6 +20,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const intervalDragState = useSelector(state => state.map.intervalDragState);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -43,6 +45,12 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
+
+  useEffect(() => {
+    if (isDragIntervalMode) return;
+    if (intervalDragState) lockOrientation();
+    else unlockOrientation();
+  }, [intervalDragState]);
 
   /* Internal Functions */
 
@@ -86,6 +94,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Exported Functions */
 
   const clickHandler = async (name, value) => {
+    dispatch(setIsDragIntervalMode(false));
     switch (name) {
       // Map Actions
       case MAP_MODES.DRAW.POINT:
@@ -205,6 +214,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   // Toggle given dialog between true (visible) and false (hidden)
   const toggleDialog = (dialog) => {
+    dispatch(setIsDragIntervalMode(false));
     console.log('Toggle', dialog);
     setDialogs({
       ...dialogs,

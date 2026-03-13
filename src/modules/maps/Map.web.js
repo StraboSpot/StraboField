@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
 import {useDispatch, useSelector} from 'react-redux';
 
+import IntervalDrag from './IntervalDrag';
 import {MapLayers} from './layers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import {setIsMapMoved} from './maps.slice';
@@ -36,6 +37,8 @@ const Map = ({
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const intervalDragState = useSelector(state => state.map.intervalDragState);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -64,7 +67,10 @@ const Map = ({
     Object.entries(symbols).forEach(([id, url]) => {
       if (!map.hasImage(id)) {
         map.loadImage(url, (error, image) => {
-          if (error) { console.error('Error loading image:', id, error); return; }
+          if (error) {
+            console.error('Error loading image:', id, error);
+            return;
+          }
           if (!map.hasImage(id)) map.addImage(id, image);
         });
       }
@@ -90,12 +96,14 @@ const Map = ({
   /* View */
 
   return (
+    <>
+    <IntervalDrag mapRef={mapRef}/>
     <ReactMapGL
       {...viewState}
-      boxZoom={allowMapViewMove}
+      boxZoom={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
       cursor={cursor}
       doubleClickZoom={!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT)}
-      dragPan={allowMapViewMove}
+      dragPan={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
       dragRotate={false}
       id={currentMapId}
       interactiveLayerIds={[...LAYER_IDS_NOT_SELECTED, ...LAYER_IDS_SELECTED]}
@@ -110,6 +118,7 @@ const Map = ({
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
       pitchWithRotate={false}
       ref={mapRef}
+      scrollZoom={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
       style={{flex: 1}}
       styleDiffing={false}
       touchPitch={false}
@@ -133,6 +142,7 @@ const Map = ({
         spotsSelected={spotsSelected}
       />
     </ReactMapGL>
+    </>
   );
 };
 

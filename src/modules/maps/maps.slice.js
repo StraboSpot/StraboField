@@ -15,6 +15,8 @@ const initialMapsState = {
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
+  intervalDragState: null,
+  isDragIntervalMode: false,
   labelTypeOn: 'dip',
   isMapMoved: true,
   isShowOnly1stMeas: false,
@@ -47,7 +49,12 @@ const mapsSlice = createSlice({
     clearedSpotsInMapExtentIds(state) {
       state.spotsInMapExtentIds = [];
     },
+    clearedIntervalDragState(state) {
+      state.intervalDragState = null;
+    },
     clearedStratSection(state) {
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = undefined;
     },
     clearedVertexes(state) {
@@ -72,6 +79,8 @@ const mapsSlice = createSlice({
       state.currentBasemap = action.payload;
     },
     setCurrentImageBasemap(state, action) {
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = undefined;
       state.currentImageBasemap = action.payload;
     },
@@ -88,6 +97,23 @@ const mapsSlice = createSlice({
     setGeometryTypesOff(state, action) {
       console.log('Map Geometry Types Off', action.payload);
       state.geometryTypesOff = action.payload;
+    },
+    setIntervalDragState(state, action) {
+      state.intervalDragState = action.payload;
+    },
+    setIntervalDragTargetSlot(state, action) {
+      if (state.intervalDragState) {
+        state.intervalDragState.targetSlotIndex = action.payload;
+        const slot = state.intervalDragState.slotMap[action.payload];
+        if (slot) {
+          state.intervalDragState.snapLngLat = slot.lngLat;
+          state.intervalDragState.snapScreenY = slot.screenY;
+        }
+      }
+    },
+    setIsDragIntervalMode(state, action) {
+      state.isDragIntervalMode = action.payload;
+      if (!action.payload) state.intervalDragState = null;
     },
     setIsMapMoved(state, action) {
       state.isMapMoved = action.payload;
@@ -110,6 +136,8 @@ const mapsSlice = createSlice({
     },
     setStratSection(state, action) {
       state.currentImageBasemap = undefined;
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = action.payload;
     },
     setTagTypeForColor(state, action) {
@@ -135,6 +163,7 @@ const mapsSlice = createSlice({
 export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
+  clearedIntervalDragState,
   clearedMaps,
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -149,6 +178,9 @@ export const {
   setFeatureTypesOff,
   setFreehandFeatureCoords,
   setGeometryTypesOff,
+  setIntervalDragState,
+  setIntervalDragTargetSlot,
+  setIsDragIntervalMode,
   setIsMapMoved,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,
@@ -156,7 +188,6 @@ export const {
   setMapSymbols,
   setSpotsInMapExtentIds,
   setStratSection,
-  setSymbolsDisplayed,
   setTagTypeForColor,
   setVertexEndCoords,
   setVertexStartCoords,
@@ -165,5 +196,3 @@ export const {
 } = mapsSlice.actions;
 
 export default mapsSlice.reducer;
-
-

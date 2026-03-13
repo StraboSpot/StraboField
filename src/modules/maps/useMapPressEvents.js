@@ -1,9 +1,12 @@
 import {useState} from 'react';
 import {PixelRatio, Platform} from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import * as turf from '@turf/turf';
+import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {MAP_MODES} from './maps.constants';
+import {convertImagePixelsToLatLong} from './maps.helpers';
+import {setIntervalDragState, setIsDragIntervalMode} from './maps.slice';
 import useMap from './useMap';
 import useMapFeatures from './useMapFeatures';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
@@ -29,29 +32,42 @@ const useMapPressEvents = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const store = useStore();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const intervalDragState = useSelector(state => state.map.intervalDragState);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
   const {getSpotAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
-  const {getSpotWithThisStratSection} = useSpots();
+  const {getIntervalSpotsThisStratSection, getSpotWithThisStratSection} = useSpots();
 
   /* Local State */
 
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
+
+  /* Internal Functions */
+
+  function getScreenPoint(e) {
+    if (Platform.OS === 'web') return [e.point.x, e.point.y];
+    if (Platform.OS === 'android') {
+      return [e.properties.screenPointX / PixelRatio.get(), e.properties.screenPointY / PixelRatio.get()];
+    }
+    return [e.properties.screenPointX, e.properties.screenPointY];
+  }
 
   /* Exported Functions */
 
   // Handle a long press on the map by making the point or vertex at the point "selected"
   const handleMapLongPress = async (e) => {
     console.log('Map long press detected:', e);
-    const [screenPointX, screenPointY] = Platform.OS === 'web' ? [e.point.x, e.point.y]
-      : Platform.OS === 'android' ? [e.properties.screenPointX / PixelRatio.get(), e.properties.screenPointY / PixelRatio.get()]
-        : [e.properties.screenPointX, e.properties.screenPointY];
+    const [screenPointX, screenPointY] = getScreenPoint(e);
     const spotToEdit = await getSpotAtPress(screenPointX, screenPointY);
+
     const mappedSpots = getAllMappedSpots();
     if (mapMode === MAP_MODES.VIEW && !isEmpty(mappedSpots) && !isEmpty(spotToEdit)) {
       await switchToEditing(screenPointX, screenPointY, spotToEdit, setMapModeToEdit);
@@ -60,8 +76,105 @@ const useMapPressEvents = ({
     else console.log('No Spots to edit. No action taken.');
   };
 
+  const startIntervalDrag = async (screenPointX, screenPointY, draggedInterval, startClientY) => {
+    const isCore = stratSection.section_type === 'core';
+    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    const sorted = [...intervals].sort((a, b) => {
+      const extA = turf.bbox(a);
+      const extB = turf.bbox(b);
+      return isCore ? extB[3] - extA[3] : extA[1] - extB[1];
+    });
+
+    const targetInterval = draggedInterval
+      ? (sorted.find(s => s.properties.id === draggedInterval.properties.id) ?? sorted[0])
+      : sorted[0];
+    if (!targetInterval) return;
+
+    dispatch(setSelectedSpot(targetInterval));
+
+    const slotMap = [];
+    for (let i = 0; i <= sorted.length; i++) {
+      let boundaryCoord;
+      if (i === 0) {
+        const firstExt = turf.bbox(sorted[0]);
+        boundaryCoord = isCore ? [0, firstExt[3]] : [0, firstExt[1]];
+      }
+      else {
+        const ext = turf.bbox(sorted[i - 1]);
+        boundaryCoord = isCore ? [0, ext[1]] : [0, ext[3]];
+      }
+      let screenY;
+      let lngLat;
+      try {
+        const mapCoord = {type: 'Feature', geometry: {type: 'Point', coordinates: boundaryCoord}};
+        const latLngFeature = convertImagePixelsToLatLong(JSON.parse(JSON.stringify(mapCoord)));
+        lngLat = latLngFeature.geometry.coordinates;
+        if (Platform.OS === 'web') {
+          const projected = mapRef.current.project(lngLat);
+          screenY = projected.y;
+        }
+        else {
+          const projected = await mapRef.current.getPointInView(lngLat);
+          screenY = projected[1];
+        }
+      }
+      catch {
+        screenY = screenPointY;
+      }
+      slotMap.push({
+        lngLat,
+        precedingIntervalId: i === 0 ? null : sorted[i - 1].properties.id,
+        screenY,
+      });
+    }
+
+    // Compute center of the target interval for initial snap line position
+    const targetBbox = turf.bbox(targetInterval);
+    const centerCoord = [0, (targetBbox[1] + targetBbox[3]) / 2];
+    let snapLngLat;
+    let snapScreenY = screenPointY;
+    try {
+      const centerMapCoord = {type: 'Feature', geometry: {type: 'Point', coordinates: centerCoord}};
+      const centerLatLngFeature = convertImagePixelsToLatLong(JSON.parse(JSON.stringify(centerMapCoord)));
+      snapLngLat = centerLatLngFeature.geometry.coordinates;
+      if (Platform.OS === 'web') {
+        snapScreenY = mapRef.current.project(snapLngLat).y;
+      }
+      else {
+        const projected = await mapRef.current.getPointInView(snapLngLat);
+        snapScreenY = projected[1];
+      }
+    }
+    catch {
+      snapLngLat = slotMap[0]?.lngLat;
+    }
+
+    dispatch(setIntervalDragState({
+      stratSectionId: stratSection.strat_section_id,
+      startScreenX: screenPointX,
+      startScreenY: snapScreenY,
+      startClientY: startClientY ?? screenPointY,
+      slotMap,
+      snapLngLat,
+      snapScreenY,
+      targetSlotIndex: sorted.findIndex(s => s.properties.id === targetInterval.properties.id),
+    }));
+  };
+
   // Mapbox: Handle map press
   const handleMapPress = async (e) => {
+    if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.VIEW) {
+      const [x, y] = getScreenPoint(e);
+      const clientY = Platform.OS === 'web' ? (e.originalEvent?.clientY ?? y) : y;
+      const spotToEdit = await getSpotAtPress(x, y);
+      if (spotToEdit?.properties?.surface_feature?.surface_feature_type === 'strat_interval') {
+        await startIntervalDrag(x, y, spotToEdit, clientY);
+      }
+      return;
+    }
+
+    if (store.getState().map.intervalDragState) return;
+
     console.log('Map press detected:', e);
     console.log('Map mode:', mapMode);
     if (mapMode === MAP_MODES.DRAW.MEASURE) {
@@ -72,9 +185,7 @@ const useMapPressEvents = ({
       // Select/Unselect a feature
       if (mapMode === MAP_MODES.VIEW) {
         console.log('Selecting or unselect a feature ...');
-        const [screenPointX, screenPointY] = Platform.OS === 'web' ? [e.point.x, e.point.y]
-          : Platform.OS === 'android' ? [e.properties.screenPointX / PixelRatio.get(), e.properties.screenPointY / PixelRatio.get()]
-            : [e.properties.screenPointX, e.properties.screenPointY];
+        const [screenPointX, screenPointY] = getScreenPoint(e);
         const spotFound = await getSpotAtPress(screenPointX, screenPointY);
         if (currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap) {
           setIsShowMacrostratOverlay(true);
@@ -101,6 +212,7 @@ const useMapPressEvents = ({
     handleMapLongPress,
     handleMapPress,
     location,
+    startIntervalDrag,
   };
 };
 

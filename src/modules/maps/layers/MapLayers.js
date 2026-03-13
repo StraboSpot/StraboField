@@ -14,6 +14,7 @@ import {
 } from '.';
 import {setIsMapMoved} from '../maps.slice';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
+import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
 import useMapView from '../useMapView';
 
@@ -108,6 +109,9 @@ const MapLayers = ({
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
       {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
+
+      {/* Dragged Interval Highlight Layer — orange fill + white border */}
+      {stratSection && <DraggedIntervalLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>
