@@ -14,13 +14,14 @@ const XAxes = () => {
   return (
     <>
       <XAxis/>
-      {stratSection?.column_profile === 'mixed_clastic' && (
+      {stratSection?.column_profile === 'mixed_clastic' ? (
         <>
           <XAxis n={2}/>
-          {stratSection?.misc_labels && <XAxis n={4}/>}
+          {stratSection?.misc_labels && <XAxis n={3}/>}
         </>
+      ) : (
+        stratSection?.misc_labels && <XAxis n={2}/>
       )}
-      {stratSection?.misc_labels && <XAxis n={2}/>}
     </>
   );
 };

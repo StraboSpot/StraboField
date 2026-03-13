@@ -122,7 +122,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.PROJECT_DATA.TAGS:
         return <Tags updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS:
-        return <Tags type={'geologic_unit'} updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+        return <Tags isGeologicUnits updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
         return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:

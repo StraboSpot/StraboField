@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
 import useDevice from './useDevice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
+import {PAGE_KEYS} from '../modules/page/pageKeys.constants';
 import {setBackupFileName} from '../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../shared/Helpers';
 
@@ -60,7 +61,7 @@ const useExport = () => {
     console.log('Added Images to backup.');
   };
 
-  const exportData = async (directory, data, filename) => {
+  const saveFile = async (directory, data, filename) => {
     await doesDeviceDirectoryExist(directory);
     await writeFileToDevice(directory, filename, data);
   };
@@ -70,7 +71,7 @@ const useExport = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Saving Project Data...'));
       console.log(dataForExport);
-      await exportData(APP_DIRECTORIES.BACKUP_DIR + filename, dataForExport, 'data.json');
+      await saveFile(APP_DIRECTORIES.BACKUP_DIR + filename, dataForExport, 'data.json');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Saving Project Data'));
     }
@@ -169,7 +170,7 @@ const useExport = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Custom Maps...'));
       if (!isEmpty(configDb.other_maps)) {
-        await exportData(deviceDir + exportedFileName, configDb.other_maps, 'other_maps.json');
+        await saveFile(deviceDir + exportedFileName, configDb.other_maps, 'other_maps.json');
         dispatch(removedLastStatusMessage());
         dispatch(addedStatusMessage('Finished Backing Up Custom Maps.'));
       }
@@ -203,6 +204,44 @@ const useExport = () => {
   };
 
   /* Exported Functions */
+
+  const backupTags = async (backupFileName, isGeologicUnits) => {
+
+    const tagsToBackup = (projectDb.project.tags || []).reduce((acc, tag) => {
+      const {spots, features, ...rest} = tag;
+      return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
+      || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
+    }, []);
+
+    console.log(isGeologicUnits ? 'Geologic Units' : 'Tags', 'to backup:', tagsToBackup);
+
+    const subFolder = isGeologicUnits ? 'GeologicUnits' : 'Tags';
+    const jsonFileName = backupFileName + '.json';
+
+    if (Platform.OS === 'ios') {
+      const exportPath = APP_DIRECTORIES.EXPORT_FILES_IOS + subFolder + '/';
+      await saveFile(exportPath, tagsToBackup, jsonFileName);
+      console.log('File saved to:', exportPath + jsonFileName);
+    }
+    else {
+      // Write to temp file first, then copy to Downloads via MediaStore (required for Android 11+)
+      const tempPath = APP_DIRECTORIES.EXPORT_FILES_ANDROID + jsonFileName;
+      await saveFile(APP_DIRECTORIES.EXPORT_FILES_ANDROID, tagsToBackup, jsonFileName);
+      const result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+        {
+          name: jsonFileName,
+          parentFolder: 'StraboSpot2/Backups/' + subFolder,
+          mimeType: 'application/json',
+        },
+        'Download',
+        tempPath,
+      );
+      console.log('File written to Downloads:', result);
+      await deleteFromDevice(APP_DIRECTORIES.EXPORT_FILES_ANDROID, jsonFileName);
+    }
+    console.log('Finished Exporting');
+    dispatch(clearedStatusMessages());
+  };
 
   const initializeBackup = async (fileName) => {
     try {
@@ -298,6 +337,7 @@ const useExport = () => {
   };
 
   return {
+    backupTags,
     initializeBackup,
     zipAndExportProjectFolder,
   };
