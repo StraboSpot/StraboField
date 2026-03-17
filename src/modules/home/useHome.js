@@ -99,7 +99,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         const targetDataset = getTargetDatasetFromId();
         if (!isEmpty(targetDataset) && name === MAP_MODES.DRAW.POINTLOCATION) await createPointAtCurrentLocation();
         else if (!isEmpty(targetDataset)) setDraw(name).catch(console.error);
-        else toast.show('No Current Dataset! \n A current dataset needs to be set before drawing Spots.');
+        else toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
         break;
       case 'cancelEdits':
         await cancelEdits();

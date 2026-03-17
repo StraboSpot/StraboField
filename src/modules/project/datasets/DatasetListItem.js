@@ -26,7 +26,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = isOwner === false && dataset.isReadOnly;
+  const isReadOnly = dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */

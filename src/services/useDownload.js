@@ -81,14 +81,43 @@ const useDownload = () => {
           console.log('Checking if active dataset still exists:', tempActiveDatasetId);
           return newDatasetIds.includes(tempActiveDatasetId) ? [...acc, tempActiveDatasetId] : acc;
         }, []);
-        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
-        else dispatch(setTargetDataset(datasets[0].id));
+        if (project.isOwner) {
+          if (updatedActiveDatasetIds.length === 1) {
+            dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+            dispatch(setTargetDataset(datasets[0].id));
+          }
+          else {
+            if (updatedActiveDatasetIds.includes(tempTargetDatasetId)) {
+              dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
+              dispatch(setTargetDataset(tempTargetDatasetId));
+            }
+            else {
+              console.log('updatedActiveDatasetIds not included in newDatasetIds: ', updatedActiveDatasetIds,
+                'newDatasetIds:', newDatasetIds);
+            }
+          }
+        }
+        else {
+          if (updatedActiveDatasetIds.length === 1) {
+            console.log('updatedActiveDatasetIds.length === 1');
+            dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+            // dispatch(setTargetDataset(datasets[0].id));
+          }
+          else {
+            console.log('updatedActiveDatasetIds.length > 1');
+          }
+        }
+        //   if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
+        //   else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+        // if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
+        // else dispatch(setTargetDataset(datasets[0].id));
       }
       else if (datasets.length >= 1) {
+        if (datasets.length === 1 && !datasets[0].isReadOnly) {
+          dispatch(setTargetDataset(datasets[0].id));
+        }
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setTargetDataset(datasets[0].id));
+        // dispatch(setTargetDataset(datasets[0].id));
       }
       else {
         const targetDataset = createDataset();
@@ -99,9 +128,9 @@ const useDownload = () => {
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
       await doGetDatasetSpots(datasets, encodedLoginScoped);
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
-        + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
+      // dispatch(removedLastStatusMessage());
+      // dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
+      //   + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
     }
     catch (e) {
       console.log('Error getting datasets...' + e);
@@ -296,6 +325,7 @@ const useDownload = () => {
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
+      return datasetsObjToSave;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

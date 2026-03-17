@@ -1,6 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import {useSelector} from 'react-redux';
+
 import {DrawActionButtons, MapActionButtons, UserLocationButton} from './index';
 import * as themes from '../../../shared/styles.constants';
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
@@ -22,6 +24,10 @@ const ActionButtonsSmallScreen = ({
   /* Data Hooks */
 
   const {height, width} = useWindowSize();
+  const isSingleLockedDataset = useSelector((state) => {
+    const values = Object.values(state.project.datasets || {});
+    return values.length === 1 && values[0]?.isReadOnly === true;
+  });
 
   /* View */
 
@@ -66,12 +72,14 @@ const ActionButtonsSmallScreen = ({
               toggleDialog={toggleDialog}
             />
           </View>
-          <View style={{paddingLeft: 10}}>
-            <DrawActionButtons
-              clickHandler={clickHandler}
-              mapMode={mapMode}
-            />
-          </View>
+          {!isSingleLockedDataset && (
+            <View style={{paddingLeft: 10}}>
+              <DrawActionButtons
+                clickHandler={clickHandler}
+                mapMode={mapMode}
+              />
+            </View>
+          )}
         </View>
       </View>
     </View>

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -24,7 +24,8 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
 
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-  const project = useSelector(state => state.project.project);
+  const {project, datasets} = useSelector(state => state.project);
+  const {email} = useSelector(state => state.user);
 
   const {initializeDownload} = useDownload();
   const {addDataset} = useProject();
@@ -50,10 +51,22 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const downloadProject = async (inProjectToDownload) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
-    await initializeDownload(inProjectToDownload, undefined);
+    const downloadedDatasets = await initializeDownload(inProjectToDownload, undefined);
     if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
       dispatch(setIsStatusMessagesModalVisible(false));
-      setIsDatasetNameModalVisible(true);
+      const emailFound = Object.values(downloadedDatasets).some(dataset => dataset.owner_email === email);
+      if (emailFound) {
+        console.log('Email found in datasets');
+        setIsDatasetNameModalVisible(false);
+        dispatch(setSidePanelVisible({bool: false}));
+        dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+      }
+      else {
+        setTimeout(() => {
+          dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+          setIsDatasetNameModalVisible(true);
+        }, 400);
+      }
     }
     else {
       closeMainMenuPanel();
@@ -109,14 +122,18 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         dialogTitle={'Name Your Dataset'}
         onActionPressed={onDatasetNameConfirm}
         onCancelPress={() => {
+          // dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
           setIsDatasetNameModalVisible(false);
-          closeMainMenuPanel();
+          // closeMainMenuPanel();
         }}
         onChangeText={text => setCollaborativeDatasetName(text)}
         placeholder={'Enter dataset name...'}
         value={collaborativeDatasetName}
         visible={isDatasetNameModalVisible}
-      />
+      >
+        <Text style={{textAlign: 'center'}}>If you wish to not create a dataset now one can be created in the Datasets
+          page.</Text>
+      </TextInputModal>
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}
