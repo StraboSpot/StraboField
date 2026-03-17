@@ -32,8 +32,9 @@ export const deleteRequest = async (url, auth) => {
 };
 
 export const getRequest = async (url, auth, options = {}) => {
+  const {responseType, ...headerOptions} = options;
   try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, options)}));
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
     return isEmpty(options) ? handleResponse(response) : response;
   }
   catch (err) {
