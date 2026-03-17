@@ -211,10 +211,10 @@ const useStratSectionCalculations = () => {
       maxY = minY + targetIntervalHeight;
     }
 
-    let targetIntervalModified = JSON.parse(JSON.stringify(targetInterval));
+    const targetIntervalModified = JSON.parse(JSON.stringify(targetInterval));
     // Regular interval (polygon geometry)
     if (targetIntervalModified.geometry.type !== 'GeometryCollection') {
-      let targetIntervalModifiedCoords = targetIntervalModified.geometry.coordinates;
+      const targetIntervalModifiedCoords = targetIntervalModified.geometry.coordinates;
       targetIntervalModifiedCoords[0][0][1] = targetIntervalModifiedCoords[0][3][1] = targetIntervalModifiedCoords[0][4][1] = minY;
       targetIntervalModifiedCoords[0][1][1] = targetIntervalModifiedCoords[0][2][1] = maxY;
     }
@@ -334,7 +334,7 @@ const useStratSectionCalculations = () => {
     }
 
     // Update target geometry
-    let newTarget = JSON.parse(JSON.stringify(targetInterval));
+    const newTarget = JSON.parse(JSON.stringify(targetInterval));
     if (newTarget.geometry.type !== 'GeometryCollection') {
       newTarget.geometry.coordinates[0][0][1] = newTarget.geometry.coordinates[0][3][1]
         = newTarget.geometry.coordinates[0][4][1] = newMinY;

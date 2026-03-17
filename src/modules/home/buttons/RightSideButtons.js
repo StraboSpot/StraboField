@@ -4,12 +4,11 @@ import {Animated, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDeviceOrientation from '../useDeviceOrientation';
-
 import {DrawActionButtons, ShortcutButtons} from './';
 import NotebookButton from './NotebookButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {cancelledIntervalDrag} from '../../maps/maps.slice';
 import {MAP_MODES} from '../../maps/maps.constants';
+import {cancelledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';

@@ -4,10 +4,10 @@ import {Text, View} from 'react-native';
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
-import IntervalDrag from './IntervalDrag';
 import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
+import SnapLineLayer from './strat-section/SnapLineLayer';
 import useMapMoveEvents from './useMapMoveEvents';
 import VertexDrag from './VertexDrag';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -37,7 +37,14 @@ const Map = ({
 
   /* Data Hooks */
 
-  const {currentImageBasemap, zoom, stratSection, vertexStartCoords, intervalDragState, isDragIntervalMode} = useSelector(state => state.map);
+  const {
+    currentImageBasemap,
+    zoom,
+    stratSection,
+    vertexStartCoords,
+    intervalDragState,
+    isDragIntervalMode,
+  } = useSelector(state => state.map);
 
   const {mapRef, cameraRef} = forwardedRef;
 
@@ -143,7 +150,7 @@ const Map = ({
         )}
 
       {vertexStartCoords && <VertexDrag/>}
-      {intervalDragState && <IntervalDrag/>}
+      {intervalDragState && <SnapLineLayer/>}
     </>
   );
 };

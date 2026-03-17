@@ -6,7 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {MAP_MODES} from './maps.constants';
 import {convertImagePixelsToLatLong} from './maps.helpers';
-import {setIntervalDragState, setIsDragIntervalMode} from './maps.slice';
+import {setIntervalDragState} from './maps.slice';
 import useMap from './useMap';
 import useMapFeatures from './useMapFeatures';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
@@ -35,16 +35,14 @@ const useMapPressEvents = ({
   const store = useStore();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
   const {getSpotAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
-  const {getIntervalSpotsThisStratSection, getSpotWithThisStratSection} = useSpots();
+  const {getSpotWithThisStratSection} = useSpots();
 
   /* Local State */
 
@@ -123,9 +121,11 @@ const useMapPressEvents = ({
           screenY = projected[1];
         }
       }
-      catch {
+      catch (err) {
+        console.log('getPointInView failed for slot', i, err);
         screenY = screenPointY;
       }
+      console.log('Slot', i, 'screenY:', screenY, 'lngLat:', lngLat);
       slotMap.push({
         lngLat,
         precedingIntervalId: i === 0 ? null : sorted[i - 1].properties.id,
@@ -143,6 +143,7 @@ const useMapPressEvents = ({
       ? [(slotA.lngLat[0] + slotB.lngLat[0]) / 2, (slotA.lngLat[1] + slotB.lngLat[1]) / 2]
       : slotA?.lngLat ?? slotMap[0]?.lngLat;
 
+    console.log('startIntervalDrag: snapScreenY =', snapScreenY, 'targetIndex =', targetIndex, 'slotMap screenYs =', slotMap.map(s => s.screenY));
     dispatch(setIntervalDragState({
       stratSectionId: stratSection.strat_section_id,
       startScreenX: screenPointX,
@@ -190,7 +191,8 @@ const useMapPressEvents = ({
         if (currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap) {
           setIsShowMacrostratOverlay(true);
           const currentZoom = await mapRef.current.getZoom();
-          setLocation({coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
+          setLocation(
+            {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
         }
         if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
         else if (stratSection) {
@@ -202,9 +204,7 @@ const useMapPressEvents = ({
       else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
       // Edit a Spot
       else if (mapMode === MAP_MODES.EDIT) await editSpot(e);
-      else {
-        console.log('Error. Unknown map mode:', mapMode);
-      }
+      else console.log('Error. Unknown map mode:', mapMode);
     }
   };
 

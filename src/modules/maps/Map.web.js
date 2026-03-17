@@ -4,7 +4,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
 import {useDispatch, useSelector} from 'react-redux';
 
-import IntervalDrag from './IntervalDrag';
 import {MapLayers} from './layers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import {setIsMapMoved} from './maps.slice';
@@ -96,8 +95,6 @@ const Map = ({
   /* View */
 
   return (
-    <>
-    <IntervalDrag mapRef={mapRef}/>
     <ReactMapGL
       {...viewState}
       boxZoom={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
@@ -142,7 +139,6 @@ const Map = ({
         spotsSelected={spotsSelected}
       />
     </ReactMapGL>
-    </>
   );
 };
 
