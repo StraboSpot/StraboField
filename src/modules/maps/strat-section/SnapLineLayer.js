@@ -87,6 +87,18 @@ const SnapLineLayer = () => {
         pointerEvents='none'
         style={[styles.snapLine, {top: startScreenY}, snapLineAnimStyle]}
       />
+      <Animated.Text
+        pointerEvents='none'
+        style={[styles.arrowUp, {top: startScreenY - 11}, snapLineAnimStyle]}
+      >
+        ▲
+      </Animated.Text>
+      <Animated.Text
+        pointerEvents='none'
+        style={[styles.arrowDown, {top: startScreenY + 3}, snapLineAnimStyle]}
+      >
+        ▼
+      </Animated.Text>
       <GestureDetector gesture={gesture}>
         <Animated.View style={[styles.snapLineHitArea, snapLineHitAreaStyle]}/>
       </GestureDetector>
@@ -95,6 +107,24 @@ const SnapLineLayer = () => {
 };
 
 const styles = StyleSheet.create({
+  arrowDown: {
+    color: 'orange',
+    fontSize: 10,
+    left: 0,
+    lineHeight: 10,
+    position: 'absolute',
+    right: 0,
+    textAlign: 'center',
+  },
+  arrowUp: {
+    color: 'orange',
+    fontSize: 10,
+    left: 0,
+    lineHeight: 10,
+    position: 'absolute',
+    right: 0,
+    textAlign: 'center',
+  },
   snapLine: {
     backgroundColor: 'orange',
     height: 3,
