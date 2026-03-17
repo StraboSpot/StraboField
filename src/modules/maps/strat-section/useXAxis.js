@@ -23,8 +23,8 @@ const useXAxis = (n) => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
-  const {getIntervalSpotsThisStratSection} = useSpots();
   const {convertImagePixelsToLatLong} = useMapCoords();
+  const {getIntervalSpotsThisStratSection} = useSpots();
 
   /* Derived Variables */
 

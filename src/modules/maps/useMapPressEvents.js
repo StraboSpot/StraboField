@@ -32,7 +32,6 @@ const useMapPressEvents = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const store = useStore();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -43,6 +42,7 @@ const useMapPressEvents = ({
   const {getSpotAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
+  const store = useStore();
 
   /* Local State */
 
@@ -50,13 +50,13 @@ const useMapPressEvents = ({
 
   /* Internal Functions */
 
-  function getScreenPoint(e) {
+  const getScreenPoint = (e) => {
     if (Platform.OS === 'web') return [e.point.x, e.point.y];
     if (Platform.OS === 'android') {
       return [e.properties.screenPointX / PixelRatio.get(), e.properties.screenPointY / PixelRatio.get()];
     }
     return [e.properties.screenPointX, e.properties.screenPointY];
-  }
+  };
 
   /* Exported Functions */
 
@@ -72,6 +72,58 @@ const useMapPressEvents = ({
     }
     else if (mapMode === MAP_MODES.EDIT) await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit);
     else console.log('No Spots to edit. No action taken.');
+  };
+
+  // Mapbox: Handle map press
+  const handleMapPress = async (e) => {
+    if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
+      const [x, y] = getScreenPoint(e);
+      const clientY = Platform.OS === 'web' ? (e.originalEvent?.clientY ?? y) : y;
+      const spotAtPress = await getSpotAtPress(x, y);
+      const isStratInterval = s => s?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
+      // Fall back to the previously selected interval (e.g. click fired after snap-line drag
+      // lands on a slot boundary where queryRenderedFeatures finds no feature).
+      // Read selectedSpot from store directly to get the post-reorder value on web.
+      const freshSelectedSpot = store.getState().spot.selectedSpot;
+      const intervalToUse = isStratInterval(spotAtPress) ? spotAtPress
+        : isStratInterval(freshSelectedSpot) ? freshSelectedSpot
+          : null;
+      if (intervalToUse) await startIntervalDrag(x, y, intervalToUse, clientY);
+      return;
+    }
+
+    if (store.getState().map.intervalDragState) return;
+
+    console.log('Map press detected:', e);
+    console.log('Map mode:', mapMode);
+    if (mapMode === MAP_MODES.DRAW.MEASURE) {
+      const updatedMeasureFeatures = await getMeasureFeatures(e, [...measureFeatures], setDistance);
+      setMeasureFeatures(updatedMeasureFeatures);
+    }
+    else if (mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON && mapMode !== MAP_MODES.DRAW.FREEHANDLINE) {
+      // Select/Unselect a feature
+      if (mapMode === MAP_MODES.VIEW) {
+        console.log('Selecting or unselect a feature ...');
+        const [screenPointX, screenPointY] = getScreenPoint(e);
+        const spotFound = await getSpotAtPress(screenPointX, screenPointY);
+        if (currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap) {
+          setIsShowMacrostratOverlay(true);
+          const currentZoom = await mapRef.current.getZoom();
+          setLocation(
+            {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
+        }
+        if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
+        else if (stratSection) {
+          dispatch(setSelectedSpot(getSpotWithThisStratSection(stratSection.strat_section_id)));
+        }
+        else clearSelectedSpots();
+      }
+      // Draw a feature
+      else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
+      // Edit a Spot
+      else if (mapMode === MAP_MODES.EDIT) await editSpot(e);
+      else console.log('Error. Unknown map mode:', mapMode);
+    }
   };
 
   const startIntervalDrag = async (screenPointX, screenPointY, draggedInterval, startClientY) => {
@@ -154,58 +206,6 @@ const useMapPressEvents = ({
       snapScreenY,
       targetSlotIndex: targetIndex,
     }));
-  };
-
-  // Mapbox: Handle map press
-  const handleMapPress = async (e) => {
-    if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
-      const [x, y] = getScreenPoint(e);
-      const clientY = Platform.OS === 'web' ? (e.originalEvent?.clientY ?? y) : y;
-      const spotAtPress = await getSpotAtPress(x, y);
-      const isStratInterval = s => s?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
-      // Fall back to the previously selected interval (e.g. click fired after snap-line drag
-      // lands on a slot boundary where queryRenderedFeatures finds no feature).
-      // Read selectedSpot from store directly to get the post-reorder value on web.
-      const freshSelectedSpot = store.getState().spot.selectedSpot;
-      const intervalToUse = isStratInterval(spotAtPress) ? spotAtPress
-        : isStratInterval(freshSelectedSpot) ? freshSelectedSpot
-          : null;
-      if (intervalToUse) await startIntervalDrag(x, y, intervalToUse, clientY);
-      return;
-    }
-
-    if (store.getState().map.intervalDragState) return;
-
-    console.log('Map press detected:', e);
-    console.log('Map mode:', mapMode);
-    if (mapMode === MAP_MODES.DRAW.MEASURE) {
-      const updatedMeasureFeatures = await getMeasureFeatures(e, [...measureFeatures], setDistance);
-      setMeasureFeatures(updatedMeasureFeatures);
-    }
-    else if (mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON && mapMode !== MAP_MODES.DRAW.FREEHANDLINE) {
-      // Select/Unselect a feature
-      if (mapMode === MAP_MODES.VIEW) {
-        console.log('Selecting or unselect a feature ...');
-        const [screenPointX, screenPointY] = getScreenPoint(e);
-        const spotFound = await getSpotAtPress(screenPointX, screenPointY);
-        if (currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap) {
-          setIsShowMacrostratOverlay(true);
-          const currentZoom = await mapRef.current.getZoom();
-          setLocation(
-            {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
-        }
-        if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
-        else if (stratSection) {
-          dispatch(setSelectedSpot(getSpotWithThisStratSection(stratSection.strat_section_id)));
-        }
-        else clearSelectedSpots();
-      }
-      // Draw a feature
-      else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
-      // Edit a Spot
-      else if (mapMode === MAP_MODES.EDIT) await editSpot(e);
-      else console.log('Error. Unknown map mode:', mapMode);
-    }
   };
 
   return {

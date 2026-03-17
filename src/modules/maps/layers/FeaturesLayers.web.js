@@ -12,8 +12,9 @@ import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
 
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
-  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   /* Data Hooks */
+
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();

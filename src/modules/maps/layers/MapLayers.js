@@ -34,7 +34,7 @@ const MapLayers = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {currentImageBasemap, isMapMoved, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, isDragIntervalMode, isMapMoved, stratSection} = useSelector(state => state.map);
 
   const {getInitialViewState} = useMapView();
 
@@ -111,7 +111,7 @@ const MapLayers = ({
       {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
 
       {/* Dragged Interval Highlight Layer — orange fill + white border */}
-      {stratSection && <DraggedIntervalLayer/>}
+      {stratSection && isDragIntervalMode && <DraggedIntervalLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>

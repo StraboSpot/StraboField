@@ -17,8 +17,6 @@ const SnapLineLayer = () => {
 
   /* Derived Variables */
 
-  if (!intervalDragState) return null;
-
   const lngLat = intervalDragState.snapLngLat;
   if (!lngLat) return null;
 

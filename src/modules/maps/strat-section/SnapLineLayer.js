@@ -16,21 +16,27 @@ const SnapLineLayer = () => {
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
-  const {reorderInterval} = useStratSectionCalculations();
   const {getSpotById} = useSpots();
+  const {reorderInterval} = useStratSectionCalculations();
 
   /* Local State */
 
   const snapOffsetY = useSharedValue(0);
-  const targetSlotIndexShared = useSharedValue(intervalDragState?.targetSlotIndex ?? 0);
 
-  /* Derived Variables */
+  const snapLineAnimStyle = useAnimatedStyle(() => ({transform: [{translateY: snapOffsetY.value}]}));
 
+  const SNAP_HIT_BUFFER = 12;
   const {startScreenY, slotMap} = intervalDragState || {};
 
-  /* Internal Functions */
+  const snapLineHitAreaStyle = useAnimatedStyle(() => ({
+    top: startScreenY + snapOffsetY.value - SNAP_HIT_BUFFER,
+    height: 3 + SNAP_HIT_BUFFER * 2,
+  }));
+  const targetSlotIndexShared = useSharedValue(intervalDragState?.targetSlotIndex ?? 0);
 
-  function executeReorder(slotIndex) {
+  /* Logic Helpers */
+
+  const executeReorder = (slotIndex) => {
     if (!selectedSpot) {
       dispatch(clearedIntervalDragState());
       return;
@@ -39,9 +45,7 @@ const SnapLineLayer = () => {
     const precedingInterval = slot?.precedingIntervalId ? getSpotById(slot.precedingIntervalId) : null;
     reorderInterval(selectedSpot, precedingInterval);
     dispatch(clearedIntervalDragState());
-  }
-
-  /* Gesture */
+  };
 
   const gesture = Gesture.Pan()
     .onUpdate((e) => {
@@ -63,38 +67,25 @@ const SnapLineLayer = () => {
       runOnJS(executeReorder)(targetSlotIndexShared.value);
     });
 
-  /* Render Functions */
-
-  const SNAP_HIT_BUFFER = 12;
-
-  const snapLineAnimStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: snapOffsetY.value}],
-  }));
-
-  const snapLineHitAreaStyle = useAnimatedStyle(() => ({
-    top: startScreenY + snapOffsetY.value - SNAP_HIT_BUFFER,
-    height: 3 + SNAP_HIT_BUFFER * 2,
-  }));
-
-  if (!intervalDragState) return null;
+  /* View */
 
   return (
     <View
-      pointerEvents='box-none'
+      pointerEvents={'box-none'}
       style={[StyleSheet.absoluteFill, {zIndex: 100}]}
     >
       <Animated.View
-        pointerEvents='none'
+        pointerEvents={'none'}
         style={[styles.snapLine, {top: startScreenY}, snapLineAnimStyle]}
       />
       <Animated.Text
-        pointerEvents='none'
+        pointerEvents={'none'}
         style={[styles.arrowUp, {top: startScreenY - 11}, snapLineAnimStyle]}
       >
         ▲
       </Animated.Text>
       <Animated.Text
-        pointerEvents='none'
+        pointerEvents={'none'}
         style={[styles.arrowDown, {top: startScreenY + 3}, snapLineAnimStyle]}
       >
         ▼

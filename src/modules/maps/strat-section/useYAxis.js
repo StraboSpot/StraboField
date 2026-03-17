@@ -29,10 +29,10 @@ const useYAxis = (spotsDisplayed) => {
 
   // Convert interval extents to pixel coords and find outermost tick marks
   // Always include 0 so the origin is labeled and the axis extends to/past it in both directions
-  const yMaxPixel = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, [0, maxY])[1];
   const yMinPixel = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, [0, minY])[1];
-  const topTickPixel = Math.max(0, Math.floor(yMaxPixel / Y_MULTIPLIER) * Y_MULTIPLIER);
   const bottomTickPixel = Math.min(0, Math.floor(yMinPixel / Y_MULTIPLIER) * Y_MULTIPLIER);
+  const yMaxPixel = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, [0, maxY])[1];
+  const topTickPixel = Math.max(0, Math.floor(yMaxPixel / Y_MULTIPLIER) * Y_MULTIPLIER);
 
   /* Exported Functions */
 

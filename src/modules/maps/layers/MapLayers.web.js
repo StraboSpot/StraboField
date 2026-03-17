@@ -32,7 +32,7 @@ const MapLayers = ({
                    }) => {
   /* Data Hooks */
 
-  const {currentImageBasemap, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, intervalDragState, isDragIntervalMode, stratSection} = useSelector(state => state.map);
 
   const useDimensions = useWindowSize();
 
@@ -80,10 +80,10 @@ const MapLayers = ({
       {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
 
       {/* Dragged Interval Highlight Layer — orange fill + white border */}
-      {stratSection && <DraggedIntervalLayer/>}
+      {stratSection && isDragIntervalMode && <DraggedIntervalLayer/>}
 
       {/* Snap Line Layer — shown while dragging an interval */}
-      {stratSection && <SnapLineLayer/>}
+      {stratSection && intervalDragState && <SnapLineLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>
