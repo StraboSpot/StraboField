@@ -32,6 +32,10 @@ const RightSideButtons = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
   const {isReadOnly} = useSelector(state => state.project?.project);
+  const isSingleLockedDataset = useSelector((state) => {
+    const values = Object.values(state.project.datasets || {});
+    return values.length === 1 && values[0]?.isReadOnly === true;
+  });
   /* View */
 
   return (
@@ -69,7 +73,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        {!isReadOnly && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
+        {!isReadOnly && !isSingleLockedDataset && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );
