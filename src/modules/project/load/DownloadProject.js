@@ -54,16 +54,15 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     const downloadedDatasets = await initializeDownload(inProjectToDownload, undefined);
     if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
       dispatch(setIsStatusMessagesModalVisible(false));
+      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       const emailFound = Object.values(downloadedDatasets).some(dataset => dataset.owner_email === email);
       if (emailFound) {
         console.log('Email found in datasets');
         setIsDatasetNameModalVisible(false);
         dispatch(setSidePanelVisible({bool: false}));
-        dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       }
       else {
         setTimeout(() => {
-          dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
           setIsDatasetNameModalVisible(true);
         }, 400);
       }
@@ -122,9 +121,8 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         dialogTitle={'Name Your Dataset'}
         onActionPressed={onDatasetNameConfirm}
         onCancelPress={() => {
-          // dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+          dispatch(setSidePanelVisible({bool: false}));
           setIsDatasetNameModalVisible(false);
-          // closeMainMenuPanel();
         }}
         onChangeText={text => setCollaborativeDatasetName(text)}
         placeholder={'Enter dataset name...'}
