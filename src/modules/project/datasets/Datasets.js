@@ -30,7 +30,9 @@ const Datasets = () => {
         dispatch(setActiveDatasets({bool: true, dataset: Object.values(datasets)[0].id}));
         dispatch(setTargetDataset(Object.values(datasets)[0].id));
       }
-      else if (!targetDatasetId) dispatch(setTargetDataset(activeDatasetsIds[0]));
+      else if (!targetDatasetId && !Object.values(datasets)[0].isReadOnly) {
+        dispatch(setTargetDataset(activeDatasetsIds[0]));
+      }
     }
   }, [datasets]);
 
