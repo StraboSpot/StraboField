@@ -35,10 +35,10 @@ const RightSideButtons = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+  const {lockOrientation, unlockOrientation} = useDeviceOrientation();
 
   useEffect(() => {
-    if (mapMode === MAP_MODES.INTERVAL_DRAG) lockToPortrait();
+    if (mapMode === MAP_MODES.INTERVAL_DRAG) lockOrientation();
     else unlockOrientation();
   }, [mapMode]);
 

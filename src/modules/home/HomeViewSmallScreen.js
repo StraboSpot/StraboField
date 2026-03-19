@@ -14,7 +14,6 @@ import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
-import {MAP_MODES} from '../maps/maps.constants';
 import {cancelledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
@@ -52,18 +51,11 @@ const HomeViewSmallScreen = forwardRef(({
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
   const {height, width} = useWindowSize();
-  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+  const {lockToPortrait} = useDeviceOrientation();
 
   useEffect(() => {
-    Platform.OS !== 'web'
-    && lockToPortrait();
+    Platform.OS !== 'web' && lockToPortrait();
   }, []);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    if (mapMode === MAP_MODES.INTERVAL_DRAG) lockToPortrait();
-    else unlockOrientation();
-  }, [mapMode]);
 
   const Tab = createMaterialTopTabNavigator();
 
