@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Image} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -20,8 +20,16 @@ import {
   setLabelTypeOn,
   setTagTypeForColor,
 } from '../../maps/maps.slice';
+import {MAP_SYMBOLS} from '../../maps/symbology/mapSymbology.constants';
 import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
+import {DRAW_ACTION_IMAGES} from '../buttons/drawActionButtons.constants';
+
+const GEOMETRY_TYPE_IMAGE = {
+  points: MAP_SYMBOLS.default_point,
+  lines: DRAW_ACTION_IMAGES.LINE.ICON,
+  polygons: DRAW_ACTION_IMAGES.POLYGON.ICON,
+};
 
 const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   /* Data Hooks */
@@ -49,6 +57,11 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   const handleShowSamplesOn = () => dispatch(setIsShowSamplesOn(!isShowSamplesOn));
 
   /* Logic Helpers */
+
+  const getSymbolImages = (type) => {
+    const matchingKeys = Object.keys(MAP_SYMBOLS).filter(key => key.startsWith(type));
+    return matchingKeys.length > 0 ? matchingKeys.map(key => MAP_SYMBOLS[key]) : [MAP_SYMBOLS.default_point];
+  };
 
   const getSymbolTitle = symbol => toTitleCase(getMeasurementLabel(symbol));
 
@@ -82,23 +95,12 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
 
   const renderGeometryTypesList = ({item}) => {
     return (
-      <ListItem containerStyle={[
-        commonStyles.listItemFormField,
-        SMALL_SCREEN && {
-          // minHeight: 50,
-          paddingVertical: 15,
-          paddingHorizontal: 20,
-        },
-      ]} key={item}>
+      <ListItem containerStyle={commonStyles.listItemFormField} key={item}>
         <>
-          <ListItem.Content>
-            <ListItem.Title style={[
-              commonStyles.listItemTitle,
-              SMALL_SCREEN && {
-                fontSize: 16,
-                fontWeight: '500',
-              },
-            ]}>    {getSymbolTitle(item)}</ListItem.Title>
+          <ListItem.Content
+            style={{paddingLeft: 20, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row'}}>
+            <ListItem.Title style={commonStyles.listItemTitle}>{getSymbolTitle(item)}</ListItem.Title>
+            <Image resizeMode={'contain'} source={GEOMETRY_TYPE_IMAGE[item]} style={{height: 24, width: 24}}/>
           </ListItem.Content>
           <SwitchWrapper onValueChange={() => toggleGeometryTypesOff(item)} value={!geometryTypesOff.includes(item)}/>
         </>
@@ -108,23 +110,14 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
 
   const renderSymbolsList = ({item}) => {
     return (
-      <ListItem containerStyle={[
-        commonStyles.listItemFormField,
-        SMALL_SCREEN && {
-          minHeight: 50,
-          paddingVertical: 15,
-          paddingHorizontal: 20,
-        },
-      ]} key={item}>
+      <ListItem containerStyle={commonStyles.listItemFormField} key={item}>
         <>
-          <ListItem.Content>
-            <ListItem.Title style={[
-              commonStyles.listItemTitle,
-              SMALL_SCREEN && {
-                fontSize: 16,
-                fontWeight: '500',
-              },
-            ]}>    {getSymbolTitle(item)}</ListItem.Title>
+          <ListItem.Content
+            style={{paddingLeft: 20, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row'}}>
+            <ListItem.Title style={commonStyles.listItemTitle}>{getSymbolTitle(item)}</ListItem.Title>
+            {getSymbolImages(item).map((source, i) => (
+              <Image key={i} resizeMode={'contain'} source={source} style={{height: 20, width: 24}}/>
+            ))}
           </ListItem.Content>
           <SwitchWrapper onValueChange={() => toggleFeatureTypesOff(item)} value={!featureTypesOff.includes(item)}/>
         </>
