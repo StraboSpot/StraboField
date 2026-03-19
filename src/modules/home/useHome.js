@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/Helpers';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {cancelledIntervalDrag, setFreehandFeatureCoords, setIntervalDragSnapshot, setIsDragIntervalMode} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -51,7 +52,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   useEffect(() => {
     if (isDragIntervalMode) return;
     if (intervalDragState) lockOrientation();
-    else unlockOrientation();
+    else if (!SMALL_SCREEN) unlockOrientation();
   }, [intervalDragState]);
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const cancelEdits = async () => {
     await mapComponentRef.current?.cancelEdits();
     setMapMode(MAP_MODES.VIEW);
-    unlockOrientation();
+    if (!SMALL_SCREEN) unlockOrientation();
   };
 
   const createPointAtCurrentLocation = async () => {
@@ -85,7 +86,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     mapComponentRef.current?.saveEdits();
     //cancelEdits();
     setMapMode(MAP_MODES.VIEW);
-    unlockOrientation();
+    if (!SMALL_SCREEN) unlockOrientation();
   };
 
   const setDraw = async (mapModeToSet) => {
