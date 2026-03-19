@@ -113,17 +113,17 @@ const Map = ({
         logoPosition={homeStyles.mapboxLogoPosition}
         onCameraChanged={handleMapMoved}  // Update spots in extent and saved view (center and zoom)
         onDidFinishLoadingMap={onDidFinishLoadingMap}
-        onLongPress={intervalDragState && !isDragIntervalMode ? undefined : handleMapLongPress}
-        onPress={intervalDragState && !isDragIntervalMode ? undefined : handleMapPress}
+        onLongPress={handleMapLongPress}
+        onPress={handleMapPress}
         pitchEnabled={false}
         ref={mapRef}
         rotateEnabled={false}
         scaleBarEnabled={!currentImageBasemap && !stratSection}
         scaleBarPosition={scaleBarPosition}
-        scrollEnabled={allowMapViewMove && !intervalDragState && !isDragIntervalMode}
+        scrollEnabled={allowMapViewMove && !isDragIntervalMode}
         style={mapStyles.map}
         styleURL={currentImageBasemap || stratSection ? JSON.stringify(BACKGROUND) : JSON.stringify(basemap)}
-        zoomEnabled={allowMapViewMove && !intervalDragState && !isDragIntervalMode}
+        zoomEnabled={allowMapViewMove && !isDragIntervalMode}
       >
         <MapLayers
           basemap={basemap}

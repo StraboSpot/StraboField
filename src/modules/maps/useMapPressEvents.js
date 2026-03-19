@@ -177,7 +177,6 @@ const useMapPressEvents = ({
         console.log('getPointInView failed for slot', i, err);
         screenY = screenPointY;
       }
-      console.log('Slot', i, 'screenY:', screenY, 'lngLat:', lngLat);
       slotMap.push({
         lngLat,
         precedingIntervalId: i === 0 ? null : sorted[i - 1].properties.id,
@@ -195,7 +194,6 @@ const useMapPressEvents = ({
       ? [(slotA.lngLat[0] + slotB.lngLat[0]) / 2, (slotA.lngLat[1] + slotB.lngLat[1]) / 2]
       : slotA?.lngLat ?? slotMap[0]?.lngLat;
 
-    console.log('startIntervalDrag: snapScreenY =', snapScreenY, 'targetIndex =', targetIndex, 'slotMap screenYs =', slotMap.map(s => s.screenY));
     dispatch(setIntervalDragState({
       stratSectionId: stratSection.strat_section_id,
       startScreenX: screenPointX,

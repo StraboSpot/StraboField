@@ -2,14 +2,14 @@ import {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
-import {cancelledIntervalDrag, setFreehandFeatureCoords, setIntervalDragSnapshot, setIsDragIntervalMode} from '../maps/maps.slice';
+import {cancelledIntervalDrag, savedIntervalDragReordering, setFreehandFeatureCoords, startedIntervalDrag} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
@@ -22,11 +22,11 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
-  const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
-  const spots = useSelector(state => state.spot.spots);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  const store = useStore();
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -48,12 +48,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
-
-  useEffect(() => {
-    if (isDragIntervalMode) return;
-    if (intervalDragState) lockOrientation();
-    else if (!SMALL_SCREEN) unlockOrientation();
-  }, [intervalDragState]);
 
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
@@ -185,15 +179,15 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         openNotebookPanel(PAGE_KEYS.STRAT_SECTION);
         break;
       case 'startIntervalDrag':
-        dispatch(setIntervalDragSnapshot(
-          Object.values(spots).filter(s => s.properties.strat_section_id === stratSection?.strat_section_id)
+        dispatch(startedIntervalDrag(
+          Object.values(store.getState().spot.spots)
+            .filter(s => s.properties.strat_section_id === stratSection?.strat_section_id)
             .map(s => JSON.parse(JSON.stringify(s))),
         ));
-        dispatch(setIsDragIntervalMode(true));
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
-        dispatch(setIsDragIntervalMode(false));
+        dispatch(savedIntervalDragReordering());
         setMapMode(MAP_MODES.VIEW);
         break;
       case 'cancelIntervalDrag':

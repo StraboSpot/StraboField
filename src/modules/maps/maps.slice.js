@@ -44,14 +44,19 @@ const mapsSlice = createSlice({
     addedCustomMapsFromBackup(state, action) {
       state.customMaps = action.payload;
     },
+    cancelledIntervalDrag(state) {
+      state.isDragIntervalMode = false;
+      state.intervalDragState = null;
+      state.intervalDragSnapshot = null;
+    },
+    clearedIntervalDragState(state) {
+      state.intervalDragState = null;
+    },
     clearedMaps(state) {
       state.customMaps = {};
     },
     clearedSpotsInMapExtentIds(state) {
       state.spotsInMapExtentIds = [];
-    },
-    clearedIntervalDragState(state) {
-      state.intervalDragState = null;
     },
     clearedStratSection(state) {
       state.intervalDragState = null;
@@ -67,6 +72,11 @@ const mapsSlice = createSlice({
     },
     resetMapState() {
       return initialMapsState;
+    },
+    savedIntervalDragReordering(state) {
+      state.isDragIntervalMode = false;
+      state.intervalDragState = null;
+      state.intervalDragSnapshot = null;
     },
     selectedCustomMapToEdit(state, action) {
       state.selectedCustomMapToEdit = action.payload;
@@ -112,21 +122,6 @@ const mapsSlice = createSlice({
         }
       }
     },
-    cancelledIntervalDrag(state) {
-      state.isDragIntervalMode = false;
-      state.intervalDragState = null;
-      state.intervalDragSnapshot = null;
-    },
-    setIntervalDragSnapshot(state, action) {
-      state.intervalDragSnapshot = action.payload;
-    },
-    setIsDragIntervalMode(state, action) {
-      state.isDragIntervalMode = action.payload;
-      if (!action.payload) {
-        state.intervalDragState = null;
-        state.intervalDragSnapshot = null;
-      }
-    },
     setIsMapMoved(state, action) {
       state.isMapMoved = action.payload;
     },
@@ -166,6 +161,10 @@ const mapsSlice = createSlice({
     setZoom(state, action) {
       state.zoom = action.payload;
     },
+    startedIntervalDrag(state, action) {
+      state.isDragIntervalMode = true;
+      state.intervalDragSnapshot = action.payload;
+    },
     updateCustomMap(state, action) {
       state.customMaps[action.payload.id] = action.payload;
     },
@@ -183,6 +182,7 @@ export const {
   clearedVertexes,
   deletedCustomMap,
   resetMapState,
+  savedIntervalDragReordering,
   selectedCustomMapToEdit,
   setCenter,
   setCurrentBasemap,
@@ -191,10 +191,8 @@ export const {
   setFeatureTypesOff,
   setFreehandFeatureCoords,
   setGeometryTypesOff,
-  setIntervalDragSnapshot,
   setIntervalDragState,
   setIntervalDragTargetSlot,
-  setIsDragIntervalMode,
   setIsMapMoved,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,
@@ -206,6 +204,7 @@ export const {
   setVertexEndCoords,
   setVertexStartCoords,
   setZoom,
+  startedIntervalDrag,
   updateCustomMap,
 } = mapsSlice.actions;
 

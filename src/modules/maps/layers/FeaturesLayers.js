@@ -18,6 +18,7 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   /* Data Hooks */
 
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
   const {isSpotInReadOnlyDataset} = useProject();
@@ -88,7 +89,10 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>
+      <FeaturesSelectedLayers
+        featuresSelected={isDragIntervalMode ? [] : featuresSelected}
+        isStratStyleLoaded={isStratStyleLoaded}
+      />
     </>
   );
 };

@@ -36,7 +36,6 @@ const Map = ({
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -97,10 +96,10 @@ const Map = ({
   return (
     <ReactMapGL
       {...viewState}
-      boxZoom={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
+      boxZoom={allowMapViewMove && !isDragIntervalMode}
       cursor={cursor}
       doubleClickZoom={!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT)}
-      dragPan={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
+      dragPan={allowMapViewMove && !isDragIntervalMode}
       dragRotate={false}
       id={currentMapId}
       interactiveLayerIds={[...LAYER_IDS_NOT_SELECTED, ...LAYER_IDS_SELECTED]}
@@ -115,7 +114,7 @@ const Map = ({
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
       pitchWithRotate={false}
       ref={mapRef}
-      scrollZoom={allowMapViewMove && !isDragIntervalMode && !intervalDragState}
+      scrollZoom={allowMapViewMove && !isDragIntervalMode}
       style={{flex: 1}}
       styleDiffing={false}
       touchPitch={false}

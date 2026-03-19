@@ -59,11 +59,6 @@ const homeStyles = StyleSheet.create({
     textShadowColor: themes.BLACK,
     textShadowRadius: 10,
   },
-  dragIntervalButton: {
-    position: 'absolute',
-    right: SMALL_SCREEN ? 60 : 110,
-    top: 10,
-  },
   drawContainer: {
     bottom: 30,
     position: 'absolute',
