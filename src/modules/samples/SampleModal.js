@@ -175,7 +175,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
         setIsLoading(false);
       }
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      await currentForm.resetForm();
+      await formSnapshot.resetForm();
       if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
 
       if (newSample.sample_id_name) {
