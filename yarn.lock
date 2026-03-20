@@ -3764,9 +3764,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/datetimepicker@npm:8.6.0":
-  version: 8.6.0
-  resolution: "@react-native-community/datetimepicker@npm:8.6.0"
+"@react-native-community/datetimepicker@npm:9.1.0":
+  version: 9.1.0
+  resolution: "@react-native-community/datetimepicker@npm:9.1.0"
   dependencies:
     invariant: "npm:^2.2.4"
   peerDependencies:
@@ -3779,7 +3779,7 @@ __metadata:
       optional: true
     react-native-windows:
       optional: true
-  checksum: 10c0/4f7e84480e3a324a1f4e235d13552468a758a0bf3d6de6a67ef39bfc56c18c41566c4411cc5fc075d000cc5f744a63ced77dd38c6bb13ae15cc980f9af891b56
+  checksum: 10c0/3f31baec58c1245204a9b4057809027019aa1abb4b8caea4cb4d44ab70f5a97dfe5114a8aa315299aa47ad31971059181c355aa056d9c3a14b7892582da9f4cb
   languageName: node
   linkType: hard
 
@@ -15644,7 +15644,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-tab-view@npm:4.3.0, react-native-tab-view@npm:^4.3.0":
+"react-native-tab-view@npm:4.2.2":
+  version: 4.2.2
+  resolution: "react-native-tab-view@npm:4.2.2"
+  dependencies:
+    use-latest-callback: "npm:^0.2.4"
+  peerDependencies:
+    react: ">= 18.2.0"
+    react-native: "*"
+    react-native-pager-view: ">= 6.0.0"
+  checksum: 10c0/8fadb0d84e2ab9695dd58946eed2840deefde1ab16cfad3bcdaf4d1e25f68fed171f7a04f1deb9a4cc267a8eafe1f620d204a0a3cd00f724c5997df104e8c45d
+  languageName: node
+  linkType: hard
+
+"react-native-tab-view@npm:^4.3.0":
   version: 4.3.0
   resolution: "react-native-tab-view@npm:4.3.0"
   dependencies:
@@ -17066,7 +17079,7 @@ __metadata:
     "@react-native-community/cli": "npm:20.1.2"
     "@react-native-community/cli-platform-android": "npm:20.1.2"
     "@react-native-community/cli-platform-ios": "npm:20.1.2"
-    "@react-native-community/datetimepicker": "npm:8.6.0"
+    "@react-native-community/datetimepicker": "npm:9.1.0"
     "@react-native-community/geolocation": "npm:3.4.0"
     "@react-native-community/netinfo": "npm:12.0.1"
     "@react-native-community/slider": "npm:5.1.2"
@@ -17146,7 +17159,7 @@ __metadata:
     react-native-screens: "npm:4.24.0"
     react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
-    react-native-tab-view: "npm:4.3.0"
+    react-native-tab-view: "npm:4.2.2"
     react-native-toast-notifications: "npm:3.4.0"
     react-native-vector-icons: "npm:10.3.0"
     react-native-web: "npm:0.21.2"
