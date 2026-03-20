@@ -15492,16 +15492,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keyboard-controller@npm:^1.20.7":
-  version: 1.20.7
-  resolution: "react-native-keyboard-controller@npm:1.20.7"
+"react-native-keyboard-controller@npm:1.21.1":
+  version: 1.21.1
+  resolution: "react-native-keyboard-controller@npm:1.21.1"
   dependencies:
     react-native-is-edge-to-edge: "npm:^1.2.1"
   peerDependencies:
     react: "*"
     react-native: "*"
     react-native-reanimated: ">=3.0.0"
-  checksum: 10c0/f3a1682552ed90f086f4442ba2eebfb2080451e4c9d686345ba92b8fbeca3498172e6b302a413406fabe9ab06cc19c67dbec22a7703b72342f89d39fce136db3
+  checksum: 10c0/873dbb28bc1576c0992eec8189ea440723f1996932f11cd9ddeabacbf711badd02c6824ab7a4a5b7a2f1f8622308774032b2ec100051eb56efd5ff664dd802d1
   languageName: node
   linkType: hard
 
@@ -17147,7 +17147,7 @@ __metadata:
     react-native-indicators: "npm:0.17.0"
     react-native-json-tree: "npm:1.5.0"
     react-native-keep-awake: "npm:4.0.0"
-    react-native-keyboard-controller: "npm:^1.20.7"
+    react-native-keyboard-controller: "npm:1.21.1"
     react-native-multiple-select: "npm:0.5.12"
     react-native-orientation-director: "npm:2.6.5"
     react-native-pager-view: "npm:8.0.0"
