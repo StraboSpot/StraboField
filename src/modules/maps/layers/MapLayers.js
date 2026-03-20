@@ -88,7 +88,7 @@ const MapLayers = ({
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}
 
       {/* Strat Section Background Layer */}
-      {stratSection && <StratSectionBackground spotsDisplayed={spotsDisplayed}/>}
+      {stratSection && <StratSectionBackground/>}
 
       {/* Image Basemap Layer */}
       <ImageBasemapLayer/>
