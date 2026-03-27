@@ -82,6 +82,21 @@ export const handleResponse = (response) => {
   return handleError(response);
 };
 
+export const postFormDataRequest = async (url, formData, auth) => {
+  try {
+    const response = await timeoutPromise(fetch(url, {
+      method: 'POST',
+      headers: buildHeaders(auth),
+      body: formData,
+    }));
+    return handleResponse(response);
+  }
+  catch (err) {
+    console.error(`Error POST (FormData): ${url}`, err);
+    throw err;
+  }
+};
+
 export const postRequest = async (url, body, auth, customHeaders = {}) => {
   try {
     const response = await timeoutPromise(fetch(url, {
