@@ -15713,20 +15713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-tab-view@npm:4.2.2":
-  version: 4.2.2
-  resolution: "react-native-tab-view@npm:4.2.2"
-  dependencies:
-    use-latest-callback: "npm:^0.2.4"
-  peerDependencies:
-    react: ">= 18.2.0"
-    react-native: "*"
-    react-native-pager-view: ">= 6.0.0"
-  checksum: 10c0/8fadb0d84e2ab9695dd58946eed2840deefde1ab16cfad3bcdaf4d1e25f68fed171f7a04f1deb9a4cc267a8eafe1f620d204a0a3cd00f724c5997df104e8c45d
-  languageName: node
-  linkType: hard
-
-"react-native-tab-view@npm:^4.3.0":
+"react-native-tab-view@npm:4.3.0, react-native-tab-view@npm:^4.3.0":
   version: 4.3.0
   resolution: "react-native-tab-view@npm:4.3.0"
   dependencies:
@@ -17228,7 +17215,7 @@ __metadata:
     react-native-screens: "npm:4.24.0"
     react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
-    react-native-tab-view: "npm:4.2.2"
+    react-native-tab-view: "npm:4.3.0"
     react-native-toast-notifications: "npm:3.4.0"
     react-native-vector-icons: "npm:10.3.0"
     react-native-web: "npm:0.21.2"
