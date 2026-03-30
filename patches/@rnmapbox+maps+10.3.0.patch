@@ -1,8 +1,68 @@
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
+index 0560de2..a2dee66 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
+@@ -66,8 +66,10 @@ class RNMBXImageQueueOperation : Operation {
+     weak var weakSelf : RNMBXImageQueueOperation! = self
+ 
+     DispatchQueue.global(qos: .default).async {
+-      if let weakSelf = weakSelf {
+-        let loader : RCTImageLoaderProtocol = weakSelf.bridge!.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
++      guard let weakSelf = weakSelf else { return }
++
++      if let bridge = weakSelf.bridge {
++        let loader : RCTImageLoaderProtocol = bridge.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
+ 
+         let cancellationBlock = loader.loadImage(with: weakSelf.urlRequest, size: .zero, scale: CGFloat(weakSelf.scale), clipped: true, resizeMode: .stretch, progressBlock: { _,_  in }, partialLoad: { _ in }) { error, image in
+           if let completionHandler = weakSelf.completionHandler {
+@@ -76,12 +78,18 @@ class RNMBXImageQueueOperation : Operation {
+           _ = weakSelf.setState(state:.Finished, except:.Finished)
+         }
+ 
+-        if true /*let weakSelf = weakSelf */ {
+-          weakSelf.cancellationBlock = cancellationBlock
+-          if (weakSelf.setState(state:.Executing, only:.Initial) == .CancelDoNotExecute) {
+-            weakSelf.callCancellationBlock()
+-          }
++        weakSelf.cancellationBlock = cancellationBlock
++        if (weakSelf.setState(state:.Executing, only:.Initial) == .CancelDoNotExecute) {
++          weakSelf.callCancellationBlock()
+         }
++      } else {
++        // Bridgeless mode fallback: load image directly via URLSession.
++        _ = weakSelf.setState(state:.Executing, only:.Initial)
++        URLSession.shared.dataTask(with: weakSelf.urlRequest) { data, _, error in
++          let image = data.flatMap { UIImage(data: $0, scale: CGFloat(weakSelf.scale ?? 1.0)) }
++          weakSelf.completionHandler?(error, image)
++          _ = weakSelf.setState(state:.Finished, except:.Finished)
++        }.resume()
+       }
+     }
+   }
+@@ -130,15 +138,15 @@ class RNMBXImageQueue {
+     return result
+   }()
+   
+-  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
++  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
+     addImage(urlRequest: RCTConvert.nsurlRequest(url), scale: scale, bridge: bridge, handler: handler)
+   }
+   
+-  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
++  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
+     addImage(urlRequest: RCTConvert.nsurlRequest(json), scale: scale, bridge: bridge, handler: handler)
+   }
+   
+-  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
++  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
+     let operation = RNMBXImageQueueOperation()
+     operation.bridge = bridge
+     operation.urlRequest = urlRequest
 diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
-index 1234567..abcdefg 100644
+index b89393d..182dbb5 100644
 --- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
 +++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImages.swift
-@@ -18,7 +18,7 @@
+@@ -12,7 +12,7 @@ typealias StyleImageMissingPayload = StyleImageMissing
  
  open class RNMBXImages : UIView, RNMBXMapComponent {
    
@@ -11,100 +71,96 @@ index 1234567..abcdefg 100644
    
    weak var style: Style? = nil
  
-diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
-index 1234567..abcdefg 100644
---- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
-+++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
-@@ -8,7 +8,7 @@
-     RNMBXImageQueue.sharedInstance.addImage(url, scale: scale, bridge: bridge, handler: callback)
-   }
-   
--  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
-+  static func fetchImages(_ bridge: RCTBridge?, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
-     guard !objects.isEmpty else {
-       return
-     }
-@@ -41,7 +41,7 @@
-             }
-           }
-           
--          RNMBXImageQueue.sharedInstance.addImage(resolvedImage, scale: Double(scale), bridge:bridge) {
-+          RNMBXImageQueue.sharedInstance.addImage(resolvedImage, scale: Double(scale), bridge: bridge) {
-             (error,image) in
-             if image == nil {
-               RNMBXLogWarn("Failed to fetch image: \(imageName) error:\(optional: error)")
-diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
-index 1234567..abcdefg 100644
---- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
-+++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
-@@ -66,22 +66,32 @@
-     weak var weakSelf : RNMBXImageQueueOperation! = self
-     
-     DispatchQueue.global(qos: .default).async {
--      if let weakSelf = weakSelf {
--        let loader : RCTImageLoaderProtocol = weakSelf.bridge!.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
--        
-+      guard let weakSelf = weakSelf else { return }
-+
-+      if let bridge = weakSelf.bridge {
-+        let loader : RCTImageLoaderProtocol = bridge.module(forName: "ImageLoader", lazilyLoadIfNecessary: true) as! RCTImageLoaderProtocol
-+
-         let cancellationBlock = loader.loadImage(with: weakSelf.urlRequest, size: .zero, scale: CGFloat(weakSelf.scale), clipped: true, resizeMode: .stretch, progressBlock: { _,_  in }, partialLoad: { _ in }) { error, image in
-           if let completionHandler = weakSelf.completionHandler {
-             completionHandler(error, image)
-           }
-           _ = weakSelf.setState(state:.Finished, except:.Finished)
-         }
--        
--        if true /*let weakSelf = weakSelf */ {
--          weakSelf.cancellationBlock = cancellationBlock
--          if (weakSelf.setState(state:.Executing, only:.Initial) == .CancelDoNotExecute) {
--            weakSelf.callCancellationBlock()
--          }
-+
-+        weakSelf.cancellationBlock = cancellationBlock
-+        if (weakSelf.setState(state:.Executing, only:.Initial) == .CancelDoNotExecute) {
-+          weakSelf.callCancellationBlock()
-         }
-+      } else {
-+        // Bridgeless mode fallback: load image directly via URLSession.
-+        // Handles both file:// (production bundle) and http:// (Metro dev server).
-+        _ = weakSelf.setState(state:.Executing, only:.Initial)
-+        URLSession.shared.dataTask(with: weakSelf.urlRequest) { data, _, error in
-+//          guard let weakSelf = weakSelf else { return }
-+          let image = data.flatMap { UIImage(data: $0, scale: CGFloat(weakSelf.scale ?? 1.0)) }
-+          weakSelf.completionHandler?(error, image)
-+          _ = weakSelf.setState(state:.Finished, except:.Finished)
-+        }.resume()
-       }
-     }
-   }
-@@ -130,15 +140,15 @@
-     return result
-   }()
-   
--  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
-+  public func addImage(_ url: String, scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
-     addImage(urlRequest: RCTConvert.nsurlRequest(url), scale: scale, bridge: bridge, handler: handler)
-   }
--  
--  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
-+
-+  public func addImage(_ json : [String:Any], scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
-     addImage(urlRequest: RCTConvert.nsurlRequest(json), scale: scale, bridge: bridge, handler: handler)
-   }
--  
--  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge, handler: @escaping (Error?, UIImage?) -> Void) {
-+
-+  public func addImage(urlRequest: URLRequest, scale: Double?, bridge: RCTBridge?, handler: @escaping (Error?, UIImage?) -> Void) {
-     let operation = RNMBXImageQueueOperation()
-     operation.bridge = bridge
-     operation.urlRequest = urlRequest
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
+index 20e3620..fc6c754 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
+@@ -53,7 +53,7 @@ func fillLayer(layer: inout FillLayer, reactStyle:Dictionary<String, Any>, oldRe
+       self.setFillTranslateAnchor(&layer, styleValue:styleValue);
+     } else if (prop == "fillPattern") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillPattern(&layer, styleValue:styleValue) },
+@@ -63,7 +63,7 @@ func fillLayer(layer: inout FillLayer, reactStyle:Dictionary<String, Any>, oldRe
+       )
+     } else if (prop == "fillPatternCrossFade") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillPatternCrossFade(&layer, styleValue:styleValue) },
+@@ -142,7 +142,7 @@ func lineLayer(layer: inout LineLayer, reactStyle:Dictionary<String, Any>, oldRe
+       self.setLineDasharray(&layer, styleValue:styleValue);
+     } else if (prop == "linePattern") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setLinePattern(&layer, styleValue:styleValue) },
+@@ -170,7 +170,7 @@ func lineLayer(layer: inout LineLayer, reactStyle:Dictionary<String, Any>, oldRe
+       self.setLineCrossSlope(&layer, styleValue:styleValue);
+     } else if (prop == "linePatternCrossFade") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setLinePatternCrossFade(&layer, styleValue:styleValue) },
+@@ -239,7 +239,7 @@ func symbolLayer(layer: inout SymbolLayer, reactStyle:Dictionary<String, Any>, o
+       self.setIconTextFitPadding(&layer, styleValue:styleValue);
+     } else if (prop == "iconImage") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setIconImage(&layer, styleValue:styleValue) },
+@@ -375,7 +375,7 @@ func symbolLayer(layer: inout SymbolLayer, reactStyle:Dictionary<String, Any>, o
+       self.setTextEmissiveStrengthTransition(&layer, styleValue:styleValue);
+     } else if (prop == "iconImageCrossFade") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setIconImageCrossFade(&layer, styleValue:styleValue) },
+@@ -542,7 +542,7 @@ func fillExtrusionLayer(layer: inout FillExtrusionLayer, reactStyle:Dictionary<S
+       self.setFillExtrusionTranslateAnchor(&layer, styleValue:styleValue);
+     } else if (prop == "fillExtrusionPattern") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillExtrusionPattern(&layer, styleValue:styleValue) },
+@@ -572,7 +572,7 @@ func fillExtrusionLayer(layer: inout FillExtrusionLayer, reactStyle:Dictionary<S
+       self.setFillExtrusionRoundedRoof(&layer, styleValue:styleValue);
+     } else if (prop == "fillExtrusionPatternCrossFade") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setFillExtrusionPatternCrossFade(&layer, styleValue:styleValue) },
+@@ -891,7 +891,7 @@ func backgroundLayer(layer: inout BackgroundLayer, reactStyle:Dictionary<String,
+       self.setBackgroundColorTransition(&layer, styleValue:styleValue);
+     } else if (prop == "backgroundPattern") {
+       styleValue.setImage(
+-        bridge: bridge!,
++        bridge: bridge,
+         style: style,
+         oldValue: oldReactStyle?[prop],
+         setImageOnLayer: { (_) in self.setBackgroundPattern(&layer, styleValue:styleValue) },
 diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
-index 1234567..abcdefg 100644
+index b540093..ad9d87a 100644
 --- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
 +++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
-@@ -497,7 +497,7 @@
+@@ -450,7 +450,7 @@ class RNMBXStyleValue {
    }
  
    func setImage(
@@ -113,7 +169,7 @@ index 1234567..abcdefg 100644
      style: Style,
      oldValue: Any?,
      setImageOnLayer: (_: RNMBXStyleValue) -> Void,
-@@ -508,6 +508,10 @@
+@@ -461,6 +461,10 @@ class RNMBXStyleValue {
      if (!shouldAddImage()) {
        setImageOnLayer(self)
      } else {
@@ -124,88 +180,24 @@ index 1234567..abcdefg 100644
        let imageURI = getImageURI()
  
        if let oldRawValue = oldValue as? [String:Any] {
-diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
-index 1234567..abcdefg 100644
---- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
-+++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyle.swift
-@@ -53,7 +53,7 @@
-       self.setFillTranslateAnchor(&layer, styleValue:styleValue);
-     } else if (prop == "fillPattern") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setFillPattern(&layer, styleValue:styleValue) },
-@@ -63,7 +63,7 @@
-       )
-     } else if (prop == "fillPatternCrossFade") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setFillPatternCrossFade(&layer, styleValue:styleValue) },
-@@ -142,7 +142,7 @@
-       self.setLineDasharray(&layer, styleValue:styleValue);
-     } else if (prop == "linePattern") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setLinePattern(&layer, styleValue:styleValue) },
-@@ -162,7 +162,7 @@
-       self.setLineCrossSlope(&layer, styleValue:styleValue);
-     } else if (prop == "linePatternCrossFade") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setLinePatternCrossFade(&layer, styleValue:styleValue) },
-@@ -231,7 +231,7 @@
-       self.setIconTextFitPadding(&layer, styleValue:styleValue);
-     } else if (prop == "iconImage") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setIconImage(&layer, styleValue:styleValue) },
-@@ -367,7 +367,7 @@
-       self.setTextEmissiveStrengthTransition(&layer, styleValue:styleValue);
-     } else if (prop == "iconImageCrossFade") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setIconImageCrossFade(&layer, styleValue:styleValue) },
-@@ -534,7 +534,7 @@
-       self.setFillExtrusionTranslateAnchor(&layer, styleValue:styleValue);
-     } else if (prop == "fillExtrusionPattern") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setFillExtrusionPattern(&layer, styleValue:styleValue) },
-@@ -564,7 +564,7 @@
-       self.setFillExtrusionRoundedRoof(&layer, styleValue:styleValue);
-     } else if (prop == "fillExtrusionPatternCrossFade") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setFillExtrusionPatternCrossFade(&layer, styleValue:styleValue) },
-@@ -881,7 +881,7 @@
-       self.setBackgroundColorTransition(&layer, styleValue:styleValue);
-     } else if (prop == "backgroundPattern") {
-       styleValue.setImage(
--        bridge: bridge!,
-+        bridge: bridge,
-         style: style,
-         oldValue: oldReactStyle?[prop],
-         setImageOnLayer: { (_) in self.setBackgroundPattern(&layer, styleValue:styleValue) },
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
+index 8d5f4ed..b5cd99e 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXUtils.swift
+@@ -1,14 +1,14 @@
+ import MapboxMaps
+ 
+ class RNMBXUtils {
+-  static func fetchImage(_ bridge: RCTBridge, url: String?, scale:Double, callback: @escaping (_ error: Error?, _ image: UIImage?) -> Void) {
++  static func fetchImage(_ bridge: RCTBridge?, url: String?, scale:Double, callback: @escaping (_ error: Error?, _ image: UIImage?) -> Void) {
+     guard let url = url else {
+       fatalError("FetchImage called with nil as url")
+     }
+     RNMBXImageQueue.sharedInstance.addImage(url, scale: scale, bridge: bridge, handler: callback)
+   }
+   
+-  static func fetchImages(_ bridge: RCTBridge, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
++  static func fetchImages(_ bridge: RCTBridge?, style: Style, objects: [String:Any], forceUpdate: Bool, loaded: @escaping (String, UIImage) -> Void) {
+     guard !objects.isEmpty else {
+       return
+     }
