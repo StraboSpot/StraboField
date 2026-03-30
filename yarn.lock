@@ -15548,9 +15548,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-orientation-director@npm:2.6.5":
-  version: 2.6.5
-  resolution: "react-native-orientation-director@npm:2.6.5"
+"react-native-orientation-director@npm:3.0.0":
+  version: 3.0.0
+  resolution: "react-native-orientation-director@npm:3.0.0"
   peerDependencies:
     expo: ">=47.0.0"
     react: "*"
@@ -15558,7 +15558,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 10c0/2303d694d9cab7cf5aff7e7b7c2c9d3dfbdcf54dee0db00ae2d2215b0978d1ee9b4e094aaba911b89714c325110d9f4d2bd3f5f49dde5bec2f5a33bd4d9df6ac
+  checksum: 10c0/c80bf77596ced1d30f4a3085eda56d6ed8a5bc8a4af21842b356188b217099946a7ea3e164d09be25985d4e2e2e47f39a7225d608445796bccbd092901c48d87
   languageName: node
   linkType: hard
 
@@ -17174,7 +17174,7 @@ __metadata:
     react-native-keep-awake: "npm:4.0.0"
     react-native-keyboard-controller: "npm:1.21.3"
     react-native-multiple-select: "npm:0.5.12"
-    react-native-orientation-director: "npm:2.6.5"
+    react-native-orientation-director: "npm:3.0.0"
     react-native-pager-view: "npm:8.0.0"
     react-native-pdf: "npm:7.0.4"
     react-native-progress: "npm:5.0.1"
