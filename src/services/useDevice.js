@@ -332,7 +332,9 @@ const useDevice = () => {
 
   const makeDirectory = async (directory) => {
     try {
-      return await RNFS.mkdir(directory);
+      const exists = await RNFS.exists(directory);
+      if (!exists) return await RNFS.mkdir(directory);
+      else return Promise.resolve();
     }
     catch (err) {
       console.error('Unable to create directory', directory, 'ERROR:', err);

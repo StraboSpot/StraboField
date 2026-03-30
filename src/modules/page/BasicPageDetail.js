@@ -57,7 +57,7 @@ const BasicPageDetail = ({
 
     const formRef = useRef(null);
 
-    const [initialValues, setInitialValues] = useState({});
+    const [initialValues, setInitialValues] = useState(selectedFeature);
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);

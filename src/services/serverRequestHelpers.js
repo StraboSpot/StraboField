@@ -32,8 +32,9 @@ export const deleteRequest = async (url, auth) => {
 };
 
 export const getRequest = async (url, auth, options = {}) => {
+  const {responseType, ...headerOptions} = options;
   try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, options)}));
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
     return isEmpty(options) ? handleResponse(response) : response;
   }
   catch (err) {
@@ -80,6 +81,21 @@ export const handleResponse = (response) => {
   if (response.ok && response.status === 204) return response.text() || 'no content';
   if (response.ok) return response.json();
   return handleError(response);
+};
+
+export const postFormDataRequest = async (url, formData, auth) => {
+  try {
+    const response = await timeoutPromise(fetch(url, {
+      method: 'POST',
+      headers: buildHeaders(auth),
+      body: formData,
+    }));
+    return handleResponse(response);
+  }
+  catch (err) {
+    console.error(`Error POST (FormData): ${url}`, err);
+    throw err;
+  }
 };
 
 export const postRequest = async (url, body, auth, customHeaders = {}) => {

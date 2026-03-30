@@ -75,6 +75,13 @@ const spotSlice = createSlice({
         console.log('UPDATED Selected Spot:', state.selectedSpot);
       }
     },
+    restoredIntervalDragSnapshot(state, action) {
+      const spots = Object.assign({}, ...action.payload.map(spot => ({[spot.properties.id]: spot})));
+      state.spots = {...state.spots, ...spots};
+      if (!isEmpty(state.selectedSpot) && Object.keys(spots).includes(state.selectedSpot?.properties?.id)) {
+        state.selectedSpot = spots[state.selectedSpot.properties.id];
+      }
+    },
     editedSpotImage(state, action) {
       const foundSpot = Object.values(state.spots).find((spot) => {
         return spot.properties.images && spot.properties.images.find(image => image.id === action.payload.id);
@@ -154,6 +161,7 @@ export const {
   editedSpotImages,
   editedSpotProperties,
   resetSpotState,
+  restoredIntervalDragSnapshot,
   setIntersectedSpotsForTagging,
   setSelectedAttributes,
   setSelectedSpot,

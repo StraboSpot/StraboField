@@ -14,9 +14,11 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
   const {
     getImageSource,
     handleEditShapePressed,
+    handleIntervalDragPressed,
     handleLinePressed,
     handlePointPressed,
     handlePolygonPressed,
+    stratSection,
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
@@ -47,6 +49,13 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
         onPress={handleEditShapePressed}
         source={getImageSource(MAP_MODES.EDIT)}
       />
+      {stratSection && (
+        <IconButton
+          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+          onPress={handleIntervalDragPressed}
+          source={getImageSource(MAP_MODES.INTERVAL_DRAG)}
+        />
+      )}
     </View>
   );
 };

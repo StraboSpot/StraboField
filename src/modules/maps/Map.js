@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
+import SnapLineLayer from './strat-section/SnapLineLayer';
 import useMapMoveEvents from './useMapMoveEvents';
 import VertexDrag from './VertexDrag';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -36,7 +37,14 @@ const Map = ({
 
   /* Data Hooks */
 
-  const {currentImageBasemap, zoom, stratSection, vertexStartCoords} = useSelector(state => state.map);
+  const {
+    currentImageBasemap,
+    zoom,
+    stratSection,
+    vertexStartCoords,
+    intervalDragState,
+    isDragIntervalMode,
+  } = useSelector(state => state.map);
 
   const {mapRef, cameraRef} = forwardedRef;
 
@@ -49,7 +57,7 @@ const Map = ({
   /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
-  const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
+  const currentMapId = currentImageBasemap?.id || stratSection?.strat_section_id || basemap.id;
   const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
     : homeStyles.currentZoomTextBlack;
 
@@ -112,10 +120,10 @@ const Map = ({
         rotateEnabled={false}
         scaleBarEnabled={!currentImageBasemap && !stratSection}
         scaleBarPosition={scaleBarPosition}
-        scrollEnabled={allowMapViewMove}
+        scrollEnabled={allowMapViewMove && !isDragIntervalMode}
         style={mapStyles.map}
         styleURL={currentImageBasemap || stratSection ? JSON.stringify(BACKGROUND) : JSON.stringify(basemap)}
-        zoomEnabled={allowMapViewMove}
+        zoomEnabled={allowMapViewMove && !isDragIntervalMode}
       >
         <MapLayers
           basemap={basemap}
@@ -142,6 +150,7 @@ const Map = ({
         )}
 
       {vertexStartCoords && <VertexDrag/>}
+      {intervalDragState && <SnapLineLayer/>}
     </>
   );
 };

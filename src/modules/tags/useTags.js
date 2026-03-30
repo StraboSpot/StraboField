@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {tagsStyles} from './index';
-import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
+import {TAG_FORM_NAMES, TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS, TAG_TYPES} from './tags.constants';
 import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
 import {useForm} from '../form';
@@ -186,22 +186,22 @@ const useTags = () => {
 
   const getGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
     const featureTagsAtSpot = getFeatureTagsAtSpot(featuresAtSpot);
-    return featureTagsAtSpot.filter(tag => tag.type === 'geologic_unit');
+    return featureTagsAtSpot.filter(tag => tag.type === TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getGeologicUnitTagsAtSpot = (spotId) => {
     const tagsAtSpot = getTagsAtSpot(spotId);
-    return tagsAtSpot.filter(tag => tag.type === 'geologic_unit');
+    return tagsAtSpot.filter(tag => tag.type === TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getNonGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
     const featureTagsAtSpot = getFeatureTagsAtSpot(featuresAtSpot);
-    return featureTagsAtSpot.filter(tag => tag.type !== 'geologic_unit');
+    return featureTagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getNonGeologicUnitTagsAtSpot = (spotId) => {
     const tagsAtSpot = getTagsAtSpot(spotId);
-    return tagsAtSpot.filter(tag => tag.type !== 'geologic_unit');
+    return tagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getSamplesWithThisTag = (tag) => {
@@ -221,7 +221,7 @@ const useTags = () => {
   };
 
   const getTagLabel = (key) => {
-    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
+    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
     if (key) return getLabel(key, formName);
     return 'No Type Specified';
   };

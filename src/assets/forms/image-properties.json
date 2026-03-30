@@ -62,7 +62,6 @@
       "type": "decimal",
       "name": "width_of_image_view",
       "label": "Width of Image View",
-      "hint": "Enables Scalebar",
       "required": "false",
       "constraint": ". > 0",
       "constraint_message": "Value must be greater than 0."
