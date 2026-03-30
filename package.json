@@ -55,7 +55,7 @@
     "@reduxjs/toolkit": "2.11.2",
     "@rn-vui/base": "5.1.10",
     "@rn-vui/themed": "5.1.10",
-    "@rnmapbox/maps": "10.2.10",
+    "@rnmapbox/maps": "10.3.0",
     "@sentry/cli": "3.3.5",
     "@sentry/react-native": "8.6.0",
     "@turf/turf": "7.3.4",
