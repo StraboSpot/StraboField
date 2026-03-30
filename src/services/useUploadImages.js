@@ -44,7 +44,7 @@ const useUploadImages = () => {
       formdata.append('image_file', {uri: imageUri, name: 'image.jpg', type: 'image/jpeg'});
       formdata.append('id', imageId);
       formdata.append('modified_timestamp', Date.now());
-      const res = await uploadImage(formdata, user.encoded_login, isProfileImage);
+      const res = await uploadImage(formdata, isProfileImage);
       console.log('Image Upload Res', res);
       console.log(': Finished Uploading Image', imageId);
       dispatch(updatedProjectTransferProgress(0));

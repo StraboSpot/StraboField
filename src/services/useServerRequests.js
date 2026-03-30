@@ -3,7 +3,14 @@ import {Linking} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProjectTransferProgress} from './connections.slice';
-import {deleteRequest, getRequest, handleResponse, postRequest, timeoutPromise} from './serverRequestHelpers';
+import {
+  deleteRequest,
+  getRequest,
+  handleResponse,
+  postFormDataRequest,
+  postRequest,
+  timeoutPromise,
+} from './serverRequestHelpers';
 import {MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent';
 import alert from '../shared/ui/alert';
@@ -207,7 +214,7 @@ const useServerRequests = () => {
     });
   };
 
-  const uploadWebImage = formData => postRequest(`${baseUrl}/image`, formData, basicAuth());
+  const uploadWebImage = formData => postFormDataRequest(`${baseUrl}/image`, formData, basicAuth());
 
   const verifyImagesExistence = imageIdsArray => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
 
