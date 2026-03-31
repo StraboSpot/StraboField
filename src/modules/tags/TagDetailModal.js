@@ -13,6 +13,7 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {NOTEBOOK_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
+import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 
 const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */
@@ -33,10 +34,11 @@ const TagDetailModal = ({closeModal}) => {
   /* Derived Variables */
 
   const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
-  const tagType = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
-  const formName = ['project', tagType];
+  const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT;
+  const tagType = isGeologicUnit ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
+  const formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
   const label = NOTEBOOK_PAGES.find(p => p.key === tagType).label.slice(0, -1);
-  const modalHeight = tagType === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+  const modalHeight = isGeologicUnit ? '80%' : 475;
 
   /* Logic Helpers */
 
