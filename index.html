@@ -176,7 +176,11 @@
         });
       };
 
-      global = global || window;
+      //global = global || window; -- 20260330 JMA
+      
+      //`global` is a Node.js/webpack 4 built-in that does not exist in the browser
+	  if (typeof global === 'undefined') { window.global = window; }
+      
       global.require = window.require;
       console.log('Require polyfill setup complete');
     }
