@@ -35,4 +35,10 @@ export const DRAW_ACTION_IMAGES = {
     ICON: require('../../../assets/icons/EditShape.png'),
     ICON_PRESSED: require('../../../assets/icons/EditShape_pressed.png'),
   },
+  INTERVAL_DRAG: {
+    BUTTON: require('../../../assets/icons/DragIntervalButton.png'),
+    BUTTON_PRESSED: require('../../../assets/icons/DragIntervalButton_pressed.png'),
+    ICON: require('../../../assets/icons/DragInterval.png'),
+    ICON_PRESSED: require('../../../assets/icons/DragInterval_pressed.png'),
+  },
 };

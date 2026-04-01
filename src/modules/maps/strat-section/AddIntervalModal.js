@@ -29,7 +29,7 @@ const AddIntervalModal = () => {
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
-  const {createInterval, orderStratSectionIntervals} = useStratSection();
+  const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
 
   /* Local State */
@@ -40,9 +40,8 @@ const AddIntervalModal = () => {
   const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   /* Derived Variables */
-
-  const isCore = stratSection?.section_type === 'core';
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+  const isCore = isNegativeColumn();
 
   /* Side Effects */
 

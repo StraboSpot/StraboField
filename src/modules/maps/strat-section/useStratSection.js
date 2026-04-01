@@ -96,12 +96,11 @@ const useStratSection = () => {
   // Move intervals and Spots in column to close gap after target interval deleted
   const deleteInterval = (targetInterval) => {
     if (turf.getGeom(targetInterval)) {
-      const isCore = stratSection.section_type === 'core';
       const targetIntervalExtent = turf.bbox(targetInterval);
       const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
       // For core: move spots below the deleted interval up (less negative) to close the gap.
       // For normal: move spots above the deleted interval down to close the gap.
-      if (isCore) {
+      if (isNegativeColumn()) {
         moveSpotsUpOrDownByPixels(targetInterval.properties.strat_section_id, targetIntervalExtent[1],
           targetIntervalHeight, targetInterval.properties.id);
       }
@@ -118,6 +117,8 @@ const useStratSection = () => {
     return spot && spot.properties && spot.properties.sed
     && spot.properties.sed.strat_section ? spot.properties.sed.strat_section : undefined;
   };
+
+  const isNegativeColumn = () => stratSection?.section_type === 'core';
 
   const orderStratSectionIntervals = (intervals) => {
     const orderedIntervals = [];
@@ -151,6 +152,7 @@ const useStratSection = () => {
     createInterval,
     deleteInterval,
     getStratSectionSettings,
+    isNegativeColumn,
     orderStratSectionIntervals,
   };
 };

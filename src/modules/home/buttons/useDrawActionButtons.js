@@ -14,6 +14,11 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
   /* Exported Functions */
 
   const getImageSource = (type) => {
+    if (type === MAP_MODES.INTERVAL_DRAG) {
+      return mapMode === MAP_MODES.INTERVAL_DRAG
+        ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.INTERVAL_DRAG.ICON_PRESSED : DRAW_ACTION_IMAGES.INTERVAL_DRAG.BUTTON_PRESSED
+        : SMALL_SCREEN ? DRAW_ACTION_IMAGES.INTERVAL_DRAG.ICON : DRAW_ACTION_IMAGES.INTERVAL_DRAG.BUTTON;
+    }
     if (type === MAP_MODES.EDIT) {
       return mapMode === MAP_MODES.EDIT
         ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.EDIT.ICON_PRESSED : DRAW_ACTION_IMAGES.EDIT.BUTTON_PRESSED
@@ -47,6 +52,11 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
     }
   };
 
+  const handleIntervalDragPressed = () => {
+    if (mapMode === MAP_MODES.INTERVAL_DRAG) clickHandler('cancelIntervalDrag');
+    else clickHandler('startIntervalDrag');
+  };
+
   const handleEditShapePressed = () => {
     if (mapMode === MAP_MODES.EDIT) clickHandler('cancelEdits');
     else clickHandler('startEditing');
@@ -72,9 +82,11 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
   return {
     getImageSource,
     handleEditShapePressed,
+    handleIntervalDragPressed,
     handleLinePressed,
     handlePointPressed,
     handlePolygonPressed,
+    stratSection,
   };
 };
 

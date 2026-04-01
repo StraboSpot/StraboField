@@ -24,12 +24,14 @@ const compileNodeModules = [
   'react-native-vector-icons',
 ].map(moduleName => path.resolve(__dirname, `node_modules/${moduleName}`));
 
-// async-storage v3+ only ships ESM (lib/module has {"type":"module"}), but babel-loader
-// transforms it to CommonJS. This rule overrides the module type so webpack doesn't try
-// to evaluate the CommonJS output as an ES module (which would cause "exports is not defined").
-const asyncStorageModuleTypeOverride = {
+// Packages that ship ESM (lib/module has {"type":"module"}), but babel-loader transforms them
+// to CommonJS. This rule overrides the module type so webpack doesn't try to evaluate the
+// CommonJS output as an ES module (which would cause "exports is not defined").
+const esmLibModuleTypeOverride = {
   test: /\.js$/,
-  include: path.resolve(__dirname, 'node_modules/@react-native-async-storage/async-storage/lib/module'),
+  include: [
+    path.resolve(__dirname, 'node_modules/@react-native-async-storage/async-storage/lib/module'),
+  ],
   type: 'javascript/auto',
 };
 
@@ -127,18 +129,23 @@ module.exports = (env, argv) => {
       extensions: ['.web.js', '.js', '.web.ts', '.ts', '.web.jsx', '.jsx', '.web.tsx', '.tsx', '.css', '.json'],
       alias: {
         'react-native$': 'react-native-web',
-        'react-native-screens': false,
+        'react-native-screens': path.resolve(__dirname, 'src/web/stubs/react-native-screens.web.js'),
         'react-native-web': path.resolve('node_modules/react-native-web'),
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
         '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
-          'src/modules/images/react-native-image-resizer.web.js'),
+          'src/web/stubs/react-native-image-resizer.web.js'),
+        '@react-native-documents/picker': path.resolve(__dirname,
+          'src/web/stubs/react-native-documents-picker.web.js'),
+        'react-native-fs': path.resolve(__dirname,
+          'src/web/stubs/react-native-fs.web.js'),
         '@react-native-async-storage/async-storage': path.resolve(__dirname,
           'node_modules/@react-native-async-storage/async-storage'),
         'react-native-tab-view': path.resolve(__dirname, 'node_modules/react-native-tab-view/src/index.tsx'),
+        'expo-updates': false,
       },
     },
     module: {
-      rules: [asyncStorageModuleTypeOverride, babelLoaderConfiguration, imageLoaderConfiguration,
+      rules: [esmLibModuleTypeOverride, babelLoaderConfiguration, imageLoaderConfiguration,
         ttfLoaderConfiguration, cssLoaderConfiguration, addedForReactNavigation],
     },
     devServer: {
@@ -149,6 +156,10 @@ module.exports = (env, argv) => {
       // new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({__DEV__: JSON.stringify(true)}),  // See: <https://github.com/necolas/react-native-web/issues/349>
       new webpack.DefinePlugin({process: {env: {}}}),
+      new webpack.NormalModuleReplacementPlugin(
+        /[\\/]@react-navigation[\\/]stack[\\/]lib[\\/]module[\\/]views[\\/]Screens\.js$/,
+        path.resolve(__dirname, 'src/web/stubs/react-navigation-stack-screens.web.js'),
+      ),
     ],
     performance: {
       hints: false,

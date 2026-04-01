@@ -1,22 +1,28 @@
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
+import {useSelector} from 'react-redux';
 
 import {EMPTY_LINE_STRING_FEATURE} from './stratSection.constants';
 import {Y_MULTIPLIER} from '../../sed/sed.constants';
-import {GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION} from '../maps.constants';
+import {useSpots} from '../../spots';
+import {PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION} from '../maps.constants';
+import useStratSection from './useStratSection';
 import useMapCoords from '../useMapCoords';
 
 const AXIS_BUFFER = Y_MULTIPLIER / 2; // pixels beyond outermost tick mark
 
-const useYAxis = (spotsDisplayed) => {
+const useYAxis = () => {
   /* Data Hooks */
 
+  const stratSection = useSelector(state => state.map.stratSection);
   const {convertImagePixelsToLatLong} = useMapCoords();
+  const {getIntervalSpotsThisStratSection} = useSpots();
+  const {isNegativeColumn} = useStratSection();
 
   /* Derived Variables */
 
-  const intervals = spotsDisplayed.filter(
-    feature => feature?.properties?.surface_feature?.surface_feature_type === 'strat_interval');
+  // Read intervals directly from Redux in pixel coordinates
+  const intervals = getIntervalSpotsThisStratSection(stratSection?.strat_section_id);
   // Get max Y and min Y across all intervals to support sections spanning positive and negative values
   const {maxY, minY} = intervals.reduce((acc, i) => {
     const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
@@ -27,12 +33,12 @@ const useYAxis = (spotsDisplayed) => {
     };
   }, {maxY: 0, minY: 0});
 
-  // Convert interval extents to pixel coords and find outermost tick marks
+  // Find outermost tick marks in pixel space
   // Always include 0 so the origin is labeled and the axis extends to/past it in both directions
-  const yMaxPixel = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, [0, maxY])[1];
-  const yMinPixel = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, [0, minY])[1];
-  const topTickPixel = Math.max(0, Math.floor(yMaxPixel / Y_MULTIPLIER) * Y_MULTIPLIER);
-  const bottomTickPixel = Math.min(0, Math.floor(yMinPixel / Y_MULTIPLIER) * Y_MULTIPLIER);
+  const hasNegativeIntervals = minY < 0;
+  const rawBottomTickPixel = Math.min(0, Math.floor(minY / Y_MULTIPLIER) * Y_MULTIPLIER);
+  const bottomTickPixel = isNegativeColumn() || hasNegativeIntervals ? rawBottomTickPixel : 0;
+  const topTickPixel = Math.max(0, Math.ceil(maxY / Y_MULTIPLIER) * Y_MULTIPLIER);
 
   /* Exported Functions */
 

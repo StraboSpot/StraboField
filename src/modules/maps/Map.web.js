@@ -36,6 +36,7 @@ const Map = ({
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -64,7 +65,10 @@ const Map = ({
     Object.entries(symbols).forEach(([id, url]) => {
       if (!map.hasImage(id)) {
         map.loadImage(url, (error, image) => {
-          if (error) { console.error('Error loading image:', id, error); return; }
+          if (error) {
+            console.error('Error loading image:', id, error);
+            return;
+          }
           if (!map.hasImage(id)) map.addImage(id, image);
         });
       }
@@ -92,10 +96,10 @@ const Map = ({
   return (
     <ReactMapGL
       {...viewState}
-      boxZoom={allowMapViewMove}
+      boxZoom={allowMapViewMove && !isDragIntervalMode}
       cursor={cursor}
       doubleClickZoom={!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT)}
-      dragPan={allowMapViewMove}
+      dragPan={allowMapViewMove && !isDragIntervalMode}
       dragRotate={false}
       id={currentMapId}
       interactiveLayerIds={[...LAYER_IDS_NOT_SELECTED, ...LAYER_IDS_SELECTED]}
@@ -110,6 +114,7 @@ const Map = ({
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
       pitchWithRotate={false}
       ref={mapRef}
+      scrollZoom={allowMapViewMove && !isDragIntervalMode}
       style={{flex: 1}}
       styleDiffing={false}
       touchPitch={false}
