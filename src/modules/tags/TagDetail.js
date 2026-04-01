@@ -13,6 +13,7 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
+import TagDetailSummaryText from './TagDetailSummaryText';
 import {useTags} from '../tags';
 
 const TagDetail = ({
@@ -31,7 +32,7 @@ const TagDetail = ({
 
   const {isSpotInReadOnlyDataset} = useProject();
   const {getSpotById} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
+  const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
   /* Local State */
 
@@ -117,7 +118,7 @@ const TagDetail = ({
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
             onPress={setIsDetailModalVisible}
           />
-          {selectedTag && renderTagInfo()}
+          {selectedTag && <TagDetailSummaryText onPress={setIsDetailModalVisible}/>}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}

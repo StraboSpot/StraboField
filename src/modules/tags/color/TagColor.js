@@ -5,9 +5,9 @@ import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import TagColorPickerModal from './TagColorPickerModal';
-import {SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {formStyles} from '../../form';
 
-const TagColor = ({colorLabel}) => {
+const TagColor = () => {
   /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
@@ -20,8 +20,8 @@ const TagColor = ({colorLabel}) => {
 
   return (
     <>
-      <View style={{width: 100, position: 'absolute', right: 0, top: 0, alignItems: 'center'}}>
-        <Text style={{paddingBottom: 5, paddingTop: 5, fontSize: SMALL_TEXT_SIZE}}>{colorLabel} Color</Text>
+      <View style={{flexDirection: 'row', alignItems: 'center', padding: 10, paddingBottom: 40}}>
+        <Text style={[formStyles.fieldLabel, {flex: 0, paddingRight: 10}]}>Color</Text>
         <Icon
           color={selectedTag.color}
           containerStyle={{borderWidth: 1}}
