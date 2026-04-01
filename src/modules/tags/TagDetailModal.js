@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {Formik} from 'formik';
@@ -34,6 +34,7 @@ const TagDetailModal = ({closeModal}) => {
   /* Local State */
 
   const formRef = useRef(null);
+  const [tempColor, setTempColor] = useState(selectedTag?.color);
 
   /* Derived Variables */
 
@@ -88,6 +89,8 @@ const TagDetailModal = ({closeModal}) => {
       console.log('Saving tag data to Project ...', formValues);
       let updatedTag = formValues;
       if (!updatedTag.id) updatedTag.id = getNewId();
+      if (tempColor) updatedTag.color = tempColor;
+      else delete updatedTag.color;
       if (addTagToSelectedSpot) {
         if (!updatedTag.spots) updatedTag.spots = [];
         updatedTag.spots.push(selectedSpot.properties.id);
@@ -124,7 +127,7 @@ const TagDetailModal = ({closeModal}) => {
                 validate={values => validateForm({formName: formName, values: values})}
               />
             </View>
-            <TagColor/>
+            <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
             {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
           </>
         }

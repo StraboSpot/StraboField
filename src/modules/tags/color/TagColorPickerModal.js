@@ -3,7 +3,6 @@ import {Pressable, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
-import {useSelector} from 'react-redux';
 
 import {COLOR_CHOICES} from './tagColor.constants';
 import {getRGBString, isValidHexColor, rgbToHex} from './tagColor.helpers';
@@ -16,20 +15,13 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
 import {TextInputField} from '../../form';
-import {useTags} from '../index';
 
-const TagColorPickerModal = ({closeModal}) => {
-  /* Data Hooks */
-
-  const selectedTag = useSelector(state => state.project.selectedTag);
-
-  const {saveTag} = useTags();
-
+const TagColorPickerModal = ({closeModal, onColorSelect, tempColor}) => {
   /* Local State */
 
   const formRef = useRef(null);
 
-  const [hexColor, setHexColor] = useState(selectedTag.color || undefined);
+  const [hexColor, setHexColor] = useState(tempColor || undefined);
 
   /* Event Handlers */
 
@@ -63,14 +55,12 @@ const TagColorPickerModal = ({closeModal}) => {
   /* Logic Helpers */
 
   const clearColor = () => {
-    let selectedTagCopy = JSON.parse(JSON.stringify(selectedTag));
-    if (selectedTagCopy.color) delete selectedTagCopy.color;
-    saveTag(selectedTagCopy);
+    onColorSelect(undefined);
     closeModal();
   };
 
-  const setColor = () => {
-    saveTag({...selectedTag, color: hexColor});
+  const selectColor = () => {
+    onColorSelect(hexColor);
     closeModal();
   };
 
@@ -142,8 +132,8 @@ const TagColorPickerModal = ({closeModal}) => {
         <Spacer/>
         <ActionButton
           disabled={isEmpty(hexColor)}
-          onPress={setColor}
-          title={'Set Color'}
+          onPress={selectColor}
+          title={'Select Color'}
         />
         <Spacer/>
         <ClearButton
