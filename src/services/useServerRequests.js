@@ -209,7 +209,11 @@ const useServerRequests = () => {
       xhr.open('POST', `${baseUrl}${isProfileImage ? '/profileImage' : '/image'}`);
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', `Basic ${encoded_login}`);
-      xhr.setRequestHeader('User-Agent', userAgent);
+      //xhr.setRequestHeader('User-Agent', userAgent);
+      
+      //User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.
+      if (Platform.OS !== 'web') xhr.setRequestHeader('User-Agent', userAgent);
+      
       xhr.send(formdata);
     });
   };
