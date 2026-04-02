@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddImageOverlayModal from './AddImageOverlayModal';
 import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEqual, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
@@ -50,6 +50,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
   /* Derived Variables */
 
   const stratSection = spot.properties?.sed?.strat_section || {};
+  const savedValuesRef = useRef(stratSection);
 
   /* Side Effects */
 
@@ -60,8 +61,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const confirmLeavePage = () => {
-    if (stratSectionRef.current && stratSectionRef.current.dirty) {
-      const formCurrent = stratSectionRef.current;
+    const formCurrent = stratSectionRef.current;
+    if (formCurrent?.dirty && !isEqual(formCurrent.values, savedValuesRef.current)) {
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
         [
@@ -82,7 +83,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const saveStratSection = async (formCurrent = stratSectionRef.current) => {
     try {
       await saveSedFeature(page.key, spot, formCurrent);
-      await formCurrent.resetForm();
+      savedValuesRef.current = {...formCurrent.values};
       toast.show('Strat Section Settings saved', {type: 'success'});
     }
     catch (e) {
@@ -134,12 +135,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
-        {!isReadOnly && (
-          <SaveAndCancelButtons
-            cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-            save={saveStratSection}
-          />
-        )}
         <Formik
           enableReinitialize={true}
           initialValues={stratSection}
@@ -149,7 +144,17 @@ const StratSectionPage = ({isReadOnly, page}) => {
           validate={values => validateForm({formName: stratSectionFormName, values: values})}
           validateOnChange={false}
         >
-          {formProps => <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>}
+          {formProps => (
+            <>
+              {!isReadOnly && (
+                <SaveAndCancelButtons
+                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                  save={() => saveStratSection(formProps)}
+                />
+              )}
+              <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>
+            </>
+          )}
         </Formik>
       </View>
     );
