@@ -14,7 +14,7 @@ import useMapFeatures from '../useMapFeatures';
 import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
 
-const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
+const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
 
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -79,21 +79,16 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       />
 
       {/* Not Selected Features Layer */}
-      {isEmpty(featuresReadOnly) ? (
-        <FeaturesNotSelectedLayers features={features} isStratStyleLoaded={isStratStyleLoaded}/>
-      ) : (
+      {isEmpty(featuresReadOnly) ? <FeaturesNotSelectedLayers features={features}/> : (
         <>
           {/* Editable & Read Only Features Layers */}
-          <FeaturesNotSelectedLayers features={featuresEditable} isStratStyleLoaded={isStratStyleLoaded}/>
+          <FeaturesNotSelectedLayers features={featuresEditable}/>
           <FeaturesReadOnlyLayers features={featuresReadOnly}/>
         </>
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers
-        featuresSelected={isDragIntervalMode ? [] : featuresSelected}
-        isStratStyleLoaded={isStratStyleLoaded}
-      />
+      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected}/>
     </>
   );
 };
