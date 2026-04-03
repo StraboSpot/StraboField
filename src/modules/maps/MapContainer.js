@@ -43,12 +43,15 @@ const MapContainer = forwardRef(({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const customBasemap = useSelector(state => state.map.customMaps);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -120,6 +123,8 @@ const MapContainer = forwardRef(({
   /* Local State */
 
   const cameraRef = useRef(null);
+  const isDatasetToggleZoomPendingRef = useRef(false);
+  const isInitialLoadZoomPendingRef = useRef(false);
   const spotsRef = useRef(null);
 
   const [isZoomToCenterOffline, setIsZoomToCenterOffline] = useState(false);
@@ -131,7 +136,28 @@ const MapContainer = forwardRef(({
   useEffect(() => {
     // console.log('UE MapContainer [featuresSelected, featuresUnselected]');
     spotsRef.current = [...spotsSelected, ...spotsNotSelected];
+    if (isDatasetToggleZoomPendingRef.current) {
+      isDatasetToggleZoomPendingRef.current = false;
+      isInitialLoadZoomPendingRef.current = false;
+      if (spotsRef.current.length > 0) zoomToSpotsExtent().catch(console.error);
+    }
+    else if (isInitialLoadZoomPendingRef.current) {
+      isInitialLoadZoomPendingRef.current = false;
+      if (spotsRef.current.length > 0) zoomToSpotsExtent().catch(console.error);
+    }
   }, [spotsSelected, spotsNotSelected]);
+
+  useEffect(() => {
+    if (isProjectLoadSelectionModalVisible) {
+      if (Platform.OS === 'web') isInitialLoadZoomPendingRef.current = true;
+      else if (spotsRef.current?.length > 0) zoomToSpotsExtent().catch(console.error);
+      else isInitialLoadZoomPendingRef.current = true;
+    }
+  }, [isProjectLoadSelectionModalVisible]);
+
+  useEffect(() => {
+    if (isStatusMessagesModalVisible) isDatasetToggleZoomPendingRef.current = true;
+  }, [activeDatasetsIds]);
 
   useEffect(() => {
     // console.log('UE MapContainer [currentImageBasemap]');
@@ -210,6 +236,15 @@ const MapContainer = forwardRef(({
       zoomToSpotsExtent: zoomToSpotsExtent,
     };
   });
+
+  /* Event Handlers */
+
+  const handleMapLoadedWeb = () => {
+    if (isInitialLoadZoomPendingRef.current && spotsRef.current?.length > 0) {
+      isInitialLoadZoomPendingRef.current = false;
+      zoomToSpotsExtent().catch(console.error);
+    }
+  };
 
   /* Logic Helpers */
 
@@ -388,9 +423,10 @@ const MapContainer = forwardRef(({
   };
 
   // Zoom map to the extent of the mapped Spots
-  const zoomToSpotsExtent = () => {
+  const zoomToSpotsExtent = async () => {
+    if (Platform.OS === 'web' && !mapRef.current) return;
     const spotsToZoomTo = [...spotsSelected, ...spotsNotSelected];
-    zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    await zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
   };
 
   /* View */
@@ -409,6 +445,7 @@ const MapContainer = forwardRef(({
           location={location}
           mapMode={mapMode}
           measureFeatures={measureFeatures}
+          onMapLoad={handleMapLoadedWeb}  // prop used in web only
           ref={{mapRef: mapRef, cameraRef: cameraRef}}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
