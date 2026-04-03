@@ -35,22 +35,18 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const toast = useToast();
-
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
+  const toast = useToast();
 
   /* Local State */
 
+  const stratSection = spot.properties?.sed?.strat_section || {};
+  const savedValuesRef = useRef(stratSection);
   const stratSectionRef = useRef(null);
 
   const [selectedImage, setSelectedImage] = useState(undefined);
-
-  /* Derived Variables */
-
-  const stratSection = spot.properties?.sed?.strat_section || {};
-  const savedValuesRef = useRef(stratSection);
 
   /* Side Effects */
 

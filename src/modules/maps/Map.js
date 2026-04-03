@@ -78,8 +78,6 @@ const Map = ({
     };
   }, [mapRef]);
 
-  /* Event Handlers */
-
   /* View */
 
   return (

@@ -11,18 +11,23 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 
 const TagDetailSummaryText = ({onPress}) => {
+  /* Data Hooks */
   const selectedTag = useSelector(state => state.project.selectedTag);
   const {getTagLabel} = useTags();
 
+  /* Derived Variables */
+
   let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
   if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
-  const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
-  const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
+  const notes = selectedTag.notes || undefined;
   let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
     if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
     else return acc;
   }, []);
-  const notes = selectedTag.notes || undefined;
+  const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
+  const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
+
+  /* View */
 
   return (
     <Pressable onPress={onPress}>

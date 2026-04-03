@@ -36,17 +36,24 @@ const ModalWrapper = ({
                         showCloseButton,
                         showDeleteButton,
                       }) => {
+  /* Data Hooks */
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
+
+  /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
   };
+
+  /* Render Functions */
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -69,6 +76,8 @@ const ModalWrapper = ({
       );
     }
   };
+
+  /* View */
 
   return (
     <Overlay

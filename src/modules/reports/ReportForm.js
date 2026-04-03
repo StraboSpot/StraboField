@@ -8,18 +8,27 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {
+  /* Data Hooks */
   const {getRelevantFields, getSurvey, validateForm} = useForm();
 
+  /* Local State */
+
   const [choicesViewKey, setChoicesViewKey] = useState(null);
+
+  /* Derived Variables */
 
   const survey = getSurvey(REPORT_FORM_NAME);
 
   const mainFormKeysFields = REPORT_MAIN_FORM_KEYS.map(k => survey.find(f => f.name === k));
 
+  /* Event Handlers */
+
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
     setChoicesViewKey(null);
   };
+
+  /* Render Functions */
 
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
@@ -39,6 +48,8 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
       </ModalWrapper>
     );
   };
+
+  /* View */
 
   return (
     <Formik
