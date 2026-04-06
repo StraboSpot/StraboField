@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 
@@ -46,13 +46,17 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
     console.log('Rendering form:', IMAGE_PROPERTIES_FORM_NAME.join('.'), 'with selected image:', image);
     return (
       <Formik
-        component={formProps => Form({formName: IMAGE_PROPERTIES_FORM_NAME, isReadOnly: isReadOnly, ...formProps})}
+        // component={formProps => Form({formName: IMAGE_PROPERTIES_FORM_NAME, isReadOnly: isReadOnly, ...formProps})}
         initialStatus={{formName: IMAGE_PROPERTIES_FORM_NAME}}
         initialValues={image}
         innerRef={formRef}
         onSubmit={() => console.log('Submitting form...')}
         validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
-      />
+      >
+        {formProps => (
+          <Form {...{formName: IMAGE_PROPERTIES_FORM_NAME, isReadOnly: isReadOnly, ...formProps}}/>
+        )}
+      </Formik>
     );
   };
 
