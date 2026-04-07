@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
-import {ImageCard, ImageInfo, imageStyles, useImageThumbnails} from '.';
+import {ImageCard, imageStyles, useImageThumbnails} from '.';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
 const ImagesList = ({
@@ -9,9 +9,7 @@ const ImagesList = ({
                       images,
                       isReadOnly,
                       isThumbnailOnly = false,
-                      openImage,
-                      saveImages,
-                      saveUpdatedImage,
+                      onOpenImage,
                     }) => {
   /* Data Hooks */
 
@@ -21,11 +19,6 @@ const ImagesList = ({
     setAreImageThumbnailsLoading,
     setImageThumbnailURIs,
   } = useImageThumbnails({images});
-
-  /* Local State */
-
-  const [imageToView, setImageToView] = useState({});
-  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
 
   /* Render Functions */
 
@@ -39,11 +32,9 @@ const ImagesList = ({
           index={index}
           isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
-          openImage={openImage}
+          onOpenImage={onOpenImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
-          setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
         />
       </React.Fragment>
     );
@@ -71,21 +62,9 @@ const ImagesList = ({
   /* View */
 
   return (
-    <>
-      <View style={{flex: 1}}>
-        {renderImages()}
-      </View>
-      <ImageInfo
-        deleteImage={deleteImage}
-        image={imageToView}
-        isReadOnly={isReadOnly}
-        isVisible={isImageModalVisible}
-        saveImages={saveImages}
-        saveUpdatedImage={saveUpdatedImage}
-        setImageToView={setImageToView}
-        setIsImageModalVisible={setIsImageModalVisible}
-      />
-    </>
+    <View style={{flex: 1}}>
+      {renderImages()}
+    </View>
   );
 };
 

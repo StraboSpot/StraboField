@@ -15,16 +15,16 @@ const ImageBasemapsList = ({closeManMenuPanel}) => {
 
   const imageBasemaps = getActiveImageBasemaps();
 
-  /* Logic Helpers */
+  /* Event Handlers */
 
-  const openImage = (image) => {
+  const handleOpenImage = (image) => {
     closeManMenuPanel();
     getImageBasemap(image);
   };
 
   /* View */
 
-  return <ImagesList images={imageBasemaps} isThumbnailOnly openImage={openImage}/>;
+  return <ImagesList images={imageBasemaps} isThumbnailOnly onOpenImage={handleOpenImage}/>;
 };
 
 export default ImageBasemapsList;

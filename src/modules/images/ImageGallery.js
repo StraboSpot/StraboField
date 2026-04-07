@@ -40,9 +40,9 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
-  /* Logic Helpers */
+  /* Event Handlers */
 
-  const openImage = async (image) => {
+  const handleOpenImage = async (image) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     console.log('Opening image', image.id, '...');
     navigate.navigate('ImageSlider', {selectedImage: image, sortedSpotsWithImages: sortedSpotsWithImages});
@@ -53,7 +53,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const renderImagesInSpot = (images, section) => {
     const isReadOnly = !isEmpty(section.spot) && isSpotInReadOnlyDataset(section.spot.properties.id);
-    return <ImagesList images={images} isReadOnly={isReadOnly} isThumbnailOnly openImage={openImage}/>;
+    return <ImagesList images={images} isReadOnly={isReadOnly} isThumbnailOnly onOpenImage={handleOpenImage}/>;
   };
 
   const renderNoImagesText = () => {
