@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE} from '../../shared/styles.constants';
+import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE} from '../../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   bold: {

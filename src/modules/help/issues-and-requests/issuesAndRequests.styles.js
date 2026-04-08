@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-import {DARKGREY, LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE, TEXT_WEIGHT_700} from '../../shared/styles.constants';
+import {DARKGREY, LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE, TEXT_WEIGHT_700} from '../../../shared/styles.constants';
 
 const issuesAndRequestsStyles = StyleSheet.create({
   container: {
@@ -22,4 +22,3 @@ const issuesAndRequestsStyles = StyleSheet.create({
 });
 
 export default issuesAndRequestsStyles;
-

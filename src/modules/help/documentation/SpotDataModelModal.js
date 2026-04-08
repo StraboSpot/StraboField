@@ -8,7 +8,11 @@ import forms from '../../../assets/forms';
 import {isEmpty} from '../../../shared/Helpers';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {shouldExpandNode} from '../help.helpers';
+
+// Since hideRoot is true, level 0 is actually the first visible level
+// Level 0: type, geometry, properties
+// Level 1: contents of properties (what we want to show)
+const shouldExpandNode = (keyName, data, level) => level <= 1;
 
 const SpotDataModelModal = ({close}) => {
   /* Local State */
