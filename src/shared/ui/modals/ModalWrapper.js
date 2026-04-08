@@ -83,7 +83,7 @@ const ModalWrapper = ({
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
-        style={isAutoHeight ? undefined : {flex: 1}}
+        style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
       >
         <ModalWrapperHeader
           buttonTitleRight={buttonTitleRight}
@@ -92,7 +92,7 @@ const ModalWrapper = ({
           showCloseButton={showCloseButton}
         />
 
-        <View style={isAutoHeight ? undefined : {flex: 1}}>
+        <View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>
           {children}
         </View>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}

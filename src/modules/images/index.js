@@ -1,7 +1,7 @@
 export {default as AddImageButtons} from './AddImageButtons';
 export {default as ImageCard} from './ImageCard';
 export {default as ImageGallery} from './ImageGallery';
-export {default as ImageInfo} from './ImageInfo';
+export {default as ImageModal} from './ImageModal';
 export {default as ImagePropertiesModal} from './ImagePropertiesModal';
 export {default as ImageSlider} from './ImageSlider';
 export {default as ImageThumbnail} from './ImageThumbnail';
