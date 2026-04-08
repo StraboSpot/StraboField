@@ -3752,10 +3752,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/slider@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@react-native-community/slider@npm:5.1.2"
-  checksum: 10c0/e48f0ad72292ca30d63b84a6c0137bb3531516c22a8a3bd1981132f25e3195c19757da271d5b8b1d66d73882ccef02a0cf21c3a99f23144623345c4eaa67823c
+"@react-native-community/slider@npm:5.2.0":
+  version: 5.2.0
+  resolution: "@react-native-community/slider@npm:5.2.0"
+  checksum: 10c0/58ec6a47b5aafefd98a61c79aeae05f1ab8371782eb497d9af665bf2f62a1c372da8fed6dead30e1d6c9e01bfb12bfdbafcde7890736f4f5d55502dabf2e01ad
   languageName: node
   linkType: hard
 
@@ -17013,7 +17013,7 @@ __metadata:
     "@react-native-community/datetimepicker": "npm:9.1.0"
     "@react-native-community/geolocation": "npm:3.4.0"
     "@react-native-community/netinfo": "npm:12.0.1"
-    "@react-native-community/slider": "npm:5.1.2"
+    "@react-native-community/slider": "npm:5.2.0"
     "@react-native-documents/picker": "npm:12.0.1"
     "@react-native-picker/picker": "npm:2.11.4"
     "@react-native/babel-preset": "npm:0.84.1"
