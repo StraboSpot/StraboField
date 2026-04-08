@@ -25,7 +25,7 @@ const ImageInfo = ({
                      setImageToView,
                      setIsImageModalVisible,
                    }) => {
-  console.log('Rendering ImageInfo...');
+  // console.log('Rendering ImageInfo...');
 
   /* Data Hooks */
 
