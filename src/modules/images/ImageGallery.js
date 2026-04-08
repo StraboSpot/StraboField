@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {SectionList, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -16,6 +16,7 @@ import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
+const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];
 
 const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
@@ -39,6 +40,22 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+  const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
+
+  const resetAndSetIsReverseSort = useCallback((val) => {
+    setVisibleSectionCount(SECTIONS_PER_PAGE);
+    setIsReverseSort(val);
+  }, []);
+
+  const resetAndSetSpotsSearched = useCallback((val) => {
+    setVisibleSectionCount(SECTIONS_PER_PAGE);
+    setSpotsSearched(val);
+  }, []);
+
+  const resetAndSetSpotsSorted = useCallback((val) => {
+    setVisibleSectionCount(SECTIONS_PER_PAGE);
+    setSpotsSorted(val);
+  }, []);
 
   /* Event Handlers */
 
@@ -48,6 +65,12 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     navigate.navigate('ImageSlider', {selectedImage: image, sortedSpotsWithImages: sortedSpotsWithImages});
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
+
+  /* Logic Helpers */
+
+  const loadMoreSections = useCallback(() => {
+    setVisibleSectionCount(prev => prev + SECTIONS_PER_PAGE);
+  }, []);
 
   /* Render Functions */
 
@@ -80,18 +103,19 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     });
     if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
     let count = 0;
-    const spotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
+    const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
       count += spot.properties.images.length;
       return [...acc, {spot: spot, data: [spot.properties.images]}];
     }, []);
+    const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
 
     return (
       <>
         <SpotFilters
           activeSpots={activeSpots}
-          setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
-          setSpotsSorted={setSpotsSorted}
+          setIsReverseSort={resetAndSetIsReverseSort}
+          setSpotsSearched={resetAndSetSpotsSearched}
+          setSpotsSorted={resetAndSetSpotsSorted}
           setTextNoSpots={setTextNoSpots}
           spotsSearched={spotsSearched}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
@@ -105,6 +129,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           <SectionList
             ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
             keyExtractor={(item, index) => item + index}
+            onEndReached={loadMoreSections}
+            onEndReachedThreshold={0.5}
             renderItem={({item, section}) => renderImagesInSpot(item, section)}
             renderSectionHeader={({section}) => renderSectionHeader(section)}
             sections={spotsAsSections}

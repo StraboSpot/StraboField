@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, View} from 'react-native';
+import {View} from 'react-native';
 
 import {ImageCard, imageStyles, useImageThumbnails} from '.';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -19,6 +19,12 @@ const ImagesList = ({
     setAreImageThumbnailsLoading,
     setImageThumbnailURIs,
   } = useImageThumbnails({images});
+
+  /* Derived Variables */
+
+  const sortedImages = JSON.parse(JSON.stringify(images)).sort(
+    (imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+      .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
 
   /* Render Functions */
 
@@ -40,30 +46,19 @@ const ImagesList = ({
     );
   };
 
-  const renderImages = () => {
-    const sortedImages = JSON.parse(JSON.stringify(images)).sort(
-      (imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
-        .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
-    return (
-      <FlatList
-        ListEmptyComponent={<ListEmptyText text={'No Images'}/>}
-        ListHeaderComponent={
+  /* View */
+
+  return (
+    <View style={{flex: 1}}>
+      {sortedImages.length === 0 ? <ListEmptyText text={'No Images'}/>
+        : (
           <View
             style={[imageStyles.imagesListContainer, {justifyContent: isThumbnailOnly ? 'flex-start' : 'space-evenly'}]}
           >
             {sortedImages.map((image, index) => renderImageCard(image, index))}
           </View>
-        }
-        data={sortedImages}
-      />
-    );
-  };
-
-  /* View */
-
-  return (
-    <View style={{flex: 1}}>
-      {renderImages()}
+        )
+      }
     </View>
   );
 };
