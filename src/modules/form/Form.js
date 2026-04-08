@@ -17,7 +17,6 @@ const Form = ({
                 formName,
                 isReadOnly,
                 onMyChange,
-                scrollEnabled = true,
                 setFieldValue,
                 subkey,
                 surveyFragment,
@@ -208,7 +207,7 @@ const Form = ({
 
   /* View */
 
-  if (Platform.OS === 'web' || !scrollEnabled) return renderFields();
+  if (Platform.OS === 'web') return renderFields();
 
   return (
     <FlatList
@@ -216,7 +215,6 @@ const Form = ({
       keyExtractor={(item, index) => index.toString()}
       listKey={JSON.stringify(survey)}
       renderItem={({item}) => renderField(item)}
-      scrollEnabled={scrollEnabled}
     />
   );
 };
