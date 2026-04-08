@@ -4,11 +4,11 @@ import {ScrollView} from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
 
-import {shouldExpandNode} from './help.helpers';
-import forms from '../../assets/forms';
-import {isEmpty} from '../../shared/Helpers';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import forms from '../../../assets/forms';
+import {isEmpty} from '../../../shared/Helpers';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {shouldExpandNode} from '../help.helpers';
 
 const SpotDataModelModal = ({close}) => {
   /* Local State */

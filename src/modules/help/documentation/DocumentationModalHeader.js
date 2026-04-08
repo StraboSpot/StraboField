@@ -4,7 +4,7 @@ import {FlatList, Platform, Text, TouchableOpacity, View} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import styles from './documentation.styles';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
   /* Local State */

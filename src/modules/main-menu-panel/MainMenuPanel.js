@@ -9,7 +9,7 @@ import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
 import DailyNotes from '../daily-notes/DailyNotes';
 import About from '../help/About';
-import Documentation from '../help/Documentation';
+import Documentation from '../help/documentation/Documentation';
 import IssuesAndRequests from '../help/IssuesAndRequests';
 import {ImageGallery} from '../images';
 import MenuSearch from './MenuSearch';
