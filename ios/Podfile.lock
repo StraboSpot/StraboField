@@ -1,5 +1,5 @@
 PODS:
-  - AsyncStorage (3.0.1):
+  - AsyncStorage (3.0.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -50,13 +50,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - MapboxCommon (24.16.6):
+  - MapboxCommon (24.18.3):
     - Turf (= 4.0.0)
-  - MapboxCoreMaps (11.16.6):
-    - MapboxCommon (= 24.16.6)
-  - MapboxMaps (11.16.6):
-    - MapboxCommon (= 24.16.6)
-    - MapboxCoreMaps (= 11.16.6)
+  - MapboxCoreMaps (11.18.3):
+    - MapboxCommon (= 24.18.3)
+  - MapboxMaps (11.18.3):
+    - MapboxCommon (= 24.18.3)
+    - MapboxCoreMaps (= 11.18.3)
     - Turf (= 4.0.0)
   - RCTDeprecation (0.84.1)
   - RCTRequired (0.84.1)
@@ -1591,7 +1591,7 @@ PODS:
     - Yoga
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-keyboard-controller (1.20.7):
+  - react-native-keyboard-controller (1.21.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1603,7 +1603,7 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-keyboard-controller/common (= 1.20.7)
+    - react-native-keyboard-controller/common (= 1.21.4)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1614,7 +1614,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-keyboard-controller/common (1.20.7):
+  - react-native-keyboard-controller/common (1.21.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1658,7 +1658,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-orientation-director (2.6.5):
+  - react-native-orientation-director (3.0.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1703,7 +1703,7 @@ PODS:
     - ReactNativeDependencies
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
-  - react-native-pdf (7.0.3):
+  - react-native-pdf (7.0.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1794,7 +1794,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-slider (5.1.2):
+  - react-native-slider (5.2.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1806,7 +1806,7 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-slider/common (= 5.1.2)
+    - react-native-slider/common (= 5.2.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1817,7 +1817,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-slider/common (5.1.2):
+  - react-native-slider/common (5.2.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2268,7 +2268,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNDateTimePicker (8.6.0):
+  - RNDateTimePicker (9.1.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2294,7 +2294,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.30.0):
+  - RNGestureHandler (2.31.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2316,15 +2316,15 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - rnmapbox-maps (10.2.10):
-    - MapboxMaps (~> 11.16.2)
+  - rnmapbox-maps (10.3.0):
+    - MapboxMaps (~> 11.18.2)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.2.10)
+    - rnmapbox-maps/DynamicLibrary (= 10.3.0)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.2.10):
+  - rnmapbox-maps/DynamicLibrary (10.3.0):
     - hermes-engine
-    - MapboxMaps (~> 11.16.2)
+    - MapboxMaps (~> 11.18.2)
     - RCTRequired
     - RCTTypeSafety
     - React
@@ -2343,7 +2343,7 @@ PODS:
     - ReactNativeDependencies
     - Turf
     - Yoga
-  - RNReanimated (4.2.2):
+  - RNReanimated (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2365,10 +2365,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated (= 4.2.2)
+    - RNReanimated/apple (= 4.3.0)
+    - RNReanimated/common (= 4.3.0)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated (4.2.2):
+  - RNReanimated/apple (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2390,10 +2391,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/reanimated/apple (= 4.2.2)
     - RNWorklets
     - Yoga
-  - RNReanimated/reanimated/apple (4.2.2):
+  - RNReanimated/common (4.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2466,7 +2466,7 @@ PODS:
     - Yoga
   - RNSensors (7.3.6):
     - React-Core
-  - RNSentry (8.3.0):
+  - RNSentry (8.7.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2488,7 +2488,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - Sentry (= 9.6.0)
+    - Sentry (= 9.8.0)
     - Yoga
   - RNSketchCanvas (0.8.0):
     - React
@@ -2516,7 +2516,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.7.4):
+  - RNWorklets (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2538,9 +2538,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets (= 0.7.4)
+    - RNWorklets/apple (= 0.8.1)
+    - RNWorklets/common (= 0.8.1)
     - Yoga
-  - RNWorklets/worklets (0.7.4):
+  - RNWorklets/apple (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2562,9 +2563,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/worklets/apple (= 0.7.4)
     - Yoga
-  - RNWorklets/worklets/apple (0.7.4):
+  - RNWorklets/common (0.8.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2594,9 +2594,9 @@ PODS:
   - RNZipArchive/Core (7.0.2):
     - React-Core
     - SSZipArchive (~> 2.5.5)
-  - Sentry (9.6.0):
-    - Sentry/Core (= 9.6.0)
-  - Sentry/Core (9.6.0)
+  - Sentry (9.8.0):
+    - Sentry/Core (= 9.8.0)
+  - Sentry/Core (9.8.0)
   - SSZipArchive (2.5.5)
   - SwiftUIIntrospect (1.3.0)
   - Turf (4.0.0)
@@ -2945,15 +2945,15 @@ CHECKOUT OPTIONS:
     :git: https://github.com/douglasjunior/IQKeyboardManager.git
 
 SPEC CHECKSUMS:
-  AsyncStorage: b7e9d8feded2a33e90a600565c35fcf9fcc37543
+  AsyncStorage: 2e1d431842588f5af845737e6435c1fcbecdab51
   FBLazyVector: e97c19a5a442429d1988f182a1940fb08df514da
   hermes-engine: dbea5e8d1d479e22dcd66fb4d4bf9c10bba9cb06
   IQKeyboardManagerSwift: 90ba81812fbbd6694924a95a271fa3affdf04a14
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
   lottie-react-native: 6a080b2f109ef611c75c503a33ebb8ea75db0c91
-  MapboxCommon: 10cbf74edb23c9abcfe2424899d804f288a47334
-  MapboxCoreMaps: f19680d20681797067268284b2292349de861730
-  MapboxMaps: 04c7bf46d66265ad0f4b98484a251777a926c423
+  MapboxCommon: 371fd6db596531464b6fd751ae7daa382fe2da2b
+  MapboxCoreMaps: 811c4196843f5554b10a807d1231270d372ff148
+  MapboxMaps: 0e8fdc25eb3b1c2ff5cf9317266fe984eeb0e18f
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2998,13 +2998,13 @@ SPEC CHECKSUMS:
   react-native-image-picker: 48d850454b4a389753053e1d7378b624d3b47d77
   react-native-image-resizer: 51fd2e3a42d7cb221e67698c550d7797f92355d4
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
-  react-native-keyboard-controller: c872321fc580f8d815e9e2ad5558b24c26c18b4f
+  react-native-keyboard-controller: ad9d45189d91a9bdcc5b7c93c114c1870a1b026e
   react-native-netinfo: 7e0b1936e928fa8ddb60da9e572a33767db7805f
-  react-native-orientation-director: 23afa00ac5403dd4ffcbdfc9228a4f69ca665676
+  react-native-orientation-director: 7beebce58bb950290dcfab01546001b91800af44
   react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
-  react-native-pdf: 70836b3b48595c7f85a3aa2b5d122b175c455733
+  react-native-pdf: dac049a15aec41db452e372f85184d3f15741b12
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
-  react-native-slider: 8b9a218d1a3e526146a170cb6133be9cda23e70e
+  react-native-slider: d535cb9791fe29bd2cd70c0c3556545aba3c1f55
   React-NativeModulesApple: 5ba0903927f6b8d335a091700e9fda143980f819
   React-networking: 3a4b7f9ed2b2d1c0441beacb79674323a24bcca6
   React-oscompat: ff26abf0ae3e3fdbe47b44224571e3fc7226a573
@@ -3041,21 +3041,21 @@ SPEC CHECKSUMS:
   ReactNativeDependencies: 25df8d31775501468beea52b9b4bccdf1bb6e056
   RNCClipboard: 88d7eeb555d1183915f0885bdbc5c97eb6f7f3ba
   RNCPicker: c8a3584b74133464ee926224463fcc54dfdaebca
-  RNDateTimePicker: 9c0a849bbe1c256f0854fea255734b715f5ea876
+  RNDateTimePicker: 9025ccd219b382f246e9ceb85cd4095279b9bad1
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 07de6f059e0ee5744ae9a56feb07ee345338cc31
-  rnmapbox-maps: 6135ab50fda2676f742555f210d1e1657a5b6378
-  RNReanimated: 66fa99647173f254f731e6aa59a0a2cc8c838ac1
+  RNGestureHandler: 5e7f23adbdc5b74c1333fdcba3455e93e84e52e6
+  rnmapbox-maps: 30c5b33f811509feea581214d9973ffe3795c0c0
+  RNReanimated: 923eb30d50cea473eed734767d4c33c374fae5fc
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
   RNSensors: 111159597ac51505df10413c61b28bcd28e88983
-  RNSentry: d673147bdfeb7cefbd0bd3e626f7df676f72b1ff
+  RNSentry: c60f22ba4945e650f727ee40ee3b2ac73bca065a
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 4351544f100d4f12cac156a7c13399e60bab3e26
-  RNWorklets: 30f9a363d681c776a5f9d74f6d21a6d1bb7bfe80
+  RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
   RNZipArchive: 4304f5100eab004eeb7349adc51997b3a28deb76
-  Sentry: 9e8d102abb153ebd2b6f3ecb4057c57c57b1d6a7
+  Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
