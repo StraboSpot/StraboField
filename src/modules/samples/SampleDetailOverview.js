@@ -41,7 +41,7 @@ const SampleDetailOverview = () => {
   };
 
   const onViewDetailPressed = () => {
-    dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
+    dispatch(setSelectedAttributes(spot.properties?.samples?.length > 0 ? [spot.properties.samples[0]] : []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 

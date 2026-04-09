@@ -35,7 +35,7 @@ const SampleListItem = ({
   /* Derived Variables */
 
   const isReadOnly = isSpotInReadOnlyDataset(parentSpot.properties?.id);
-  const sampleMetadata = sample.properties?.isSample ? sample.properties.samples[0] : sample;
+  const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
   /* Event Handlers */
@@ -83,7 +83,7 @@ const SampleListItem = ({
         />
       ) : (
         <>
-          <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample && sample}/>
+          <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample ? sample : undefined}/>
           <ListItem.Chevron/>
         </>
       )}

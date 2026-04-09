@@ -205,7 +205,12 @@ const useTags = () => {
 
   const getSamplesWithThisTag = (tag) => {
     return isEmpty(tag.spots) ? []
-      : tag.spots.filter(spotId => spots[spotId] && !isEmpty(spots[spotId].properties.samples));
+      : tag.spots.filter((spotId) => {
+        const spot = spots[spotId];
+        if (!spot) return false;
+        if (spot.properties?.isSample) return true;
+        return spot.properties?.samples?.some(s => !spots[s.id]);
+      });
   };
 
   const getSpotsWithThisTagCount = (tag) => {
