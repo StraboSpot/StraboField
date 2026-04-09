@@ -55,6 +55,16 @@ const useDownload = () => {
   const {clearProject} = useResetState();
   const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
 
+  const resetDownloadState = () => {
+    customMapsToSave = {};
+    datasetsObjToSave = {};
+    spotsToSave = [];
+    imagesDownloadedCount = 0;
+    imagesFailedCount = 0;
+    tempActiveDatasetsIds = undefined;
+    tempTargetDatasetId = undefined;
+  };
+
   /* Internal Functions */
 
   const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
@@ -279,6 +289,7 @@ const useDownload = () => {
   };
 
   const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
+    resetDownloadState();
     if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
     const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
     dispatch(setStatusMessageModalTitle(projectName));

@@ -62,9 +62,9 @@ const SplashScreen = ({children}) => {
         {/*)}*/}
       </ScrollView>
       <VersionCheckLabel/>
-      <Text style={splashScreenStyles.buildNumberText}>
+      {Platform.OS !== 'web' && <Text style={splashScreenStyles.buildNumberText}>
         Build: {DeviceInfo.getBuildNumber()}
-      </Text>
+      </Text>}
       <Loading isLoading={loading} size={60}/>
     </ImageBackground>
   );
