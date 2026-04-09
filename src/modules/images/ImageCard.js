@@ -22,12 +22,10 @@ const ImageCard = ({
                      index,
                      isReadOnly,
                      isThumbnailOnly,
-                     openImage,
+                     onOpenImage,
                      saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
-                     setImageToView,
-                     setIsImageModalVisible,
                    }) => {
   /* Data Hooks */
 
@@ -82,11 +80,7 @@ const ImageCard = ({
 
   const handleImagePressed = async () => {
     if (imageThumbnailURIs?.[image.id]) {
-      if (openImage) openImage(image);
-      else {
-        setImageToView(image);
-        setIsImageModalVisible(true);
-      }
+      if (onOpenImage) onOpenImage(image);
     }
     else {
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: true});

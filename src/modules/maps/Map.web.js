@@ -27,6 +27,7 @@ const Map = ({
                location,
                mapMode,
                measureFeatures,
+               onMapLoad,
                spotsNotSelected,
                spotsSelected,
              }, forwardedRef) => {
@@ -73,7 +74,8 @@ const Map = ({
         });
       }
     });
-  }, []);
+    onMapLoad?.();
+  }, [onMapLoad]);
 
   /* Side Effects */
 

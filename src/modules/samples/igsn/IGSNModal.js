@@ -26,16 +26,17 @@ const IGSNModal = forwardRef(({
   const {straboSesarMapping, updateSampleIsSesar, uploadSample} = useIGSN();
 
   /* Local State */
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [errorView, setErrorView] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [mappedSesarValues, setMappedSesarValues] = useState({});
+  const [modalPage, setModalPage] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
+
+  /* Derived Variables */
 
   const formValues = formRef.current?.values || {};
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorView, setErrorView] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
-  const [modalPage, setModalPage] = useState(null);
-  const [mappedSesarValues, setMappedSesarValues] = useState({});
 
   /* Side Effects */
 
@@ -107,14 +108,6 @@ const IGSNModal = forwardRef(({
 
   /* Render Functions */
 
-  const renderErrorView = () => {
-    return (
-      <View style={IGSNModalStyles.errorContainer}>
-        <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
-        {errorMessages.map(msg => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
-      </View>
-    );
-  };
   const renderContentItems = () => {
     return (
       <View style={IGSNModalStyles.contentContainer}>
@@ -138,6 +131,15 @@ const IGSNModal = forwardRef(({
     );
   };
 
+  const renderErrorView = () => {
+    return (
+      <View style={IGSNModalStyles.errorContainer}>
+        <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
+        {errorMessages.map(msg => <Text style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
+      </View>
+    );
+  };
+
   const renderUploadContent = () => {
     if (isEmpty(formRef.current?.values?.sample_id_name)) return null;
     return (
@@ -146,6 +148,8 @@ const IGSNModal = forwardRef(({
       </ScrollView>
     );
   };
+
+  /* View */
 
   return (
     <ModalWrapper

@@ -4,8 +4,8 @@ import {Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import issuesAndRequestsStyles from './issuesAndRequests.styles';
-import UrlLinkButton from './UrlLinkButton';
-import {SUPPORT_PATHS} from '../../services/urls.constants';
+import {SUPPORT_PATHS} from '../../../services/urls.constants';
+import UrlLinkButton from '../UrlLinkButton';
 
 const IssuesAndRequests = () => {
   /* Data Hooks */
@@ -39,4 +39,3 @@ const IssuesAndRequests = () => {
 };
 
 export default IssuesAndRequests;
-

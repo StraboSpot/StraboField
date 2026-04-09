@@ -40,35 +40,31 @@ const MapContainer = forwardRef(({
                                  }, mapComponentRef) => {
   console.log('Rendering MapContainer...');
 
-  const cameraRef = useRef(null);
-  const mapRef = useRef(null);
-  const spotsRef = useRef(null);
+  /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const customBasemap = useSelector(state => state.map.customMaps);
-  const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
-  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
+  const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
+  const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const userEmail = useSelector(state => state.user.email);
-
-  const [isShowMacrostratOverlay, setIsShowMacrostratOverlay] = useState(false);
-  const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
-  const [isZoomToCenterOffline, setIsZoomToCenterOffline] = useState(false);
-  const [measureFeatures, setMeasureFeatures] = useState([]);
-  const [showSetInCurrentViewModal, setShowSetInCurrentViewModal] = useState(false);
-  const [showUserLocation, setShowUserLocation] = useState(false);
-  const [vertexActionValues, setVertexActionValues] = useState(null);
 
   const {setCustomMapSwitchValue} = useCustomMap();
   const {setImageHeightAndWidth} = useImages();
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
+  const mapRef = useRef(null);
   const {getLassoedSpots} = useMapFeaturesCalculated(mapRef);
+  const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
+  const [vertexActionValues, setVertexActionValues] = useState(null);
   const {
     addNewVertex,
     allowMapViewMove,
@@ -98,6 +94,9 @@ const MapContainer = forwardRef(({
     setIsShowVertexActionsModal: setIsShowVertexActionsModal,
     setVertexActionValues: setVertexActionValues,
   });
+  const {getCurrentLocation} = useMapLocation();
+  const [isShowMacrostratOverlay, setIsShowMacrostratOverlay] = useState(false);
+  const [measureFeatures, setMeasureFeatures] = useState([]);
   const {
     handleMapLongPress,
     handleMapPress,
@@ -117,15 +116,48 @@ const MapContainer = forwardRef(({
     setMeasureFeatures,
     switchToEditing,
   });
-  const {getCurrentLocation} = useMapLocation();
-  const {setMapView, zoomToSpotsNow} = useMapView();
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
+  const {setMapView, zoomToSpotsNow} = useMapView();
   const {getTilesFromHost} = useServerRequests();
+
+  /* Local State */
+
+  const cameraRef = useRef(null);
+  const isDatasetToggleZoomPendingRef = useRef(false);
+  const isInitialLoadZoomPendingRef = useRef(false);
+  const spotsRef = useRef(null);
+
+  const [isZoomToCenterOffline, setIsZoomToCenterOffline] = useState(false);
+  const [showSetInCurrentViewModal, setShowSetInCurrentViewModal] = useState(false);
+  const [showUserLocation, setShowUserLocation] = useState(false);
+
+  /* Side Effects */
 
   useEffect(() => {
     // console.log('UE MapContainer [featuresSelected, featuresUnselected]');
     spotsRef.current = [...spotsSelected, ...spotsNotSelected];
+    if (isDatasetToggleZoomPendingRef.current) {
+      isDatasetToggleZoomPendingRef.current = false;
+      isInitialLoadZoomPendingRef.current = false;
+      if (spotsRef.current.length > 0) zoomToSpotsExtent().catch(console.error);
+    }
+    else if (isInitialLoadZoomPendingRef.current) {
+      isInitialLoadZoomPendingRef.current = false;
+      if (spotsRef.current.length > 0) zoomToSpotsExtent().catch(console.error);
+    }
   }, [spotsSelected, spotsNotSelected]);
+
+  useEffect(() => {
+    if (isProjectLoadSelectionModalVisible) {
+      if (Platform.OS === 'web') isInitialLoadZoomPendingRef.current = true;
+      else if (spotsRef.current?.length > 0) zoomToSpotsExtent().catch(console.error);
+      else isInitialLoadZoomPendingRef.current = true;
+    }
+  }, [isProjectLoadSelectionModalVisible]);
+
+  useEffect(() => {
+    if (isStatusMessagesModalVisible) isDatasetToggleZoomPendingRef.current = true;
+  }, [activeDatasetsIds]);
 
   useEffect(() => {
     // console.log('UE MapContainer [currentImageBasemap]');
@@ -180,6 +212,41 @@ const MapContainer = forwardRef(({
     }
     clearVertexes();
   }, [userEmail, isOnline]);
+
+  useImperativeHandle(mapComponentRef, () => {
+    return {
+      cancelDraw: cancelDraw,
+      cancelEdits: cancelEdits,
+      clearSelectedSpots: clearSelectedSpots,
+      createDefaultGeom: createDefaultGeom,
+      endDraw: endDraw,
+      endMapMeasurement: endMapMeasurement,
+      getCurrentZoom: getCurrentZoom,
+      getExtentString: getExtentString,
+      getTileCount: getTileCount,
+      moveVertex: moveVertex,
+      saveEdits: saveEdits,
+      startEditingMode: startEditingMode,
+      toggleUserLocation: toggleUserLocation,
+      updateSpotsInMapExtent: updateSpotsInMapExtent,
+      zoomToCenterOfflineTile: zoomToCenterOfflineTile,
+      zoomToCurrentLocation: zoomToCurrentLocation,
+      zoomToCustomMap: zoomToCustomMap,
+      zoomToSpots: zoomToSpots,
+      zoomToSpotsExtent: zoomToSpotsExtent,
+    };
+  });
+
+  /* Event Handlers */
+
+  const handleMapLoadedWeb = () => {
+    if (isInitialLoadZoomPendingRef.current && spotsRef.current?.length > 0) {
+      isInitialLoadZoomPendingRef.current = false;
+      zoomToSpotsExtent().catch(console.error);
+    }
+  };
+
+  /* Logic Helpers */
 
   // Create a default geometry for a Spot that doesn't have geometry when 'Set in Current View' is clicked,
   // then make it selected for immediate editing
@@ -257,6 +324,10 @@ const MapContainer = forwardRef(({
       dispatch(addedStatusMessage('Error fetching data from tile count service.'));
       dispatch(setIsErrorMessagesModalVisible(true));
     }
+  };
+
+  const startEditingMode = () => {
+    startEditing(undefined, undefined, undefined, setMapModeToEdit);
   };
 
   const toggleUserLocation = (value) => {
@@ -352,38 +423,13 @@ const MapContainer = forwardRef(({
   };
 
   // Zoom map to the extent of the mapped Spots
-  const zoomToSpotsExtent = () => {
+  const zoomToSpotsExtent = async () => {
+    if (Platform.OS === 'web' && !mapRef.current) return;
     const spotsToZoomTo = [...spotsSelected, ...spotsNotSelected];
-    zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    await zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
   };
 
-  const startEditingMode = () => {
-    startEditing(undefined, undefined, undefined, setMapModeToEdit);
-  };
-
-  useImperativeHandle(mapComponentRef, () => {
-    return {
-      cancelDraw: cancelDraw,
-      cancelEdits: cancelEdits,
-      clearSelectedSpots: clearSelectedSpots,
-      createDefaultGeom: createDefaultGeom,
-      endDraw: endDraw,
-      endMapMeasurement: endMapMeasurement,
-      getCurrentZoom: getCurrentZoom,
-      getExtentString: getExtentString,
-      getTileCount: getTileCount,
-      moveVertex: moveVertex,
-      saveEdits: saveEdits,
-      startEditingMode: startEditingMode,
-      toggleUserLocation: toggleUserLocation,
-      updateSpotsInMapExtent: updateSpotsInMapExtent,
-      zoomToCenterOfflineTile: zoomToCenterOfflineTile,
-      zoomToCurrentLocation: zoomToCurrentLocation,
-      zoomToCustomMap: zoomToCustomMap,
-      zoomToSpots: zoomToSpots,
-      zoomToSpotsExtent: zoomToSpotsExtent,
-    };
-  });
+  /* View */
 
   return (
     <View style={{flex: 1, zIndex: -1}}>
@@ -399,6 +445,7 @@ const MapContainer = forwardRef(({
           location={location}
           mapMode={mapMode}
           measureFeatures={measureFeatures}
+          onMapLoad={handleMapLoadedWeb}  // prop used in web only
           ref={{mapRef: mapRef, cameraRef: cameraRef}}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}

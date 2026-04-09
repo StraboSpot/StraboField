@@ -36,17 +36,24 @@ const ModalWrapper = ({
                         showCloseButton,
                         showDeleteButton,
                       }) => {
+  /* Data Hooks */
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
+
+  /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
   };
+
+  /* Render Functions */
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -70,6 +77,8 @@ const ModalWrapper = ({
     }
   };
 
+  /* View */
+
   return (
     <Overlay
       animationType={'fade'}
@@ -83,7 +92,7 @@ const ModalWrapper = ({
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
-        style={isAutoHeight ? undefined : {flex: 1}}
+        style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
       >
         <ModalWrapperHeader
           buttonTitleRight={buttonTitleRight}
@@ -92,7 +101,7 @@ const ModalWrapper = ({
           showCloseButton={showCloseButton}
         />
 
-        <View style={isAutoHeight ? undefined : {flex: 1}}>
+        <View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>
           {children}
         </View>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}

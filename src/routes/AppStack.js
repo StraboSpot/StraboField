@@ -3,7 +3,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import {NAVIGATION_OPTIONS} from './routes.constants';
-import DocumentationScreen from '../modules/help/DocumentationScreen';
+import DocumentationScreen from '../modules/help/documentation/DocumentationScreen';
 import HomeContainer from '../modules/home/HomeContainer';
 import {ImageSlider} from '../modules/images';
 

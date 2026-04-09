@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/Helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {AddImageButtons, ImagesList, useImages} from '../images';
+import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
 
 const ReportImages = ({setUpdatedImages, updatedImages}) => {
@@ -16,6 +16,18 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
   const reports = useSelector(state => state.project.project?.reports) || [];
 
   const {deleteImageFile} = useImages();
+
+  /* Local State */
+
+  const [imageToView, setImageToView] = useState({});
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+
+  /* Event Handlers */
+
+  const handleOpenImage = (image) => {
+    setImageToView(image);
+    setIsImageModalVisible(true);
+  };
 
   /* Logic Helpers */
 
@@ -57,8 +69,18 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
         deleteImage={deleteImage}
         images={updatedImages}
         isThumbnailOnly
+        onOpenImage={handleOpenImage}
+      />
+
+      {/* Modal */}
+      <ImageModal
+        deleteImage={deleteImage}
+        image={imageToView}
+        isVisible={isImageModalVisible}
         saveImages={saveImagesToReport}
         saveUpdatedImage={saveUpdatedImage}
+        setImageToView={setImageToView}
+        setIsImageModalVisible={setIsImageModalVisible}
       />
     </View>
   );

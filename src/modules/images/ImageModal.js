@@ -15,17 +15,17 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import SketchModal from '../sketch/SketchModal';
 
-const ImageInfo = ({
-                     deleteImage,
-                     image,
-                     isReadOnly,
-                     isVisible,
-                     saveImages,
-                     saveUpdatedImage,
-                     setImageToView,
-                     setIsImageModalVisible,
-                   }) => {
-  console.log('Rendering ImageInfo...');
+const ImageModal = ({
+                      deleteImage,
+                      image,
+                      isReadOnly,
+                      isVisible,
+                      saveImages,
+                      saveUpdatedImage,
+                      setImageToView,
+                      setIsImageModalVisible,
+                    }) => {
+  console.log('Rendering ImageModal...');
 
   /* Data Hooks */
 
@@ -114,20 +114,20 @@ const ImageInfo = ({
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}
             source={require('../../assets/icons/ImagePropertiesButton.png')}
-            style={imageStyles.imageInfoButtons}
+            style={imageStyles.imageModalButtons}
           />
           {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
               onPress={openInSketch}
               source={require('../../assets/icons/ImageSketchButton.png')}
-              style={imageStyles.imageInfoButtons}
+              style={imageStyles.imageModalButtons}
             />
           )}
           {!isReadOnly && (
             <IconButton
               onPress={() => handleDeleteImageOnPress()}
               source={require('../../assets/icons/DeleteButton.png')}
-              style={imageStyles.imageInfoButtons}
+              style={imageStyles.imageModalButtons}
             />
           )}
         </View>
@@ -151,4 +151,4 @@ const ImageInfo = ({
   );
 };
 
-export default ImageInfo;
+export default ImageModal;

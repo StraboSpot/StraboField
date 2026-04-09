@@ -61,11 +61,6 @@ const useExport = () => {
     console.log('Added Images to backup.');
   };
 
-  const saveFile = async (directory, data, filename) => {
-    await doesDeviceDirectoryExist(directory);
-    await writeFileToDevice(directory, filename, data);
-  };
-
   const gatherDataForBackup = async (filename) => {
     try {
       dispatch(removedLastStatusMessage());
@@ -201,6 +196,11 @@ const useExport = () => {
       imageBackupFailures++;
       console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
     }
+  };
+
+  const saveFile = async (directory, data, filename) => {
+    await doesDeviceDirectoryExist(directory);
+    await writeFileToDevice(directory, filename, data);
   };
 
   /* Exported Functions */

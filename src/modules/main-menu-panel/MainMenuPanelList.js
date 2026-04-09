@@ -35,7 +35,7 @@ const MainMenuPanelList = ({searchText}) => {
 
   useEffect(() => {
     filterMenuItems();
-  }, [searchText]);
+  }, [searchText, projectName, encodedLogin]);
 
   /* Event Handlers */
 

@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, useWindowDimensions, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 
@@ -8,12 +8,13 @@ import {IMAGE_PROPERTIES_FORM_NAME} from './images.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {formStyles, Form, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
   /* Data Hooks */
 
   const {showErrors, validateForm} = useForm();
+  const {height: windowHeight} = useWindowDimensions();
 
   /* Local State */
 
@@ -40,22 +41,6 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
     }
   };
 
-  /* Render Functions */
-
-  const renderFormFields = () => {
-    console.log('Rendering form:', IMAGE_PROPERTIES_FORM_NAME.join('.'), 'with selected image:', image);
-    return (
-      <Formik
-        component={formProps => Form({formName: IMAGE_PROPERTIES_FORM_NAME, isReadOnly: isReadOnly, ...formProps})}
-        initialStatus={{formName: IMAGE_PROPERTIES_FORM_NAME}}
-        initialValues={image}
-        innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
-      />
-    );
-  };
-
   /* View */
 
   return (
@@ -64,21 +49,44 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       headerTitle={'Image Properties'}
       isVisible={isVisible}
       onActionPressed={saveFormAndGo}
-      overlayStylesOverride={{height: '90%'}}
+      overlayStyleOverride={{height: windowHeight * 0.9}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
-      <FlatList
-        ListFooterComponent={
-          <View style={imageStyles.switch}>
-            <Text style={{marginLeft: 10, fontSize: 16}}>Use as Image Basemap?</Text>
-            <SwitchWrapper disabled={isReadOnly} onValueChange={setIsAnnotated} value={isAnnotated}/>
-          </View>
-        }
-        ListHeaderComponent={renderFormFields()}
-      />
-      {!isReadOnly && <ActionButton onPress={saveFormAndGo}/>}
+      <View style={{flex: 1, minHeight: 0, overflow: 'hidden'}}>
+        <FlatList
+          ListFooterComponent={
+            <View style={imageStyles.imageBasemapSwitchRow}>
+              <View style={imageStyles.imageBasemapSwitchControl}>
+                <SwitchWrapper disabled={isReadOnly} onValueChange={setIsAnnotated} value={isAnnotated}/>
+              </View>
+              <View style={[formStyles.fieldLabelContainer, imageStyles.imageBasemapSwitchLabelContainer]}>
+                <Text style={[formStyles.fieldLabel, imageStyles.imageBasemapSwitchLabel]}>Use as Image Basemap?</Text>
+              </View>
+            </View>
+          }
+          ListHeaderComponent={
+            <Formik
+              initialStatus={{formName: IMAGE_PROPERTIES_FORM_NAME}}
+              initialValues={image}
+              innerRef={formRef}
+              onSubmit={() => console.log('Submitting form...')}
+              validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
+            >
+              {formProps => (
+                <View style={{flex: 1}}>
+                  <Form formName={IMAGE_PROPERTIES_FORM_NAME} isReadOnly={isReadOnly} {...formProps}/>
+                </View>
+              )}
+            </Formik>
+          }
+          bounces={false}
+          contentContainerStyle={{paddingBottom: 8}}
+          style={{flex: 1, minHeight: 0}}
+        />
+        {!isReadOnly && <ActionButton onPress={saveFormAndGo}/>}
+      </View>
     </ModalWrapper>
   );
 };

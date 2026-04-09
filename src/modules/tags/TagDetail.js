@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {FlatList} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
@@ -15,6 +15,7 @@ import {deletedSpotIdFromTags} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
+import TagDetailSummaryText from './TagDetailSummaryText';
 import {useTags} from '../tags';
 
 const TagDetail = ({
@@ -34,22 +35,7 @@ const TagDetail = ({
 
   const {isSpotInReadOnlyDataset} = useProject();
   const {getSpotById, getSpotWithThisSample} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent, renderTagInfo} = useTags();
-
-  /* Local State */
-
-  const [refresh, setRefresh] = useState(false);
-
-  // console.log('selectedTag', selectedTag);
-  // selectedTag.spots.map((spotId, index) => console.log(index, spotId, getSpotById(spotId)));
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE TagDetail [selectedTag]', selectedTag);
-    setRefresh(!refresh); // #TODO : Current hack to render two different FlatListComponents when selectedTag Changes.
-                          //         To handle the navigation issue from 0 tagged features to non zero tagged features.
-  }, [selectedTag]);
+  const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
   /* Render Functions */
 
@@ -135,6 +121,7 @@ const TagDetail = ({
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Features'}/>}
         data={getAllTaggedFeatures(selectedTag)}
+        extraData={selectedTag}
         keyExtractor={item => 'Feature' + item.id.toString()}
         listKey={'features'}
         renderItem={({item}) => renderSpotFeatureItem(item)}
@@ -153,7 +140,7 @@ const TagDetail = ({
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
             onPress={setIsDetailModalVisible}
           />
-          {selectedTag && renderTagInfo()}
+          {selectedTag && <TagDetailSummaryText onPress={setIsDetailModalVisible}/>}
 
           {/* Spots with this Tag */}
           <SectionDividerWithRightButton
@@ -187,7 +174,7 @@ const TagDetail = ({
                 dividerText={'Tagged Features'}
                 onPress={addRemoveFeatures}
               />
-              {refresh ? renderTaggedFeaturesList() : renderTaggedFeaturesList()}
+              {renderTaggedFeaturesList()}
             </>
           )}
         </>

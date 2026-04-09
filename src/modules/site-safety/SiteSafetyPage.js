@@ -1,9 +1,8 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {Platform, View} from 'react-native';
+import {FlatList, KeyboardAvoidingView, Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -123,7 +122,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly, scrollEnabled: false}}/>}
+        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
       </Formik>
     );
   };
@@ -131,16 +130,23 @@ const SiteSafetyPage = ({isReadOnly}) => {
   /* View */
 
   return (
-    <>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      style={{flex: 1}}
+    >
       <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
-      <KeyboardAwareScrollView
-        style={{flex: 1}}
-      >
-        <SectionDivider dividerText={page.label}/>
-        {renderSiteSafetyForm()}
-      </KeyboardAwareScrollView>
-    </>
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <SectionDivider dividerText={page.label}/>
+            {renderSiteSafetyForm()}
+          </>
+        }
+        contentContainerStyle={{paddingBottom: 200}}
+      />
+    </KeyboardAvoidingView>
   );
 };
 

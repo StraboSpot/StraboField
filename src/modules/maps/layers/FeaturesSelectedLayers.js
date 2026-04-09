@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const FeaturesSelectedLayers = ({featuresSelected, isStratStyleLoaded}) => {
+const FeaturesSelectedLayers = ({featuresSelected}) => {
   /* Data Hooks */
 
   const {stratSection} = useSelector(state => state.map);
@@ -31,10 +31,7 @@ const FeaturesSelectedLayers = ({featuresSelected, isStratStyleLoaded}) => {
         filter={['all', ['==', ['geometry-type'], 'Polygon'], ['has', 'fillPattern', ['get', 'symbology']]]}
         id={'polygonLayerWithPatternSelected'}
         minZoomLevel={1}
-        style={{
-          ...getMapSymbology().polygonWithPatternSelected,
-          visibility: stratSection && isStratStyleLoaded ? 'visible' : 'none',
-        }}
+        style={{...getMapSymbology().polygonWithPatternSelected, visibility: stratSection ? 'visible' : 'none'}}
       />
       <MapboxGL.LineLayer
         filter={['==', ['geometry-type'], 'Polygon']}

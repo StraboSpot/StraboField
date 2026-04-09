@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {FlatList, View} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 
-import {ImageCard, ImageInfo, imageStyles, useImageThumbnails} from '.';
+import {ImageCard, imageStyles, useImageThumbnails} from '.';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
 const ImagesList = ({
@@ -9,8 +9,7 @@ const ImagesList = ({
                       images,
                       isReadOnly,
                       isThumbnailOnly = false,
-                      openImage,
-                      saveImages,
+                      onOpenImage,
                       saveUpdatedImage,
                     }) => {
   /* Data Hooks */
@@ -22,10 +21,11 @@ const ImagesList = ({
     setImageThumbnailURIs,
   } = useImageThumbnails({images});
 
-  /* Local State */
+  /* Derived Variables */
 
-  const [imageToView, setImageToView] = useState({});
-  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const sortedImages = JSON.parse(JSON.stringify(images)).sort(
+    (imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+      .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
 
   /* Render Functions */
 
@@ -39,54 +39,29 @@ const ImagesList = ({
           index={index}
           isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
-          openImage={openImage}
+          onOpenImage={onOpenImage}
           saveUpdatedImage={saveUpdatedImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
-          setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
         />
       </React.Fragment>
-    );
-  };
-
-  const renderImages = () => {
-    const sortedImages = JSON.parse(JSON.stringify(images)).sort(
-      (imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
-        .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
-    return (
-      <FlatList
-        ListEmptyComponent={<ListEmptyText text={'No Images'}/>}
-        ListHeaderComponent={
-          <View
-            style={[imageStyles.imagesListContainer, {justifyContent: isThumbnailOnly ? 'flex-start' : 'space-evenly'}]}
-          >
-            {sortedImages.map((image, index) => renderImageCard(image, index))}
-          </View>
-        }
-        data={sortedImages}
-      />
     );
   };
 
   /* View */
 
   return (
-    <>
-      <View style={{flex: 1}}>
-        {renderImages()}
-      </View>
-      <ImageInfo
-        deleteImage={deleteImage}
-        image={imageToView}
-        isReadOnly={isReadOnly}
-        isVisible={isImageModalVisible}
-        saveImages={saveImages}
-        saveUpdatedImage={saveUpdatedImage}
-        setImageToView={setImageToView}
-        setIsImageModalVisible={setIsImageModalVisible}
-      />
-    </>
+    <View style={{flex: 1}}>
+      {sortedImages.length === 0 ? <ListEmptyText text={'No Images'}/>
+        : (
+          <View
+            style={[imageStyles.imagesListContainer, {justifyContent: isThumbnailOnly ? 'flex-start' : 'space-evenly'}]}
+          >
+            {sortedImages.map((image, index) => renderImageCard(image, index))}
+          </View>
+        )
+      }
+    </View>
   );
 };
 

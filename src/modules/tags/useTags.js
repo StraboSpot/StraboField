@@ -1,12 +1,11 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {tagsStyles} from './index';
-import {TAG_FORM_NAMES, TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS, TAG_TYPES} from './tags.constants';
+import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
-import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
+import {deepFindFeatureById, isEmpty} from '../../shared/Helpers';
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
@@ -30,7 +29,6 @@ const useTags = () => {
   const projectTags = useSelector(state => state.project.project?.tags) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
   const {getLabel} = useForm();
@@ -88,7 +86,8 @@ const useTags = () => {
   };
 
   const addRemoveSpotFromTag = (spotId, tag) => {
-    const updatedSpots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId) : [...(tag.spots ?? []), spotId];
+    const updatedSpots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId)
+      : [...(tag.spots ?? []), spotId];
     saveTag({...tag, spots: updatedSpots});
   };
 
@@ -241,23 +240,9 @@ const useTags = () => {
     return projectTags.filter(tag => tag.spots && tag.spots.includes(spotId));
   };
 
-  const renderTagInfo = () => {
-    let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
-    if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
-    const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
-    const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
-    let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
-      if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
-      else return acc;
-    }, []);
-    const notes = selectedTag.notes ? truncateText(selectedTag.notes, 100) : undefined;
-    return (
-      <View style={tagsStyles.sectionContainer}>
-        {<Text style={tagsStyles.listText}>{toTitleCase(type)}{subType && ' - ' + subType.toUpperCase()}</Text>}
-        {!isEmpty(rockUnitString) && <Text style={tagsStyles.listText}>{rockUnitString}</Text>}
-        {notes && <Text style={tagsStyles.listText}>Notes: {notes}</Text>}
-      </View>
-    );
+  const getTagSpotsCount = (tag) => {
+    const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
+    return validSpots.length;
   };
 
   const saveTag = (tagToSave) => {
@@ -313,7 +298,7 @@ const useTags = () => {
     getTagLabel,
     getTagsAtFeature,
     getTagsAtSpot,
-    renderTagInfo,
+    getTagSpotsCount,
     saveTag,
     setFeaturesSelectedForMultiTagging,
     tagSpotExists,

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -10,9 +10,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddImageOverlayModal from './AddImageOverlayModal';
 import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEqual, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
+import alert from '../../shared/ui/alert';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -34,23 +35,40 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const toast = useToast();
-
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
+  const toast = useToast();
 
   /* Local State */
 
+  const stratSection = spot.properties?.sed?.strat_section || {};
+  const savedValuesRef = useRef(stratSection);
   const stratSectionRef = useRef(null);
 
   const [selectedImage, setSelectedImage] = useState(undefined);
 
-  /* Derived Variables */
+  /* Side Effects */
 
-  const stratSection = spot.properties?.sed?.strat_section || {};
+  useLayoutEffect(() => {
+    return () => confirmLeavePage();
+  }, []);
 
   /* Logic Helpers */
+
+  const confirmLeavePage = () => {
+    const formCurrent = stratSectionRef.current;
+    if (formCurrent?.dirty && !isEqual(formCurrent.values, savedValuesRef.current)) {
+      alert('Unsaved Changes',
+        'Would you like to save your data before continuing?',
+        [
+          {text: 'No', style: 'cancel'},
+          {text: 'Yes', onPress: () => saveStratSection(formCurrent)},
+        ],
+        {cancelable: false},
+      );
+    }
+  };
 
   const getImageLabel = (id) => {
     const index = spot.properties.images.findIndex(i => id === i.id);
@@ -58,10 +76,10 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return image && image.title ? image.title : 'Untitled ' + (index + 1);
   };
 
-  const saveStratSection = async () => {
+  const saveStratSection = async (formCurrent = stratSectionRef.current) => {
     try {
-      await saveSedFeature(page.key, spot, stratSectionRef.current);
-      await stratSectionRef.current.resetForm();
+      await saveSedFeature(page.key, spot, formCurrent);
+      savedValuesRef.current = {...formCurrent.values};
       toast.show('Strat Section Settings saved', {type: 'success'});
     }
     catch (e) {
@@ -113,12 +131,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
-        {!isReadOnly && (
-          <SaveAndCancelButtons
-            cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-            save={saveStratSection}
-          />
-        )}
         <Formik
           enableReinitialize={true}
           initialValues={stratSection}
@@ -128,7 +140,17 @@ const StratSectionPage = ({isReadOnly, page}) => {
           validate={values => validateForm({formName: stratSectionFormName, values: values})}
           validateOnChange={false}
         >
-          {formProps => <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>}
+          {formProps => (
+            <>
+              {!isReadOnly && (
+                <SaveAndCancelButtons
+                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                  save={() => saveStratSection(formProps)}
+                />
+              )}
+              <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>
+            </>
+          )}
         </Formik>
       </View>
     );

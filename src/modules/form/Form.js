@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Platform} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
@@ -18,7 +18,6 @@ const Form = ({
                 formName,
                 isReadOnly,
                 onMyChange,
-                scrollEnabled = true,
                 setFieldValue,
                 subkey,
                 surveyFragment,
@@ -31,6 +30,7 @@ const Form = ({
   /* Derived Variables */
 
   const survey = surveyFragment || getSurvey(formName);
+  const relevantFields = Object.values(survey.filter(item => isRelevant(item, values)));
 
   /* Side Effects */
 
@@ -135,6 +135,12 @@ const Form = ({
     );
   };
 
+  const renderFields = () => relevantFields.map((field, index) => (
+    <React.Fragment key={field.name || field.label || index.toString()}>
+      {renderField(field)}
+    </React.Fragment>
+  ));
+
   const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
 
   const renderNumberInput = (field) => {
@@ -202,13 +208,14 @@ const Form = ({
 
   /* View */
 
+  if (Platform.OS === 'web') return renderFields();
+
   return (
     <FlatList
-      data={Object.values(survey.filter(item => isRelevant(item, values)))}
+      data={relevantFields}
       keyExtractor={(item, index) => index.toString()}
       listKey={JSON.stringify(survey)}
       renderItem={({item}) => renderField(item)}
-      scrollEnabled={scrollEnabled}
     />
   );
 };
