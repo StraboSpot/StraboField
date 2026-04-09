@@ -59,7 +59,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   /* Render Functions */
 
   const renderSampleDetail = () => {
-    if (spot.properties?.isSample && !selectedSample) return <Overview/>;
+    if (spot.properties?.isSample && isEmpty(selectedSample)) return <Overview/>;
     return (
       <BasicPageDetail
         closeDetailView={closeDetailView}
