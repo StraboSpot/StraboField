@@ -90,12 +90,12 @@ const ImageSlider = ({route, navigation}) => {
           <IconButton
             onPress={getSpotFromId}
             source={require('../../assets/icons/NotebookNavButton.png')}
-            style={imageStyles.imageInfoButtons}
+            style={imageStyles.imageModalButtons}
           />
           <IconButton
             onPress={() => navigation.goBack()}
             source={require('../../assets/icons/Close.png')}
-            style={imageStyles.imageInfoButtons}
+            style={imageStyles.imageModalButtons}
           />
         </View>
         <ImageZoomAndPanWrapper>

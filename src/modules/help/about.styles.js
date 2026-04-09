@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   },
   buildText: {
     fontSize: MEDIUM_TEXT_SIZE,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   container: {
     alignItems: 'center',
@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: LARGE_TEXT_SIZE,
     marginBottom: 8,
+    marginTop: 10,
   },
   paragraph: {
     fontSize: MEDIUM_TEXT_SIZE,
