@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, KeyboardAvoidingView, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -529,32 +529,38 @@ const MeasurementDetail = ({
 
   return (
     <>
-      {selectedMeasurement && (
-        <View style={styles.measurementsContentContainer}>
-          <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
-          {!isReadOnly && renderCancelSaveButtons()}
-          <FlatList
-            ListHeaderComponent={
-              <View>
-                {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
-                {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
-                {!isReadOnly && selectedMeasurement && selectedMeasurement.type
-                  && (selectedMeasurement.type === 'planar_orientation'
-                    || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Adjust offset as needed
+        style={{flex: 1}} // Important for padding behavior
+      >
+        {selectedMeasurement && (
+          <View style={styles.measurementsContentContainer}>
+            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+            {!isReadOnly && renderCancelSaveButtons()}
+            <FlatList
+              ListHeaderComponent={
                 <View>
-                  {!isEmpty(formName) && renderFormFields()}
+                  {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
+                  {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
+                  {!isReadOnly && selectedMeasurement && selectedMeasurement.type
+                    && (selectedMeasurement.type === 'planar_orientation'
+                      || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+                  <View>
+                    {!isEmpty(formName) && renderFormFields()}
+                  </View>
+                  {selectedAttributes.length === 1 && !isReadOnly && (
+                    <DeleteButton
+                      onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
+                      title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
+                    />
+                  )}
                 </View>
-                {selectedAttributes.length === 1 && !isReadOnly && (
-                  <DeleteButton
-                    onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
-                    title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
-                  />
-                )}
-              </View>
-            }
-          />
-        </View>
-      )}
+              }
+            />
+          </View>
+        )}
+      </KeyboardAvoidingView>
     </>
   );
 };
