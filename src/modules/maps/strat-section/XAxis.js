@@ -9,7 +9,7 @@ const XAxis = ({n = 1}) => {
   /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
-  const {getXAxis, getXAxisTickMarks} = useXAxis(n);
+  const {getXAxis, getXAxisTickMarks, isFlipped} = useXAxis(n);
 
   /* View */
 
@@ -38,7 +38,11 @@ const XAxis = ({n = 1}) => {
         <MapboxGL.SymbolLayer
           id={'xAxisTickMarksLabelLayer' + n}
           minZoomLevel={1}
-          style={getMapSymbology().xAxisTickMarkLabels}
+          style={{
+            ...getMapSymbology().xAxisTickMarkLabels,
+            textOffset: isFlipped ? [1, -1] : [1, 1],
+            textRotate: isFlipped ? 315 : 45,
+          }}
         />
       </MapboxGL.ShapeSource>
     </>

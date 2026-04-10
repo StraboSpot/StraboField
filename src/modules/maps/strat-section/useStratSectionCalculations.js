@@ -73,9 +73,17 @@ const useStratSectionCalculations = () => {
     return intervalWidth;
   };
 
-  // Get the height (y) of the whole section
+  // Get the height (y) of the whole section.
+  // For normal sections, returns max Y (top of stack); for core sections, returns min Y (bottom of stack).
   const getSectionHeight = () => {
     const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    if (stratSection.section_type === 'core') {
+      return intervals.reduce((acc, i) => {
+        const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
+        const ys = coords.flat().map(c => c[1]);
+        return Math.min(acc, Math.min(...ys));
+      }, 0);
+    }
     return intervals.reduce((acc, i) => {
       const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
       const ys = coords.flat().map(c => c[1]);
@@ -86,8 +94,10 @@ const useStratSectionCalculations = () => {
 
   /* Exported Functions */
 
-  // Calculate the geometry for an interval (single bed or interbedded)
-  const calculateIntervalGeometry = (stratSectionId, sedData, minY) => {
+  // Calculate the geometry for an interval (single bed or interbedded).
+  // anchorY: for normal sections = bottom of interval; for core sections = top of interval.
+  const calculateIntervalGeometry = (stratSectionId, sedData, anchorY) => {
+    const isCore = stratSection.section_type === 'core';
     const character = sedData.character;
     const interval = sedData.interval;
     const bedding = sedData.bedding;
@@ -95,9 +105,10 @@ const useStratSectionCalculations = () => {
     const intervalHeight = interval.interval_thickness * Y_MULTIPLIER;
     const intervalWidth = getIntervalWidth(sedData, stratSectionId);
     const minX = 0;
-    minY = minY === undefined ? getSectionHeight() : minY;
+    anchorY = anchorY === undefined ? getSectionHeight() : anchorY;
     const maxX = minX + intervalWidth;
-    const maxY = minY + intervalHeight;
+    const minY = isCore ? anchorY - intervalHeight : anchorY;
+    const maxY = isCore ? anchorY : anchorY + intervalHeight;
 
     let geometry = {
       'type': 'Polygon',
@@ -126,27 +137,41 @@ const useStratSectionCalculations = () => {
 
       const interbedIntervalWidth = getIntervalWidth(sedData, stratSectionId, true);
       let maxXBed = bedding.lithology_at_bottom_contact === 'lithology_2' ? interbedIntervalWidth : intervalWidth;
-      let minYBed = JSON.parse(JSON.stringify(minY));
-      let maxYBed = JSON.parse(JSON.stringify(minY));
       let currentBedHeight = bedding.lithology_at_bottom_contact === 'lithology_2' ? y2 : y1;
       const polyCoords = [];
-      while (maxYBed < minY + intervalHeight) {
-        maxYBed = minYBed + currentBedHeight <= minY + intervalHeight ? minYBed + currentBedHeight
-          : minY + intervalHeight;
-        const coords = [[minX, minYBed], [minX, maxYBed], [maxXBed, maxYBed], [maxXBed, minYBed], [minX, minYBed]];
-        polyCoords.push(coords);
-        currentBedHeight = currentBedHeight === y1 ? y2 : y1;
-        maxXBed = maxXBed === intervalWidth ? interbedIntervalWidth : intervalWidth;
-        minYBed = JSON.parse(JSON.stringify(maxYBed));
+      if (isCore) {
+        // Stack beds downward from maxY
+        let maxYBed = JSON.parse(JSON.stringify(maxY));
+        let minYBed = JSON.parse(JSON.stringify(maxY));
+        while (minYBed > maxY - intervalHeight) {
+          minYBed = maxYBed - currentBedHeight >= maxY - intervalHeight ? maxYBed - currentBedHeight
+            : maxY - intervalHeight;
+          const coords = [[minX, minYBed], [minX, maxYBed], [maxXBed, maxYBed], [maxXBed, minYBed], [minX, minYBed]];
+          polyCoords.push(coords);
+          currentBedHeight = currentBedHeight === y1 ? y2 : y1;
+          maxXBed = maxXBed === intervalWidth ? interbedIntervalWidth : intervalWidth;
+          maxYBed = JSON.parse(JSON.stringify(minYBed));
+        }
+      }
+      else {
+        // Stack beds upward from minY
+        let minYBed = JSON.parse(JSON.stringify(minY));
+        let maxYBed = JSON.parse(JSON.stringify(minY));
+        while (maxYBed < minY + intervalHeight) {
+          maxYBed = minYBed + currentBedHeight <= minY + intervalHeight ? minYBed + currentBedHeight
+            : minY + intervalHeight;
+          const coords = [[minX, minYBed], [minX, maxYBed], [maxXBed, maxYBed], [maxXBed, minYBed], [minX, minYBed]];
+          polyCoords.push(coords);
+          currentBedHeight = currentBedHeight === y1 ? y2 : y1;
+          maxXBed = maxXBed === intervalWidth ? interbedIntervalWidth : intervalWidth;
+          minYBed = JSON.parse(JSON.stringify(maxYBed));
+        }
       }
 
-      const geometries = [];
-      polyCoords.forEach((polyCoord) => {
-        geometries.push({
-          'type': 'Polygon',
-          'coordinates': [polyCoord],
-        });
-      });
+      const geometries = polyCoords.map(polyCoord => ({
+        'type': 'Polygon',
+        'coordinates': [polyCoord],
+      }));
 
       geometry = {
         'type': 'GeometryCollection',
@@ -169,27 +194,47 @@ const useStratSectionCalculations = () => {
 
   // Move target interval to after given interval (the preceding interval)
   const moveIntervalToAfter = (targetInterval, precedingInterval) => {
+    const isCore = stratSection.section_type === 'core';
     let targetIntervalExtent = turf.bbox(targetInterval);
     const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
     console.log('interval to move:', targetInterval, 'height:', targetIntervalHeight);
 
-    // Move new interval (to bottom if no precedingInterval)
-    let minY = 0;
-    if (precedingInterval) {
-      const precedingIntervalExtent = turf.bbox(precedingInterval);
-      minY = precedingIntervalExtent[3];
+    // For core: stack downward — anchor is top of new interval = bottom of preceding (or 0 if none).
+    // For normal: stack upward — anchor is bottom of new interval = top of preceding (or 0 if none).
+    let minY, maxY;
+    if (isCore) {
+      maxY = precedingInterval ? turf.bbox(precedingInterval)[1] : 0;
+      minY = maxY - targetIntervalHeight;
     }
-    let maxY = minY + targetIntervalHeight;
-    let targetIntervalModified = JSON.parse(JSON.stringify(targetInterval));
+    else {
+      minY = precedingInterval ? turf.bbox(precedingInterval)[3] : 0;
+      maxY = minY + targetIntervalHeight;
+    }
+
+    const targetIntervalModified = JSON.parse(JSON.stringify(targetInterval));
     // Regular interval (polygon geometry)
     if (targetIntervalModified.geometry.type !== 'GeometryCollection') {
-      let targetIntervalModifiedCoords = targetIntervalModified.geometry.coordinates;
+      const targetIntervalModifiedCoords = targetIntervalModified.geometry.coordinates;
       targetIntervalModifiedCoords[0][0][1] = targetIntervalModifiedCoords[0][3][1] = targetIntervalModifiedCoords[0][4][1] = minY;
       targetIntervalModifiedCoords[0][1][1] = targetIntervalModifiedCoords[0][2][1] = maxY;
     }
     // Interbedded interval (geometry collection)
+    else if (isCore) {
+      let currentMaxY = maxY;
+      targetIntervalModified.geometry.geometries.forEach((_, g) => {
+        const interbedExtent = turf.bbox(targetIntervalModified.geometry.geometries[g]);
+        const newInterbedHeight = interbedExtent[3] - interbedExtent[1];
+        const currentMinY = currentMaxY - newInterbedHeight;
+        targetIntervalModified.geometry.geometries[g].coordinates[0][0][1] = currentMinY;
+        targetIntervalModified.geometry.geometries[g].coordinates[0][1][1] = currentMaxY;
+        targetIntervalModified.geometry.geometries[g].coordinates[0][2][1] = currentMaxY;
+        targetIntervalModified.geometry.geometries[g].coordinates[0][3][1] = currentMinY;
+        targetIntervalModified.geometry.geometries[g].coordinates[0][4][1] = currentMinY;
+        currentMaxY = currentMinY;
+      });
+    }
     else {
-      targetIntervalModified.geometry.geometries.forEach((geometry, g) => {
+      targetIntervalModified.geometry.geometries.forEach((_, g) => {
         const interbedExtent = turf.bbox(targetIntervalModified.geometry.geometries[g]);
         const newInterbedHeight = interbedExtent[3] - interbedExtent[1];
         maxY = minY + newInterbedHeight;
@@ -205,28 +250,43 @@ const useStratSectionCalculations = () => {
     dispatch(updatedModifiedTimestampsBySpotsIds([targetIntervalModified.properties.id]));
     dispatch(editedOrCreatedSpot(targetIntervalModified));
     targetIntervalExtent = turf.bbox(targetIntervalModified);
-    moveSpotsUpOrDownByPixels(targetIntervalModified.properties.strat_section_id, targetIntervalExtent[1],
-      targetIntervalHeight, targetIntervalModified.properties.id);
+    // For core: push spots below the new interval deeper (negative direction).
+    // For normal: push spots above the new interval up.
+    if (isCore) {
+      moveSpotsUpOrDownByPixels(targetIntervalModified.properties.strat_section_id, targetIntervalExtent[3],
+        -targetIntervalHeight, targetIntervalModified.properties.id);
+    }
+    else {
+      moveSpotsUpOrDownByPixels(targetIntervalModified.properties.strat_section_id, targetIntervalExtent[1],
+        targetIntervalHeight, targetIntervalModified.properties.id);
+    }
   };
 
   // Move all Spots (except excluded Spot, if given) in a specified Strat Section
-  // up after cutoff (if pixels is positive) or down after cutoff (if pixels is negative)
+  // up after cutoff (if pixels is positive) or down after cutoff (if pixels is negative).
+  // For core sections, "below" means a spot whose top (maxY) is at or below the cutoff.
+  // For normal sections, "above" means a spot whose bottom (minY) is at or above the cutoff.
   const moveSpotsUpOrDownByPixels = (stratSectionId, cutoff, pixels, excludedSpotId) => {
+    const isCore = stratSection.section_type === 'core';
     const spots = getSpotsMappedOnGivenStratSection(stratSectionId);
-    let spotsFiltered = spots.filter(spot => excludedSpotId && spot.properties.id !== excludedSpotId);
-    let movedSpots = [];
-    spotsFiltered.map((spot) => {
-      const extent = turf.bbox(spot); //bbox extent in minX, minY, maxX, maxY order
-      if (extent[1] >= cutoff) movedSpots.push(moveSpotByPixels(spot, pixels));
-    });
+    const spotsFiltered = spots.filter(spot => excludedSpotId && spot.properties.id !== excludedSpotId);
+    const movedSpots = spotsFiltered
+      .filter((spot) => {
+        const extent = turf.bbox(spot);
+        return isCore ? extent[3] <= cutoff : extent[1] >= cutoff;
+      })
+      .map(spot => moveSpotByPixels(spot, pixels));
     console.log('Dispatching', movedSpots);
     dispatch(editedOrCreatedSpots(movedSpots));
   };
 
   const recalculateIntervalGeometry = (spot) => {
     console.log('Recalculating Spot Geometry...', spot);
+    const isCore = stratSection.section_type === 'core';
     const extent = turf.bbox(spot);
-    const updatedGeometry = calculateIntervalGeometry(spot.properties.strat_section_id, spot.properties.sed, extent[1]);
+    // For core: anchor to the top of the interval (maxY); for normal: anchor to the bottom (minY).
+    const anchorY = isCore ? extent[3] : extent[1];
+    const updatedGeometry = calculateIntervalGeometry(spot.properties.strat_section_id, spot.properties.sed, anchorY);
     const editedSpot = {...spot, geometry: updatedGeometry};
     console.log('Spot after geometry recalculation', editedSpot);
     dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
@@ -235,11 +295,101 @@ const useStratSectionCalculations = () => {
     return editedSpot;
   };
 
+  // Reorder an interval: close gap at its old position, then place it after precedingInterval.
+  // precedingInterval is null to place at the bottom (non-core) or top (core) of the stack.
+  const reorderInterval = (targetInterval, precedingInterval) => {
+    const isCore = stratSection.section_type === 'core';
+    const stratSectionId = targetInterval.properties.strat_section_id;
+    const targetExtent = turf.bbox(targetInterval);
+    const targetHeight = targetExtent[3] - targetExtent[1];
+
+    // All spots on this strat section except the target interval
+    const allSpots = getSpotsMappedOnGivenStratSection(stratSectionId);
+    let updatedSpots = allSpots
+      .filter(s => s.properties.id !== targetInterval.properties.id)
+      .map(s => JSON.parse(JSON.stringify(s)));
+
+    // Step 1: Close the gap at the target's old position
+    const gapCutoff = isCore ? targetExtent[1] : targetExtent[3];
+    const gapPixels = isCore ? targetHeight : -targetHeight;
+    updatedSpots = updatedSpots.map((spot) => {
+      const ext = turf.bbox(spot);
+      return (isCore ? ext[3] <= gapCutoff : ext[1] >= gapCutoff) ? moveSpotByPixels(spot, gapPixels) : spot;
+    });
+
+    // Step 2: Find the updated preceding interval
+    const updatedPrecedingInterval = precedingInterval
+      ? updatedSpots.find(s => s.properties.id === precedingInterval.properties.id) || null
+      : null;
+
+    // Step 3: Compute the target's new position
+    let newMinY, newMaxY;
+    if (isCore) {
+      newMaxY = updatedPrecedingInterval ? turf.bbox(updatedPrecedingInterval)[1] : 0;
+      newMinY = newMaxY - targetHeight;
+    }
+    else {
+      newMinY = updatedPrecedingInterval ? turf.bbox(updatedPrecedingInterval)[3] : 0;
+      newMaxY = newMinY + targetHeight;
+    }
+
+    // Update target geometry
+    const newTarget = JSON.parse(JSON.stringify(targetInterval));
+    if (newTarget.geometry.type !== 'GeometryCollection') {
+      newTarget.geometry.coordinates[0][0][1] = newTarget.geometry.coordinates[0][3][1]
+        = newTarget.geometry.coordinates[0][4][1] = newMinY;
+      newTarget.geometry.coordinates[0][1][1] = newTarget.geometry.coordinates[0][2][1] = newMaxY;
+    }
+    else if (isCore) {
+      let curMaxY = newMaxY;
+      newTarget.geometry.geometries.forEach((_, g) => {
+        const ih = turf.bbox(targetInterval.geometry.geometries[g]);
+        const interbedHeight = ih[3] - ih[1];
+        const curMinY = curMaxY - interbedHeight;
+        newTarget.geometry.geometries[g].coordinates[0][0][1] = curMinY;
+        newTarget.geometry.geometries[g].coordinates[0][1][1] = curMaxY;
+        newTarget.geometry.geometries[g].coordinates[0][2][1] = curMaxY;
+        newTarget.geometry.geometries[g].coordinates[0][3][1] = curMinY;
+        newTarget.geometry.geometries[g].coordinates[0][4][1] = curMinY;
+        curMaxY = curMinY;
+      });
+    }
+    else {
+      let curMinY = newMinY;
+      newTarget.geometry.geometries.forEach((_, g) => {
+        const ih = turf.bbox(targetInterval.geometry.geometries[g]);
+        const interbedHeight = ih[3] - ih[1];
+        const curMaxY = curMinY + interbedHeight;
+        newTarget.geometry.geometries[g].coordinates[0][0][1] = curMinY;
+        newTarget.geometry.geometries[g].coordinates[0][1][1] = curMaxY;
+        newTarget.geometry.geometries[g].coordinates[0][2][1] = curMaxY;
+        newTarget.geometry.geometries[g].coordinates[0][3][1] = curMinY;
+        newTarget.geometry.geometries[g].coordinates[0][4][1] = curMinY;
+        curMinY = curMaxY;
+      });
+    }
+
+    // Step 4: Open space at the new position for the target
+    const newCutoff = isCore ? newMaxY : newMinY;
+    const makeRoomPixels = isCore ? -targetHeight : targetHeight;
+    updatedSpots = updatedSpots.map((spot) => {
+      const ext = turf.bbox(spot);
+      return (isCore ? ext[3] <= newCutoff : ext[1] >= newCutoff)
+        ? moveSpotByPixels(spot, makeRoomPixels) : spot;
+    });
+
+    // Dispatch all changes at once
+    const allChanged = [...updatedSpots, newTarget];
+    dispatch(updatedModifiedTimestampsBySpotsIds(allChanged.map(s => s.properties.id)));
+    dispatch(editedOrCreatedSpots(allChanged));
+  };
+
   return {
     calculateIntervalGeometry,
     moveIntervalToAfter,
     moveSpotsUpOrDownByPixels,
     recalculateIntervalGeometry,
+    reorderInterval,
   };
 };
 

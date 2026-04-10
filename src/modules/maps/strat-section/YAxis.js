@@ -5,11 +5,11 @@ import MapboxGL from '@rnmapbox/maps';
 import useYAxis from './useYAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const YAxis = ({spotsDisplayed}) => {
+const YAxis = () => {
   /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
-  const {getYAxis, getYAxisTickMarks} = useYAxis(spotsDisplayed);
+  const {getYAxis, getYAxisTickMarks} = useYAxis();
 
   /* View */
 

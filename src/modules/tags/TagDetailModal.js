@@ -4,6 +4,7 @@ import {FlatList, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
@@ -13,7 +14,7 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
 
-let formName = ['project', 'tags'];
+let formName = TAG_FORM_NAMES.TAGS;
 let initialValues;
 
 const TagDetailModal = ({closeModal}) => {
@@ -35,15 +36,15 @@ const TagDetailModal = ({closeModal}) => {
   /* Derived Variables */
 
   if (modalVisible) {
-    let tagType = 'concept';
+    let tagType = TAG_TYPES.CONCEPT;
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
       tagType = PAGE_KEYS.GEOLOGIC_UNITS;
-      formName = ['project', 'geologic_unit'];
+      formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     }
     initialValues = {type: tagType};
   }
   else if (!isEmpty(selectedTag)) {
-    if (selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS) formName = ['project', 'geologic_unit'];
+    if (selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS) formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');

@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
@@ -14,8 +15,9 @@ import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
+import BackupLoadTags from './BackupLoadTags';
 
-const Tags = ({type, updateSpotsInMapExtent}) => {
+const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
   console.log('Rendering Tags...');
 
   /* Data Hooks */
@@ -32,7 +34,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
 
   /* Derived Variables */
 
-  const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
+  const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
 
@@ -43,7 +45,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
   /* Logic Helpers */
 
   const addTag = () => {
-    const newTag = type === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'};
+    const newTag = isGeologicUnits ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: TAG_TYPES.CONCEPT};
     dispatch(setSelectedTag(newTag));
     setIsDetailModalVisible(true);
   };
@@ -51,7 +53,7 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
   const closeDetailModal = () => setIsDetailModalVisible(false);
 
   const getButtonTitle = () => {
-    if (type === PAGE_KEYS.GEOLOGIC_UNITS) return ['Alphabetical', 'Map Extent'];
+    if (isGeologicUnits) return ['Alphabetical', 'Map Extent'];
     return ['Categorized', 'Map Extent'];
   };
 
@@ -79,13 +81,16 @@ const Tags = ({type, updateSpotsInMapExtent}) => {
         </>
       )}
       <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
+      <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
         </ListItem.Content>
         <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
       </ListItem>
-      <TagsList selectedIndex={selectedIndex} type={type}/>
+      <TagsList selectedIndex={selectedIndex} type={isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS}/>
+
+      {/* Modal */}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
     </View>
   );

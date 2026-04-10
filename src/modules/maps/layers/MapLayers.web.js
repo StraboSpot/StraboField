@@ -15,6 +15,8 @@ import {
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
 import mapStyles from '../maps.styles';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
+import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
+import SnapLineLayer from '../strat-section/SnapLineLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
 
 const MapLayers = ({
@@ -30,7 +32,7 @@ const MapLayers = ({
                    }) => {
   /* Data Hooks */
 
-  const {currentImageBasemap, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, intervalDragState, isDragIntervalMode, stratSection} = useSelector(state => state.map);
 
   const useDimensions = useWindowSize();
 
@@ -60,7 +62,7 @@ const MapLayers = ({
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}
 
       {/* Strat Section Background Layer */}
-      {stratSection && <StratSectionBackground spotsDisplayed={spotsDisplayed}/>}
+      {stratSection && <StratSectionBackground/>}
 
       {/* Image Basemap Layer */}
       <ImageBasemapLayer/>
@@ -76,6 +78,12 @@ const MapLayers = ({
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
       {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
+
+      {/* Dragged Interval Highlight Layer — orange fill + white border */}
+      {stratSection && isDragIntervalMode && <DraggedIntervalLayer/>}
+
+      {/* Snap Line Layer — shown while dragging an interval */}
+      {stratSection && intervalDragState && <SnapLineLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>
