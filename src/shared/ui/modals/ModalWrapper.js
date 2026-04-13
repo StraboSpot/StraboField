@@ -90,8 +90,8 @@ const ModalWrapper = ({
       supportedOrientations={['portrait', 'landscape']}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
+        behavior={'padding'}
+        enabled={Platform.OS === 'ios'}
         style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
       >
         <ModalWrapperHeader
