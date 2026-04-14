@@ -362,7 +362,9 @@ const BasicPageDetail = ({
               )}
               <FlatList
                 ListHeaderComponent={renderFormFields()}
+                automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
                 contentContainerStyle={{paddingBottom: 200}}
+                keyboardShouldPersistTaps='handled'
               />
             </>
           )}

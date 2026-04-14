@@ -140,7 +140,9 @@ const SiteSafetyPage = ({isReadOnly}) => {
             {renderSiteSafetyForm()}
           </>
         }
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         contentContainerStyle={{paddingBottom: 200}}
+        keyboardShouldPersistTaps='handled'
       />
     </View>
   );

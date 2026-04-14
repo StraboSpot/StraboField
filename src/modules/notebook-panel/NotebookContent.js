@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {FlatList, KeyboardAvoidingView, Platform, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -87,13 +87,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             zoomToSpots={zoomToSpots}
           />
         </View>
-        <KeyboardAvoidingView
-          behavior={'padding'}
-          enabled={Platform.OS === 'ios'}
-          style={{...notebookStyles.centerContainer}}
-        >
+        <View style={{...notebookStyles.centerContainer}}>
           <Page {...pageProps}/>
-        </KeyboardAvoidingView>
+        </View>
         <View style={notebookStyles.footerContainer}>
           <NotebookFooter openPage={openPage}/>
         </View>

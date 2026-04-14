@@ -553,6 +553,8 @@ const MeasurementDetail = ({
                   )}
                 </View>
               }
+              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+              keyboardShouldPersistTaps='handled'
             />
           </View>
         )}

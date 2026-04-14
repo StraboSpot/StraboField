@@ -1,5 +1,5 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -100,10 +100,15 @@ const ModalWrapper = ({
           headerTitle={headerTitle}
           showCloseButton={showCloseButton}
         />
-
-        <View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={Platform.OS === 'ios'}
+          contentContainerStyle={isAutoHeight ? undefined : {flexGrow: 1, minHeight: 0}}
+          keyboardShouldPersistTaps={'handled'}
+        >
+          {/*<View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>*/}
           {children}
-        </View>
+          {/*</View>*/}
+        </ScrollView>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
       </KeyboardAvoidingView>
       <ModalSaveAndCancelButtons
