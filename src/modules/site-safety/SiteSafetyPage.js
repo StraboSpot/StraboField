@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {FlatList, KeyboardAvoidingView, Platform, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
@@ -130,11 +130,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
   /* View */
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      style={{flex: 1}}
-    >
+    <View style={{flex: 1}}>
       <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
       <FlatList
@@ -144,9 +140,11 @@ const SiteSafetyPage = ({isReadOnly}) => {
             {renderSiteSafetyForm()}
           </>
         }
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         contentContainerStyle={{paddingBottom: 200}}
+        keyboardShouldPersistTaps='handled'
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

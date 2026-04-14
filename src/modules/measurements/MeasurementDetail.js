@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, KeyboardAvoidingView, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -529,11 +529,7 @@ const MeasurementDetail = ({
 
   return (
     <>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Adjust offset as needed
-        style={{flex: 1}} // Important for padding behavior
-      >
+      <View style={{flex: 1}}>
         {selectedMeasurement && (
           <View style={styles.measurementsContentContainer}>
             <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
@@ -557,10 +553,12 @@ const MeasurementDetail = ({
                   )}
                 </View>
               }
+              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+              keyboardShouldPersistTaps='handled'
             />
           </View>
         )}
-      </KeyboardAvoidingView>
+      </View>
     </>
   );
 };
