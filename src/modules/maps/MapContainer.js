@@ -50,6 +50,8 @@ const MapContainer = forwardRef(({
   const customBasemap = useSelector(state => state.map.customMaps);
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+  const intervalDragState = useSelector(state => state.map.intervalDragState);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const userEmail = useSelector(state => state.user.email);
@@ -100,6 +102,7 @@ const MapContainer = forwardRef(({
     handleMapLongPress,
     handleMapPress,
     location,
+    startIntervalDrag,
   } = useMapPressEvents({
     clearSelectedSpots,
     editSpot,
@@ -136,6 +139,24 @@ const MapContainer = forwardRef(({
     updateMapView().catch(err => console.warn('Error getting center of custom map:', err));
     if (currentBasemap?.source !== 'macrostrat') setIsShowMacrostratOverlay(false);
   }, [currentBasemap, isZoomToCenterOffline]);
+
+  useEffect(() => {
+    if (isDragIntervalMode && stratSection) {
+      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
+        ? selectedSpot
+        : null;
+      startIntervalDrag(0, 0, interval, 0).catch(console.error);
+    }
+  }, [isDragIntervalMode]);
+
+  useEffect(() => {
+    if (!intervalDragState && isDragIntervalMode && stratSection) {
+      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
+        ? selectedSpot
+        : null;
+      startIntervalDrag(0, 0, interval, 0).catch(console.error);
+    }
+  }, [intervalDragState]);
 
   useEffect(() => {
     // console.log('UE MapContainer [userEmail, isOnline]');

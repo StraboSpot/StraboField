@@ -3,10 +3,13 @@ const useDeviceOrientation = () => {
 
   const lockOrientation = () => {};
 
+  const lockToPortrait = () => {};
+
   const unlockOrientation = () => {};
 
   return {
     lockOrientation,
+    lockToPortrait,
     unlockOrientation,
   };
 };

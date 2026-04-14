@@ -4,6 +4,7 @@ import {FlatList, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AddImageOverlayModal from './AddImageOverlayModal';
@@ -33,6 +34,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const toast = useToast();
+
   const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
@@ -59,7 +62,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
     try {
       await saveSedFeature(page.key, spot, stratSectionRef.current);
       await stratSectionRef.current.resetForm();
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+      toast.show('Strat Section Settings saved', {type: 'success'});
     }
     catch (e) {
       console.log('Error saving strat section', e);

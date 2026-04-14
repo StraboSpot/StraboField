@@ -45,8 +45,9 @@ export const deleteRequest = async (url, auth) => {
 
 /* -- 20260330 JMA
 export const getRequest = async (url, auth, options = {}) => {
+  const {responseType, ...headerOptions} = options;
   try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, options)}));
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
     return isEmpty(options) ? handleResponse(response) : response;
 */
 

@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import RNSketchCanvas from '@StraboSpot/react-native-sketch-canvas';
 import {useDispatch} from 'react-redux';
 
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import {setFreehandFeatureCoords} from '../maps/maps.slice';
@@ -25,6 +26,7 @@ const FreehandSketch = ({mapMode}) => {
   /* Side Effects */
 
   useEffect(() => {
+    if (SMALL_SCREEN) return;
     lockOrientation();
     return () => unlockOrientation();
   }, []);

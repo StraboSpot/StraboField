@@ -1,5 +1,7 @@
 import React, {useMemo} from 'react';
 
+import {useSelector} from 'react-redux';
+
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
 import {isEmpty} from '../../../shared/Helpers';
 import useProject from '../../project/useProject';
@@ -11,6 +13,8 @@ import {getUniqFeatures} from './layers.helpers';
 
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
+
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
@@ -52,7 +56,10 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
     <>
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
-      <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+      <FeatureHalosLayers
+        featuresNotSelected={featuresNotSelectedUniq}
+        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
+      />
 
       <SampleLayers features={features}/>
 
@@ -67,7 +74,7 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
         )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers featuresSelected={featuresSelected}/>
+      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected}/>
     </>
   );
 };

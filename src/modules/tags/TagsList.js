@@ -5,8 +5,8 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
-import TagColorIcon from './TagColorIcon';
-import {TAG_SECTIONS} from './tags.constants';
+import TagColorIcon from './color/TagColorIcon';
+import {TAG_SECTIONS, TAG_TYPES} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
@@ -79,7 +79,7 @@ const TagsList = ({type, selectedIndex}) => {
     else {
       tagsInMapExtent = tags.filter((tag) => {
         return tag.spots && !isEmpty(tag.spots.find(spotId => spotsInMapExtentIds?.includes(spotId)))
-          && tag.type !== 'geologic_unit';
+          && tag.type !== TAG_TYPES.GEOLOGIC_UNIT;
       });
     }
     console.log('tagsInMapExtent', tagsInMapExtent);
@@ -121,7 +121,11 @@ const TagsList = ({type, selectedIndex}) => {
     );
   };
 
-  if (isEmpty(tags)) return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+  const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
+    : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
+  if (isEmpty(filteredTags)) {
+    return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+  }
   else {
     return (
       <View style={{flex: 1}}>

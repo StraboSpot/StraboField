@@ -1,6 +1,7 @@
 import React, {useMemo, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
+import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {isEmpty} from '../../../shared/Helpers';
@@ -16,6 +17,9 @@ import {getUniqFeatures} from './layers.helpers';
 const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
 
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const stratSection = useSelector(state => state.map.stratSection);
+
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
   const {isSpotInReadOnlyDataset} = useProject();
@@ -30,12 +34,12 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   const featuresNotSelected = useMemo(() => {
     console.log('Getting Spots Not Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsNotSelected]);
+  }, [spotsNotSelected, stratSection]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsSelected]);
+  }, [spotsSelected, stratSection]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
@@ -60,7 +64,10 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
     <>
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
-      <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+      <FeatureHalosLayers
+        featuresNotSelected={featuresNotSelectedUniq}
+        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
+      />
 
       <SampleLayers features={features}/>
 
@@ -83,7 +90,10 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers featuresSelected={featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>
+      <FeaturesSelectedLayers
+        featuresSelected={isDragIntervalMode ? [] : featuresSelected}
+        isStratStyleLoaded={isStratStyleLoaded}
+      />
     </>
   );
 };

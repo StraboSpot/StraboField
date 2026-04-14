@@ -5,11 +5,11 @@ import {Layer, Source} from 'react-map-gl/mapbox';
 import useYAxis from './useYAxis';
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const YAxis = ({spotsDisplayed}) => {
+const YAxis = () => {
   /* Data Hooks */
 
   const {getLayoutSymbology} = useMapSymbology();
-  const {getYAxis, getYAxisTickMarks} = useYAxis(spotsDisplayed);
+  const {getYAxis, getYAxisTickMarks} = useYAxis();
 
   /* View */
 

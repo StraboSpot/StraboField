@@ -4,7 +4,8 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
-import TagColorIcon from './TagColorIcon';
+import TagColorIcon from './color/TagColorIcon';
+import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/Helpers';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
@@ -32,7 +33,7 @@ const TagsListItem = ({
   const openTag = () => {
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
     dispatch(setSelectedTag(tag));
-    if (tag.type === 'geologic_unit') {
+    if (tag.type === TAG_TYPES.GEOLOGIC_UNIT) {
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
     }
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
