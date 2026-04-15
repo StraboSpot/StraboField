@@ -10,7 +10,6 @@ const notebookFooterStyles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   footerIconContainerWrap: {
-    alignItems: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-evenly',

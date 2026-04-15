@@ -1,9 +1,12 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import ColorPickerModal from './ColorPickerModal';
 import {isEmpty} from '../../shared/Helpers';
+import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
@@ -19,12 +22,14 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
 
   /* Local State */
 
+  const [isColorPickerModalVisible, setIsColorPickerModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
   /* Derived Variables */
 
   const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
     : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
+  const colorLabel = label === MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS ? 'Unit' : label.slice(0, -1);
 
   /* Logic Helpers */
 
@@ -40,11 +45,26 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
 
   return (
     <View style={{flex: 1}}>
-      <SidePanelHeader
-        backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-        headerTitle={!isEmpty(selectedTag) && selectedTag.name}
-        title={label}
-      />
+      <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 1}}>
+          <SidePanelHeader
+            backButton={() => dispatch(setSidePanelVisible({bool: false}))}
+            headerTitle={!isEmpty(selectedTag) && selectedTag.name}
+            title={label}
+          />
+        </View>
+        <View style={{width: 100, position: 'absolute', right: 0, top: 0, alignItems: 'center'}}>
+          <Text style={{paddingBottom: 5, paddingTop: 5, fontSize: SMALL_TEXT_SIZE}}>{colorLabel} Color</Text>
+          <Icon
+            color={selectedTag.color}
+            containerStyle={{borderWidth: 1}}
+            name={selectedTag.color ? 'square' : 'x-square'}
+            onPress={() => setIsColorPickerModalVisible(true)}
+            size={30}
+            type={selectedTag.color ? 'ionicon' : 'feather'}
+          />
+        </View>
+      </View>
 
       <View style={{flex: 1}}>
         <TagDetail
@@ -62,9 +82,8 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
           setIsDetailModalVisible={() => setIsDetailModalVisible(true)}
         />
       </View>
-
-      {/* Modals */}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
+      {isColorPickerModalVisible && <ColorPickerModal closeModal={() => setIsColorPickerModalVisible(false)}/>}
     </View>
   );
 };

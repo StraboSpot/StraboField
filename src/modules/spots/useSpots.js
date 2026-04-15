@@ -1,7 +1,6 @@
 import {Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
-import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -244,20 +243,12 @@ const useSpots = () => {
     }
     await checkSpotName(newSpot.properties.name);
 
-    if (newSpot.geometry && (currentImageBasemap || stratSection)) { //newSpot geometry is unavailable when spot is copied.
+    if ((currentImageBasemap || stratSection) && newSpot.geometry && newSpot.geometry.type === 'Point') { //newSpot geometry is unavailable when spot is copied.
       const rootSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id)
         : getSpotWithThisStratSection(stratSection.strat_section_id);
-      if (rootSpot && rootSpot.geometry) {
-        if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
-          newSpot.properties.lng = rootSpot.properties.lng;
-          newSpot.properties.lat = rootSpot.properties.lat;
-        }
-        else if (isOnGeoMap(rootSpot)) {
-          const center = rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
-            : turf.centroid(rootSpot).geometry.coordinates;
-          newSpot.properties.lng = center[0];
-          newSpot.properties.lat = center[1];
-        }
+      if (rootSpot && rootSpot.geometry && rootSpot.geometry.type === 'Point') {
+        newSpot.properties.lng = rootSpot.geometry.coordinates[0];
+        newSpot.properties.lat = rootSpot.geometry.coordinates[1];
       }
     }
     // Continuous tagging

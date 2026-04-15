@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {DARKGREY} from '../../../shared/styles.constants';
+import {DARKGREY} from '../../shared/styles.constants';
 
 const TagColorIcon = ({color}) => {
   return (

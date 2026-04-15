@@ -4,7 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
-import TagColorIcon from './color/TagColorIcon';
+import TagColorIcon from './TagColorIcon';
 import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/Helpers';

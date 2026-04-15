@@ -141,7 +141,6 @@ module.exports = (env, argv) => {
         '@react-native-async-storage/async-storage': path.resolve(__dirname,
           'node_modules/@react-native-async-storage/async-storage'),
         'react-native-tab-view': path.resolve(__dirname, 'node_modules/react-native-tab-view/src/index.tsx'),
-        'expo-updates': false,
       },
     },
     module: {

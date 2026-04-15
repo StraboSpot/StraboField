@@ -18,7 +18,6 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   /* Data Hooks */
 
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
-  const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
@@ -34,12 +33,12 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   const featuresNotSelected = useMemo(() => {
     console.log('Getting Spots Not Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsNotSelected, stratSection]);
+  }, [spotsNotSelected]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsSelected, stratSection]);
+  }, [spotsSelected]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
