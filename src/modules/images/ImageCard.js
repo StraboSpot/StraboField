@@ -211,7 +211,7 @@ const ImageCard = ({
       >
         <View>
           <Text style={{textAlign: 'center', paddingVertical: 10}}>
-            The image {image.id} is missing from the server. Would you like to delete the image file?
+            The image {image.id} is missing from the server. Would you like to remove the image?
           </Text>
         </View>
       </ModalWrapper>
