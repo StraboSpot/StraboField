@@ -1,4 +1,5 @@
 import UIKit
+import OrientationDirector
 
 @main class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -28,7 +29,7 @@ import UIKit
     }
 
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        return OrientationDirector.getSupportedInterfaceOrientationsForWindow()
+        return SharedOrientationDirectorImpl.shared.supportedInterfaceOrientations
     }
 
     func application(_ app: UIApplication,
