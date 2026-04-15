@@ -79,7 +79,7 @@ const useImages = () => {
       const imagesDataCopy = spotWithImage.properties.images;
       const allOtherImages = imagesDataCopy.filter(item => imageId !== item.id);
       dispatch(setSelectedSpot(spotWithImage));
-      dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotWithImage.properties.id]));
       dispatch(editedSpotProperties({field: 'images', value: allOtherImages}));
       await deleteImageFile(imageId);
       if (currentImageBasemap && currentImageBasemap.id === imageId) dispatch(setCurrentImageBasemap(undefined));

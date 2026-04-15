@@ -1,4 +1,4 @@
-import {hexToRgb} from '../../shared/Helpers';
+import {hexToRgb} from '../../../shared/Helpers';
 
 /* Internal Functions */
 
