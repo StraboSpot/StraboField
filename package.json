@@ -103,7 +103,7 @@
     "react-native-web": "0.21.2",
     "react-native-worklets": "0.8.1",
     "react-native-xml2js": "1.0.3",
-    "react-native-zip-archive": "7.0.2",
+    "react-native-zip-archive": "7.1.0",
     "react-redux": "9.2.0",
     "redux-logger": "3.0.6",
     "redux-persist": "6.0.0",
