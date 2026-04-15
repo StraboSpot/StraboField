@@ -25,6 +25,7 @@ const ImageCard = ({
                      onOpenImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
+                     spotWithImage,
                    }) => {
   /* Data Hooks */
 
@@ -105,7 +106,7 @@ const ImageCard = ({
 
   const deleteImage = async () => {
     console.log('Deleting image from spot', image.id);
-    await deleteImageFromSpot(image.id, spot);
+    await deleteImageFromSpot(image.id, spotWithImage || spot);
     console.log('Deleted image from spot', image.id);
     setIsMissingImageModalVisible(false);
   };
@@ -162,7 +163,7 @@ const ImageCard = ({
           <ImageThumbnail
             imageThumbnailURI={imageThumbnailURIs?.[image.id]}
             isConnected={isConnected}
-            // isImageMissingOnServer={isImageMissingOnServer}
+            isImageMissingOnServer={isImageMissingOnServer}
             isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
             isInternetReachable={isInternetReachable}
             isThumbnailOnly={isThumbnailOnly}

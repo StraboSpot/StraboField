@@ -1,15 +1,16 @@
 import React from 'react';
-import {ActivityIndicator, Platform} from 'react-native';
+import {ActivityIndicator, Platform, Text} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
 import {imageStyles, PlaceholderImageIcon} from '.';
+import {WARNING_COLOR} from '../../shared/styles.constants';
 
 const ImageThumbnail = ({
                           imageThumbnailURI,
                           isConnected,
                           isInternetReachable,
-                          // isImageMissingOnServer,
+                          isImageMissingOnServer,
                           isImageThumbnailLoading,
                           isThumbnailOnly,
                           onFinishedLoading,
@@ -24,9 +25,9 @@ const ImageThumbnail = ({
   return (
     <Image
       PlaceholderContent={isImageThumbnailLoading ? <ActivityIndicator/>
-        // : isImageMissingOnServer
-        //   ? <Text style={{color: WARNING_COLOR, textAlign: 'center'}}>Image Not Found On Server</Text>
-        : <PlaceholderImageIcon isConnected={isConnected} isInternetReachable={isInternetReachable}/>}
+        : isImageMissingOnServer
+          ? <Text style={{color: WARNING_COLOR, textAlign: 'center'}}>Image Not Found On Server</Text>
+          : <PlaceholderImageIcon isConnected={isConnected} isInternetReachable={isInternetReachable}/>}
       containerStyle={[imageStyles.thumbnailImageContainer, {height: height, width: height}]}
       onError={onFinishedLoading}
       onLoadEnd={onFinishedLoading}
