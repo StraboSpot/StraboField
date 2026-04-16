@@ -18,6 +18,10 @@ const ErrorModal = ({children, headerTitle, isVisible, onActionPressed}) => {
 
   const scrollView = useRef(null);
 
+  /* Logic Helpers */
+
+  const closeErrorModal = () => dispatch(setIsErrorMessagesModalVisible(false));
+
   /* View */
 
   return (
@@ -25,7 +29,7 @@ const ErrorModal = ({children, headerTitle, isVisible, onActionPressed}) => {
       actionTitle={'Ok'}
       headerTitle={headerTitle || 'Error!'}
       isVisible={isVisible || isErrorMessagesModalVisible}
-      onActionPressed={onActionPressed || dispatch(setIsErrorMessagesModalVisible(false))}
+      onActionPressed={onActionPressed || closeErrorModal}
       overlayStyleOverride={{
         paddingHorizontal: 0, // Set to 0 so the inner container controls spacing
         // Limits the total height of the white box

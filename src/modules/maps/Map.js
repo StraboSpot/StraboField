@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useEffect} from 'react';
 import {Text, View} from 'react-native';
 
 import MapboxGL from '@rnmapbox/maps';
@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
+import SnapLineLayer from './strat-section/SnapLineLayer';
 import useMapMoveEvents from './useMapMoveEvents';
 import VertexDrag from './VertexDrag';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -34,19 +35,29 @@ const Map = ({
              }, forwardedRef) => {
   // console.log('Rendering Map...');
 
-  const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
-    : homeStyles.currentZoomTextBlack;
+  /* Data Hooks */
 
-  const {currentImageBasemap, zoom, stratSection, vertexStartCoords} = useSelector(state => state.map);
+  const {
+    currentImageBasemap,
+    zoom,
+    stratSection,
+    vertexStartCoords,
+    intervalDragState,
+    isDragIntervalMode,
+  } = useSelector(state => state.map);
 
   const {mapRef, cameraRef} = forwardedRef;
 
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
-  const [isStratStyleLoaded, setIsStratStyleLoaded] = useState(false);
+  /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
-  const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
+  const currentMapId = currentImageBasemap?.id || stratSection?.strat_section_id || basemap.id;
+  const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
+    : homeStyles.currentZoomTextBlack;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('isShowMacrostratOverlay', isShowMacrostratOverlay);
@@ -67,12 +78,7 @@ const Map = ({
     };
   }, [mapRef]);
 
-  // Set flag for when the map has been loaded
-  // This is a fix for patterns loading too slowly after v10 update
-  // ToDo: Check if this bug is fixed in rnmapbox and therefore can be removed
-  const onDidFinishLoadingMap = () => {
-    stratSection ? setIsStratStyleLoaded(true) : setIsStratStyleLoaded(false);
-  };
+  /* View */
 
   return (
     <>
@@ -93,7 +99,6 @@ const Map = ({
         logoEnabled={true}
         logoPosition={homeStyles.mapboxLogoPosition}
         onCameraChanged={handleMapMoved}  // Update spots in extent and saved view (center and zoom)
-        onDidFinishLoadingMap={onDidFinishLoadingMap}
         onLongPress={handleMapLongPress}
         onPress={handleMapPress}
         pitchEnabled={false}
@@ -101,17 +106,16 @@ const Map = ({
         rotateEnabled={false}
         scaleBarEnabled={!currentImageBasemap && !stratSection}
         scaleBarPosition={scaleBarPosition}
-        scrollEnabled={allowMapViewMove}
+        scrollEnabled={allowMapViewMove && !isDragIntervalMode}
         style={mapStyles.map}
         styleURL={currentImageBasemap || stratSection ? JSON.stringify(BACKGROUND) : JSON.stringify(basemap)}
-        zoomEnabled={allowMapViewMove}
+        zoomEnabled={allowMapViewMove && !isDragIntervalMode}
       >
         <MapLayers
           basemap={basemap}
           drawFeatures={drawFeatures}
           editFeatureVertex={editFeatureVertex}
           isShowMacrostratOverlay={isShowMacrostratOverlay}
-          isStratStyleLoaded={isStratStyleLoaded}
           location={location}
           mapMode={mapMode}
           measureFeatures={measureFeatures}
@@ -123,14 +127,14 @@ const Map = ({
       </MapboxGL.MapView>
 
       {/* Sketch Layer */}
-      {(mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE)
-        && (
-          <FreehandSketch mapMode={mapMode}>
-            <MapboxGL.RasterLayer id={'sketchLayer'}/>
-          </FreehandSketch>
-        )}
+      {(mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE) && (
+        <FreehandSketch mapMode={mapMode}>
+          <MapboxGL.RasterLayer id={'sketchLayer'}/>
+        </FreehandSketch>
+      )}
 
       {vertexStartCoords && <VertexDrag/>}
+      {intervalDragState && <SnapLineLayer/>}
     </>
   );
 };

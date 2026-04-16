@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
@@ -8,10 +8,10 @@ import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import {ImageCard, useImages, useImageThumbnails} from '../images';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
+import NestingImageCard from './NestingImageCard';
 
 const Nesting = () => {
   console.log('Rendering Nesting');
@@ -23,11 +23,6 @@ const Nesting = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  const {getImageByImageId} = useImages();
-  const [images, setImages] = useState([]);
-  const {
-    areImageThumbnailsLoading, imageThumbnailURIs, setAreImageThumbnailsLoading, setImageThumbnailURIs,
-  } = useImageThumbnails({images});
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
   const {getSpotWithThisImageBasemap, handleSpotSelected} = useSpots();
 
@@ -39,13 +34,6 @@ const Nesting = () => {
   /* Derived Variables */
 
   const notebookPageVisible = !isEmpty(pagesStack) && pagesStack.slice(-1)[0];
-
-  /* Derived State */
-
-  const reversedParentGenerations = useMemo(
-    () => parentGenerations ? [...parentGenerations].reverse() : null,
-    [parentGenerations],
-  );
 
   /* Side Effects */
 
@@ -64,21 +52,6 @@ const Nesting = () => {
       setParentGenerations(parentSpots);
       const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
       setChildrenGenerations(childrenSpots);
-
-      // Get All Images (Image Basemaps) Used in Nest
-      const allSpotsInNest = [...parentSpots.flat(Infinity), ...childrenSpots.flat(Infinity), selectedSpot];
-      console.log(allSpotsInNest);
-      const allImagesInNest = allSpotsInNest.reduce((acc, spot) => {
-        const imageBasemapId = spot.properties?.image_basemap;
-        if (imageBasemapId && !acc.find(a => a.id.toString() === imageBasemapId.toString())) {
-          const image = getImageByImageId(spot.properties.image_basemap);
-          return isEmpty(image) ? acc : [...acc, image];
-        }
-        else return acc;
-      }, []);
-      const newImageIds = allImagesInNest.map(img => img.id).sort().join(',');
-      const currentImageIds = images.map(img => img.id).sort().join(',');
-      if (newImageIds !== currentImageIds) setImages(allImagesInNest);
     }
   };
 
@@ -86,9 +59,14 @@ const Nesting = () => {
 
   const renderGeneration = (type, generation, i, length) => {
     const levelNum = type === 'Parents' ? length - i : i + 1;
-    const generationText = `${levelNum}${levelNum === 1 ? ' Level' : ' Levels'}${type === 'Parents' ? ' Up' : ' Down'}`;
-    const groupedGeneration = generation.reduce(
-      (r, v, i, a, k = v.properties.image_basemap) => ((r[k] || (r[k] = [])).push(v), r), {});
+    const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
+    const groupedGeneration = generation.reduce((r, v) => {
+      const k = v.properties.image_basemap;
+      if (!r[k]) r[k] = [];
+      r[k].push(v);
+      return r;
+    }, {});
+    console.log('groupedGeneration', groupedGeneration);
     return (
       <>
         {type === 'Children' && (
@@ -109,11 +87,11 @@ const Nesting = () => {
   };
 
   const renderGenerations = (type) => {
-    const generationData = type === 'Parents' ? reversedParentGenerations : childrenGenerations;
+    const generationData = type === 'Parents' ? parentGenerations : childrenGenerations;
     if (!isEmpty(generationData)) {
       return (
         <FlatList
-          data={generationData}
+          data={type === 'Parents' ? [...generationData].reverse() : generationData}
           keyExtractor={(item, index) => `${type}${index}`}
           listKey={type}
           renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
@@ -123,8 +101,8 @@ const Nesting = () => {
   };
 
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
+    console.log('renderGroup', type, i, group, b);
     console.log('renderGroup', type, i, imageBasemapKey, group, b);
-    const image = getImageByImageId(imageBasemapKey);
     const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImageBasemap(imageBasemapKey);
     const isGroupNestedInSample = spotWithThisImageBasemap?.properties?.isSample;
     return (
@@ -140,11 +118,7 @@ const Nesting = () => {
           marginBottom: 2,
         }}
       >
-        {imageBasemapKey !== 'undefined' && (
-          <View style={{alignSelf: 'center'}}>
-            {renderImage(image, b)}
-          </View>
-        )}
+        {imageBasemapKey !== 'undefined' && <NestingImageCard imageBasemapId={imageBasemapKey} index={b}/>}
         <View style={{flex: 1}}>
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -158,29 +132,12 @@ const Nesting = () => {
     );
   };
 
-  const renderImage = (image, index) => {
-    return (
-      <ImageCard
-        areImageThumbnailsLoading={areImageThumbnailsLoading}
-        image={image}
-        imageThumbnailURIs={imageThumbnailURIs}
-        index={index}
-        isThumbnailOnly
-        setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
-        setImageThumbnailURIs={setImageThumbnailURIs}
-      />
-    );
-  };
-
   const renderItem = (spot) => {
     if (spot && spot.properties) {
       if (spot.properties.image_basemap) {
-        const image = getImageByImageId(spot.properties.image_basemap);
         return (
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{alignSelf: 'center'}}>
-              {renderImage(image, 0)}
-            </View>
+            <NestingImageCard imageBasemapId={spot.properties.image_basemap} index={0}/>
             <View style={{flex: 1, alignSelf: 'center'}}>
               {renderName(spot)}
             </View>

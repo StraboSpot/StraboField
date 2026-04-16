@@ -1,12 +1,11 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {tagsStyles} from './index';
-import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
+import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
-import {deepFindFeatureById, isEmpty, toTitleCase, truncateText} from '../../shared/Helpers';
+import {deepFindFeatureById, isEmpty} from '../../shared/Helpers';
 import {useForm} from '../form';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
@@ -30,7 +29,6 @@ const useTags = () => {
   const projectTags = useSelector(state => state.project.project?.tags) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
   const {getLabel} = useForm();
@@ -66,9 +64,9 @@ const useTags = () => {
   const getFeatureTagsAtSpot = (featuresAtSpot) => {
     if (isEmpty(selectedSpot)) return [];
     let spotId = selectedSpot.properties.id;
-    let featureIds = featuresAtSpot.map(feature => feature.id);
+    const featureIdSet = new Set(featuresAtSpot.map(feature => feature.id));
     return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
-      && tag.features[spotId].some(featureId => featureIds.includes(featureId)));
+      && tag.features[spotId].some(featureId => featureIdSet.has(featureId)));
   };
 
   /* Exported Functions */
@@ -88,18 +86,9 @@ const useTags = () => {
   };
 
   const addRemoveSpotFromTag = (spotId, tag) => {
-    let selectedTagCopy = JSON.parse(JSON.stringify(tag));
-    if (selectedTagCopy.spots) {
-      if (selectedTagCopy.spots.includes(spotId)) {
-        selectedTagCopy.spots = selectedTagCopy.spots.filter(id => spotId !== id);
-      }
-      else selectedTagCopy.spots.push(spotId);
-    }
-    else {
-      selectedTagCopy.spots = [];
-      selectedTagCopy.spots.push(spotId);
-    }
-    saveTag(selectedTagCopy);
+    const updatedSpots = tag.spots?.includes(spotId) ? tag.spots.filter(id => id !== spotId)
+      : [...(tag.spots ?? []), spotId];
+    saveTag({...tag, spots: updatedSpots});
   };
 
   // tag modal - add remove tags (wrapper method for feature level tagging and spot level tagging).
@@ -196,27 +185,32 @@ const useTags = () => {
 
   const getGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
     const featureTagsAtSpot = getFeatureTagsAtSpot(featuresAtSpot);
-    return featureTagsAtSpot.filter(tag => tag.type === 'geologic_unit');
+    return featureTagsAtSpot.filter(tag => tag.type === TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getGeologicUnitTagsAtSpot = (spotId) => {
     const tagsAtSpot = getTagsAtSpot(spotId);
-    return tagsAtSpot.filter(tag => tag.type === 'geologic_unit');
+    return tagsAtSpot.filter(tag => tag.type === TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getNonGeologicUnitFeatureTagsAtSpot = (featuresAtSpot) => {
     const featureTagsAtSpot = getFeatureTagsAtSpot(featuresAtSpot);
-    return featureTagsAtSpot.filter(tag => tag.type !== 'geologic_unit');
+    return featureTagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getNonGeologicUnitTagsAtSpot = (spotId) => {
     const tagsAtSpot = getTagsAtSpot(spotId);
-    return tagsAtSpot.filter(tag => tag.type !== 'geologic_unit');
+    return tagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
   const getSamplesWithThisTag = (tag) => {
     return isEmpty(tag.spots) ? []
-      : tag.spots.filter(spotId => spots[spotId] && !isEmpty(spots[spotId].properties.samples));
+      : tag.spots.filter((spotId) => {
+        const spot = spots[spotId];
+        if (!spot) return false;
+        if (spot.properties?.isSample) return true;
+        return spot.properties?.samples?.some(s => !spots[s.id]);
+      });
   };
 
   const getSpotsWithThisTagCount = (tag) => {
@@ -231,7 +225,7 @@ const useTags = () => {
   };
 
   const getTagLabel = (key) => {
-    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? ['project', 'geologic_unit'] : ['project', 'tags'];
+    const formName = key && key === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
     if (key) return getLabel(key, formName);
     return 'No Type Specified';
   };
@@ -251,23 +245,9 @@ const useTags = () => {
     return projectTags.filter(tag => tag.spots && tag.spots.includes(spotId));
   };
 
-  const renderTagInfo = () => {
-    let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
-    if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
-    const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
-    const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
-    let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
-      if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
-      else return acc;
-    }, []);
-    const notes = selectedTag.notes ? truncateText(selectedTag.notes, 100) : undefined;
-    return (
-      <View style={tagsStyles.sectionContainer}>
-        {<Text style={tagsStyles.listText}>{toTitleCase(type)}{subType && ' - ' + subType.toUpperCase()}</Text>}
-        {!isEmpty(rockUnitString) && <Text style={tagsStyles.listText}>{rockUnitString}</Text>}
-        {notes && <Text style={tagsStyles.listText}>Notes: {notes}</Text>}
-      </View>
-    );
+  const getTagSpotsCount = (tag) => {
+    const validSpots = isEmpty(tag.spots) ? [] : tag.spots.filter(spotIds => spots[spotIds]);
+    return validSpots.length;
   };
 
   const saveTag = (tagToSave) => {
@@ -277,8 +257,8 @@ const useTags = () => {
       updatedTags.push(tagToSave);
     }
     else {
-      let tagIdsToSave = tagToSave.map(tag => tag.id);
-      updatedTags = projectTags.filter(tag => !tagIdsToSave.includes(tag.id));
+      const tagIdsToSave = new Set(tagToSave.map(tag => tag.id));
+      updatedTags = projectTags.filter(tag => !tagIdsToSave.has(tag.id));
       updatedTags = tagToSave.concat(updatedTags);
     }
     updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
@@ -286,24 +266,19 @@ const useTags = () => {
   };
 
   const setFeaturesSelectedForMultiTagging = (feature) => {
-    let selectedFeaturesForTaggingCopy = JSON.parse(JSON.stringify(selectedFeaturesForTagging));
-    let index = selectedFeaturesForTagging.findIndex(obj => obj.id === feature.id);
+    const index = selectedFeaturesForTagging.findIndex(obj => obj.id === feature.id);
     if (index === -1) {
-      selectedFeaturesForTaggingCopy.push(feature);
-      dispatch(setSelectedAttributes(selectedFeaturesForTaggingCopy));
+      dispatch(setSelectedAttributes([...selectedFeaturesForTagging, feature]));
       return true;
     }
     else {
-      selectedFeaturesForTaggingCopy.splice(index, 1);
-      dispatch(setSelectedAttributes(selectedFeaturesForTaggingCopy));
+      dispatch(setSelectedAttributes(selectedFeaturesForTagging.filter(obj => obj.id !== feature.id)));
       return false;
     }
   };
 
   const toggleContinuousTagging = (tag) => {
-    let tagCopy = JSON.parse(JSON.stringify(tag));
-    tagCopy.continuousTagging = !tag.continuousTagging;
-    saveTag(tagCopy);
+    saveTag({...tag, continuousTagging: !tag.continuousTagging});
   };
 
   return {
@@ -328,7 +303,7 @@ const useTags = () => {
     getTagLabel,
     getTagsAtFeature,
     getTagsAtSpot,
-    renderTagInfo,
+    getTagSpotsCount,
     saveTag,
     setFeaturesSelectedForMultiTagging,
     tagSpotExists,

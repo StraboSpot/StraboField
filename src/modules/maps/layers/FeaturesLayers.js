@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
+import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {isEmpty} from '../../../shared/Helpers';
@@ -13,8 +14,11 @@ import useMapFeatures from '../useMapFeatures';
 import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
 
-const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
+const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
+
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
@@ -27,13 +31,15 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   /* Derived Variables */
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
-  const spotsNotSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsNotSelected)));
-  const spotsSelectedWithSymbology = addSymbology(JSON.parse(JSON.stringify(spotsSelected)));
+  const featuresNotSelected = useMemo(() => {
+    console.log('Getting Spots Not Selected as Features...');
+    return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
+  }, [spotsNotSelected, stratSection]);
 
-  console.log('Getting Spots Not Selected as Features...');
-  const featuresNotSelected = getSpotsAsFeatures(spotsNotSelectedWithSymbology);
-  console.log('Getting Spots Selected as Features...');
-  const featuresSelected = getSpotsAsFeatures(spotsSelectedWithSymbology);
+  const featuresSelected = useMemo(() => {
+    console.log('Getting Spots Selected as Features...');
+    return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
+  }, [spotsSelected, stratSection]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
@@ -58,7 +64,10 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
     <>
       {/* Halos Around Point Features Layers */}
       {/* Use unique features so multiple halos are not stacked on top of each other */}
-      <FeatureHalosLayers featuresNotSelected={featuresNotSelectedUniq} featuresSelected={featuresSelectedUniq}/>
+      <FeatureHalosLayers
+        featuresNotSelected={featuresNotSelectedUniq}
+        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
+      />
 
       <SampleLayers features={features}/>
 
@@ -70,18 +79,16 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       />
 
       {/* Not Selected Features Layer */}
-      {isEmpty(featuresReadOnly) ? (
-        <FeaturesNotSelectedLayers features={features} isStratStyleLoaded={isStratStyleLoaded}/>
-      ) : (
+      {isEmpty(featuresReadOnly) ? <FeaturesNotSelectedLayers features={features}/> : (
         <>
           {/* Editable & Read Only Features Layers */}
-          <FeaturesNotSelectedLayers features={featuresEditable} isStratStyleLoaded={isStratStyleLoaded}/>
+          <FeaturesNotSelectedLayers features={featuresEditable}/>
           <FeaturesReadOnlyLayers features={featuresReadOnly}/>
         </>
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers featuresSelected={featuresSelected} isStratStyleLoaded={isStratStyleLoaded}/>
+      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected}/>
     </>
   );
 };

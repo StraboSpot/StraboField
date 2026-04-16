@@ -2,44 +2,56 @@ import {Platform} from 'react-native';
 
 import RNFS from 'react-native-fs';
 
-const devicePath = RNFS.DocumentDirectoryPath;
-const exportPath =  Platform.OS === 'ios' ? devicePath : RNFS.DownloadDirectoryPath + '/StraboSpot2';
-const androidDownloadsPath = RNFS.DownloadDirectoryPath + '/StraboSpot2/Backups/'; //Android Only
-const androidExportPath = devicePath + '/AndroidExportFiles/';
-// const appDirectoryForDistributedBackups = Platform.OS === 'ios' ? devicePath + /ProjectBackups/ : androidBackupPath + '/StraboSpot2/ProjectBackups/';
-const appDirectoryForBackups = devicePath + '/ProjectBackups/';
-const appDirectoryForDistributedBackups = devicePath + '/Distribution/';
-const appDirectory = devicePath + '/StraboSpot';
-const sharedDocumentsPathIOS = 'shareddocuments://'; // To access Files.app on iOS
-const imagesDirectory = appDirectory + '/Images/';
-const tilesDirectory = devicePath + '/StraboSpotTiles';
-const tileCacheDirectory = tilesDirectory + '/TileCache/';
-const tileTempDirectory = tilesDirectory + '/TileTemp/';
-const zipsDirectory = tilesDirectory + '/TileZips/';
+const isIOS = Platform.OS === 'ios';
 
-// StraboMicro Projects Paths
-const microDirectory = appDirectory + '/Micro/';
-const microExportsPath = exportPath + '/StraboMicro Projects/';
-const microZipsDirectory = appDirectory + '/Micro/Zips/';
+/* Shared Paths */
+const documentDir = RNFS.DocumentDirectoryPath;
+const appDir = documentDir + '/StraboSpot';
+const backupDir = documentDir + '/ProjectBackups/';
+const imagesDir = appDir + '/Images/';
+const microDir = appDir + '/Micro/';
+const microZipsDir = appDir + '/Micro/Zips/';
+const tilesDir = documentDir + '/StraboSpotTiles';
+const tileCacheDir = tilesDir + '/TileCache/';
+const tileTempDir = tilesDir + '/TileTemp/';
+const tileZipsDir = tilesDir + '/TileZips/';
 
-export const APP_EXPORT_DIRECTORY = Platform.OS === 'ios' ? appDirectoryForDistributedBackups : androidExportPath;
-export const TEMP_IMAGES_DOWNSIZED_DIRECTORY = appDirectory + '/TempImages';
+/* iOS-Only Paths */
+const iosDistributionDir = documentDir + '/Distribution/';     // Accessible via Files app
+const iosSharedDocumentsPath = 'shareddocuments://';           // Deep-links into Files app
+
+/* Android-Only Paths */
+const androidTempExportDir = documentDir + '/AndroidExportFiles/';             // Private temp dir; files moved to Downloads via MediaStore
+const androidDownloadsBackupDir = RNFS.DownloadDirectoryPath + '/StraboSpot2/Backups/';  // Final destination in Downloads
+
+/* Platform-Specific  */
+// iOS uses Distribution/; Android uses AndroidExportFiles/ as a staging area before MediaStore copy
+export const APP_EXPORT_DIRECTORY = isIOS ? iosDistributionDir : androidTempExportDir;
+
+const microExportsDir = (isIOS ? documentDir : RNFS.DownloadDirectoryPath + '/StraboSpot2') + '/StraboMicro Projects/';
+
+export const TEMP_IMAGES_DOWNSIZED_DIRECTORY = appDir + '/TempImages';
 
 export const APP_DIRECTORIES = {
-  ROOT_PATH: devicePath,
-  APP_DIR: appDirectory,
-  BACKUP_DIR: appDirectoryForBackups,
-  DOWNLOAD_DIR_ANDROID: androidDownloadsPath,
-  EXPORT_FILES_ANDROID: androidExportPath,
-  EXPORT_FILES_IOS: appDirectoryForDistributedBackups,
-  SHARED_DOCUMENTS_PATH_IOS: sharedDocumentsPathIOS,
-  IMAGES: imagesDirectory,
-  MICRO: microDirectory,
-  MICRO_EXPORTS: microExportsPath,
-  MICRO_ZIPS: microZipsDirectory,
-  PROFILE_IMAGE: imagesDirectory + 'profileImage.jpg',
-  TILE_CACHE: tileCacheDirectory,
-  TILES_DIRECTORY: tilesDirectory,
-  TILE_TEMP: tileTempDirectory,
-  TILE_ZIP: zipsDirectory,
+  // Shared
+  ROOT_PATH: documentDir,
+  APP_DIR: appDir,
+  BACKUP_DIR: backupDir,
+  IMAGES: imagesDir,
+  PROFILE_IMAGE: imagesDir + 'profileImage.jpg',
+  MICRO: microDir,
+  MICRO_EXPORTS: microExportsDir,
+  MICRO_ZIPS: microZipsDir,
+  TILE_CACHE: tileCacheDir,
+  TILES_DIRECTORY: tilesDir,
+  TILE_TEMP: tileTempDir,
+  TILE_ZIP: tileZipsDir,
+
+  // iOS-only
+  EXPORT_FILES_IOS: iosDistributionDir,
+  SHARED_DOCUMENTS_PATH_IOS: iosSharedDocumentsPath,
+
+  // Android-only
+  EXPORT_FILES_ANDROID: androidTempExportDir,
+  DOWNLOAD_DIR_ANDROID: androidDownloadsBackupDir,
 };

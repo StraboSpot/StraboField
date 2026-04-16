@@ -2,6 +2,7 @@ import {createListenerMiddleware, isAnyOf} from '@reduxjs/toolkit';
 import * as turf from '@turf/turf';
 import {Toast} from 'react-native-toast-notifications';
 
+import {cancelledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
 import {
   addedCustomFeatureTypes,
   addedDataset,
@@ -30,6 +31,9 @@ import {
   uploadProjectDatasetsSpots,
 } from '../services/serverAPI';
 import {isEmpty} from '../shared/Helpers';
+
+// Spot IDs modified during drag interval mode — flushed to server when mode ends
+let pendingDragSpotIds = new Set();
 
 const alertAuthenticationError = () => {
   Toast.hideAll();
@@ -156,6 +160,12 @@ const uploadProjectDatasetDeleteSpotListener = async (action, listenerApi) => {
 
 // Update spots, datasets and project on server DB
 const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
+  // Defer interval-reorder saves until drag mode ends (avoids per-reorder server uploads)
+  if (action.type.includes('spot/editedOrCreatedSpots') && listenerApi.getState().map.isDragIntervalMode) {
+    action.payload.forEach(s => pendingDragSpotIds.add(s.properties.id));
+    return;
+  }
+
   Toast.hideAll();
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Spot edited:', action.payload);
@@ -220,6 +230,51 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   }
 };
 
+// Flush deferred interval-reorder saves when drag mode is turned off
+const intervalDragModeEndedListener = async (action, listenerApi) => {
+  if (pendingDragSpotIds.size === 0) return;
+
+  const spotIds = [...pendingDragSpotIds];
+  pendingDragSpotIds = new Set();
+
+  Toast.hideAll();
+  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
+
+  const newState = listenerApi.getState();
+  const encodedLogin = newState.user.encoded_login;
+  const project = newState.project.project;
+  const datasets = Object.values(newState.project.datasets);
+
+  const spotIdsGroupedByDatasetId = spotIds.reduce((acc, spotId) => {
+    const dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+    if (!dataset) return acc;
+    const datasetId = dataset.id;
+    if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
+    else return {...acc, [datasetId]: [spotId]};
+  }, {});
+
+  const datasetsToSend = Object.entries(spotIdsGroupedByDatasetId).reduce((acc, [datasetId, spotIdsInDataset]) => {
+    const spots = spotIdsInDataset.map(spotId => newState.spot.spots[spotId]);
+    return [...acc, {...newState.project.datasets[datasetId], spots: turf.featureCollection(spots)}];
+  }, []);
+
+  const objectToSend = {project: {...project, datasets: cleanDatasets(datasetsToSend)}};
+  const jsonToSend = JSON.parse(JSON.stringify(objectToSend));
+
+  try {
+    const resJSON = await uploadProjectDatasetsSpots(jsonToSend, encodedLogin);
+    console.log('uploadProjectDatasetsSpots (interval drag batch) resJSON', resJSON);
+    Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
+  }
+  catch (err) {
+    alertAuthenticationError();
+  }
+};
+
+const cancelledIntervalDragListener = () => {
+  pendingDragSpotIds = new Set();
+};
+
 const listenerMiddleware = createListenerMiddleware();
 
 // Spot, Dataset and Project Updates to Send to Server
@@ -231,6 +286,10 @@ listenerMiddleware.startListening({
   matcher: isAnyOf(addedDataset, editedOrCreatedSpot, editedOrCreatedSpots, editedSpotImage, editedSpotImages,
     editedSpotProperties, updatedDatasetProperties), effect: updatedProjectDatasetsSpotsListener,
 });
+
+// Batch-save interval reorder changes when drag mode ends
+listenerMiddleware.startListening({actionCreator: savedIntervalDragReordering, effect: intervalDragModeEndedListener});
+listenerMiddleware.startListening({actionCreator: cancelledIntervalDrag, effect: cancelledIntervalDragListener});
 
 // Don't need to do addedSpotsFromDevice until can add from device on web
 // listenerMiddleware.startListening({actionCreator: addedSpotsFromDevice, effect: updatedProjectDatasetSpotListener});

@@ -29,7 +29,7 @@ const AddIntervalModal = () => {
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
-  const {createInterval, orderStratSectionIntervals} = useStratSection();
+  const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
 
   /* Local State */
@@ -40,8 +40,8 @@ const AddIntervalModal = () => {
   const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   /* Derived Variables */
-
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+  const isCore = isNegativeColumn();
 
   /* Side Effects */
 
@@ -163,12 +163,18 @@ const AddIntervalModal = () => {
         }
         if (intervalToCopy) newInterval = copyRestOfInterval(newInterval);
         const newSpot = await createSpot({type: 'Feature', ...newInterval});
-        if (preFormRef.current?.values?.intervalToInsertAfter) {
-          const intervalToInsertAfterObj = intervals.find(
-            i => i.properties.id === preFormRef.current.values.intervalToInsertAfter);
-          console.log('Insert after', preFormRef.current.values.intervalToInsertAfter, intervalToInsertAfterObj);
+        const insertAfterValue = preFormRef.current?.values?.intervalToInsertAfter;
+        // Core + Top: place at y=0 (surface), shifting existing intervals deeper
+        if (insertAfterValue === 'top' && isCore) moveIntervalToAfter(newSpot, null);
+        // Non-core + Bottom: place at y=0 (base), shifting existing intervals up
+        else if (insertAfterValue === 'bottom' && !isCore) moveIntervalToAfter(newSpot, null);
+        // Specific interval selected: insert after that interval
+        else if (insertAfterValue && insertAfterValue !== 'top' && insertAfterValue !== 'bottom') {
+          const intervalToInsertAfterObj = intervals.find(i => i.properties.id === insertAfterValue);
+          console.log('Insert after', insertAfterValue, intervalToInsertAfterObj);
           moveIntervalToAfter(newSpot, intervalToInsertAfterObj);
         }
+        // else: 'top' for non-core or 'bottom' for core = natural end-of-stack placement, no repositioning needed
         dispatch(setSelectedSpot(newSpot));
         dispatch(setModalValues({}));
         dispatch(setModalVisible({modal: null}));
@@ -236,9 +242,14 @@ const AddIntervalModal = () => {
   const renderAddIntervalNameField = () => {
     const initialIntervalName = {
       intervalName: (preferences.spot_prefix || '') + (preferences.starting_number_for_spot || ''),
+      intervalToInsertAfter: isCore ? 'bottom' : 'top',
     };
     const orderedIntervals = orderStratSectionIntervals(intervals);
-    const intervalsForInsert = [...orderedIntervals, {properties: {name: '-- Bottom --', id: 1}}];
+    const intervalsForInsert = [
+      {properties: {name: '-- Top --', id: 'top'}},
+      ...orderedIntervals,
+      {properties: {name: '-- Bottom --', id: 'bottom'}},
+    ];
     return (
       <Formik
         initialValues={initialIntervalName}
@@ -257,7 +268,7 @@ const AddIntervalModal = () => {
                     SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                   )}
                   key={'intervalToInsertAfter'}
-                  label={'Insert New Interval After:'}
+                  label={isCore ? 'Insert New Interval Below:' : 'Insert New Interval Above:'}
                   name={'intervalToInsertAfter'}
                   single={true}
                 />

@@ -84,7 +84,10 @@ const path = require('path');
 const glob = require('glob');
 
 const ROOT = path.resolve(__dirname, '..');
-const files = glob.sync('src/**/*.js', {cwd: ROOT});
+const argFiles = process.argv.slice(2);
+const files = argFiles.length > 0
+  ? argFiles
+  : glob.sync('src/**/*.js', {cwd: ROOT});
 
 const FUNC_PATTERNS = {
   constArrow: /^const\s+(\w+)\s*=\s*(?:async\s*)?\(/,
@@ -363,6 +366,10 @@ function convertToArrowFunction(chunk) {
   // Only convert function declarations (not already arrow functions)
   if (!FUNC_PATTERNS.functionDecl.test(firstLine.trim())) return lines;
 
+  // Skip if any preceding comment mentions hoisting
+  const commentLines = lines.slice(0, codeIdx).join('\n');
+  if (/hoist/i.test(commentLines)) return lines;
+
   const indentStr = firstLine.match(/^(\s*)/)[1];
 
   // Check if the function declaration spans multiple lines (params across lines)
@@ -510,7 +517,7 @@ const PREAMBLE_HEADER_RE = /^\s*\/\*\s*(Data Hooks\s*\/?\s*State|Data Hooks|Loca
 // Categorize a preamble statement by the hook it contains.
 function categorizePreambleStatement(stmtLines) {
   const text = stmtLines.join(' ');
-  if (/\buseEffect\b|\buseLayoutEffect\b/.test(text)) return 'sideEffects';
+  if (/\buseEffect\b|\buseLayoutEffect\b|\buseImperativeHandle\b/.test(text)) return 'sideEffects';
   if (/\buseMemo\b|\buseCallback\b/.test(text)) return 'derivedState';
   if (/\b(useState|useRef|useReducer|useSharedValue|useAnimatedStyle)\b/.test(text)) return 'localState';
   // Generic hook pattern — require call syntax (followed by `(`) or assignment
@@ -1099,6 +1106,110 @@ function processHelperFile(fullPath, content, file) {
   return false;
 }
 
+// Process slice files (*.slice.js) — alphabetize object keys and reducer methods.
+// Never adds block comment headers.
+function processSliceFile(fullPath, lines, file) {
+  let changed = false;
+
+  // Find the line of the closing brace that matches the opening brace on openLine.
+  // Scans from openLine+1 with depth=1 (assumes exactly one unmatched { on openLine).
+  function findClosingBrace(openLine) {
+    let depth = 1;
+    for (let i = openLine + 1; i < lines.length; i++) {
+      for (const ch of lines[i]) {
+        if (ch === '{') depth++;
+        if (ch === '}') { depth--; if (depth === 0) return i; }
+      }
+    }
+    return -1;
+  }
+
+  // Sort direct children of a block (lines[startIdx..endIdx]) alphabetically.
+  // Uses depth-aware grouping so multi-line entries (e.g. reducer methods) stay together.
+  function sortBlockLines(startIdx, endIdx) {
+    if (startIdx > endIdx) return;
+    const groups = [];
+    let current = null;
+    let depth = 0;
+    for (let i = startIdx; i <= endIdx; i++) {
+      const line = lines[i];
+      const t = line.trim();
+      if (t === '') {
+        if (current) current.push(line);
+        continue;
+      }
+      if (depth === 0 && (/^[a-zA-Z_$]/.test(t) || t.startsWith('...'))) {
+        if (current) groups.push(current);
+        current = [line];
+      } else {
+        if (!current) current = [];
+        current.push(line);
+      }
+      for (const ch of line) {
+        if (ch === '{') depth++;
+        if (ch === '}') depth--;
+      }
+    }
+    if (current) groups.push(current);
+    if (groups.length < 2) return;
+    const sorted = [...groups].sort((a, b) => {
+      const nameA = a[0].trim().replace(/^\.\.\./, '').split(/[^a-zA-Z0-9_]/)[0].toLowerCase();
+      const nameB = b[0].trim().replace(/^\.\.\./, '').split(/[^a-zA-Z0-9_]/)[0].toLowerCase();
+      return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+    });
+    const flat = groups.flatMap(g => g);
+    const sortedFlat = sorted.flatMap(g => g);
+    if (flat.every((l, idx) => l === sortedFlat[idx])) return;
+    for (let i = 0; i < sortedFlat.length; i++) lines[startIdx + i] = sortedFlat[i];
+    changed = true;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    // Only process blocks where { is the last character (content on subsequent lines)
+    if (!t.endsWith('{')) continue;
+
+    // Sort `export const { ... } = x.actions`
+    if (/^export\s+const\s*\{/.test(t)) {
+      const closeIdx = findClosingBrace(i);
+      if (closeIdx < 0) continue;
+      let end = closeIdx - 1;
+      while (end >= i + 1 && lines[end].trim() === '') end--;
+      sortBlockLines(i + 1, end);
+      i = closeIdx;
+      continue;
+    }
+
+    // Sort `reducers: { ... }`
+    if (/^\breducers\s*:\s*\{/.test(t)) {
+      const closeIdx = findClosingBrace(i);
+      if (closeIdx < 0) continue;
+      let end = closeIdx - 1;
+      while (end >= i + 1 && lines[end].trim() === '') end--;
+      sortBlockLines(i + 1, end);
+      i = closeIdx;
+      continue;
+    }
+
+    // Sort `const X = { ... }` (e.g. initialState)
+    if (/^const\s+\w+\s*=\s*\{/.test(t)) {
+      const closeIdx = findClosingBrace(i);
+      if (closeIdx < 0) continue;
+      let end = closeIdx - 1;
+      while (end >= i + 1 && lines[end].trim() === '') end--;
+      sortBlockLines(i + 1, end);
+      i = closeIdx;
+      continue;
+    }
+  }
+
+  if (changed) {
+    fs.writeFileSync(fullPath, lines.join('\n'), 'utf8');
+    return true;
+  }
+  return false;
+}
+
 let totalReturnChanges = 0;
 let totalFuncChanges = 0;
 let changedFiles = [];
@@ -1115,21 +1226,31 @@ for (const file of files) {
     continue;
   }
 
-  const exportDefaultMatch = content.match(/export default (\w+)/);
+  const exportDefaultMatch = content.match(/export default (?:\w+\.)*\w+\((\w+)\)/)
+    || content.match(/export default (\w+)/);
   if (!exportDefaultMatch) continue;
   const exportedName = exportDefaultMatch[1];
 
   const isFunctionRegex = new RegExp(
-    `(?:const|let|var|function)\\s+${exportedName}\\s*(?:=\\s*\\(|=\\s*\\{|\\()`,
+    `(?:const|let|var|function)\\s+${exportedName}\\s*(?:=\\s*\\(|=\\s*\\{|\\(|=\\s*(?:\\w+\\.)*\\w+\\()`,
   );
   if (!isFunctionRegex.test(content)) continue;
 
   const basename = path.basename(file);
   const isHook = basename.startsWith('use');
+  const isSlice = basename.endsWith('.slice.js');
 
   let lines = content.split('\n');
   let fileReturnChanges = 0;
   let fileFuncChanges = 0;
+
+  if (isSlice) {
+    if (processSliceFile(fullPath, lines, file)) {
+      changedFiles.push({file, returnChanges: 1, funcChanges: 0});
+      totalReturnChanges++;
+    }
+    continue;
+  }
 
   // === PART 1: Sort return block properties (hooks only) ===
   // Components return JSX, not plain objects, so skip return-block sorting for them.
@@ -1231,8 +1352,11 @@ for (const file of files) {
     if (varDefRegex.test(lines[i]) || funcDefRegex.test(lines[i])) {
       // Skip past the parameter list before looking for the body `{`.
       // This avoids matching `{` inside destructured params like ({prop1, prop2}).
+      // For forwardRef-wrapped components, the body `{` appears at parenDepth=1
+      // (inside the forwardRef call) after the `=>` arrow.
       let parenDepth = 0;
       let pastParams = false;
+      let seenArrow = false;
       for (let j = i; j < lines.length; j++) {
         for (let ci = 0; ci < lines[j].length; ci++) {
           if (lines[j][ci] === '(') parenDepth++;
@@ -1240,8 +1364,9 @@ for (const file of files) {
             parenDepth--;
             if (parenDepth === 0) pastParams = true;
           }
-          // Only match body `{` after we've closed the parameter list
-          if (pastParams && lines[j][ci] === '{') {
+          if (lines[j][ci] === '=' && lines[j][ci + 1] === '>') seenArrow = true;
+          // Match body `{` after params close (normal) or after `=>` at depth 1 (forwardRef wrapper)
+          if ((pastParams || (seenArrow && parenDepth === 1)) && lines[j][ci] === '{') {
             bodyStart = j + 1;
             break;
           }
@@ -1732,7 +1857,16 @@ for (const file of files) {
       }
     } else {
       // Derived State / Side Effects: preserve original order
-      for (const stmt of preambleGroups[cat]) {
+      // Exception: within Side Effects, useImperativeHandle goes last
+      const stmts = cat === 'sideEffects'
+        ? [...preambleGroups[cat]].sort((a, b) => {
+            const aImp = /\buseImperativeHandle\b/.test(a.join(' '));
+            const bImp = /\buseImperativeHandle\b/.test(b.join(' '));
+            if (aImp === bImp) return 0;
+            return aImp ? 1 : -1;
+          })
+        : preambleGroups[cat];
+      for (const stmt of stmts) {
         const isMultiLine = stmt.filter(l => !l.trim().startsWith('//')).length > 1;
         if (newBodyLines.length > 0 && newBodyLines[newBodyLines.length - 1].trim() !== ''
           && isMultiLine) {

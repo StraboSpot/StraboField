@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {ScaleControl} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
@@ -15,6 +15,8 @@ import {
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
 import mapStyles from '../maps.styles';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
+import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
+import SnapLineLayer from '../strat-section/SnapLineLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
 
 const MapLayers = ({
@@ -30,9 +32,16 @@ const MapLayers = ({
                    }) => {
   /* Data Hooks */
 
-  const {currentImageBasemap, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, intervalDragState, isDragIntervalMode, stratSection} = useSelector(state => state.map);
 
   const useDimensions = useWindowSize();
+
+  /* Derived State */
+
+  const spotsDisplayed = useMemo(
+    () => [...spotsNotSelected, ...spotsSelected],
+    [spotsNotSelected, spotsSelected],
+  );
 
   /* View */
 
@@ -53,7 +62,7 @@ const MapLayers = ({
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}
 
       {/* Strat Section Background Layer */}
-      {stratSection && <StratSectionBackground spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <StratSectionBackground/>}
 
       {/* Image Basemap Layer */}
       <ImageBasemapLayer/>
@@ -68,7 +77,13 @@ const MapLayers = ({
       <EditLayers editFeatureVertex={editFeatureVertex}/>
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
-      {stratSection && <CoveredIntervalsXLines spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
+
+      {/* Dragged Interval Highlight Layer — orange fill + white border */}
+      {stratSection && isDragIntervalMode && <DraggedIntervalLayer/>}
+
+      {/* Snap Line Layer — shown while dragging an interval */}
+      {stratSection && intervalDragState && <SnapLineLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>

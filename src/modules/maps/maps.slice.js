@@ -15,6 +15,9 @@ const initialMapsState = {
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
+  intervalDragSnapshot: null,
+  intervalDragState: null,
+  isDragIntervalMode: false,
   labelTypeOn: 'dip',
   isMapMoved: true,
   isShowOnly1stMeas: false,
@@ -41,6 +44,14 @@ const mapsSlice = createSlice({
     addedCustomMapsFromBackup(state, action) {
       state.customMaps = action.payload;
     },
+    cancelledIntervalDrag(state) {
+      state.isDragIntervalMode = false;
+      state.intervalDragState = null;
+      state.intervalDragSnapshot = null;
+    },
+    clearedIntervalDragState(state) {
+      state.intervalDragState = null;
+    },
     clearedMaps(state) {
       state.customMaps = {};
     },
@@ -48,6 +59,8 @@ const mapsSlice = createSlice({
       state.spotsInMapExtentIds = [];
     },
     clearedStratSection(state) {
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = undefined;
     },
     clearedVertexes(state) {
@@ -59,6 +72,11 @@ const mapsSlice = createSlice({
     },
     resetMapState() {
       return initialMapsState;
+    },
+    savedIntervalDragReordering(state) {
+      state.isDragIntervalMode = false;
+      state.intervalDragState = null;
+      state.intervalDragSnapshot = null;
     },
     selectedCustomMapToEdit(state, action) {
       state.selectedCustomMapToEdit = action.payload;
@@ -72,6 +90,8 @@ const mapsSlice = createSlice({
       state.currentBasemap = action.payload;
     },
     setCurrentImageBasemap(state, action) {
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = undefined;
       state.currentImageBasemap = action.payload;
     },
@@ -88,6 +108,19 @@ const mapsSlice = createSlice({
     setGeometryTypesOff(state, action) {
       console.log('Map Geometry Types Off', action.payload);
       state.geometryTypesOff = action.payload;
+    },
+    setIntervalDragState(state, action) {
+      state.intervalDragState = action.payload;
+    },
+    setIntervalDragTargetSlot(state, action) {
+      if (state.intervalDragState) {
+        state.intervalDragState.targetSlotIndex = action.payload;
+        const slot = state.intervalDragState.slotMap[action.payload];
+        if (slot) {
+          state.intervalDragState.snapLngLat = slot.lngLat;
+          state.intervalDragState.snapScreenY = slot.screenY;
+        }
+      }
     },
     setIsMapMoved(state, action) {
       state.isMapMoved = action.payload;
@@ -110,6 +143,8 @@ const mapsSlice = createSlice({
     },
     setStratSection(state, action) {
       state.currentImageBasemap = undefined;
+      state.intervalDragState = null;
+      state.isDragIntervalMode = false;
       state.stratSection = action.payload;
     },
     setTagTypeForColor(state, action) {
@@ -126,6 +161,10 @@ const mapsSlice = createSlice({
     setZoom(state, action) {
       state.zoom = action.payload;
     },
+    startedIntervalDrag(state, action) {
+      state.isDragIntervalMode = true;
+      state.intervalDragSnapshot = action.payload;
+    },
     updateCustomMap(state, action) {
       state.customMaps[action.payload.id] = action.payload;
     },
@@ -135,12 +174,15 @@ const mapsSlice = createSlice({
 export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
+  cancelledIntervalDrag,
+  clearedIntervalDragState,
   clearedMaps,
   clearedSpotsInMapExtentIds,
   clearedStratSection,
   clearedVertexes,
   deletedCustomMap,
   resetMapState,
+  savedIntervalDragReordering,
   selectedCustomMapToEdit,
   setCenter,
   setCurrentBasemap,
@@ -149,6 +191,8 @@ export const {
   setFeatureTypesOff,
   setFreehandFeatureCoords,
   setGeometryTypesOff,
+  setIntervalDragState,
+  setIntervalDragTargetSlot,
   setIsMapMoved,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,
@@ -156,14 +200,12 @@ export const {
   setMapSymbols,
   setSpotsInMapExtentIds,
   setStratSection,
-  setSymbolsDisplayed,
   setTagTypeForColor,
   setVertexEndCoords,
   setVertexStartCoords,
   setZoom,
+  startedIntervalDrag,
   updateCustomMap,
 } = mapsSlice.actions;
 
 export default mapsSlice.reducer;
-
-

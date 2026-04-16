@@ -37,7 +37,7 @@ const useNesting = () => {
     // Find active children spots based on sample
     if (!thisSpot.properties.isSample && thisSpot.properties.samples) {
       const sampleIds = thisSpot.properties.samples.map(sample => sample.id);
-      const sampleChildrenSpots = sampleIds.map(sampleId => spots[sampleId]);
+      const sampleChildrenSpots = sampleIds.map(sampleId => spots[sampleId]).filter(Boolean);
       childrenSpots.push(sampleChildrenSpots);
     }
     // Find active children spots based on image basemap
@@ -57,11 +57,8 @@ const useNesting = () => {
     if (thisSpot.properties.nesting) {
       let nonGeomChildrenSpots = [];
       thisSpot.properties.nesting.forEach((spotId) => {
-        if (getSpotById(spotId)) nonGeomChildrenSpots.push(getSpotById(spotId));
-        else {
-          thisSpot.properties.nesting = thisSpot.properties.nesting.filter(nestingId => nestingId !== spotId);
-          if (isEmpty(thisSpot.properties.nesting)) delete thisSpot.properties.nesting;
-        }
+        const spot = getSpotById(spotId);
+        if (spot) nonGeomChildrenSpots.push(spot);
       });
       childrenSpots.push(nonGeomChildrenSpots);
     }

@@ -66,6 +66,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
       dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
+    const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
+      || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
+      || getRelevantPetPages().map(p => p.key).includes(pageVisible)
+      || getRelevantSedPages().map(p => p.key).includes(pageVisible)
+      || SUBPAGES.map(p => p.key).includes(pageVisible);
+    if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   }, [pageVisible, spot]);
 
   /* Logic Helpers */
@@ -85,18 +91,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   /* Render Functions */
 
   const renderNotebookContent = () => {
-    const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
-      || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
-      || getRelevantPetPages().map(p => p.key).includes(pageVisible)
-      || getRelevantSedPages().map(p => p.key).includes(pageVisible)
-      || SUBPAGES.map(p => p.key).includes(pageVisible);
-    if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-
-    let pageKey = isRelevantPage ? pageVisible : PAGE_KEYS.OVERVIEW;
-    const page = NOTEBOOK_PAGES.find(p => p.key === pageKey);
+    const page = NOTEBOOK_PAGES.find(p => p.key === pageVisible);
     const Page = page?.page_component || Overview;
     let pageProps = {isReadOnly: isReadOnly, isSample: isSample, openMainMenuPanel: openMainMenuPanel, page: page};
-    if (page.key === PAGE_KEYS.SAMPLES) {
+    if (page?.key === PAGE_KEYS.SAMPLES) {
       pageProps = {
         ...pageProps,
         selectedSample: selectedSample,

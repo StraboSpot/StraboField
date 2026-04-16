@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Web version of ImageZoomAndPanWrapper
  * On web, native zoom and pan is handled by the browser,

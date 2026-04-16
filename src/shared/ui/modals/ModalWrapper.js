@@ -1,5 +1,5 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -36,17 +36,24 @@ const ModalWrapper = ({
                         showCloseButton,
                         showDeleteButton,
                       }) => {
+  /* Data Hooks */
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Derived Variables */
+
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
+
+  /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
     return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
   };
+
+  /* Render Functions */
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -70,6 +77,8 @@ const ModalWrapper = ({
     }
   };
 
+  /* View */
+
   return (
     <Overlay
       animationType={'fade'}
@@ -81,9 +90,9 @@ const ModalWrapper = ({
       supportedOrientations={['portrait', 'landscape']}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
-        style={isAutoHeight ? undefined : {flex: 1}}
+        behavior={'padding'}
+        enabled={Platform.OS === 'ios'}
+        style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
       >
         <ModalWrapperHeader
           buttonTitleRight={buttonTitleRight}
@@ -91,10 +100,15 @@ const ModalWrapper = ({
           headerTitle={headerTitle}
           showCloseButton={showCloseButton}
         />
-
-        <View style={isAutoHeight ? undefined : {flex: 1}}>
+        <ScrollView
+          automaticallyAdjustContentInsets={Platform.OS === 'ios'}
+          contentContainerStyle={isAutoHeight ? undefined : {flexGrow: 1, minHeight: 0}}
+          keyboardShouldPersistTaps={'handled'}
+        >
+          {/*<View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>*/}
           {children}
-        </View>
+          {/*</View>*/}
+        </ScrollView>
         {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
       </KeyboardAvoidingView>
       <ModalSaveAndCancelButtons

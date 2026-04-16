@@ -9,7 +9,7 @@ const XAxis = ({n = 1}) => {
   /* Data Hooks */
 
   const {getLayoutSymbology} = useMapSymbology();
-  const {getXAxis, getXAxisTickMarks} = useXAxis(n);
+  const {getXAxis, getXAxisTickMarks, isFlipped} = useXAxis(n);
 
   /* View */
 
@@ -41,7 +41,11 @@ const XAxis = ({n = 1}) => {
         />
         <Layer
           id={'xAxisTickMarksLabelLayer' + n}
-          layout={getLayoutSymbology().xAxisTickMarkLabels}
+          layout={{
+            ...getLayoutSymbology().xAxisTickMarkLabels,
+            'text-offset': isFlipped ? [1, -1] : [1, 1],
+            'text-rotate': isFlipped ? 315 : 45,
+          }}
           minZoomLevel={1}
           type={'symbol'}
         />

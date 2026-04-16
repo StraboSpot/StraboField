@@ -31,7 +31,8 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
     return (
       <SampleListItem
         isCheckedList={isCheckedList}
-        isItemChecked={checkedItems?.find(i => i === sample?.properties?.id || i === parentSpot?.properties?.id)}
+        isItemChecked={checkedItems?.find(
+          i => sample.properties?.isSample ? i === sample.properties.id : i === parentSpot?.properties?.id)}
         isShowAvatar
         onPress={() => handleSamplePress(sample, parentSpot)}
         parentSpot={parentSpot}

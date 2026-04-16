@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, KeyboardAvoidingView, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -56,7 +56,7 @@ const BasicPageDetail = ({
 
     const formRef = useRef(null);
 
-    const [initialValues, setInitialValues] = useState({});
+    const [initialValues, setInitialValues] = useState(selectedFeature);
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
@@ -360,11 +360,7 @@ const BasicPageDetail = ({
 
     return (
       <>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Adjust offset as needed
-          style={{flex: 1}} // Important for padding behavior
-        >
+        <View style={{flex: 1}}>
           {(isTemplate || !isEmpty(selectedFeature)) && (
             <>
               <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
@@ -378,7 +374,9 @@ const BasicPageDetail = ({
               )}
               <FlatList
                 ListHeaderComponent={renderFormFields()}
+                automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
                 contentContainerStyle={{paddingBottom: 200}}
+                keyboardShouldPersistTaps='handled'
               />
             </>
           )}
@@ -418,7 +416,7 @@ const BasicPageDetail = ({
               </Text>
             </View>
           </ModalWrapper>
-        </KeyboardAvoidingView>
+        </View>
       </>
     );
   }

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ScrollView, Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -200,72 +200,78 @@ const SignUp = ({navigation}) => {
   return (
     <>
       <SplashScreen>
-        <View style={styles.signUpContainer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              onChangeText={val => onChangeText('firstName', val)}
-              placeholder={'First Name'}
-              placeholderTextColor={themes.MEDIUMGREY}
-              style={styles.input}
-              value={userData.firstName.value || ''}
-            />
-            <TextInput
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              onChangeText={val => onChangeText('lastName', val)}
-              placeholder={'Last Name'}
-              placeholderTextColor={themes.MEDIUMGREY}
-              style={styles.input}
-              value={userData.lastName.value || ''}
-            />
-          </View>
+        <KeyboardAvoidingView
+          behavior={'padding'}
+          enabled={Platform.OS === 'ios'}
+          style={{flex: 1}}
+        >
+          <View style={styles.signUpContainer}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                onChangeText={val => onChangeText('firstName', val)}
+                placeholder={'First Name'}
+                placeholderTextColor={themes.MEDIUMGREY}
+                style={styles.input}
+                value={userData.firstName.value || ''}
+              />
+              <TextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                onChangeText={val => onChangeText('lastName', val)}
+                placeholder={'Last Name'}
+                placeholderTextColor={themes.MEDIUMGREY}
+                style={styles.input}
+                value={userData.lastName.value || ''}
+              />
+            </View>
 
-          <View style={{width: '100%'}}>
-            <Text style={styles.text}>
-              Password must contain at least one uppercase, one digit, and no spaces
-            </Text>
-          </View>
+            <View style={{width: '100%'}}>
+              <Text style={styles.text}>
+                Password must contain at least one uppercase, one digit, and no spaces
+              </Text>
+            </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              onChangeText={val => onChangeText('password', val)}
-              placeholder={'Password'}
-              placeholderTextColor={themes.MEDIUMGREY}
-              secureTextEntry={true}
-              style={styles.input}
-              value={userData.password.value || ''}
-            />
-            <TextInput
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              onChangeText={val => onChangeText('confirmPassword', val)}
-              placeholder={'Confirm Password'}
-              placeholderTextColor={themes.MEDIUMGREY}
-              secureTextEntry={true}
-              style={styles.input}
-              value={userData.confirmPassword.value || ''}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                onChangeText={val => onChangeText('password', val)}
+                placeholder={'Password'}
+                placeholderTextColor={themes.MEDIUMGREY}
+                secureTextEntry={true}
+                style={styles.input}
+                value={userData.password.value || ''}
+              />
+              <TextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                onChangeText={val => onChangeText('confirmPassword', val)}
+                placeholder={'Confirm Password'}
+                placeholderTextColor={themes.MEDIUMGREY}
+                secureTextEntry={true}
+                style={styles.input}
+                value={userData.confirmPassword.value || ''}
+              />
+            </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              keyboardType={'email-address'}
-              onChangeText={val => onChangeText('email', val)}
-              placeholder={'Email'}
-              placeholderTextColor={themes.MEDIUMGREY}
-              style={styles.input}
-              value={userData.email.value || ''}
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                autoCapitalize={'none'}
+                autoCorrect={false}
+                keyboardType={'email-address'}
+                onChangeText={val => onChangeText('email', val)}
+                placeholder={'Email'}
+                placeholderTextColor={themes.MEDIUMGREY}
+                style={styles.input}
+                value={userData.email.value || ''}
+              />
+            </View>
 
-          {renderButtons()}
-        </View>
+            {renderButtons()}
+          </View>
+        </KeyboardAvoidingView>
 
         <ModalWrapper
           actionTitle={'Got It'}

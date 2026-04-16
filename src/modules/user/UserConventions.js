@@ -121,11 +121,17 @@ const UserProfile = () => {
       const {email, encoded_login, isAuthenticated, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isOnline.isInternetReachable) {
-        await uploadProfile(userValuesToUpdate);
-        toast.show('Profile uploaded successfully!', {type: 'success'});
+        if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        else {
+          await uploadProfile(userValuesToUpdate);
+          toast.show('Profile uploaded successfully!', {type: 'success'});
+          toast.show('Changes Saved!', {type: 'success'});
+        }
       }
-      else toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
-      toast.show('Changes Saved!', {type: 'success'});
+      else {
+        toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
+        toast.show('Changes Saved Locally Only!', {type: 'success'});
+      }
     }
     catch (err) {
       console.error('Error uploading profile', err);
@@ -162,7 +168,8 @@ const UserProfile = () => {
           ListHeaderComponent={
             <>
               <Formik
-                component={formProps => Form({formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
+                component={formProps => Form(
+                  {formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
                 enableReinitialize={true}  // Update values if preferences change while form open
                 initialValues={userData}
                 innerRef={formRef}
@@ -172,15 +179,17 @@ const UserProfile = () => {
               />
               {renderBulkUpdatesSection()}
               {isOnline.isInternetReachable ? (
-                <View style={userStyles.saveButtonContainer}>
-                  {Platform.OS !== 'web' && (
-                    <OutlineButton
-                      loading={isDownloading}
-                      onPress={onDownloadUserProfile}
-                      title={'Download User Conventions'}
-                    />
+                <>
+                  {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
+                    <View style={userStyles.saveButtonContainer}>
+                      <OutlineButton
+                        loading={isDownloading}
+                        onPress={onDownloadUserProfile}
+                        title={'Download User Conventions'}
+                      />
+                    </View>
                   )}
-                </View>
+                </>
               ) : (
                 <Text style={commonStyles.noValueText}>
                   Must be online to save changes to user conventions.

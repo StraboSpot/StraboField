@@ -87,4 +87,4 @@ const SpotsListItem = ({
   );
 };
 
-export default SpotsListItem;
+export default React.memo(SpotsListItem);

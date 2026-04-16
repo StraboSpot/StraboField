@@ -9,7 +9,7 @@ import {useImages} from '../../images';
 import {useSpots} from '../../spots';
 import useMapCoords from '../useMapCoords';
 
-const StratSectionBackground = ({spotsDisplayed}) => {
+const StratSectionBackground = () => {
   console.log('Rendering StratSectionBackground...');
 
   /* Data Hooks */
@@ -56,7 +56,7 @@ const StratSectionBackground = ({spotsDisplayed}) => {
       {renderImageOverlays()}
 
       {/* Y Axis */}
-      <YAxis spotsDisplayed={spotsDisplayed}/>
+      <YAxis/>
 
       {/* X Axes */}
       {<XAxes/>}

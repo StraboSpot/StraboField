@@ -64,7 +64,7 @@ const SampleDetailOverview = () => {
   };
 
   const onViewDetailPressed = () => {
-    dispatch(setSelectedAttributes([spot.properties?.samples?.[0]] || []));
+    dispatch(setSelectedAttributes(spot.properties?.samples?.length > 0 ? [spot.properties.samples[0]] : []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
@@ -105,14 +105,14 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        <Pressable onPress={onIGSNPressed}>
+        {sampleDetail.Sample_IGSN && <Pressable onPress={onIGSNPressed}>
           <Text style={[commonStyles.listItemTitle, {
             color: PRIMARY_ACCENT_COLOR,
             paddingTop: 5,
           }]}>
-            {sampleDetail.Sample_IGSN ? 'View IGSN Data' : 'Get IGSN'}
+            View IGSN Data
           </Text>
-        </Pressable>
+        </Pressable>}
       </View>
       {!isEmpty(sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
       {isIGSNModalVisible && (

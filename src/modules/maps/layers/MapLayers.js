@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useEffect, useMemo, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useDispatch, useSelector} from 'react-redux';
@@ -14,6 +14,7 @@ import {
 } from '.';
 import {setIsMapMoved} from '../maps.slice';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
+import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
 import useMapView from '../useMapView';
 
@@ -22,7 +23,6 @@ const MapLayers = ({
                      drawFeatures,
                      editFeatureVertex,
                      isShowMacrostratOverlay,
-                     isStratStyleLoaded,
                      location,
                      mapMode,
                      measureFeatures,
@@ -30,14 +30,26 @@ const MapLayers = ({
                      spotsNotSelected,
                      spotsSelected,
                    }, cameraRef) => {
+  /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {currentImageBasemap, isMapMoved, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, isDragIntervalMode, isMapMoved, stratSection} = useSelector(state => state.map);
+
+  const {getInitialViewState} = useMapView();
+
+  /* Local State */
 
   const [initialCenter, setInitialCenter] = useState([0, 0]);
   const [initialZoom, setInitialZoom] = useState();
 
-  const {getInitialViewState} = useMapView();
+  /* Derived State */
+
+  const spotsDisplayed = useMemo(
+    () => [...spotsNotSelected, ...spotsSelected],
+    [spotsNotSelected, spotsSelected],
+  );
+
+  /* Side Effects */
 
   useEffect(() => {
       // console.log('UE Basemap');
@@ -48,6 +60,8 @@ const MapLayers = ({
       setInitialZoom(zoom);
     }, [currentImageBasemap, stratSection],
   );
+
+  /* View */
 
   return (
     <>
@@ -73,14 +87,13 @@ const MapLayers = ({
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}
 
       {/* Strat Section Background Layer */}
-      {stratSection && <StratSectionBackground spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <StratSectionBackground/>}
 
       {/* Image Basemap Layer */}
       <ImageBasemapLayer/>
 
       {/* Features Layers */}
       <FeaturesLayers
-        isStratStyleLoaded={isStratStyleLoaded}
         mapMode={mapMode}
         spotsNotSelected={spotsNotSelected}
         spotsSelected={spotsSelected}
@@ -93,7 +106,10 @@ const MapLayers = ({
       <EditLayers editFeatureVertex={editFeatureVertex}/>
 
       {/* Strat Section X Lines Layer for Covered/Uncovered or Not Measured Intervals */}
-      {stratSection && <CoveredIntervalsXLines spotsDisplayed={[...spotsNotSelected, ...spotsSelected]}/>}
+      {stratSection && <CoveredIntervalsXLines spotsDisplayed={spotsDisplayed}/>}
+
+      {/* Dragged Interval Highlight Layer — orange fill + white border */}
+      {stratSection && isDragIntervalMode && <DraggedIntervalLayer/>}
 
       {/* Measure Layer */}
       <MeasureLayers measureFeatures={measureFeatures}/>

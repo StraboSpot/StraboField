@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 
 import Notes from './Notes';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 
@@ -12,6 +13,7 @@ const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
   /* Side Effects */
 
   useEffect(() => {
+    if (SMALL_SCREEN) return;
     lockToPortrait();
     return () => unlockOrientation();
   }, []);

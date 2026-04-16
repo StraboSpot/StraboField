@@ -7,7 +7,7 @@ import {ImagesInSpot} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesOverview = ({isReadOnly}) => {
+const ImagesOverview = ({isReadOnly, onOpenImage}) => {
   console.log('Rendering ImagesOverview...');
 
   /* Data Hooks */
@@ -27,7 +27,7 @@ const ImagesOverview = ({isReadOnly}) => {
 
   /* View */
 
-  return <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>;
+  return <ImagesInSpot isReadOnly={isReadOnly} onOpenImage={onOpenImage} saveImages={saveImagesToSpot}/>;
 };
 
 export default ImagesOverview;

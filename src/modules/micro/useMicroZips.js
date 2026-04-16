@@ -14,13 +14,13 @@ const useMicroZips = () => {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
 
-  const {deleteFromDevice} = useDevice();
-  const {doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
+  const {deleteFromDevice, doesDeviceDirectoryExist, downloadAndSaveMap} = useDevice();
 
   /* Local State */
 
   const [isLoadingWave, setIsLoadingWave] = useState(false);
   const [percentDone, setPercentDone] = useState(0);
+  const [projectName, setProjectName] = useState('');
   const [showComplete, setShowComplete] = useState(false);
   const [showLoadingBar, setShowLoadingBar] = useState(false);
 
@@ -49,9 +49,14 @@ const useMicroZips = () => {
     setShowComplete(false);
     setIsLoadingWave(false);
     setPercentDone(0);
+    setProjectName('');
   };
 
-  const downloadZip = async (projectId) => {
+  const downloadZip = async (projectId, name) => {
+    let lastLoggedPct = -1;
+    setProjectName(name);
+    setShowLoadingBar(true);
+    setIsLoadingWave(true);
     try {
       const downloadZipURL = STRABO_APIS.STRABO + MICRO_PATHS.PDF_PROJECT + '/' + projectId;
       const downloadOptions = {
@@ -63,21 +68,26 @@ const useMicroZips = () => {
         toFile: APP_DIRECTORIES.MICRO_ZIPS + projectId + '.zip',
         begin: (response) => {
           const jobId = response.jobId;
-          setShowLoadingBar(true);
           setIsLoadingWave(false);
           dispatch(removedLastStatusMessage());
           dispatch(addedStatusMessage('Downloading...'));
-          console.log('DOWNLOAD HAS BEGUN! JobId: ' + jobId);
+          console.log(`Download started for "${name}" (jobId: ${jobId})`);
         },
         progress: (res) => {
-          console.log('Download Zip Progress', ((res.bytesWritten / res.contentLength) * 100).toFixed(2));
-          setPercentDone(res.bytesWritten / res.contentLength);
+          const pct = Math.floor((res.bytesWritten / res.contentLength) * 100);
+          if (pct % 10 === 0 && pct > lastLoggedPct) {
+            console.log('Download Zip Progress', pct + '%');
+            lastLoggedPct = pct;
+          }
+          setPercentDone(prev => Math.max(prev, res.bytesWritten / res.contentLength));
         },
         discretionary: true,
       };
 
-      await doesDeviceDirectoryExist(APP_DIRECTORIES.MICRO_ZIPS);
-      await doesDeviceDirectoryExist(APP_DIRECTORIES.MICRO);
+      await Promise.all([
+        doesDeviceDirectoryExist(APP_DIRECTORIES.MICRO_ZIPS),
+        doesDeviceDirectoryExist(APP_DIRECTORIES.MICRO),
+      ]);
       await downloadAndSaveMap(downloadOptions);
       await doUnzip(projectId);
       setShowComplete(true);
@@ -96,6 +106,7 @@ const useMicroZips = () => {
     downloadZip,
     isLoadingWave,
     percentDone,
+    projectName,
     showComplete,
     showLoadingBar,
   };

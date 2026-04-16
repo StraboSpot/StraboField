@@ -67,9 +67,10 @@ const VertexDrag = () => {
 
   /* Logic Helpers */
 
-  const saveEnd = (endCoords) => {
+  // Using function declaration (not const) so it is hoisted and available to runOnJS above
+  function saveEnd(endCoords) {
     dispatch(setVertexEndCoords(endCoords));
-  };
+  }
 
   /* View */
 

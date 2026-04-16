@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
@@ -14,6 +14,8 @@ import useMapMouseActions from './useMapMouseActions.web';
 import useMapMoveEvents from './useMapMoveEvents';
 import useMapView from './useMapView';
 
+const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
+
 const Map = ({
                allowMapViewMove,
                basemap,
@@ -25,30 +27,57 @@ const Map = ({
                location,
                mapMode,
                measureFeatures,
+               onMapLoad,
                spotsNotSelected,
                spotsSelected,
              }, forwardedRef) => {
   // console.log('Rendering Map...');
 
+  /* Data Hooks */
+
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {isDrawMode} = useMap();
   const {mapRef} = forwardedRef;
+  const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
 
-  const [viewState, setViewState] = React.useState({});
+  const [viewState, setViewState] = useState({});
+  const {handleMapMoved} = useMapMoveEvents({setViewState});
+  const {getInitialViewState} = useMapView();
+
+  /* Local State */
   const [mapKey, setMapKey] = useState(0);
+
+  /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
   const currentMapId = currentImageBasemap ? currentImageBasemap.id : stratSection ? stratSection.strat_section_id : basemap.id;
 
-  const {isDrawMode} = useMap();
-  const {handleMapMoved} = useMapMoveEvents({setViewState});
-  const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
-  const {getInitialViewState} = useMapView();
+  /* Derived State */
 
-  const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
+  // Preload all symbol images when the map style finishes loading.
+  const handleMapLoad = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    Object.entries(symbols).forEach(([id, url]) => {
+      if (!map.hasImage(id)) {
+        map.loadImage(url, (error, image) => {
+          if (error) {
+            console.error('Error loading image:', id, error);
+            return;
+          }
+          if (!map.hasImage(id)) map.addImage(id, image);
+        });
+      }
+    });
+    onMapLoad?.();
+  }, [onMapLoad]);
+
+  /* Side Effects */
 
   useEffect(() => {
       // console.log('UE Map', viewState);
@@ -64,30 +93,15 @@ const Map = ({
     console.log('Web Map ID changed to:', currentMapId);
   }, [currentMapId]);
 
-  // Add the image to the map style.
-  mapRef.current?.on('styleimagemissing', (e) => {
-    const id = e.id;  // id of the missing image
-    if (!mapRef.current?.hasImage(id)) {
-      mapRef.current?.loadImage(
-        symbols[id],
-        (error, image) => {
-          if (error) throw error;
-          if (!mapRef.current?.hasImage(id)) {
-            mapRef.current?.addImage(id, image);
-            if (mapRef.current?.hasImage(id)) console.log('Added Image:', id);
-          }
-        },
-      );
-    }
-  });
+  /* View */
 
   return (
     <ReactMapGL
       {...viewState}
-      boxZoom={allowMapViewMove}
+      boxZoom={allowMapViewMove && !isDragIntervalMode}
       cursor={cursor}
       doubleClickZoom={!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT)}
-      dragPan={allowMapViewMove}
+      dragPan={allowMapViewMove && !isDragIntervalMode}
       dragRotate={false}
       id={currentMapId}
       interactiveLayerIds={[...LAYER_IDS_NOT_SELECTED, ...LAYER_IDS_SELECTED]}
@@ -96,11 +110,13 @@ const Map = ({
       mapboxAccessToken={MAPBOX_TOKEN}
       onClick={handleMapPress}
       onDblClick={handleMapLongPress}
+      onLoad={handleMapLoad}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
       pitchWithRotate={false}
       ref={mapRef}
+      scrollZoom={allowMapViewMove && !isDragIntervalMode}
       style={{flex: 1}}
       styleDiffing={false}
       touchPitch={false}

@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {NOTEBOOK_PAGES, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.constants';
@@ -18,9 +19,11 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
+import {ImageModal, useImages} from '../images';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
@@ -30,12 +33,17 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
+  const {deleteImageFromSpot} = useImages();
   const {getPopulatedPagesKeys} = usePage();
+  const {getSpotByImageId} = useSpots();
+  const toast = useToast();
 
   /* Local State */
 
   const formRef = useRef(null);
 
+  const [imageToView, setImageToView] = useState({});
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
 
@@ -49,11 +57,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const sections = visiblePagesKeys.reduce((acc, key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     if (page.overview_component) {
-      const SectionOverview = page.overview_component;
-      const sectionOverview = {
-        title: page,
-        data: [<SectionOverview isReadOnly={isReadOnly} openMainMenuPanel={openMainMenuPanel} page={page}/>],
-      };
+      const sectionOverview = {title: page, data: [page]};
       return [...acc, sectionOverview];
     }
     else return acc;
@@ -65,9 +69,16 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     console.log('UE Overview [spot]', spot);
     setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
+    setIsImageModalVisible(false);
+    setImageToView({});
   }, [spot]);
 
   /* Event Handlers */
+
+  const handleOpenImage = (image) => {
+    setImageToView(image);
+    setIsImageModalVisible(true);
+  };
 
   const handleToggleShowTraceSurfaceFeatureForm = () => {
     if (isTraceSurfaceFeatureEdit) setIsTraceSurfaceFeatureEdit(false);
@@ -88,6 +99,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
       setIsTraceSurfaceFeatureEnabled(false);
     }
   };
+
+  const deleteImage = async image => await deleteImageFromSpot(image.id, getSpotByImageId(image.id));
 
   const openPage = (page) => {
     dispatch(setNotebookPageVisible(page.key));
@@ -124,6 +137,20 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     }, () => {
       console.log('Error saving form data to Spot');
     });
+  };
+
+  const saveImagesToSpot = (newImages) => {
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
+    dispatch(editedSpotProperties({field: 'images', value: newImages}));
+    toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
+  };
+
+  const saveUpdatedImage = (updatedImage) => {
+    const images = spot?.properties?.images || [];
+    const imagesFiltered = images.filter(i => i.id !== updatedImage.id);
+    const updatedImages = [...imagesFiltered, updatedImage];
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
+    dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
 
   const toggleTraceSurfaceFeature = () => {
@@ -176,8 +203,18 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         <PageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
-          keyExtractor={(item, index) => item + index}
-          renderItem={({item}) => item}
+          keyExtractor={item => item.key}
+          renderItem={({item}) => {
+            const SectionOverview = item.overview_component;
+            return (
+              <SectionOverview
+                isReadOnly={isReadOnly}
+                onOpenImage={handleOpenImage}
+                openMainMenuPanel={openMainMenuPanel}
+                page={item}
+              />
+            );
+          }}
           renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
           sections={sections}
           stickySectionHeadersEnabled={true}
@@ -247,6 +284,18 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         </View>
       )}
       {isTraceSurfaceFeatureEdit ? renderTraceSurfaceFeatureForm() : renderSections()}
+
+      {/* Modals */}
+      <ImageModal
+        deleteImage={deleteImage}
+        image={imageToView}
+        isReadOnly={isReadOnly}
+        isVisible={isImageModalVisible}
+        saveImages={saveImagesToSpot}
+        saveUpdatedImage={saveUpdatedImage}
+        setImageToView={setImageToView}
+        setIsImageModalVisible={setIsImageModalVisible}
+      />
     </View>
   );
 };

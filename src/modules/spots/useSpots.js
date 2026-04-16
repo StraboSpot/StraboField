@@ -1,6 +1,7 @@
 import {Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
+import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -257,12 +258,20 @@ const useSpots = () => {
     }
     await checkSpotName(newSpot.properties.name);
 
-    if ((currentImageBasemap || stratSection) && newSpot.geometry && newSpot.geometry.type === 'Point') { //newSpot geometry is unavailable when spot is copied.
+    if (newSpot.geometry && (currentImageBasemap || stratSection)) { //newSpot geometry is unavailable when spot is copied.
       const rootSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id)
         : getSpotWithThisStratSection(stratSection.strat_section_id);
-      if (rootSpot && rootSpot.geometry && rootSpot.geometry.type === 'Point') {
-        newSpot.properties.lng = rootSpot.geometry.coordinates[0];
-        newSpot.properties.lat = rootSpot.geometry.coordinates[1];
+      if (rootSpot && rootSpot.geometry) {
+        if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
+          newSpot.properties.lng = rootSpot.properties.lng;
+          newSpot.properties.lat = rootSpot.properties.lat;
+        }
+        else if (isOnGeoMap(rootSpot)) {
+          const center = rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
+            : turf.centroid(rootSpot).geometry.coordinates;
+          newSpot.properties.lng = center[0];
+          newSpot.properties.lat = center[1];
+        }
       }
     }
     // Continuous tagging
@@ -358,8 +367,7 @@ const useSpots = () => {
 
   // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
-    const allSpotsCopy = JSON.parse(JSON.stringify(Object.values(getActiveSpotsObj())));
-    const allSpotsCopyFiltered = allSpotsCopy.filter((spot) => {
+    const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
       if (spot.properties.isSample) return false;
       const geometries = spot.geometry?.geometries || [spot.geometry] || [];
       let hasValidGeometry = true;
@@ -428,11 +436,8 @@ const useSpots = () => {
   };
 
   const getSpotsByIds = (spotIds) => {
-    const foundSpots = [];
-    Object.entries(spots).forEach((obj) => {
-      if (spotIds.includes(obj[1].properties.id)) foundSpots.push(obj[1]);
-    });
-    return foundSpots;
+    const idsSet = new Set(spotIds);
+    return Object.values(spots).filter(spot => idsSet.has(spot.properties.id));
   };
 
   const getSpotsInMapExtent = () => spotsInMapExtentIds.map(id => spots[id]);
@@ -478,9 +483,8 @@ const useSpots = () => {
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
   const getSpotWithThisStratSection = (stratSectionId) => {
-    // Comparing int to string so use only 2 equal signs
     return Object.values(getActiveSpotsObj()).find(
-      spot => spot?.properties?.sed?.strat_section?.strat_section_id == stratSectionId);
+      spot => spot?.properties?.sed?.strat_section?.strat_section_id?.toString() === stratSectionId?.toString());
   };
 
   const getVisibleSpots = () => {
@@ -513,12 +517,9 @@ const useSpots = () => {
   // Don't use viewed_timestamp as this is supposed to be removed from Spot objects. Updating viewed_timestamp
   // in slice requires entire spots object to update in redux which breaks editing a feature on the map.
   const sortSpotsByRecentlyViewed = (spotsToSort) => {
-    const spotsToSortIds = spotsToSort.map(spot => spot.properties.id);
-    let spotsToSortInRecentViewsIds = recentViews.reduce((acc, spotId) => {
-      return spotsToSortIds.includes(spotId) ? [...acc, spotId] : acc;
-    }, []);
-    const spotsSortedByRecentlyViewedIds = [...new Set([...spotsToSortInRecentViewsIds, ...spotsToSortIds])];
-    return spotsSortedByRecentlyViewedIds.map(spotId => spotsToSort.find(spot => spot.properties.id === spotId));
+    const spotsById = new Map(spotsToSort.map(spot => [spot.properties.id, spot]));
+    const recentIds = new Set(recentViews.filter(id => spotsById.has(id)));
+    return [...recentIds].map(id => spotsById.get(id)).concat(spotsToSort.filter(s => !recentIds.has(s.properties.id)));
   };
 
   return {

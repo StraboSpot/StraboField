@@ -30,7 +30,5 @@ export const metersPerPixel = (latitude, zoomLevel, tileSize = 256) => {
   // The width of the world map in pixels at the current zoom level is tileSize * 2^zoomLevel
   const mapWidthPixels = tileSize * Math.pow(2, zoomLevel);
   // The distance represented by one pixel (S) is given by S = (C * cos(latitude)) / mapWidthPixels
-  const metersPerPixel = (EARTH_CIRCUMFERENCE * Math.cos(latitudeRadians)) / mapWidthPixels;
-
-  return metersPerPixel;
+  return (EARTH_CIRCUMFERENCE * Math.cos(latitudeRadians)) / mapWidthPixels;
 };

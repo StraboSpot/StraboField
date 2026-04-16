@@ -1,13 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImagesList, useImages} from '.';
+import {ImageModal, ImagesList, useImages} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const ImagesInSpot = ({isReadOnly, saveImages}) => {
+const ImagesInSpot = ({isReadOnly, onOpenImage, saveImages}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -16,6 +16,21 @@ const ImagesInSpot = ({isReadOnly, saveImages}) => {
 
   const {deleteImageFromSpot} = useImages();
   const {getSpotByImageId} = useSpots();
+
+  /* Local State */
+
+  const [imageToView, setImageToView] = useState({});
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+
+  /* Event Handlers */
+
+  const handleOpenImage = (image) => {
+    if (onOpenImage) onOpenImage(image);
+    else {
+      setImageToView(image);
+      setIsImageModalVisible(true);
+    }
+  };
 
   /* Logic Helpers */
 
@@ -34,13 +49,28 @@ const ImagesInSpot = ({isReadOnly, saveImages}) => {
   /* View */
 
   return (
-    <ImagesList
-      deleteImage={deleteImage}
-      images={images}
-      isReadOnly={isReadOnly}
-      saveImages={saveImages}
-      saveUpdatedImage={saveUpdatedImage}
-    />
+    <>
+      <ImagesList
+        deleteImage={deleteImage}
+        images={images}
+        isReadOnly={isReadOnly}
+        onOpenImage={handleOpenImage}
+      />
+
+      {/* Modal */}
+      {!onOpenImage && (
+        <ImageModal
+          deleteImage={deleteImage}
+          image={imageToView}
+          isReadOnly={isReadOnly}
+          isVisible={isImageModalVisible}
+          saveImages={saveImages}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+          setIsImageModalVisible={setIsImageModalVisible}
+        />
+      )}
+    </>
   );
 };
 

@@ -21,14 +21,6 @@ const CompassDebug = ({compassData, matrixRotation}) => {
     return () => console.log('Compass Debug UNMOUNTED');
   }, []);
 
-  /* Logic Helpers */
-
-  const Col = ({children, flex = 1}) => <View style={{flex, alignItems: 'center', padding: 0}}>{children}</View>;
-
-  const Row = ({children}) => (
-    <View style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>{children}</View>
-  );
-
   /* Render Functions */
 
   const renderCompassData = () => (
@@ -54,17 +46,13 @@ const CompassDebug = ({compassData, matrixRotation}) => {
         (rows, key, idx) => {
           if (idx % 3 === 0) rows.push([]);
           rows[rows.length - 1].push(
-            <Col key={key}>
-              <Text>
-                {key.toUpperCase()}:{'\n'}{roundToDecimalPlaces(matrixRotation?.[key], 3)}
-              </Text>
-            </Col>,
+            renderTableCol(key, (
+              <Text>{key.toUpperCase()}:{'\n'}{roundToDecimalPlaces(matrixRotation?.[key], 3)}</Text>
+            )),
           );
           return rows;
         }, [],
-      ).map((cols, i) => (
-        <Row key={`row-${i}`}>{cols}</Row>
-      ))}
+      ).map((cols, i) => renderTableRow(`row-${i}`, cols))}
     </View>
   );
 
@@ -96,6 +84,16 @@ const CompassDebug = ({compassData, matrixRotation}) => {
       </View>
     );
   };
+
+  const renderTableCol = (key, children) => (
+    <View key={key} style={{flex: 1, alignItems: 'center', padding: 0}}>{children}</View>
+  );
+
+  const renderTableRow = (key, children) => (
+    <View key={key} style={[compassStyles.compassDataGridRow, {marginVertical: 2, marginHorizontal: 'auto'}]}>
+      {children}
+    </View>
+  );
 
   /* View */
 
