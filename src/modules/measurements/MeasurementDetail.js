@@ -529,32 +529,36 @@ const MeasurementDetail = ({
 
   return (
     <>
-      {selectedMeasurement && (
-        <View style={styles.measurementsContentContainer}>
-          <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
-          {!isReadOnly && renderCancelSaveButtons()}
-          <FlatList
-            ListHeaderComponent={
-              <View>
-                {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
-                {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
-                {!isReadOnly && selectedMeasurement && selectedMeasurement.type
-                  && (selectedMeasurement.type === 'planar_orientation'
-                    || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+      <View style={{flex: 1}}>
+        {selectedMeasurement && (
+          <View style={styles.measurementsContentContainer}>
+            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+            {!isReadOnly && renderCancelSaveButtons()}
+            <FlatList
+              ListHeaderComponent={
                 <View>
-                  {!isEmpty(formName) && renderFormFields()}
+                  {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
+                  {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
+                  {!isReadOnly && selectedMeasurement && selectedMeasurement.type
+                    && (selectedMeasurement.type === 'planar_orientation'
+                      || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+                  <View>
+                    {!isEmpty(formName) && renderFormFields()}
+                  </View>
+                  {selectedAttributes.length === 1 && !isReadOnly && (
+                    <DeleteButton
+                      onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
+                      title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
+                    />
+                  )}
                 </View>
-                {selectedAttributes.length === 1 && !isReadOnly && (
-                  <DeleteButton
-                    onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
-                    title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
-                  />
-                )}
-              </View>
-            }
-          />
-        </View>
-      )}
+              }
+              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+              keyboardShouldPersistTaps='handled'
+            />
+          </View>
+        )}
+      </View>
     </>
   );
 };

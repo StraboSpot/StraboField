@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
@@ -199,7 +199,9 @@ const BeddingPage = ({isReadOnly, page}) => {
               </>
             )
           }
+          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
           data={formName}
+          keyboardShouldPersistTaps='handled'
         />
       </View>
     );

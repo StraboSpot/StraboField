@@ -206,8 +206,8 @@ const MainMenuPanel = forwardRef(({
   return (
     <View style={mainMenuPanelStyles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        // keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
+        behavior={'padding'}
+        enabled={Platform.OS === 'ios'}
         style={{flex: 1}}
       >
         {isSidePanelVisible && sidePanelView ? renderSidePanelContent() : renderMainMenuContent()}

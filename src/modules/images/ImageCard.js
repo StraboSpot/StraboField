@@ -10,6 +10,7 @@ import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
@@ -26,21 +27,25 @@ const ImageCard = ({
                      saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
+                     spotWithImage,
                    }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
   const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
+  const {deleteImageFromSpot} = useImages();
 
   /* Local State */
 
   const [isEditing, setIsEditing] = useState(false);
   const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
+  const [isMissingImageModalVisible, setIsMissingImageModalVisible] = useState(false);
   const [title, setTitle] = useState(getDisplayTitle);
 
   /* Derived Variables */
@@ -91,12 +96,27 @@ const ImageCard = ({
         setImageThumbnailURIs({...imageThumbnailURIs, ...uriObj});
         if (isImageMissingOnServer) setIsImageMissingOnServer(false);
       }
-      else setIsImageMissingOnServer(true);
+      else {
+        console.log('Image not found on device');
+        handleMissingImage();
+      }
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: false});
     }
   };
 
+  const handleMissingImage = () => {
+    setIsImageMissingOnServer(true);
+    setIsMissingImageModalVisible(true);
+  };
+
   /* Logic Helpers */
+
+  const deleteImage = async () => {
+    console.log('Deleting image from spot', image.id);
+    await deleteImageFromSpot(image.id, spotWithImage || spot);
+    console.log('Deleted image from spot', image.id);
+    setIsMissingImageModalVisible(false);
+  };
 
   function getDisplayTitle() {
     return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
@@ -108,86 +128,110 @@ const ImageCard = ({
   /* View */
 
   return (
-    <Card containerStyle={imageStyles.cardContainer}>
-      <View style={imageStyles.cardTitleContainer}>
-        {isEditing ? (
-          <TextInput
-            autoFocus
-            blurOnSubmit                        // Needed for web
-            onChangeText={handleEditImageName}
-            onEndEditing={handleEndEditing}
-            onSubmitEditing={handleEndEditing}  // Needed for web
-            placeholder={placeholderTitle}
-            style={[imageStyles.cardTitle, Platform.OS === 'web' && {
-              display: 'inline-block',
-              maxWidth: 87,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }]}
-            value={title}
-          />
-        ) : (
-          <TouchableOpacity
-            disabled={isReadOnly}
-            onPress={() => setIsEditing(true)}
-            style={imageStyles.cardTitleEditingButton}>
-            <Text
-              ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
-              numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
-              style={[
-                imageStyles.cardTitle,
-                Platform.OS === 'web' && {
-                  display: 'inline-block',
-                  maxWidth: 87,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                },
-              ]}
-            >
-              {title || placeholderTitle}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View style={imageStyles.cardImageContainer}>
-        <ImageThumbnail
-          imageThumbnailURI={imageThumbnailURIs?.[image.id]}
-          isImageMissingOnServer={isImageMissingOnServer}
-          isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
-          isThumbnailOnly={isThumbnailOnly}
-          onFinishedLoading={handleImageFinishedLoading}
-          onImagePressed={handleImagePressed}
-        />
-      </View>
-
-      {!isThumbnailOnly && (
-        <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5, alignItems: 'center'}}>
-          <SwitchWrapper
-            disabled={getIsSwitchDisabled()}
-            onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
-            value={image.annotated}
-          />
-          <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'center', paddingHorizontal: 5}}>
-            Use Image as{'\n'}a Basemap?
-          </Text>
-          <View style={{margin: -5}}>
-            <ClearButton
-              disabled={!image.annotated}
-              icon={{
-                color: image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY,
-                name: 'map-outline',
-                size: 20,
-                type: 'ionicon',
-              }}
-              onPress={() => getImageBasemap(image)}
+    <>
+      <Card containerStyle={imageStyles.cardContainer}>
+        <View style={imageStyles.cardTitleContainer}>
+          {isEditing ? (
+            <TextInput
+              autoFocus
+              blurOnSubmit                        // Needed for web
+              onChangeText={handleEditImageName}
+              onEndEditing={handleEndEditing}
+              onSubmitEditing={handleEndEditing}  // Needed for web
+              placeholder={placeholderTitle}
+              style={[imageStyles.cardTitle, Platform.OS === 'web' && {
+                display: 'inline-block',
+                maxWidth: 87,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }]}
+              value={title}
             />
-          </View>
+          ) : (
+            <TouchableOpacity
+              disabled={isReadOnly}
+              onPress={() => setIsEditing(true)}
+              style={imageStyles.cardTitleEditingButton}>
+              <Text
+                ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}
+                numberOfLines={Platform.OS !== 'web' ? 1 : undefined}
+                style={[
+                  imageStyles.cardTitle,
+                  Platform.OS === 'web' && {
+                    display: 'inline-block',
+                    maxWidth: 87,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  },
+                ]}
+              >
+                {title || placeholderTitle}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-      )}
-    </Card>
+
+        <View style={imageStyles.cardImageContainer}>
+          <ImageThumbnail
+            imageThumbnailURI={imageThumbnailURIs?.[image.id]}
+            isConnected={isConnected}
+            isImageMissingOnServer={isImageMissingOnServer}
+            isImageThumbnailLoading={areImageThumbnailsLoading?.[image.id]}
+            isInternetReachable={isInternetReachable}
+            isThumbnailOnly={isThumbnailOnly}
+            onFinishedLoading={handleImageFinishedLoading}
+            onImagePressed={handleImagePressed}
+          />
+        </View>
+
+        {!isThumbnailOnly && (
+          <View
+            style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5, alignItems: 'center'}}>
+            <SwitchWrapper
+              disabled={getIsSwitchDisabled()}
+              onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
+              value={image.annotated}
+            />
+            <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'center', paddingHorizontal: 5}}>
+              Use Image as{'\n'}a Basemap?
+            </Text>
+            <View style={{margin: -5}}>
+              <ClearButton
+                disabled={!image.annotated}
+                icon={{
+                  color: image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY,
+                  name: 'map-outline',
+                  size: 20,
+                  type: 'ionicon',
+                }}
+                onPress={() => getImageBasemap(image)}
+              />
+            </View>
+          </View>
+        )}
+      </Card>
+
+      {/* Modals */}
+      <ModalWrapper
+        actionTitle={'Delete'}
+        headerTitle={'Missing Image on Server!'}
+        isVisible={isMissingImageModalVisible}
+        onActionPressed={deleteImage}
+        onCancelPress={() => setIsMissingImageModalVisible(false)}
+        overlayStyleOverride={{height: 'auto'}}
+        showActionButton={true}
+        showCancelButton
+        showDeleteButton={false}
+      >
+        <View>
+          <Text style={{textAlign: 'center', paddingVertical: 10}}>
+            The image {image.id} is missing from the server. Would you like to remove the image?
+          </Text>
+        </View>
+      </ModalWrapper>
+    </>
   );
 };
 

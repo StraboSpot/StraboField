@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddImageOverlayModal from './AddImageOverlayModal';
 import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
-import {isEqual, isEmpty} from '../../shared/Helpers';
+import {isEmpty, isEqual} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
@@ -201,6 +201,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
                 )}
               </>
             }
+            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+            keyboardShouldPersistTaps='handled'
           />
         </View>
       </View>

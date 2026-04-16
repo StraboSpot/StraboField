@@ -11,6 +11,7 @@ const ImagesList = ({
                       isThumbnailOnly = false,
                       onOpenImage,
                       saveUpdatedImage,
+                      spotWithImage,
                     }) => {
   /* Data Hooks */
 
@@ -43,6 +44,7 @@ const ImagesList = ({
           saveUpdatedImage={saveUpdatedImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
+          spotWithImage={spotWithImage}
         />
       </React.Fragment>
     );

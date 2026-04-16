@@ -4112,9 +4112,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/stack@npm:7.8.9":
-  version: 7.8.9
-  resolution: "@react-navigation/stack@npm:7.8.9"
+"@react-navigation/stack@npm:7.8.10":
+  version: 7.8.10
+  resolution: "@react-navigation/stack@npm:7.8.10"
   dependencies:
     "@react-navigation/elements": "npm:^2.9.14"
     color: "npm:^4.2.3"
@@ -4126,7 +4126,7 @@ __metadata:
     react-native-gesture-handler: ">= 2.0.0"
     react-native-safe-area-context: ">= 4.0.0"
     react-native-screens: ">= 4.0.0"
-  checksum: 10c0/29ecb6198f16709aec49b757832408c133f452c69a7b7490b1e6b53f8f681aa4de41efaff01e8371e34200a056b10de2a3efcde75da17625b8ff67bc6342eb86
+  checksum: 10c0/2d67979b62b0d1a230de8c54fef398bcfbf9285a3d7767a972f6caa3b4d67c92180800ee4f5cdc68a2ea6d5c32ea0d9e06be338ece8b971ddc1008e68098cc2e
   languageName: node
   linkType: hard
 
@@ -7199,9 +7199,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vis.gl/react-mapbox@npm:8.1.0":
-  version: 8.1.0
-  resolution: "@vis.gl/react-mapbox@npm:8.1.0"
+"@vis.gl/react-mapbox@npm:8.1.1":
+  version: 8.1.1
+  resolution: "@vis.gl/react-mapbox@npm:8.1.1"
   peerDependencies:
     mapbox-gl: ">=3.5.0"
     react: ">=16.3.0"
@@ -7209,13 +7209,13 @@ __metadata:
   peerDependenciesMeta:
     mapbox-gl:
       optional: true
-  checksum: 10c0/2f3fdfd2090e031a8934d82b494d46a4d0546e5f31a92f550c264666e15ae2ce15122acd96e55fa3455e85625a447f5bb17581878e5296bcb8b6a82ed83287f2
+  checksum: 10c0/9c906284f3a3392cfb07cbde29ef014bad247b1eaf1ba62f4e826431ab9eb365ac8fe4f68df32b5bef12e062e00e1ea222626750dcb55390a2f7bfd3e44f3606
   languageName: node
   linkType: hard
 
-"@vis.gl/react-maplibre@npm:8.1.0":
-  version: 8.1.0
-  resolution: "@vis.gl/react-maplibre@npm:8.1.0"
+"@vis.gl/react-maplibre@npm:8.1.1":
+  version: 8.1.1
+  resolution: "@vis.gl/react-maplibre@npm:8.1.1"
   dependencies:
     "@maplibre/maplibre-gl-style-spec": "npm:^19.2.1"
   peerDependencies:
@@ -7225,7 +7225,7 @@ __metadata:
   peerDependenciesMeta:
     maplibre-gl:
       optional: true
-  checksum: 10c0/ebbbf581a81f50da8f25d740187f91851fbcd07d46f09af67a3017dc05a49bc0de5a943daa9bf6bf7da5faebd19d2e6e8ca670dc5516c487bf5537fe6f89cf94
+  checksum: 10c0/5ea999d0f238d1cb1d8a59bde81e11bf13f8fbc6f303f4debaaaea72902fd2336f16cbe4b4a2f945f956fce9ea9d4a668c5f25d0df7f332581f708c8118f4400
   languageName: node
   linkType: hard
 
@@ -12991,7 +12991,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-parse-even-better-errors@npm:^2.3.0, json-parse-even-better-errors@npm:^2.3.1":
+"json-parse-even-better-errors@npm:^2.3.0":
   version: 2.3.1
   resolution: "json-parse-even-better-errors@npm:2.3.1"
   checksum: 10c0/140932564c8f0b88455432e0f33c4cb4086b8868e37524e07e723f4eaedb9425bdc2bafd71bd1d9765bd15fd1e2d126972bc83990f55c467168c228c24d665f3
@@ -14851,12 +14851,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.8.1":
-  version: 3.8.1
-  resolution: "prettier@npm:3.8.1"
+"prettier@npm:3.8.3":
+  version: 3.8.3
+  resolution: "prettier@npm:3.8.3"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/33169b594009e48f570471271be7eac7cdcf88a209eed39ac3b8d6d78984039bfa9132f82b7e6ba3b06711f3bfe0222a62a1bfb87c43f50c25a83df1b78a2c42
+  checksum: 10c0/754816fd7593eb80f6376d7476d463e832c38a12f32775a82683adb6e35b772b1f484d65f19401507b983a8c8a7cd5a4a9f12006bd56491e8f35503473f77473
   languageName: node
   linkType: hard
 
@@ -15257,12 +15257,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-map-gl@npm:8.1.0":
-  version: 8.1.0
-  resolution: "react-map-gl@npm:8.1.0"
+"react-map-gl@npm:8.1.1":
+  version: 8.1.1
+  resolution: "react-map-gl@npm:8.1.1"
   dependencies:
-    "@vis.gl/react-mapbox": "npm:8.1.0"
-    "@vis.gl/react-maplibre": "npm:8.1.0"
+    "@vis.gl/react-mapbox": "npm:8.1.1"
+    "@vis.gl/react-maplibre": "npm:8.1.1"
   peerDependencies:
     mapbox-gl: ">=1.13.0"
     maplibre-gl: ">=1.13.0"
@@ -15273,7 +15273,7 @@ __metadata:
       optional: true
     maplibre-gl:
       optional: true
-  checksum: 10c0/acec8b8b3d5226bfd91526e87793ca13043a0c9acbae569f04d1f8e45bf27e87f7a8a5fa1cfc3e1875e33e46db6dcc5e013a52db64324f829feba6ad31311d33
+  checksum: 10c0/9f0337dda8cf53f079da240074fbc2029af6224a164090c70418293723b767f23d15e2248bb3b60983d04d90ea8061a459d2864e9f7f47f717cb86fca2e7d42c
   languageName: node
   linkType: hard
 
@@ -15338,9 +15338,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-gesture-handler@npm:2.31.0":
-  version: 2.31.0
-  resolution: "react-native-gesture-handler@npm:2.31.0"
+"react-native-gesture-handler@npm:2.31.1":
+  version: 2.31.1
+  resolution: "react-native-gesture-handler@npm:2.31.1"
   dependencies:
     "@egjs/hammerjs": "npm:^2.0.17"
     "@types/react-test-renderer": "npm:^19.1.0"
@@ -15349,7 +15349,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/2f51cce11b389fdf2e7ae415a91004b424ec06b83890e1bb4765afcbc809af662e1a94f429774eed020ab15abce56b3e08a71b691a130d9f98d3bf18c0861b4e
+  checksum: 10c0/c73621a588ba12cf339c27c5185b3ade250a1bcaf1762d52ecafc09c4883b7ddf2b1956ad427740050af253ee9bb3e201493f391067ef99c084891cbef6dbcc9
   languageName: node
   linkType: hard
 
@@ -15386,16 +15386,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-is-edge-to-edge@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "react-native-is-edge-to-edge@npm:1.2.1"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/87d20b900aded7d44c90afb946a7aa03c23a94ca3dd547bdddc2303b85357e4aab22567a57b19f1558d6c8be7058e3dcf34faa1e15182d1604f90974266d9a1d
-  languageName: node
-  linkType: hard
-
 "react-native-is-edge-to-edge@npm:^1.3.1":
   version: 1.3.1
   resolution: "react-native-is-edge-to-edge@npm:1.3.1"
@@ -15423,19 +15413,6 @@ __metadata:
   version: 4.0.0
   resolution: "react-native-keep-awake@npm:4.0.0"
   checksum: 10c0/73cabf9de1033e9157721280d23bdf1d7467d5e5db859dd706e43772388e4c9a12916f0c282ff44d4ef0d2a3eab246a2331bce2fff3a1834a2a73f646a5119c1
-  languageName: node
-  linkType: hard
-
-"react-native-keyboard-controller@npm:1.21.4":
-  version: 1.21.4
-  resolution: "react-native-keyboard-controller@npm:1.21.4"
-  dependencies:
-    react-native-is-edge-to-edge: "npm:^1.2.1"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-    react-native-reanimated: ">=3.0.0"
-  checksum: 10c0/dcd37d731ee89406ab04b093b24a60d65d22a49ff46d27a837c1c795b48b99065b3f29eb3fd300da1d7dfd4983aa68fd5fd5bf2ff8ff390757481b3303e38159
   languageName: node
   linkType: hard
 
@@ -15468,13 +15445,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-pager-view@npm:8.0.0":
-  version: 8.0.0
-  resolution: "react-native-pager-view@npm:8.0.0"
+"react-native-pager-view@npm:8.0.1":
+  version: 8.0.1
+  resolution: "react-native-pager-view@npm:8.0.1"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/2513ab5e55c7c8e290c514f1dd5388e198975853ffb8e8546bbacc605a853f76a9cb31048bfac22a95a1d0d6e61ae954d690b4522530e97c54e2eabd3447af9d
+  checksum: 10c0/aaa77622e8ec3cdb65b2be1da90f70144a4b9ecc51d51344bf8e793f06e7509a2ecfa00e217afa1eb8a358b1d3bd0fb6bc17e540f004af8b445440fbbe7c7518
   languageName: node
   linkType: hard
 
@@ -15673,13 +15650,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-zip-archive@npm:7.0.2":
-  version: 7.0.2
-  resolution: "react-native-zip-archive@npm:7.0.2"
+"react-native-zip-archive@npm:7.1.0":
+  version: 7.1.0
+  resolution: "react-native-zip-archive@npm:7.1.0"
   peerDependencies:
     react: ">=16.8.6"
     react-native: ">=0.60.0"
-  checksum: 10c0/d769a4028c2165d5d428a0c32247d486b460a68d740abc043e435cadf98e73b7b6d9b0f9888251af17baeb40093aac775ed6dadfcf5eb0fb385bf38816e69626
+  checksum: 10c0/9eadd2be231a8a568bc0e6362faa5adcd3b7cb47a06f55c4b601f5c203903ab5bd6ea6dd3767ccc4352656e720d4a5c21aad833261b8d4fd6641d3c2be16d84c
   languageName: node
   linkType: hard
 
@@ -17022,7 +16999,7 @@ __metadata:
     "@react-native/typescript-config": "npm:0.84.1"
     "@react-navigation/material-top-tabs": "npm:7.4.23"
     "@react-navigation/native": "npm:7.2.2"
-    "@react-navigation/stack": "npm:7.8.9"
+    "@react-navigation/stack": "npm:7.8.10"
     "@reduxjs/toolkit": "npm:2.11.2"
     "@rn-vui/base": "npm:5.1.10"
     "@rn-vui/themed": "npm:5.1.10"
@@ -17058,30 +17035,29 @@ __metadata:
     moment: "npm:2.30.1"
     password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
-    prettier: "npm:3.8.1"
+    prettier: "npm:3.8.3"
     proj4: "npm:2.20.8"
     prop-types: "npm:15.8.1"
     react: "npm:19.2.3"
     react-datepicker: "npm:9.1.0"
     react-dom: "npm:19.2.3"
     react-image-file-resizer: "npm:0.4.8"
-    react-map-gl: "npm:8.1.0"
+    react-map-gl: "npm:8.1.1"
     react-native: "npm:0.84.1"
     react-native-blob-util: "npm:0.24.7"
     react-native-check-version: "npm:1.4.0"
     react-native-device-info: "npm:15.0.2"
     react-native-draggable-flatlist: "npm:4.0.3"
     react-native-fs: "npm:2.20.0"
-    react-native-gesture-handler: "npm:2.31.0"
+    react-native-gesture-handler: "npm:2.31.1"
     react-native-get-random-values: "npm:2.0.0"
     react-native-image-picker: "npm:8.2.1"
     react-native-indicators: "npm:0.17.0"
     react-native-json-tree: "npm:1.5.0"
     react-native-keep-awake: "npm:4.0.0"
-    react-native-keyboard-controller: "npm:1.21.4"
     react-native-multiple-select: "npm:0.5.12"
     react-native-orientation-director: "npm:3.0.2"
-    react-native-pager-view: "npm:8.0.0"
+    react-native-pager-view: "npm:8.0.1"
     react-native-pdf: "npm:7.0.4"
     react-native-progress: "npm:5.0.1"
     react-native-reanimated: "npm:4.3.0"
@@ -17096,7 +17072,7 @@ __metadata:
     react-native-web: "npm:0.21.2"
     react-native-worklets: "npm:0.8.1"
     react-native-xml2js: "npm:1.0.3"
-    react-native-zip-archive: "npm:7.0.2"
+    react-native-zip-archive: "npm:7.1.0"
     react-redux: "npm:9.2.0"
     react-test-renderer: "npm:19.2.3"
     redux-logger: "npm:3.0.6"
@@ -17106,7 +17082,7 @@ __metadata:
     typescript: "npm:^5.9.3"
     url-loader: "npm:^4.1.1"
     uuid: "npm:13.0.0"
-    webpack: "npm:^5.106.0"
+    webpack: "npm:^5.106.2"
     webpack-cli: "npm:^7.0.2"
     webpack-dev-server: "npm:^5.2.3"
   languageName: unknown
@@ -18335,9 +18311,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.106.0":
-  version: 5.106.0
-  resolution: "webpack@npm:5.106.0"
+"webpack@npm:^5.106.2":
+  version: 5.106.2
+  resolution: "webpack@npm:5.106.2"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.8"
@@ -18355,9 +18331,8 @@ __metadata:
     events: "npm:^3.2.0"
     glob-to-regexp: "npm:^0.4.1"
     graceful-fs: "npm:^4.2.11"
-    json-parse-even-better-errors: "npm:^2.3.1"
     loader-runner: "npm:^4.3.1"
-    mime-types: "npm:^2.1.27"
+    mime-db: "npm:^1.54.0"
     neo-async: "npm:^2.6.2"
     schema-utils: "npm:^4.3.3"
     tapable: "npm:^2.3.0"
@@ -18369,7 +18344,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/6ae5889438c3138691abbc030162fa4112968c01ccc6c8bb5e215d37c290d999eb47479212897590d9b1391985d928b90599c0aade0531bffa0bcc11e5565c08
+  checksum: 10c0/933293ae94b7f3405147aebd824d978696693a7fbd85cfbf4d05b517329c93f69e634400ad70a27f4ba4148e14e2fd502e335cd8d30d75282091ab3c72a1ac01
   languageName: node
   linkType: hard
 
