@@ -1,5 +1,5 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
+import {FlatList} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -89,28 +89,20 @@ const ModalWrapper = ({
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
-      <KeyboardAvoidingView
-        behavior={'padding'}
-        enabled={Platform.OS === 'ios'}
-        style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
-      >
-        <ModalWrapperHeader
-          buttonTitleRight={buttonTitleRight}
-          closeModal={closeModal}
-          headerTitle={headerTitle}
-          showCloseButton={showCloseButton}
-        />
-        <ScrollView
-          automaticallyAdjustContentInsets={Platform.OS === 'ios'}
-          contentContainerStyle={isAutoHeight ? undefined : {flexGrow: 1, minHeight: 0}}
-          keyboardShouldPersistTaps={'handled'}
-        >
-          {/*<View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>*/}
-          {children}
-          {/*</View>*/}
-        </ScrollView>
-        {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
-      </KeyboardAvoidingView>
+      <ModalWrapperHeader
+        buttonTitleRight={buttonTitleRight}
+        closeModal={closeModal}
+        headerTitle={headerTitle}
+        showCloseButton={showCloseButton}
+      />
+      <FlatList
+        ListHeaderComponent={() => <>{children}</>}
+        data={[]}
+        keyExtractor={(item, index) => index.toString()}
+        keyboardShouldPersistTaps={'handled'}
+        style={isAutoHeight ? undefined : {flex: 1}}
+      />
+      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}
