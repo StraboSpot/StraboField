@@ -9,7 +9,7 @@ import overlayStyles from './overlay.styles';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';
-import {SMALL_SCREEN} from '../../styles.constants';
+import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
@@ -50,7 +50,7 @@ const ModalWrapper = ({
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
-    return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
+    return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
   };
 
   /* Render Functions */
