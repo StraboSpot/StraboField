@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useRef} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
@@ -42,6 +42,11 @@ const ModalWrapper = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Local State */
+
+  const childrenRef = useRef(children);
+  childrenRef.current = children;
+
   /* Derived Variables */
 
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
@@ -54,6 +59,8 @@ const ModalWrapper = ({
   };
 
   /* Render Functions */
+
+  const renderListHeader = useCallback(() => <>{childrenRef.current}</>, []);
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -96,7 +103,7 @@ const ModalWrapper = ({
         showCloseButton={showCloseButton}
       />
       <FlatList
-        ListHeaderComponent={() => <>{children}</>}
+        ListHeaderComponent={renderListHeader}
         data={[]}
         keyExtractor={(item, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
