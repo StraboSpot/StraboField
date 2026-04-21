@@ -9,7 +9,7 @@ module.exports = {
     },
     development: {
       plugins: [
-        ['@babel/plugin-transform-react-jsx', {runtime: 'classic'}],
+        ['@babel/plugin-transform-react-jsx', {runtime: 'automatic'}],
         'react-native-reanimated/plugin',
       ],
     },

@@ -49,14 +49,15 @@ export const SPOT_NAME_SIZE = Platform.OS === 'web' ? 20 : 30;
 // MODALS AND OVERLAYS
 export const MODAL_TEXT_SIZE = Platform.OS === 'web' ? 10 : 14;
 export const MODAL_BORDER_RADIUS = 10;
+export const MODAL_WIDTH = 300;
 
 export const UPDATE_LABEL_WIDTH = 150;
 export const UPDATE_LABEL_HEIGHT = 150;
 export const MODAL_BACKDROP = 'rgba(0, 0, 0, 0.5)';
 
 // Home Menu and Notebook widths
-export const MAIN_MENU_DRAWER_WIDTH = 300;
-export const NOTEBOOK_DRAWER_WIDTH = 400;
+export const MAIN_MENU_WIDTH = 300;
+export const NOTEBOOK_WIDTH = 400;
 
 export const SMALL_SCREEN = width < 600;
 export const MEDIUM_SCREEN = (width >= 600 && width < 840) || (height >= 480 && height < 900);

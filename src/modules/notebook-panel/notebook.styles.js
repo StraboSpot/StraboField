@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUMGREY, SAMPLES_BORDER_WIDTH, SAMPLES_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {MEDIUMGREY, NOTEBOOK_WIDTH, SAMPLES_BORDER_WIDTH, SAMPLES_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 
 const notebookStyles = StyleSheet.create({
   centerContainer: {
@@ -41,7 +41,7 @@ const notebookStyles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
     right: 0,
-    width: 400,
+    width: NOTEBOOK_WIDTH,
     zIndex: -1,
   },
   notebookPanel: {

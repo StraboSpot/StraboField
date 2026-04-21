@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUMGREY, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {MAIN_MENU_WIDTH, MEDIUMGREY, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   buttons: {
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     height: '100%',
     left: 0,
     position: 'absolute',
-    width: 300,
+    width: MAIN_MENU_WIDTH,
     zIndex: 0,
   },
   subheaderText: {
