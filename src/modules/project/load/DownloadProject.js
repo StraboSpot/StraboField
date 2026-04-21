@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/useDownload';
+import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsStatusMessagesModalVisible} from '../../home/home.slice';
@@ -24,7 +25,7 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
 
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-  const {project, datasets} = useSelector(state => state.project);
+  const {project} = useSelector(state => state.project);
   const {email} = useSelector(state => state.user);
 
   const {initializeDownload} = useDownload();
@@ -97,7 +98,7 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         {!isProjectLoadSelectionModalVisible && (
           <SidePanelHeader
             backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-            // headerTitle={'Download Project'}
+            headerTitle={'Download Project'}
             title={'My StraboField Projects'}
           />
         )}
@@ -108,7 +109,7 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
             console.log('Selected index:', index);
             setSelectedButtonIndex(index);
           }}
-          selectedButtonStyle={{backgroundColor: '#007AFF'}}
+          selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           selectedIndex={selectedButtonIndex}
           textStyle={buttonStyles.buttonGroupText}
         />

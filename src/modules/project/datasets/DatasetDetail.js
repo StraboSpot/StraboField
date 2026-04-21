@@ -235,7 +235,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
           <View style={formStyles.fieldLabelContainer}>
-            <Text style={formStyles.fieldLabel}>{'Owner'}</Text>
+            <Text style={formStyles.fieldLabel}>{'Owner Name'}</Text>
           </View>
           <TextInput
             editable={false}
@@ -243,7 +243,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
             value={dataset.owner_name}
           />
           <View style={formStyles.fieldLabelContainer}>
-            <Text style={formStyles.fieldLabel}>{'Email'}</Text>
+            <Text style={formStyles.fieldLabel}>{'Owner Email'}</Text>
           </View>
           <TextInput
             editable={false}
