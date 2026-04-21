@@ -105,7 +105,7 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        {sampleDetail.Sample_IGSN && <Pressable onPress={onIGSNPressed}>
+        {<Pressable onPress={onIGSNPressed}>
           <Text style={[commonStyles.listItemTitle, {
             color: PRIMARY_ACCENT_COLOR,
             paddingTop: 5,
