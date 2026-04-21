@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Pressable, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, toTitleCase} from '../../shared/Helpers';
-import {RED} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -25,6 +25,7 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
+import commonStyles from '../../shared/common.styles';
 
 
 const BasicPageDetail = ({
@@ -371,6 +372,18 @@ const BasicPageDetail = ({
                   // getIsDisabled={!formRef?.current?.dirty}
                   save={saveButtonOnPress}
                 />
+              )}
+              {PAGE_KEYS.SAMPLES && (
+                <View style={{alignItems: 'flex-start', margin: 10}}>
+                  <Pressable onPress={() => console.log('IGSN DATA')}>
+                    <Text style={[commonStyles.listItemTitle, {
+                      color: PRIMARY_ACCENT_COLOR,
+                      paddingTop: 5,
+                    }]}>
+                      View IGSN Data
+                    </Text>
+                  </Pressable>
+                </View>
               )}
               <FlatList
                 ListHeaderComponent={renderFormFields()}
