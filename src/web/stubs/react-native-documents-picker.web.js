@@ -17,6 +17,6 @@ export const types = {
 
 export const isErrorWithCode = err => err && typeof err.code === 'string';
 
-export const pick = () => Promise.reject({code: errorCodes.UNABLE_TO_OPEN_FILE_TYPE});
-
 export const keepLocalCopy = () => Promise.reject({code: errorCodes.UNABLE_TO_OPEN_FILE_TYPE});
+
+export const pick = () => Promise.reject({code: errorCodes.UNABLE_TO_OPEN_FILE_TYPE});

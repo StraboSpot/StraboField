@@ -54,7 +54,6 @@ const homeConfig = {
     'isMainMenuPanelVisible',
     'isOfflineMapModalVisible',
     'isProgressModalVisible',
-    'isProjectLoadComplete',
     'isProjectLoadSelectionModalVisible',
     'isStatusMessagesModalVisible',
     'isUploadModalVisible',

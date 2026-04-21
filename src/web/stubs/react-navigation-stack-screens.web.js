@@ -4,5 +4,6 @@
 import React from 'react';
 import {View} from 'react-native';
 
-export const MaybeScreenContainer = ({enabled, ...rest}) => React.createElement(View, rest);
 export const MaybeScreen = ({enabled, active, ...rest}) => React.createElement(View, rest);
+
+export const MaybeScreenContainer = ({enabled, ...rest}) => React.createElement(View, rest);

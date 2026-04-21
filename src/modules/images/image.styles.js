@@ -50,7 +50,26 @@ const imageStyles = StyleSheet.create({
   icon: {
     paddingRight: 10,
   },
-  imageInfoButtons: {
+  imageBasemapSwitchControl: {
+    justifyContent: 'center',
+  },
+  imageBasemapSwitchLabel: {
+    fontWeight: 'normal',
+    paddingLeft: 5,
+  },
+  imageBasemapSwitchLabelContainer: {
+    flex: 1,
+    paddingLeft: 5,
+  },
+  imageBasemapSwitchRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    width: '100%',
+  },
+  imageModalButtons: {
     marginTop: 20,
   },
   imagesListContainer: {
@@ -68,12 +87,6 @@ const imageStyles = StyleSheet.create({
     bottom: 50,
     position: 'absolute',
     right: 10,
-  },
-  switch: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 15,
   },
   thumbnail: {
     height: 90,

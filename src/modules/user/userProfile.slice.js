@@ -22,9 +22,6 @@ const userProfileSlice = createSlice({
   name: 'user',
   initialState: initialUserState,
   reducers: {
-    setUserData(state, action) {
-      Object.assign(state, {...state, ...action.payload});
-    },
     login(state) {
       state.isAuthenticated = true;
     },
@@ -34,6 +31,12 @@ const userProfileSlice = createSlice({
     resetUserState() {
       return initialUserState;
     },
+    setInitialSesarState(state) {
+      state.sesar = initialUserState.sesar;
+    },
+    setSelectedUserCode(state, action) {
+      state.sesar.selectedUserCode = action.payload;
+    },
     setSesarToken(state, action) {
       const {access, refresh} = action.payload;
       state.sesar.sesarToken.access = access;
@@ -42,14 +45,11 @@ const userProfileSlice = createSlice({
     setSesarUserCodes(state, action) {
       state.sesar.userCodes = action.payload;
     },
-    setSelectedUserCode(state, action) {
-      state.sesar.selectedUserCode = action.payload;
+    setUserData(state, action) {
+      Object.assign(state, {...state, ...action.payload});
     },
     updatedKey(state, action) {
       Object.assign(state, action.payload);
-    },
-    setInitialSesarState(state) {
-      state.sesar = initialUserState.sesar;
     },
   },
 });
@@ -58,13 +58,13 @@ export const {
   login,
   logout,
   resetUserState,
-  setUserData,
+  setInitialSesarState,
   setOrcidToken,
+  setSelectedUserCode,
   setSesarToken,
   setSesarUserCodes,
-  setSelectedUserCode,
+  setUserData,
   updatedKey,
-  setInitialSesarState,
 } = userProfileSlice.actions;
 
 export default userProfileSlice.reducer;

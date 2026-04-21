@@ -23,7 +23,6 @@ const MapLayers = ({
                      drawFeatures,
                      editFeatureVertex,
                      isShowMacrostratOverlay,
-                     isStratStyleLoaded,
                      location,
                      mapMode,
                      measureFeatures,
@@ -95,7 +94,6 @@ const MapLayers = ({
 
       {/* Features Layers */}
       <FeaturesLayers
-        isStratStyleLoaded={isStratStyleLoaded}
         mapMode={mapMode}
         spotsNotSelected={spotsNotSelected}
         spotsSelected={spotsSelected}

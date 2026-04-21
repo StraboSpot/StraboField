@@ -4,7 +4,6 @@ import {Platform, StatusBar} from 'react-native';
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
-import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -88,11 +87,9 @@ const App = () => {
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
-              <KeyboardProvider>
-                <NavigationContainer linking={linking}>
-                  <Routes/>
-                </NavigationContainer>
-              </KeyboardProvider>
+              <NavigationContainer linking={linking}>
+                <Routes/>
+              </NavigationContainer>
               {/*</Sentry.TouchEventBoundary>*/}
             </PersistGate>
           </ToastWrapper>

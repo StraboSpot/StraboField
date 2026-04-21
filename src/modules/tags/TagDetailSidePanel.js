@@ -10,7 +10,6 @@ import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 import {TagDetail, TagDetailModal} from '../tags';
-import TagColor from './color/TagColor';
 
 const TagDetailSidePanel = ({openNotebookPanel}) => {
   /* Data Hooks */
@@ -26,7 +25,6 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
 
   const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
     : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
-  const colorLabel = label === MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS ? 'Unit' : label.slice(0, -1);
 
   /* Logic Helpers */
 
@@ -42,16 +40,11 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
 
   return (
     <View style={{flex: 1}}>
-      <View style={{flexDirection: 'row'}}>
-        <View style={{flex: 1}}>
-          <SidePanelHeader
-            backButton={() => dispatch(setSidePanelVisible({bool: false}))}
-            headerTitle={!isEmpty(selectedTag) && selectedTag.name}
-            title={label}
-          />
-        </View>
-        <TagColor colorLabel={colorLabel}/>
-      </View>
+      <SidePanelHeader
+        backButton={() => dispatch(setSidePanelVisible({bool: false}))}
+        headerTitle={!isEmpty(selectedTag) && selectedTag.name}
+        title={label}
+      />
 
       <View style={{flex: 1}}>
         <TagDetail

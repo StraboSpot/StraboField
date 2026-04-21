@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
-import {setIsProjectLoadComplete, setIsProjectLoadSelectionModalVisible} from './home.slice';
+import {setIsProjectLoadSelectionModalVisible} from './home.slice';
 import homeStyles from './home.style';
 import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
@@ -24,7 +24,6 @@ const HomeContainer = ({navigation, route}) => {
   const currentProjectId = useSelector(state => state.project.project?.id);
   const {email, name} = useSelector(state => state.user);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-  const projectLoadComplete = useSelector(state => state.home.isProjectLoadComplete);
 
   const {createProjectDirectories} = useDevice();
   const {
@@ -66,15 +65,6 @@ const HomeContainer = ({navigation, route}) => {
     // console.log('UE HomeContainer [user]', email);
     if (email && name) Sentry.setUser({'email': email, 'username': name});
   }, [email, name]);
-
-  useEffect(() => {
-    // console.log('UE HomeContainer [projectLoadComplete]', projectLoadComplete);
-    if (projectLoadComplete) {
-      mapComponentRef.current?.zoomToSpotsExtent();
-      dispatch(setIsProjectLoadComplete(false));
-      // toggles off whenever new project is loaded successfully to trigger the same for next project load.
-    }
-  }, [projectLoadComplete]);
 
   /* View */
 
