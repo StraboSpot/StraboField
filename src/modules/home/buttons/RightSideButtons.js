@@ -9,12 +9,10 @@ import NotebookButton from './NotebookButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import {cancelledIntervalDrag} from '../../maps/maps.slice';
-import {MAP_MODES} from '../../maps/maps.constants';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
-import useDeviceOrientation from '../useDeviceOrientation';
 
 const RightSideButtons = ({
                             animateRightSide,
