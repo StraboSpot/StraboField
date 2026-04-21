@@ -1,5 +1,5 @@
 import React, {useCallback, useRef} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, Modal, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -54,7 +54,7 @@ const ModalWrapper = ({
   /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
-    if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
+    if (fullscreen) return overlayStyles.overlayContainerFullScreen;
     return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
   };
 
@@ -84,18 +84,8 @@ const ModalWrapper = ({
     }
   };
 
-  /* View */
-
-  return (
-    <Overlay
-      animationType={'fade'}
-      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
-      fullScreen={fullscreen || SMALL_SCREEN}
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      overlayStyle={getResponsiveOverlayStyle()}
-      supportedOrientations={['portrait', 'landscape']}
-    >
+  const renderModalContent = () => (
+    <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
         closeModal={closeModal}
@@ -122,6 +112,38 @@ const ModalWrapper = ({
         showCancelButton={showCancelButton}
         showDeleteButton={showDeleteButton}
       />
+    </>
+  );
+
+  /* View */
+
+  if (SMALL_SCREEN) {
+    return (
+      <Modal
+        animationType={'fade'}
+        onRequestClose={onBackdropPress}
+        statusBarTranslucent
+        supportedOrientations={['portrait', 'landscape']}
+        visible={isVisible}
+      >
+        <View style={overlayStyles.overlayContainerFullScreen}>
+          {renderModalContent()}
+        </View>
+      </Modal>
+    );
+  }
+
+  return (
+    <Overlay
+      animationType={'fade'}
+      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
+      fullScreen={fullscreen}
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      overlayStyle={getResponsiveOverlayStyle()}
+      supportedOrientations={['portrait', 'landscape']}
+    >
+      {renderModalContent()}
     </Overlay>
   );
 };
