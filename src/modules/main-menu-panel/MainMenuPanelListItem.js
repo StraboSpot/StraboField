@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -19,6 +19,19 @@ const MainMenuPanelListItem = ({onPress, title}) => {
 
   const {getTargetDatasetFromId} = useProject();
 
+  /* Local State */
+
+  const [targetDatasetName, setTargetDatasetName] = useState('');
+
+  /* Side Effects */
+
+  useEffect(() => {
+    if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS && !isEmpty(currentProjectId)) {
+      const targetDataset = getTargetDatasetFromId();
+      setTargetDatasetName(targetDataset?.name || '');
+    }
+  }, [currentProjectId, title]);
+
   /* Event Handlers */
 
   const handleMenuItemPress = () => dispatch(setMenuSelectionPage({name: title}));
@@ -26,15 +39,9 @@ const MainMenuPanelListItem = ({onPress, title}) => {
   /* Logic Helpers */
 
   const getTitle = () => {
-    let subtitle;
-    if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS) {
-      let targetDatasetName = '';
-      if (!isEmpty(currentProjectId)) {
-        const targetDataset = getTargetDatasetFromId();
-        if (targetDataset?.name) targetDatasetName = targetDataset?.name;
-      }
-      subtitle = '  (Target: ' + truncateText(targetDatasetName, 25) + ')';
-    }
+    const subtitle = title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
+      ? '  (Target: ' + truncateText(targetDatasetName, 25) + ')'
+      : undefined;
 
     return (
       <ListItem.Title style={commonStyles.listItemTitle}>
