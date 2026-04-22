@@ -79,8 +79,9 @@ const styles = StyleSheet.create({
   },
   overlayContainerFullScreen: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    flex: 1,
     overflow: 'hidden',
-    paddingTop: Platform.OS === 'ios' && SMALL_SCREEN ? 50 : 0,
+    paddingTop: SMALL_SCREEN ? 50 : 0,
     zIndex: 1,
   },
   overlayContent: {
