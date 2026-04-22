@@ -33,7 +33,6 @@ const useProject = () => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
-  // const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const {isOwner, isReadOnly} = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -216,11 +215,17 @@ const useProject = () => {
     return Promise.resolve();
   };
 
-  const isSpotInReadOnlyDataset = (spotId) => {
-    const datasetId = getDatasetIdFromSpotId(spotId);
+  const isReadOnlyDataset = (datasetId) => {
     if (isReadOnly) return true;
-    else if (datasets[datasetId].isReadOnly !== undefined) return datasets[datasetId]?.isReadOnly;
-    else return false;
+    const dataset = datasets[datasetId];
+    if (dataset?.isReadOnly !== undefined) return dataset.isReadOnly;
+    return false;
+  };
+
+  // Is Spot in a Read Only Dataset?
+  const isReadOnlySpot = (spotId) => {
+    const datasetId = getDatasetIdFromSpotId(spotId);
+    return isReadOnlyDataset(datasetId);
   };
 
   const makeDatasetCurrent = (datasetId) => {
@@ -264,7 +269,8 @@ const useProject = () => {
     getAllServerProjects,
     getTargetDatasetFromId,
     initializeNewProject,
-    isSpotInReadOnlyDataset,
+    isReadOnlyDataset,
+    isReadOnlySpot,
     makeDatasetCurrent,
     setSwitchValue,
   };

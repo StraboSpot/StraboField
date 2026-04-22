@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import useDownload from '../../../services/useDownload';
 import commonStyles from '../../../shared/common.styles';
@@ -10,15 +10,12 @@ import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
-import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetPreferencesListItem = ({dataset}) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
@@ -34,8 +31,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-  const isTarget = targetDatasetId === dataset.id;
+  const isReadOnly = dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */
@@ -44,8 +40,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
     const value = await setSwitchValue(val, dataset);
     console.log('Value has been switched', value);
   };
-
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
   /* Logic Helpers */
 

@@ -20,12 +20,12 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {getPopulatedPagesKeys} = usePage();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = isReadOnlySpot(spot.properties.id);
 
   /* Event Handlers */
 

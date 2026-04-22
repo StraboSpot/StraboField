@@ -15,7 +15,6 @@ const initialProjectState = {
   isTestingMode: false,
   project: {},
   projectTransferProgress: 0,
-  readOnlyDatasetsIds: [],
   selectedProject: {
     project: '',
     source: '',
@@ -267,12 +266,6 @@ const projectSlice = createSlice({
     setMultipleFeaturesTaggingEnabled(state, action) {
       state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
-    setReadOnlyDatasetsIds(state, action) {
-      if (state.readOnlyDatasetsIds?.includes(action.payload)) {
-        state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(r => r !== action.payload);
-      }
-      else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
-    },
     setSelectedProject(state, action) {
       const {project, source} = action.payload;
       state.selectedProject.project = project;
@@ -368,7 +361,6 @@ export const {
   setBackupFileName,
   setIsImageTransferring,
   setMultipleFeaturesTaggingEnabled,
-  setReadOnlyDatasetsIds,
   setSelectedProject,
   setSelectedTag,
   setTargetDataset,

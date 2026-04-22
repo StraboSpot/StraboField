@@ -27,7 +27,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const dispatch = useDispatch();
 
   const navigate = useNavigation();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
 
   /* Local State */
@@ -75,7 +75,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Render Functions */
 
   const renderImagesInSpot = (images, section) => {
-    const isReadOnly = !isEmpty(section.spot) && isSpotInReadOnlyDataset(section.spot.properties.id);
+    const isReadOnly = !isEmpty(section.spot) && isReadOnlySpot(section.spot.properties.id);
     return <ImagesList
       images={images}
       isReadOnly={isReadOnly}

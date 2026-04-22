@@ -30,7 +30,7 @@ const TagDetail = ({
 
   // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {getSpotById} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
@@ -40,7 +40,7 @@ const TagDetail = ({
     const spot = getSpotById(feature.parentSpotId);
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
     if (!isEmpty(spot)) {
-      const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+      const isReadOnly = isReadOnlySpot(spot.properties.id);
       return (
         <ListItem
           containerStyle={commonStyles.listItem}

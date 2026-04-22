@@ -94,12 +94,13 @@ const useDownload = () => {
         if (project.isOwner) {
           if (updatedActiveDatasetIds.length === 1) {
             dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-            dispatch(setTargetDataset(datasets[0].id));
+            if (!datasets[0].isReadOnly) dispatch(setTargetDataset(datasets[0].id));
           }
           else {
             if (updatedActiveDatasetIds.includes(tempTargetDatasetId)) {
               dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-              dispatch(setTargetDataset(tempTargetDatasetId));
+              const tempTargetDataset = datasets.find(d => d.id === tempTargetDatasetId);
+              if (tempTargetDataset && !tempTargetDataset.isReadOnly) dispatch(setTargetDataset(tempTargetDatasetId));
             }
             else {
               console.log('updatedActiveDatasetIds not included in newDatasetIds: ', updatedActiveDatasetIds,

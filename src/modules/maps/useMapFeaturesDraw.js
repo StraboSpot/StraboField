@@ -58,7 +58,7 @@ const useMapFeaturesDraw = ({
     getDrawFeatureAtPress, getLassoedSpots, getSpotAtPress, identifyClosestVertexOnSpotPress,
   } = useMapFeaturesCalculated(mapRef);
   const {getSymbology} = useMapSymbology();
-  const {getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
+  const {getTargetDatasetFromId, isReadOnlySpot} = useProject();
   const {createSpot} = useSpots();
   const {getStereonet} = useStereonet();
 
@@ -342,7 +342,7 @@ const useMapFeaturesDraw = ({
 
     // Filter out Read Only Spots
     const selectedSpotsFiltered = selectedSpots.filter((spot) => {
-      if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+      if (spot?.properties?.id && !isReadOnlySpot(spot.properties.id)) return spot;
     });
 
     if (selectedSpotsFiltered.length > 0) {

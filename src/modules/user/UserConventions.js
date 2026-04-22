@@ -30,7 +30,7 @@ const UserProfile = () => {
 
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const toast = useToast();
   const {uploadProfile} = useUpload();
 
@@ -61,7 +61,7 @@ const UserProfile = () => {
     else {
       // Filter out Read Only Spots
       const spotsFiltered = Object.values(spots).filter((spot) => {
-        if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+        if (spot?.properties?.id && !isReadOnlySpot(spot.properties.id)) return spot;
       });
       if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found.  No changes made.', {placement: 'top'});
 

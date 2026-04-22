@@ -21,11 +21,11 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {activeDatasetsIds, project, readOnlyDatasetsIds} = useSelector(state => state.project);
+  const {activeDatasetsIds} = useSelector(state => state.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
-  const {destroyDataset} = useProject();
+  const {destroyDataset, isReadOnlyDataset} = useProject();
   const toast = useToast();
 
   /* Local State */
@@ -35,8 +35,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   /* Derived Variables */
 
-  const isOwnerOfDataset = project.isOwner !== false || dataset.isReadOnly === true;
-  const isReadOnly = !isOwnerOfDataset || readOnlyDatasetsIds.includes(dataset.id);
+  const isReadOnly = isReadOnlyDataset(dataset.id);
 
   /* Event Handlers */
 
@@ -255,6 +254,34 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
+  // Read-Only Status Field
+  const renderReadOnlyField = () => {
+    return (
+      <ListItem containerStyle={commonStyles.listItemFormField}>
+        <ListItem.Content
+          style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+        >
+          <View style={{flex: 1}}>
+            <View style={formStyles.fieldLabelContainer}>
+              <Text style={formStyles.fieldLabel}>{'Read Only'}</Text>
+            </View>
+            <TextInput
+              editable={false}
+              style={formStyles.fieldValue}
+              value={isReadOnly ? 'Yes' : 'No'}
+            />
+          </View>
+          <Icon
+            color={isReadOnly ? WARNING_COLOR : POSITIVE_COLOR}
+            name={isReadOnly ? 'lock-closed' : 'lock-open'}
+            size={24}
+            type={'ionicon'}
+          />
+        </ListItem.Content>
+      </ListItem>
+    );
+  };
+
   // Dataset Name Field
   const renderNameField = () => {
     return (
@@ -268,7 +295,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
                 <Text style={formStyles.fieldLabel}>{'Name'}</Text>
               </View>
               <TextInput
-                editable={isReadOnly}
+                editable={!isReadOnly}
                 onChangeText={text => setDatasetName(text)}
                 style={formStyles.fieldValue}
                 value={datasetName}
@@ -313,6 +340,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       {renderNameField()}
       {renderMetadataForm()}
       {renderOwnerField()}
+      {renderReadOnlyField()}
       {renderSpotsField()}
       {renderImagesField()}
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
