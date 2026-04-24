@@ -11,7 +11,7 @@ import {
   postRequest,
   timeoutPromise,
 } from './serverRequestHelpers';
-import {MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
+import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent';
 import alert from '../shared/ui/alert';
 
@@ -84,6 +84,17 @@ const useServerRequests = () => {
   const getMacrostratData = (location) => {
     const params = {lng: location.coords[0].toFixed(4), lat: location.coords[1].toFixed(4)};
     return getRequest(`https://macrostrat.org/api/v2/mobile/point?${new URLSearchParams(params).toString()}`, null);
+  };
+
+  const openMacrostratLogin = async () => {
+    try {
+      const {LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
+      await Linking.openURL(`${LOGIN}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
+    }
+    catch (err) {
+      console.error('Error opening Rockd login', err);
+      alert('Error opening Rockd login', err.toString());
+    }
   };
 
   const getMyMapsBbox = async (mapUrl) => {
@@ -245,6 +256,7 @@ const useServerRequests = () => {
     getDatasetSpots,
     getImage,
     getMacrostratData,
+    openMacrostratLogin,
     getMyMapsBbox,
     getMyMicroProjects,
     getMyProjects,

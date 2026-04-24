@@ -65,7 +65,7 @@ const MapLayers = ({
 
   return (
     <>
-      {/* Displays the marker when Macrostrat view is displayed */}
+      {/* Displays the marker when macrostrat view is displayed */}
       {isShowMacrostratOverlay && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
 
       {/* Blue dot for user location */}

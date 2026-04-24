@@ -22,6 +22,7 @@ const ModalWrapper = ({
                         closeModal,
                         disabled,
                         fullscreen,
+                        headerImage,
                         headerTitle,
                         isLoading,
                         isVisible,
@@ -89,6 +90,7 @@ const ModalWrapper = ({
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
         closeModal={closeModal}
+        headerImage={headerImage}
         headerTitle={headerTitle}
         showCloseButton={showCloseButton}
       />

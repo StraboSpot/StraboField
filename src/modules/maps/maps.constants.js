@@ -40,7 +40,7 @@ export const DEFAULT_MAPS = [
     id: 'osm',
     source: 'osm',
   }, {
-    title: 'Geology from Macrostrat',
+    title: 'Geology from macrostrat',
     id: 'macrostrat',
     source: 'macrostrat',
   }, {
@@ -90,7 +90,7 @@ export const MAP_PROVIDERS = {
     maxZoom: 16,                  // http://wiki.openstreetmap.org/wiki/Zoom_levels
   },
   macrostrat: {
-    attributions: '© <a href="https://macrostrat.org/#about">Macrostrat</a>',
+    attributions: '© <a href="https://macrostrat.org/#about">macrostrat</a>',
     imageType: 'png',
     mime: 'image/png',
     tilePath: '/{z}/{x}/{y}.png',

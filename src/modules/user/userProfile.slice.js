@@ -1,11 +1,20 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+import config from '../../utils/config';
+
+const rockedToken = config.get('rockd_access_token');
+const rockdExpiration = 1839181062830;
+
 const initialUserState = {
   email: null,
   encoded_login: null,
   image: null,
   isAuthenticated: false,
   mapboxToken: null,
+  macrostrat: {
+    token: __DEV__ ? rockedToken : null,
+    expires: __DEV__ ? rockdExpiration : null,
+  },
   name: null,
   sesar: {
     selectedUserCode: null,
@@ -34,6 +43,10 @@ const userProfileSlice = createSlice({
     setInitialSesarState(state) {
       state.sesar = initialUserState.sesar;
     },
+    setMacrostratToken(state, action) {
+      state.macrostrat.token = action.payload.token;
+      state.macrostrat.expires = action.payload.expires;
+    },
     setSelectedUserCode(state, action) {
       state.sesar.selectedUserCode = action.payload;
     },
@@ -59,6 +72,7 @@ export const {
   logout,
   resetUserState,
   setInitialSesarState,
+  setMacrostratToken,
   setOrcidToken,
   setSelectedUserCode,
   setSesarToken,

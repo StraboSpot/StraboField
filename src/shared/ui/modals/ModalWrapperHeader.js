@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
+import {Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import modalStyles from './modal.styles';
@@ -13,6 +14,7 @@ const ModalWrapperHeader = ({
                               closeModal,
                               showCloseButton = false,
                               headerTitle,
+                              headerImage,
                             }) => {
   /* Data Hooks */
 
@@ -40,7 +42,15 @@ const ModalWrapperHeader = ({
             />
           </View>
         )}
-        <Text style={modalStyles.modalTitle}>{headerTitle || getTitle()}</Text>
+        {headerImage ? (
+          <Image
+            resizeMode='contain'
+            source={headerImage}
+            style={modalStyles.modalHeaderImage}
+          />
+        ) : (
+          <Text style={modalStyles.modalTitle}>{headerTitle || getTitle()}</Text>
+        )}
       </View>
     </View>
   );

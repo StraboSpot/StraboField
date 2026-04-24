@@ -3,6 +3,8 @@ import config from '../utils/config';
 const account = '/account';
 const orcid = 'https://orcid.org/oauth';
 const orcidClientId = config.get('orcid_client_id');
+const rockdLogin = 'https://dev.rockd.org/login';
+const rockdRedirectUri = 'strabofield://macrostrat/login';
 const sesarAPI = __DEV__ ? 'https://app-sandbox.geosamples.org/webservices' : 'https://app.geosamples.org/webservices';
 const straboSpotAPI = 'https://strabospot.org';
 const tilehost = 'https://tiles.strabospot.org';
@@ -63,6 +65,11 @@ export const ORCID_PATHS = {
   ORCID: orcid,
   REDIRECT_URL: 'redirect_uri=https://www.strabospot.org/orcid_callback%3Fcreds%3D$',
   SCOPE: `?client_id=${orcidClientId}&response_type=code&scope=openid&`,
+};
+
+export const MACROSTRAT_PATHS = {
+  LOGIN: rockdLogin,
+  REDIRECT_URI: rockdRedirectUri,
 };
 
 export const SUPPORT_PATHS = {
