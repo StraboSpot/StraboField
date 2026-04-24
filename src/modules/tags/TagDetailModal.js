@@ -49,6 +49,7 @@ const TagDetailModal = ({closeModal}) => {
   }
   else console.error('Tag Problem. No modals and no selected tag');
   const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+  const headerTitle = initialValues?.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit' : 'Tag';
 
   /* Logic Helpers */
 
@@ -101,7 +102,7 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      headerTitle={'Create New Tag'}
+      headerTitle={headerTitle}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
