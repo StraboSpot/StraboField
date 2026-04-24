@@ -127,7 +127,7 @@ const ImageCard = ({
               placeholder={placeholderTitle}
               style={[imageStyles.cardTitle, Platform.OS === 'web' && {
                 display: 'inline-block',
-                maxWidth: 87,
+                maxWidth: 85,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -146,7 +146,7 @@ const ImageCard = ({
                   imageStyles.cardTitle,
                   Platform.OS === 'web' && {
                     display: 'inline-block',
-                    maxWidth: 87,
+                    maxWidth: 85,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
