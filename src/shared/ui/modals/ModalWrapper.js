@@ -1,5 +1,5 @@
 import React, {useCallback, useRef} from 'react';
-import {FlatList, Modal, View} from 'react-native';
+import {FlatList, KeyboardAvoidingView, Modal, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -126,9 +126,15 @@ const ModalWrapper = ({
         supportedOrientations={['portrait', 'landscape']}
         visible={isVisible}
       >
-        <View style={overlayStyles.overlayContainerFullScreen}>
-          {renderModalContent()}
-        </View>
+        <KeyboardAvoidingView
+          behavior={'padding'}
+          enabled={Platform.OS === 'android'}
+          style={{flex: 1}}
+        >
+          <View style={overlayStyles.overlayContainerFullScreen}>
+            {renderModalContent()}
+          </View>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
