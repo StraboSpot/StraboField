@@ -92,7 +92,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
   };
 
   const renderProjectItem = (item) => {
-    const modifiedTimeAndDate = moment.unix(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
+    const modifiedTimeAndDate = moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
