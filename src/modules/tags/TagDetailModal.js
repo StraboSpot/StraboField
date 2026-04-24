@@ -23,6 +23,7 @@ const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -109,7 +110,7 @@ const TagDetailModal = ({closeModal}) => {
   return (
     <ModalWrapper
       headerTitle={`${toTitleCase(label).slice(0, -1)} Info`}
-      onActionPressed={saveFormAndClose}
+      onActionPressed={isReadOnlyProject ? undefined : saveFormAndClose}
       onCancelPress={closeModal}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
     >
@@ -128,7 +129,8 @@ const TagDetailModal = ({closeModal}) => {
               />
             </View>
             <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
-            {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
+            {isEmpty(modalVisible) && !isReadOnlyProject
+              && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
           </>
         }
       />

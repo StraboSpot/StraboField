@@ -3,12 +3,13 @@ import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSection from './useStratSection';
 import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
-import {deepObjectExtend} from '../../../shared/Helpers';
+import {deepObjectExtend, isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -26,11 +27,13 @@ const AddIntervalModal = () => {
   const dispatch = useDispatch();
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {getLabel, getSurvey, showErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
+  const toast = useToast();
 
   /* Local State */
 
@@ -40,8 +43,10 @@ const AddIntervalModal = () => {
   const [intervalToCopy, setIntervalToCopy] = useState(null);
 
   /* Derived Variables */
+
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
   const isCore = isNegativeColumn();
+  const isTargetDatasetMissing = isEmpty(targetDatasetId);
 
   /* Side Effects */
 
@@ -154,6 +159,10 @@ const AddIntervalModal = () => {
 
   const saveInterval = async () => {
     try {
+      if (isTargetDatasetMissing) {
+        toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
+        return;
+      }
       await formRef.current.submitForm();
       const intervalData = showErrors(formRef.current);
       if (doUnitsFieldsMatch(intervalData)) {

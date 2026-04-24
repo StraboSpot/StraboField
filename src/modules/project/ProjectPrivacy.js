@@ -14,6 +14,7 @@ const ProjectPrivacy = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
   const {validateForm} = useForm();
@@ -35,7 +36,7 @@ const ProjectPrivacy = () => {
   /* View */
 
   return (
-    <View>
+    <>
       <Formik
         enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
         initialValues={preferences}
@@ -49,6 +50,7 @@ const ProjectPrivacy = () => {
           formName: formName,
           onMyChange: onMyChange,
           setFieldValue: onMyChange,
+          isReadOnly: isReadOnlyProject,
         }}/>}
       </Formik>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
@@ -57,7 +59,7 @@ const ProjectPrivacy = () => {
           project is uploaded.
         </Text>
       </View>
-    </View>
+    </>
   );
 };
 

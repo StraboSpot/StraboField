@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
+import {useSelector} from 'react-redux';
+
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/Helpers';
 import {WarningModal} from '../../shared/ui/modals';
@@ -8,6 +10,8 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Data Hooks */
+
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   const {
     checkIsSafeDelete,
@@ -45,12 +49,12 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       <ModalWrapper
         actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
-        onActionPressed={handleSavePressed}
-        onDeletePress={handleDeletePressed}
+        onActionPressed={isReadOnlyProject ? undefined : handleSavePressed}
+        onDeletePress={isReadOnlyProject ? undefined : handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
         showCancelButton={false}
         showCloseButton
-        showDeleteButton={!isEmpty(initialValues)}
+        showDeleteButton={!isEmpty(initialValues) && !isReadOnlyProject}
       >
         <FlatList
           ListHeaderComponent={

@@ -20,7 +20,7 @@ const ImageCard = ({
                      image,
                      imageThumbnailURIs,
                      index,
-                     isReadOnly,
+                     isReadOnlyImage,
                      isThumbnailOnly,
                      onOpenImage,
                      setAreImageThumbnailsLoading,
@@ -31,6 +31,7 @@ const ImageCard = ({
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
@@ -97,12 +98,12 @@ const ImageCard = ({
 
   const handleMissingImage = () => {
     setIsImageMissingOnServer(true);
-    setIsMissingImageModalVisible(true);
+    if (!isReadOnlyImage && !isReadOnlyProject) setIsMissingImageModalVisible(true);
   };
 
   /* Logic Helpers */
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnlyImage;
 
   const deleteImage = async () => {
     console.log('Deleting image from spot', image.id);
@@ -136,7 +137,7 @@ const ImageCard = ({
             />
           ) : (
             <TouchableOpacity
-              disabled={isReadOnly}
+              disabled={isReadOnlyImage}
               onPress={() => setIsEditing(true)}
               style={imageStyles.cardTitleEditingButton}>
               <Text

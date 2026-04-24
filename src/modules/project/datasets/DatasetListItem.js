@@ -16,9 +16,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const {targetDatasetId} = useSelector(state => state.project);
-  const {isOwner} = useSelector(state => state.project.project);
 
-  const {makeDatasetCurrent, setSwitchValue} = useProject();
+  const {toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Derived Variables */
 
@@ -33,15 +32,9 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
   const handleDatasetPressed = () => setDatasetToView(dataset);
 
-  const onSwitch = async (val) => {
-    const value = await setSwitchValue(val, dataset);
-    console.log('Value has been switched', value);
-  };
-
-  /* Logic Helpers */
-
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
+  const handleToggleActiveDataset = async (val) => {
+    const value = await toggleActiveDataset(val, dataset);
+    console.log('Active dataset has been switched', value);
   };
 
   /* View */
@@ -54,7 +47,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         onPress={handleDatasetPressed}
         pad={10}
       >
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
+        <SwitchWrapper
+          disabled={false}
+          onValueChange={handleToggleActiveDataset}
+          value={isActive}
+        />
 
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{truncateText(dataset.name, 18)}</ListItem.Title>
@@ -73,7 +70,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
           disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => makeDatasetCurrent(dataset.id)}
+          onPress={() => toggleTargetDataset(dataset.id)}
           type={'ionicon'}
         />
 

@@ -3,7 +3,6 @@ import {Animated, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDeviceOrientation from '../useDeviceOrientation';
 import {DrawActionButtons, ShortcutButtons} from './';
 import NotebookButton from './NotebookButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
@@ -13,6 +12,7 @@ import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
+import useDeviceOrientation from '../useDeviceOrientation';
 
 const RightSideButtons = ({
                             animateRightSide,
@@ -20,6 +20,8 @@ const RightSideButtons = ({
                             closeNotebookPanel,
                             distance,
                             endMeasurement,
+                            isCreateToolsDisabled,
+                            isEditToolsDisabled,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -34,11 +36,6 @@ const RightSideButtons = ({
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
-  const {isReadOnly} = useSelector(state => state.project?.project);
-  const isSingleLockedDataset = useSelector((state) => {
-    const values = Object.values(state.project.datasets || {});
-    return values.length === 1 && values[0]?.isReadOnly === true;
-  });
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
 
@@ -51,7 +48,7 @@ const RightSideButtons = ({
 
   return (
     <>
-      {stratSection && (
+      {stratSection && !isCreateToolsDisabled && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => {
@@ -87,7 +84,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        {!isReadOnly && !isSingleLockedDataset && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
+        {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );

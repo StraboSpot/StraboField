@@ -7,7 +7,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 const ImagesList = ({
                       deleteImage,
                       images,
-                      isReadOnly,
+                      isReadOnlyImages,
                       isThumbnailOnly = false,
                       onOpenImage,
                       spotWithImage,
@@ -37,7 +37,7 @@ const ImagesList = ({
           image={image}
           imageThumbnailURIs={imageThumbnailURIs}
           index={index}
-          isReadOnly={isReadOnly}
+          isReadOnlyImage={isReadOnlyImages}
           isThumbnailOnly={isThumbnailOnly}
           onOpenImage={onOpenImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}

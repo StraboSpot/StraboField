@@ -23,8 +23,8 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const tags = useSelector(state => state.project.project?.tags) || [];
-
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
   /* Local State */
@@ -80,14 +80,20 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
           )}
         </>
       )}
-      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
+      {!isReadOnlyProject && <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>}
       <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
-      <ListItem containerStyle={commonStyles.listItem}>
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
-        </ListItem.Content>
-        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
-      </ListItem>
+      {!isReadOnlyProject && (
+        <ListItem containerStyle={commonStyles.listItem}>
+          <ListItem.Content>
+            <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
+          </ListItem.Content>
+          <SwitchWrapper
+            disabled={isReadOnlyProject}
+            onValueChange={handleContinuousTaggingSwitched}
+            value={useContinuousTagging}
+          />
+        </ListItem>
+      )}
       <TagsList selectedIndex={selectedIndex} type={isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS}/>
 
       {/* Modal */}

@@ -187,6 +187,12 @@ const useSpots = () => {
 
   // Given geojson for a point with coordinates and a number of spots, create that many spots randomly around given point
   const createRandomSpots = (feature, numRandomSpots) => {
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating Spots.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     let newSpots = [];
     Array.from({length: numRandomSpots}, (_, n) => {
       const randomLongOffset = Math.random() * 0.01 * (Math.round(Math.random()) ? 1 : -1);
@@ -211,7 +217,6 @@ const useSpots = () => {
     });
     console.log('Creating', numRandomSpots, 'new random Spots near current location.');
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpots[0].properties.id]));
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
     dispatch(editedOrCreatedSpots(newSpots));
     console.log('Finished creating new random Spot. All Spots: ', spots);
@@ -265,9 +270,14 @@ const useSpots = () => {
       let continuousTaggingList = tags.filter(tag => tag.continuousTagging);
       addSpotsToTags(continuousTaggingList, [newSpot]);
     }
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating Spots.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     console.log('Creating new Spot:', newSpot);
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpot.properties.id]));
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newSpot.properties.id}));
     dispatch(editedOrCreatedSpot(newSpot));
     console.log('Finished creating new Spot. All Spots: ', spots);

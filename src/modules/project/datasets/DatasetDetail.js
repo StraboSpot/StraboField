@@ -13,6 +13,7 @@ import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
+import GovernanceFields from '../../form/GovernanceFields';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import {updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
@@ -21,7 +22,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {activeDatasetsIds} = useSelector(state => state.project);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
@@ -66,9 +66,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     else console.error('Target dataset or id is undefined!');
   };
 
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
-  };
+  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
@@ -227,61 +225,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
-  // Dataset Creator Field (shown for collaborative datasets)
-  const renderOwnerField = () => {
-    if (!dataset.owner_name) return null;
-    return (
-      <ListItem containerStyle={commonStyles.listItemFormField}>
-        <ListItem.Content>
-          <View style={formStyles.fieldLabelContainer}>
-            <Text style={formStyles.fieldLabel}>{'Owner Name'}</Text>
-          </View>
-          <TextInput
-            editable={false}
-            style={formStyles.fieldValue}
-            value={dataset.owner_name}
-          />
-          <View style={formStyles.fieldLabelContainer}>
-            <Text style={formStyles.fieldLabel}>{'Owner Email'}</Text>
-          </View>
-          <TextInput
-            editable={false}
-            style={formStyles.fieldValue}
-            value={dataset.owner_email}
-          />
-        </ListItem.Content>
-      </ListItem>
-    );
-  };
-
-  // Read-Only Status Field
-  const renderReadOnlyField = () => {
-    return (
-      <ListItem containerStyle={commonStyles.listItemFormField}>
-        <ListItem.Content
-          style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-        >
-          <View style={{flex: 1}}>
-            <View style={formStyles.fieldLabelContainer}>
-              <Text style={formStyles.fieldLabel}>{'Read Only'}</Text>
-            </View>
-            <TextInput
-              editable={false}
-              style={formStyles.fieldValue}
-              value={isReadOnly ? 'Yes' : 'No'}
-            />
-          </View>
-          <Icon
-            color={isReadOnly ? WARNING_COLOR : POSITIVE_COLOR}
-            name={isReadOnly ? 'lock-closed' : 'lock-open'}
-            size={24}
-            type={'ionicon'}
-          />
-        </ListItem.Content>
-      </ListItem>
-    );
-  };
-
   // Dataset Name Field
   const renderNameField = () => {
     return (
@@ -339,10 +282,14 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
       {renderNameField()}
       {renderMetadataForm()}
-      {renderOwnerField()}
-      {renderReadOnlyField()}
       {renderSpotsField()}
       {renderImagesField()}
+      <GovernanceFields
+        isReadOnly={isReadOnly}
+        ownerEmail={dataset.owner_email}
+        ownerName={dataset.owner_name}
+      />
+
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 
       {/* Child Modal */}

@@ -75,14 +75,16 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Render Functions */
 
   const renderImagesInSpot = (images, section) => {
-    const isReadOnly = !isEmpty(section.spot) && isReadOnlySpot(section.spot.properties.id);
-    return <ImagesList
-      images={images}
-      isReadOnly={isReadOnly}
-      isThumbnailOnly
-      onOpenImage={handleOpenImage}
-      spotWithImage={section.spot}
-    />;
+    const isReadOnlyImages = !isEmpty(section.spot) && isReadOnlySpot(section.spot.properties.id);
+    return (
+      <ImagesList
+        images={images}
+        isReadOnlyImages={isReadOnlyImages}
+        isThumbnailOnly
+        onOpenImage={handleOpenImage}
+        spotWithImage={section.spot}
+      />
+    );
   };
 
   const renderNoImagesText = () => {

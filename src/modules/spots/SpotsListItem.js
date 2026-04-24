@@ -12,7 +12,7 @@ import usePage from '../page/usePage';
 import useProject from '../project/useProject';
 import {useTags} from '../tags';
 
-const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
+const SpotsListItem = ({doShowTags, ignoreReadOnly, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
   /* Data Hooks */
@@ -25,7 +25,7 @@ const SpotsListItem = ({doShowTags, isCheckedList, isItemChecked, onChecked, onP
 
   /* Derived Variables */
 
-  const isReadOnly = isReadOnlySpot(spot.properties.id);
+  const isReadOnly = !ignoreReadOnly && isReadOnlySpot(spot.properties.id);
 
   /* Event Handlers */
 

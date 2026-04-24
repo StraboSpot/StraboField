@@ -8,13 +8,14 @@ import {MAIN_MENU_ITEMS, MAIN_MENU_TITLE} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import {truncateText} from '../../shared/Helpers';
-import {BLACK} from '../../shared/styles.constants';
+import {BLACK, MEDIUMGREY} from '../../shared/styles.constants';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 
 const MainMenuPanelHeader = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
   const isSideMenuVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
@@ -67,9 +68,20 @@ const MainMenuPanelHeader = () => {
               )}
             </>
           ) : (
-            <Text style={mainMenuPanelStyles.headerText}>
-              {truncateText(projectName, 35) || 'No Project Selected'}
-            </Text>
+            <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+              {isReadOnlyProject && (
+                <Icon
+                  color={MEDIUMGREY}
+                  containerStyle={{justifyContent: 'center', paddingRight: 5}}
+                  name={'lock-closed'}
+                  size={20}
+                  type={'ionicon'}
+                />
+              )}
+              <Text style={mainMenuPanelStyles.headerText}>
+                {truncateText(projectName, isReadOnlyProject ? 30 : 35) || 'No Project Selected'}
+              </Text>
+            </View>
           )}
         </View>
       </Pressable>

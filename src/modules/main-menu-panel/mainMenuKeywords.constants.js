@@ -16,7 +16,7 @@ export const MENU_KEYWORDS = {
     },
     {
       key: MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS,
-      keywords: ['settings', 'privacy', 'public', 'private'],
+      keywords: ['governance', 'owner', 'read only', 'settings', 'privacy', 'public', 'private'],
     },
   ],
   CUSTOMIZE_AND_PRESET: [

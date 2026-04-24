@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {useImages} from '../../images';
@@ -13,7 +14,7 @@ import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
-import {setLoadingStatus, setModalVisible} from '../home.slice';
+import {setLoadingStatus, setModalVisible, setShortcutSwitchPositions} from '../home.slice';
 
 const ShortcutButtons = ({openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
@@ -24,6 +25,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -32,6 +34,19 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   /* Local State */
 
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const isTargetDatasetMissing = isEmpty(targetDatasetId);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    if (!isTargetDatasetMissing) return;
+    if (Object.values(shortcutSwitchPositions).some(Boolean)) {
+      dispatch(setShortcutSwitchPositions({switchName: 'all', value: false}));
+    }
+  }, [dispatch, isTargetDatasetMissing, shortcutSwitchPositions]);
 
   /* Logic Helpers */
 
@@ -80,7 +95,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   return (
     <>
       {SHORTCUT_MODALS?.reduce((acc, sm) => {
-        if (shortcutSwitchPositions[sm.key] && (Platform.OS !== 'web' || (Platform.OS === 'web'
+        if (!isTargetDatasetMissing && shortcutSwitchPositions[sm.key] && (Platform.OS !== 'web' || (Platform.OS === 'web'
           && sm.key !== MODAL_KEYS.SHORTCUTS.PHOTO && sm.key !== MODAL_KEYS.SHORTCUTS.SKETCH))) {
           return [...acc, (
             <IconButton

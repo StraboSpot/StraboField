@@ -121,8 +121,7 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
     let myProjectsArr = [];
     let collaborationArr = [];
     projectsArr.projects?.forEach((project) => {
-      return project?.isOwner || project?.isOwner === undefined ? myProjectsArr.push(project) : collaborationArr.push(
-        project);
+      return project?.isCollaborativeProject ? collaborationArr.push(project) : myProjectsArr.push(project);
     });
     return selectedButtonIndex === 0 ? myProjectsArr : collaborationArr;
   };

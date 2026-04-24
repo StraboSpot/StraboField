@@ -6,6 +6,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import {WarningModal} from '../../../shared/ui/modals';
@@ -23,6 +24,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const navigation = useNavigation();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
@@ -32,6 +34,10 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const notebookMenuActions = NOTEBOOK_MENU_ACTIONS.filter(item => item.key !== 'copy' || !isEmpty(targetDatasetId));
 
   /* Event Handlers */
 
@@ -76,7 +82,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
   /* Render Functions */
 
   const renderActionItem = ({item}) => {
-    if (isReadOnly && item.key === 'delete') return;
+    if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
     else {
       return (
         <ListItem
@@ -114,7 +120,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           contentContainerStyle={{alignItems: 'center'}}
-          data={NOTEBOOK_MENU_ACTIONS}
+          data={notebookMenuActions}
           key={'notebookActions'}
           renderItem={renderActionItem}
         />

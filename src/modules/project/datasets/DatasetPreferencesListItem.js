@@ -19,7 +19,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
-  const {makeDatasetCurrent, setSwitchValue} = useProject();
+  const {toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Local State */
 
@@ -36,8 +36,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   /* Event Handlers */
 
-  const onSwitch = async (val) => {
-    const value = await setSwitchValue(val, dataset);
+  const handleToggleActiveDataset = async (val) => {
+    const value = await toggleActiveDataset(val, dataset);
     console.log('Value has been switched', value);
   };
 
@@ -56,9 +56,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
     }
   };
 
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
-  };
+  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   /* Render Functions */
 
@@ -100,7 +98,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
           </View>
         </ListItem.Content>
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
+        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={handleToggleActiveDataset} value={isActive}/>
       </ListItem>
     );
   };
@@ -121,7 +119,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
           disabled={!isActive}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => makeDatasetCurrent(dataset.id)}
+          onPress={() => toggleTargetDataset(dataset.id)}
           type={'ionicon'}
         />
       </View>

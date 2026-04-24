@@ -1,15 +1,20 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import {useSelector} from 'react-redux';
+
+import useDrawActionButtons from './useDrawActionButtons';
+import useDrawGeometryToggle from './useDrawGeometryToggle';
+import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
-import useDrawActionButtons from './useDrawActionButtons';
-import useDrawGeometryToggle from './useDrawGeometryToggle';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
   /* Data Hooks */
+
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {
     getImageSource,
@@ -22,28 +27,36 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
+  /* Derived Variables */
+
+  const canCreateSpots = !isEmpty(targetDatasetId);
+
   /* View */
 
   return (
     <View style={homeStyles.drawToolsContainer}>
-      <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-        onLongPress={handlePointLongPressed}
-        onPress={handlePointPressed}
-        source={getImageSource(MAP_MODES.DRAW.POINT)}
-      />
-      <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-        onLongPress={handleLineLongPressed}
-        onPress={handleLinePressed}
-        source={getImageSource(MAP_MODES.DRAW.LINE)}
-      />
-      <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
-        onLongPress={handlePolygonLongPressed}
-        onPress={handlePolygonPressed}
-        source={getImageSource(MAP_MODES.DRAW.POLYGON)}
-      />
+      {canCreateSpots && (
+        <>
+          <IconButton
+            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+            onLongPress={handlePointLongPressed}
+            onPress={handlePointPressed}
+            source={getImageSource(MAP_MODES.DRAW.POINT)}
+          />
+          <IconButton
+            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+            onLongPress={handleLineLongPressed}
+            onPress={handleLinePressed}
+            source={getImageSource(MAP_MODES.DRAW.LINE)}
+          />
+          <IconButton
+            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
+            onLongPress={handlePolygonLongPressed}
+            onPress={handlePolygonPressed}
+            source={getImageSource(MAP_MODES.DRAW.POLYGON)}
+          />
+        </>
+      )}
       <IconButton
         imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onPress={handleEditShapePressed}

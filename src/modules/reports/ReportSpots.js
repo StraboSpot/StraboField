@@ -82,6 +82,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
             <ScrollView>
               <SpotsList
                 checkedItems={checkedSpotsIds}
+                ignoreReadOnly={true}
                 isCheckedList={true}
                 onChecked={handleSpotChecked}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
@@ -92,6 +93,7 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
               ListHeaderComponent={
                 <SpotsList
                   checkedItems={checkedSpotsIds}
+                  ignoreReadOnly={true}
                   isCheckedList={true}
                   onChecked={handleSpotChecked}
                   updateSpotsInMapExtent={updateSpotsInMapExtent}

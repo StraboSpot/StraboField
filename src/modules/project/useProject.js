@@ -1,5 +1,3 @@
-import {Platform} from 'react-native';
-
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -15,7 +13,6 @@ import useDevice from '../../services/useDevice';
 import useResetState from '../../services/useResetState';
 import useServerRequests from '../../services/useServerRequests';
 import {getNewId, isEmpty} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -33,7 +30,7 @@ const useProject = () => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets) || {};
-  const {isOwner, isReadOnly} = useSelector(state => state.project.project);
+  const {isOwner, isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
@@ -85,7 +82,7 @@ const useProject = () => {
     if (isOwner === false) {
       datasetObj = {
         ...datasetObj,
-        isReadOnly: isReadOnly,
+        isReadOnly: isReadOnlyProject,
         owner_name: user.name,
         owner_email: user.email,
       };
@@ -188,26 +185,7 @@ const useProject = () => {
     }
   };
 
-  // Get target dataset, if none selected make one
-  const getTargetDatasetFromId = () => {
-    let targetDataset = datasets[targetDatasetId];
-    if (isEmpty(targetDataset)) {
-      const datasetToSelect = Object.values(datasets)?.[0];
-      if (!isEmpty(datasetToSelect) && datasetToSelect.id) {
-        dispatch(setActiveDatasets({bool: true, dataset: datasetToSelect.id}));
-        dispatch(setTargetDataset(datasetToSelect.id));
-      }
-      else if (!__DEV__ && Platform.OS !== 'web') {
-        alert('No Target Dataset. Creating a new Default Dataset.');
-        targetDataset = createDataset();
-        dispatch(addedDataset(targetDataset));
-        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
-        dispatch(setTargetDataset(targetDataset.id));
-      }
-    }
-    console.log('Target Dataset', targetDataset);
-    return targetDataset;
-  };
+  const getTargetDatasetFromId = () => datasets[targetDatasetId];
 
   const initializeNewProject = async (descriptionData) => {
     clearProject();
@@ -216,7 +194,7 @@ const useProject = () => {
   };
 
   const isReadOnlyDataset = (datasetId) => {
-    if (isReadOnly) return true;
+    if (isReadOnlyProject) return true;
     const dataset = datasets[datasetId];
     if (dataset?.isReadOnly !== undefined) return dataset.isReadOnly;
     return false;
@@ -228,23 +206,10 @@ const useProject = () => {
     return isReadOnlyDataset(datasetId);
   };
 
-  const makeDatasetCurrent = (datasetId) => {
-    const datasetName = datasets[datasetId].name;
-    toast.show(
-      `Target Dataset switched to ${datasetName}!`,
-      {
-        type: 'warning',
-        animationType: 'slide-in',
-        duration: 3000,
-        placement: 'top',
-      });
-    toast.hideAll();
-    dispatch(setTargetDataset(datasetId));
-  };
-
-  const setSwitchValue = async (val, dataset) => {
+  const toggleActiveDataset = async (val, dataset) => {
     try {
       dispatch(setActiveDatasets({bool: val, dataset: dataset.id}));
+      if (!val && dataset.id === targetDatasetId) dispatch(setTargetDataset(undefined));
       dispatch(clearedSpotsInMapExtentIds());
       if (!val && !isEmpty(selectedSpot) && dataset.spotIds?.includes(selectedSpot.properties.id)) {
         if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
@@ -259,6 +224,23 @@ const useProject = () => {
     dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };
 
+  const toggleTargetDataset = (datasetId) => {
+    if (datasetId === targetDatasetId) {
+      toast.show('Target Dataset deselected.',
+        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+      toast.hideAll();
+      dispatch(setTargetDataset(undefined));
+    }
+    else {
+      const datasetName = datasets[datasetId].name;
+      toast.show(
+        `Target Dataset switched to ${datasetName}!`,
+        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+      toast.hideAll();
+      dispatch(setTargetDataset(datasetId));
+    }
+  };
+
   return {
     addDataset,
     checkValidDateTime,
@@ -271,8 +253,8 @@ const useProject = () => {
     initializeNewProject,
     isReadOnlyDataset,
     isReadOnlySpot,
-    makeDatasetCurrent,
-    setSwitchValue,
+    toggleActiveDataset,
+    toggleTargetDataset,
   };
 };
 

@@ -3,14 +3,14 @@ import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import ClearButton from './buttons/ClearButton';
 import SectionDivider from './SectionDivider';
 import styles from '../../shared/ui/ui.styles';
 import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
-import ClearButton from './buttons/ClearButton';
 
 const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, onPress}) => {
 
-  const {isReadOnly} = useSelector(state => state.project.project);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
 
   return (
     <View style={styles.sectionDividerWithButtonContainer}>
@@ -22,7 +22,7 @@ const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, icon
           size={'sm'}
           title={buttonTitle}
         />
-      ) : isReadOnly ? null : (
+      ) : isReadOnlyProject ? null : (
         <ClearButton
           disabled={disabled}
           icon={{

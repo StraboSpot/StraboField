@@ -8,7 +8,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
-const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
+const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
   // console.log('Rendering SpotsList...');
 
   /* Data Hooks */
@@ -54,6 +54,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
             renderItem={({item}) => (
               <SpotsListItem
                 doShowTags={true}
+                ignoreReadOnly={ignoreReadOnly}
                 isCheckedList={isCheckedList}
                 isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
                 onChecked={onChecked}

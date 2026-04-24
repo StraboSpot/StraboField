@@ -312,6 +312,9 @@ const useMapFeaturesDraw = ({
     return indexOfCoordinatesToUpdate;
   };
 
+  const isEditableSpot = spot => !spot?.properties?.id || !isReadOnlySpot(spot.properties.id);
+  const getEditableSpots = spotsToFilter => spotsToFilter.filter(isEditableSpot);
+
   const selectReports = (feature) => {
     const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
     if (selectedSpots.length > 0) {
@@ -387,15 +390,18 @@ const useMapFeaturesDraw = ({
 
   // Set selected and not selected Spots to display while editing
   const setDisplayedSpotsWhileEditing = (spotEditingTmp, spotsEditedTmp, spotsNotEditedTmp) => {
-    if (!isEmpty(spotEditingTmp)) {
-      spotsNotEditedTmp = spotsNotEditedTmp.filter(spot => spot.properties.id !== spotEditingTmp.properties.id);
+    const editableSpotEditingTmp = isEditableSpot(spotEditingTmp) ? spotEditingTmp : {};
+    const editableSpotsEditedTmp = getEditableSpots(spotsEditedTmp);
+    spotsNotEditedTmp = getEditableSpots(spotsNotEditedTmp);
+    if (!isEmpty(editableSpotEditingTmp)) {
+      spotsNotEditedTmp = spotsNotEditedTmp.filter(spot => spot.properties.id !== editableSpotEditingTmp.properties.id);
     }
-    console.log('Set displayed Spots while editing. Editing:', spotEditingTmp, 'Edited:', spotsEditedTmp, 'Not edited:',
+    console.log('Set displayed Spots while editing. Editing:', editableSpotEditingTmp, 'Edited:', editableSpotsEditedTmp, 'Not edited:',
       spotsNotEditedTmp);
 
-    let spotsEditedCopy = JSON.parse(JSON.stringify(isEmpty(spotsEditedTmp) ? [] : spotsEditedTmp));
+    let spotsEditedCopy = JSON.parse(JSON.stringify(isEmpty(editableSpotsEditedTmp) ? [] : editableSpotsEditedTmp));
     let spotsNotEditedCopy = JSON.parse(JSON.stringify(isEmpty(spotsNotEditedTmp) ? [] : spotsNotEditedTmp));
-    let spotEditingCopy = JSON.parse(JSON.stringify(isEmpty(spotEditingTmp) ? [] : [{...spotEditingTmp}]));
+    let spotEditingCopy = JSON.parse(JSON.stringify(isEmpty(editableSpotEditingTmp) ? [] : [{...editableSpotEditingTmp}]));
 
     // Convert image pixels to lat, lng
     if (currentImageBasemap || stratSection) {
@@ -433,12 +439,18 @@ const useMapFeaturesDraw = ({
   };
 
   const setSelectedSpotToEdit = (spotToEdit) => {
-    console.log('setSelectedSpotToEdit spotToEdit', spotToEdit);
-    setSpotEditing(spotToEdit);
-    console.log('Set selected Spot to edit:', spotToEdit);
-    setDisplayedSpotsWhileEditing(spotToEdit, spotsEdited, spotsNotEdited);
-    setEditFeatures(spotToEdit);
-    if (turf.getType(spotToEdit) === 'Point') setSelectedVertexToEdit(spotToEdit);
+    const editableSpotToEdit = isEditableSpot(spotToEdit) ? spotToEdit : {};
+    console.log('setSelectedSpotToEdit spotToEdit', editableSpotToEdit);
+    setSpotEditing(editableSpotToEdit);
+    console.log('Set selected Spot to edit:', editableSpotToEdit);
+    setDisplayedSpotsWhileEditing(editableSpotToEdit, spotsEdited, spotsNotEdited);
+    if (isEmpty(editableSpotToEdit)) {
+      setDrawFeatures([]);
+      clearSelectedVertexToEdit();
+      return;
+    }
+    setEditFeatures(editableSpotToEdit);
+    if (turf.getType(editableSpotToEdit) === 'Point') setSelectedVertexToEdit(editableSpotToEdit);
   };
 
   const setSelectedVertexToEdit = async (vertex) => {
@@ -754,9 +766,11 @@ const useMapFeaturesDraw = ({
     if (!isEmpty(spotsEdited)) {
       const spotIds = spotsEdited.map(s => s.properties.id);
       const targetDataset = getTargetDatasetFromId();
-      dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
-      dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
-      dispatch(editedOrCreatedSpots(spotsEdited));
+      if (!isEmpty(targetDataset)) {
+        dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
+        dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
+        dispatch(editedOrCreatedSpots(spotsEdited));
+      }
     }
     clearEditing();
   };
@@ -882,25 +896,27 @@ const useMapFeaturesDraw = ({
   const startEditing = (spotToEdit, vertexToEditTemp, index, setMapModeToEdit) => {
     setMapModeToEdit();
     clearEditing();
-    const mappedSpots = getAllMappedSpots();
-    setSpotEditing(spotToEdit ? spotToEdit : {});
+    const editableMappedSpots = getEditableSpots(getAllMappedSpots());
+    const editableSpotToEdit = isEditableSpot(spotToEdit) ? spotToEdit : {};
+    if (isEmpty(editableSpotToEdit)) dispatch(clearedSelectedSpots());
+    setSpotEditing(editableSpotToEdit);
     setSpotsEdited([]);
-    setSpotsNotEdited(mappedSpots);
-    spotToEdit ? console.log('Set Spot to edit:', spotToEdit) : console.log('No Spot selected to edit.');
+    setSpotsNotEdited(editableMappedSpots);
+    !isEmpty(editableSpotToEdit) ? console.log('Set Spot to edit:', editableSpotToEdit) : console.log('No Spot selected to edit.');
     // #114, editing a spot should immediately identify it as the selected spot and hence update the notebook panel.
-    setDisplayedSpotsWhileEditing(spotToEdit, [], mappedSpots);
-    if (!isEmpty(spotToEdit)) {
-      dispatch(setSelectedSpot(spotToEdit));
-      setEditFeatures(spotToEdit);
+    setDisplayedSpotsWhileEditing(editableSpotToEdit, [], editableMappedSpots);
+    if (!isEmpty(editableSpotToEdit)) {
+      dispatch(setSelectedSpot(editableSpotToEdit));
+      setEditFeatures(editableSpotToEdit);
     }
     // while starting to edit the spot, set the vertex active to move immediately, if available
-    if (vertexToEditTemp) {
-      if (spotToEdit.geometry.type !== 'Point') {
+    if (vertexToEditTemp && !isEmpty(editableSpotToEdit)) {
+      if (editableSpotToEdit.geometry.type !== 'Point') {
         setSelectedVertexToEdit(vertexToEditTemp);
         setVertexIndex(index);
       }
     }
-    if (spotToEdit?.geometry?.type === 'Point') setSelectedVertexToEdit(spotToEdit);
+    if (editableSpotToEdit?.geometry?.type === 'Point') setSelectedVertexToEdit(editableSpotToEdit);
   };
 
   const switchToEditing = async (screenPointX, screenPointY, spotToEdit, setMapModeToEdit) => {
