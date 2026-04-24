@@ -35,10 +35,11 @@ const TagDetailModal = ({closeModal}) => {
 
   /* Derived Variables */
 
+  formName = TAG_FORM_NAMES.TAGS;
   if (modalVisible) {
     let tagType = TAG_TYPES.CONCEPT;
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-      tagType = PAGE_KEYS.GEOLOGIC_UNITS;
+      tagType = TAG_TYPES.GEOLOGIC_UNIT;
       formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     }
     initialValues = {type: tagType};
