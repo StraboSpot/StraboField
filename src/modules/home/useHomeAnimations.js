@@ -4,7 +4,7 @@ import {Animated, Easing, Platform} from 'react-native';
 import {useDispatch} from 'react-redux';
 
 import {setIsMainMenuPanelVisible} from './home.slice';
-import {MAIN_MENU_DRAWER_WIDTH, NOTEBOOK_DRAWER_WIDTH, SMALL_SCREEN} from '../../shared/styles.constants';
+import {MAIN_MENU_WIDTH, NOTEBOOK_WIDTH, SMALL_SCREEN} from '../../shared/styles.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {cancelledIntervalDrag} from '../maps/maps.slice';
 import {setIsNotebookPanelVisible, setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -19,8 +19,8 @@ const useHomeAnimations = ({navigation}) => {
   /* Local State */
 
   const animatedValueLeftSide = useRef(new Animated.Value(0)).current;
-  const animatedValueMainMenuDrawer = useRef(new Animated.Value(-MAIN_MENU_DRAWER_WIDTH)).current;
-  const animatedValueNotebookDrawer = useRef(new Animated.Value(NOTEBOOK_DRAWER_WIDTH)).current;
+  const animatedValueMainMenuDrawer = useRef(new Animated.Value(-MAIN_MENU_WIDTH)).current;
+  const animatedValueNotebookDrawer = useRef(new Animated.Value(NOTEBOOK_WIDTH)).current;
   const animatedValueRightSide = useRef(new Animated.Value(0)).current;
   const animatedValueTextInputs = useRef(new Animated.Value(0)).current;
 
@@ -63,14 +63,14 @@ const useHomeAnimations = ({navigation}) => {
     console.log('Closing Main Menu Panel...');
     dispatch(setIsMainMenuPanelVisible(false));
     dispatch(setMenuSelectionPage({name: null}));
-    animateDrawer(animatedValueMainMenuDrawer, -MAIN_MENU_DRAWER_WIDTH);
+    animateDrawer(animatedValueMainMenuDrawer, -MAIN_MENU_WIDTH);
     animateDrawer(animatedValueLeftSide, 0);
     dispatch(setSidePanelVisible({bool: false, view: 'home'}));
   };
 
   const closeNotebookPanel = () => {
     console.log('Closing Notebook Panel...');
-    animateDrawer(animatedValueNotebookDrawer, NOTEBOOK_DRAWER_WIDTH);
+    animateDrawer(animatedValueNotebookDrawer, NOTEBOOK_WIDTH);
     animateDrawer(animatedValueRightSide, 0);
     setTimeout(() => dispatch(setIsNotebookPanelVisible(false)), 1000);
   };
@@ -80,7 +80,7 @@ const useHomeAnimations = ({navigation}) => {
     dispatch(cancelledIntervalDrag());
     dispatch(setIsMainMenuPanelVisible(true));
     animateDrawer(animatedValueMainMenuDrawer, 0);
-    animateDrawer(animatedValueLeftSide, MAIN_MENU_DRAWER_WIDTH);
+    animateDrawer(animatedValueLeftSide, MAIN_MENU_WIDTH);
   };
 
   const openNotebookPanel = (pageView) => {
@@ -89,7 +89,7 @@ const useHomeAnimations = ({navigation}) => {
     dispatch(setNotebookPageVisible(pageView || PAGE_KEYS.OVERVIEW));
     dispatch(setIsNotebookPanelVisible(true));
     animateDrawer(animatedValueNotebookDrawer, 0);
-    animateDrawer(animatedValueRightSide, -NOTEBOOK_DRAWER_WIDTH);
+    animateDrawer(animatedValueRightSide, -NOTEBOOK_WIDTH);
     if (SMALL_SCREEN) {
       navigation.navigate('HomeScreen', {screen: 'Notebook'});
       closeMainMenuPanel();

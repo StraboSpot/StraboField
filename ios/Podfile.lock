@@ -1500,28 +1500,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-geolocation (3.4.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
+  - react-native-geolocation-service (5.3.1):
+    - React
   - react-native-get-random-values (2.0.0):
     - hermes-engine
     - RCTRequired
@@ -1591,51 +1571,6 @@ PODS:
     - Yoga
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-keyboard-controller (1.21.4):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - react-native-keyboard-controller/common (= 1.21.4)
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - react-native-keyboard-controller/common (1.21.4):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - react-native-netinfo (12.0.1):
     - hermes-engine
     - RCTRequired
@@ -1680,7 +1615,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (8.0.0):
+  - react-native-pager-view (8.0.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2294,7 +2229,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.31.0):
+  - RNGestureHandler (2.31.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2587,11 +2522,11 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNZipArchive (7.0.2):
+  - RNZipArchive (7.1.0):
     - React-Core
-    - RNZipArchive/Core (= 7.0.2)
+    - RNZipArchive/Core (= 7.1.0)
     - SSZipArchive (~> 2.5.5)
-  - RNZipArchive/Core (7.0.2):
+  - RNZipArchive/Core (7.1.0):
     - React-Core
     - SSZipArchive (~> 2.5.5)
   - Sentry (9.8.0):
@@ -2647,12 +2582,11 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
-  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-image-resizer (from `../node_modules/@bam.tech/react-native-image-resizer`)"
   - react-native-keep-awake (from `../node_modules/react-native-keep-awake`)
-  - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation-director (from `../node_modules/react-native-orientation-director`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -2812,8 +2746,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-blob-util"
   react-native-document-picker:
     :path: "../node_modules/@react-native-documents/picker"
-  react-native-geolocation:
-    :path: "../node_modules/@react-native-community/geolocation"
+  react-native-geolocation-service:
+    :path: "../node_modules/react-native-geolocation-service"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-image-picker:
@@ -2822,8 +2756,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@bam.tech/react-native-image-resizer"
   react-native-keep-awake:
     :path: "../node_modules/react-native-keep-awake"
-  react-native-keyboard-controller:
-    :path: "../node_modules/react-native-keyboard-controller"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-orientation-director:
@@ -2993,15 +2925,14 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: d1956f0eec54c619b63a379520fb4c618a55ccb9
   react-native-blob-util: 5926090844c5d8081f065066cdb262854351777d
   react-native-document-picker: 29b2ee2573287f2b34c7716c98ffc3d9322fbe72
-  react-native-geolocation: cfc39041210bd9f591ec2beb7d417291251da8e5
+  react-native-geolocation-service: 32b2c2a3b91e70ce2a8d0c684801aaeb0a07e0ec
   react-native-get-random-values: a603782b2b222a34533c66371614790282dba3f1
   react-native-image-picker: 48d850454b4a389753053e1d7378b624d3b47d77
   react-native-image-resizer: 51fd2e3a42d7cb221e67698c550d7797f92355d4
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
-  react-native-keyboard-controller: ad9d45189d91a9bdcc5b7c93c114c1870a1b026e
   react-native-netinfo: 7e0b1936e928fa8ddb60da9e572a33767db7805f
   react-native-orientation-director: 7beebce58bb950290dcfab01546001b91800af44
-  react-native-pager-view: adc7d78123fb395e03a70d19e8d75805b49838b5
+  react-native-pager-view: 10d0f13689f8ba17233e6d8d7286baf8771e36ce
   react-native-pdf: dac049a15aec41db452e372f85184d3f15741b12
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
   react-native-slider: d535cb9791fe29bd2cd70c0c3556545aba3c1f55
@@ -3044,7 +2975,7 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 9025ccd219b382f246e9ceb85cd4095279b9bad1
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 5e7f23adbdc5b74c1333fdcba3455e93e84e52e6
+  RNGestureHandler: b633cb9b819ffb23661496af13bd6943d66f093c
   rnmapbox-maps: 30c5b33f811509feea581214d9973ffe3795c0c0
   RNReanimated: 923eb30d50cea473eed734767d4c33c374fae5fc
   RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
@@ -3054,7 +2985,7 @@ SPEC CHECKSUMS:
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 4351544f100d4f12cac156a7c13399e60bab3e26
   RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
-  RNZipArchive: 4304f5100eab004eeb7349adc51997b3a28deb76
+  RNZipArchive: f2806ba80e24cf1984d6a7cb361d8a07d734997d
   Sentry: 88746bf877eff714bc45315a39ad1d1efea2cdda
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d

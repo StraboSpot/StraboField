@@ -33,8 +33,16 @@ const SamplesPage = ({isReadOnly, page}) => {
     console.log('UE SamplesPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (isEmpty(selectedAttributes)) setSelectedSample({});
     else {
-      setSelectedSample(selectedAttributes[0]);
-      setIsDetailView(true);
+      const sample = selectedAttributes[0];
+      const spotSamples = spot?.properties?.samples || [];
+      if (spotSamples.some(s => s.id === sample?.id)) {
+        setSelectedSample(sample);
+        setIsDetailView(true);
+      }
+      else {
+        setSelectedSample({});
+        dispatch(setSelectedAttributes([]));
+      }
     }
   }, [selectedAttributes, spot]);
 

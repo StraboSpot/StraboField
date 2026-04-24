@@ -21,6 +21,7 @@ const Routes = () => {
   /* Local State */
 
   const [isLoading, setIsLoading] = useState(true);
+  const [autoLogInFailed, setAutoLogInFailed] = useState(false);
 
   /* Side Effects */
 
@@ -35,6 +36,7 @@ const Routes = () => {
       }
       catch (e) {
         console.error('Error with the auto log in.', e);
+        setAutoLogInFailed(true);
         setIsLoading(false);
       }
     })();
@@ -46,6 +48,7 @@ const Routes = () => {
   /* View */
 
   if (isLoading) return <LoadingSplashScreen/>;
+  else if (autoLogInFailed) return <AuthenticationErrorSplashScreen/>;
   else if (isAuthenticated) return <AppStack/>;
   return <AuthenticationErrorSplashScreen/>;
 };

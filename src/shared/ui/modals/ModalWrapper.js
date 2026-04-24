@@ -1,5 +1,5 @@
-import React from 'react';
-import {KeyboardAvoidingView, Platform, View} from 'react-native';
+import React, {useCallback, useRef} from 'react';
+import {FlatList, Modal, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -9,7 +9,7 @@ import overlayStyles from './overlay.styles';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../Helpers';
-import {SMALL_SCREEN} from '../../styles.constants';
+import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
@@ -36,17 +36,31 @@ const ModalWrapper = ({
                         showCloseButton,
                         showDeleteButton,
                       }) => {
+  /* Data Hooks */
 
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Local State */
+
+  const childrenRef = useRef(children);
+  childrenRef.current = children;
+
+  /* Derived Variables */
+
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
 
+  /* Logic Helpers */
+
   const getResponsiveOverlayStyle = () => {
-    if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
-    return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
+    if (fullscreen) return overlayStyles.overlayContainerFullScreen;
+    return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
   };
+
+  /* Render Functions */
+
+  const renderListHeader = useCallback(() => <>{childrenRef.current}</>, []);
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -70,33 +84,22 @@ const ModalWrapper = ({
     }
   };
 
-  return (
-    <Overlay
-      animationType={'fade'}
-      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
-      fullScreen={fullscreen || SMALL_SCREEN}
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      overlayStyle={getResponsiveOverlayStyle()}
-      supportedOrientations={['portrait', 'landscape']}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
-        style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}
-      >
-        <ModalWrapperHeader
-          buttonTitleRight={buttonTitleRight}
-          closeModal={closeModal}
-          headerTitle={headerTitle}
-          showCloseButton={showCloseButton}
-        />
-
-        <View style={isAutoHeight ? undefined : {flex: 1, minHeight: 0}}>
-          {children}
-        </View>
-        {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
-      </KeyboardAvoidingView>
+  const renderModalContent = () => (
+    <>
+      <ModalWrapperHeader
+        buttonTitleRight={buttonTitleRight}
+        closeModal={closeModal}
+        headerTitle={headerTitle}
+        showCloseButton={showCloseButton}
+      />
+      <FlatList
+        ListHeaderComponent={renderListHeader}
+        data={[]}
+        keyExtractor={(item, index) => index.toString()}
+        keyboardShouldPersistTaps={'handled'}
+        style={isAutoHeight ? undefined : {flex: 1}}
+      />
+      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}
@@ -109,6 +112,38 @@ const ModalWrapper = ({
         showCancelButton={showCancelButton}
         showDeleteButton={showDeleteButton}
       />
+    </>
+  );
+
+  /* View */
+
+  if (SMALL_SCREEN) {
+    return (
+      <Modal
+        animationType={'fade'}
+        onRequestClose={onBackdropPress}
+        statusBarTranslucent
+        supportedOrientations={['portrait', 'landscape']}
+        visible={isVisible}
+      >
+        <View style={overlayStyles.overlayContainerFullScreen}>
+          {renderModalContent()}
+        </View>
+      </Modal>
+    );
+  }
+
+  return (
+    <Overlay
+      animationType={'fade'}
+      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
+      fullScreen={fullscreen}
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      overlayStyle={getResponsiveOverlayStyle()}
+      supportedOrientations={['portrait', 'landscape']}
+    >
+      {renderModalContent()}
     </Overlay>
   );
 };

@@ -34,7 +34,6 @@ const initialHomeState = {
     sketch: false,
   },
   statusMessageModalTitle: '',
-  isProjectLoadComplete: false,
 };
 
 // createSlice combines reducers, actions, and constants
@@ -71,9 +70,6 @@ const homeSlice = createSlice({
     },
     setIsProgressModalVisible(state, action) {
       state.isProgressModalVisible = action.payload;
-    },
-    setIsProjectLoadComplete(state, action) {
-      state.isProjectLoadComplete = action.payload;
     },
     setIsProjectLoadSelectionModalVisible(state, action) {
       state.isProjectLoadSelectionModalVisible = action.payload;
@@ -121,7 +117,6 @@ export const {
   setIsMainMenuPanelVisible,
   setIsOfflineMapsModalVisible,
   setIsProgressModalVisible,
-  setIsProjectLoadComplete,
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setIsUploadModalVisible,

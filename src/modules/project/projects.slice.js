@@ -5,23 +5,23 @@ import {getNewId, isEmpty, isEqual} from '../../shared/Helpers';
 
 const initialProjectState = {
   activeDatasetsIds: [],
-  targetDatasetId: undefined,
-  project: {},
+  addTagToSelectedSpot: false,
+  backupFileName: '',
   datasets: {},
   deviceBackUpDirectoryExists: false,
-  backupFileName: '',
   downloadsDirectory: false, //Android Only
+  isImageTransferring: false,
+  isMultipleFeaturesTaggingEnabled: false,
   isTestingMode: false,
+  project: {},
+  projectTransferProgress: 0,
   readOnlyDatasetsIds: [],
   selectedProject: {
     project: '',
     source: '',
   },
   selectedTag: {},
-  isMultipleFeaturesTaggingEnabled: false,
-  addTagToSelectedSpot: false,
-  projectTransferProgress: 0,
-  isImageTransferring: false,
+  targetDatasetId: undefined,
 };
 
 const projectSlice = createSlice({
@@ -56,18 +56,18 @@ const projectSlice = createSlice({
         [datasetId]: {...state.datasets[datasetId], modified_timestamp: datasetTimestamp, images: imagesInDataset},
       };
     },
-    addedNewSpotIdToDataset(state, action) {
-      const {datasetId, spotId} = action.payload;
-      const timestamp = Date.now();
-      const spotIdsInDataset = [...state.datasets[action.payload.datasetId].spotIds || [], spotId];
-      const dataset = {...state.datasets[datasetId], modified_timestamp: timestamp, spotIds: spotIdsInDataset};
-      state.datasets = {...state.datasets, [datasetId]: dataset};
-      state.project.modified_timestamp = timestamp;
-    },
     addedNewSpotIdsToDataset(state, action) {
       const {datasetId, spotIds} = action.payload;
       const timestamp = Date.now();
       const spotIdsInDataset = [...new Set([...state.datasets[action.payload.datasetId].spotIds || [], ...spotIds])];
+      const dataset = {...state.datasets[datasetId], modified_timestamp: timestamp, spotIds: spotIdsInDataset};
+      state.datasets = {...state.datasets, [datasetId]: dataset};
+      state.project.modified_timestamp = timestamp;
+    },
+    addedNewSpotIdToDataset(state, action) {
+      const {datasetId, spotId} = action.payload;
+      const timestamp = Date.now();
+      const spotIdsInDataset = [...state.datasets[action.payload.datasetId].spotIds || [], spotId];
       const dataset = {...state.datasets[datasetId], modified_timestamp: timestamp, spotIds: spotIdsInDataset};
       state.datasets = {...state.datasets, [datasetId]: dataset};
       state.project.modified_timestamp = timestamp;
@@ -264,14 +264,14 @@ const projectSlice = createSlice({
     setIsImageTransferring(state, action) {
       state.isImageTransferring = action.payload;
     },
+    setMultipleFeaturesTaggingEnabled(state, action) {
+      state.isMultipleFeaturesTaggingEnabled = action.payload;
+    },
     setReadOnlyDatasetsIds(state, action) {
       if (state.readOnlyDatasetsIds?.includes(action.payload)) {
         state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(r => r !== action.payload);
       }
       else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
-    },
-    setMultipleFeaturesTaggingEnabled(state, action) {
-      state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
     setSelectedProject(state, action) {
       const {project, source} = action.payload;
@@ -343,8 +343,8 @@ export const {
   addedDataset,
   addedDatasets,
   addedNeededImagesToDataset,
-  addedNewSpotIdToDataset,
   addedNewSpotIdsToDataset,
+  addedNewSpotIdToDataset,
   addedProject,
   addedProjectDescription,
   addedTagToSelectedSpot,

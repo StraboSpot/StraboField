@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, Text, TextInput, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -100,39 +100,45 @@ const SignIn = ({navigation}) => {
 
   return (
     <SplashScreen>
-      <View style={{marginTop: 20}}>
-        <View style={signInStyles.signInContainer}>
-          <TextInput
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            keyboardType={'email-address'}
-            onChangeText={val => setUsername(val.toLowerCase())}
-            placeholder={'Email'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            returnKeyType={'go'}
-            style={signInStyles.input}
-            value={username || ''}
-          />
-          <TextInput
-            autoCapitalize={'none'}
-            onChangeText={val => setPassword(val)}
-            onSubmitEditing={() => signIn(username, password, setUsername, setPassword, setErrorMessage,
-              setIsErrorModalVisible)}
-            placeholder={'Password'}
-            placeholderTextColor={themes.MEDIUMGREY}
-            returnKeyType={'go'}
-            secureTextEntry={true}
-            style={signInStyles.input}
-            value={password || ''}
-          />
-          {renderButtons()}
-          <CustomEndpoint
-            containerStyles={{width: '80%'}}
-            textStyles={{color: WHITE, fontSize: 14, textAlign: 'center'}}
-          />
+      <KeyboardAvoidingView
+        behavior={'padding'}
+        enabled={Platform.OS === 'ios'}
+        style={{flex: 1}}
+      >
+        <View style={{marginTop: 20}}>
+          <View style={signInStyles.signInContainer}>
+            <TextInput
+              autoCapitalize={'none'}
+              autoCorrect={false}
+              keyboardType={'email-address'}
+              onChangeText={val => setUsername(val.toLowerCase())}
+              placeholder={'Email'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              returnKeyType={'go'}
+              style={signInStyles.input}
+              value={username || ''}
+            />
+            <TextInput
+              autoCapitalize={'none'}
+              onChangeText={val => setPassword(val)}
+              onSubmitEditing={() => signIn(username, password, setUsername, setPassword, setErrorMessage,
+                setIsErrorModalVisible)}
+              placeholder={'Password'}
+              placeholderTextColor={themes.MEDIUMGREY}
+              returnKeyType={'go'}
+              secureTextEntry={true}
+              style={signInStyles.input}
+              value={password || ''}
+            />
+            {renderButtons()}
+            <CustomEndpoint
+              containerStyles={{width: '80%'}}
+              textStyles={{color: WHITE, fontSize: 14, textAlign: 'center'}}
+            />
+          </View>
+          {renderErrorModal()}
         </View>
-        {renderErrorModal()}
-      </View>
+      </KeyboardAvoidingView>
       <GlyphDownloader/>
     </SplashScreen>
   );

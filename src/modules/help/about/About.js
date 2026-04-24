@@ -4,7 +4,7 @@ import {Platform, ScrollView, Text, View} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 import styles from './about.styles';
-import {VERSION_NUMBER} from '../../shared/app.constants';
+import {VERSION_NUMBER} from '../../../shared/app.constants';
 
 const About = () => {
   return (
@@ -15,7 +15,7 @@ const About = () => {
         <Text style={styles.heading}>📌 About StraboField</Text>
         <Text style={styles.paragraph}>
           <Text style={styles.bold}>StraboField</Text> is a powerful tool for collecting and organizing geologic field
-          data. It allows users to create and manage spatial “Spots” — points, lines, or polygons that store geologic
+          data. It allows users to create and manage spatial "Spots" — points, lines, or polygons that store geologic
           observations.
           {'\n\n'}
           Spots can be:
@@ -32,7 +32,7 @@ const About = () => {
           StraboField works seamlessly with the open-source <Text style={styles.bold}>StraboSpot.org</Text> platform,
           supported by the <Text style={styles.bold}>National Science Foundation</Text>. You can:
           {'\n\n'}• Upload your field data to your online account
-          {'\n'}• Export everything locally to your device’s file system
+          {'\n'}• Export everything locally to your device's file system
         </Text>
 
         <Text style={styles.heading}>🗺️ Custom & Offline Maps</Text>

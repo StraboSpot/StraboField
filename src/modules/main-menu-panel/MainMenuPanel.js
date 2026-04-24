@@ -8,9 +8,9 @@ import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
 import DailyNotes from '../daily-notes/DailyNotes';
-import About from '../help/About';
-import Documentation from '../help/Documentation';
-import IssuesAndRequests from '../help/IssuesAndRequests';
+import About from '../help/about/About';
+import Documentation from '../help/documentation/Documentation';
+import IssuesAndRequests from '../help/issues-and-requests/IssuesAndRequests';
 import {ImageGallery} from '../images';
 import MenuSearch from './MenuSearch';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
@@ -203,8 +203,8 @@ const MainMenuPanel = forwardRef(({
   return (
     <View style={mainMenuPanelStyles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        // keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0} // Adjust offset as needed
+        behavior={'padding'}
+        enabled={Platform.OS === 'ios'}
         style={{flex: 1}}
       >
         {isSidePanelVisible && sidePanelView ? renderSidePanelContent() : renderMainMenuContent()}

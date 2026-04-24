@@ -118,7 +118,6 @@ module.exports = (env, argv) => {
     devtool: false, // disables source maps
     ignoreWarnings: [
       {
-        module: /node_modules\/react-datepicker/,
         message: /Critical dependency: the request of a dependency is an expression/,
       },
       {

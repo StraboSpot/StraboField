@@ -3,17 +3,29 @@ import {createSlice} from '@reduxjs/toolkit';
 import {isEmpty} from '../../shared/Helpers';
 
 const initialNotebookState = {
-  visibleNotebookPagesStack: [],
   isNotebookPanelVisible: false,
   isSamplesModalVisible: false,
   notebookPagesOn: ['geologic_unit', 'notes', 'orientation_data', 'images', 'tags', 'samples'],
   // notebookPagesOn: PRIMARY_PAGES.map(p => p.key),  // This worked in Native but not Web
+  visibleNotebookPagesStack: [],
 };
 
 const notebookSlice = createSlice({
   name: 'notebook',
   initialState: initialNotebookState,
   reducers: {
+    addedNotebookPageOn(state, action) {
+      state.notebookPagesOn = [...state.notebookPagesOn, action.payload];
+    },
+    removedNotebookPageOn(state, action) {
+      state.notebookPagesOn = state.notebookPagesOn.filter(s => s !== action.payload);
+    },
+    resetNotebookState() {
+      return initialNotebookState;
+    },
+    setIsNotebookPanelVisible(state, action) {
+      state.isNotebookPanelVisible = action.payload;
+    },
     setNotebookPageVisible(state, action) {
       let visibleNotebookPagesStack = state.visibleNotebookPagesStack;
       if (isEmpty(visibleNotebookPagesStack)) state.visibleNotebookPagesStack = [action.payload];
@@ -28,28 +40,16 @@ const notebookSlice = createSlice({
     setNotebookPageVisibleToPrev(state) {
       state.visibleNotebookPagesStack = state.visibleNotebookPagesStack.slice(0, -1);
     },
-    setIsNotebookPanelVisible(state, action) {
-      state.isNotebookPanelVisible = action.payload;
-    },
-    addedNotebookPageOn(state, action) {
-      state.notebookPagesOn = [...state.notebookPagesOn, action.payload];
-    },
-    removedNotebookPageOn(state, action) {
-      state.notebookPagesOn = state.notebookPagesOn.filter(s => s !== action.payload);
-    },
-    resetNotebookState() {
-      return initialNotebookState;
-    },
   },
 });
 
 export const {
-  setNotebookPageVisible,
-  setNotebookPageVisibleToPrev,
-  setIsNotebookPanelVisible,
   addedNotebookPageOn,
   removedNotebookPageOn,
   resetNotebookState,
+  setIsNotebookPanelVisible,
+  setNotebookPageVisible,
+  setNotebookPageVisibleToPrev,
 } = notebookSlice.actions;
 
 export default notebookSlice.reducer;

@@ -14,10 +14,16 @@ import useMapFeatures from '../useMapFeatures';
 import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
 
-const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSelected}) => {
+const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
 
+  const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
+  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
+  const stratSection = useSelector(state => state.map.stratSection);
+  const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
@@ -33,12 +39,12 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
   const featuresNotSelected = useMemo(() => {
     console.log('Getting Spots Not Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsNotSelected]);
+  }, [spotsNotSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsSelected]);
+  }, [spotsSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around
@@ -78,21 +84,16 @@ const FeaturesLayers = ({isStratStyleLoaded, mapMode, spotsNotSelected, spotsSel
       />
 
       {/* Not Selected Features Layer */}
-      {isEmpty(featuresReadOnly) ? (
-        <FeaturesNotSelectedLayers features={features} isStratStyleLoaded={isStratStyleLoaded}/>
-      ) : (
+      {isEmpty(featuresReadOnly) ? <FeaturesNotSelectedLayers features={features}/> : (
         <>
           {/* Editable & Read Only Features Layers */}
-          <FeaturesNotSelectedLayers features={featuresEditable} isStratStyleLoaded={isStratStyleLoaded}/>
+          <FeaturesNotSelectedLayers features={featuresEditable}/>
           <FeaturesReadOnlyLayers features={featuresReadOnly}/>
         </>
       )}
 
       {/* Selected Features Layer */}
-      <FeaturesSelectedLayers
-        featuresSelected={isDragIntervalMode ? [] : featuresSelected}
-        isStratStyleLoaded={isStratStyleLoaded}
-      />
+      <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected}/>
     </>
   );
 };

@@ -5,8 +5,8 @@ import Pdf from 'react-native-pdf';
 
 import documentationStyles from './documentation.styles';
 import DocumentationModalHeader from './DocumentationModalHeader';
-import {isEmpty, openUrl} from '../../shared/Helpers';
-import alert from '../../shared/ui/alert';
+import {isEmpty, openUrl} from '../../../shared/Helpers';
+import alert from '../../../shared/ui/alert';
 
 const DocumentationScreen = ({route, navigation}) => {
   /* Local State */
