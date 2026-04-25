@@ -11,7 +11,7 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
 import TagColor from './color/TagColor';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
@@ -50,7 +50,7 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = {type: tagType};
   }
   else if (!isEmpty(selectedTag)) {
-    formName = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
+    formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
