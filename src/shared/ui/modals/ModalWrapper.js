@@ -1,5 +1,5 @@
-import React, {useCallback, useRef} from 'react';
-import {FlatList, Modal, View} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {FlatList, Keyboard, Modal, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -46,6 +46,14 @@ const ModalWrapper = ({
 
   const childrenRef = useRef(children);
   childrenRef.current = children;
+  const [kbOffset, setKbOffset] = useState(0);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
+    const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
 
   /* Derived Variables */
 
@@ -126,7 +134,7 @@ const ModalWrapper = ({
         supportedOrientations={['portrait', 'landscape']}
         visible={isVisible}
       >
-        <View style={overlayStyles.overlayContainerFullScreen}>
+        <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
           {renderModalContent()}
         </View>
       </Modal>

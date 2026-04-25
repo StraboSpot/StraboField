@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import {Platform} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,6 +13,14 @@ const useDrawGeometryToggle = () => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const drawGeometries = useSelector(state => state.map.drawGeometries);
   const stratSection = useSelector(state => state.map.stratSection);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    if ((currentImageBasemap || stratSection) && drawGeometries.point === MAP_MODES.DRAW.POINTLOCATION) {
+      dispatch(setDrawGeometries({point: MAP_MODES.DRAW.POINT}));
+    }
+  }, [currentImageBasemap, stratSection]);
 
   /* Exported Functions */
 

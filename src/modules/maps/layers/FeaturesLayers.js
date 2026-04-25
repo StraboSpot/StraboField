@@ -17,8 +17,13 @@ import {getUniqFeatures} from './layers.helpers';
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
 
+  const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
+  const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
+  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
   const stratSection = useSelector(state => state.map.stratSection);
+  const tagTypeForColor = useSelector(state => state.map.tagTypeForColor);
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
@@ -34,12 +39,12 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   const featuresNotSelected = useMemo(() => {
     console.log('Getting Spots Not Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsNotSelected, stratSection]);
+  }, [spotsNotSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
     return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsSelected, stratSection]);
+  }, [spotsSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer
   // so we have a point for the selected halo to be around

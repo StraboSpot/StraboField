@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -14,9 +14,7 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
 import TagColor from './color/TagColor';
-import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 
-let formName = TAG_FORM_NAMES.TAGS;
 let initialValues;
 
 const TagDetailModal = ({closeModal}) => {
@@ -39,10 +37,11 @@ const TagDetailModal = ({closeModal}) => {
 
   /* Derived Variables */
 
+  let formName = TAG_FORM_NAMES.TAGS;
   if (modalVisible) {
     let tagType = TAG_TYPES.CONCEPT;
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-      tagType = PAGE_KEYS.GEOLOGIC_UNITS;
+      tagType = TAG_TYPES.GEOLOGIC_UNIT;
       formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     }
     initialValues = {type: tagType};
@@ -52,9 +51,8 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
-  const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
-    : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
   const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
+  const headerTitle = initialValues?.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit' : 'Tag';
 
   /* Logic Helpers */
 
@@ -109,7 +107,7 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      headerTitle={`${toTitleCase(label).slice(0, -1)} Info`}
+      headerTitle={headerTitle}
       onActionPressed={isReadOnlyProject ? undefined : saveFormAndClose}
       onCancelPress={closeModal}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}

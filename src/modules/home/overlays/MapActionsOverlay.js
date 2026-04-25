@@ -39,7 +39,7 @@ const MapActionsOverlay = ({
 
   /* Logic Helpers */
 
-  const mapActionItem = (item) => {
+  const isItemVisible = (item) => {
     const isNative = Platform.OS !== 'web';
     const isIOS = Platform.OS === 'ios';
     const hasValidConnection = isConnected && (isInternetReachable || currentBasemap?.source);
@@ -54,7 +54,7 @@ const MapActionsOverlay = ({
     const otherKeysToHide = new Set(['saveMap', 'stereonet', 'stratSection', 'selectSpots', 'mapMeasurement']);
     const isDefaultVisible = !otherKeysToHide.has(item.key);
 
-    const shouldRender = (
+    return !isReadOnlyHiddenAction && (
       isSaveMapVisible
       || isStereonetVisible
       || isStratSectionVisible
@@ -62,34 +62,32 @@ const MapActionsOverlay = ({
       || isMapMeasurementVisible
       || isDefaultVisible
     );
-
-    if (!shouldRender || isReadOnlyHiddenAction) return null;
-
-    return (
-      <ListItem
-        containerStyle={[
-          commonStyles.listItem,
-          SMALL_SCREEN && {
-            minHeight: 50,
-            paddingVertical: 15,
-            paddingHorizontal: 20,
-          },
-        ]}
-        key={item.key}
-        onPress={() => onPress(item.key)}
-      >
-        <ListItem.Title style={[
-          commonStyles.listItemTitle,
-          SMALL_SCREEN && {
-            fontSize: 16,
-            fontWeight: '500',
-          },
-        ]}>
-          {item.title}
-        </ListItem.Title>
-      </ListItem>
-    );
   };
+
+  const mapActionItem = item => (
+    <ListItem
+      containerStyle={[
+        commonStyles.listItem,
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+        },
+      ]}
+      key={item.key}
+      onPress={() => onPress(item.key)}
+    >
+      <ListItem.Title style={[
+        commonStyles.listItemTitle,
+        SMALL_SCREEN && {
+          fontSize: 16,
+          fontWeight: '500',
+        },
+      ]}>
+        {item.title}
+      </ListItem.Title>
+    </ListItem>
+  );
 
   /* View */
 
@@ -112,7 +110,7 @@ const MapActionsOverlay = ({
           paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
         }}
-        data={MAP_ACTIONS}
+        data={MAP_ACTIONS.filter(isItemVisible)}
         key={'mapActions'}
         renderItem={({item}) => mapActionItem(item)}
         style={{width: '100%'}}

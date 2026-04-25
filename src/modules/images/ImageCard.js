@@ -128,7 +128,7 @@ const ImageCard = ({
               placeholder={placeholderTitle}
               style={[imageStyles.cardTitle, Platform.OS === 'web' && {
                 display: 'inline-block',
-                maxWidth: 87,
+                maxWidth: 85,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -147,7 +147,7 @@ const ImageCard = ({
                   imageStyles.cardTitle,
                   Platform.OS === 'web' && {
                     display: 'inline-block',
-                    maxWidth: 87,
+                    maxWidth: 85,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -199,6 +199,8 @@ const ImageCard = ({
           </View>
         )}
       </Card>
+
+      {/* Modals */}
       <ModalWrapper
         actionTitle={'Delete'}
         headerTitle={'Missing Image on Server!'}
@@ -210,7 +212,7 @@ const ImageCard = ({
         showCancelButton
         showDeleteButton={false}
       >
-        <View>
+        <View style={{padding: 10}}>
           <Text style={{textAlign: 'center', paddingVertical: 10}}>
             The image {image.id} is missing from the server. Would you like to remove the image?
           </Text>
