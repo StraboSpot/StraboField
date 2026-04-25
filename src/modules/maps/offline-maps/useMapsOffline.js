@@ -299,6 +299,9 @@ const useMapsOffline = () => {
   };
 
   const moveFiles = async (zipUId) => {
+    fileCount = 0;
+    neededTiles = 0;
+    notNeededTiles = 0;
     try {
       let result;
       let mapID = currentBasemap.id;

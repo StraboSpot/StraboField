@@ -16,7 +16,6 @@ import {useTags} from '../tags';
 import TagColor from './color/TagColor';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 
-let formName = TAG_FORM_NAMES.TAGS;
 let initialValues;
 
 const TagDetailModal = ({closeModal}) => {
@@ -41,10 +40,11 @@ const TagDetailModal = ({closeModal}) => {
   const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
   const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT;
 
+  let formName = TAG_FORM_NAMES.TAGS;
   if (modalVisible) {
     let tagType = TAG_TYPES.CONCEPT;
     if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-      tagType = PAGE_KEYS.GEOLOGIC_UNITS;
+      tagType = TAG_TYPES.GEOLOGIC_UNIT;
       formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     }
     initialValues = {type: tagType};
@@ -54,8 +54,7 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
-  const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
-    : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
+  const label = isGeologicUnit ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
   const modalHeight = isGeologicUnit ? '80%' : 475;
 
   /* Logic Helpers */
