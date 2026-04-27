@@ -104,7 +104,12 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
         )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
+          ListEmptyComponent={
+            <ListEmptyText
+              onPress={!isReadOnly && addReaction}
+              text={'No ' + page.label.toLowerCase() + ' at this Spot.'}
+            />
+          }
           data={spot.properties.pet && spot.properties.pet[page.key]
             && spot.properties.pet[page.key].slice().sort(
               (a, b) => (a[page.key] || 'Unknown').localeCompare((b[page.key] || 'Unknown')))}

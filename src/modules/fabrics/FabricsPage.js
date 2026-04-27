@@ -83,7 +83,14 @@ const FabricsPage = ({isReadOnly, page}) => {
         keyExtractor={(item, index) => item + index}
         renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
         renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+          return (
+            section.data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && section.key !== 'deprecated' && (() => addFabric(section.key))}
+                text={'No ' + section.title}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
         sections={fabricsGrouped}

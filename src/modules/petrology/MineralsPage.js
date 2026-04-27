@@ -137,7 +137,9 @@ const MineralsPage = ({isReadOnly, page}) => {
     return (
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
+        ListEmptyComponent={
+          <ListEmptyText onPress={!isReadOnly && addMineral} text={'There are no minerals at this Spot.'}/>
+        }
         data={mineralDataSorted}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}

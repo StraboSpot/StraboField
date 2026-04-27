@@ -80,7 +80,10 @@ const SamplesPage = ({isReadOnly, page}) => {
           pageTitle={page.label}
           showAddButton={!isReadOnly}
         />
-        <SamplesList onPress={editSample}/>
+        <SamplesList
+          onPress={editSample}
+          onPressEmpty={!isReadOnly && (() => dispatch(setModalVisible({modal: page.key})))}
+        />
       </View>
     );
   };
