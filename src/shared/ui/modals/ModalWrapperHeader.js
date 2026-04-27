@@ -15,6 +15,7 @@ const ModalWrapperHeader = ({
                               showCloseButton = false,
                               headerTitle,
                               headerImage,
+                              imageStyle,
                             }) => {
   /* Data Hooks */
 
@@ -43,11 +44,13 @@ const ModalWrapperHeader = ({
           </View>
         )}
         {headerImage ? (
-          <Image
-            resizeMode='contain'
-            source={headerImage}
-            style={modalStyles.modalHeaderImage}
-          />
+          <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <Image
+              resizeMode='contain'
+              source={headerImage}
+              style={{...modalStyles.modalHeaderImage, ...imageStyle}}
+            />
+          </View>
         ) : (
           <Text style={modalStyles.modalTitle}>{headerTitle || getTitle()}</Text>
         )}

@@ -25,6 +25,7 @@ const ModalWrapper = ({
                         headerImage,
                         headerTitle,
                         isLoading,
+                        imageStyle,
                         isVisible,
                         onActionPressed,
                         onBackdropPress,
@@ -53,7 +54,10 @@ const ModalWrapper = ({
     if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
     const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
     const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
-    return () => { show.remove(); hide.remove(); };
+    return () => {
+      show.remove();
+      hide.remove();
+    };
   }, []);
 
   /* Derived Variables */
@@ -100,6 +104,7 @@ const ModalWrapper = ({
         closeModal={closeModal}
         headerImage={headerImage}
         headerTitle={headerTitle}
+        imageStyle={imageStyle}
         showCloseButton={showCloseButton}
       />
       <FlatList
