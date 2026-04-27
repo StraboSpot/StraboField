@@ -127,7 +127,7 @@ const TephraPage = ({isReadOnly, page}) => {
           )}
           <DraggableFlatList
             ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+            ListEmptyComponent={<ListEmptyText onPress={!isReadOnly && addAttribute} text={'No ' + page.label}/>}
             data={data1}
             keyExtractor={item => item.id}
             onDragBegin={() => setIsReorderingActive(true)}

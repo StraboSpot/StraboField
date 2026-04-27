@@ -27,7 +27,9 @@ const MeasurementsOverview = ({page}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Measurements'}/>}
+      ListEmptyComponent={
+        <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No Measurements'}/>
+      }
       data={orientationsData}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item}) => (

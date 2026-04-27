@@ -270,7 +270,15 @@ const MeasurementsPage = ({isReadOnly, page}) => {
           />
         )}
         renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+          const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
+          return (
+            section.data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && !modalVisible && (() => addMeasurement(sectionType))}
+                text={'No ' + section.title}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section}) => renderSectionHeader(section)}
         sections={sections}

@@ -34,7 +34,9 @@ const OtherFeaturesOverview = ({page}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Other Features'}/>}
+      ListEmptyComponent={
+        <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No Other Features'}/>
+      }
       data={featuresData}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item}) => renderFeature(item)}
