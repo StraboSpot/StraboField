@@ -7,7 +7,7 @@ export const NOTEBOOK_MENU_ACTIONS = [
   {key: 'geography', title: 'Show Geography'},
   {key: 'metadata', title: 'Show Metadata'},
   {key: 'nesting', title: 'Show Nesting'},
-  {key: 'rockd', title: 'Send to Spot to Rock\'d'},
+  {key: 'rockd', title: 'Send Spot to Rock\'d'},
   ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
 ];
 

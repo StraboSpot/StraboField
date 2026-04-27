@@ -102,8 +102,12 @@ const useServerRequests = () => {
     }
   };
 
-  const postToMacrostrat = (spotCheckIn) => {
+  const postCheckinToRockd = (spotCheckIn) => {
     return postRequest(SPOT_CHECKIN, spotCheckIn, null, {});
+  };
+
+  const postCheckinImageToRockd = (spotCheckIn, image) => {
+
   };
 
   const getMyMapsBbox = async (mapUrl) => {
@@ -279,7 +283,7 @@ const useServerRequests = () => {
     getTileBaseUrl,
     getTilesFromHost,
     convertSpotToMacrostrat,
-    postToMacrostrat,
+    postCheckinToRockd,
     postToSesar,
     refreshSesarToken,
     registerUser,
