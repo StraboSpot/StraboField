@@ -16,11 +16,7 @@ const Governance = () => {
       ListHeaderComponent={
         <>
           <ProjectPrivacy/>
-          <GovernanceFields
-            isReadOnly={isReadOnlyProject}
-            ownerEmail={ownerEmail}
-            ownerName={ownerName}
-          />
+          <GovernanceFields isReadOnly={isReadOnlyProject} ownerEmail={ownerEmail} ownerName={ownerName}/>
         </>
       }
     />

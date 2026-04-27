@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {Text, View} from 'react-native';
+import {Linking, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
@@ -55,8 +55,15 @@ const ProjectPrivacy = () => {
       </Formik>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>
-          *Public datasets are accessible at StraboSpot.org/search. Privacy settings are reversible and update when
-          project is uploaded.
+          {'* Public datasets are accessible at '}
+          <Text
+            onPress={() => Linking.openURL('https://strabospot.org/search/')}
+            style={{textDecorationLine: 'underline'}}>
+            {'strabospot.org/search'}
+          </Text>
+          {'. Privacy settings are reversible and update when project is uploaded.\n\nA public project does not mean '
+            + 'a project is editable. To make a project ediable it must be shared as a collaborative project. See '
+            + 'the next section.'}
         </Text>
       </View>
     </>

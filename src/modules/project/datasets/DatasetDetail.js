@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {FlatList, Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
@@ -279,20 +279,18 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         headerTitle={'Dataset Detail'}
         title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
       />
-
-      {renderNameField()}
-      {renderMetadataForm()}
-      {renderSpotsField()}
-      {renderImagesField()}
-      <GovernanceFields
-        isReadOnly={isReadOnly}
-        ownerEmail={dataset.owner_email}
-        ownerName={dataset.owner_name}
+      <FlatList
+        ListHeaderComponent={
+          <>
+            {renderNameField()}
+            {renderMetadataForm()}
+            {renderSpotsField()}
+            {renderImagesField()}
+            <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
+            {Platform.OS === 'web' && renderDeleteDatasetButton()}
+          </>
+        }
       />
-
-      {Platform.OS === 'web' && renderDeleteDatasetButton()}
-
-      {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );
