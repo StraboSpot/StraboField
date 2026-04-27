@@ -10,6 +10,7 @@ const ImagesList = ({
                       isReadOnly,
                       isThumbnailOnly = false,
                       onOpenImage,
+                      onPressEmpty,
                       saveUpdatedImage,
                       spotWithImage,
                     }) => {
@@ -54,7 +55,7 @@ const ImagesList = ({
 
   return (
     <View style={{flex: 1}}>
-      {sortedImages.length === 0 ? <ListEmptyText text={'No Images'}/>
+      {sortedImages.length === 0 ? <ListEmptyText onPress={onPressEmpty} text={'No Images'}/>
         : (
           <View
             style={[imageStyles.imagesListContainer, {justifyContent: isThumbnailOnly ? 'flex-start' : 'space-evenly'}]}

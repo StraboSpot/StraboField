@@ -8,7 +8,7 @@ import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
-const SamplesList = ({onPress}) => {
+const SamplesList = ({onPress, onPressEmpty}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -29,7 +29,7 @@ const SamplesList = ({onPress}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Samples'}/>}
+      ListEmptyComponent={<ListEmptyText onPress={onPressEmpty} text={'No Samples'}/>}
       data={samplesSorted}
       keyExtractor={item => 'Sample' + (item.id || item.properties.id)}
       renderItem={({item}) => <SampleListItem isShowSubtitle onPress={onPress} parentSpot={spot} sample={item}/>}

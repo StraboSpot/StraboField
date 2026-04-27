@@ -28,7 +28,7 @@ const SpotNotesOverview = ({page}) => {
             </ListItem.Content>
           </ListItem>
         )
-        : <ListEmptyText text={'No Notes'}/>}
+        : <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No Notes'}/>}
     </>
   );
 };

@@ -71,7 +71,9 @@ const BasicOverviewList = ({page}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+      ListEmptyComponent={
+        <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No ' + page.label}/>
+      }
       data={getData()}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item, index}) => (

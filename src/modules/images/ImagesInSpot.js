@@ -7,7 +7,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const ImagesInSpot = ({isReadOnly, onOpenImage, saveImages}) => {
+const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -55,6 +55,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, saveImages}) => {
         images={images}
         isReadOnly={isReadOnly}
         onOpenImage={handleOpenImage}
+        onPressEmpty={onPressEmpty}
       />
 
       {/* Modal */}

@@ -245,7 +245,14 @@ const RockPage = ({isReadOnly, page}) => {
           />
         )}
         renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+          return (
+            section.data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && section.key !== 'deprecated' && (() => addRock(section.key))}
+                text={'No ' + section.title}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
         sections={rocksGrouped}

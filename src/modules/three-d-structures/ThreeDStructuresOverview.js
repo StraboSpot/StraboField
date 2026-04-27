@@ -31,7 +31,9 @@ const ThreeDStructuresOverview = ({page}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No 3D Structures yet'}/>}
+      ListEmptyComponent={
+        <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No 3D Structures yet'}/>
+      }
       data={threeDStructures}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item}) => <ThreeDStructureItem edit3dStructure={() => on3DStructurePressed(item)} item={item}/>}

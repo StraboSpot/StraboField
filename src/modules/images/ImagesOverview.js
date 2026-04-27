@@ -4,10 +4,11 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ImagesInSpot} from '.';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesOverview = ({isReadOnly, onOpenImage}) => {
+const ImagesOverview = ({isReadOnly, onOpenImage, page}) => {
   console.log('Rendering ImagesOverview...');
 
   /* Data Hooks */
@@ -27,7 +28,14 @@ const ImagesOverview = ({isReadOnly, onOpenImage}) => {
 
   /* View */
 
-  return <ImagesInSpot isReadOnly={isReadOnly} onOpenImage={onOpenImage} saveImages={saveImagesToSpot}/>;
+  return (
+    <ImagesInSpot
+      isReadOnly={isReadOnly}
+      onOpenImage={onOpenImage}
+      onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}
+      saveImages={saveImagesToSpot}
+    />
+  );
 };
 
 export default ImagesOverview;
