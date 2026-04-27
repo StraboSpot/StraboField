@@ -25,6 +25,7 @@ const useServerRequests = () => {
   /* Derived Variables */
 
   // URL Helpers
+  const {SPOT_CONVERSION, LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;
   const domain = endpoint && isSelected ? endpoint : STRABO_APIS.STRABO;
   const tilehost = STRABO_APIS.TILE_HOST;
@@ -81,6 +82,12 @@ const useServerRequests = () => {
     }
   };
 
+  //MacroStrat API
+  const convertSpotToMacrostrat = (spot) => {
+    return postRequest(SPOT_CONVERSION, spot, null,
+      {'Content-Type': 'application/json', 'Accept': 'application/json'});
+  };
+
   const getMacrostratData = (location) => {
     const params = {lng: location.coords[0].toFixed(4), lat: location.coords[1].toFixed(4)};
     return getRequest(`https://macrostrat.org/api/v2/mobile/point?${new URLSearchParams(params).toString()}`, null);
@@ -88,7 +95,6 @@ const useServerRequests = () => {
 
   const openMacrostratLogin = async () => {
     try {
-      const {LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
       await Linking.openURL(`${LOGIN}?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`);
     }
     catch (err) {
@@ -221,10 +227,10 @@ const useServerRequests = () => {
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', `Basic ${encoded_login}`);
       //xhr.setRequestHeader('User-Agent', userAgent);
-      
+
       //User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.
       if (Platform.OS !== 'web') xhr.setRequestHeader('User-Agent', userAgent);
-      
+
       xhr.send(formdata);
     });
   };
@@ -269,6 +275,7 @@ const useServerRequests = () => {
     getSesarUserCode,
     getTileBaseUrl,
     getTilesFromHost,
+    convertSpotToMacrostrat,
     postToSesar,
     refreshSesarToken,
     registerUser,
