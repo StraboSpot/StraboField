@@ -21,7 +21,7 @@ const SamplesOverview = ({page}) => {
   /* View */
 
   return (
-    <SamplesList onPress={onPressed}/>
+    <SamplesList onPress={onPressed} onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}/>
   );
 };
 

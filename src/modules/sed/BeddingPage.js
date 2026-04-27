@@ -148,7 +148,7 @@ const BeddingPage = ({isReadOnly, page}) => {
           )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Beds'}/>}
+          ListEmptyComponent={<ListEmptyText onPress={!isReadOnly && addAttribute} text={'No Beds'}/>}
           data={bedding.beds}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (

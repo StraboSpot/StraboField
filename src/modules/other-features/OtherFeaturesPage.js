@@ -86,7 +86,9 @@ const OtherFeaturesPage = ({isReadOnly}) => {
         />
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
+          ListEmptyComponent={
+            <ListEmptyText onPress={!isReadOnly && addFeature} text={'There are no other features at this Spot.'}/>
+          }
           data={spot.properties.other_features}
           keyExtractor={item => item.id.toString()}
           renderItem={item => renderFeature(item.item)}

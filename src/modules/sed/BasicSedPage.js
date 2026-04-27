@@ -116,7 +116,9 @@ const BasicSedPage = ({isReadOnly, page}) => {
         <PageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+          ListEmptyComponent={
+            <ListEmptyText onPress={!isReadOnly && addAttribute} text={'No ' + page.label}/>
+          }
           data={attributes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
