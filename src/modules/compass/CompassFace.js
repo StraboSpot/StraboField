@@ -50,7 +50,7 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
     const linearOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR);
     const planarOn = compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR);
 
-    if (linearOn && planarOn && trend >= 0 && strike >= 0) return [renderTrendSymbol(), renderStrikeDipSymbol()];
+    if (linearOn && planarOn && trend >= 0 && strike >= 0) return <>{renderTrendSymbol()}{renderStrikeDipSymbol()}</>;
     else if (linearOn) return renderTrendSymbol();
     else if (planarOn) return renderStrikeDipSymbol();
     return null;
