@@ -136,7 +136,6 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         {renderDeleteMessage()}
       </WarningModal>
       <RockdModal
-        checkInTransmitState={() => console.log('checkInTransmitState')}
         closeModal={() => setIsRockdModalVisible(false)}
         isVisible={isRockdModalVisible}
       />

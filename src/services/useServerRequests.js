@@ -25,7 +25,7 @@ const useServerRequests = () => {
   /* Derived Variables */
 
   // URL Helpers
-  const {SPOT_CONVERSION, LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
+  const {SPOT_CHECKIN, SPOT_CONVERSION, LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;
   const domain = endpoint && isSelected ? endpoint : STRABO_APIS.STRABO;
   const tilehost = STRABO_APIS.TILE_HOST;
@@ -84,8 +84,7 @@ const useServerRequests = () => {
 
   //MacroStrat API
   const convertSpotToMacrostrat = (spot) => {
-    return postRequest(SPOT_CONVERSION, spot, null,
-      {'Content-Type': 'application/json', 'Accept': 'application/json'});
+    return postRequest(SPOT_CONVERSION, spot, null, {});
   };
 
   const getMacrostratData = (location) => {
@@ -101,6 +100,10 @@ const useServerRequests = () => {
       console.error('Error opening Rockd login', err);
       alert('Error opening Rockd login', err.toString());
     }
+  };
+
+  const postToMacrostrat = (spotCheckIn) => {
+    return postRequest(SPOT_CHECKIN, spotCheckIn, null, {});
   };
 
   const getMyMapsBbox = async (mapUrl) => {
@@ -276,6 +279,7 @@ const useServerRequests = () => {
     getTileBaseUrl,
     getTilesFromHost,
     convertSpotToMacrostrat,
+    postToMacrostrat,
     postToSesar,
     refreshSesarToken,
     registerUser,
