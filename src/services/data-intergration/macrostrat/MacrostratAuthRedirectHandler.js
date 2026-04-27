@@ -9,6 +9,18 @@ import {setMacrostratToken} from '../../../modules/user/userProfile.slice';
 const MACROSTRAT_CALLBACK_ROUTES = ['macrostrat/login', 'macrostrat_login'];
 const TOKEN_QUERY_KEYS = ['token', 'auth_token', 'access_token'];
 
+const parseJwtExpiration = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    return decoded.exp ? new Date(decoded.exp * 1000).toISOString() : null;
+  }
+  catch {
+    return null;
+  }
+};
+
 const parseMacrostratCallback = (url) => {
   if (!url || typeof url !== 'string') return null;
 
@@ -52,7 +64,7 @@ const MacrostratAuthRedirectHandler = () => {
         return;
       }
 
-      dispatch(setMacrostratToken(callback.token));
+      dispatch(setMacrostratToken({token: callback.token, expires: parseJwtExpiration(callback.token)}));
       toast.show('Rockd login complete.', {type: 'success'});
     };
 
