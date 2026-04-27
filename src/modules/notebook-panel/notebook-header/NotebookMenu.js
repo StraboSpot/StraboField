@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import RockdModal from '../../../services/data-intergration/macrostrat/RockdModal';
 import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
@@ -32,6 +33,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+  const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
 
   /* Event Handlers */
 
@@ -52,6 +54,10 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else if (key === 'rockd') {
+      closeNotebookMenu();
+      setIsRockdModalVisible(true);
+    }
     else closeNotebookPanel();
     closeNotebookMenu();
   };
@@ -129,6 +135,11 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
       >
         {renderDeleteMessage()}
       </WarningModal>
+      <RockdModal
+        checkInTransmitState={() => console.log('checkInTransmitState')}
+        closeModal={() => setIsRockdModalVisible(false)}
+        isVisible={isRockdModalVisible}
+      />
     </>
   );
 };

@@ -12,8 +12,10 @@ const initialUserState = {
   isAuthenticated: false,
   mapboxToken: null,
   macrostrat: {
-    token: __DEV__ ? rockedToken : null,
-    expires: __DEV__ ? rockdExpiration : null,
+    // token: __DEV__ ? rockedToken : null,
+    token: null,
+    // expires: __DEV__ ? rockdExpiration : null,
+    expires: null,
   },
   name: null,
   sesar: {
