@@ -103,7 +103,7 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
           />
         )}
         <ButtonGroup
-          buttons={['My Projects', 'Collaborative Projects']}
+          buttons={['Unshared', 'Shared\nby Me', 'Shared\nwith Me']}
           containerStyle={buttonStyles.buttonGroupContainer}
           onPress={(index) => {
             console.log('Selected index:', index);
@@ -130,8 +130,9 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
         value={collaborativeDatasetName}
         visible={isDatasetNameModalVisible}
       >
-        <Text style={{textAlign: 'center'}}>If you wish to not create a dataset now one can be created in the Datasets
-          page.</Text>
+        <Text style={{textAlign: 'center'}}>
+          If you wish to not create a dataset now one can be created in the Datasets page.
+        </Text>
       </TextInputModal>
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal

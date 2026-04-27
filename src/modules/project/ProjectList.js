@@ -10,6 +10,7 @@ import useProject from './useProject';
 import {APP_DIRECTORIES} from '../../services/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
+import {MEDIUMGREY} from '../../shared/styles.constants';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -59,6 +60,15 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
 
   /* Logic Helpers */
 
+  const filteredProjectsList = () => {
+    const projects = projectsArr.projects ?? [];
+    if (selectedButtonIndex === undefined) return projects;
+    if (selectedButtonIndex === 0) return projects.filter(p => !p?.isCollaborativeProject);
+    if (selectedButtonIndex === 1) return projects.filter(p => p?.isCollaborativeProject && p?.isOwner);
+    if (selectedButtonIndex === 2) return projects.filter(p => p?.isCollaborativeProject && !p?.isOwner);
+    return projects;
+  };
+
   const getAllProjects = async () => {
     let projectsResponse;
     setLoading(true);
@@ -81,17 +91,16 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
     }
   };
 
-  /* Render Functions */
-
-  const renderErrorMessage = () => {
-    return (
-      <View>
-        <Text style={{color: 'red', textAlign: 'center'}}>{errorMessage}</Text>
-      </View>
-    );
+  const getEmptyMessage = () => {
+    if (selectedButtonIndex === 0) return 'No unshared projects found.';
+    if (selectedButtonIndex === 1) return 'No projects shared by you found.';
+    if (selectedButtonIndex === 2) return 'No projects shared with you found.';
+    return 'No Projects Available';
   };
 
-  const renderProjectItem = (item) => {
+  /* Render Functions */
+
+  const renderProjectItem = ({item}) => {
     const modifiedTimeAndDate = moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
     return (
       <ListItem
@@ -111,43 +120,10 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
             </ListItem.Subtitle>
           )}
         </ListItem.Content>
-        {item.isReadOnly && <Icon name={'lock-closed'} type={'ionicon'}/>}
+        {item.isReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} size={20} type={'ionicon'}/>}
         <ListItem.Chevron/>
       </ListItem>
     );
-  };
-
-  const filteredProjectsList = () => {
-    let myProjectsArr = [];
-    let collaborationArr = [];
-    projectsArr.projects?.forEach((project) => {
-      return project?.isCollaborativeProject ? collaborationArr.push(project) : myProjectsArr.push(project);
-    });
-    return selectedButtonIndex === 0 ? myProjectsArr : collaborationArr;
-  };
-
-  const renderProjectsList = () => {
-    if (!isEmpty(userData)) {
-      return (
-        <View style={{flex: 1}}>
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={
-              <View>
-                {source === 'server' ? <OutlineButton onPress={getAllProjects} title={'Retry'}/>
-                  : (
-                    <ListEmptyText text={'No Projects Available'}/>
-                  )}
-                {isError && renderErrorMessage()}
-              </View>
-            }
-            // data={projectsArr.projects}
-            data={filteredProjectsList()}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => renderProjectItem(item)}/>
-        </View>
-      );
-    }
   };
 
   /* View */
@@ -155,7 +131,22 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
   return (
     <View style={{flex: 1}}>
       <Loading isLoading={loading} style={{backgroundColor: themes.PRIMARY_BACKGROUND_COLOR}}/>
-      {renderProjectsList()}
+      {!isEmpty(userData) && (
+        <View style={{flex: 1}}>
+          <FlatList
+            ItemSeparatorComponent={FlatListItemSeparator}
+            ListEmptyComponent={
+              <View>
+                <ListEmptyText text={getEmptyMessage()}/>
+                {source === 'server' && <OutlineButton onPress={getAllProjects} title={'Retry'}/>}
+                {isError && <Text style={{color: 'red', textAlign: 'center'}}>{errorMessage}</Text>}
+              </View>
+            }
+            data={filteredProjectsList()}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderProjectItem}/>
+        </View>
+      )}
     </View>
   );
 };
