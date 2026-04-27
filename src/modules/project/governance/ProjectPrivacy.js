@@ -4,9 +4,9 @@ import {Linking, Text, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Form, useForm} from '../form';
-import {updatedProject} from './projects.slice';
-import commonStyles from '../../shared/common.styles';
+import commonStyles from '../../../shared/common.styles';
+import {Form, useForm} from '../../form';
+import {updatedProject} from '../projects.slice';
 
 const formName = ['settings', 'project_settings'];
 
@@ -55,15 +55,15 @@ const ProjectPrivacy = () => {
       </Formik>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>
-          {'* Public datasets are accessible at '}
+          {'Public datasets are accessible at '}
           <Text
             onPress={() => Linking.openURL('https://strabospot.org/search/')}
             style={{textDecorationLine: 'underline'}}>
             {'strabospot.org/search'}
           </Text>
-          {'. Privacy settings are reversible and update when project is uploaded.\n\nA public project does not mean '
-            + 'a project is editable. To make a project ediable it must be shared as a collaborative project. See '
-            + 'the next section.'}
+          {'. Privacy settings are reversible and update when project is uploaded.\n\n* A public project does not mean '
+            + 'it\'s data is editable. To make a project ediable it must be shared as a collaborative project. See'
+            + ' the next section.'}
         </Text>
       </View>
     </>

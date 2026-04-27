@@ -3,8 +3,8 @@ import {FlatList} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import GovernanceFields from './GovernanceFields';
 import ProjectPrivacy from './ProjectPrivacy';
-import GovernanceFields from '../form/GovernanceFields';
 
 const Governance = () => {
 

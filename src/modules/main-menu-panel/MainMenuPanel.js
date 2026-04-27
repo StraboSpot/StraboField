@@ -26,7 +26,7 @@ import ExportProject from '../project/backup/ExportProject';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import Datasets from '../project/datasets/Datasets';
 import DeleteProject from '../project/delete/DeleteProject';
-import Governance from '../project/Governance';
+import Governance from '../project/governance/Governance';
 import DownloadProject from '../project/load/DownloadProject';
 import ImportProjectFromZip from '../project/load/ImportProjectFromZip';
 import NewProject from '../project/load/NewProject';

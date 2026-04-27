@@ -13,8 +13,8 @@ import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
-import GovernanceFields from '../../form/GovernanceFields';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import GovernanceFields from '../governance/GovernanceFields';
 import {updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 

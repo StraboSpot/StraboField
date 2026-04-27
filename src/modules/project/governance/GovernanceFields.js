@@ -4,10 +4,10 @@ import {Linking, Text, TextInput, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import commonStyles from '../../shared/common.styles';
-import {MEDIUMGREY} from '../../shared/styles.constants';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import {formStyles} from '../form';
+import commonStyles from '../../../shared/common.styles';
+import {MEDIUMGREY} from '../../../shared/styles.constants';
+import SectionDivider from '../../../shared/ui/SectionDivider';
+import {formStyles} from '../../form';
 
 const GovernanceFields = ({isReadOnly, ownerName, ownerEmail}) => {
 
@@ -53,7 +53,7 @@ const GovernanceFields = ({isReadOnly, ownerName, ownerEmail}) => {
       </ListItem>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>
-          {'* Set collaboration settings at '}
+          {'Set collaboration settings at '}
           <Text onPress={() => Linking.openURL('https://strabospot.org/')} style={{textDecorationLine: 'underline'}}>
             {'strabospot.org'}
           </Text>
