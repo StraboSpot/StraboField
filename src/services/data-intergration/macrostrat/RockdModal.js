@@ -1,75 +1,97 @@
 import React from 'react';
-import {ActivityIndicator, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import RockdLogo from '../../../assets/images/logos/rockd_transparent.png';
-import {setMacrostratToken} from '../../../modules/user/userProfile.slice';
+import {updatedModifiedTimestampsBySpotsIds} from '../../../modules/project/projects.slice';
+import {editedSpotProperties} from '../../../modules/spots/spots.slice';
+import {addedCheckedInSpotId, setMacrostratToken} from '../../../modules/user/userProfile.slice';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import useServerRequests from '../../useServerRequests';
+
+const STATUS_MESSAGES = {
+  converting: 'Converting spot to Rock\'d format...',
+  sending: 'Sending check-in to Rock\'d...',
+  success: 'Successfully checked in to Rock\'d!',
+};
 
 const RockdModal = ({closeModal, isVisible}) => {
   const dispatch = useDispatch();
-  const {convertSpotToMacrostrat, openMacrostratLogin} = useServerRequests();
+  const {convertSpotToMacrostrat, openMacrostratLogin, postCheckinToRockd} = useServerRequests();
 
   const macrostratToken = useSelector(state => state.user.macrostrat?.token);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
-  const [statusMessage, setStatusMessage] = React.useState('');
+  const [checkInStatus, setCheckInStatus] = React.useState('idle');
+  const [errorMessage, setErrorMessage] = React.useState('');
 
-  // useEffect(() => {
-  //   console.log('macrostratToken', macrostratToken);
-  //   convertSpot().then((r) => {
-  //     sendSpot();
-  //   });
-  // }, [macrostratToken]);
+  const isLoading = checkInStatus === 'converting' || checkInStatus === 'sending';
 
-  if (macrostratToken) {
-    convertSpot();
-  }
+  React.useEffect(() => {
+    if (macrostratToken && selectedSpot && isVisible) {
+      handleCheckIn();
+    }
+  }, [macrostratToken, isVisible]);
 
-  const convertSpot = async () => {
-    console.log('convertSpot', selectedSpot);
-    setStatusMessage('Converting Spot to Rock\'d Spot...');
-    const response = await convertSpotToMacrostrat(selectedSpot);
-    console.log('convertSpot response', response);
+  const handleCheckIn = async () => {
+    try {
+      console.log('RockdModal check-in CONVERTING');
+      setCheckInStatus('converting');
+      const converted = await convertSpotToMacrostrat(selectedSpot);
+      if (!converted) throw new Error('Conversion returned an empty result');
+
+      console.log('RockdModal check-in SENDING');
+      setCheckInStatus('sending');
+      const checkInResponse = await postCheckinToRockd({...converted, token: macrostratToken});
+
+      console.log('RockdModal check-in SUCCESS', checkInResponse);
+      dispatch(addedCheckedInSpotId(selectedSpot.properties.id));
+      dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
+      dispatch(
+        editedSpotProperties({
+          field: 'rockd_checkin_id',
+          value: checkInResponse?.success?.data?.checkin_id,
+        }),
+      );
+      setCheckInStatus('success');
+    }
+    catch (err) {
+      console.error('RockdModal check-in error', err);
+      setErrorMessage(err?.message ?? 'An unknown error occurred');
+      setCheckInStatus('error');
+    }
   };
-
-  // const sendSpot = async () => {
-  //   console.log('sendSpot', selectedSpot);
-  //   setStatusMessage('Sending Spot to Rock\'d...');
-  // };
 
   return (
     <ModalWrapper
       closeModal={closeModal}
       headerImage={RockdLogo}
-      imageStyle={{height: 75, width: 200, marginBottom: 20}}
-      imageStyleOverride={{
-        height: 75,
-        width: 200,
-        marginBottom: 20,
-      }}
+      imageStyle={{height: 100, width: 250, marginBottom: 20}}
       isVisible={isVisible}
       onBackdropPress={closeModal}
-      overlayStyleOverride={{
-        height: 'auto',
-        width: '80%',
-        maxWidth: 400,
-      }}
+      overlayStyleOverride={{height: 'auto', width: '80%', maxWidth: 400}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
     >
-      <View style={{alignItems: 'center'}}>
+      <View style={{alignItems: 'center', gap: 12}}>
         {macrostratToken ? (
-          <View style={{alignItems: 'center', gap: 12}}>
-            <ActivityIndicator size='large'/>
+          <>
+            <LottieAnimations
+              doesLoop={isLoading}
+              show={checkInStatus !== 'idle'}
+              type={isLoading ? 'uploading' : checkInStatus === 'error' ? 'error' : 'complete'}
+            />
             <Text style={{fontSize: 16, textAlign: 'center'}}>
-              {statusMessage}
+              {checkInStatus === 'error' ? errorMessage : STATUS_MESSAGES[checkInStatus]}
             </Text>
-          </View>
+            {checkInStatus === 'error' && (
+              <OutlineButton onPress={handleCheckIn} title={'Retry'}/>
+            )}
+          </>
         ) : (
           <OutlineButton
             onPress={openMacrostratLogin}
