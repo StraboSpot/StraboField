@@ -131,7 +131,7 @@ const useCustomMap = () => {
     console.log('Custom Map Switch Value:', value, 'Map Id:', map.id);
     if (customMaps[map.id]) {
       dispatch(addedCustomMap({...customMaps[map.id], isViewable: value}));
-      if (!customMaps[map.id].overlay) viewCustomMap(map);
+      if (value && !customMaps[map.id].overlay) viewCustomMap(map);
     }
   };
 
