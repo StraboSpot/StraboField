@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {doesBackupDirectoryExist} from './projects.slice';
 import useProject from './useProject';
-import {APP_DIRECTORIES} from '../../services/directories.constants';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';

@@ -2,21 +2,21 @@ import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import useDevice from './useDevice';
-import useResetState from './useResetState';
-import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
-import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
-import {addedMapsFromDevice} from '../modules/maps/offline-maps/offlineMaps.slice';
+import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
+import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
+import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {
   addedDatasets,
   addedProject,
   setActiveDatasets,
   setSelectedProject,
   setTargetDataset,
-} from '../modules/project/projects.slice';
-import {addedSpotsFromDevice} from '../modules/spots/spots.slice';
-import {isEmpty} from '../shared/Helpers';
-import {persistor} from '../store/ConfigureStore';
+} from '../../modules/project/projects.slice';
+import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
+import {isEmpty} from '../../shared/Helpers';
+import {persistor} from '../../store/ConfigureStore';
+import useResetState from '../../store/useResetState';
+import useDevice from '../device/useDevice';
 
 let fileCount = 0;
 let isOldBackup;

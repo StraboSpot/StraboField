@@ -5,7 +5,7 @@ import {Icon} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 import Toast from 'react-native-toast-notifications';
 
-import useDevice from '../../services/useDevice';
+import useDevice from '../../services/device/useDevice';
 import {isEmpty, openUrl} from '../../shared/Helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import CloseButton from '../../shared/ui/buttons/CloseButton';

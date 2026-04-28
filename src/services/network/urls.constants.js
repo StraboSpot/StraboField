@@ -1,4 +1,4 @@
-import config from '../utils/config';
+import config from '../../utils/config';
 
 const account = '/account';
 const orcid = 'https://orcid.org/oauth';

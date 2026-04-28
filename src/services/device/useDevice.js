@@ -5,13 +5,13 @@ import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
 
-import {APP_DIRECTORIES} from './directories.constants';
-import useServerRequests from './useServerRequests';
-import {setLoadingStatus} from '../modules/home/home.slice';
-import {deletedOfflineMap} from '../modules/maps/offline-maps/offlineMaps.slice';
-import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../modules/project/projects.slice';
-import usePermissions from '../services/usePermissions';
-import useSafeDocumentPicker from '../services/useSafeDocumentPicker';
+import usePermissions from './usePermissions';
+import useSafeDocumentPicker from './useSafeDocumentPicker';
+import {setLoadingStatus} from '../../modules/home/home.slice';
+import {deletedOfflineMap} from '../../modules/maps/offline-maps/offlineMaps.slice';
+import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modules/project/projects.slice';
+import {APP_DIRECTORIES} from '../files/directories.constants';
+import useServerRequests from '../network/useServerRequests';
 
 const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {

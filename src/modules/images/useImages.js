@@ -6,10 +6,10 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES} from '../../services/directories.constants';
-import {STRABO_APIS} from '../../services/urls.constants';
-import useDevice from '../../services/useDevice';
-import usePermissions from '../../services/usePermissions';
+import useDevice from '../../services/device/useDevice';
+import usePermissions from '../../services/device/usePermissions';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
+import {STRABO_APIS} from '../../services/network/urls.constants';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';

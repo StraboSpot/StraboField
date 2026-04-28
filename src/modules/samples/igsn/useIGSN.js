@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {SAMPLE_FORM_NAME} from '../samples.constants';
 import {convertAndBuildSchema, getMaterialName, isTokenExpired, parseXML} from './igsn.helpers';
-import useServerRequests from '../../../services/useServerRequests';
+import useServerRequests from '../../../services/network/useServerRequests';
 import useForm from '../../form/useForm';
 import {setSesarToken} from '../../user/userProfile.slice';
 

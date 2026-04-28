@@ -5,10 +5,11 @@ import {Picker} from '@react-native-picker/picker';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {calculateScaleRatio} from './scale';
 import useMapsOffline from './useMapsOffline';
-import {APP_DIRECTORIES} from '../../../services/directories.constants';
-import useDevice from '../../../services/useDevice';
-import useServerRequests from '../../../services/useServerRequests';
+import useDevice from '../../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
+import useServerRequests from '../../../services/network/useServerRequests';
 import {toNumberFixedValue} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -20,7 +21,6 @@ import {
   setIsOfflineMapsModalVisible,
 } from '../../home/home.slice';
 import {MAP_PROVIDERS} from '../maps.constants';
-import {calculateScaleRatio} from './scale';
 
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   // console.log('Rendering SaveMapsModal...');

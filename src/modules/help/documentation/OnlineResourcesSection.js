@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {STRABO_APIS} from '../../../services/urls.constants';
+import {STRABO_APIS} from '../../../services/network/urls.constants';
 import {BLUE} from '../../../shared/styles.constants';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import UrlLinkButton from '../UrlLinkButton';

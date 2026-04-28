@@ -4,7 +4,7 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDownload from '../../../services/useDownload';
+import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/Helpers';
 import * as themes from '../../../shared/styles.constants';

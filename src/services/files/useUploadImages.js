@@ -3,15 +3,15 @@ import {useState} from 'react';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {updatedProjectTransferProgress} from './connections.slice';
 import {APP_DIRECTORIES, TEMP_IMAGES_DOWNSIZED_DIRECTORY} from './directories.constants';
-import {getImageIds} from './services.helpers';
-import useDevice from './useDevice';
-import useServerRequests from './useServerRequests';
-import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../modules/home/home.slice';
-import {useImages} from '../modules/images';
-import {setIsImageTransferring} from '../modules/project/projects.slice';
-import {isEmpty} from '../shared/Helpers';
+import {getImageIds} from './files.helpers';
+import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../../modules/home/home.slice';
+import {useImages} from '../../modules/images';
+import {setIsImageTransferring} from '../../modules/project/projects.slice';
+import {isEmpty} from '../../shared/Helpers';
+import useDevice from '../device/useDevice';
+import useServerRequests from '../network/useServerRequests';
 
 const useUploadImages = () => {
   /* Data Hooks */

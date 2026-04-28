@@ -1,10 +1,10 @@
 import geomagnetism from 'geomagnetism';
 import {useSelector} from 'react-redux';
 
-import {cartesianToSpherical, getHeading, getStrikeAndDip, getTrendAndPlunge} from './services.helpers';
-import useMapCoords from '../modules/maps/useMapCoords';
-import useMapLocation from '../modules/maps/useMapLocation';
-import {isEmpty, roundToDecimalPlaces} from '../shared/Helpers';
+import {cartesianToSpherical, getHeading, getStrikeAndDip, getTrendAndPlunge} from './compass.helpers';
+import useMapCoords from '../../modules/maps/useMapCoords';
+import useMapLocation from '../../modules/maps/useMapLocation';
+import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
 
 let matrixArray = [];
 

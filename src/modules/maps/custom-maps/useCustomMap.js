@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {STRABO_APIS} from '../../../services/urls.constants';
-import useServerRequests from '../../../services/useServerRequests';
+import {STRABO_APIS} from '../../../services/network/urls.constants';
+import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/Helpers';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';

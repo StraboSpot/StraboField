@@ -5,11 +5,11 @@ import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
-import useDevice from './useDevice';
-import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../modules/home/home.slice';
-import {PAGE_KEYS} from '../modules/page/pageKeys.constants';
-import {setBackupFileName} from '../modules/project/projects.slice';
-import {hasSpace, isEmpty} from '../shared/Helpers';
+import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
+import {PAGE_KEYS} from '../../modules/page/pageKeys.constants';
+import {setBackupFileName} from '../../modules/project/projects.slice';
+import {hasSpace, isEmpty} from '../../shared/Helpers';
+import useDevice from '../device/useDevice';
 
 let imageBackupFailures = 0;
 let imageSuccess = 0;

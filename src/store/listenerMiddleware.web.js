@@ -29,7 +29,7 @@ import {
   updateProject,
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
-} from '../services/serverAPI';
+} from '../services/network/serverAPI';
 import {isEmpty} from '../shared/Helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends

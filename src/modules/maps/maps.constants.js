@@ -1,4 +1,4 @@
-import {STRABO_APIS} from '../../services/urls.constants';
+import {STRABO_APIS} from '../../services/network/urls.constants';
 import config from '../../utils/config';
 
 export const LATITUDE = 39.828175;      // Geographic center of US;

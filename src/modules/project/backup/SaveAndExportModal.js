@@ -4,11 +4,11 @@ import {Platform} from 'react-native';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useExport from '../../../services/useExport';
+import SaveAndExportModalContent from './SaveAndExportModalContent';
+import useExport from '../../../services/files/useExport';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
-import SaveAndExportModalContent from './SaveAndExportModalContent';
 
 const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
   /* Data Hooks */

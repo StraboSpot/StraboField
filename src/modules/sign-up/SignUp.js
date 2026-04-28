@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {formatMessage} from './signUp.helpers';
 import styles from './signUp.styles';
-import useServerRequests from '../../services/useServerRequests';
+import useServerRequests from '../../services/network/useServerRequests';
 import {validate} from '../../shared/Helpers';
 import * as themes from '../../shared/styles.constants';
 import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
