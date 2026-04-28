@@ -6,11 +6,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {SwitchWrapper} from '.';
 import uiStyles from './ui.styles';
+import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../modules/connections/connections.slice';
 import {updateCustomMap} from '../../modules/maps/maps.slice';
 import useMap from '../../modules/maps/useMap';
 import signInStyles from '../../modules/sign-in/signIn.styles';
-import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../services/connections.slice';
-import {STRABO_APIS} from '../../services/urls.constants';
+import {STRABO_APIS} from '../../services/network/urls.constants';
 
 const CustomEndpoint = ({containerStyles, textStyles}) => {
     /* Data Hooks */

@@ -1,6 +1,6 @@
-import {PermissionsAndroid} from 'react-native';
-
-// Pure math/compass helper functions extracted from useCompass
+export const mod = (value, degree) => {
+  return ((value % degree) + degree) % degree;
+};
 
 export const cartesianToSpherical = (mValue1, mValue2, mValue3) => {
   let rho = Math.sqrt(Math.pow(mValue1, 2) + Math.pow(mValue2, 2) + Math.pow(mValue3, 2));
@@ -39,14 +39,6 @@ export const getHeading = (yaw) => {
   return azimuthDegrees;
 };
 
-// Pure helper extracted from useUploadImages
-export const getImageIds = (images) => {
-  const imageIds = [];
-  images.forEach(image => imageIds.push(image.id));
-  console.log(imageIds);
-  return imageIds;
-};
-
 export const getStrikeAndDip = (ENU) => {
   let phi = ENU.phi;
   let theta = ENU.theta;
@@ -55,7 +47,6 @@ export const getStrikeAndDip = (ENU) => {
   if (phi <= Math.PI / 2) {
     strikeDeg = mod((360 - theta * (180 / Math.PI)), 360);
     dipDeg = phi * (180 / Math.PI);
-
   }
   else {
     strikeDeg = mod((360 - (theta + Math.PI) * (180 / Math.PI)), 360);
@@ -75,37 +66,4 @@ export const getTrendAndPlunge = (ENU_TP) => {
     plungeDeg = -plungeDeg;
   }
   return {trend: trendDeg, plunge: plungeDeg};
-};
-
-export const mod = (value, degree) => {
-  return ((value % degree) + degree) % degree;
-};
-
-// Pure helper extracted from usePermissions
-export const permissionsRequestType = (permission) => {
-  switch (permission) {
-    case PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE:
-      return {
-        title: 'WRITE To External Storage',
-        message: 'StraboSpot needs permission access the external storage to save files',
-      };
-    case PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE:
-      return {
-        title: 'READ External Storage',
-        message: 'StraboSpot needs permission access the external storage to read files',
-      };
-    case PermissionsAndroid.PERMISSIONS.CAMERA:
-      return {
-        title: 'CAMERA',
-        message: 'StraboSpot needs permission to use the camera take pictures',
-      };
-    case PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION:
-      return {
-        title: 'Location Permission',
-        message: 'App needs access to your location',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      };
-  }
 };

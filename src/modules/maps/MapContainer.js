@@ -19,7 +19,7 @@ import useMapLocation from './useMapLocation';
 import useMapPressEvents from './useMapPressEvents';
 import useMapView from './useMapView';
 import VertexActionsOverlay from './VertexActionsOverlay';
-import useServerRequests from '../../services/useServerRequests';
+import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/Helpers';
 import {
   addedStatusMessage,

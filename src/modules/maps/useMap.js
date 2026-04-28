@@ -5,8 +5,8 @@ import {isDrawMode} from './maps.helpers';
 import {setCurrentBasemap} from './maps.slice';
 import useMapCoords from './useMapCoords';
 import useMapURL from './useMapURL';
-import {STRABO_APIS} from '../../services/urls.constants';
-import useServerRequests from '../../services/useServerRequests';
+import {STRABO_APIS} from '../../services/network/urls.constants';
+import useServerRequests from '../../services/network/useServerRequests';
 import {
   addedStatusMessage,
   clearedStatusMessages,

@@ -4,9 +4,6 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import useDevice from './useDevice';
-import useResetState from './useResetState';
-import useServerRequests from './useServerRequests';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -16,10 +13,10 @@ import {
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
   setStatusMessageModalTitle,
-} from '../modules/home/home.slice';
-import {useImages} from '../modules/images';
-import {MAP_PROVIDERS} from '../modules/maps/maps.constants';
-import {addedCustomMapsFromBackup} from '../modules/maps/maps.slice';
+} from '../../modules/home/home.slice';
+import {useImages} from '../../modules/images';
+import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
+import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
   addedDatasets,
@@ -28,11 +25,14 @@ import {
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
-} from '../modules/project/projects.slice';
-import useProject from '../modules/project/useProject';
-import {addedSpotsFromServer} from '../modules/spots/spots.slice';
-import {setUserData} from '../modules/user/userProfile.slice';
-import {isEmpty} from '../shared/Helpers';
+} from '../../modules/project/projects.slice';
+import useProject from '../../modules/project/useProject';
+import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
+import {setUserData} from '../../modules/user/userProfile.slice';
+import {isEmpty} from '../../shared/Helpers';
+import useResetState from '../../store/useResetState';
+import useDevice from '../device/useDevice';
+import useServerRequests from '../network/useServerRequests';
 
 let customMapsToSave = {};
 let datasetsObjToSave = {};

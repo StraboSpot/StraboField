@@ -3,11 +3,11 @@ import {Image, Text, View} from 'react-native';
 
 import {useBatteryLevel} from 'react-native-device-info';
 
-import uiStyles from '../shared/ui/ui.styles';
+import uiStyles from '../../shared/ui/ui.styles';
 
-const batteryGreen = require('../assets/icons/BatteryGreenButton.png');
-const batteryRed = require('../assets/icons/BatteryRedButton.png');
-const batteryYellow = require('../assets/icons/BatteryYellowButton.png');
+const batteryGreen = require('../../assets/icons/BatteryGreenButton.png');
+const batteryRed = require('../../assets/icons/BatteryRedButton.png');
+const batteryYellow = require('../../assets/icons/BatteryYellowButton.png');
 
 const BatteryInfo = () => {
   const batteryLevel = useBatteryLevel();

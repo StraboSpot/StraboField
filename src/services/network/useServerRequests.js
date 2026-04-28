@@ -1,8 +1,7 @@
-import {Linking} from 'react-native';
+import {Linking, Platform} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {updatedProjectTransferProgress} from './connections.slice';
 import {
   deleteRequest,
   getRequest,
@@ -13,7 +12,8 @@ import {
 } from './serverRequestHelpers';
 import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent';
-import alert from '../shared/ui/alert';
+import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import alert from '../../shared/ui/alert';
 
 const useServerRequests = () => {
   /* Data Hooks */

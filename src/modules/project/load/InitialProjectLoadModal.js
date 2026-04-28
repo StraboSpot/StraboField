@@ -7,16 +7,16 @@ import DownloadProject from './DownloadProject';
 import ImportProjectFromZip from './ImportProjectFromZip';
 import LoadProjectButtons from './LoadProjectButtons';
 import NewProjectForm from './NewProjectForm';
-import useResetState from '../../../services/useResetState';
+import OpenProject from './OpenProject';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
 import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import useResetState from '../../../store/useResetState';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
 import projectStyles from '../project.styles';
-import OpenProject from './OpenProject';
-import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
   console.log('Rendering InitialProjectLoadModal...');

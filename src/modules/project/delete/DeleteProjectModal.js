@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {APP_DIRECTORIES} from '../../../services/directories.constants';
-import useDevice from '../../../services/useDevice';
+import useDevice from '../../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';

@@ -3,11 +3,11 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDownload from '../../../services/useDownload';
+import ConfirmOverwriteModal from './ConfirmOverwriteModal';
+import useDownload from '../../../services/files/useDownload';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
-import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 
 const source = 'server';
 
