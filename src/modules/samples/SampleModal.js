@@ -14,7 +14,7 @@ import {
   SAMPLE_ORIENTED_KEY,
   SAMPLE_TYPE_KEY,
 } from './samples.constants';
-import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
+import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import {WarningModal} from '../../shared/ui/modals';

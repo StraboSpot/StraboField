@@ -6,29 +6,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     padding: 20,
   },
-  customEndpointContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  customEndpointInput: {
-    borderBottomColor: 'transparent',
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    textAlign: 'center',
-    // marginLeft: 10,
-  },
-  customEndpointInputContainer: {
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderColor: themes.DARKGREY,
-    borderRadius: 10,
-    borderWidth: 1,
-    height: 45,
-    marginVertical: 10,
-    // width: '65%',
-  },
-  customEndpointText: {
-    fontWeight: 'bold',
-  },
   errorText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
   },

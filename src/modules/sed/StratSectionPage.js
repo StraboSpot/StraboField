@@ -10,7 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddImageOverlayModal from './AddImageOverlayModal';
 import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, isEqual} from '../../shared/Helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';

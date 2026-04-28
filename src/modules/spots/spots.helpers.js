@@ -1,4 +1,4 @@
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 export const getImageBasemapsInSpot = (spot) => {
   return spot.properties.images && spot.properties.images.reduce((acc, image) => {

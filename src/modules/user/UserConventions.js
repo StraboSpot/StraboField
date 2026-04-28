@@ -11,7 +11,7 @@ import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';

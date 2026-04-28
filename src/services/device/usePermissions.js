@@ -3,7 +3,7 @@ import {PermissionsAndroid} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 import {permissionsRequestType} from './device.helpers';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 
 const usePermissions = () => {

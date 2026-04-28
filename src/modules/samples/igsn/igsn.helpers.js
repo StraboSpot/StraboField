@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {isEmpty, truncateText} from '../../../shared/helpers';
 
 const parseString = require('react-native-xml2js').parseString;
 

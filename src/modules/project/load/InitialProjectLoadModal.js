@@ -8,7 +8,7 @@ import ImportProjectFromZip from './ImportProjectFromZip';
 import LoadProjectButtons from './LoadProjectButtons';
 import NewProjectForm from './NewProjectForm';
 import OpenProject from './OpenProject';
-import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {isEmpty, truncateText} from '../../../shared/helpers';
 import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';

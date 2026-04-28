@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
-import {truncateText} from '../../../shared/Helpers';
+import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';

@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {imageSliderStyles, imageStyles, useImages} from '.';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';

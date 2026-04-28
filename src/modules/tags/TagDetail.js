@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {deepFindFeatureTypeById, isEmpty} from '../../shared/Helpers';
+import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
 import {NotebookPageAvatar} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';

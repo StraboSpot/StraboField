@@ -9,7 +9,7 @@ import {addedStatusMessage} from '../../modules/home/home.slice';
 import {deletedSpotIdFromDataset, setIsImageTransferring} from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
 import {useSpots} from '../../modules/spots';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useServerRequests from '../network/useServerRequests';
 

@@ -2,7 +2,7 @@ import {useSelector} from 'react-redux';
 
 import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapSymbology.constants';
 import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
-import {hexToRgb, isEmpty} from '../../../shared/Helpers';
+import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';

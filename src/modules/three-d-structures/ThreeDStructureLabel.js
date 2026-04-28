@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-import {toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/helpers';
 import {useForm} from '../form';
 
 const ThreeDStructureLabel = ({item}) => {

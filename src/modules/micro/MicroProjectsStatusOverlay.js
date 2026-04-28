@@ -3,7 +3,7 @@ import {ActivityIndicator, Text, View} from 'react-native';
 
 import ProgressBar from 'react-native-progress/Bar';
 
-import {toNumberFixedValue} from '../../shared/Helpers';
+import {toNumberFixedValue} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';

@@ -19,7 +19,7 @@ import useUpload from '../../services/files/useUpload';
 import useUploadImages from '../../services/files/useUploadImages';
 import useServerRequests from '../../services/network/useServerRequests';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

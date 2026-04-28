@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import MorePagesMenu from './MorePagesMenu';
 import footerStyle from './notebookFooter.styles';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {BLACK} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';

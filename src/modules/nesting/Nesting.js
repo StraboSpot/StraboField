@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import NestingImageCard from './NestingImageCard';
 import useNesting from './useNesting';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';

@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import {convertXLSFormLogicToJS, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {LABEL_DICTIONARY} from '../form';
 
