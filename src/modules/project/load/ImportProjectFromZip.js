@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';

@@ -9,7 +9,7 @@ import {setIsProjectLoadSelectionModalVisible, setIsStatusMessagesModalVisible} 
 import {MAIN_MENU_ITEMS} from '../../../modules/main-menu-panel/mainMenu.constants';
 import DatasetPreferences from '../../../modules/project/datasets/DatasetPreferences';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {isEmpty} from '../../Helpers';
+import {isEmpty} from '../../helpers';
 import OutlineButton from '../buttons/OutlineButton';
 
 const StatusModal = () => {

@@ -4,7 +4,7 @@ import {ScrollView, Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 
 import {ADD_ROCK_KEYS} from './petrology.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';

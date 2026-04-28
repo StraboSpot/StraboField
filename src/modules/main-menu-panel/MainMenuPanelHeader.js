@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {MAIN_MENU_ITEMS, MAIN_MENU_TITLE} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import {BLACK} from '../../shared/styles.constants';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 

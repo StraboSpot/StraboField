@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import OtherFeatureDetail from './OtherFeatureDetail';
 import OtherFeatureItem from './OtherFeatureItem';
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import PageHeader from '../page/PageHeader';

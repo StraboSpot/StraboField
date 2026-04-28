@@ -5,7 +5,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
 
 import forms from '../../../assets/forms';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 

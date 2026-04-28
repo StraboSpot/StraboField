@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 
 import {useImages} from './index';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 const useImageThumbnails = ({images}) => {
   /* Data Hooks */

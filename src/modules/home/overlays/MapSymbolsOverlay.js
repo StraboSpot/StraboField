@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {overlayStyles} from './index';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';

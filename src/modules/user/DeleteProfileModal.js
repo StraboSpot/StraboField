@@ -7,7 +7,7 @@ import {useToast} from 'react-native-toast-notifications';
 
 import userStyles from './user.styles';
 import useServerRequests from '../../services/network/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {RED} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

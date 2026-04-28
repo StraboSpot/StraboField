@@ -9,7 +9,7 @@ import {NOTEBOOK_PAGES, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.c
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';

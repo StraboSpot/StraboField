@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import drawGeometryTogglesStyles from './drawGeometryToggles.styles';
 import {DEFAULT_GEOMETRIES, POINT_BUTTONS_TEXT, SHARP_CURVED_BUTTONS_TEXT} from './preferences.constants';
 import commonStyles from '../../shared/common.styles';
-import {toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';

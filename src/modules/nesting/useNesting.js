@@ -1,7 +1,7 @@
 import {useSelector} from 'react-redux';
 
 import {isWithin} from './nesting.helpers';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {useSpots} from '../spots';
 
 const useNesting = () => {

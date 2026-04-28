@@ -5,7 +5,7 @@ import {Icon} from '@rn-vui/base';
 import {MarkerView} from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 
 const MacrostratMarkerLayer = ({location}) => {
   /* Data Hooks */

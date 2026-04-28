@@ -2,7 +2,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setLoadingStatus} from './home.slice';
-import {isEqual} from '../../shared/Helpers';
+import {isEqual} from '../../shared/helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 import {setSelectedAttributes} from '../spots/spots.slice';

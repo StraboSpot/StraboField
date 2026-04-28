@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
-import {truncateText} from '../../../shared/Helpers';
+import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';

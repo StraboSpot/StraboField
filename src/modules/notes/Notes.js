@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';

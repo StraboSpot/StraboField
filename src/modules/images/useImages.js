@@ -10,7 +10,7 @@ import useDevice from '../../services/device/useDevice';
 import usePermissions from '../../services/device/usePermissions';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {STRABO_APIS} from '../../services/network/urls.constants';
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import {useWindowSize} from '../../shared/ui/useWindowSize';

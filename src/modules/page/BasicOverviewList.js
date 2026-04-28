@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import BasicListItem from './BasicListItem';
 import {PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';

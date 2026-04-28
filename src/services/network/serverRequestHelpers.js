@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 import * as Sentry from '@sentry/react-native';
 
 import {userAgent} from './userAgent';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 const DEFAULT_TIMEOUT = 300000;  // 5 min
 

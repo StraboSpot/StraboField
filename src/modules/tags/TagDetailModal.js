@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

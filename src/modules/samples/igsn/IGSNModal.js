@@ -8,7 +8,7 @@ import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
 import useIGSN from './useIGSN';
 import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {updatedKey} from '../../user/userProfile.slice';

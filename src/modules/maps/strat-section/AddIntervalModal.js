@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useStratSection from './useStratSection';
 import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
-import {deepObjectExtend} from '../../../shared/Helpers';
+import {deepObjectExtend} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';

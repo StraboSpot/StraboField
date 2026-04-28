@@ -6,7 +6,7 @@ import Pdf from 'react-native-pdf';
 import Toast from 'react-native-toast-notifications';
 
 import useDevice from '../../services/device/useDevice';
-import {isEmpty, openUrl} from '../../shared/Helpers';
+import {isEmpty, openUrl} from '../../shared/helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import CloseButton from '../../shared/ui/buttons/CloseButton';
 import Loading from '../../shared/ui/Loading';

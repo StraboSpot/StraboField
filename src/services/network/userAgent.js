@@ -9,7 +9,7 @@ import {
   getSystemVersion,
 } from 'react-native-device-info';
 
-import {toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/helpers';
 
 const app = `(${getApplicationName()}/${getReadableVersion()})`;
 

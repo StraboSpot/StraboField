@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {TagsModal} from '../tags';
 

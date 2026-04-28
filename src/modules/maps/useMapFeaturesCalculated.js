@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {SPOT_LAYERS} from './maps.constants';
 import {getClosestSpotDistanceAndIndex} from './maps.helpers';
 import useMapCoords from './useMapCoords';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import useNesting from '../nesting/useNesting';
 import {useSpots} from '../spots';
 

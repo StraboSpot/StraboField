@@ -1,4 +1,4 @@
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 export const equalsIgnoreOrder = (a, b) => {
   if (a.length !== b.length) return false;

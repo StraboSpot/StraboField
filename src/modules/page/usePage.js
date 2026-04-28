@@ -4,7 +4,7 @@ import {
   NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PET_PAGES, PRIMARY_PAGES, SECONDARY_PAGES, SED_PAGES,
 } from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {useTags} from '../tags';
 
 const usePage = () => {

@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SamplesList from './SamplesList';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicPageDetail from '../page/BasicPageDetail';

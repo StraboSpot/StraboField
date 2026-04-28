@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {convertMillisecondsToSliderValue} from './preferences.helpers';
 import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
-import {convertMillisecondsToTime, convertSliderValueToMilliseconds} from '../../shared/Helpers';
+import {convertMillisecondsToTime, convertSliderValueToMilliseconds} from '../../shared/helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import uiStyles from '../../shared/ui/ui.styles';

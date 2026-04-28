@@ -11,7 +11,7 @@ import {
 import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from './maps.helpers';
 import {setCenter, setZoom} from './maps.slice';
 import useMapCoords from './useMapCoords';
-import {isEmpty, isEqual} from '../../shared/Helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 
 const useMapView = () => {
   /* Data Hooks */

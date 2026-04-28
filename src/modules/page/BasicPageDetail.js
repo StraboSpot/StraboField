@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';

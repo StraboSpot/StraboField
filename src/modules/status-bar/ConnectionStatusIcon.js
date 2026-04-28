@@ -3,7 +3,7 @@ import {Image, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import uiStyles from '../../shared/ui/ui.styles';
+import statusBarStyles from './statusBar.styles';
 
 const accessPointIcon = require('../../assets/icons/ConnectionStatusButton_connected.png');
 const offlineIcon = require('../../assets/icons/ConnectionStatusButton_offline.png');
@@ -25,10 +25,10 @@ const ConnectionStatusIcon = () => {
   /* View */
 
   return (
-    <View style={uiStyles.connectionStatusContainer}>
+    <View style={statusBarStyles.connectionStatusContainer}>
       <Image
         source={getNetworkStatusIcon()}
-        style={uiStyles.statusBarIcon}
+        style={statusBarStyles.statusBarIcon}
       />
     </View>
   );

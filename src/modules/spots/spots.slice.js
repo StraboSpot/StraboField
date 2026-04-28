@@ -1,6 +1,6 @@
 import {createSlice, current} from '@reduxjs/toolkit';
 
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 const initialSpotState = {
   intersectedSpotsForTagging: [],

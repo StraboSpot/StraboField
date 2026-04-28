@@ -4,7 +4,7 @@ import {FlatList, Platform, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

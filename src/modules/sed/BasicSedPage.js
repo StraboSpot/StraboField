@@ -5,7 +5,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {INTERPRETATIONS_SUBPAGES, LITHOLOGY_SUBPAGES, STRUCTURE_SUBPAGES} from './sed.constants';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';

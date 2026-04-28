@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {BLUE, DARKGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';

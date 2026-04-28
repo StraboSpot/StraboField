@@ -7,7 +7,7 @@ import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';

@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import {useSpots} from '.';
 import SortingButtons from './SortingButtons';
 import {SORT_ORDER, SORTED_VIEWS} from './spots.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {DARKGREY, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';

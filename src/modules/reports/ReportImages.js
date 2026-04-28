@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';

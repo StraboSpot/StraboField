@@ -4,7 +4,7 @@ import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
 import {MAP_MODES} from '../maps.constants';
 import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';

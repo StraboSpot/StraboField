@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
 import {getLinearTemplates, getPlanarTemplates} from './templates.helpers';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
