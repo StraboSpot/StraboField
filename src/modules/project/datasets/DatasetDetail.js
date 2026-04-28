@@ -6,7 +6,7 @@ import {Field, Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDownload from '../../../services/useDownload';
+import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';

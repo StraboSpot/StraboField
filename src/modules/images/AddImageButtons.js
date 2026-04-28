@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux';
 
 import {getImageMetaFromWeb, getSize, resizeFile} from './imageHelpers';
 import {imageStyles, useImages} from './index';
-import useUpload from '../../services/useUpload';
+import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';

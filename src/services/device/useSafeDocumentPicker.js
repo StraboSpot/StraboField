@@ -4,7 +4,7 @@ import {errorCodes, isErrorWithCode, pick} from '@react-native-documents/picker'
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
-import {setLoadingStatus} from '../modules/home/home.slice';
+import {setLoadingStatus} from '../../modules/home/home.slice';
 
 const useSafeDocumentPicker = () => {
   /* Data Hooks */

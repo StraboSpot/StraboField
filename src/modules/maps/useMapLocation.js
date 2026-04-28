@@ -4,7 +4,7 @@ import * as turf from '@turf/turf';
 import Geolocation from 'react-native-geolocation-service';
 import {useDispatch} from 'react-redux';
 
-import usePermissions from '../../services/usePermissions';
+import usePermissions from '../../services/device/usePermissions';
 import {useSpots} from '../spots';
 import {setSelectedSpot} from '../spots/spots.slice';
 

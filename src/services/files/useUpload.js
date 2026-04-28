@@ -4,14 +4,14 @@ import {Platform} from 'react-native';
 import KeepAwake from 'react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useServerRequests from './useServerRequests';
 import useUploadImages from './useUploadImages';
-import {addedStatusMessage} from '../modules/home/home.slice';
-import {deletedSpotIdFromDataset, setIsImageTransferring} from '../modules/project/projects.slice';
-import useProject from '../modules/project/useProject';
-import {useSpots} from '../modules/spots';
-import {isEmpty} from '../shared/Helpers';
-import alert from '../shared/ui/alert';
+import {addedStatusMessage} from '../../modules/home/home.slice';
+import {deletedSpotIdFromDataset, setIsImageTransferring} from '../../modules/project/projects.slice';
+import useProject from '../../modules/project/useProject';
+import {useSpots} from '../../modules/spots';
+import {isEmpty} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
+import useServerRequests from '../network/useServerRequests';
 
 const datasetsNotUploaded = [];
 let projectUploadStatus = {};

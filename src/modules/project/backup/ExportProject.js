@@ -3,13 +3,13 @@ import {Platform, View} from 'react-native';
 
 import {useDispatch} from 'react-redux';
 
-import useDevice from '../../../services/useDevice';
+import SaveAndExportModal from './SaveAndExportModal';
+import useDevice from '../../../services/device/useDevice';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
-import SaveAndExportModal from './SaveAndExportModal';
-import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 
 const source = 'device';
 

@@ -2,8 +2,8 @@ import React from 'react';
 import {Platform, View} from 'react-native';
 
 import homeStyles from './home.style';
-import BatteryInfo from '../../services/BatteryInfo';
-import ConnectionStatusIcon from '../../services/ConnectionStatusIcon';
+import BatteryInfo from '../status-bar/BatteryInfo';
+import ConnectionStatusIcon from '../status-bar/ConnectionStatusIcon';
 
 const DeviceInfo = () => {
   if (Platform.OS !== 'web') {

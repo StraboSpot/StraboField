@@ -4,7 +4,7 @@ import {Base64} from 'js-base64';
 import {useDispatch} from 'react-redux';
 
 import useSignIn from './useSignIn';
-import useDownload from '../../services/useDownload';
+import useDownload from '../../services/files/useDownload';
 import {
   addedStatusMessage,
   clearedStatusMessages,

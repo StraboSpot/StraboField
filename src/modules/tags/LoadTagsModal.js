@@ -6,7 +6,7 @@ import RNFS from 'react-native-fs';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS} from './tags.constants';
-import useSafeDocumentPicker from '../../services/useSafeDocumentPicker';
+import useSafeDocumentPicker from '../../services/device/useSafeDocumentPicker';
 import {DARKGREY, MODAL_TEXT_SIZE, PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import LottieAnimations from '../../utils/animations/LottieAnimations';

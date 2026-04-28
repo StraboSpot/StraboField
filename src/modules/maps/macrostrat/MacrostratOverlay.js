@@ -4,7 +4,7 @@ import {Linking, ScrollView, Text, View} from 'react-native';
 import {Card} from '@rn-vui/base';
 
 import macrostratOverlayStyles from './macrostratOverlay.styles';
-import useServerRequests from '../../../services/useServerRequests';
+import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/Helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';

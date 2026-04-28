@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import useImport from '../../../services/useImport';
+import useImport from '../../../services/files/useImport';
 import {
   addedStatusMessage,
   clearedStatusMessages,

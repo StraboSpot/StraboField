@@ -5,7 +5,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import useDownload from '../../../services/useDownload';
+import useDownload from '../../../services/files/useDownload';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
 import TextInputModal from '../../../shared/ui/TextInputModal';

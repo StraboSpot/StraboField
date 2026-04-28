@@ -3,11 +3,11 @@ import {Image, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import uiStyles from '../shared/ui/ui.styles';
+import uiStyles from '../../shared/ui/ui.styles';
 
-const accessPointIcon = require('../assets/icons/ConnectionStatusButton_connected.png');
-const offlineIcon = require('../assets/icons/ConnectionStatusButton_offline.png');
-const onlineIcon = require('../assets/icons/ConnectionStatusButton_online.png');
+const accessPointIcon = require('../../assets/icons/ConnectionStatusButton_connected.png');
+const offlineIcon = require('../../assets/icons/ConnectionStatusButton_offline.png');
+const onlineIcon = require('../../assets/icons/ConnectionStatusButton_online.png');
 
 const ConnectionStatusIcon = () => {
   /* Data Hooks */

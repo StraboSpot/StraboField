@@ -4,7 +4,7 @@ import {Platform, View} from 'react-native';
 import {useDispatch} from 'react-redux';
 
 import DeleteProjectModal from './DeleteProjectModal';
-import useDevice from '../../../services/useDevice';
+import useDevice from '../../../services/device/useDevice';
 import {BLUE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';

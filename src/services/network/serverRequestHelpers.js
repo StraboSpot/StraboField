@@ -1,10 +1,11 @@
+import {Platform} from 'react-native';
+
 import * as Sentry from '@sentry/react-native';
 
 import {userAgent} from './userAgent';
-import {isEmpty} from '../shared/Helpers';
-import {Platform} from 'react-native';
+import {isEmpty} from '../../shared/Helpers';
 
-const DEFAULT_TIMEOUT = 60000;
+const DEFAULT_TIMEOUT = 300000;  // 5 min
 
 /* Internal Functions */
 
@@ -14,21 +15,21 @@ const buildAuthHeader = (auth) => {
 };
 
 /* -- 20260330 JMA
+ const buildHeaders = (auth, customHeaders = {}) => ({
+ 'User-Agent': userAgent,
+ ...buildAuthHeader(auth),
+ ...customHeaders,
+ });
+ */
+
+/*
+ User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.
+ */
 const buildHeaders = (auth, customHeaders = {}) => ({
-  'User-Agent': userAgent,
+  ...(Platform.OS !== 'web' && {'User-Agent': userAgent}),
   ...buildAuthHeader(auth),
   ...customHeaders,
 });
-*/
-
-/*
-User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.
-*/
-const buildHeaders = (auth, customHeaders = {}) => ({                                                                                                          
-  ...(Platform.OS !== 'web' && {'User-Agent': userAgent}),                                                                                                     
-  ...buildAuthHeader(auth),                                                                                                                                    
-  ...customHeaders,                                                                                                                                            
-});  
 
 /* Exported Functions */
 
@@ -44,21 +45,21 @@ export const deleteRequest = async (url, auth) => {
 };
 
 /* -- 20260330 JMA
-export const getRequest = async (url, auth, options = {}) => {
-  const {responseType, ...headerOptions} = options;
-  try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
-    return isEmpty(options) ? handleResponse(response) : response;
-*/
+ export const getRequest = async (url, auth, options = {}) => {
+ const {responseType, ...headerOptions} = options;
+ try {
+ const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
+ return isEmpty(options) ? handleResponse(response) : response;
+ */
 
 /*
-`options` (e.g. {responseType: 'blob'}) was being passed as the `customHeaders` argument to buildHeaders(), 
-which spread it into the HTTP headers. This sent `responsetype: blob` as an actual HTTP header, triggering a CORS
-*/
-export const getRequest = async (url, auth, options = {}) => {                                                                                                 
-  try {                                                                                                                                                        
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));                                                           
-    return isEmpty(options) ? handleResponse(response) : response;   
+ `options` (e.g. {responseType: 'blob'}) was being passed as the `customHeaders` argument to buildHeaders(),
+ which spread it into the HTTP headers. This sent `responsetype: blob` as an actual HTTP header, triggering a CORS
+ */
+export const getRequest = async (url, auth, options = {}) => {
+  try {
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
+    return isEmpty(options) ? handleResponse(response) : response;
   }
   catch (err) {
     console.error(`Error GET: ${url}`, err);

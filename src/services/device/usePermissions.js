@@ -2,9 +2,9 @@ import {PermissionsAndroid} from 'react-native';
 
 import DeviceInfo from 'react-native-device-info';
 
-import {permissionsRequestType} from './services.helpers';
-import {isEmpty} from '../shared/Helpers';
-import alert from '../shared/ui/alert';
+import {permissionsRequestType} from './device.helpers';
+import {isEmpty} from '../../shared/Helpers';
+import alert from '../../shared/ui/alert';
 
 const usePermissions = () => {
   /* Exported Functions */

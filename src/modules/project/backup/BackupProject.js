@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
-import useDevice from '../../../services/useDevice';
+import useDevice from '../../../services/device/useDevice';
 import {BLUE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';

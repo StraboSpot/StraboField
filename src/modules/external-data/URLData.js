@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import useExternalData from './useExternalData';
-import useDevice from '../../services/useDevice';
+import useDevice from '../../services/device/useDevice';
 import commonStyles from '../../shared/common.styles';
 import {truncateText, urlValidator} from '../../shared/Helpers';
 import {BLUE, DARKGREY} from '../../shared/styles.constants';

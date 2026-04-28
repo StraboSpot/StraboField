@@ -5,7 +5,7 @@ import {Card} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImages} from '.';
-import useDevice from '../../services/useDevice';
+import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/Helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
