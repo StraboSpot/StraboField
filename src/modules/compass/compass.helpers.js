@@ -1,4 +1,4 @@
-import {roundToDecimalPlaces, toDegrees, toRadians} from '../../shared/Helpers';
+import {roundToDecimalPlaces, toDegrees, toRadians} from '../../shared/helpers';
 
 export const calcDipDir = (strike, formRefCurrent) => {
   console.log('Calculating dip direction...');

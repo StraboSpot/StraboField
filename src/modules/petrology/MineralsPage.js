@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import commonStyles from '../../shared/common.styles';
-import {getNewCopyId, isEmpty} from '../../shared/Helpers';
+import {getNewCopyId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SelectInputField} from '../form';

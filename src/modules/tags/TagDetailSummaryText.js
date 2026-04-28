@@ -8,7 +8,7 @@ import {tagsStyles} from './index';
 import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
 import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 
 const TagDetailSummaryText = ({onPress}) => {
   /* Data Hooks */

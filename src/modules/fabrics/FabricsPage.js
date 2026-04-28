@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {DEPRECATED_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_SECTIONS_TITLES} from './fabric.constants';
 import FabricListItem from './FabricListItem';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';

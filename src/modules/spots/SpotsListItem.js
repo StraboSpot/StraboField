@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import {NotebookPageAvatar, SpotGeometryAvatar} from '../../shared/ui/avatars';
 import usePage from '../page/usePage';

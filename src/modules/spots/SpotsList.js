@@ -3,7 +3,7 @@ import {FlatList, View} from 'react-native';
 
 import {SpotsListItem, useSpots} from '.';
 import SpotFilters from './SpotFilters';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';

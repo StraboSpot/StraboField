@@ -5,7 +5,7 @@ import {Card} from '@rn-vui/base';
 
 import macrostratOverlayStyles from './macrostratOverlay.styles';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';

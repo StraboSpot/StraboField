@@ -3,7 +3,7 @@ import {PixelRatio, Platform} from 'react-native';
 import * as turf from '@turf/turf';
 
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 const useMapMeasure = (mapRef) => {
   /* Data Hooks */

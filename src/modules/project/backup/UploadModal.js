@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import uploadModalStyles from './uploadModal.styles';
 import useUpload from '../../../services/files/useUpload';
 import useUploadImages from '../../../services/files/useUploadImages';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';

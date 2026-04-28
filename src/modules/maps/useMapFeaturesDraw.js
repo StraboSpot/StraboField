@@ -14,7 +14,7 @@ import useMapCoords from './useMapCoords';
 import useMapFeatures from './useMapFeatures';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
 import useStereonet from './useStereonet';
-import {getNewId, getNewUUID, isEmpty, isEqual} from '../../shared/Helpers';
+import {getNewId, getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';

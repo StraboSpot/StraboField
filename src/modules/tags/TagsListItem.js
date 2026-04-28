@@ -7,7 +7,7 @@ import {useTags} from '.';
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
-import {toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/helpers';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {setSelectedTag} from '../project/projects.slice';

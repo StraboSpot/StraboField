@@ -9,7 +9,7 @@ import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import PageHeader from './PageHeader';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';

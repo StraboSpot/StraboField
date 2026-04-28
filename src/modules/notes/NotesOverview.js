@@ -4,7 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 

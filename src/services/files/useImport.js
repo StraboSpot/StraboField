@@ -13,7 +13,7 @@ import {
   setTargetDataset,
 } from '../../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {persistor} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';

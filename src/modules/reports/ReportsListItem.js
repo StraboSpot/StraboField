@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {REPORT_FORM_NAME} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import {updatedProject} from '../project/projects.slice';

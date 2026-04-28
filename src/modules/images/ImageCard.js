@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImages} from '.';
 import useDevice from '../../services/device/useDevice';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -60,11 +60,11 @@ const ImageCard = ({
   };
 
   const handleEndEditing = () => {
-    if (isEmpty(title) || title !== image.title) {
-      const updatedImage = {...image, title: isEmpty(title) ? placeholderTitle : title};
-      dispatch(editedSpotImage(updatedImage));
+    if (!isEmpty(title) && title !== image.title) {
+      dispatch(editedSpotImage({...image, title}));
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     }
+    if (isEmpty(title)) setTitle(undefined);
     setIsEditing(false);
   };
 
@@ -98,6 +98,11 @@ const ImageCard = ({
   const handleMissingImage = () => {
     setIsImageMissingOnServer(true);
     setIsMissingImageModalVisible(true);
+  };
+
+  const handleStartEditing = () => {
+    if (isEmpty(image.title) || title?.toLowerCase().startsWith('untitled')) setTitle('');
+    setIsEditing(true);
   };
 
   /* Logic Helpers */
@@ -137,7 +142,7 @@ const ImageCard = ({
           ) : (
             <TouchableOpacity
               disabled={isReadOnly}
-              onPress={() => setIsEditing(true)}
+              onPress={handleStartEditing}
               style={imageStyles.cardTitleEditingButton}>
               <Text
                 ellipsizeMode={Platform.OS !== 'web' ? 'tail' : undefined}

@@ -3,7 +3,7 @@ import {Image, Text, View} from 'react-native';
 
 import {useBatteryLevel} from 'react-native-device-info';
 
-import uiStyles from '../../shared/ui/ui.styles';
+import statusBarStyles from './statusBar.styles';
 
 const batteryGreen = require('../../assets/icons/BatteryGreenButton.png');
 const batteryRed = require('../../assets/icons/BatteryRedButton.png');
@@ -22,13 +22,13 @@ const BatteryInfo = () => {
 
   if (batteryPercentage !== '0') {
     return (
-      <View style={uiStyles.batteryStatusContainer}>
+      <View style={statusBarStyles.batteryStatusContainer}>
         <Image
           source={getBatterySource()}
-          style={uiStyles.statusBarIcon}
+          style={statusBarStyles.statusBarIcon}
         />
-        <View style={uiStyles.batteryLevelTextContainer}>
-          <Text style={uiStyles.batteryLevelText}>{batteryPercentage}%</Text>
+        <View style={statusBarStyles.batteryLevelTextContainer}>
+          <Text style={statusBarStyles.batteryLevelText}>{batteryPercentage}%</Text>
         </View>
       </View>
     );

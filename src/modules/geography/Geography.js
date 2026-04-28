@@ -9,7 +9,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import GeoFieldInputs from './GeoFieldInputs';
 import {GEOGRAPHY_FORM_NAME} from './geography.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
 import useMapView from '../maps/useMapView';

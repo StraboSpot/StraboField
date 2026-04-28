@@ -4,7 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import DatasetPreferencesListItem from './DatasetPreferencesListItem';
-import {truncateText} from '../../../shared/Helpers';
+import {truncateText} from '../../../shared/helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../../shared/ui/SectionDivider';

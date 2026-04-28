@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {TEPHRA_SUBPAGES} from './tephra.constants';
 import tephraStyles from './tephra.styles';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

@@ -30,7 +30,7 @@ import {
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
 } from '../services/network/serverAPI';
-import {isEmpty} from '../shared/Helpers';
+import {isEmpty} from '../shared/helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends
 let pendingDragSpotIds = new Set();

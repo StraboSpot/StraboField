@@ -9,7 +9,7 @@ import {updatedProjectTransferProgress} from '../../modules/connections/connecti
 import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
 import {setIsImageTransferring} from '../../modules/project/projects.slice';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
 

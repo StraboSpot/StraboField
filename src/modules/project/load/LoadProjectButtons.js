@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 

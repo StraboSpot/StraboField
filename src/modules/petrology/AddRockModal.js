@@ -12,7 +12,7 @@ import AddRockMetamorphicModal from './AddRockMetamorphicModal';
 import AddRockSedimentaryModal from './AddRockSedimentaryModal';
 import {IGNEOUS_ROCK_CLASSES} from './petrology.constants';
 import usePetrology from './usePetrology';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

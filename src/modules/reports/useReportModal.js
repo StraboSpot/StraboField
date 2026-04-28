@@ -2,7 +2,7 @@ import {useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty, isEqual} from '../../shared/Helpers';
+import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';

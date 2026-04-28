@@ -13,7 +13,7 @@ import {
 } from './sed.constants';
 import {onSedFormChange} from './sed.helpers';
 import useSedValidation from './useSedValidation';
-import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/Helpers';
+import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';

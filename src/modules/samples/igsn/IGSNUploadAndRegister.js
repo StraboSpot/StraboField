@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import igsnStyles from './igsn.styles';
 import useIGSN from './useIGSN';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';

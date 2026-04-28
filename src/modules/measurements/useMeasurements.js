@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {useForm} from '../form';

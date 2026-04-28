@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {REPORT_ITEM_WIDTH} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ListEmptyText from '../../shared/ui/ListEmptyText';

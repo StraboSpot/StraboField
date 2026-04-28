@@ -6,7 +6,7 @@ import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {DateInputField, TextInputField} from '../form';
