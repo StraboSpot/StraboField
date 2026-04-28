@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 
 import {STRABO_APIS} from './urls.constants';
-import alert from '../shared/ui/alert';
+import alert from '../../shared/ui/alert';
 
 const baseUrl = STRABO_APIS.DB;
 

@@ -11,11 +11,11 @@ import {
   setActiveDatasets,
   setTargetDataset,
 } from './projects.slice';
-import useDevice from '../../services/useDevice';
-import useResetState from '../../services/useResetState';
-import useServerRequests from '../../services/useServerRequests';
+import useDevice from '../../services/device/useDevice';
+import useServerRequests from '../../services/network/useServerRequests';
 import {getNewId, isEmpty} from '../../shared/Helpers';
 import alert from '../../shared/ui/alert';
+import useResetState from '../../store/useResetState';
 import {
   addedStatusMessage,
   clearedStatusMessages,

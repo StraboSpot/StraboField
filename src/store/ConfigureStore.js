@@ -5,6 +5,7 @@ import {persistReducer, persistStore} from 'redux-persist';
 
 import listenerMiddleware from './listenerMiddleware';
 import compassSlice from '../modules/compass/compass.slice';
+import connectionsSlice from '../modules/connections/connections.slice';
 import homeSlice from '../modules/home/home.slice';
 import mainMenuSlice from '../modules/main-menu-panel/mainMenuPanel.slice';
 import mapsSlice from '../modules/maps/maps.slice';
@@ -13,7 +14,6 @@ import notebookSlice from '../modules/notebook-panel/notebook.slice';
 import projectSlice from '../modules/project/projects.slice';
 import spotsSlice from '../modules/spots/spots.slice';
 import userSlice from '../modules/user/userProfile.slice';
-import connectionsSlice from '../services/connections.slice';
 
 // Redux Persist
 export const persistConfig = {

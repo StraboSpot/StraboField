@@ -1,12 +1,12 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import useDrawActionButtons from './useDrawActionButtons';
+import useDrawGeometryToggle from './useDrawGeometryToggle';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.style';
-import useDrawActionButtons from './useDrawActionButtons';
-import useDrawGeometryToggle from './useDrawGeometryToggle';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
   /* Data Hooks */

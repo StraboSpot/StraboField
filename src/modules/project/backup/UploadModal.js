@@ -6,9 +6,8 @@ import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
 import uploadModalStyles from './uploadModal.styles';
-import {updatedProjectTransferProgress} from '../../../services/connections.slice';
-import useUpload from '../../../services/useUpload';
-import useUploadImages from '../../../services/useUploadImages';
+import useUpload from '../../../services/files/useUpload';
+import useUploadImages from '../../../services/files/useUploadImages';
 import {isEmpty} from '../../../shared/Helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
@@ -17,6 +16,7 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
+import {updatedProjectTransferProgress} from '../../connections/connections.slice';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 

@@ -4,13 +4,13 @@ import {FlatList, Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import NestingImageCard from './NestingImageCard';
 import useNesting from './useNesting';
 import {isEmpty} from '../../shared/Helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
-import NestingImageCard from './NestingImageCard';
 
 const Nesting = () => {
   console.log('Rendering Nesting');

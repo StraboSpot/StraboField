@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import issuesAndRequestsStyles from './issuesAndRequests.styles';
-import {SUPPORT_PATHS} from '../../../services/urls.constants';
+import {SUPPORT_PATHS} from '../../../services/network/urls.constants';
 import UrlLinkButton from '../UrlLinkButton';
 
 const IssuesAndRequests = () => {

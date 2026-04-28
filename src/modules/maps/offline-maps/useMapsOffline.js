@@ -3,10 +3,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {checkIfZipStatusReady, getMedian, tile2lat, tile2long} from './offlineMaps.helpers';
 import {addMapFromDevice, clearedMapsFromRedux, setOfflineMap} from './offlineMaps.slice';
-import {APP_DIRECTORIES} from '../../../services/directories.constants';
-import {STRABO_APIS} from '../../../services/urls.constants';
-import useDevice from '../../../services/useDevice';
-import useServerRequests from '../../../services/useServerRequests';
+import useDevice from '../../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
+import {STRABO_APIS} from '../../../services/network/urls.constants';
+import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';

@@ -8,7 +8,7 @@ import {getOfflineMapTitle} from './offlineMaps.helpers';
 import {editedOfflineMap, setOfflineMapVisible} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
-import useDevice from '../../../services/useDevice';
+import useDevice from '../../../services/device/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';

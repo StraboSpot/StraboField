@@ -1,6 +1,6 @@
-import {APP_DIRECTORIES} from '../../services/directories.constants';
-import useDevice from '../../services/useDevice';
-import useServerRequests from '../../services/useServerRequests';
+import useDevice from '../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
+import useServerRequests from '../../services/network/useServerRequests';
 
 const useMicro = () => {
   /* Data Hooks */
