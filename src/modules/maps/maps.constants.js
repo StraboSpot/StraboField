@@ -56,7 +56,7 @@ export const CUSTOM_MAP_TYPES = [
     source: 'mapbox_styles',
   },
   {
-    title: 'Strabospot My Maps',
+    title: 'StraboSpot My Maps',
     id: 'strabospot.mymaps',
     source: 'strabospot_mymaps',
   },

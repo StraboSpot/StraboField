@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {isEmpty, truncateText} from '../../../shared/Helpers';
+import {isEmpty, truncateText} from '../../../shared/helpers';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {MAP_MODES} from '../../maps/maps.constants';

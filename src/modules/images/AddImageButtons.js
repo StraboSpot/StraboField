@@ -7,7 +7,7 @@ import {getImageMetaFromWeb, getSize, resizeFile} from './imageHelpers';
 import {imageStyles, useImages} from './index';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
-import {getNewId} from '../../shared/Helpers';
+import {getNewId} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import {setLoadingStatus} from '../home/home.slice';

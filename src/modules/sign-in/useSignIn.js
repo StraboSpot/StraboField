@@ -5,7 +5,7 @@ import {Base64} from 'js-base64';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDownload from '../../services/files/useDownload';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
 import {setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/home.slice';
 import {login, logout} from '../user/userProfile.slice';

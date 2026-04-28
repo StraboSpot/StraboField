@@ -8,7 +8,7 @@ import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
-import {isEmpty} from '../../Helpers';
+import {isEmpty} from '../../helpers';
 import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
@@ -52,7 +52,10 @@ const ModalWrapper = ({
     if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
     const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
     const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
-    return () => { show.remove(); hide.remove(); };
+    return () => {
+      show.remove();
+      hide.remove();
+    };
   }, []);
 
   /* Derived Variables */

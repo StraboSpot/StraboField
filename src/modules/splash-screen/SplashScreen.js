@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import splashScreenStyles from './splashScreen.styles';
 import {VERSION_NUMBER} from '../../shared/app.constants';
-import {getFontSizeByWindowWidth} from '../../shared/Helpers';
+import {getFontSizeByWindowWidth} from '../../shared/helpers';
 import Loading from '../../shared/ui/Loading';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import BatteryInfo from '../status-bar/BatteryInfo';

@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import {formatDeg} from './compass.helpers';
 import compassStyles from './compass.styles';
-import {roundToDecimalPlaces} from '../../shared/Helpers';
+import {roundToDecimalPlaces} from '../../shared/helpers';
 import {overlayStyles} from '../home/overlays';
 
 const CompassDebug = ({compassData, matrixRotation}) => {

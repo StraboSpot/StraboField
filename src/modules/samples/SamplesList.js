@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import IGSNDisplay from './igsn/IGSNDisplay';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 

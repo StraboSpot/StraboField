@@ -1,4 +1,4 @@
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {LABELS_WITH_ABBREVIATIONS} from '../petrology/minerals.constants';
 

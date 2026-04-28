@@ -4,7 +4,7 @@ import {Dimensions, FlatList, Pressable, ScrollView, Text, View} from 'react-nat
 import {Rows, Table} from 'react-native-reanimated-table';
 
 import externalDataStyles from './externalData.styles';
-import {toTitleCase} from '../../shared/Helpers';
+import {toTitleCase} from '../../shared/helpers';
 import {DARKGREY} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

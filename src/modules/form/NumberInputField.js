@@ -3,7 +3,7 @@ import {Text, TextInput, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {formStyles} from '../form';
 

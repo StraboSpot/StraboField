@@ -7,7 +7,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

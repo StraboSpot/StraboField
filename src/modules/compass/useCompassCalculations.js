@@ -1,5 +1,5 @@
 import {calcDipDir, calcStrike, calcTrendPlunge} from './compass.helpers';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 
 const useCompassCalculations = () => {

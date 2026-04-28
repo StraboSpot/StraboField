@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ADD_ROCK_KEYS, IGNEOUS_ROCK_CLASSES} from './petrology.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {Form, MainButtons} from '../form';
 
 const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) => {

@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {useForm} from '.';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

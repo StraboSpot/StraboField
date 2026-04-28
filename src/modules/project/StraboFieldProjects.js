@@ -4,7 +4,7 @@ import {FlatList, Platform, Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDevice from '../../services/device/useDevice';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {BLUE} from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

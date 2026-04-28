@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {useImages} from '../../images';
 import useMapCoords from '../useMapCoords';
 

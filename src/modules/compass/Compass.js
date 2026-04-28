@@ -9,7 +9,7 @@ import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
 import CompassModule from '../../services/device/CompassModule';
 import useCompass from '../../services/device/useCompass';
-import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
+import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';

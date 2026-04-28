@@ -11,7 +11,7 @@ import {
 } from './projects.slice';
 import useDevice from '../../services/device/useDevice';
 import useServerRequests from '../../services/network/useServerRequests';
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
 import {
   addedStatusMessage,

@@ -7,7 +7,7 @@ import {Field} from 'formik';
 import AcknowledgeInput from './AcknowledgeInput';
 import {showFieldInfo} from './form.helpers';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 

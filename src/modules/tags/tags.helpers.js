@@ -1,4 +1,4 @@
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 export const filterTagsByTagType = (tags, tagType) => {
   if (isEmpty(tagType)) return tags;

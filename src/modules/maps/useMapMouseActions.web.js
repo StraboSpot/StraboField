@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {useSpots} from '../spots';
 import {MAP_MODES} from './maps.constants';
 import {clearedIntervalDragState, setIntervalDragTargetSlot, setVertexEndCoords} from './maps.slice';

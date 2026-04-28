@@ -1,5 +1,5 @@
 import {getSiliciclasticGrainSize} from './sed.helpers';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {PAGE_KEYS} from '../page/pageKeys.constants';

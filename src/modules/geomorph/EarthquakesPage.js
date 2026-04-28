@@ -3,7 +3,7 @@ import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalVisible} from '../home/home.slice';

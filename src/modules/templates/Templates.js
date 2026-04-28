@@ -4,7 +4,7 @@ import NewTemplateSectionList from './NewTemplateSectionList';
 import TemplateDetail from './TemplateDetail';
 import TemplatesSectionList from './TemplatesSectionList';
 import useTemplates from './useTemplates';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';

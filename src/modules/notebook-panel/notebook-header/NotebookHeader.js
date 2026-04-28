@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
-import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shared/Helpers';
+import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shared/helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';

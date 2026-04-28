@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import {formStyles, useForm} from '../form';
 

@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import PageHeader from './PageHeader';
 import usePage from './usePage';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';

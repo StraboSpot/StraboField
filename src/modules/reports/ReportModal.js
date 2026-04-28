@@ -4,7 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 

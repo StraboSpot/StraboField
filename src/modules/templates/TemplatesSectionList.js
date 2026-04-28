@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import TemplateListItem from './TemplateListItem';
 import TemplateSectionHeader from './TemplateSectionHeader';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 

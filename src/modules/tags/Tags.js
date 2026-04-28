@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import AddButton from '../../shared/ui/buttons/AddButton';

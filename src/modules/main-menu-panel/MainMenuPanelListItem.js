@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {MAIN_MENU_ITEMS} from './mainMenu.constants';
 import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, truncateText} from '../../shared/Helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
 import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import useProject from '../project/useProject';
 

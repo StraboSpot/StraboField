@@ -7,7 +7,7 @@ import MeasurementDetail from './MeasurementDetail';
 import MeasurementItem from './MeasurementItem';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';

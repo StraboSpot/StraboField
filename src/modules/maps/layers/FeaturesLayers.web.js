@@ -3,7 +3,7 @@ import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
 import {MAP_MODES} from '../maps.constants';
 import useMapSymbology from '../symbology/useMapSymbology';
