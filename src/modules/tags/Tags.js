@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import TagFilters from './filters/TagFilters';
 import {TAG_TYPES} from './tags.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
@@ -31,8 +32,14 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [tagsSorted, setTagsSorted] = useState([]);
 
   /* Derived Variables */
+
+  const baseTags = useMemo(() => isGeologicUnits ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
+      : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS),
+    [isGeologicUnits, tags],
+  );
 
   const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
@@ -61,6 +68,14 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
 
   return (
     <View style={{flex: 1}}>
+      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
+      <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
+      <ListItem containerStyle={commonStyles.listItem}>
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
+        </ListItem.Content>
+        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
+      </ListItem>
       {!isEmpty(tags) && (
         <>
           <ButtonGroup
@@ -78,17 +93,10 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
               updateSpotsInMapExtent={updateSpotsInMapExtent}
             />
           )}
+          <TagFilters isGeologicUnits={isGeologicUnits} setTagsSorted={setTagsSorted} tags={baseTags}/>
         </>
       )}
-      <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
-      <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
-      <ListItem containerStyle={commonStyles.listItem}>
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
-        </ListItem.Content>
-        <SwitchWrapper onValueChange={handleContinuousTaggingSwitched} value={useContinuousTagging}/>
-      </ListItem>
-      <TagsList selectedIndex={selectedIndex} type={isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS}/>
+      <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>
 
       {/* Modal */}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
