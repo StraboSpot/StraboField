@@ -30,6 +30,13 @@ const getAgeFromFieldGroup = (tag, fields) => {
   return applyAgeModifier(spanMax, spanMin, ageModifier);
 };
 
+// Temporal age priority (Ma, smaller = younger):
+// 1. absolute_age_of_geologic_unit
+// 2. max/min_absolute_age_of_geol_unit (midpoint if both, otherwise whichever is set)
+// 3–7. Named time period fields checked in group order: age → epoch → period → era → eon
+//      All selected values in the matching group are combined into a single Ma span,
+//      then age_modifier shifts the result: early=1/4 from old end, late=3/4, middle/none=midpoint
+// Fallback: alphabetical (no date fields set)
 const getTemporalAge = (tag) => {
   if (tag.absolute_age_of_geologic_unit != null) return tag.absolute_age_of_geologic_unit;
   const max = tag.max_absolute_age_of_geol_unit;
