@@ -3,10 +3,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
+import useImages from '../../modules/images/useImages';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {
   addedDatasets,
+  addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
   setSelectedProject,
@@ -41,6 +43,7 @@ const useImport = () => {
     readDirectory,
   } = useDevice();
   const {clearProject} = useResetState();
+  const {gatherNeededImages} = useImages();
 
   /* Internal Functions */
 
@@ -69,9 +72,9 @@ const useImport = () => {
       dispatch(addedMapsFromDevice({mapType: 'offlineMaps', maps: mapNamesDb}));
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('---------------------'));
-      dispatch(addedStatusMessage(`Map tiles imported: ${progress.fileCount || 0}`));
-      dispatch(addedStatusMessage(`Map tiles installed: ${progress.neededTiles || 0}`));
-      dispatch(addedStatusMessage(`Map tiles already installed: ${progress.notNeededTiles || 0}`));
+      dispatch(addedStatusMessage(`Map tiles imported: ${progress?.fileCount || 0}`));
+      dispatch(addedStatusMessage(`Map tiles installed: ${progress?.neededTiles || 0}`));
+      dispatch(addedStatusMessage(`Map tiles already installed: ${progress?.notNeededTiles || 0}`));
       dispatch(addedStatusMessage('Finished moving tiles'));
     }
     else {
@@ -195,6 +198,17 @@ const useImport = () => {
       dispatch(addedStatusMessage('Importing image files...'));
       await copyImages(selectedProject);
       await checkForMaps(dataFile, selectedProject, isExternal);
+      for (const dataset of Object.values(projectDb.datasets)) {
+        const datasetSpots = (dataset.spotIds || []).map(id => spotsDb[id]).filter(Boolean);
+        const spotImages = await gatherNeededImages(datasetSpots, dataset);
+        if (spotImages) {
+          dispatch(addedNeededImagesToDataset({
+            datasetId: dataset.id,
+            images: spotImages,
+            modified_timestamp: dataset.modified_timestamp,
+          }));
+        }
+      }
       dispatch(setSelectedProject({project: '', source: ''}));
       dispatch(addedStatusMessage('Complete!'));
       return Promise.resolve({project: dataFile.projectDb.project});
@@ -211,7 +225,7 @@ const useImport = () => {
             APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/');
           if (checkSuccess) {
             console.log('dir exists');
-            const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP);
+            const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
             const mapId = files.find(id => id === map.id);
             const zipID = files.find(zipId => zipId === map.mapId);
             const id = isOldBackup ? zipID : mapId;

@@ -50,23 +50,34 @@ const useExport = () => {
 
   /* Internal Functions */
 
-  const backupProjectToDevice = async (fileName) => {
-    await gatherDataForBackup(fileName);
+  const backupProjectToDevice = async (fileName, options) => {
+    await gatherDataForBackup(fileName, options);
     console.log('Added Project Data to backup.');
-    await gatherOtherMapsForDistribution(fileName);
-    console.log('Added Other Maps to backup.');
-    await gatherMapsForDistribution(dataForExport, fileName);
-    console.log('Added Maps tiles to backup.');
-    await gatherImagesForDistribution(dataForExport, fileName);
-    console.log('Added Images to backup.');
+    if (options.customMaps) {
+      await gatherOtherMapsForDistribution(fileName);
+      console.log('Added Other Maps to backup.');
+    }
+    if (options.offlineTiles) {
+      await gatherMapsForDistribution(dataForExport, fileName);
+      console.log('Added Maps tiles to backup.');
+    }
+    if (options.images) {
+      await gatherImagesForDistribution(dataForExport, fileName);
+      console.log('Added Images to backup.');
+    }
   };
 
-  const gatherDataForBackup = async (filename) => {
+  const gatherDataForBackup = async (filename, options) => {
     try {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Saving Project Data...'));
-      console.log(dataForExport);
-      await saveFile(APP_DIRECTORIES.BACKUP_DIR + filename, dataForExport, 'data.json');
+      const exportData = {
+        ...dataForExport,
+        mapNamesDb: options.offlineTiles ? mapNamesDb : {},
+        otherMapsDb: options.customMaps ? otherMapsDb : {},
+      };
+      console.log(exportData);
+      await saveFile(APP_DIRECTORIES.BACKUP_DIR + filename, exportData, 'data.json');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Saving Project Data'));
     }
@@ -243,7 +254,7 @@ const useExport = () => {
     dispatch(clearedStatusMessages());
   };
 
-  const initializeBackup = async (fileName) => {
+  const initializeBackup = async (fileName, options = {images: true, offlineTiles: true, customMaps: true}) => {
     try {
       if (hasSpace(fileName)) fileName = fileName.replaceAll(' ', '_');
 
@@ -254,10 +265,10 @@ const useExport = () => {
 
       const hasBackupDir = await doesDeviceBackupDirExist();
       console.log('Has Backup Dir?: ', hasBackupDir);
-      if (hasBackupDir) await backupProjectToDevice(fileName);
+      if (hasBackupDir) await backupProjectToDevice(fileName, options);
       else {
         await makeDirectory(APP_DIRECTORIES.BACKUP_DIR);
-        await backupProjectToDevice(fileName);
+        await backupProjectToDevice(fileName, options);
       }
     }
     catch (err) {
@@ -265,7 +276,7 @@ const useExport = () => {
     }
   };
 
-  const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported) => {
+  const zipAndExportProjectFolder = async (selectedBackupFile, isBeingExported, options = {images: true, offlineTiles: true, customMaps: true}) => {
     // try {
     // dispatch(setLoadingStatus({view: 'modal', bool: true}));
     await makeDirectory(APP_EXPORT_DIRECTORY + selectedBackupFile);
@@ -283,11 +294,15 @@ const useExport = () => {
     await copyFiles(source, `${destination}/data.json`);
     console.log('Files Copied', exportedJSON);
     dispatch(removedLastStatusMessage());
-    await gatherImagesForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
-    console.log('Images copied to:', destination);
-    await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
-    console.log('Map tiles copied to:', destination);
-    await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
+    if (options.images) {
+      await gatherImagesForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
+      console.log('Images copied to:', destination);
+    }
+    if (options.offlineTiles) {
+      await gatherMapsForDistribution(exportedJSON, selectedBackupFile, isBeingExported);
+      console.log('Map tiles copied to:', destination);
+    }
+    if (options.customMaps) await gatherOtherMapsForDistribution(selectedBackupFile, isBeingExported);
 
     const zipFileName = selectedBackupFile + '.zip';
 
