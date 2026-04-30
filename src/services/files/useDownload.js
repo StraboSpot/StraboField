@@ -20,7 +20,6 @@ import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
   addedDatasets,
-  addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
   setActiveDatasetsMultiple,
@@ -46,6 +45,7 @@ const useDownload = () => {
 
   const dispatch = useDispatch();
   const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
+  const spots = useSelector(state => state.spot.spots);
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
@@ -200,7 +200,9 @@ const useDownload = () => {
       else {
         const spotsDownloaded = featureCollection.features;
         const spotImages = await findNeededImages(spotsDownloaded, dataset);
-        if (spotImages) datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], images: spotImages};
+        if (spotImages) {
+          datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], images: {imageIds: spotImages.imageIds}};
+        }
         spotsToSave.push(...spotsDownloaded);
         const spotIds = Object.values(spotsDownloaded).map(spot => spot.properties.id);
         datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], spotIds: spotIds};
@@ -323,27 +325,21 @@ const useDownload = () => {
 
   const initializeDownloadImages = async (dataset) => {
     try {
-      const neededImagesIds = dataset.images?.neededImagesIds;
-      let updatedNeededImagesIds = JSON.parse(JSON.stringify(neededImagesIds));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(clearedStatusMessages());
       dispatch(setIsStatusMessagesModalVisible(true));
-      console.log('Downloading Needed Images...');
+      dispatch(addedStatusMessage('Checking for needed images...'));
+      const datasetSpots = (dataset.spotIds || []).map(id => spots[id]).filter(Boolean);
+      const spotImages = await gatherNeededImages(datasetSpots, dataset);
+      const neededImagesIds = spotImages?.neededImagesIds || [];
+      console.log('Downloading Needed Images...', neededImagesIds.length);
+      dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloading Needed Images...'));
       if (!isEmpty(neededImagesIds)) {
-        // Check path first and if it doesn't exist, then create
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
-        for (const imageId of updatedNeededImagesIds) {
+        for (const imageId of neededImagesIds) {
           const success = await downloadImageAndSave(imageId);
-          if (success) {
-            imagesDownloadedCount++;
-            updatedNeededImagesIds = updatedNeededImagesIds.filter(id => id !== imageId);
-            dispatch(addedNeededImagesToDataset({
-              datasetId: dataset.id,
-              images: {...dataset.images, neededImagesIds: updatedNeededImagesIds},
-              modified_timestamp: dataset.modified_timestamp,
-            }));
-          }
+          if (success) imagesDownloadedCount++;
           else imagesFailedCount++;
           console.log('New/Modified Images Saved: ' + imagesDownloadedCount + '/'
             + neededImagesIds.length + ' Failed Images: ' + imagesFailedCount + '/' + neededImagesIds.length);
@@ -352,7 +348,6 @@ const useDownload = () => {
             + imagesDownloadedCount + '/' + neededImagesIds.length + '\n'
             + 'Failed Images: ' + imagesFailedCount + '/' + neededImagesIds.length));
         }
-
         dispatch(removedLastStatusMessage());
         if (imagesFailedCount > 0) {
           dispatch(addedStatusMessage('Finished downloading images but with failures.\n'

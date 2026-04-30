@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {useTags} from '.';
 import TagColorIcon from './color/TagColorIcon';
-import {TAG_SECTIONS, TAG_TYPES} from './tags.constants';
+import {TAG_SECTIONS} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -19,7 +19,7 @@ import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag} from '../project/projects.slice';
 
-const TagsList = ({type, selectedIndex}) => {
+const TagsList = ({selectedIndex, tagsSorted, type}) => {
   console.log('Rendering TagsList...');
 
   const dispatch = useDispatch();
@@ -69,19 +69,9 @@ const TagsList = ({type, selectedIndex}) => {
   };
 
   const renderTagsListByMapExtent = () => {
-    let tagsInMapExtent;
-    if (type === PAGE_KEYS.GEOLOGIC_UNITS) {
-      tagsInMapExtent = tags.filter((tag) => {
-        return tag.spots && !isEmpty(
-          tag.spots.find(spotId => spotsInMapExtentIds?.includes(spotId))) && tag.type === PAGE_KEYS.GEOLOGIC_UNITS;
-      });
-    }
-    else {
-      tagsInMapExtent = tags.filter((tag) => {
-        return tag.spots && !isEmpty(tag.spots.find(spotId => spotsInMapExtentIds?.includes(spotId)))
-          && tag.type !== TAG_TYPES.GEOLOGIC_UNIT;
-      });
-    }
+    const tagsInMapExtent = (tagsSorted || []).filter(
+      tag => tag.spots && !isEmpty(tag.spots.find(spotId => spotsInMapExtentIds?.includes(spotId))),
+    );
     console.log('tagsInMapExtent', tagsInMapExtent);
 
     return (
@@ -101,9 +91,8 @@ const TagsList = ({type, selectedIndex}) => {
 
   const renderTagsListByType = () => {
     const dataSectioned = Object.values(SECTIONS).reduce((acc, {title, key}) => {
-      const data = tags?.filter(d => d.type === key) || [];
-      const dataSorted = data.slice().sort((a, b) => getTagTitle(a).localeCompare(getTagTitle(b)));
-      return [...acc, {title: title, data: dataSorted}];
+      const data = (tagsSorted || []).filter(d => d.type === key);
+      return [...acc, {title: title, data: data}];
     }, []);
 
     return (

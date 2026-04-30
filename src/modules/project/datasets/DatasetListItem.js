@@ -4,6 +4,7 @@ import {Platform, Text, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
@@ -19,12 +20,12 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {makeDatasetCurrent, setSwitchValue} = useProject();
+  const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
 
   /* Derived Variables */
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
-  const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const spotsCount = dataset.spotIds?.length || 0;
