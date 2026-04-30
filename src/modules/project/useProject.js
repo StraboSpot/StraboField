@@ -111,7 +111,6 @@ const useProject = () => {
       modified_timestamp: modifiedTimeStamp,
       spotIds: [],
       images: {
-        neededImagesIds: [],
         imageIds: [],
       },
     };

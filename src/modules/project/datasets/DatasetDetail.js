@@ -6,6 +6,7 @@ import {Field, Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
@@ -29,6 +30,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset} = useProject();
+  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
   const toast = useToast();
 
   /* Local State */
@@ -59,6 +61,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const downloadImages = async () => {
     await initializeDownloadImages(dataset);
+    await refreshNeededImagesCount();
     closeDetailView();
   };
 
@@ -126,7 +129,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   // Dataset Images Field
   const renderImagesField = () => {
     const imagesCount = dataset?.images?.imageIds?.length || 0;
-    const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
 
     return (
       <>
@@ -144,7 +146,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
                 value={imagesCount.toString()}
               />
             </View>
-            {Platform.OS !== 'web' && imagesNeededCount === 0 && (
+            {Platform.OS !== 'web' && neededImagesCount === 0 && (
               <Icon
                 color={POSITIVE_COLOR}
                 name={'checkmark-outline'}
@@ -167,10 +169,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
                 <TextInput
                   editable={false}
                   style={formStyles.fieldValue}
-                  value={imagesNeededCount.toString()}
+                  value={neededImagesCount.toString()}
                 />
               </View>
-              {imagesNeededCount > 0 && (
+              {neededImagesCount > 0 && (
                 <Icon
                   color={WARNING_COLOR}
                   name={'download-circle-outline'}

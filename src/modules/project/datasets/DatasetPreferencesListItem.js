@@ -12,6 +12,7 @@ import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../sha
 import {SwitchWrapper} from '../../../shared/ui/';
 import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
+import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 
 const DatasetPreferencesListItem = ({dataset}) => {
   /* Data Hooks */
@@ -23,6 +24,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const {initializeDownloadImages} = useDownload();
   const {makeDatasetCurrent, setSwitchValue} = useProject();
+  const [imagesNeededCount, refreshImagesNeededCount] = useDatasetNeededImagesCount(dataset);
 
   /* Local State */
 
@@ -32,7 +34,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
-  const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
@@ -53,6 +54,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
     setIsDownloadingImages(true);
     try {
       await initializeDownloadImages(dataset);
+      await refreshImagesNeededCount();
     }
     catch (err) {
       console.error('Error downloading images:', err);
