@@ -18,8 +18,8 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const {targetDatasetId} = useSelector(state => state.project);
 
-  const {makeDatasetCurrent, setSwitchValue} = useProject();
   const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
+  const {toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Derived Variables */
 
