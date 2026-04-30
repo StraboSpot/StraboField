@@ -3,12 +3,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
-import useImages from '../../modules/images/useImages';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {
   addedDatasets,
-  addedNeededImagesToDataset,
   addedProject,
   setActiveDatasets,
   setSelectedProject,
@@ -43,7 +41,6 @@ const useImport = () => {
     readDirectory,
   } = useDevice();
   const {clearProject} = useResetState();
-  const {gatherNeededImages} = useImages();
 
   /* Internal Functions */
 
@@ -198,17 +195,6 @@ const useImport = () => {
       dispatch(addedStatusMessage('Importing image files...'));
       await copyImages(selectedProject);
       await checkForMaps(dataFile, selectedProject, isExternal);
-      for (const dataset of Object.values(projectDb.datasets)) {
-        const datasetSpots = (dataset.spotIds || []).map(id => spotsDb[id]).filter(Boolean);
-        const spotImages = await gatherNeededImages(datasetSpots, dataset);
-        if (spotImages) {
-          dispatch(addedNeededImagesToDataset({
-            datasetId: dataset.id,
-            images: spotImages,
-            modified_timestamp: dataset.modified_timestamp,
-          }));
-        }
-      }
       dispatch(setSelectedProject({project: '', source: ''}));
       dispatch(addedStatusMessage('Complete!'));
       return Promise.resolve({project: dataFile.projectDb.project});
