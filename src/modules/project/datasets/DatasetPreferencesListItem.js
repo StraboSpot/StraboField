@@ -11,6 +11,7 @@ import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
 import useProject from '../useProject';
+import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 
 const DatasetPreferencesListItem = ({dataset}) => {
   /* Data Hooks */
@@ -19,7 +20,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
-  const {toggleActiveDataset, toggleTargetDataset} = useProject();
+  const {makeDatasetCurrent, setSwitchValue, toggleActiveDataset, toggleTargetDataset} = useProject();
+  const [imagesNeededCount, refreshImagesNeededCount] = useDatasetNeededImagesCount(dataset);
 
   /* Local State */
 
@@ -29,7 +31,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
-  const imagesNeededCount = dataset?.images?.neededImagesIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
@@ -47,6 +48,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
     setIsDownloadingImages(true);
     try {
       await initializeDownloadImages(dataset);
+      await refreshImagesNeededCount();
     }
     catch (err) {
       console.error('Error downloading images:', err);

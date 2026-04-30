@@ -69,9 +69,9 @@ const useImport = () => {
       dispatch(addedMapsFromDevice({mapType: 'offlineMaps', maps: mapNamesDb}));
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('---------------------'));
-      dispatch(addedStatusMessage(`Map tiles imported: ${progress.fileCount || 0}`));
-      dispatch(addedStatusMessage(`Map tiles installed: ${progress.neededTiles || 0}`));
-      dispatch(addedStatusMessage(`Map tiles already installed: ${progress.notNeededTiles || 0}`));
+      dispatch(addedStatusMessage(`Map tiles imported: ${progress?.fileCount || 0}`));
+      dispatch(addedStatusMessage(`Map tiles installed: ${progress?.neededTiles || 0}`));
+      dispatch(addedStatusMessage(`Map tiles already installed: ${progress?.notNeededTiles || 0}`));
       dispatch(addedStatusMessage('Finished moving tiles'));
     }
     else {
@@ -211,7 +211,7 @@ const useImport = () => {
             APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/');
           if (checkSuccess) {
             console.log('dir exists');
-            const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP);
+            const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
             const mapId = files.find(id => id === map.id);
             const zipID = files.find(zipId => zipId === map.mapId);
             const id = isOldBackup ? zipID : mapId;
