@@ -8,7 +8,7 @@ import BackupTagsModal from './BackupTagsModal';
 import TagFilters from './filters/TagFilters';
 import LoadTagsModal from './LoadTagsModal';
 import {TAG_TYPES} from './tags.constants';
-import TagsMenu from './TagsMenu';
+import TagsOverflowMenu from './TagsOverflowMenu';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
@@ -17,7 +17,13 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
 
-const Tags = ({closeTagsMenu, isGeologicUnits, isMenuVisible = false, type, updateSpotsInMapExtent}) => {
+const Tags = ({
+                closeTagsOverflowMenu,
+                isGeologicUnits,
+                isOverflowMenuVisible = false,
+                type,
+                updateSpotsInMapExtent,
+              }) => {
   console.log('Rendering Tags...');
 
   /* Data Hooks */
@@ -92,9 +98,9 @@ const Tags = ({closeTagsMenu, isGeologicUnits, isMenuVisible = false, type, upda
       <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>
 
       {/* Menus and Modals */}
-      <TagsMenu
-        closeMenu={closeTagsMenu}
-        isVisible={isMenuVisible}
+      <TagsOverflowMenu
+        closeMenu={closeTagsOverflowMenu}
+        isVisible={isOverflowMenuVisible}
         label={label}
         onAddPress={addTag}
         onBackupPress={() => setIsBackupTagsModalVisible(true)}

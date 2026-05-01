@@ -9,16 +9,16 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const TagsMenu = ({
-                    closeMenu,
-                    isVisible,
-                    label,
-                    onAddPress,
-                    onBackupPress,
-                    onContinuousTaggingSwitched,
-                    onLoadPress,
-                    useContinuousTagging,
-                  }) => {
+const TagsOverflowMenu = ({
+                            closeMenu,
+                            isVisible,
+                            label,
+                            onAddPress,
+                            onBackupPress,
+                            onContinuousTaggingSwitched,
+                            onLoadPress,
+                            useContinuousTagging,
+                          }) => {
 
   /* Derived Variables */
 
@@ -55,7 +55,8 @@ const TagsMenu = ({
           closeMenu();
         }}
       >
-        <ListItem.Title style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Load ${label}` : `Import ${label}`}</ListItem.Title>
+        <ListItem.Title
+          style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Load ${label}` : `Import ${label}`}</ListItem.Title>
       </ListItem>
       <ListItem
         bottomDivider
@@ -65,7 +66,8 @@ const TagsMenu = ({
           closeMenu();
         }}
       >
-        <ListItem.Title style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Backup ${label}` : `Export ${label}`}</ListItem.Title>
+        <ListItem.Title
+          style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Backup ${label}` : `Export ${label}`}</ListItem.Title>
       </ListItem>
       <ListItem containerStyle={commonStyles.listItem}>
         <ListItem.Content>
@@ -77,4 +79,4 @@ const TagsMenu = ({
   );
 };
 
-export default TagsMenu;
+export default TagsOverflowMenu;

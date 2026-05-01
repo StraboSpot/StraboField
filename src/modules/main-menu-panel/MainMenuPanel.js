@@ -59,7 +59,7 @@ const MainMenuPanel = forwardRef(({
 
   /* Local State */
 
-  const [isTagsMenuVisible, setIsTagsMenuVisible] = useState(false);
+  const [isTagsOverflowMenuVisible, setIsTagsOverflowMenuVisible] = useState(false);
   const [searchState, setSearchState] = useState('');
 
   /* Derived Variables */
@@ -71,7 +71,7 @@ const MainMenuPanel = forwardRef(({
 
   useEffect(() => {
     setSearchState('');
-    setIsTagsMenuVisible(false);
+    setIsTagsOverflowMenuVisible(false);
   }, [mainMenuPageVisible]);
 
   /* Render Functions */
@@ -83,7 +83,7 @@ const MainMenuPanel = forwardRef(({
           && (!mainMenuPageVisible
             || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
               && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
-          && <MainMenuPanelHeader onTagsMenuPress={isTagsPage && (() => setIsTagsMenuVisible(true))}/>
+          && <MainMenuPanelHeader onTagsOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
         }
         {renderMainMenuList()}
       </>
@@ -137,17 +137,17 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.PROJECT_DATA.TAGS:
         return (
           <Tags
-            closeTagsMenu={() => setIsTagsMenuVisible(false)}
-            isMenuVisible={isTagsMenuVisible}
+            closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
+            isOverflowMenuVisible={isTagsOverflowMenuVisible}
             updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS:
         return (
           <Tags
-            closeTagsMenu={() => setIsTagsMenuVisible(false)}
+            closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
             isGeologicUnits
-            isMenuVisible={isTagsMenuVisible}
+            isOverflowMenuVisible={isTagsOverflowMenuVisible}
             updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
           />
         );

@@ -11,7 +11,7 @@ import {truncateText} from '../../shared/helpers';
 import {BLACK} from '../../shared/styles.constants';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 
-const MainMenuPanelHeader = ({onTagsMenuPress}) => {
+const MainMenuPanelHeader = ({onTagsOverflowMenuPress}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -84,12 +84,12 @@ const MainMenuPanelHeader = ({onTagsMenuPress}) => {
           />
         </View>
       )}
-      {mainMenuPageVisible && onTagsMenuPress && (
+      {mainMenuPageVisible && onTagsOverflowMenuPress && (
         <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingLeft: 5}]}>
           <Icon
             color={BLACK}
             name={'ellipsis-vertical'}
-            onPress={onTagsMenuPress}
+            onPress={onTagsOverflowMenuPress}
             size={25}
             type={'ionicon'}
           />
