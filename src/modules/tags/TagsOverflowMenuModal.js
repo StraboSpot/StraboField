@@ -9,16 +9,16 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const TagsOverflowMenu = ({
-                            closeMenu,
-                            isVisible,
-                            label,
-                            onAddPress,
-                            onBackupPress,
-                            onContinuousTaggingSwitched,
-                            onLoadPress,
-                            useContinuousTagging,
-                          }) => {
+const TagsOverflowMenuModal = ({
+                                 closeMenu,
+                                 isVisible,
+                                 label,
+                                 onAddPress,
+                                 onBackupPress,
+                                 onContinuousTaggingSwitched,
+                                 onLoadPress,
+                                 useContinuousTagging,
+                               }) => {
 
   /* Derived Variables */
 
@@ -79,4 +79,4 @@ const TagsOverflowMenu = ({
   );
 };
 
-export default TagsOverflowMenu;
+export default TagsOverflowMenuModal;

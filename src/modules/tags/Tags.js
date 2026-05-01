@@ -8,7 +8,7 @@ import BackupTagsModal from './BackupTagsModal';
 import TagFilters from './filters/TagFilters';
 import LoadTagsModal from './LoadTagsModal';
 import {TAG_TYPES} from './tags.constants';
-import TagsOverflowMenu from './TagsOverflowMenu';
+import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
@@ -98,7 +98,7 @@ const Tags = ({
       <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>
 
       {/* Menus and Modals */}
-      <TagsOverflowMenu
+      <TagsOverflowMenuModal
         closeMenu={closeTagsOverflowMenu}
         isVisible={isOverflowMenuVisible}
         label={label}
