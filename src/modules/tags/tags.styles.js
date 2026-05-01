@@ -7,15 +7,15 @@ const tagStyles = StyleSheet.create({
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: 12,
   },
-  menuDialog: {
+  overflowMenuModal: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderColor: themes.MEDIUMGREY,
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 2,
     height: 'auto',
+    left: themes.SMALL_SCREEN ? undefined : themes.MAIN_MENU_WIDTH - 230,
     position: themes.SMALL_SCREEN ? null : 'absolute',
-    right: themes.SMALL_SCREEN ? 0 : 10,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     top: themes.SMALL_SCREEN ? 0 : 10,
