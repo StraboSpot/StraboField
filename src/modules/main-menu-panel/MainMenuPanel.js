@@ -51,15 +51,30 @@ const MainMenuPanel = forwardRef(({
                                   }, mapComponentRef) => {
   console.log('Rendering MainMenuPanel...');
 
+  /* Data Hooks */
+
   const isSidePanelVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
 
+  /* Local State */
+
+  const [isTagsMenuVisible, setIsTagsMenuVisible] = useState(false);
   const [searchState, setSearchState] = useState('');
+
+  /* Derived Variables */
+
+  const isTagsPage = mainMenuPageVisible === MAIN_MENU_ITEMS.PROJECT_DATA.TAGS
+    || mainMenuPageVisible === MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS;
+
+  /* Side Effects */
 
   useEffect(() => {
     setSearchState('');
+    setIsTagsMenuVisible(false);
   }, [mainMenuPageVisible]);
+
+  /* Render Functions */
 
   const renderMainMenuContent = () => {
     return (
@@ -68,7 +83,7 @@ const MainMenuPanel = forwardRef(({
           && (!mainMenuPageVisible
             || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
               && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
-          && <MainMenuPanelHeader/>
+          && <MainMenuPanelHeader onTagsMenuPress={isTagsPage && (() => setIsTagsMenuVisible(true))}/>
         }
         {renderMainMenuList()}
       </>
@@ -120,9 +135,22 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.PROJECT_DATA.REPORTS:
         return <ReportsMenu/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.TAGS:
-        return <Tags updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+        return (
+          <Tags
+            closeTagsMenu={() => setIsTagsMenuVisible(false)}
+            isMenuVisible={isTagsMenuVisible}
+            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+          />
+        );
       case MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS:
-        return <Tags isGeologicUnits updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+        return (
+          <Tags
+            closeTagsMenu={() => setIsTagsMenuVisible(false)}
+            isGeologicUnits
+            isMenuVisible={isTagsMenuVisible}
+            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+          />
+        );
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
         return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
@@ -199,6 +227,8 @@ const MainMenuPanel = forwardRef(({
         return <TagDetailSidePanel openNotebookPanel={openNotebookPanel}/>;
     }
   };
+
+  /* View */
 
   return (
     <View style={mainMenuPanelStyles.container}>
