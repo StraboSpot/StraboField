@@ -89,27 +89,27 @@ const ImageModal = ({
       showCancelButton={false}
       showCloseButton
     >
-      <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
-        <View style={{flex: 1}}>
-          <ImageZoomAndPanWrapper>
-            <Image
-              PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
-                : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
-              onError={() => {
-                if (!isImageLoaded) setIsImageLoaded(true);
-              }}
-              onLoadEnd={() => {
-                if (!isImageLoaded) setIsImageLoaded(true);
-              }}
-              placeholderStyle={commonStyles.imagePlaceholder}
-              resizeMode={'contain'}
-              source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
-                : {uri: getLocalImageURI(image.id)}}
-              style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
-                : {width: '100%', height: '100%'}}
-            />
-          </ImageZoomAndPanWrapper>
-        </View>
+      <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
+        {/*<View style={{flex: 1}}>*/}
+        <ImageZoomAndPanWrapper>
+          <Image
+            PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
+              : <Image source={placeholderImage} style={imageStyles.thumbnail}/>}
+            onError={() => {
+              if (!isImageLoaded) setIsImageLoaded(true);
+            }}
+            onLoadEnd={() => {
+              if (!isImageLoaded) setIsImageLoaded(true);
+            }}
+            placeholderStyle={commonStyles.imagePlaceholder}
+            resizeMode={'contain'}
+            source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
+              : {uri: getLocalImageURI(image.id)}}
+            style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
+              : {width: width, height: height - 100}}
+          />
+        </ImageZoomAndPanWrapper>
+        {/*</View>*/}
         <View style={imageStyles.rightsideIcons}>
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}
