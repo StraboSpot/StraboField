@@ -61,7 +61,6 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           }}
           clearComponent={<View style={{...styles.functionButton, backgroundColor: 'red'}}>
             <Text style={{color: 'white'}}>Clear</Text></View>}
-          closeComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Close</Text></View>}
           containerStyle={{backgroundColor: 'transparent', flex: 1}}
           defaultStrokeIndex={0}
           defaultStrokeWidth={1}
@@ -72,7 +71,6 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           }}
           maxStrokeWidth={10}
           minStrokeWidth={1}
-          onClosePressed={() => setIsSketchModalVisible(false)}
           onSketchSaved={saveSketch}
           saveComponent={
             <View style={styles.functionButton}>
