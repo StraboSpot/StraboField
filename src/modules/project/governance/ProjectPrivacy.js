@@ -62,8 +62,8 @@ const ProjectPrivacy = () => {
             {'strabospot.org/search'}
           </Text>
           {'. Privacy settings are reversible and update when project is uploaded.\n\n* A public project does not mean '
-            + 'it\'s data is editable. To make a project ediable it must be shared as a collaborative project. See'
-            + ' the next section.'}
+            + 'the project is editable by everyone. To make a project ediable to others besides yourself it must be '
+            + 'shared as a collaborative project. See the next section.'}
         </Text>
       </View>
     </>
