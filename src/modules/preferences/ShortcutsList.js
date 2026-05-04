@@ -6,7 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

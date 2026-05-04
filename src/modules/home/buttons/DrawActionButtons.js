@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import useDrawActionButtons from './useDrawActionButtons';
 import useDrawGeometryToggle from './useDrawGeometryToggle';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
