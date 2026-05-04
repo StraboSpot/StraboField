@@ -23,6 +23,7 @@ const ModalWrapper = ({
                         disabled,
                         fullscreen,
                         headerTitle,
+                        isHideHeader = false,
                         isLoading,
                         isVisible,
                         onActionPressed,
@@ -52,7 +53,10 @@ const ModalWrapper = ({
     if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
     const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
     const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
-    return () => { show.remove(); hide.remove(); };
+    return () => {
+      show.remove();
+      hide.remove();
+    };
   }, []);
 
   /* Derived Variables */
@@ -94,12 +98,14 @@ const ModalWrapper = ({
 
   const renderModalContent = () => (
     <>
-      <ModalWrapperHeader
-        buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal}
-        headerTitle={headerTitle}
-        showCloseButton={showCloseButton}
-      />
+      {!isHideHeader && (
+        <ModalWrapperHeader
+          buttonTitleRight={buttonTitleRight}
+          closeModal={closeModal}
+          headerTitle={headerTitle}
+          showCloseButton={showCloseButton}
+        />
+      )}
       <FlatList
         ListHeaderComponent={renderListHeader}
         data={[]}

@@ -73,6 +73,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   return (
     <ModalWrapper
       fullscreen
+      isHideHeader
       isVisible={visible}
       showActionButton={false}
       showCancelButton={false}
