@@ -5,12 +5,14 @@ import RNSketchCanvas from '@StraboSpot/react-native-sketch-canvas';
 
 import styles from './sketch.styles';
 import alert from '../../shared/ui/alert';
+import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
   /* Data Hooks */
 
   const {getLocalImageURI, saveFile} = useImages();
+  const {height, width} = useWindowSize();
 
   /* Logic Helpers */
 
@@ -49,7 +51,7 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1, flexDirection: 'row'}}>
+      <View style={{width, height: height - 100, flexDirection: 'row'}}>
         <RNSketchCanvas
           canvasStyle={{
             backgroundColor: 'transparent',

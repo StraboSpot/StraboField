@@ -7,7 +7,6 @@ const sketchStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     backgroundColor: WHITE,
-    flex: 1,
     justifyContent: 'center',
   },
   functionButton: {
