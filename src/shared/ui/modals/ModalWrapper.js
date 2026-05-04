@@ -32,6 +32,7 @@ const ModalWrapper = ({
                         onDeletePress,
                         onFooterButtonPress,
                         overlayStyleOverride,
+                        scrollEnabled = true,
                         showActionButton,
                         showCancelButton,
                         showCloseButton,
@@ -111,6 +112,7 @@ const ModalWrapper = ({
         data={[]}
         keyExtractor={(item, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
+        scrollEnabled={scrollEnabled}
         style={isAutoHeight ? undefined : {flex: 1}}
       />
       {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}

@@ -8,6 +8,7 @@ const SketchModal = ({image, saveImages, setIsSketchModalVisible}) => {
     <ModalWrapper
       fullscreen
       headerTitle={'Sketch'}
+      scrollEnabled={false}
       showActionButton={false}
       showCancelButton={false}
     >
