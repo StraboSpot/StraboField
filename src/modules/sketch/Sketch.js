@@ -4,13 +4,16 @@ import {Text, View} from 'react-native';
 import RNSketchCanvas from '@StraboSpot/react-native-sketch-canvas';
 
 import styles from './sketch.styles';
+import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
+import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
   /* Data Hooks */
 
   const {getLocalImageURI, saveFile} = useImages();
+  const {height, width} = useWindowSize();
 
   /* Logic Helpers */
 
@@ -49,7 +52,13 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1, flexDirection: 'row'}}>
+      <View
+        style={{
+          width,
+          height: height - 100 - (SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0),
+          flexDirection: 'row',
+        }}
+      >
         <RNSketchCanvas
           canvasStyle={{
             backgroundColor: 'transparent',
@@ -59,7 +68,6 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           }}
           clearComponent={<View style={{...styles.functionButton, backgroundColor: 'red'}}>
             <Text style={{color: 'white'}}>Clear</Text></View>}
-          closeComponent={<View style={styles.functionButton}><Text style={{color: 'white'}}>Close</Text></View>}
           containerStyle={{backgroundColor: 'transparent', flex: 1}}
           defaultStrokeIndex={0}
           defaultStrokeWidth={1}
@@ -70,7 +78,6 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           }}
           maxStrokeWidth={10}
           minStrokeWidth={1}
-          onClosePressed={() => setIsSketchModalVisible(false)}
           onSketchSaved={saveSketch}
           saveComponent={
             <View style={styles.functionButton}>
