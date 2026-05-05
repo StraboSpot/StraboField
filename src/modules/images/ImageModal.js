@@ -7,7 +7,7 @@ import {ImagePropertiesModal, imageStyles, useImages} from '.';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
-import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
@@ -90,7 +90,6 @@ const ImageModal = ({
       showCloseButton
     >
       <View style={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
-        {/*<View style={{flex: 1}}>*/}
         <ImageZoomAndPanWrapper>
           <Image
             PlaceholderContent={!isImageLoaded ? <ActivityIndicator/>
@@ -106,10 +105,9 @@ const ImageModal = ({
             source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
               : {uri: getLocalImageURI(image.id)}}
             style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
-              : {width: width, height: height - 100}}
+              : {width: width, height: height - 100 - (SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0)}}
           />
         </ImageZoomAndPanWrapper>
-        {/*</View>*/}
         <View style={imageStyles.rightsideIcons}>
           <IconButton
             onPress={() => setIsImagePropertiesModalVisible(true)}

@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, Keyboard, Modal, Platform, View} from 'react-native';
+import {Keyboard, Modal, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
+import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
@@ -23,6 +24,7 @@ const ModalWrapper = ({
                         disabled,
                         fullscreen,
                         headerTitle,
+                        isHideHeader = false,
                         isLoading,
                         isVisible,
                         onActionPressed,
@@ -31,6 +33,7 @@ const ModalWrapper = ({
                         onDeletePress,
                         onFooterButtonPress,
                         overlayStyleOverride,
+                        scrollEnabled = true,
                         showActionButton,
                         showCancelButton,
                         showCloseButton,
@@ -97,17 +100,20 @@ const ModalWrapper = ({
 
   const renderModalContent = () => (
     <>
-      <ModalWrapperHeader
-        buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal}
-        headerTitle={headerTitle}
-        showCloseButton={showCloseButton}
-      />
+      {!isHideHeader && (
+        <ModalWrapperHeader
+          buttonTitleRight={buttonTitleRight}
+          closeModal={closeModal}
+          headerTitle={headerTitle}
+          showCloseButton={showCloseButton}
+        />
+      )}
       <FlatList
         ListHeaderComponent={renderListHeader}
         data={[]}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
+        scrollEnabled={scrollEnabled}
         style={isAutoHeight ? undefined : {flex: 1}}
       />
       {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
@@ -137,9 +143,11 @@ const ModalWrapper = ({
         supportedOrientations={['portrait', 'landscape']}
         visible={isVisible}
       >
-        <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
-          {renderModalContent()}
-        </View>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
+            {renderModalContent()}
+          </View>
+        </GestureHandlerRootView>
       </Modal>
     );
   }
@@ -154,7 +162,9 @@ const ModalWrapper = ({
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
-      {renderModalContent()}
+      {Platform.OS === 'android' ? (
+        <GestureHandlerRootView style={{flex: 1}}>{renderModalContent()}</GestureHandlerRootView>
+      ) : renderModalContent()}
     </Overlay>
   );
 };

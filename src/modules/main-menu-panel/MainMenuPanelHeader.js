@@ -11,7 +11,7 @@ import {truncateText} from '../../shared/helpers';
 import {BLACK} from '../../shared/styles.constants';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 
-const MainMenuPanelHeader = () => {
+const MainMenuPanelHeader = ({onTagsOverflowMenuPress}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -79,6 +79,17 @@ const MainMenuPanelHeader = () => {
             color={BLACK}
             name={'swap-horizontal'}
             onPress={() => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS}))}
+            size={25}
+            type={'ionicon'}
+          />
+        </View>
+      )}
+      {mainMenuPageVisible && onTagsOverflowMenuPress && (
+        <View style={[mainMenuPanelStyles.mainMenuIconContainer, {paddingLeft: 5}]}>
+          <Icon
+            color={BLACK}
+            name={'ellipsis-vertical'}
+            onPress={onTagsOverflowMenuPress}
             size={25}
             type={'ionicon'}
           />

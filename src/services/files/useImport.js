@@ -179,7 +179,8 @@ const useImport = () => {
     const dirExists = await doesDeviceBackupDirExist(selectedProject);
     if (dirExists) {
       const dataFile = await readDeviceJSONFile(selectedProject);
-      if (!isEmpty(project) && dataFile) await persistor.purge();
+      if (!dataFile) throw new Error('Project data file (data.json) not found in ' + selectedProject);
+      if (!isEmpty(project)) await persistor.purge();
       const {projectDb, spotsDb} = dataFile;
       if (!isEmpty(project.id) && project.id !== projectDb.project.id) clearProject();
       console.log('DataFile', dataFile);
