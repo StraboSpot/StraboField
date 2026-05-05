@@ -4,6 +4,7 @@ import {Text, View} from 'react-native';
 import RNSketchCanvas from '@StraboSpot/react-native-sketch-canvas';
 
 import styles from './sketch.styles';
+import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
@@ -51,7 +52,13 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{width, height: height - 100, flexDirection: 'row'}}>
+      <View
+        style={{
+          width,
+          height: height - 100 - (SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0),
+          flexDirection: 'row',
+        }}
+      >
         <RNSketchCanvas
           canvasStyle={{
             backgroundColor: 'transparent',
