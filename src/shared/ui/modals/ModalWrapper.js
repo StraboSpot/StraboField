@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {FlatList, Keyboard, Modal, Platform, View} from 'react-native';
+import {Keyboard, Modal, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
+import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
@@ -110,7 +111,7 @@ const ModalWrapper = ({
       <FlatList
         ListHeaderComponent={renderListHeader}
         data={[]}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
         scrollEnabled={scrollEnabled}
         style={isAutoHeight ? undefined : {flex: 1}}
@@ -142,9 +143,11 @@ const ModalWrapper = ({
         supportedOrientations={['portrait', 'landscape']}
         visible={isVisible}
       >
-        <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
-          {renderModalContent()}
-        </View>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
+            {renderModalContent()}
+          </View>
+        </GestureHandlerRootView>
       </Modal>
     );
   }
@@ -159,7 +162,9 @@ const ModalWrapper = ({
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
-      {renderModalContent()}
+      <GestureHandlerRootView style={{flex: 1}}>
+        {renderModalContent()}
+      </GestureHandlerRootView>
     </Overlay>
   );
 };
