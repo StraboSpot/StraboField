@@ -162,12 +162,9 @@ const ModalWrapper = ({
       overlayStyle={getResponsiveOverlayStyle()}
       supportedOrientations={['portrait', 'landscape']}
     >
-      {Platform.OS !== 'ios' ? (
-          <GestureHandlerRootView style={{flex: 1}}>
-            {renderModalContent()}
-          </GestureHandlerRootView>
-        )
-        : renderModalContent()}
+      {Platform.OS === 'android' ? (
+        <GestureHandlerRootView style={{flex: 1}}>{renderModalContent()}</GestureHandlerRootView>
+      ) : renderModalContent()}
     </Overlay>
   );
 };
