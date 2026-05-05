@@ -440,7 +440,7 @@ const useImages = () => {
             else if (response.error) reject();
             else {
               const imageAsset = response.assets[0];
-              const createResizedImageProps = [imageAsset.uri, imageAsset.height, imageAsset.width, 'JPEG', 100, 0];
+              const createResizedImageProps = [imageAsset.uri, imageAsset.width, imageAsset.height, 'JPEG', 100, 0];
               const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
               console.log('Resized Image:', resizedImage);
               resolve(saveFile(resizedImage));
