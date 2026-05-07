@@ -39,10 +39,9 @@ const useImageSize = () => {
     let imgWidth = imageData.width;
     const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
     if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
-    const createResizedImageProps = (imgHeight > IMAGE_MAX_LOCAL_SIZE || imgWidth > IMAGE_MAX_LOCAL_SIZE)
-      ? [tempImageURI, IMAGE_MAX_LOCAL_SIZE, IMAGE_MAX_LOCAL_SIZE, 'JPEG', 100, 0]
-      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
-    return ImageResizer.createResizedImage(...createResizedImageProps);
+    if (imgHeight <= IMAGE_MAX_LOCAL_SIZE && imgWidth <= IMAGE_MAX_LOCAL_SIZE) return imageData;
+    const createResizedImageProps = [tempImageURI, IMAGE_MAX_LOCAL_SIZE, IMAGE_MAX_LOCAL_SIZE, 'JPEG', 100, 0];
+    return await ImageResizer.createResizedImage(...createResizedImageProps);
   };
 
   const resizeImageForThumbnail = async (imageUri) => {
@@ -52,7 +51,7 @@ const useImageSize = () => {
 
   const resizeImageForUpload = async (imageProps) => {
     try {
-      console.log('Resizing Image', imageProps?.id, '...');
+      console.log('Resizing Image', imageProps?.id, imageProps, '...');
       let imageHeight = imageProps?.height;
       let imageWidth = imageProps?.width;
 
@@ -70,7 +69,9 @@ const useImageSize = () => {
 
         await makeDirectory(TEMP_IMAGES_DOWNSIZED_DIRECTORY);
         const createResizedImageProps = [imageProps.uri, imageWidth, imageHeight, 'JPEG', 100, 0, TEMP_IMAGES_DOWNSIZED_DIRECTORY];
-        return await ImageResizer.createResizedImage(...createResizedImageProps);
+        const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
+        console.log('Resized Image:', imageProps.id, resizedImage);
+        return resizedImage;
       }
       else return imageProps;
     }
