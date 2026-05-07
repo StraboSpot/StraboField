@@ -36,7 +36,7 @@ const useImages = () => {
   const spots = useSelector(state => state.spot.spots);
 
   const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
-  const {getImageHeightAndWidth, resizeImageIfNecessary} = useImageSize();
+  const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
   const {checkPermission, requestPermission} = usePermissions();
   const toast = useToast();
@@ -190,7 +190,7 @@ const useImages = () => {
             await Promise.all(
               imageAsset.map(async (image) => {
                 imageCount++;
-                const resizedImage = await resizeImageIfNecessary(image);
+                const resizedImage = await resizeImageForDevice(image);
                 const savedPhoto = await saveFile(resizedImage);
                 newImages.push(savedPhoto);
                 console.log('Saved Photo in getImagesFromCameraRoll:', savedPhoto);
@@ -356,7 +356,7 @@ const useImages = () => {
             else if (response.error) reject();
             else {
               const imageAsset = response.assets[0];
-              const resizedImage = await resizeImageIfNecessary(imageAsset);
+              const resizedImage = await resizeImageForDevice(imageAsset);
               console.log('Resized Image:', resizedImage);
               resolve(saveFile(resizedImage));
             }

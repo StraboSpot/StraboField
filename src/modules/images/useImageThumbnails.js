@@ -10,7 +10,7 @@ const useImageThumbnails = ({images} = {}) => {
   /* Data Hooks */
 
   const {doesDeviceDirExist} = useDevice();
-  const {createThumbnail} = useImageSize();
+  const {resizeImageForThumbnail} = useImageSize();
 
   /* Local State */
 
@@ -55,7 +55,7 @@ const useImageThumbnails = ({images} = {}) => {
           const imageUri = getLocalImageURI(image.id);
           const exists = await doesDeviceDirExist(imageUri);
           if (exists) {
-            const resizedImage = await createThumbnail(imageUri);
+            const resizedImage = await resizeImageForThumbnail(imageUri);
             thumbnailURIs = {...thumbnailURIs, [image.id]: resizedImage.uri};
           }
           else thumbnailURIs = {...thumbnailURIs, [image.id]: undefined};

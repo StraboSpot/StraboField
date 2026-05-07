@@ -9,6 +9,10 @@ import {TEMP_IMAGES_DOWNSIZED_DIRECTORY} from '../../services/files/directories.
 import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {editedSpotImage} from '../spots/spots.slice';
 
+const IMAGE_MAX_THUMBNAIL_SIZE = 200;
+const IMAGE_MAX_UPLOAD_SIZE = 2000;
+const IMAGE_MAX_LOCAL_SIZE = 4096;
+
 const useImageSize = () => {
   /* Data Hooks */
 
@@ -18,11 +22,6 @@ const useImageSize = () => {
   const {doesDeviceDirExist, makeDirectory} = useDevice();
 
   /* Exported Functions */
-
-  const createThumbnail = async (imageUri) => {
-    const createResizedImageProps = [imageUri, 200, 200, 'JPEG', 100, 0];
-    return await ImageResizer.createResizedImage(...createResizedImageProps);
-  };
 
   const getImageHeightAndWidth = (imageURI) => {
     return new Promise((resolve, reject) => {
@@ -35,6 +34,22 @@ const useImageSize = () => {
     });
   };
 
+  const resizeImageForDevice = async (imageData) => {
+    let imgHeight = imageData.height;
+    let imgWidth = imageData.width;
+    const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
+    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
+    const createResizedImageProps = (imgHeight > IMAGE_MAX_LOCAL_SIZE || imgWidth > IMAGE_MAX_LOCAL_SIZE)
+      ? [tempImageURI, IMAGE_MAX_LOCAL_SIZE, IMAGE_MAX_LOCAL_SIZE, 'JPEG', 100, 0]
+      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
+    return ImageResizer.createResizedImage(...createResizedImageProps);
+  };
+
+  const resizeImageForThumbnail = async (imageUri) => {
+    const createResizedImageProps = [imageUri, IMAGE_MAX_THUMBNAIL_SIZE, IMAGE_MAX_THUMBNAIL_SIZE, 'JPEG', 100, 0];
+    return await ImageResizer.createResizedImage(...createResizedImageProps);
+  };
+
   const resizeImageForUpload = async (imageProps) => {
     try {
       console.log('Resizing Image', imageProps?.id, '...');
@@ -43,15 +58,14 @@ const useImageSize = () => {
 
       if (!imageWidth || !imageHeight) ({imageWidth, imageHeight} = await getImageHeightAndWidth(imageProps.uri));
 
-      if (imageWidth > 2000 || imageHeight > 2000) {
-        const max_size = 2000;
-        if (imageWidth > imageHeight && imageWidth > max_size) {
-          imageHeight = max_size * imageHeight / imageWidth;
-          imageWidth = max_size;
+      if (imageWidth > IMAGE_MAX_UPLOAD_SIZE || imageHeight > IMAGE_MAX_UPLOAD_SIZE) {
+        if (imageWidth > imageHeight && imageWidth > IMAGE_MAX_UPLOAD_SIZE) {
+          imageHeight = IMAGE_MAX_UPLOAD_SIZE * imageHeight / imageWidth;
+          imageWidth = IMAGE_MAX_UPLOAD_SIZE;
         }
-        else if (imageHeight > max_size) {
-          imageWidth = max_size * imageWidth / imageHeight;
-          imageHeight = max_size;
+        else if (imageHeight > IMAGE_MAX_UPLOAD_SIZE) {
+          imageWidth = IMAGE_MAX_UPLOAD_SIZE * imageWidth / imageHeight;
+          imageHeight = IMAGE_MAX_UPLOAD_SIZE;
         }
 
         await makeDirectory(TEMP_IMAGES_DOWNSIZED_DIRECTORY);
@@ -64,16 +78,6 @@ const useImageSize = () => {
       console.error('Error Resizing Image.', err);
       throw Error('Error Resizing Image.', err);
     }
-  };
-
-  const resizeImageIfNecessary = async (imageData) => {
-    let imgHeight = imageData.height;
-    let imgWidth = imageData.width;
-    const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
-    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
-    const createResizedImageProps = (imgHeight > 4096 || imgWidth > 4096) ? [tempImageURI, 4096, 4096, 'JPEG', 100, 0]
-      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
-    return ImageResizer.createResizedImage(...createResizedImageProps);
   };
 
   const setImageHeightAndWidth = async (image) => {
@@ -92,10 +96,10 @@ const useImageSize = () => {
   };
 
   return {
-    createThumbnail,
     getImageHeightAndWidth,
+    resizeImageForDevice,
+    resizeImageForThumbnail,
     resizeImageForUpload,
-    resizeImageIfNecessary,
     setImageHeightAndWidth,
   };
 };
