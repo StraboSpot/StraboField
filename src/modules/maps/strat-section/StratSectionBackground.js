@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 import StratSectionImageOverlay from './StratSectionImageOverlay';
 import XAxes from './XAxes';
 import YAxis from './YAxis';
-import {useImages} from '../../images';
+import {getLocalImageURI} from '../../images/imageURIs.helpers';
 import {useSpots} from '../../spots';
 import useMapCoords from '../useMapCoords';
 
@@ -16,7 +16,6 @@ const StratSectionBackground = () => {
 
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLocalImageURI} = useImages();
   const {getCoordQuad} = useMapCoords();
   const {getSpotWithThisStratSection} = useSpots();
 

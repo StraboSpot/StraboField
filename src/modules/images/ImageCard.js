@@ -4,7 +4,7 @@ import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Card} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, ImageThumbnail, useImages} from '.';
+import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
@@ -34,7 +34,8 @@ const ImageCard = ({
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
-  const {getImageBasemap, getImageThumbnailURIs, setAnnotation} = useImages();
+  const {getImageBasemap, setAnnotation} = useImages();
+  const {getImageThumbnailURIs} = useImageThumbnails();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
   const {deleteImageFromSpot} = useImages();
 

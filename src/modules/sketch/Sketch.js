@@ -8,11 +8,12 @@ import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.
 import alert from '../../shared/ui/alert';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
+import {getLocalImageURI} from '../images/imageURIs.helpers';
 
 const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
   /* Data Hooks */
 
-  const {getLocalImageURI, saveFile} = useImages();
+  const {saveFile} = useImages();
   const {height, width} = useWindowSize();
 
   /* Logic Helpers */
