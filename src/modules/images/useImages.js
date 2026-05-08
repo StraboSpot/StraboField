@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getLocalImageURI} from './imageURIs.helpers';
 import useImageSize from './useImageSize';
+import useCompassCore from '../../services/device/useCompassCore';
 import useDevice from '../../services/device/useDevice';
 import usePermissions from '../../services/device/usePermissions';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
@@ -35,6 +36,7 @@ const useImages = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
+  const {getCameraAngles, startCameraAnglesCapture, stopCameraAnglesCapture} = useCompassCore();
   const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
   const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
@@ -219,12 +221,8 @@ const useImages = () => {
         return newImages;
       }
       else {
-        const photoProperties = {
-          id: savedPhoto.id,
-          image_type: 'photo',
-          height: savedPhoto.height,
-          width: savedPhoto.width,
-        };
+        const {height, id, width, ...compassData} = savedPhoto;
+        const photoProperties = {id, image_type: 'photo', height, width, ...compassData};
         console.log('Photos to Save:', [...newImages, photoProperties]);
         newImages.push(photoProperties);
         return launchCameraLoop();
@@ -348,17 +346,26 @@ const useImages = () => {
     console.log(PermissionsAndroid.PERMISSIONS.CAMERA);
     if (Platform.OS === 'android') permissionGranted = await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
     if (permissionGranted === 'granted' || Platform.OS === 'ios') {
+      await startCameraAnglesCapture();
       return new Promise((resolve, reject) => {
         try {
-          launchCamera({saveToPhotos: true}, async (response) => {
+          launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
             console.log('Launch Camera Response:', response);
-            if (response.didCancel) resolve('cancelled');
-            else if (response.error) reject();
+            if (response.didCancel) {
+              stopCameraAnglesCapture();
+              resolve('cancelled');
+            }
+            else if (response.error) {
+              stopCameraAnglesCapture();
+              reject();
+            }
             else {
               const imageAsset = response.assets[0];
+              const compassReading = getCameraAngles(imageAsset.timestamp);
               const resizedImage = await resizeImageForDevice(imageAsset);
               console.log('Resized Image:', resizedImage);
-              resolve(saveFile(resizedImage));
+              const savedFile = await saveFile(resizedImage);
+              resolve({...savedFile, ...compassReading});
             }
           });
         }

@@ -23,6 +23,9 @@ const useCompassCore = () => {
   /* Local State */
 
   const calibrationSubscription = useRef(null);
+  const imageCapturedDeclination = useRef(0);
+  const imageCaptureLog = useRef([]);
+  const imageCaptureSubscription = useRef(null);
   const magneticDeclination = useRef(0);
   const matrixRawData = useRef(null);
   const rotationMatrixSubscription = useRef(null);
@@ -50,16 +53,9 @@ const useCompassCore = () => {
     const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
     matrixRawData.current = matrix;
     let {magneticHeading, trueHeading} = matrixRotationData;
-    const {m21, m22, m23, m31, m32, m33} = matrix;
-    const ENU_Pole = Platform.OS === 'ios' ? cartesianToSpherical(-m32, m31, m33) : cartesianToSpherical(m31, m32, m33);
-    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23) : cartesianToSpherical(m21, m22, m23);
-    let {strike, dip} = getStrikeAndDip(ENU_Pole);
-    let {plunge, trend} = getTrendAndPlunge(ENU_TP);
-    if (Platform.OS !== 'ios') {
-      strike = (strike + declination) % 360;
-      trend = (trend + declination) % 360;
-      trueHeading = (magneticHeading + declination) % 360;
-    }
+    if (Platform.OS !== 'ios') trueHeading = (magneticHeading + declination) % 360;
+    const {strike, dip} = getStrikeAndDipFromMatrix(matrix, declination);
+    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, declination);
 
     const dipDirection = (strike + 90) % 360;
     setCompassData({
@@ -72,6 +68,41 @@ const useCompassCore = () => {
       trend: roundToDecimalPlaces(trend, 0),
       trueHeading: roundToDecimalPlaces(trueHeading, 0),
     });
+  };
+
+  // Uses the -Z axis (negated m3x row) — the back camera's optical axis.
+  // Unlike strike/dip which uses +Z (screen normal), or trend/plunge which uses Y (long edge toward target),
+  // the camera points through the back of the device, perpendicular to the screen and away from the user.
+  const getCameraViewFromMatrix = (matrix, declination) => {
+    const {m31, m32, m33} = matrix;
+    const ENU_Cam = Platform.OS === 'ios' ? cartesianToSpherical(m32, -m31, -m33)
+      : cartesianToSpherical(-m31, -m32, -m33);
+    let {plunge, trend} = getTrendAndPlunge(ENU_Cam);
+    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    return {plunge, trend};
+  };
+
+  // Uses the Z axis (m3x row) as the pole (normal) to the measured plane.
+  // Device is held back-against-rock with the screen facing the user; Z points out perpendicular to the rock surface.
+  // Strike and dip are derived from this pole direction, not measured directly along Z.
+  const getStrikeAndDipFromMatrix = (matrix, declination) => {
+    const {m31, m32, m33} = matrix;
+    const ENU_Pole = Platform.OS === 'ios' ? cartesianToSpherical(-m32, m31, m33)
+      : cartesianToSpherical(m31, m32, m33);
+    let {strike, dip} = getStrikeAndDip(ENU_Pole);
+    if (Platform.OS !== 'ios') strike = (strike + declination) % 360;
+    return {strike, dip};
+  };
+
+  // Uses the Y axis (m2x row) — the device's long axis (toward the top edge).
+  // Device is pointed at the feature being measured, so Y points toward the target.
+  const getTrendAndPlungeFromMatrix = (matrix, declination) => {
+    const {m21, m22, m23} = matrix;
+    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23)
+      : cartesianToSpherical(m21, m22, m23);
+    let {plunge, trend} = getTrendAndPlunge(ENU_TP);
+    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    return {plunge, trend};
   };
 
   const handleMatrixRotationData = async (matrixData) => {
@@ -117,6 +148,55 @@ const useCompassCore = () => {
     console.log('MagDeclination', result);
     magneticDeclination.current = result.decl;
     return result.decl;
+  };
+
+  const getCameraAngles = (photoTimestamp) => {
+    const log = [...imageCaptureLog.current];
+    stopCameraAnglesCapture();
+    if (!log.length) return {};
+    try {
+      const tsNum = Number(photoTimestamp);
+      const ts = isNaN(tsNum) ? new Date(photoTimestamp).getTime() : tsNum * 1000;
+      const closest = [...log]
+        .sort((a, b) => Math.abs(a.timestamp - ts) - Math.abs(b.timestamp - ts))
+        .slice(0, 5);
+      console.log('ImageCapture: log entries', log.length, 'photo ts', ts, 'closest diff',
+        Math.abs(closest[0].timestamp - ts), 'ms');
+      const avg = key => closest.reduce((sum, e) => sum + e.matrix[key] / closest.length, 0);
+      const matrix = {m31: avg('m31'), m32: avg('m32'), m33: avg('m33')};
+      const {plunge, trend} = getCameraViewFromMatrix(matrix, imageCapturedDeclination.current);
+      return {
+        view_angle_plunge: roundToDecimalPlaces(plunge, 0),
+        view_azimuth_trend: roundToDecimalPlaces(trend, 0),
+      };
+    }
+    catch (err) {
+      console.error('Error finishing image view capture:', err);
+      return {};
+    }
+  };
+
+  const startCameraAnglesCapture = async () => {
+    try {
+      imageCapturedDeclination.current = await fetchDeclination();
+      imageCaptureLog.current = [];
+      const CompassEvents = new NativeEventEmitter(CompassModule);
+      imageCaptureSubscription.current = CompassEvents.addListener('rotationMatrix', (matrixData) => {
+        const matrix = Platform.OS === 'ios' ? matrixData.matrix : matrixData;
+        imageCaptureLog.current.push({matrix, timestamp: Date.now()});
+      });
+      Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
+    }
+    catch (err) {
+      console.error('Error starting image view capture:', err);
+    }
+  };
+
+  const stopCameraAnglesCapture = () => {
+    imageCaptureSubscription.current?.remove();
+    imageCaptureSubscription.current = null;
+    imageCaptureLog.current = [];
+    Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
   };
 
   const subscribeToCalibrationStatus = (handler) => {
@@ -169,7 +249,10 @@ const useCompassCore = () => {
   return {
     compassData,
     fetchDeclination,
+    getCameraAngles,
     matrixRawData,
+    startCameraAnglesCapture,
+    stopCameraAnglesCapture,
     subscribeToCalibrationStatus,
     subscribeToSensors,
     unsubscribeFromCalibrationStatus,
