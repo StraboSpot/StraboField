@@ -44,6 +44,46 @@ const useCompassCore = () => {
 
   /* Internal Functions */
 
+  const computeCompassData = (matrixRotationData) => {
+    const declination = magneticDeclination.current;
+
+    const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
+    matrixRawData.current = matrix;
+    let {magneticHeading, trueHeading} = matrixRotationData;
+    const {m21, m22, m23, m31, m32, m33} = matrix;
+    const ENU_Pole = Platform.OS === 'ios' ? cartesianToSpherical(-m32, m31, m33) : cartesianToSpherical(m31, m32, m33);
+    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23) : cartesianToSpherical(m21, m22, m23);
+    let {strike, dip} = getStrikeAndDip(ENU_Pole);
+    let {plunge, trend} = getTrendAndPlunge(ENU_TP);
+    if (Platform.OS !== 'ios') {
+      strike = (strike + declination) % 360;
+      trend = (trend + declination) % 360;
+      trueHeading = (magneticHeading + declination) % 360;
+    }
+
+    const dipDirection = (strike + 90) % 360;
+    setCompassData({
+      declination: declination.toFixed(2),
+      dip: roundToDecimalPlaces(dip, 0),
+      dip_direction: roundToDecimalPlaces(dipDirection, 0),
+      magHeading: roundToDecimalPlaces(magneticHeading, 0),
+      plunge: roundToDecimalPlaces(plunge, 0),
+      strike: roundToDecimalPlaces(strike, 0),
+      trend: roundToDecimalPlaces(trend, 0),
+      trueHeading: roundToDecimalPlaces(trueHeading, 0),
+    });
+  };
+
+  const handleMatrixRotationData = async (matrixData) => {
+    try {
+      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
+      computeCompassData(matrixData);
+    }
+    catch (err) {
+      console.error('Error Getting Matrix', err);
+    }
+  };
+
   const matrixAverage = async (matrixData) => {
     matrixArray.push(matrixData);
     if (matrixArray.length > 5) matrixArray.shift();
@@ -61,60 +101,6 @@ const useCompassCore = () => {
       m33: roundToDecimalPlaces(avg('m33'), 3),
       magneticHeading: roundToDecimalPlaces(matrixData.magneticHeading, 0),
     };
-  };
-
-  const computeCompassData = (matrixRotationData) => {
-    let strike, trend;
-    let ENU_Pole, ENU_TP;
-    const declination = magneticDeclination.current;
-
-    const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
-    matrixRawData.current = matrix;
-
-    let {magneticHeading, trueHeading} = matrixRotationData;
-    const {m21, m22, m23, m31, m32, m33} = matrix;
-    if (Platform.OS === 'ios') {
-      ENU_Pole = cartesianToSpherical(-m32, m31, m33);
-      ENU_TP = cartesianToSpherical(-m22, m21, m23);
-    }
-    else {
-      ENU_Pole = cartesianToSpherical(m31, m32, m33);
-      ENU_TP = cartesianToSpherical(m21, m22, m23);
-    }
-    const strikeAndDip = getStrikeAndDip(ENU_Pole);
-    const trendAndPlunge = getTrendAndPlunge(ENU_TP);
-
-    if (Platform.OS === 'ios') {
-      strike = strikeAndDip.strike;
-      trend = trendAndPlunge.trend;
-    }
-    else {
-      trueHeading = (magneticHeading + declination) % 360;
-      strike = (strikeAndDip.strike + declination) % 360;
-      trend = (trendAndPlunge.trend + declination) % 360;
-    }
-
-    const dipDirection = (strike + 90) % 360;
-    setCompassData({
-      declination: declination.toFixed(2),
-      dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
-      dip_direction: roundToDecimalPlaces(dipDirection, 0),
-      magHeading: roundToDecimalPlaces(magneticHeading, 0),
-      plunge: roundToDecimalPlaces(trendAndPlunge.plunge, 0),
-      strike: roundToDecimalPlaces(strike, 0),
-      trend: roundToDecimalPlaces(trend, 0),
-      trueHeading: roundToDecimalPlaces(trueHeading, 0),
-    });
-  };
-
-  const handleMatrixRotationData = async (matrixData) => {
-    try {
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
-      computeCompassData(matrixData);
-    }
-    catch (err) {
-      console.error('Error Getting Matrix', err);
-    }
   };
 
   /* Exported Functions */
