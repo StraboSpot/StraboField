@@ -163,7 +163,7 @@ const ModalWrapper = ({
       supportedOrientations={['portrait', 'landscape']}
     >
       {Platform.OS === 'android' ? (
-          <GestureHandlerRootView style={{flex: 1}}>
+          <GestureHandlerRootView style={{}}>
             {renderModalContent()}
           </GestureHandlerRootView>
         )
