@@ -110,6 +110,7 @@ const ModalWrapper = ({
       )}
       <FlatList
         ListHeaderComponent={renderListHeader}
+        // contentContainerStyle={{flexGrow: 1}}
         data={[]}
         keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
@@ -152,6 +153,7 @@ const ModalWrapper = ({
     );
   }
 
+  console.log('isAutoHeight', isAutoHeight, overlayStyleOverride?.height, fullscreen, isVisible, Platform.OS);
   return (
     <Overlay
       animationType={'fade'}
@@ -163,7 +165,7 @@ const ModalWrapper = ({
       supportedOrientations={['portrait', 'landscape']}
     >
       {Platform.OS === 'android' ? (
-          <GestureHandlerRootView style={{}}>
+          <GestureHandlerRootView style={isAutoHeight ? {} : {flex: 1}}>
             {renderModalContent()}
           </GestureHandlerRootView>
         )
