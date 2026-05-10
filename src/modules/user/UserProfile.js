@@ -26,6 +26,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {persistor} from '../../store/ConfigureStore';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import useImageSize from '../images/useImageSize';
 
 const formName = ['general', 'user_profile'];
 
@@ -44,7 +45,8 @@ const UserProfile = () => {
   const {deleteProfileImage} = useServerRequests();
   const toast = useToast();
   const {uploadProfile} = useUpload();
-  const {resizeImageForUpload, uploadProfileImage} = useUploadImages();
+  const {resizeImageForUpload} = useImageSize();
+  const {uploadProfileImage} = useUploadImages();
 
   /* Local State */
 
@@ -161,8 +163,7 @@ const UserProfile = () => {
     try {
       setIsUploadingProfileImage(true);
       console.log('Need to upload', tempUserProfileImage.uri);
-      const resizedProfileImage = await resizeImageForUpload(tempUserProfileImage,
-        tempUserProfileImage.uri);
+      const resizedProfileImage = await resizeImageForUpload(tempUserProfileImage);
       await copyFiles(resizedProfileImage.uri, APP_DIRECTORIES.PROFILE_IMAGE);
       await deleteFromDevice(resizedProfileImage.uri);
       await uploadProfileImage();

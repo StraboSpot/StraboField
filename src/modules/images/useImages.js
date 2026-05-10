@@ -1,19 +1,19 @@
-import {Image, PermissionsAndroid, Platform} from 'react-native';
+import {PermissionsAndroid, Platform} from 'react-native';
 
-import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getLocalImageURI} from './imageURIs.helpers';
+import useImageSize from './useImageSize';
+import useCompassCore from '../../services/device/useCompassCore';
 import useDevice from '../../services/device/useDevice';
 import usePermissions from '../../services/device/usePermissions';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
-import {STRABO_APIS} from '../../services/network/urls.constants';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -22,7 +22,7 @@ import {
 } from '../home/home.slice';
 import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {clearedSelectedSpots, editedSpotImage, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
+import {clearedSelectedSpots, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 
 let imageCount = 0;
 let newImages = [];
@@ -36,25 +36,12 @@ const useImages = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
+  const {getCameraAngles, startCameraAnglesCapture, stopCameraAnglesCapture} = useCompassCore();
   const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
+  const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
   const {checkPermission, requestPermission} = usePermissions();
   const toast = useToast();
-  const {width, height} = useWindowSize();
-
-  /* Internal Functions */
-
-  const resizeImageIfNecessary = async (imageData) => {
-    let imgHeight = imageData.height;
-    let imgWidth = imageData.width;
-    const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
-    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
-    let resizedImage, createResizedImageProps;
-    createResizedImageProps = (imgHeight > 4096 || imgWidth > 4096) ? [tempImageURI, 4096, 4096, 'JPEG', 100, 0]
-      : [tempImageURI, imgWidth, imgHeight, 'JPEG', 100, 0];
-    resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
-    return resizedImage;
-  };
 
   /* Exported Functions */
 
@@ -188,21 +175,6 @@ const useImages = () => {
     return image;
   };
 
-  const getImageHeightAndWidth = (imageURI) => {
-    return new Promise((resolve, reject) => {
-      Image.getSize(imageURI, (imageWidth, imageHeight) => {
-        resolve({height: imageHeight, width: imageWidth});
-      }, (err) => {
-        console.log('Error getting size of image:', err.message);
-        reject(err);
-      });
-    });
-  };
-
-  const getImageScreenSizedURI = (id) => {
-    return STRABO_APIS.PUBLIC_IMAGE_RESIZED + Math.max(width, height) + '/' + id;
-  };
-
   const getImagesFromCameraRoll = async () => {
     newImages = [];
     return new Promise((res, rej) => {
@@ -220,7 +192,7 @@ const useImages = () => {
             await Promise.all(
               imageAsset.map(async (image) => {
                 imageCount++;
-                const resizedImage = await resizeImageIfNecessary(image);
+                const resizedImage = await resizeImageForDevice(image);
                 const savedPhoto = await saveFile(resizedImage);
                 newImages.push(savedPhoto);
                 console.log('Saved Photo in getImagesFromCameraRoll:', savedPhoto);
@@ -238,41 +210,6 @@ const useImages = () => {
     });
   };
 
-  const getImageThumbnailURI = (id) => {
-    return STRABO_APIS.PUBLIC_IMAGE_THUMBNAIL + id;
-  };
-
-  const getImageThumbnailURIs = async (images) => {
-    try {
-      let imageThumbnailURIs = {};
-      await Promise.all(images.map(async (image) => {
-        if (Platform.OS === 'web') {
-          imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: getImageThumbnailURI(image.id)};
-        }
-        else {
-          const imageUri = getLocalImageURI(image.id);
-          const exists = await doesDeviceDirExist(imageUri);
-          if (exists) {
-            const createResizedImageProps = [imageUri, 200, 200, 'JPEG', 100, 0];
-            const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
-            imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: resizedImage.uri};
-          }
-          else imageThumbnailURIs = {...imageThumbnailURIs, [image.id]: undefined};
-        }
-      }));
-      return imageThumbnailURIs;
-    }
-    catch (err) {
-      console.error('Error creating thumbnails', err);
-      // throw Error(err);
-    }
-  };
-
-  const getLocalImageURI = (id) => {
-    if (Platform.OS === 'web') return STRABO_APIS.PUBLIC_IMAGE + id;
-    else return 'file://' + APP_DIRECTORIES.IMAGES + id + '.jpg';
-  };
-
   const launchCameraLoop = async () => {
     try {
       const savedPhoto = await takePicture();
@@ -284,12 +221,8 @@ const useImages = () => {
         return newImages;
       }
       else {
-        const photoProperties = {
-          id: savedPhoto.id,
-          image_type: 'photo',
-          height: savedPhoto.height,
-          width: savedPhoto.width,
-        };
+        const {height, id, width, ...compassData} = savedPhoto;
+        const photoProperties = {id, image_type: 'photo', height, width, ...compassData};
         console.log('Photos to Save:', [...newImages, photoProperties]);
         newImages.push(photoProperties);
         return launchCameraLoop();
@@ -336,9 +269,7 @@ const useImages = () => {
         PermissionsAndroid.PERMISSIONS.CAMERA,
         {
           title: 'Camera Permission Requested',
-          message:
-            'StraboSpot needs access to your camera '
-            + 'so you can take pictures.',
+          message: 'StraboSpot needs access to your camera so you can take pictures.',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
         },
@@ -409,41 +340,32 @@ const useImages = () => {
     if (!imageCopy.annotated) dispatch(setCurrentImageBasemap(undefined));
   };
 
-  const setImageHeightAndWidth = async (image) => {
-    const imageURI = getLocalImageURI(image.id);
-    if (imageURI) {
-      const isValidImageURI = await doesDeviceDirExist(imageURI);
-      if (isValidImageURI) {
-        const imageSize = await getImageHeightAndWidth(imageURI);
-        const updatedImage = {...image, ...imageSize};
-        const spot = dispatch(editedSpotImage(updatedImage));
-        console.log(spot);
-        if (currentImageBasemap.id === updatedImage.id) {
-          dispatch(setCurrentImageBasemap(updatedImage));
-        }
-      }
-    }
-    else console.error('Error setting image height and width');
-  };
-
   // Called from Notebook Panel Footer and opens camera only
   const takePicture = async () => {
     let permissionGranted;
     console.log(PermissionsAndroid.PERMISSIONS.CAMERA);
     if (Platform.OS === 'android') permissionGranted = await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
     if (permissionGranted === 'granted' || Platform.OS === 'ios') {
+      await startCameraAnglesCapture();
       return new Promise((resolve, reject) => {
         try {
-          launchCamera({saveToPhotos: true}, async (response) => {
+          launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
             console.log('Launch Camera Response:', response);
-            if (response.didCancel) resolve('cancelled');
-            else if (response.error) reject();
+            if (response.didCancel) {
+              stopCameraAnglesCapture();
+              resolve('cancelled');
+            }
+            else if (response.error) {
+              stopCameraAnglesCapture();
+              reject();
+            }
             else {
               const imageAsset = response.assets[0];
-              const createResizedImageProps = [imageAsset.uri, imageAsset.width, imageAsset.height, 'JPEG', 100, 0];
-              const resizedImage = await ImageResizer.createResizedImage(...createResizedImageProps);
+              const compassReading = getCameraAngles(imageAsset.timestamp);
+              const resizedImage = await resizeImageForDevice(imageAsset);
               console.log('Resized Image:', resizedImage);
-              resolve(saveFile(resizedImage));
+              const savedFile = await saveFile(resizedImage);
+              resolve({...savedFile, ...compassReading});
             }
           });
         }
@@ -464,18 +386,12 @@ const useImages = () => {
     getAllImagesIds,
     getImageBasemap,
     getImageByImageId,
-    getImageHeightAndWidth,
-    getImageScreenSizedURI,
     getImagesFromCameraRoll,
-    getImageThumbnailURI,
-    getImageThumbnailURIs,
-    getLocalImageURI,
     launchCameraFromNotebook,
     requestCameraPermission,
     saveFile,
     saveImageFromDownloadsDir,
     setAnnotation,
-    setImageHeightAndWidth,
     takePicture,
   };
 };

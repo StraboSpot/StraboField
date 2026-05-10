@@ -5,13 +5,14 @@ import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
 import {useImages} from '../../images';
+import {getLocalImageURI} from '../../images/imageURIs.helpers';
 import useMapCoords from '../useMapCoords';
 
 const ImageBasemapLayer = () => {
   const {currentImageBasemap} = useSelector(state => state.map);
 
   const {getCoordQuad} = useMapCoords();
-  const {doesImageExistOnDevice, getLocalImageURI} = useImages();
+  const {doesImageExistOnDevice} = useImages();
 
   const [doesImageExist, setDoesImageExist] = useState(false);
 

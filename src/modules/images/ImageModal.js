@@ -3,7 +3,8 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import {ImagePropertiesModal, imageStyles, useImages} from '.';
+import {ImagePropertiesModal, imageStyles} from '.';
+import {getResizedImageURI, getLocalImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
@@ -29,7 +30,6 @@ const ImageModal = ({
 
   /* Data Hooks */
 
-  const {getImageScreenSizedURI, getLocalImageURI} = useImages();
   const {width, height} = useWindowSize();
 
   /* Local State */
@@ -102,7 +102,7 @@ const ImageModal = ({
             }}
             placeholderStyle={commonStyles.imagePlaceholder}
             resizeMode={'contain'}
-            source={Platform.OS === 'web' ? {uri: getImageScreenSizedURI(image.id)}
+            source={Platform.OS === 'web' ? {uri: getResizedImageURI(image.id, width, height)}
               : {uri: getLocalImageURI(image.id)}}
             style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
               : {width: width, height: height - 100 - (SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0)}}

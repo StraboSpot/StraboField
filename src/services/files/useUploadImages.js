@@ -1,13 +1,14 @@
 import {useState} from 'react';
 
-import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES, TEMP_IMAGES_DOWNSIZED_DIRECTORY} from './directories.constants';
+import {APP_DIRECTORIES} from './directories.constants';
 import {getImageIds} from './files.helpers';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
+import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
+import useImageSize from '../../modules/images/useImageSize';
 import {setIsImageTransferring} from '../../modules/project/projects.slice';
 import {isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
@@ -20,8 +21,9 @@ const useUploadImages = () => {
   const spots = useSelector(state => state.spot.spots);
   const user = useSelector(state => state.user);
 
-  const {deleteTempImagesFolder, doesDeviceDirExist, makeDirectory} = useDevice();
-  const {getAllImages, getImageHeightAndWidth, getLocalImageURI} = useImages();
+  const {deleteTempImagesFolder, doesDeviceDirExist} = useDevice();
+  const {getAllImages} = useImages();
+  const {resizeImageForUpload} = useImageSize();
   const {uploadImage, verifyImagesExistence} = useServerRequests();
 
   /* Local State */
@@ -88,38 +90,6 @@ const useUploadImages = () => {
     setImageUploadStatusMessage('');
     setCurrentImage('');
     setCurrentImageStatus({success: 0, failed: 0});
-  };
-
-  // Downsize image for upload
-  const resizeImageForUpload = async (imageProps) => {
-    try {
-      console.log('Resizing Image', imageProps?.id, '...');
-      let height = imageProps?.height;
-      let width = imageProps?.width;
-
-      if (!width || !height) ({width, height} = await getImageHeightAndWidth(imageProps.uri));
-
-      if (width > 2000 || height > 2000) {
-        const max_size = 2000;
-        if (width > height && width > max_size) {
-          height = max_size * height / width;
-          width = max_size;
-        }
-        else if (height > max_size) {
-          width = max_size * width / height;
-          height = max_size;
-        }
-
-        await makeDirectory(TEMP_IMAGES_DOWNSIZED_DIRECTORY);
-        const createResizedImageProps = [imageProps.uri, width, height, 'JPEG', 100, 0, TEMP_IMAGES_DOWNSIZED_DIRECTORY];
-        return await ImageResizer.createResizedImage(...createResizedImageProps);
-      }
-      else return imageProps;
-    }
-    catch (err) {
-      console.error('Error Resizing Image.', err);
-      throw Error('Error Resizing Image.', err);
-    }
   };
 
   const uploadImages = async (imagesToUpload) => {
@@ -213,7 +183,6 @@ const useUploadImages = () => {
     imageUploadStatusMessage,
     initializeImageUpload,
     resetState,
-    resizeImageForUpload,
     totalImages,
     uploadImages,
     uploadProfileImage,
