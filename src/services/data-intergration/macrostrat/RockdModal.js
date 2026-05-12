@@ -10,7 +10,7 @@ import {addedCheckedInSpotId, setMacrostratToken} from '../../../modules/user/us
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import useServerRequests from '../../useServerRequests';
+import useServerRequests from '../../network/useServerRequests';
 
 const STATUS_MESSAGES = {
   converting: 'Converting spot to Rock\'d format...',

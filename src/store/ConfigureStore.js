@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {createLogger} from 'redux-logger';
-import {persistReducer, persistStore} from 'redux-persist';
+import {autoMergeLevel2, createMigrate, persistReducer, persistStore} from 'redux-persist';
 
 import listenerMiddleware from './listenerMiddleware';
 import compassSlice from '../modules/compass/compass.slice';
@@ -15,9 +15,24 @@ import projectSlice from '../modules/project/projects.slice';
 import spotsSlice from '../modules/spots/spots.slice';
 import userSlice from '../modules/user/userProfile.slice';
 
+const migrations = {
+  1: state => ({
+    ...state,
+    user: {
+      ...state.user,
+      macrostrat: state.user?.macrostrat ?? {
+        token: null,
+        expires: null,
+        checkedInSpotIds: [],
+      },
+    },
+  }),
+};
+
 // Redux Persist
 export const persistConfig = {
   key: 'root',
+  version: 1,
   storage: AsyncStorage,
   blacklist: [
     'compass',
@@ -27,6 +42,8 @@ export const persistConfig = {
     'notebook',
     'spot',
   ],
+  migrate: createMigrate(migrations, {debug: false}),
+  stateReconciler: autoMergeLevel2,
   timeout: null,
 };
 
