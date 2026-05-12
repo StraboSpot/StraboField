@@ -25,6 +25,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
 
   const navigation = useNavigation();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
@@ -84,8 +85,9 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && item.key === 'delete') return;
-    else if (item.key === 'rockd' && (checkedInSpotIds.includes(
+    else if (item.key === 'rockd' && !isTestingMode && (checkedInSpotIds.includes(
       spot.properties.id) || spot.geometry.type !== 'Point')) return;
+    else if (item.key === 'rockd' && !isTestingMode) return;
     else {
       return (
         <ListItem
