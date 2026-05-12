@@ -3206,7 +3206,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mapbox/jsonlint-lines-primitives@npm:^2.0.2, @mapbox/jsonlint-lines-primitives@npm:~2.0.2":
+"@mapbox/jsonlint-lines-primitives@npm:~2.0.2":
   version: 2.0.2
   resolution: "@mapbox/jsonlint-lines-primitives@npm:2.0.2"
   checksum: 10c0/5814e42fc453700132f93ea742aabcef9a3c98d9bf17d4c1106f82d1dcd91bbc93052e66e29014323b9b2a41b020c743d897e4a96cc4ed2f734482d587d8c2b2
@@ -13516,11 +13516,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mapbox-gl@npm:3.21.0":
-  version: 3.21.0
-  resolution: "mapbox-gl@npm:3.21.0"
+"mapbox-gl@npm:3.23.1":
+  version: 3.23.1
+  resolution: "mapbox-gl@npm:3.23.1"
   dependencies:
-    "@mapbox/jsonlint-lines-primitives": "npm:^2.0.2"
     "@mapbox/mapbox-gl-supported": "npm:^3.0.0"
     "@mapbox/point-geometry": "npm:^1.1.0"
     "@mapbox/tiny-sdf": "npm:^2.0.6"
@@ -13544,7 +13543,7 @@ __metadata:
     quickselect: "npm:^3.0.0"
     supercluster: "npm:^8.0.1"
     tinyqueue: "npm:^3.0.0"
-  checksum: 10c0/44ba1c9741c0d2a43feb1e6033a72ecf9920e39abd262259af76abe71957a39b560fd758deb22887888bac5d4a22322a2a6b4c6248592d34c7a50e4d9cd1bdc2
+  checksum: 10c0/f999f7aca36c8296cdb9e774ee5369aa7defa308c415f1fba865be5a5404cf136c95af766053859be4bfaf40598bdb0f862a4b190099367e48aac7b7d26484af
   languageName: node
   linkType: hard
 
@@ -17142,7 +17141,7 @@ __metadata:
     jest: "npm:^30.3.0"
     js-base64: "npm:3.7.8"
     lottie-react-native: "npm:7.3.6"
-    mapbox-gl: "npm:3.21.0"
+    mapbox-gl: "npm:3.23.1"
     moment: "npm:2.30.1"
     password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
