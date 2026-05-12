@@ -10,8 +10,11 @@ const useDevice = () => {
     else console.log('Could not open:', url);
   };
 
+  const readDirectory = async () => [];
+
   return {
     openURL,
+    readDirectory,
   };
 };
 

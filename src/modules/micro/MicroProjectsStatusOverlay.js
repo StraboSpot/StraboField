@@ -27,6 +27,7 @@ const MicroProjectsStatusOverlay = ({
       isVisible={showLoadingBar || isError || showComplete}
       onActionPressed={closeStatusOverlay}
       overlayStyleOverride={{height: 'auto'}}
+      scrollEnabled={false}
       showCancelButton={false}
     >
       <View>

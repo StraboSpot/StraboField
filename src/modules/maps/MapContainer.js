@@ -27,7 +27,7 @@ import {
   setIsErrorMessagesModalVisible,
   setIsOfflineMapsModalVisible,
 } from '../home/home.slice';
-import {useImages} from '../images';
+import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
@@ -58,7 +58,7 @@ const MapContainer = forwardRef(({
   const userEmail = useSelector(state => state.user.email);
 
   const {setCustomMapSwitchValue} = useCustomMap();
-  const {setImageHeightAndWidth} = useImages();
+  const {setImageHeightAndWidth} = useImageSize();
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);

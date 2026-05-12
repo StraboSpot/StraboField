@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Pressable, SectionList, Text, View} from 'react-native';
+import {FlatList, Image, Linking, Pressable, SectionList, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
 import PageHeader from './PageHeader';
 import usePage from './usePage';
+import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
@@ -30,6 +31,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
 
   const {showErrors, validateForm} = useForm();
   const {deleteImageFromSpot} = useImages();
@@ -101,6 +103,11 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     dispatch(setNotebookPageVisible(page.key));
     if (page.modal) dispatch(setModalVisible({modal: page.modal}));
     else dispatch(setModalVisible({modal: null}));
+  };
+
+  const openRockdLink = () => {
+    const checkinId = spot.properties.rockd_checkin_id;
+    Linking.openURL(`https://dev.rockd.org/checkin/${checkinId}`);
   };
 
   const saveForm = async () => {
@@ -190,12 +197,26 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     );
   };
 
+  const renderRockdBadge = () => {
+    if (!checkedInSpotIds.includes(spot.properties.id)) return null;
+    return (
+      <Pressable onPress={openRockdLink}
+                 style={uiStyles.sectionHeaderBackground}>
+        <View style={{alignItems: 'center', flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingVertical: 6}}>
+          <Image resizeMode='contain' source={RockdLogo} style={{height: 20, width: 20}}/>
+          <Text style={{fontSize: 12}}>Checked in to Rock&apos;d</Text>
+        </View>
+      </Pressable>
+    );
+  };
+
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
         <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
+          ListHeaderComponent={renderRockdBadge}
           keyExtractor={item => item.key}
           renderItem={({item}) => {
             const SectionOverview = item.overview_component;
