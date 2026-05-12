@@ -36,7 +36,7 @@ const useImages = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 
-  const {getCameraAngles, startCameraAnglesCapture, stopCameraAnglesCapture} = useCompassCore();
+  const {getCurrentCameraAngles, startCameraAnglesCapture, stopCameraAnglesCapture} = useCompassCore();
   const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
   const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
@@ -361,7 +361,8 @@ const useImages = () => {
             }
             else {
               const imageAsset = response.assets[0];
-              const compassReading = getCameraAngles(imageAsset.timestamp);
+              const compassReading = getCurrentCameraAngles();
+              stopCameraAnglesCapture();
               const resizedImage = await resizeImageForDevice(imageAsset);
               console.log('Resized Image:', resizedImage);
               const savedFile = await saveFile(resizedImage);

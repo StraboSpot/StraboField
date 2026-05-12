@@ -24,7 +24,6 @@ const useCompassCore = () => {
 
   const calibrationSubscription = useRef(null);
   const imageCapturedDeclination = useRef(0);
-  const imageCaptureLog = useRef([]);
   const imageCaptureSubscription = useRef(null);
   const magneticDeclination = useRef(0);
   const matrixRawData = useRef(null);
@@ -150,40 +149,21 @@ const useCompassCore = () => {
     return result.decl;
   };
 
-  const getCameraAngles = (photoTimestamp) => {
-    const log = [...imageCaptureLog.current];
-    stopCameraAnglesCapture();
-    if (!log.length) return {};
-    try {
-      const tsNum = Number(photoTimestamp);
-      const ts = isNaN(tsNum) ? new Date(photoTimestamp).getTime() : tsNum * 1000;
-      const closest = [...log]
-        .sort((a, b) => Math.abs(a.timestamp - ts) - Math.abs(b.timestamp - ts))
-        .slice(0, 5);
-      console.log('ImageCapture: log entries', log.length, 'photo ts', ts, 'closest diff',
-        Math.abs(closest[0].timestamp - ts), 'ms');
-      const avg = key => closest.reduce((sum, e) => sum + e.matrix[key] / closest.length, 0);
-      const matrix = {m31: avg('m31'), m32: avg('m32'), m33: avg('m33')};
-      const {plunge, trend} = getCameraViewFromMatrix(matrix, imageCapturedDeclination.current);
-      return {
-        view_angle_plunge: roundToDecimalPlaces(plunge, 0),
-        view_azimuth_trend: roundToDecimalPlaces(trend, 0),
-      };
-    }
-    catch (err) {
-      console.error('Error finishing image view capture:', err);
-      return {};
-    }
+  const getCurrentCameraAngles = () => {
+    if (!matrixRawData.current) return {};
+    const {plunge, trend} = getCameraViewFromMatrix(matrixRawData.current, imageCapturedDeclination.current);
+    return {
+      view_angle_plunge: roundToDecimalPlaces(plunge, 0),
+      view_azimuth_trend: roundToDecimalPlaces(trend, 0),
+    };
   };
 
   const startCameraAnglesCapture = async () => {
     try {
       imageCapturedDeclination.current = await fetchDeclination();
-      imageCaptureLog.current = [];
       const CompassEvents = new NativeEventEmitter(CompassModule);
       imageCaptureSubscription.current = CompassEvents.addListener('rotationMatrix', (matrixData) => {
-        const matrix = Platform.OS === 'ios' ? matrixData.matrix : matrixData;
-        imageCaptureLog.current.push({matrix, timestamp: Date.now()});
+        matrixRawData.current = Platform.OS === 'ios' ? matrixData.matrix : matrixData;
       });
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
     }
@@ -195,7 +175,6 @@ const useCompassCore = () => {
   const stopCameraAnglesCapture = () => {
     imageCaptureSubscription.current?.remove();
     imageCaptureSubscription.current = null;
-    imageCaptureLog.current = [];
     Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
   };
 
@@ -249,7 +228,7 @@ const useCompassCore = () => {
   return {
     compassData,
     fetchDeclination,
-    getCameraAngles,
+    getCurrentCameraAngles,
     matrixRawData,
     startCameraAnglesCapture,
     stopCameraAnglesCapture,
