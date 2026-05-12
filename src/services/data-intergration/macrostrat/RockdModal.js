@@ -13,9 +13,9 @@ import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import useServerRequests from '../../network/useServerRequests';
 
 const STATUS_MESSAGES = {
-  converting: 'Converting spot to Rock\'d format...',
-  sending: 'Sending check-in to Rock\'d...',
-  success: 'Successfully checked in to Rock\'d!',
+  converting: 'Converting spot to Rockd format...',
+  sending: 'Sending check-in to Rockd...',
+  success: 'Successfully checked in to Rockd!',
 };
 
 const RockdModal = ({closeModal, isVisible}) => {
@@ -95,7 +95,7 @@ const RockdModal = ({closeModal, isVisible}) => {
         ) : (
           <OutlineButton
             onPress={openMacrostratLogin}
-            title={'Login to Rock\'d'}
+            title={'Login to Rockd'}
           />
         )}
         {__DEV__ && (
