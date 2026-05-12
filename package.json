@@ -107,7 +107,7 @@
     "react-redux": "9.2.0",
     "redux-logger": "3.0.6",
     "redux-persist": "6.0.0",
-    "uuid": "13.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
