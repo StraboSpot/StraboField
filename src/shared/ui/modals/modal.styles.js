@@ -15,6 +15,11 @@ const modalStyles = StyleSheet.create({
     padding: 10,
     paddingTop: 5,
   },
+  modalHeaderImage: {
+    alignItems: 'center',
+    height: 60,
+    width: 60,
+  },
   modalTitle: {
     color: themes.PRIMARY_TEXT_COLOR,
     fontSize: 18,

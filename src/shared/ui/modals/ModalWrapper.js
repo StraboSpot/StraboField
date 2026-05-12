@@ -23,9 +23,11 @@ const ModalWrapper = ({
                         closeModal,
                         disabled,
                         fullscreen,
+                        headerImage,
                         headerTitle,
                         isHideHeader = false,
                         isLoading,
+                        imageStyle,
                         isVisible,
                         onActionPressed,
                         onBackdropPress,
@@ -100,14 +102,14 @@ const ModalWrapper = ({
 
   const renderModalContent = () => (
     <>
-      {!isHideHeader && (
-        <ModalWrapperHeader
-          buttonTitleRight={buttonTitleRight}
-          closeModal={closeModal}
-          headerTitle={headerTitle}
-          showCloseButton={showCloseButton}
-        />
-      )}
+      <ModalWrapperHeader
+        buttonTitleRight={buttonTitleRight}
+        closeModal={closeModal}
+        headerImage={headerImage}
+        headerTitle={headerTitle}
+        imageStyle={imageStyle}
+        showCloseButton={showCloseButton}
+      />
       <FlatList
         ListHeaderComponent={renderListHeader}
         data={[]}
