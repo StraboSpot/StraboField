@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
-import {Card} from '@rn-vui/base';
+import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
@@ -9,7 +9,6 @@ import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
@@ -179,29 +178,46 @@ const ImageCard = ({
         </View>
 
         {!isThumbnailOnly && (
-          <View
-            style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 5, alignItems: 'center'}}>
-            <SwitchWrapper
-              disabled={getIsSwitchDisabled()}
-              onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
-              value={image.annotated}
-            />
-            <Text style={{fontSize: SMALL_TEXT_SIZE, textAlign: 'center', paddingHorizontal: 5}}>
-              Use Image as{'\n'}a Basemap?
-            </Text>
-            <View style={{margin: -5}}>
-              <ClearButton
-                disabled={!image.annotated}
-                icon={{
-                  color: image.annotated ? PRIMARY_ACCENT_COLOR : MEDIUMGREY,
-                  name: 'map-outline',
-                  size: 20,
-                  type: 'ionicon',
-                }}
-                onPress={() => getImageBasemap(image)}
+          <>
+            {/* Image Basemap icon overlay */}
+            {image.annotated && (
+              <View style={{position: 'relative'}}>
+                <TouchableOpacity
+                  onPress={() => getImageBasemap(image)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.9)',
+                    borderColor: MEDIUMGREY,
+                    borderRadius: 10,
+                    borderWidth: 2,
+                    bottom: 2,
+                    padding: 4,
+                    position: 'absolute',
+                    right: 8,
+                  }}
+                >
+                  <Icon color={PRIMARY_ACCENT_COLOR} name={'map-outline'} size={24} type={'ionicon'}/>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Image Basemap toggle */}
+            <View style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+            }}>
+              <SwitchWrapper
+                disabled={getIsSwitchDisabled()}
+                onValueChange={isAnnotated => setAnnotation(image, isAnnotated, title ? title : placeholderTitle)}
+                value={image.annotated}
               />
+              <Text style={{flexShrink: 1, fontSize: SMALL_TEXT_SIZE, textAlign: 'left'}}>
+                Use Image as{'\n'}a Basemap?
+              </Text>
             </View>
-          </View>
+          </>
         )}
       </Card>
 

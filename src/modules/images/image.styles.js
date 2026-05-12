@@ -68,6 +68,9 @@ const imageStyles = StyleSheet.create({
     paddingVertical: 5,
     width: '100%',
   },
+  imageCardWrapper: {
+    width: '48%',
+  },
   imageModalButtons: {
     marginTop: 20,
   },

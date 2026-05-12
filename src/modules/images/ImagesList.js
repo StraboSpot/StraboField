@@ -32,7 +32,7 @@ const ImagesList = ({
 
   const renderImageCard = (image, index) => {
     return (
-      <React.Fragment key={image.id}>
+      <View key={image.id} style={isThumbnailOnly ? undefined : imageStyles.imageCardWrapper}>
         <ImageCard
           areImageThumbnailsLoading={areImageThumbnailsLoading}
           image={image}
@@ -45,7 +45,7 @@ const ImagesList = ({
           setImageThumbnailURIs={setImageThumbnailURIs}
           spotWithImage={spotWithImage}
         />
-      </React.Fragment>
+      </View>
     );
   };
 
