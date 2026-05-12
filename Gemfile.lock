@@ -36,7 +36,7 @@ GEM
     babosa (1.0.4)
     base64 (0.2.0)
     benchmark (0.1.0)
-    bigdecimal (2.0.0)
+    bigdecimal (4.1.2)
     claide (1.1.0)
     cocoapods (1.13.0)
       addressable (~> 2.8)
