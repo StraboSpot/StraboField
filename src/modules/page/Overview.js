@@ -10,6 +10,7 @@ import PageHeader from './PageHeader';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
+import {SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -47,6 +48,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
 
   /* Derived Variables */
 
@@ -200,11 +202,25 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const renderRockdBadge = () => {
     if (!checkedInSpotIds.includes(spot.properties.id)) return null;
     return (
-      <Pressable onPress={openRockdLink}
-                 style={uiStyles.sectionHeaderBackground}>
-        <View style={{alignItems: 'center', flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingVertical: 6}}>
-          <Image resizeMode='contain' source={RockdLogo} style={{height: 20, width: 20}}/>
-          <Text style={{fontSize: 12}}>Checked in to Rock&apos;d</Text>
+      <Pressable
+        onPress={openRockdLink}
+        style={({pressed}) => [
+          {opacity: pressed ? 0.3 : 1, backgroundColor: '#F5F5F5', borderRadius: 10},
+        ]}
+      >
+        <View style={{
+          alignItems: 'center',
+          flexDirection: 'row',
+          gap: 8,
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+        }}>
+          <Image resizeMode='contain' source={RockdLogo} style={{height: 30, width: 30}}/>
+          <Text
+            style={{fontSize: SMALL_TEXT_SIZE, fontWeight: TEXT_WEIGHT_500}}
+          >
+            Checked in to Rockd (press to view)
+          </Text>
         </View>
       </Pressable>
     );
@@ -216,7 +232,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
         <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListHeaderComponent={renderRockdBadge}
+          ListHeaderComponent={isTestingMode && renderRockdBadge}
           keyExtractor={item => item.key}
           renderItem={({item}) => {
             const SectionOverview = item.overview_component;
