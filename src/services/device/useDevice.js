@@ -317,7 +317,7 @@ const useDevice = () => {
     if (await RNFS.exists(microJSON)) {
       const file = await readFile(microJSON);
       const fileAsJSON = JSON.parse(file);
-      // console.log('fileAsJSON', fileAsJSON);
+      console.log('Micro Project project.json file', fileAsJSON);
       return fileAsJSON.modifiedtimestamp || undefined;
     }
     else return undefined;
