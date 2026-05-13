@@ -7,9 +7,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {doesBackupDirectoryExist} from './projects.slice';
 import useProject from './useProject';
-import {APP_DIRECTORIES} from '../../services/directories.constants';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -92,7 +92,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
   };
 
   const renderProjectItem = (item) => {
-    const modifiedTimeAndDate = moment.unix(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
+    const modifiedTimeAndDate = moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
     return (
       <ListItem
         containerStyle={commonStyles.listItem}

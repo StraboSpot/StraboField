@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {showFieldInfo, validateImageOverlay} from './sed.helpers';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

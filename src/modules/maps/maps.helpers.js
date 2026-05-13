@@ -5,7 +5,7 @@ import moment from 'moment/moment';
 import proj4 from 'proj4';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 // Add a new vertex to a line
 export const addVertexToLine = (line, newVertex) => {

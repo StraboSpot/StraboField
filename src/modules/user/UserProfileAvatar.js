@@ -6,9 +6,9 @@ import {useSelector} from 'react-redux';
 import userStyles from './user.styles';
 import useUserProfile from './useUserProfile';
 import defaultAvatar from '../../assets/images/splash.png';
-import {APP_DIRECTORIES} from '../../services/directories.constants';
-import useDevice from '../../services/useDevice';
-import {isEmpty} from '../../shared/Helpers';
+import useDevice from '../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
+import {isEmpty} from '../../shared/helpers';
 import {AvatarAccessoryWrapper, AvatarWrapper} from '../../shared/ui/avatars';
 
 const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage, size, tempUserProfileImageURI}) => {

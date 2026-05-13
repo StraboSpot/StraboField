@@ -6,13 +6,13 @@ import {Base64} from 'js-base64';
 import {useToast} from 'react-native-toast-notifications';
 
 import userStyles from './user.styles';
-import useResetState from '../../services/useResetState';
-import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
+import useServerRequests from '../../services/network/useServerRequests';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {RED} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import useResetState from '../../store/useResetState';
 
 const offlineText = (
   <Text style={userStyles.deleteProfileText}>

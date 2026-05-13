@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -104,7 +104,12 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
         )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No ' + page.label.toLowerCase() + ' at this Spot.'}/>}
+          ListEmptyComponent={
+            <ListEmptyText
+              onPress={!isReadOnly && addReaction}
+              text={'No ' + page.label.toLowerCase() + ' at this Spot.'}
+            />
+          }
           data={spot.properties.pet && spot.properties.pet[page.key]
             && spot.properties.pet[page.key].slice().sort(
               (a, b) => (a[page.key] || 'Unknown').localeCompare((b[page.key] || 'Unknown')))}

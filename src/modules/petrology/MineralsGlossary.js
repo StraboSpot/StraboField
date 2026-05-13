@@ -3,7 +3,7 @@ import {FlatList, Linking, Text, View} from 'react-native';
 
 import {MINERAL_GLOSSARY_INFO} from './mineralsGlossary.constants';
 import {chunk} from './petrology.helpers';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 

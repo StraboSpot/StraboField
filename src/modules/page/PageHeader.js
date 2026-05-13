@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {
   DARKGREY,
   PRIMARY_ACCENT_COLOR,

@@ -1,5 +1,3 @@
-import {SMALL_SCREEN} from '../../shared/styles.constants';
-
 export const TRACE_SUB_TYPE_FIELDS = [
   'contact_type',
   'geologic_structure_type',

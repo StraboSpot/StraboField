@@ -5,7 +5,7 @@ import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import {formStyles, useForm} from '.';
-import {isEmpty, padWithLeadingZeros} from '../../shared/Helpers';
+import {isEmpty, padWithLeadingZeros} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';

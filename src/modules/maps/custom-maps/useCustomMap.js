@@ -1,8 +1,8 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {STRABO_APIS} from '../../../services/urls.constants';
-import useServerRequests from '../../../services/useServerRequests';
-import {isEmpty} from '../../../shared/Helpers';
+import {STRABO_APIS} from '../../../services/network/urls.constants';
+import useServerRequests from '../../../services/network/useServerRequests';
+import {isEmpty} from '../../../shared/helpers';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import {updatedProject} from '../../project/projects.slice';
@@ -131,7 +131,7 @@ const useCustomMap = () => {
     console.log('Custom Map Switch Value:', value, 'Map Id:', map.id);
     if (customMaps[map.id]) {
       dispatch(addedCustomMap({...customMaps[map.id], isViewable: value}));
-      if (!customMaps[map.id].overlay) viewCustomMap(map);
+      if (value && !customMaps[map.id].overlay) viewCustomMap(map);
     }
   };
 

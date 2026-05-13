@@ -4,11 +4,11 @@ import {Platform} from 'react-native';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useExport from '../../../services/useExport';
+import SaveAndExportModalContent from './SaveAndExportModalContent';
+import useExport from '../../../services/files/useExport';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
-import SaveAndExportModalContent from './SaveAndExportModalContent';
 
 const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
   /* Data Hooks */
@@ -21,6 +21,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   /* Local State */
 
   const [backingUpStatus, setBackingUpStatus] = useState('');
+  const [backupOptions, setBackupOptions] = useState({images: true, offlineTiles: true, customMaps: true});
 
   const defaultFileName = selectedFilename || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + currentProject.description.project_name).replace(/\s/g, '');
@@ -35,28 +36,30 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
     if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
     else {
       if (backupAction === 'save') await initiateBackup();
-      else if (backupAction === 'export') await exportProject();
+      else if (backupAction === 'export') await exportProject(backupOptions);
     }
   };
 
   const handleClosePress = () => {
     setBackingUpStatus('');
+    setBackupFileName(defaultFileName);
+    setIsFileNameError(false);
     setModalTitle('Confirm or Change Folder Name');
     closeModal();
   };
 
   /* Logic Helpers */
 
-  const exportProject = async () => {
+  const exportProject = async (options) => {
     try {
       console.log('FileName', backupFileName);
       setBackingUpStatus('inProgress');
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Zipping Project' : 'Saving & Zipping Project');
       else setModalTitle(selectedFilename ? 'Exporting Project' : 'Saving & Exporting Project');
-      if (!selectedFilename) await initializeBackup(backupFileName);  // Save first
+      if (!selectedFilename) await initializeBackup(backupFileName, options);  // Save first
       dispatch(clearedStatusMessages());
-      await zipAndExportProjectFolder(backupFileName, true);
+      await zipAndExportProjectFolder(backupFileName, true, options);
       setBackingUpStatus('complete');
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       if (Platform.OS === 'ios') setModalTitle(selectedFilename ? 'Project Zipped' : 'Project Saved and Zipped!');
@@ -85,7 +88,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
     try {
       setBackingUpStatus('inProgress');
       setModalTitle('Saving Project');
-      await initializeBackup(backupFileName);
+      await initializeBackup(backupFileName, backupOptions);
       dispatch(setSelectedProject({source: '', project: {fileName: backupFileName}}));
       setBackingUpStatus('complete');
       setModalTitle('Project Saved!');
@@ -114,9 +117,11 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
         backingUpStatus={backingUpStatus}
         backupAction={backupAction}
         backupFileName={backupFileName}
+        backupOptions={backupOptions}
         closeModal={closeModal}
         isFileNameError={isFileNameError}
         setBackupFileName={setBackupFileName}
+        setBackupOptions={setBackupOptions}
         setIsFileNameError={setIsFileNameError}
       />
     </ModalWrapper>

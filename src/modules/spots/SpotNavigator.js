@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import {SpotsList, SpotsListItem} from './index';
 import {PICKER_KEYS, PICKER_LABELS} from './spots.constants';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {PRIMARY_BACKGROUND_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ListEmptyText from '../../shared/ui/ListEmptyText';

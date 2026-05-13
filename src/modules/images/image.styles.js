@@ -26,7 +26,6 @@ const imageStyles = StyleSheet.create({
     padding: 0,
   },
   cardTitle: {
-    flex: 1,
     fontSize: MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
     paddingVertical: 5,
@@ -68,6 +67,9 @@ const imageStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     width: '100%',
+  },
+  imageCardWrapper: {
+    width: '48%',
   },
   imageModalButtons: {
     marginTop: 20,

@@ -1,8 +1,19 @@
 import React from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
+import {CheckBox} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {
+  DARKGREY,
+  MEDIUMGREY,
+  NEGATIVE_COLOR,
+  PRIMARY_BACKGROUND_COLOR,
+  PRIMARY_TEXT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  SMALL_TEXT_SIZE,
+  TEXT_WEIGHT_700,
+} from '../../../shared/styles.constants';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {TAG_BACKUP_ACTIONS} from '../../tags/tags.constants';
 
@@ -10,8 +21,10 @@ const SaveAndExportModalContent = ({
                                      backingUpStatus,
                                      backupAction,
                                      backupFileName,
+                                     backupOptions,
                                      isFileNameError,
                                      setBackupFileName,
+                                     setBackupOptions,
                                      setIsFileNameError,
                                    }) => {
   /* Data Hooks */
@@ -49,7 +62,7 @@ const SaveAndExportModalContent = ({
         type={backingUpStatus === 'inProgress' ? 'loadingFile'
           : backingUpStatus === 'complete' ? 'complete' : 'error'}
       />
-      <Text style={{marginTop: 12, textAlign: 'center', color: '#444'}}>
+      <Text style={{marginTop: 12, textAlign: 'center', color: DARKGREY}}>
         {statusMessages.join('\n')}
       </Text>
     </View>
@@ -62,7 +75,7 @@ const SaveAndExportModalContent = ({
       {backingUpStatus === '' ? (
         <View style={{padding: 16}}>
           {/* Instruction Text */}
-          <Text style={{fontSize: 16, marginBottom: 12, color: '#444'}}>
+          <Text style={{fontSize: PRIMARY_TEXT_SIZE, marginBottom: 12, color: DARKGREY}}>
             {backupAction === 'save'
               ? 'All datasets will be saved locally, along with any images and custom maps.'
               : Platform.OS === 'ios'
@@ -75,30 +88,68 @@ const SaveAndExportModalContent = ({
           </Text>
 
           {/* File Name Input */}
-          <Text style={{fontWeight: '600', marginBottom: 6}}>File Name</Text>
+          <Text style={{fontWeight: TEXT_WEIGHT_700, marginBottom: 6}}>File Name</Text>
           <TextInput
             onChangeText={validateFileName}
             style={[
               {
                 borderWidth: 1,
-                borderColor: isFileNameError ? 'red' : '#ccc',
+                borderColor: isFileNameError ? NEGATIVE_COLOR : MEDIUMGREY,
                 borderRadius: 8,
                 padding: 10,
                 marginBottom: 8,
-                fontSize: 15,
-                backgroundColor: '#fafafa',
+                fontSize: PRIMARY_TEXT_SIZE,
+                backgroundColor: PRIMARY_BACKGROUND_COLOR,
               },
             ]}
             value={fileName}
           />
           {isFileNameError && (
-            <Text style={{color: 'red', marginBottom: 8, fontSize: 13}}>
+            <Text style={{color: NEGATIVE_COLOR, marginBottom: 8, fontSize: SMALL_TEXT_SIZE}}>
               File Name Error! Only letters, numbers, dashes, or underscores allowed.
             </Text>
           )}
-          <Text style={{fontSize: 12, color: '#666', marginBottom: 16}}>
+          <Text style={{fontSize: SMALL_TEXT_SIZE, color: DARKGREY, marginBottom: 16}}>
             *File names cannot contain spaces or special characters. Do not include a file extension.
           </Text>
+
+          {(backupAction === 'save' || backupAction === 'export') && (
+            <View>
+              <Text style={{fontWeight: TEXT_WEIGHT_700, marginBottom: 4}}>Include in Backup</Text>
+              <CheckBox
+                checked
+                checkedColor={MEDIUMGREY}
+                containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
+                disabled
+                title={'Project Data (Spots, Datasets, Tags, Geologic Units, Reports, etc.)'}
+                titleStyle={{color: DARKGREY, fontSize: SMALL_TEXT_SIZE}}
+              />
+              <CheckBox
+                checked={backupOptions.images}
+                containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
+                onPress={() => setBackupOptions(prev => ({...prev, images: !prev.images}))}
+                title={'Images (Spot & Report)'}
+                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              />
+              <CheckBox
+                checked={backupOptions.offlineTiles}
+                containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
+                onPress={() => setBackupOptions(prev => ({...prev, offlineTiles: !prev.offlineTiles}))}
+                title={'Offline Map Tiles'}
+                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              />
+              <CheckBox
+                checked={backupOptions.customMaps}
+                containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
+                onPress={() => setBackupOptions(prev => ({...prev, customMaps: !prev.customMaps}))}
+                title={'Custom Maps'}
+                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              />
+              <Text style={{fontSize: SMALL_TEXT_SIZE, color: DARKGREY, marginTop: 4, marginBottom: 4}}>
+                Note: User settings (Mapbox token, credentials) are not included in backups.
+              </Text>
+            </View>
+          )}
         </View>
       ) : renderBackingUpView()}
     </>

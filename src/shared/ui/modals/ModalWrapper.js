@@ -1,15 +1,16 @@
-import React from 'react';
-import {FlatList} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Keyboard, Modal, Platform, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
+import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
-import {isEmpty} from '../../Helpers';
-import {SMALL_SCREEN} from '../../styles.constants';
+import {isEmpty} from '../../helpers';
+import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
@@ -22,8 +23,11 @@ const ModalWrapper = ({
                         closeModal,
                         disabled,
                         fullscreen,
+                        headerImage,
                         headerTitle,
+                        isHideHeader = false,
                         isLoading,
+                        imageStyle,
                         isVisible,
                         onActionPressed,
                         onBackdropPress,
@@ -31,6 +35,7 @@ const ModalWrapper = ({
                         onDeletePress,
                         onFooterButtonPress,
                         overlayStyleOverride,
+                        scrollEnabled = true,
                         showActionButton,
                         showCancelButton,
                         showCloseButton,
@@ -42,6 +47,22 @@ const ModalWrapper = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
+  /* Local State */
+
+  const childrenRef = useRef(children);
+  childrenRef.current = children;
+  const [kbOffset, setKbOffset] = useState(0);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
+    const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
   /* Derived Variables */
 
   const isAutoHeight = overlayStyleOverride?.height === 'auto';
@@ -49,11 +70,13 @@ const ModalWrapper = ({
   /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
-    if (fullscreen || SMALL_SCREEN) return overlayStyles.overlayContainerFullScreen;
-    return {...overlayStyles.overlayContainer, ...overlayStyleOverride};
+    if (fullscreen) return overlayStyles.overlayContainerFullScreen;
+    return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
   };
 
   /* Render Functions */
+
+  const renderListHeader = useCallback(() => <>{childrenRef.current}</>, []);
 
   const renderModalBottom = () => {
     const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
@@ -77,29 +100,22 @@ const ModalWrapper = ({
     }
   };
 
-  /* View */
-
-  return (
-    <Overlay
-      animationType={'fade'}
-      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
-      fullScreen={fullscreen || SMALL_SCREEN}
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      overlayStyle={getResponsiveOverlayStyle()}
-      supportedOrientations={['portrait', 'landscape']}
-    >
+  const renderModalContent = () => (
+    <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
         closeModal={closeModal}
+        headerImage={headerImage}
         headerTitle={headerTitle}
+        imageStyle={imageStyle}
         showCloseButton={showCloseButton}
       />
       <FlatList
         ListHeaderComponent={() => <>{children}</>}
         data={[]}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
+        scrollEnabled={scrollEnabled}
         style={isAutoHeight ? undefined : {flex: 1}}
       />
       {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
@@ -115,6 +131,45 @@ const ModalWrapper = ({
         showCancelButton={showCancelButton}
         showDeleteButton={showDeleteButton}
       />
+    </>
+  );
+
+  /* View */
+
+  if (SMALL_SCREEN) {
+    return (
+      <Modal
+        animationType={'fade'}
+        onRequestClose={onBackdropPress}
+        statusBarTranslucent
+        supportedOrientations={['portrait', 'landscape']}
+        visible={isVisible}
+      >
+        <GestureHandlerRootView style={{flex: 1}}>
+          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
+            {renderModalContent()}
+          </View>
+        </GestureHandlerRootView>
+      </Modal>
+    );
+  }
+
+  return (
+    <Overlay
+      animationType={'fade'}
+      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
+      fullScreen={fullscreen}
+      isVisible={isVisible}
+      onBackdropPress={onBackdropPress}
+      overlayStyle={getResponsiveOverlayStyle()}
+      supportedOrientations={['portrait', 'landscape']}
+    >
+      {Platform.OS === 'android' ? (
+          <GestureHandlerRootView style={isAutoHeight ? {} : {flex: 1}}>
+            {renderModalContent()}
+          </GestureHandlerRootView>
+        )
+        : renderModalContent()}
     </Overlay>
   );
 };

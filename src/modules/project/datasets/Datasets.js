@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {setActiveDatasets, setTargetDataset} from '../projects.slice';
 import DatasetDetail from './DatasetDetail';
 import DatasetsOverview from './DatasetsOverview';

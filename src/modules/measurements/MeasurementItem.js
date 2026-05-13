@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import MeasurementLabel from './MeasurementLabel';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {useTags} from '../tags';
 import FeatureTagsList from '../tags/FeatureTagsList';

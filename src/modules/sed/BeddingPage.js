@@ -4,7 +4,7 @@ import {FlatList, Platform, View} from 'react-native';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -148,7 +148,7 @@ const BeddingPage = ({isReadOnly, page}) => {
           )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Beds'}/>}
+          ListEmptyComponent={<ListEmptyText onPress={!isReadOnly && addAttribute} text={'No Beds'}/>}
           data={bedding.beds}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (

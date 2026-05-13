@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import {TERNARY_MINERALS} from './minerals.constants';
-import {roundToDecimalPlaces} from '../../shared/Helpers';
+import {roundToDecimalPlaces} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import PageHeader from '../page/PageHeader';
 

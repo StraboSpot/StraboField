@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 
 import TablesData from './TablesData';
 import UrlData from './URLData';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 
 const DataOverview = () => {
   /* Data Hooks */

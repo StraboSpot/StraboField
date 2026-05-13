@@ -5,7 +5,7 @@ import TablesData from './TablesData';
 import UrlData from './URLData';
 import useExternalData from './useExternalData';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 
 function DataWrapper({

@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';

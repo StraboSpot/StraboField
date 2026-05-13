@@ -14,7 +14,7 @@ import {
 import {MENU_KEYWORDS} from './mainMenuKeywords.constants';
 import {setSectionsCollapsed} from './mainMenuPanel.slice';
 import MainMenuPanelListItem from './MainMenuPanelListItem';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';

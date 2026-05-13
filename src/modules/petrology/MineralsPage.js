@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
 import commonStyles from '../../shared/common.styles';
-import {getNewCopyId, isEmpty} from '../../shared/Helpers';
+import {getNewCopyId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SelectInputField} from '../form';
@@ -137,7 +137,9 @@ const MineralsPage = ({isReadOnly, page}) => {
     return (
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={<ListEmptyText text={'There are no minerals at this Spot.'}/>}
+        ListEmptyComponent={
+          <ListEmptyText onPress={!isReadOnly && addMineral} text={'There are no minerals at this Spot.'}/>
+        }
         data={mineralDataSorted}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}

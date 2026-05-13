@@ -2,7 +2,7 @@ import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
-import {getNewUUID, isEmpty} from '../../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../../shared/helpers';
 import {useForm} from '../../form';
 import {useSpots} from '../../spots';
 

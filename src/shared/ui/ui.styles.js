@@ -2,6 +2,7 @@ import {Platform, StyleSheet} from 'react-native';
 
 import {
   BLACK,
+  DARKGREY,
   GOLD,
   MEDIUM_TEXT_SIZE,
   MODAL_BACKDROP,
@@ -13,16 +14,8 @@ import {
 } from '../styles.constants';
 
 const styles = StyleSheet.create({
-  accessPointIcon: {
-    height: 30,
-    width: 30,
-  },
   alignItemsToCenter: {
     alignItems: 'center',
-  },
-  backButton: {
-    alignItems: 'flex-start',
-    marginTop: 10,
   },
   backdrop: {
     backgroundColor: MODAL_BACKDROP,
@@ -33,24 +26,6 @@ const styles = StyleSheet.create({
     width: '100%',
     zIndex: 50,
   },
-  batteryLevelText: {
-    color: BLACK,
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  batteryLevelTextContainer: {
-    alignItems: 'center',
-    height: 50,
-    justifyContent: 'center',
-    position: 'absolute',
-    width: 50,
-  },
-  batteryStatusContainer: {
-    padding: 5,
-  },
-  connectionStatusContainer: {
-    padding: 5,
-  },
   container: {
     backgroundColor: Platform.OS === 'ios' ? BLACK : WHITE,
     flex: 1,
@@ -59,6 +34,20 @@ const styles = StyleSheet.create({
   customEndpointContainer: {
     paddingHorizontal: 10,
     paddingVertical: 5,
+  },
+  customEndpointInput: {
+    borderBottomColor: 'transparent',
+    fontSize: MEDIUM_TEXT_SIZE,
+    textAlign: 'center',
+  },
+  customEndpointInputContainer: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: DARKGREY,
+    borderRadius: 10,
+    borderWidth: 1,
+    height: 45,
+    marginVertical: 10,
   },
   customEndpointSwitchContainer: {
     alignItems: 'center',
@@ -80,12 +69,6 @@ const styles = StyleSheet.create({
   },
   customEndpointVerifyInputContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerContainer: {
-    alignItems: 'center',
-    backgroundColor: SECONDARY_BACKGROUND_COLOR,
-    height: 60,
     justifyContent: 'center',
   },
   imageIcon: {
@@ -136,22 +119,11 @@ const styles = StyleSheet.create({
   spacer: {
     padding: 10,
   },
-  statusBarIcon: {
-    backgroundColor: 'white',
-    borderRadius: 50,
-    height: 40,
-    width: 40,
-  },
   toastContainer: {
     alignItems: 'center',
     backgroundColor: GOLD,
     flexDirection: 'row',
     padding: 5,
-  },
-  verifyButtonStyle: {
-    borderRadius: 15,
-    paddingLeft: 20,
-    paddingRight: 20,
   },
 });
 

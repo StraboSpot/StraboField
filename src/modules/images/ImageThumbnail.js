@@ -18,7 +18,7 @@ const ImageThumbnail = ({
                         }) => {
   /* Derived Variables */
 
-  const height = isThumbnailOnly && Platform.OS === 'web' ? 87 : isThumbnailOnly ? 90 : 150;
+  const height = isThumbnailOnly && Platform.OS === 'web' ? 85 : isThumbnailOnly ? 90 : 150;
 
   /* View */
 

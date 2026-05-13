@@ -1,6 +1,6 @@
 import {useSelector} from 'react-redux';
 
-import {isEmpty, truncateText} from '../../shared/Helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
 
 const useUserProfile = () => {
   /* Data Hooks */

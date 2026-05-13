@@ -19,7 +19,7 @@ import {
 } from './measurements.constants';
 import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
 import ActionButton from '../../shared/ui/buttons/ActionButton';

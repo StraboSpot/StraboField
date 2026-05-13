@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';

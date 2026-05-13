@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {AppState, NativeEventEmitter, Platform, View} from 'react-native';
+import {AppState, Platform, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -7,9 +7,8 @@ import {setCompassMeasurements} from './compass.slice';
 import CompassDebug from './CompassDebug';
 import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
-import CompassModule from '../../services/CompassModule';
-import useCompass from '../../services/useCompass';
-import {isEmpty, roundToDecimalPlaces} from '../../shared/Helpers';
+import useCompassCore from '../../services/device/useCompassCore';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
@@ -28,47 +27,37 @@ const Compass = ({
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
 
-  const {cartesianToSpherical, matrixAverage, getStrikeAndDip, getTrendAndPlunge, getUserDeclination} = useCompass();
+  const {
+    compassData,
+    fetchDeclination,
+    matrixRawData,
+    subscribeToCalibrationStatus,
+    subscribeToSensors,
+    unsubscribeFromCalibrationStatus,
+    unsubscribeFromSensors,
+  } = useCompassCore();
   const {playCompassSound} = useCompassSound();
   const {createNewMeasurement} = useMeasurements();
 
   /* Local State */
 
-  let hasShownCalibrationAlert = useRef(false);
-  let magneticDeclination = useRef(0);
-  let matrixRawData = useRef(null);
-
-  const [compassData, setCompassData] = useState({
-    magHeading: 0,
-    trueHeading: 0,
-    strike: 0,
-    magDecStrike: 0,
-    dip_direction: null,
-    dip: null,
-    trend: 0,
-    magDecTrend: 0,
-    plunge: null,
-    rake: null,
-    rake_calculated: 'yes',
-    quality: null,
-  });
-  // const [matrixRotation, setMatrixRotation] = useState({});
+  const hasShownCalibrationAlert = useRef(false);
   const [showCompassRawDataView, setShowCompassRawDataView] = useState(false);
-  // const [userDeclination, setUserDeclination] = useState('');
-
-  const CompassEvents = new NativeEventEmitter(CompassModule);
-
-  /* Derived Variables */
-
-  const {startSensors, stopSensors, startCompass, stopCompass} = CompassModule;
 
   /* Side Effects */
 
   useEffect(() => {
     console.log('UE Compass []');
-    getDeclination().catch(err => console.error('Error getting user\'s declination', err));
+    fetchDeclination().catch((err) => {
+      console.error('Magnetic Declination not available', err);
+      const errorMessage = err.message || err;
+      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
+        alert('Location Services Required',
+          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
+      }
+    });
     subscribeToSensors();
-    subscribeToCalibrationStatus();
+    subscribeToCalibrationStatus(handleCalibrationStatus);
     AppState.addEventListener('change', handleAppStateChange);
     return () => {
       unsubscribeFromSensors();
@@ -100,34 +89,18 @@ const Compass = ({
   };
 
   const handleCalibrationStatus = (data) => {
-    // Reset flag if calibration is now OK
     if (data.needsCalibration === false) {
-      hasShownCalibrationAlert.current = false;
+      hasShownCalibrationAlert.current = false; // Reset flag if calibration is now OK
       return;
     }
 
     // Only show the alert once per compass session - check and set flag atomically
     if (data.needsCalibration && Platform.OS === 'ios') {
-      if (hasShownCalibrationAlert.current) {
-        return; // Already shown, ignore this event
-      }
-
-      // Set flag IMMEDIATELY before calling alert to prevent race conditions
-      hasShownCalibrationAlert.current = true;
+      if (hasShownCalibrationAlert.current) return; // Already shown, ignore this event
+      hasShownCalibrationAlert.current = true;  // Set flag IMMEDIATELY before calling alert to prevent race conditions
 
       alert('Compass Calibration Required',
         'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
-    }
-  };
-
-  const handleMatrixRotationData = async (matrixData) => {
-    try {
-      // console.log(matrixData);
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
-      await getCartesianToSpherical(matrixData);
-    }
-    catch (err) {
-      console.error('Error Getting Matrix', err);
     }
   };
 
@@ -139,69 +112,6 @@ const Compass = ({
     closeCompass();
   };
 
-  const getCartesianToSpherical = async (matrixRotationData) => {
-    let ENU_Pole;
-    let ENU_TP;
-    let strike;
-    let trend;
-    let declination = magneticDeclination?.current;
-
-    const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
-    matrixRawData.current = matrix;
-
-    let {magneticHeading, trueHeading} = matrixRotationData;
-    const {m21, m22, m23, m31, m32, m33} = matrix;
-    if (Platform.OS === 'ios') {
-      ENU_Pole = await cartesianToSpherical(-m32, m31, m33);
-      ENU_TP = await cartesianToSpherical(-m22, m21, m23);
-    }
-    else {
-      ENU_Pole = await cartesianToSpherical(m31, m32, m33);
-      ENU_TP = await cartesianToSpherical(m21, m22, m23);
-    }
-    const strikeAndDip = await getStrikeAndDip(ENU_Pole);
-    const trendAndPlunge = await getTrendAndPlunge(ENU_TP);
-
-    if (Platform.OS === 'ios') {
-      strike = strikeAndDip.strike;
-      trend = trendAndPlunge.trend;
-    }
-    else {
-      trueHeading = (magneticHeading + declination) % 360;
-      strike = (strikeAndDip.strike + declination) % 360;
-      trend = (trendAndPlunge.trend + declination) % 360;
-    }
-
-    const dipDirection = (strike + 90) % 360;
-    setCompassData({
-      declination: declination.toFixed(2),
-      dip: roundToDecimalPlaces(strikeAndDip.dip, 0),
-      dip_direction: roundToDecimalPlaces(dipDirection, 0),
-      magHeading: roundToDecimalPlaces(magneticHeading, 0),
-      plunge: roundToDecimalPlaces(trendAndPlunge.plunge, 0),
-      strike: roundToDecimalPlaces(strike, 0),
-      trend: roundToDecimalPlaces(trend, 0),
-      trueHeading: roundToDecimalPlaces(trueHeading, 0),
-    });
-  };
-
-  const getDeclination = async () => {
-    try {
-      const declination = await getUserDeclination();
-      console.log('Declination is:', declination);
-      magneticDeclination.current = declination;
-    }
-    catch (err) {
-      console.error('Magnetic Declination not available', err);
-      const errorMessage = err.message || err;
-      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
-        alert('Location Services Required',
-          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
-      }
-    }
-
-  };
-
   const grabMeasurements = async (isCompassMeasurement) => {
     try {
       if (isCompassMeasurement) {
@@ -210,63 +120,13 @@ const Compass = ({
         const sliderQuality = !sliderValue || sliderValue === 6 ? {} : {quality: sliderValue.toString()};
         console.log('Compass measurements', compassData, sliderValue);
         if (setAttributeMeasurements) addAttributeMeasurement(compassData);
-        else if (setMeasurements) {
-          setMeasurements({...compassData, ...sliderQuality, unix_timestamp: unixTimestamp});
-        }
-        else {
-          dispatch(setCompassMeasurements(compassData.quality ? compassData
-            : {...compassData, ...sliderQuality}));
-        }
+        else if (setMeasurements) setMeasurements({...compassData, ...sliderQuality, unix_timestamp: unixTimestamp});
+        else dispatch(setCompassMeasurements(compassData.quality ? compassData : {...compassData, ...sliderQuality}));
       }
       else dispatch(setCompassMeasurements({...compassData, manual: true}));
     }
     catch (e) {
       console.log('Error grabbing compass measurement', e);
-    }
-  };
-
-  const subscribeToCalibrationStatus = () => {
-    if (Platform.OS === 'ios') {
-      try {
-        CompassEvents.addListener('compassCalibrationStatus', handleCalibrationStatus);
-      }
-      catch (err) {
-        console.error('Error subscribing to calibration status: ' + err);
-      }
-    }
-  };
-
-  const subscribeToSensors = () => {
-    try {
-      CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
-      Platform.OS === 'ios' ? startCompass() : startSensors();
-      console.log('%cSUBSCRIBING to native compass data!', 'color: green');
-    }
-    catch (err) {
-      console.error(('Error subscribing to the native data: ' + err));
-    }
-  };
-
-  const unsubscribeFromCalibrationStatus = () => {
-    if (Platform.OS === 'ios') {
-      try {
-        CompassEvents.addListener('compassCalibrationStatus', handleCalibrationStatus).remove();
-        console.log('%cEnded compass calibration status listener.', 'color: red');
-      }
-      catch (err) {
-        console.error('Error unsubscribing from calibration status', err);
-      }
-    }
-  };
-
-  const unsubscribeFromSensors = () => {
-    try {
-      CompassEvents.addListener('rotationMatrix', handleMatrixRotationData).remove();
-      Platform.OS === 'ios' ? stopCompass() : stopSensors();
-      console.log('%cEnded Compass observation and rotationMatrix listener.', 'color: red');
-    }
-    catch (err) {
-      console.error('Error unsubscribing to compass events', err);
     }
   };
 
@@ -279,10 +139,7 @@ const Compass = ({
         compassMeasurementTypes={compassMeasurementTypes}
         grabMeasurements={grabMeasurements}
       />
-      {showCompassRawDataView && <CompassDebug
-        compassData={compassData}
-        matrixRotation={matrixRawData?.current}
-      />}
+      {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
     </View>
   );
 };

@@ -19,7 +19,7 @@ import {
   sortSpotsByDateLastModified,
 } from './spots.helpers';
 import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, setSelectedSpot} from './spots.slice';
-import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/Helpers';
+import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';

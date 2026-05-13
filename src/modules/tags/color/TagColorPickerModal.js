@@ -7,7 +7,7 @@ import {Field, Formik} from 'formik';
 import {COLOR_CHOICES} from './tagColor.constants';
 import {getRGBString, isValidHexColor, rgbToHex} from './tagColor.helpers';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {BLACK, WHITE} from '../../../shared/styles.constants';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';

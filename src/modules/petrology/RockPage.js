@@ -13,7 +13,7 @@ import {
   SEDIMENTARY_SECTION_TITLE,
 } from './petrology.constants';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty} from '../../shared/Helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -245,7 +245,14 @@ const RockPage = ({isReadOnly, page}) => {
           />
         )}
         renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+          return (
+            section.data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && section.key !== 'deprecated' && (() => addRock(section.key))}
+                text={'No ' + section.title}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section: {title, key}}) => renderSectionHeader(title, key)}
         sections={rocksGrouped}

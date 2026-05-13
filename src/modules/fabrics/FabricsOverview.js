@@ -33,7 +33,9 @@ const FabricsOverview = ({page}) => {
   return (
     <FlatList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Fabrics'}/>}
+      ListEmptyComponent={
+        <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No Fabrics'}/>
+      }
       data={fabrics}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item}) => <FabricListItem editFabric={() => onFabricPressed(item)} fabric={item}/>}
