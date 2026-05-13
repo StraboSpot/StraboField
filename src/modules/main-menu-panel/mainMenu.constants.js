@@ -52,7 +52,6 @@ export const MAIN_MENU_DATA = Object.entries(MAIN_MENU_ITEMS).map(([key, value])
 const listItemsToHideOnWeb = [
   MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP,
   MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS,
-  MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS,
   MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS];
 export const MAIN_MENU_DATA_WEB = Object.entries(MAIN_MENU_ITEMS).map(([key, value]) => {
   return {

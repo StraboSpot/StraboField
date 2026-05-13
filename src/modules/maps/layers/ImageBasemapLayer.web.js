@@ -4,14 +4,15 @@ import {Layer, Source} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
-import {useImages} from '../../images';
+import {useWindowSize} from '../../../shared/ui/useWindowSize';
+import {getResizedImageURI} from '../../images/imageURIs.helpers';
 import useMapCoords from '../useMapCoords';
 
 const ImageBasemapLayer = () => {
   const {currentImageBasemap} = useSelector(state => state.map);
 
   const {getCoordQuad} = useMapCoords();
-  const {getImageScreenSizedURI} = useImages();
+  const {width, height} = useWindowSize();
 
   const coordQuad = getCoordQuad(currentImageBasemap);
 
@@ -21,7 +22,7 @@ const ImageBasemapLayer = () => {
         coordinates={coordQuad}
         id={'currentImageBasemap'}
         type={'image'}
-        url={getImageScreenSizedURI(currentImageBasemap.id)}
+        url={getResizedImageURI(currentImageBasemap.id, width, height)}
       >
         <Layer
           // beforeId={'pointLayerColorHalo'}

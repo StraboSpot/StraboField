@@ -39,7 +39,7 @@ const MacrostratOverlay = ({
 
   useEffect(() => {
     return () => {
-      console.log('Closing Macrostrat modals and setting to {}');
+      console.log('Closing macrostrat modals and setting to {}');
       setDataObject({});
     };
   }, []);
@@ -64,7 +64,7 @@ const MacrostratOverlay = ({
       setDataObject(res.success.data);
     }
     catch (err) {
-      console.error('Error getting Macrostrat Data', err);
+      console.error('Error getting macrostrat Data', err);
     }
   };
 

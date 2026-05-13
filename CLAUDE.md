@@ -31,6 +31,9 @@ export const PASSWORD_TEST = 'your password';
 
 # 3. Generate Sentry properties files (auto-generated from env.json):
 npm run setup-sentry
+
+# 4. Install git hooks (keeps CLAUDE.md auto-updated on commit):
+node scripts/install-hooks.js
 ```
 
 ### Running the App
@@ -90,11 +93,29 @@ npm run debug            # Start Metro with experimental debugger
 npm run remove:packages  # Clean node_modules and iOS Pods
 ```
 
+### Pre-commit Hook (CLAUDE.md auto-update)
+
+`scripts/update-claude-md.js` keeps CLAUDE.md in sync with the codebase (module count, dependency versions) on every commit. Git hooks are not committed to the repo, so after cloning you need to install it once:
+
+```bash
+node scripts/install-hooks.js
+```
+
+### File Organizer Script
+
+`scripts/organize-file.js` — reorganizes React component/hook files into canonical section order: imports, preamble (Data Hooks, Local State, Derived Variables, Side Effects), functions (Event Handlers, Logic Helpers, Render Functions), then the return/view.
+
+```bash
+node scripts/organize-file.js src/modules/[feature]/[File].js
+```
+
+Use `git checkout src/` to reset source files before re-running. Always verify output for correctness (use-before-declaration errors, broken chains, etc.).
+
 ## Architecture Overview
 
 ### Feature-Based Module Structure
 
-The codebase is organized into **39 self-contained feature modules** under `/src/modules/`, each containing:
+The codebase is organized into **40 self-contained feature modules** under `/src/modules/`, each containing:
 - UI components
 - Redux slice for state management
 - Custom hooks for business logic
@@ -167,7 +188,7 @@ Hooks keep components presentational and logic reusable.
   - Projects in device backup directory
   - Images in dedicated directory
   - Offline map tiles cached locally
-  - Directory structure managed by `directories.constants.js`
+  - Directory structure managed by `src/services/files/directories.constants.js`
 
 **Data Model:**
 - **Projects** contain datasets, templates, tags, reports
@@ -186,7 +207,7 @@ Hooks keep components presentational and logic reusable.
 
 ### Dynamic Form System
 
-**JSON-based form definitions** in `/src/assets/forms/` (74 forms):
+**JSON-based form definitions** in `/src/assets/forms/` (58 forms):
 - XLSForm-style structure: `survey` (field definitions) + `choices` (options)
 - 14 form categories (measurement, petrology, sedimentology, 3d_structures, etc.)
 - Features:
@@ -200,17 +221,28 @@ Form rendering in `/src/modules/form/` with custom field components.
 
 ### Services Layer
 
-Key services in `/src/services/`:
-- **useDevice.js** - File operations, storage management
-- **useServerRequests.js** - API calls to StraboSpot server
-- **useUpload.js** / **useDownload.js** - Data synchronization
-- **useExport.js** / **useImport.js** - Data import/export
-- **useCompass.js** - Compass and sensor integration
-- **ConnectionStatus.js** - Network monitoring
+`/src/services/` is split into three subdirectories:
+
+**`device/`**
+- `useDevice.js` - File operations, storage management
+- `useCompass.js` - Compass and sensor integration
+- `usePermissions.js` - Device permissions
+- `CompassModule.js` - Native compass module bridge
+
+**`files/`**
+- `useUpload.js` / `useDownload.js` - Data synchronization
+- `useExport.js` / `useImport.js` - Data import/export
+- `useUploadImages.js` - Image upload
+- `directories.constants.js` - File system directory paths
+
+**`network/`**
+- `useServerRequests.js` - API calls to StraboSpot server
+- `serverAPI.js` - Server API helpers
+- `urls.constants.js` - API URL constants
 
 ### Shared Code
 
-**Utilities** (`/src/shared/Helpers.js`):
+**Utilities** (`/src/shared/helpers.js`):
 - `isEmpty()`, `isEqual()`, `deepObjectExtend()` - Object utilities
 - `getNewId()`, `getNewUUID()` - ID generation
 - `validate()` - Form validation
@@ -316,6 +348,12 @@ Sentry integration for error reporting:
 
 **Critical:** Must run `npm run bundle:android` before every PlayStore deployment. This command bundles JavaScript and removes duplicate resources.
 
+**`compileSdkVersion` must be 36** — `react-native-screens` pulls in `androidx.core:core-ktx:1.17.0` which requires SDK 36. Set in `android/app/build.gradle`.
+
+### iOS Bridgeless Mode Patch (@rnmapbox/maps)
+
+`@rnmapbox/maps` requires a patch for bridgeless mode: `RCTBridge!` → `RCTBridge?` with a URLSession fallback in `RNMBXImageQueue`. Applied via `patches/@rnmapbox+maps+10.3.0.patch` (update the filename when upgrading Mapbox).
+
 ### Version Bumping
 
 Use npm scripts for version management:
@@ -338,18 +376,18 @@ Minimal test coverage currently. Tests in `__tests__/`:
 ## Dependencies
 
 **Key dependencies:**
-- React 19.0.0 + React Native 0.79.1
-- Redux Toolkit 2.7.0 + Redux Persist 6.0.0
+- React 19.2.3 + React Native 0.84.1
+- Redux Toolkit 2.11.2 + Redux Persist 6.0.0
 - React Navigation 7.x
-- Mapbox Maps (@rnmapbox/maps 10.x for native, mapbox-gl 2.x for web)
-- Formik 2.4.6 - Form management
+- Mapbox Maps (@rnmapbox/maps 10.3.0 for native, mapbox-gl 2.x for web)
+- Formik 2.4.9 - Form management
 - Turf.js 7.x - Geospatial calculations
 - RNFS - File system access
 - Sentry - Error tracking
 
 **Node version:** >=18 (specified in `package.json`)
 
-**Package manager:** Yarn 4.9.4
+**Package manager:** Yarn 4.13.0
 
 ## Deployment Checklist
 

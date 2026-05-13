@@ -1,36 +1,42 @@
 import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 
-import {ButtonGroup, ListItem} from '@rn-vui/base';
+import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import BackupTagsModal from './BackupTagsModal';
 import TagFilters from './filters/TagFilters';
+import LoadTagsModal from './LoadTagsModal';
 import {TAG_TYPES} from './tags.constants';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
+import TagsOverflowMenuModal from './TagsOverflowMenuModal';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
-import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
 import {TagDetailModal, TagsList} from '../tags';
-import BackupLoadTags from './BackupLoadTags';
 
-const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
+const Tags = ({
+                closeTagsOverflowMenu,
+                isGeologicUnits,
+                isOverflowMenuVisible = false,
+                type,
+                updateSpotsInMapExtent,
+              }) => {
   console.log('Rendering Tags...');
 
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
   /* Local State */
 
+  const [isBackupTagsModalVisible, setIsBackupTagsModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [isLoadTagsModalVisible, setIsLoadTagsModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tagsSorted, setTagsSorted] = useState([]);
 
@@ -68,20 +74,6 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
 
   return (
     <View style={{flex: 1}}>
-      {!isReadOnlyProject && <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>}
-      <BackupLoadTags isGeologicUnits={isGeologicUnits}/>
-      {!isReadOnlyProject && (
-        <ListItem containerStyle={commonStyles.listItem}>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>{`Continuous ${label}`}</ListItem.Title>
-          </ListItem.Content>
-          <SwitchWrapper
-            disabled={isReadOnlyProject}
-            onValueChange={handleContinuousTaggingSwitched}
-            value={useContinuousTagging}
-          />
-        </ListItem>
-      )}
       {!isEmpty(tags) && (
         <>
           <ButtonGroup
@@ -104,8 +96,24 @@ const Tags = ({isGeologicUnits, type, updateSpotsInMapExtent}) => {
       )}
       <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>
 
-      {/* Modal */}
+      {/* Menus and Modals */}
+      <TagsOverflowMenuModal
+        closeMenu={closeTagsOverflowMenu}
+        isVisible={isOverflowMenuVisible}
+        label={label}
+        onAddPress={addTag}
+        onBackupPress={() => setIsBackupTagsModalVisible(true)}
+        onContinuousTaggingSwitched={handleContinuousTaggingSwitched}
+        onLoadPress={() => setIsLoadTagsModalVisible(true)}
+        useContinuousTagging={useContinuousTagging}
+      />
+      {isBackupTagsModalVisible && (
+        <BackupTagsModal closeModal={() => setIsBackupTagsModalVisible(false)} isGeologicUnits={isGeologicUnits}/>
+      )}
       {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
+      {isLoadTagsModalVisible && (
+        <LoadTagsModal closeModal={() => setIsLoadTagsModalVisible(false)} isGeologicUnits={isGeologicUnits}/>
+      )}
     </View>
   );
 };

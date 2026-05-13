@@ -29,7 +29,7 @@ const useMicroZips = () => {
   const doUnzip = async (projectId) => {
     try {
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Preparing to install tiles...'));
+      dispatch(addedStatusMessage('Preparing to unzip micro project...'));
       const sourcePath = APP_DIRECTORIES.MICRO_ZIPS + projectId + '.zip';
       await unzip(sourcePath, APP_DIRECTORIES.MICRO);
       console.log('Unzip to', APP_DIRECTORIES.MICRO, 'completed');

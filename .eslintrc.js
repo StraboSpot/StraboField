@@ -54,8 +54,8 @@ module.exports = {
     // StraboSpot2 Override React rules
     'react/jsx-filename-extension': [1, {extensions: ['.js', '.jsx']}], // allow .js files to contain JSX code
     'react/no-unstable-nested-components': ['error', {allowAsProps: true}],
-    'react-native/no-inline-styles': 'off',
     'react-hooks/exhaustive-deps': 'off',
+    'react-native/no-inline-styles': 'off',
   },
   settings: {
     'import/ignore': ['react-native', 'react-map-gl', '@rnmapbox/maps', 'uuid'],

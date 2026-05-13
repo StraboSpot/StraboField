@@ -95,7 +95,14 @@ const spotSlice = createSlice({
       let tempImages = [];
       if (state.selectedSpot.properties.images) tempImages = state.selectedSpot.properties.images;
       const updatedSpotObj = action.payload.map((image) => {
-        return {id: image.id, height: image.height, width: image.width, image_type: image.image_type};
+        return {
+          id: image.id,
+          height: image.height,
+          width: image.width,
+          image_type: image.image_type,
+          ...(!isEmpty(image.view_angle_plunge) && {view_angle_plunge: image.view_angle_plunge}),
+          ...(!isEmpty(image.view_azimuth_trend) && {view_azimuth_trend: image.view_azimuth_trend}),
+        };
       });
       tempImages = [...tempImages, ...updatedSpotObj];
       const tempImagesWithTitles = tempImages.map((image, i) => {

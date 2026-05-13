@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import RockdModal from '../../../services/data-intergration/macrostrat/RockdModal';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
@@ -24,6 +25,8 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const navigation = useNavigation();
@@ -34,6 +37,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+  const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
 
   /* Derived Variables */
 
@@ -58,6 +62,10 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else if (key === 'rockd') {
+      closeNotebookMenu();
+      setIsRockdModalVisible(true);
+    }
     else closeNotebookPanel();
     closeNotebookMenu();
   };
@@ -83,6 +91,9 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
+    else if (item.key === 'rockd' && !isTestingMode && (checkedInSpotIds.includes(
+      spot.properties.id) || spot.geometry.type !== 'Point')) return;
+    else if (item.key === 'rockd' && !isTestingMode) return;
     else {
       return (
         <ListItem
@@ -135,6 +146,10 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
       >
         {renderDeleteMessage()}
       </WarningModal>
+      <RockdModal
+        closeModal={() => setIsRockdModalVisible(false)}
+        isVisible={isRockdModalVisible}
+      />
     </>
   );
 };
