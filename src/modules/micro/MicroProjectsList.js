@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Platform, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import moment from 'moment/moment';
@@ -13,10 +13,11 @@ import useDevice from '../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import {LIGHTGREY, MEDIUMGREY, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
+import UrlLinkButton from '../help/UrlLinkButton';
 
 const MicroProjectsList = () => {
   /* Data Hooks */
@@ -106,34 +107,33 @@ const MicroProjectsList = () => {
       else if (isEmpty(projectsResponse.projects)) setErrorMessage('No StraboMico Projects');
       else {
         setIsError(false);
-        console.log('List of Projects:', projectsResponse);
+        console.log('List of Projects on Server:', projectsResponse);
         setProjectsArr(projectsResponse);
-        let projectsExistsArrTemp = [];
-        let projectsExistsUpdateAvailableTemp = [];
-        await Promise.all(projectsResponse.projects.map(async (project, i) => {
-          const exists = await doesMicroProjectPDFExist(project.id);
-          projectsExistsArrTemp[i] = exists;
-          if (exists) {
-            // console.log('server project', project);
-            const modifiedTimestamp = await getSavedMicroProjectModifiedTimestamp(project.id);
-            if (modifiedTimestamp && project.modifiedtimestamp > modifiedTimestamp) {
-              projectsExistsUpdateAvailableTemp[i] = true;
+        if (Platform.OS !== 'web') {
+          let projectsExistsArrTemp = [];
+          let projectsExistsUpdateAvailableTemp = [];
+          await Promise.all(projectsResponse.projects.map(async (project, i) => {
+            const exists = await doesMicroProjectPDFExist(project.id);
+            projectsExistsArrTemp[i] = exists;
+            if (exists) {
+              const modifiedTimestamp = await getSavedMicroProjectModifiedTimestamp(project.id);
+              if (modifiedTimestamp && project.modifiedtimestamp > modifiedTimestamp) {
+                projectsExistsUpdateAvailableTemp[i] = true;
+              }
+              else projectsExistsUpdateAvailableTemp[i] = false;
             }
-            else projectsExistsUpdateAvailableTemp[i] = false;
-          }
-        }));
-        setProjectsExistsArr(projectsExistsArrTemp);
-        setProjectsUpdateAvailableArr(projectsExistsUpdateAvailableTemp);
+          }));
+          setProjectsExistsArr(projectsExistsArrTemp);
+          setProjectsUpdateAvailableArr(projectsExistsUpdateAvailableTemp);
+        }
       }
     }
     else {
       projectsResponse = await getAllLocalMicroProjects();
-      if (!projectsResponse || !projectsResponse.projects) {
-        setErrorMessage('No Offline StraboMicro Projects Found');
-      }
+      if (!projectsResponse || !projectsResponse.projects) setErrorMessage('No Offline StraboMicro Projects Found');
       else {
         setIsError(false);
-        console.log('List of Projects:', projectsResponse);
+        console.log('List of Projects on Device:', projectsResponse);
         setProjectsArr(projectsResponse);
         setProjectsExistsArr(Array(projectsResponse.projects.length).fill(true));
       }
@@ -199,7 +199,18 @@ const MicroProjectsList = () => {
   return (
     <View style={{flex: 1}}>
       <Loading isLoading={loading} style={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}/>
+      {Platform.OS === 'web' && (
+        <UrlLinkButton
+          color={PRIMARY_ACCENT_COLOR}
+          icon={'globe-outline'}
+          key={'micro-link'}
+          title={'Go To My StraboMicro Data'}
+          url={'https://strabospot.org/my_micro_data'}
+        />
+      )}
       {renderMicroProjectsList()}
+
+      {/* Modals */}
       <MicroProjectsStatusOverlay
         closeStatusOverlay={closeStatusOverlay}
         errorMessage={errorMessage}

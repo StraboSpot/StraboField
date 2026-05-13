@@ -317,7 +317,7 @@ const useDevice = () => {
     if (await RNFS.exists(microJSON)) {
       const file = await readFile(microJSON);
       const fileAsJSON = JSON.parse(file);
-      // console.log('fileAsJSON', fileAsJSON);
+      console.log('Micro Project project.json file', fileAsJSON);
       return fileAsJSON.modifiedtimestamp || undefined;
     }
     else return undefined;
@@ -470,7 +470,6 @@ const useDevice = () => {
 
   const unZipAndCopyImportedData = async (zipFile) => {
     try {
-      let fileName = '';
       if (Platform.OS === 'android') {
         if (await RNFS.exists(APP_DIRECTORIES.EXPORT_FILES_ANDROID)) {
           await RNFS.copyFile(zipFile.localUri, APP_DIRECTORIES.EXPORT_FILES_ANDROID + zipFile.name);
@@ -479,16 +478,40 @@ const useDevice = () => {
         else {
           await makeDirectory(APP_DIRECTORIES.EXPORT_FILES_ANDROID);
           await unZipAndCopyImportedData(zipFile);
+          return;
         }
       }
-      fileName = zipFile.name.replace('.zip', '');
+      const fileName = zipFile.name.replace('.zip', '');
       const source = Platform.OS === 'ios' ? zipFile.localUri : APP_DIRECTORIES.EXPORT_FILES_ANDROID + zipFile.name;
-      const dest = Platform.OS === 'ios' ? APP_DIRECTORIES.BACKUP_DIR + fileName : APP_DIRECTORIES.BACKUP_DIR + fileName;
+      const dest = APP_DIRECTORIES.BACKUP_DIR + fileName;
+      const tempDir = dest + '_import_temp';
 
       console.log('SOURCE', source);
       console.log('DEST', dest);
 
-      await unzip(source, dest);
+      await unzip(source, tempDir);
+
+      // Find data.json — it may be at the root of the zip or inside a folder (any name).
+      const items = await RNFS.readdir(tempDir);
+      let projectSource = null;
+      if (items.includes('data.json')) projectSource = tempDir;
+      else {
+        for (const item of items.filter(i => !i.startsWith('__'))) {
+          if (await RNFS.exists(tempDir + '/' + item + '/data.json')) {
+            projectSource = tempDir + '/' + item;
+            break;
+          }
+        }
+      }
+
+      if (!projectSource) {
+        await RNFS.unlink(tempDir);
+        throw new Error('data.json not found. Ensure this is a valid StraboField project backup.');
+      }
+
+      if (await RNFS.exists(dest)) await RNFS.unlink(dest);
+      await RNFS.moveFile(projectSource, dest);
+      if (await RNFS.exists(tempDir)) await RNFS.unlink(tempDir);
     }
     catch (err) {
       console.error('Error unzipping imported file', err);

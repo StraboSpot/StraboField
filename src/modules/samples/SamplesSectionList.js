@@ -4,7 +4,7 @@ import {SectionList} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import SampleListItem from './SampleListItem';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';

@@ -45,6 +45,7 @@ const TephraPage = ({isReadOnly, page}) => {
     console.log('UE TephraPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (!isEmpty(selectedAttributes)) {
       setSelectedAttribute(selectedAttributes[0]);
+      setSelectedTypeIndex(0);
       setIsDetailView(true);
     }
     setData(attributes);
@@ -66,6 +67,7 @@ const TephraPage = ({isReadOnly, page}) => {
       id: getNewUUID(),
     };
     setSelectedAttribute(initialValues);
+    setSelectedTypeIndex(0);
     setIsDetailView(true);
     dispatch(setModalVisible({modal: null}));
   };
@@ -78,6 +80,7 @@ const TephraPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'tephra', value: editedTephraData}));
     }
+    setSelectedTypeIndex(0);
     setIsDetailView(true);
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));

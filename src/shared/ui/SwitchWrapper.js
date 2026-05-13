@@ -2,6 +2,7 @@ import React from 'react';
 import {Platform, Switch, View} from 'react-native';
 
 import {
+  DARKGREY,
   LIGHTGREY,
   MEDIUMGREY,
   PRIMARY_ACCENT_COLOR,
@@ -30,6 +31,7 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
         <Switch
           disabled={disabled}
           onValueChange={onValueChange}
+          thumbColor={DARKGREY}
           // style={{transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
           trackColor={{false: MEDIUMGREY, true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
           value={value}

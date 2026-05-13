@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import IGSNLogo from './igsn/IGSNLogo';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import useProject from '../project/useProject';

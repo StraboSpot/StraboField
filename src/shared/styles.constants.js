@@ -50,6 +50,7 @@ export const SPOT_NAME_SIZE = Platform.OS === 'web' ? 20 : 30;
 export const MODAL_TEXT_SIZE = Platform.OS === 'web' ? 10 : 14;
 export const MODAL_BORDER_RADIUS = 10;
 export const MODAL_WIDTH = 300;
+export const SMALL_SCREEN_STATUS_BAR_OFFSET = 50;
 
 export const UPDATE_LABEL_WIDTH = 150;
 export const UPDATE_LABEL_HEIGHT = 150;

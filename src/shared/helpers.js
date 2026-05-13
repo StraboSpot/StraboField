@@ -57,7 +57,7 @@ export const convertSliderValueToMilliseconds = (sliderValue) => {
   return timeMap[sliderValue];
 };
 
-// Parsing CSV Strings With Javascript Exec() Regular Expression Command
+// Parsing CSV Strings With JavaScript Exec() Regular Expression Command
 // https://gist.github.com/bennadel/9753411#file-code-1-htm
 export const csvToArray = (strData, strDelimiter) => {
   // Check to see if the delimiter is defined. If not, then default to comma.

@@ -42,28 +42,27 @@ export const getHeading = (yaw) => {
 export const getStrikeAndDip = (ENU) => {
   let phi = ENU.phi;
   let theta = ENU.theta;
-  let strikeDeg = 0;
-  let dipDeg = 0;
+  let strike = 0, dip = 0;
   if (phi <= Math.PI / 2) {
-    strikeDeg = mod((360 - theta * (180 / Math.PI)), 360);
-    dipDeg = phi * (180 / Math.PI);
+    strike = mod((360 - theta * (180 / Math.PI)), 360);
+    dip = phi * (180 / Math.PI);
   }
   else {
-    strikeDeg = mod((360 - (theta + Math.PI) * (180 / Math.PI)), 360);
-    dipDeg = (Math.PI - phi) * (180 / Math.PI);
+    strike = mod((360 - (theta + Math.PI) * (180 / Math.PI)), 360);
+    dip = (Math.PI - phi) * (180 / Math.PI);
   }
 
-  return {strike: strikeDeg, dip: dipDeg};
+  return {strike, dip};
 };
 
 export const getTrendAndPlunge = (ENU_TP) => {
   let phi = ENU_TP.phi;
   let theta = ENU_TP.theta;
-  let trendDeg = mod(90 - theta * (180 / Math.PI), 360);
-  let plungeDeg = phi * (180 / Math.PI) - 90;
-  if (plungeDeg < 0) {
-    trendDeg = mod(trendDeg + 180, 360);
-    plungeDeg = -plungeDeg;
+  let trend = mod(90 - theta * (180 / Math.PI), 360);
+  let plunge = phi * (180 / Math.PI) - 90;
+  if (plunge < 0) {
+    trend = mod(trend + 180, 360);
+    plunge = -plunge;
   }
-  return {trend: trendDeg, plunge: plungeDeg};
+  return {trend, plunge};
 };

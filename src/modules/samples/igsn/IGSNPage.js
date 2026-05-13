@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
 import useIGSN from './useIGSN';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import PageHeader from '../../page/PageHeader';
 
 const IGSNPage = (props) => {

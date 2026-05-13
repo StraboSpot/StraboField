@@ -1,7 +1,7 @@
 import {Dimensions, Platform, StyleSheet} from 'react-native';
 
 import * as themes from '../../styles.constants';
-import {LIGHTGREY, MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
+import {LIGHTGREY, MODAL_WIDTH, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../styles.constants';
 
 const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     flex: 1,
     overflow: 'hidden',
-    paddingTop: SMALL_SCREEN ? 50 : 0,
+    paddingTop: SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0,
     zIndex: 1,
   },
   overlayContent: {
