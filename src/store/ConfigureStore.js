@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {createLogger} from 'redux-logger';
-import {autoMergeLevel2, createMigrate, persistReducer, persistStore} from 'redux-persist';
+import {createMigrate, persistReducer, persistStore} from 'redux-persist';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
 import listenerMiddleware from './listenerMiddleware';
 import compassSlice from '../modules/compass/compass.slice';
