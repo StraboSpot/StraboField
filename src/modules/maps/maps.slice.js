@@ -20,6 +20,7 @@ const initialMapsState = {
   isDragIntervalMode: false,
   labelTypeOn: 'dip',
   isMapMoved: true,
+  isScaleBarMetric: true,
   isShowOnly1stMeas: false,
   isShowSamplesOn: false,
   mapSymbols: [],
@@ -128,6 +129,9 @@ const mapsSlice = createSlice({
     setIsShowOnly1stMeas(state, action) {
       state.isShowOnly1stMeas = action.payload;
     },
+    setIsScaleBarMetric(state, action) {
+      state.isScaleBarMetric = action.payload;
+    },
     setIsShowSamplesOn(state, action) {
       state.isShowSamplesOn = action.payload;
     },
@@ -194,6 +198,7 @@ export const {
   setIntervalDragState,
   setIntervalDragTargetSlot,
   setIsMapMoved,
+  setIsScaleBarMetric,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,
   setLabelTypeOn,
