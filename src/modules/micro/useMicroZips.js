@@ -3,9 +3,9 @@ import {useState} from 'react';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES} from '../../services/directories.constants';
-import {MICRO_PATHS, STRABO_APIS} from '../../services/urls.constants';
-import useDevice from '../../services/useDevice';
+import useDevice from '../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
+import {MICRO_PATHS, STRABO_APIS} from '../../services/network/urls.constants';
 import {addedStatusMessage, removedLastStatusMessage} from '../home/home.slice';
 
 const useMicroZips = () => {
@@ -29,7 +29,7 @@ const useMicroZips = () => {
   const doUnzip = async (projectId) => {
     try {
       dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Preparing to install tiles...'));
+      dispatch(addedStatusMessage('Preparing to unzip micro project...'));
       const sourcePath = APP_DIRECTORIES.MICRO_ZIPS + projectId + '.zip';
       await unzip(sourcePath, APP_DIRECTORIES.MICRO);
       console.log('Unzip to', APP_DIRECTORIES.MICRO, 'completed');

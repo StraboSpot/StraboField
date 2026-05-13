@@ -5,7 +5,7 @@ import {CheckBox, Icon, ListItem} from '@rn-vui/base';
 import MultiSelect from 'react-native-multiple-select';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {DARKGREY, PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import {formStyles} from '../form';

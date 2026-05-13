@@ -30,7 +30,7 @@ const SamplesOverview = ({page}) => {
   /* View */
 
   if (spot.properties?.isSample) return <SampleDetailOverview/>;
-  return <SamplesList onPress={onPressed}/>;
+  return <SamplesList onPress={onPressed} onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}/>;
 };
 
 export default SamplesOverview;

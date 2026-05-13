@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {TEPHRA_SUBPAGES} from './tephra.constants';
 import tephraStyles from './tephra.styles';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -45,6 +45,7 @@ const TephraPage = ({isReadOnly, page}) => {
     console.log('UE TephraPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (!isEmpty(selectedAttributes)) {
       setSelectedAttribute(selectedAttributes[0]);
+      setSelectedTypeIndex(0);
       setIsDetailView(true);
     }
     setData(attributes);
@@ -66,6 +67,7 @@ const TephraPage = ({isReadOnly, page}) => {
       id: getNewUUID(),
     };
     setSelectedAttribute(initialValues);
+    setSelectedTypeIndex(0);
     setIsDetailView(true);
     dispatch(setModalVisible({modal: null}));
   };
@@ -78,6 +80,7 @@ const TephraPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'tephra', value: editedTephraData}));
     }
+    setSelectedTypeIndex(0);
     setIsDetailView(true);
     setSelectedAttribute(attribute);
     dispatch(setModalVisible({modal: null}));
@@ -127,7 +130,7 @@ const TephraPage = ({isReadOnly, page}) => {
           )}
           <DraggableFlatList
             ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={'No ' + page.label}/>}
+            ListEmptyComponent={<ListEmptyText onPress={!isReadOnly && addAttribute} text={'No ' + page.label}/>}
             data={data1}
             keyExtractor={item => item.id}
             onDragBegin={() => setIsReorderingActive(true)}

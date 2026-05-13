@@ -3,8 +3,8 @@ import {Platform} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useDevice from '../../services/useDevice';
-import {csvToArray, getNewUUID, urlValidator} from '../../shared/Helpers';
+import useDevice from '../../services/device/useDevice';
+import {csvToArray, getNewUUID, urlValidator} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';

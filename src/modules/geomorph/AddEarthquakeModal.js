@@ -15,7 +15,7 @@ import {
   MAIN_BUTTONS_KEYS_2,
   VECTOR_MEASUREMENT_KEYS,
 } from './geomorph.constants';
-import {getNewUUID} from '../../shared/Helpers';
+import {getNewUUID} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';

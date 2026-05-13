@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
-import {getNewId, isEmpty, isEqual} from '../../shared/Helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 
 const initialProjectState = {
   activeDatasetsIds: [],
@@ -38,23 +38,6 @@ const projectSlice = createSlice({
     },
     addedDatasets(state, action) {
       state.datasets = action.payload;
-    },
-    addedNeededImagesToDataset(state, action) {
-      const {datasetId, images, modified_timestamp} = action.payload;
-      let datasetTimestamp = modified_timestamp;
-      const timestamp = Date.now();
-      const imagesInDataset = state.datasets[datasetId].images
-        ? {...state.datasets[datasetId].images, ...images}
-        : images;
-      if (!datasetTimestamp) {
-        datasetTimestamp = timestamp;
-        console.log('Modified Timestamp:', datasetTimestamp);
-        state.project.modified_timestamp = timestamp;
-      }
-      state.datasets = {
-        ...state.datasets,
-        [datasetId]: {...state.datasets[datasetId], modified_timestamp: datasetTimestamp, images: imagesInDataset},
-      };
     },
     addedNewSpotIdsToDataset(state, action) {
       const {datasetId, spotIds} = action.payload;
@@ -357,7 +340,6 @@ export const {
   addedCustomFeatureTypes,
   addedDataset,
   addedDatasets,
-  addedNeededImagesToDataset,
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
   addedProject,

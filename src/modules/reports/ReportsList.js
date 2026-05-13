@@ -4,7 +4,7 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ReportsListItem} from '.';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';

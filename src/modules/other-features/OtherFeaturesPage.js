@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import OtherFeatureDetail from './OtherFeatureDetail';
 import OtherFeatureItem from './OtherFeatureItem';
-import {getNewId, isEmpty} from '../../shared/Helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import PageHeader from '../page/PageHeader';
@@ -86,7 +86,9 @@ const OtherFeaturesPage = ({isReadOnly}) => {
         />
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'There are no other features at this Spot.'}/>}
+          ListEmptyComponent={
+            <ListEmptyText onPress={!isReadOnly && addFeature} text={'There are no other features at this Spot.'}/>
+          }
           data={spot.properties.other_features}
           keyExtractor={item => item.id.toString()}
           renderItem={item => renderFeature(item.item)}

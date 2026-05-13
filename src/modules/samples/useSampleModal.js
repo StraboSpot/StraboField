@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useSamples from './useSamples';
-import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/Helpers';
+import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/useMapLocation';

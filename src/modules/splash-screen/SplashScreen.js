@@ -5,12 +5,12 @@ import DeviceInfo from 'react-native-device-info';
 import {useSelector} from 'react-redux';
 
 import splashScreenStyles from './splashScreen.styles';
-import BatteryInfo from '../../services/BatteryInfo';
-import ConnectionStatusIcon from '../../services/ConnectionStatusIcon';
 import {VERSION_NUMBER} from '../../shared/app.constants';
-import {getFontSizeByWindowWidth} from '../../shared/Helpers';
+import {getFontSizeByWindowWidth} from '../../shared/helpers';
 import Loading from '../../shared/ui/Loading';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
+import BatteryInfo from '../status-bar/BatteryInfo';
+import ConnectionStatusIcon from '../status-bar/ConnectionStatusIcon';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const SplashScreen = ({children}) => {

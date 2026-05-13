@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -32,10 +32,16 @@ const ImagesPage = ({isReadOnly}) => {
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={'Images'}/>
-      <View style={{alignItems: 'center', flex: 1}}>
-        {!isReadOnly && <AddImageButtons saveImages={saveImagesToSpot}/>}
-        <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>
-      </View>
+      <FlatList
+        ListHeaderComponent={
+          <>
+            {!isReadOnly && <AddImageButtons saveImages={saveImagesToSpot}/>}
+            <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>
+          </>
+        }
+        contentContainerStyle={{alignItems: 'center', paddingBottom: 40}}
+        keyboardShouldPersistTaps='handled'
+      />
     </View>
   );
 };

@@ -10,8 +10,8 @@ import homeStyles from './home.style';
 import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';
-import useDevice from '../../services/useDevice';
-import {isEmpty} from '../../shared/Helpers';
+import useDevice from '../../services/device/useDevice';
+import {isEmpty} from '../../shared/helpers';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 

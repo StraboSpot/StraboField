@@ -8,8 +8,9 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
+import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
 import Routes from './src/routes/Routes';
-import ConnectionStatus from './src/services/ConnectionStatus';
+import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
 import {RELEASE_NAME} from './src/shared/app.constants';
 import {SMALL_SCREEN} from './src/shared/styles.constants';
 import ToastWrapper from './src/shared/ui/ToastWrapper';
@@ -87,6 +88,7 @@ const App = () => {
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
+              <MacrostratAuthRedirectHandler/>
               <NavigationContainer linking={linking}>
                 <Routes/>
               </NavigationContainer>

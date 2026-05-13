@@ -19,15 +19,15 @@ import useMapLocation from './useMapLocation';
 import useMapPressEvents from './useMapPressEvents';
 import useMapView from './useMapView';
 import VertexActionsOverlay from './VertexActionsOverlay';
-import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
+import useServerRequests from '../../services/network/useServerRequests';
+import {isEmpty} from '../../shared/helpers';
 import {
   addedStatusMessage,
   clearedStatusMessages,
   setIsErrorMessagesModalVisible,
   setIsOfflineMapsModalVisible,
 } from '../home/home.slice';
-import {useImages} from '../images';
+import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
@@ -58,7 +58,7 @@ const MapContainer = forwardRef(({
   const userEmail = useSelector(state => state.user.email);
 
   const {setCustomMapSwitchValue} = useCustomMap();
-  const {setImageHeightAndWidth} = useImages();
+  const {setImageHeightAndWidth} = useImageSize();
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);
@@ -309,7 +309,7 @@ const MapContainer = forwardRef(({
   const getTileCount = async (zoomLevel) => {
     const extentString = await getExtentString();
     try {
-      //Assign the promise unresolved first then get the data using the json method.
+      //Assign the promise unresolved first then get the data using the JSON method.
       console.log('sending this extent to server: ', extentString);
       console.log('sending zoom to server: ', zoomLevel);
       const tileCallURL = getExtentAndZoomCall(extentString, zoomLevel);

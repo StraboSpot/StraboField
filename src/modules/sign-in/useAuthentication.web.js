@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import useServerRequests from '../../services/useServerRequests';
+import useServerRequests from '../../services/network/useServerRequests';
 import {login, logout} from '../user/userProfile.slice';
 
 const useAuthentication = () => {

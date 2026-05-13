@@ -4,14 +4,14 @@ import {Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {logout} from './userProfile.slice';
-import useResetState from '../../services/useResetState';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import useResetState from '../../store/useResetState';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage} from '../main-menu-panel/mainMenuPanel.slice';
 

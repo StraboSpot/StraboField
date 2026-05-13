@@ -4,9 +4,9 @@ import {Platform, Text, View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {APP_DIRECTORIES} from '../../../services/directories.constants';
-import useDevice from '../../../services/useDevice';
-import {isEmpty} from '../../../shared/Helpers';
+import useDevice from '../../../services/device/useDevice';
+import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
+import {isEmpty} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';

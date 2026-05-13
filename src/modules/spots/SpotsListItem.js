@@ -4,7 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import {SpotGeometryAvatar} from '../../shared/ui/avatars';
 import useProject from '../project/useProject';

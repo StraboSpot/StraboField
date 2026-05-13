@@ -1,10 +1,10 @@
 import {Platform} from 'react-native';
 
-import Geolocation from '@react-native-community/geolocation';
 import * as turf from '@turf/turf';
+import Geolocation from 'react-native-geolocation-service';
 import {useDispatch} from 'react-redux';
 
-import usePermissions from '../../services/usePermissions';
+import usePermissions from '../../services/device/usePermissions';
 import {useSpots} from '../spots';
 import {setSelectedSpot} from '../spots/spots.slice';
 
@@ -26,31 +26,9 @@ const useMapLocation = () => {
 
   // Get the current location from the device and set it in the state
   const getCurrentLocation = async () => {
-    if (Platform.OS === 'android') {
-      const permissionGranted = await hasLocationPermission();
-      if (!permissionGranted) {
-        throw new Error('Location permission not granted');
-      }
-    }
-
-    if (Platform.OS !== 'web') {
-      Geolocation.setRNConfiguration({
-        skipPermissionRequests: false,
-        locationProvider: 'auto', //fallback to native provider if needed
-        // locationProvider: Platform.OS === 'ios' ? null : 'playServices',
-      });
-    }
-
-    const geolocationOptions = {
-      timeout: 15000,
-      maximumAge: 10000,
-      forceRequestLocation: true, //forces real-time fix
-      showLocationDialog: true,
-      enableHighAccuracy: Platform.OS === 'ios',
-    };
-    return (
-      new Promise((resolve, reject) => {
-        Geolocation.getCurrentPosition(
+    if (Platform.OS === 'web') {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
           (position) => {
             console.log('Got location', position.coords);
             resolve(position.coords);
@@ -59,10 +37,36 @@ const useMapLocation = () => {
             console.error(error);
             reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error'));
           },
-          geolocationOptions,
+          {timeout: 30000, maximumAge: 10000, enableHighAccuracy: true},
         );
-      })
-    );
+      });
+    }
+
+    if (Platform.OS === 'android') {
+      const permissionGranted = await hasLocationPermission();
+      if (!permissionGranted) throw new Error('Location permission not granted');
+    }
+
+    const geolocationOptions = {
+      enableHighAccuracy: true,
+      forceRequestLocation: true,
+      maximumAge: 10000,
+      showLocationDialog: true,
+      timeout: 30000,
+    };
+    return new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Got location', position.coords);
+          resolve(position.coords);
+        },
+        (error) => {
+          console.error(error);
+          reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error'));
+        },
+        geolocationOptions,
+      );
+    });
   };
 
   // Create a point feature at the current location

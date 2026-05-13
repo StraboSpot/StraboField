@@ -3,10 +3,10 @@ import proj4 from 'proj4';
 import {useSelector} from 'react-redux';
 
 import {EMPTY_LINE_STRING_FEATURE} from './stratSection.constants';
+import useStratSection from './useStratSection';
 import {Y_MULTIPLIER} from '../../sed/sed.constants';
 import {useSpots} from '../../spots';
 import {PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION} from '../maps.constants';
-import useStratSection from './useStratSection';
 import useMapCoords from '../useMapCoords';
 
 const AXIS_BUFFER = Y_MULTIPLIER / 2; // pixels beyond outermost tick mark

@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';

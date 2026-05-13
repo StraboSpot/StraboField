@@ -7,7 +7,7 @@ import MeasurementDetail from './MeasurementDetail';
 import MeasurementItem from './MeasurementItem';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -270,7 +270,15 @@ const MeasurementsPage = ({isReadOnly, page}) => {
           />
         )}
         renderSectionFooter={({section}) => {
-          return section.data.length === 0 && <ListEmptyText text={'No ' + section.title}/>;
+          const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
+          return (
+            section.data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && !modalVisible && (() => addMeasurement(sectionType))}
+                text={'No ' + section.title}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section}) => renderSectionHeader(section)}
         sections={sections}

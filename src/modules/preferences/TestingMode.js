@@ -6,7 +6,7 @@ import {useDispatch} from 'react-redux';
 
 import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -26,7 +26,6 @@ const TestingMode = ({isTestingMode, textStyles}) => {
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [isTestingModalVisible, setIsTestingModalVisible] = useState(false);
   const [password, setPassword] = useState(__DEV__ ? testingModePassword : '');
-
   /* Side Effects */
 
   useEffect(() => {
@@ -38,7 +37,10 @@ const TestingMode = ({isTestingMode, textStyles}) => {
 
   const onTestingSwitchChange = (value) => {
     setIsTestingModalVisible(value);
-    dispatch(setTestingMode(value));
+    if (isTestingMode) {
+      dispatch(setTestingMode(false));
+      setIsErrorMessage(false);
+    }
   };
 
   /* Logic Helpers */
@@ -56,8 +58,12 @@ const TestingMode = ({isTestingMode, textStyles}) => {
   const verifyPassword = () => {
     if (password === testingModePassword) {
       setIsTestingModalVisible(false);
+      dispatch(setTestingMode(true));
     }
-    else setIsErrorMessage(true);
+    else {
+      setIsErrorMessage(true);
+      setTimeout(() => setIsErrorMessage(false), 1500);
+    }
   };
 
   /* Render Functions */

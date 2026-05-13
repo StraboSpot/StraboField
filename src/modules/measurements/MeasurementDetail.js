@@ -11,7 +11,7 @@ import {isEmptyMeasurement} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/Helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';

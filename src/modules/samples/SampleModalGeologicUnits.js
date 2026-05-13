@@ -4,7 +4,7 @@ import {FlatList, Platform, ScrollView, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/Helpers';
+import {isEmpty} from '../../shared/helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';

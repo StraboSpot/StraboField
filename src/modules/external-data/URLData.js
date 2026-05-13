@@ -5,9 +5,9 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import useExternalData from './useExternalData';
-import useDevice from '../../services/useDevice';
+import useDevice from '../../services/device/useDevice';
 import commonStyles from '../../shared/common.styles';
-import {truncateText, urlValidator} from '../../shared/Helpers';
+import {truncateText, urlValidator} from '../../shared/helpers';
 import {BLUE, DARKGREY} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

@@ -10,6 +10,7 @@ import IGSNModalStyles from './IGSNModal.styles';
 import IGSNUploadAndRegister from './IGSNUploadAndRegister';
 import useIGSN from './useIGSN';
 import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
+import {isEmpty} from '../../../shared/helpers';
 import useServerRequests from '../../../services/useServerRequests';
 import {isEmpty} from '../../../shared/Helpers';
 import alert from '../../../shared/ui/alert';

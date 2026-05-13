@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/Helpers';
+import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/useMapFeatures';

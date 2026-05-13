@@ -4,7 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/Helpers';
+import {truncateText} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
@@ -28,7 +28,7 @@ const SpotNotesOverview = ({page}) => {
             </ListItem.Content>
           </ListItem>
         )
-        : <ListEmptyText text={'No Notes'}/>}
+        : <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No Notes'}/>}
     </>
   );
 };

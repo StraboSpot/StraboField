@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ThreeDStructureItem from './ThreeDStructureItem';
 import {THREE_D_STRUCTURE_SECTIONS} from './threeDStructures.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/Helpers';
+import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -104,7 +104,16 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
         keyExtractor={(item, index) => item + index}
         renderItem={({item}) => render3dStructure(item)}
         renderSectionFooter={({section: {data, title}}) => {
-          return data.length === 0 && <ListEmptyText text={'No ' + title + ' Observations'}/>;
+          const sectionKey = Object.values(THREE_D_STRUCTURE_SECTIONS).reduce(
+            (acc, {title: t, key}) => title === t ? key : acc, '');
+          return (
+            data.length === 0 && (
+              <ListEmptyText
+                onPress={!isReadOnly && !isMultipleFeaturesTaggingEnabled && (() => add3dStructure(sectionKey))}
+                text={'No ' + title + ' Observations'}
+              />
+            )
+          );
         }}
         renderSectionHeader={({section: {title}}) => renderSectionHeader(title)}
         sections={dataSectioned}

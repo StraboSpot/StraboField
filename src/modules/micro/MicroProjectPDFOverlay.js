@@ -5,18 +5,20 @@ import {Icon} from '@rn-vui/base';
 import Pdf from 'react-native-pdf';
 import Toast from 'react-native-toast-notifications';
 
-import useDevice from '../../services/useDevice';
-import {isEmpty, openUrl} from '../../shared/Helpers';
+import useDevice from '../../services/device/useDevice';
+import {isEmpty, openUrl} from '../../shared/helpers';
 import {BLACK, POSITIVE_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
 import CloseButton from '../../shared/ui/buttons/CloseButton';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import {useWindowSize} from '../../shared/ui/useWindowSize';
 
 const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   /* Data Hooks */
 
   const {exportMicroProjectPDF} = useDevice();
+  const {height, width} = useWindowSize();
 
   /* Local State */
 
@@ -71,6 +73,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   return (
     <ModalWrapper
       fullscreen
+      isHideHeader
       isVisible={visible}
       showActionButton={false}
       showCancelButton={false}
@@ -116,7 +119,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
               await openUrl(uri);
             }}
             source={doc.file}
-            style={{flex: 1}}
+            style={{width, height: height - 100}}
           />
         )}
         <Loading isLoading={loading} style={{backgroundColor: 'transparent'}}/>

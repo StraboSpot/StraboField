@@ -8,9 +8,9 @@ import {
   getBoundsPadded,
   getCoordQuad,
 } from './maps.helpers';
-import {STRABO_APIS} from '../../services/urls.constants';
-import useServerRequests from '../../services/useServerRequests';
-import {isEmpty} from '../../shared/Helpers';
+import {STRABO_APIS} from '../../services/network/urls.constants';
+import useServerRequests from '../../services/network/useServerRequests';
+import {isEmpty} from '../../shared/helpers';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 
 const useMapCoords = () => {
