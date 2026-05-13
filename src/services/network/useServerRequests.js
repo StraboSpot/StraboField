@@ -106,9 +106,9 @@ const useServerRequests = () => {
     return postRequest(SPOT_CHECKIN, spotCheckIn, null, {});
   };
 
-  const postCheckinImageToRockd = (spotCheckIn, image) => {
-
-  };
+  // const postCheckinImageToRockd = (spotCheckIn, image) => {
+  //
+  // };
 
   const getMyMapsBbox = async (mapUrl) => {
     const response = await fetch(mapUrl);

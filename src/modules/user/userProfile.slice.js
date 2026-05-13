@@ -1,9 +1,9 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-import config from '../../utils/config';
+// import config from '../../utils/config';
 
-const rockedToken = config.get('rockd_access_token');
-const rockdExpiration = 1839181062830;
+// const rockedToken = config.get('rockd_access_token');
+// const rockdExpiration = 1839181062830;
 
 const initialUserState = {
   email: null,
