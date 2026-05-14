@@ -16,6 +16,7 @@ export const PAGE_KEYS = {
   MINERALS: 'minerals',
   NESTING: 'nesting',
   NOTES: 'notes',
+  QAQC: 'qaqc',
   OTHER_FEATURES: 'other_features',
   OVERVIEW: 'overview',
   REACTIONS: 'reactions',

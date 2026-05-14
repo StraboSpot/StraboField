@@ -115,7 +115,7 @@ Use `git checkout src/` to reset source files before re-running. Always verify o
 
 ### Feature-Based Module Structure
 
-The codebase is organized into **40 self-contained feature modules** under `/src/modules/`, each containing:
+The codebase is organized into **41 self-contained feature modules** under `/src/modules/`, each containing:
 - UI components
 - Redux slice for state management
 - Custom hooks for business logic
