@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Pressable, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -25,7 +25,6 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
-import commonStyles from '../../shared/common.styles';
 
 
 const BasicPageDetail = ({
@@ -96,16 +95,6 @@ const BasicPageDetail = ({
       if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
     }, [selectedFeature]);
 
-    // useEffect(() => {
-    //   checkIfIsDisabled();
-    // }, [sesar.sesarToken.access]);
-
-    /* Event Handlers */
-
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
     const onSampleSaved = async (formCurrent) => {
       console.log('Saving Sample To SESAR', formRef.current?.values);
       await saveFeature(formCurrent);
@@ -124,21 +113,6 @@ const BasicPageDetail = ({
     const cancelForm = async () => {
       closeDetailView();
     };
-
-    // const checkIfIsDisabled = () => {
-    //   console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
-    //   console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
-    //
-    //   if (!isIGSNChecked) return false;
-    //
-    //   if (!sesar.sesarToken.access) return true;
-    //
-    //   if (isEmpty(sesar.selectedUserCode)) {
-    //     return !(selectedFeature.isOnMySesar && isInternetReachable);
-    //   }
-    //
-    //   return false;
-    // };
 
     const confirmLeavePage = () => {
       const description = isIGSNChecked
@@ -249,8 +223,6 @@ const BasicPageDetail = ({
     const saveForm = async (formCurrent) => {
       try {
         console.log('Saving form...', formCurrent);
-        // if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
-        // else {
         if (groupKey === 'pet') {
           await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
         }
@@ -271,7 +243,6 @@ const BasicPageDetail = ({
         }
         else closeDetailView();
         console.log('Done');
-        // }
       }
       catch (err) {
         toast.show('Error Saving Changes', {type: 'danger'});
@@ -298,8 +269,6 @@ const BasicPageDetail = ({
       const formName = getFormName();
       return (
         <View style={{flex: 1}}>
-          {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'*/}
-          {/*  && !spot.properties.isSample && renderIGSNUpload()}*/}
           <Formik
             enableReinitialize={true}
             initialStatus={{formName: formName}}
@@ -313,7 +282,6 @@ const BasicPageDetail = ({
               <>
                 <Form {...{
                   ...formProps,
-                  // fieldCustomHeights: page.key === PAGE_KEYS.SAMPLES ? {sample_description: 200} : undefined, //TODO Possibly make the description higher
                   formName: formName,
                   isReadOnly: isReadOnly,
                   onMyChange: page.key === PAGE_KEYS.MINERALS
@@ -339,26 +307,6 @@ const BasicPageDetail = ({
       );
     };
 
-    // const renderIGSNUpload = () => {
-    //   return (
-    //     <>
-    //       {!isEmpty(encoded_login) ? (
-    //         <IGSNUploadAndRegister
-    //           handleIGSNChecked={handleIGSNChecked}
-    //           isIGSNChecked={isIGSNChecked}
-    //           selectedFeature={selectedFeature}
-    //         />
-    //       ) : (
-    //         <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-    //           You need to login to StraboSpot to upload to SESAR
-    //         </Text>
-    //       )}
-    //     </>
-    //   );
-    // };
-
-    /* View */
-
     return (
       <>
         <View style={{flex: 1}}>
@@ -373,18 +321,6 @@ const BasicPageDetail = ({
                   save={saveButtonOnPress}
                 />
               )}
-              {PAGE_KEYS.SAMPLES && (
-                <View style={{alignItems: 'flex-start', margin: 10}}>
-                  <Pressable onPress={() => console.log('IGSN DATA')}>
-                    <Text style={[commonStyles.listItemTitle, {
-                      color: PRIMARY_ACCENT_COLOR,
-                      paddingTop: 5,
-                    }]}>
-                      View IGSN Data
-                    </Text>
-                  </Pressable>
-                </View>
-              )}
               <FlatList
                 ListHeaderComponent={renderFormFields()}
                 automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
@@ -393,16 +329,14 @@ const BasicPageDetail = ({
               />
             </>
           )}
-
-          {/*{isIGSNModalVisible && (*/}
           <IGSNModal
             isVisible={isIGSNModalVisible}
+            onIGSNUpdated={closeDetailView}
             onModalCancel={() => setIsIGSNModalVisible(false)}
             onSampleSaved={onSampleSaved}
             ref={formRef}
             sampleValues={formRef.current?.values}
           />
-          {/*)}*/}
 
           {/*Modal when deleting a sample with an IGSN attached*/}
           <ModalWrapper
