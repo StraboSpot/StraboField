@@ -31,6 +31,7 @@ const NotebookHeader = ({
                           isReadOnly,
                           isSampleOrSampleChild,
                           openMainMenuPanel,
+                          selectedSample,
                           setSelectedSample,
                           zoomToSpots,
                         }) => {
@@ -249,9 +250,10 @@ const NotebookHeader = ({
           closeNotebookPanel={closeNotebookPanel}
           isNotebookMenuVisible={isNotebookMenuVisible}
           isReadOnly={isReadOnly}
-          isSample={spot.properties.isSample}
+          isSample={spot.properties.isSample || !isEmpty(selectedSample)}
           overlayStyle={notebookStyles.dialogBoxPosition}
           parentSpot={parentSpot}
+          selectedSample={selectedSample}
           zoomToSpots={zoomToSpots}
         />
       </>
