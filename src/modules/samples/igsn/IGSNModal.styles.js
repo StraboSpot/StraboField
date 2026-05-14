@@ -12,15 +12,26 @@ const IGSNModalStyles = {
     width: 400,
   },
   errorContainer: {
-    padding: 20,
     alignItems: 'center',
-    backgroundColor: themes.RED,
     borderRadius: 10,
+    margin: 15,
+    padding: 20,
   },
-  errorMessageText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
+  statusHeaderText: {
+    fontSize: themes.LARGE_TEXT_SIZE,
     fontWeight: 'bold',
+    marginBottom: 8,
     textAlign: 'center',
+  },
+  statusMessageText: {
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+    textAlign: 'center',
+  },
+  successContainer: {
+    alignItems: 'center',
+    borderRadius: 10,
+    margin: 15,
+    padding: 20,
   },
   fieldRow: {
     flexDirection: 'row',
@@ -33,11 +44,6 @@ const IGSNModalStyles = {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     color: themes.PRIMARY_TEXT_COLOR,
     fontWeight: '400',
-  },
-  headerText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: 'bold',
-    margin: 10,
   },
   labelColumn: {
     flex: 1.5, // Controls the width of the left side

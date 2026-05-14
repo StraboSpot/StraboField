@@ -29,6 +29,7 @@ import {
 
 const IGSNModal = forwardRef(({
                                 isVisible,
+                                onIGSNUpdated,
                                 onModalCancel,
                                 onSampleSaved,
                               }, formRef) => {
@@ -51,9 +52,10 @@ const IGSNModal = forwardRef(({
 
   /* Local State */
 
-  let formValues = formRef?.current?.values || selectedAttributes[0];
+  let formValues = formRef?.current?.values || selectedAttributes?.[0];
   // let currentFormValues = formRef?.current?.values || {};
 
+  const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,18 +93,18 @@ const IGSNModal = forwardRef(({
     else {
       setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
       setModalPage('content');
-      const sesarMappedObj = straboSesarMapping(formValues);
+      const sesarMappedObj = formValues ? straboSesarMapping(formValues) : [];
       setMappedSesarValues(sesarMappedObj);
 
       console.log('User Codes', sesar.userCodes);
       console.log('Selected User Code', sesar.selectedUserCode);
     }
-  }, [sesar.selectedUserCode, formValues]);
+  }, [sesar.selectedUserCode, sesar.sesarToken?.access, formValues]);
 
   /* Event Handlers */
 
-  const handleConfirmOnPress = () => {
-    if (formRef?.current) onSampleSaved(formRef?.current);
+  const handleClose = () => {
+    if (isUploaded && onIGSNUpdated) onIGSNUpdated();
     onModalCancel();
   };
 
@@ -117,27 +119,20 @@ const IGSNModal = forwardRef(({
     }
   };
 
-  // const handleUserCodeSelect = (userCode) => {
-  //   dispatch(setSelectedUserCode(userCode?.sesar_code || userCode));
-  //   setModalPage(null); // Return to default upload content view
-  // };
-
   const onReset = () => {
     dispatch(setInitialSesarState());
     console.log('Sesar credentials have beed reset');
     toast.show('Sesar credentials have beed reset', {type: 'success'});
-    // handleIGSNChecked(false);
   };
 
   /* Logic Helpers */
 
-  // Determine if the action button (Register) should be shown
   const doShowActionButton = !isEmpty(sesar.sesarToken?.access)
     && !isLoading
     && !isUploaded
-    // && !isEmpty(sesar.sesarToken?.access)
-    // && !isEmpty(sesar.selectedUserCode)
     && modalPage !== 'picker';
+
+  const isActionDisabled = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
 
   const getSesarTokenAndCodes = async (orcidToken) => {
     try {
@@ -159,9 +154,6 @@ const IGSNModal = forwardRef(({
         const sesarCodesRes = await getAndSaveSesarCode(tokens);
         // Dispatch the full list of codes
         dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
-
-        // Show the picker
-        // setModalPage('picker');
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
       else if (tokens.errors.permissions) {
@@ -174,10 +166,6 @@ const IGSNModal = forwardRef(({
     }
   };
 
-  // const orcidAuthentication = async () => {
-  //   await getOrcidToken();
-  // };
-
   const onUserCodeSelect = async (userCode) => {
     dispatch(setSelectedUserCode(userCode?.sesar_code || userCode));
     setIsPickerVisible(false);
@@ -185,7 +173,6 @@ const IGSNModal = forwardRef(({
 
   const registerSample = async () => {
     try {
-      // const formValues = formRef?.current?.values || {};
       console.log('Updated FormRef', formValues);
       setIsLoading(true);
       const res = formValues.isOnMySesar
@@ -200,6 +187,7 @@ const IGSNModal = forwardRef(({
       else {
         setIsUploaded(true);
         setStatusMessage(res.status);
+        setAssignedIgsn(res.igsn || '');
         if (spot.properties.isSample) {
           let newSampleSpot = {};
           console.log('Is a sample', newSampleSpot);
@@ -215,7 +203,13 @@ const IGSNModal = forwardRef(({
         }
         else if (formRef?.current) {
           await formRef?.current?.setValues({...formRef?.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
-
+        }
+        else if (selectedAttributes?.[0]) {
+          const sampleId = selectedAttributes[0].id;
+          const updatedSamples = (spot.properties.samples || []).map(s =>
+            s.id === sampleId ? {...s, Sample_IGSN: res.igsn, isOnMySesar: true} : s
+          );
+          dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
         }
       }
       setIsLoading(false);
@@ -229,137 +223,101 @@ const IGSNModal = forwardRef(({
     }
   };
 
-  const setPage = () => {
-    if (modalPage === 'login') return loginToSesar();
-    else if (modalPage === 'content') return renderContentItems();
-    else if (modalPage === 'error') return renderErrorView();
+  /* Derived Variables */
+
+  const isStatusView = isUploaded || modalPage === 'error';
+
+  const getModalHeight = () => {
+    if (modalPage === 'content' && !isStatusView) return '80%';
+    return 'auto';
   };
 
   /* Render Functions */
 
-  const renderErrorView = () => {
-    return (
-      <View style={IGSNModalStyles.errorContainer}>
-        <Text style={IGSNModalStyles.headerText}>There was a error!</Text>
-        {errorMessages.map(msg => <Text key={msg} style={IGSNModalStyles.errorMessageText}>{msg}</Text>)}
-      </View>
-    );
-  };
+  const renderLoginView = () => (
+    <IGSNUploadAndRegister
+      isIGSNChecked={true}
+      selectedFeature={formValues}
+    />
+  );
 
-  // const renderOrcidSignInButton = () => (
-  //   <View style={{alignItems: 'center', justifyContent: 'flex-start', padding: 20}}>
-  //     <OutlineButton onPress={orcidAuthentication} title={'Sign into MySESAR'}/>
-  //     <Text style={sampleStyles.mySesarUpdateDisclaimer}>
-  //       ⚠️ Authenticate your SESAR account to upload a sample.
-  //     </Text>
-  //   </View>
-  // );
+  const renderContentView = () => (
+    <ScrollView style={IGSNModalStyles.contentContainer}>
+      <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      {isVisible && mappedSesarValues?.map((item) => {
+        if (item.sesarKey === 'user_code' && formRef?.current?.values?.isOnMySesar) return null;
+        if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
 
-  // const renderUserCodePicker = () => {
-  //   const codes = sesar?.userCodes || [];
-  //   return (
-  //     <View style={{flex: 1, width: '100%', padding: 20}}>
-  //       <Text style={[IGSNModalStyles.headerText, {textAlign: 'center'}]}>Select a User Code</Text>
-  //       <Text style={{textAlign: 'center', marginBottom: 20, color: 'grey'}}>
-  //         Please select the SESAR user code you wish to use for this session.
-  //       </Text>
-  //       <ScrollView>
-  //         {codes.map((item, index) => {
-  //           // Adjust based on actual API response structure. Assuming item has sesar_code field or is the code string.
-  //           const codeLabel = item.sesar_code || item;
-  //           return (
-  //             <TouchableOpacity
-  //               key={index}
-  //               onPress={() => handleUserCodeSelect(codeLabel)}
-  //               style={{
-  //                 padding: 15,
-  //                 borderBottomWidth: 1,
-  //                 borderBottomColor: '#ccc',
-  //                 alignItems: 'center',
-  //                 backgroundColor: 'white',
-  //               }}
-  //             >
-  //               <Text style={{fontSize: 16, fontWeight: '500'}}>{codeLabel}</Text>
-  //             </TouchableOpacity>
-  //           );
-  //         })}
-  //         {codes.length === 0 && (
-  //           <Text style={{textAlign: 'center', marginTop: 20}}>No user codes found.</Text>
-  //         )}
-  //       </ScrollView>
-  //     </View>
-  //   );
-  // };
-
-  const renderContentItems = () => {
-    return (
-      <ScrollView style={IGSNModalStyles.contentContainer}>
-        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
-        {isVisible && mappedSesarValues?.map((item) => {
-          if (item.sesarKey === 'user_code' && formRef?.current?.values?.isOnMySesar) return null;
-          if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
-
-          return (
-            <View key={item.sesarKey} style={IGSNModalStyles.fieldRow}>
-              <View style={IGSNModalStyles.labelColumn}>
-                <Text style={IGSNModalStyles.uploadContentText}>{item.label}</Text>
-              </View>
-              <View style={{
-                ...IGSNModalStyles.valueColumn,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <Text style={IGSNModalStyles.fieldValueText}>{formatContentItems(item)}</Text>
-                {item.sesarKey === 'user_code'
-                  && (
-                    <ClearButton
-                      containerStyle={{width: '50%'}}
-                      icon={
-                        <Icon
-                          color='#00aced'
-                          name='pencil-outline'
-                          type='ionicon'
-                        />
-                      }
-                      onPress={() => setIsPickerVisible(true)}
-                    />
-                  )}
-              </View>
+        return (
+          <View key={item.sesarKey} style={IGSNModalStyles.fieldRow}>
+            <View style={IGSNModalStyles.labelColumn}>
+              <Text style={IGSNModalStyles.uploadContentText}>{item.label}</Text>
             </View>
-          );
-        })}
-      </ScrollView>
-    );
-  };
+            <View style={{
+              ...IGSNModalStyles.valueColumn,
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+              <Text style={IGSNModalStyles.fieldValueText}>{formatContentItems(item)}</Text>
+              {item.sesarKey === 'user_code' && (
+                <ClearButton
+                  containerStyle={{width: '50%'}}
+                  icon={
+                    <Icon
+                      color='#00aced'
+                      name='pencil-outline'
+                      type='ionicon'
+                    />
+                  }
+                  onPress={() => setIsPickerVisible(true)}
+                />
+              )}
+            </View>
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
 
-  const loginToSesar = () => {
-    return (
-      <IGSNUploadAndRegister
-        isIGSNChecked={true}
-        selectedFeature={formValues}
-      />
-    );
+  const renderStatusView = () => (
+    <View style={isUploaded ? IGSNModalStyles.successContainer : IGSNModalStyles.errorContainer}>
+      <Text style={IGSNModalStyles.statusHeaderText}>
+        {isUploaded ? 'Success!' : 'There was an error!'}
+      </Text>
+      {isUploaded
+        ? <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+        : errorMessages.map(msg => (
+          <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
+        ))
+      }
+    </View>
+  );
+
+  const renderCurrentView = () => {
+    if (isStatusView) return renderStatusView();
+    if (modalPage === 'login') return renderLoginView();
+    if (modalPage === 'content') return renderContentView();
+    return null;
   };
 
   return (
     <ModalWrapper
       actionTitle={formValues?.isOnMySesar ? 'Update' : 'Register'}
-      cancelTitle={isUploaded ? 'Close' : 'Cancel'}
-      closeModal={onModalCancel}
+      cancelTitle={'Close'}
+      closeModal={handleClose}
+      disabled={isActionDisabled}
       isLoading={isLoading}
-      onCancelPress={onModalCancel}
+      isVisible={isVisible}
+      onActionPressed={registerSample}
+      onCancelPress={handleClose}
       overlayStyleOverride={{
-        flex: 1,
-        maxHeight: isUploaded || errorView || modalPage === 'picker' ? '80%' : '80%', // Adjust height for picker/error
-        width: 500,
+        height: getModalHeight(),
+        width: 400,
       }}
       showActionButton={doShowActionButton}
       showCancelButton={false}
       showCloseButton
-      isVisible={isVisible}
-      // onActionPressed={!isUploaded ? registerSample : handleConfirmOnPress}
-      onActionPressed={registerSample}
     >
       <View style={IGSNModalStyles.container}>
         <View style={IGSNModalStyles.sesarImageContainer}>
@@ -368,8 +326,10 @@ const IGSNModal = forwardRef(({
             style={IGSNModalStyles.sesarImage}
           />
         </View>
-        {setPage()}
-        {!isEmpty(sesar.sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
+        {renderCurrentView()}
+        {!isEmpty(sesar.sesarToken?.access) && !isStatusView && (
+          <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>
+        )}
       </View>
       <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
       <PickerOverlay
