@@ -26,6 +26,14 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
 
+const IGSN_RELEVANT_FIELDS = [
+  'collection_date',
+  'main_sampling_purpose',
+  'material_type',
+  'sample_description',
+  'sample_id_name',
+  'sample_type',
+];
 
 const BasicPageDetail = ({
                            PageTabsComponent,
@@ -235,7 +243,10 @@ const BasicPageDetail = ({
         else await saveFeature(formCurrent);
         // closeDetailView();
         if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
+        const hasIGSNRelevantChange = IGSN_RELEVANT_FIELDS.some(
+          field => formCurrent?.values[field] !== selectedFeature[field]
+        );
+        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar && hasIGSNRelevantChange) {
           alert('Changes Saved!',
             'Do you want to update the IGSN with SESAR?',
             [{text: 'Yes', onPress: () => updateIGSNAndShowModal(formCurrent)}, {text: 'No', style: 'cancel'}],
