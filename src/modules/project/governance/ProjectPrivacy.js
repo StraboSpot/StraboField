@@ -14,8 +14,9 @@ const ProjectPrivacy = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
+  const {owner_straboUserId} = useSelector(state => state.project.project);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
+  const {straboUserId} = useSelector(state => state.user);
 
   const {validateForm} = useForm();
 
@@ -50,7 +51,7 @@ const ProjectPrivacy = () => {
           formName: formName,
           onMyChange: onMyChange,
           setFieldValue: onMyChange,
-          isReadOnly: isReadOnlyProject,
+          isReadOnly: owner_straboUserId !== straboUserId,
         }}/>}
       </Formik>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
