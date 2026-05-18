@@ -118,7 +118,7 @@ const UserProfile = () => {
       await formRef.current.submitForm();
       let newValues = JSON.parse(JSON.stringify(formCurrent.values));
       if (hasErrors(formCurrent)) throw Error('Error in form.');
-      const {email, encoded_login, isAuthenticated, sesar, ...userValuesToUpdate} = newValues;
+      const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isOnline.isInternetReachable) {
         if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
