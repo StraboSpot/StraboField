@@ -82,7 +82,8 @@ const UserProfile = () => {
   };
 
   const doCleanup = async () => {
-    if (formRef.current?.dirty) saveForm(formRef.current);
+    const formCurrent = formRef.current;
+    if (formCurrent?.dirty) await saveForm(formCurrent);
   };
 
   const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
@@ -138,10 +139,9 @@ const UserProfile = () => {
     }
   };
 
-  const saveForm = async () => {
+  const saveForm = async (formCurrent) => {
     try {
-      const formCurrent = formRef.current;
-      await formRef.current.submitForm();
+      await formCurrent.submitForm();
       let newValues = JSON.parse(JSON.stringify(formCurrent.values));
       if (hasErrors(formCurrent)) throw Error('Error in form.');
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
@@ -263,10 +263,12 @@ const UserProfile = () => {
                       onPress={() => setDeleteProfileModalVisible(true)}
                       title={'Delete Account'}
                     />
-                    {__DEV__ && <OutlineButton
-                      onPress={purgeRedux}
-                      title={'Purge Redux Store'}
-                    />}
+                    {__DEV__ && (
+                      <OutlineButton
+                        onPress={purgeRedux}
+                        title={'Purge Redux Store'}
+                      />
+                    )}
                   </View>
                 ) : (
                   <Text style={commonStyles.noValueText}>
