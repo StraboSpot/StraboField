@@ -15,7 +15,7 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
-const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, updateSpotsInMapExtent}) => {
+const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly, updateSpotsInMapExtent}) => {
   /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
@@ -43,18 +43,20 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
     <>
       <View>
         <SectionDivider dividerText={'Associated Spots'}/>
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
-          <OutlineButton
-            icon={{
-              color: commonStyles.iconColor.color,
-              iconStyle: imageStyles.icon,
-              name: 'plus-minus',
-              type: 'material-community',
-            }}
-            onPress={addAssociatedSpots}
-            title={'Add/Remove Spots'}
-          />
-        </View>
+        {!isReadOnly && (
+          <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
+            <OutlineButton
+              icon={{
+                color: commonStyles.iconColor.color,
+                iconStyle: imageStyles.icon,
+                name: 'plus-minus',
+                type: 'material-community',
+              }}
+              onPress={addAssociatedSpots}
+              title={'Add/Remove Spots'}
+            />
+          </View>
+        )}
 
         <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5}}>
           {isEmpty(checkedSpots) && <ListEmptyText text={'No Associated Spots'}/>}
@@ -69,6 +71,8 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, upd
         </View>
 
       </View>
+
+      {/* Modal */}
       {isSpotsListModalVisible && (
         <ModalWrapper
           closeModal={() => setIsSpotsListModalVisible(false)}

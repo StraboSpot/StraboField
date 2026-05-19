@@ -8,7 +8,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
 
-const ReportImages = ({setUpdatedImages, updatedImages}) => {
+const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
   return (
     <View>
       <SectionDivider dividerText={'Images'}/>
-      <AddImageButtons saveImages={saveImagesToReport}/>
+      {!isReadOnly && <AddImageButtons saveImages={saveImagesToReport}/>}
       <ImagesList
         deleteImage={deleteImage}
         images={updatedImages}

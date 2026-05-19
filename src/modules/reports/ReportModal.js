@@ -30,6 +30,10 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     updatedImages,
   } = useReportModal({openSpotInNotebook: openSpotInNotebook});
 
+  /* Derived Variables */
+
+  const isNewReport = isEmpty(initialValues);
+
   /* Local State */
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -47,25 +51,32 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
       <ModalWrapper
-        actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
+        actionTitle={isNewReport ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
-        onActionPressed={isReadOnlyProject ? undefined : handleSavePressed}
-        onDeletePress={isReadOnlyProject ? undefined : handleDeletePressed}
+        headerTitle={isReadOnlyProject ? 'View Report' : isNewReport ? 'Create New Report' : 'Edit Report'}
+        onActionPressed={handleSavePressed}
+        onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
+        showActionButton={!isReadOnlyProject}
         showCancelButton={false}
         showCloseButton
-        showDeleteButton={!isEmpty(initialValues) && !isReadOnlyProject}
+        showDeleteButton={!isNewReport && !isReadOnlyProject}
       >
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} ref={formRef}/>
-              <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
+              <ReportForm initialValues={initialValues} isReadOnly={isReadOnlyProject} ref={formRef}/>
+              <ReportImages
+                isReadOnly={isReadOnlyProject}
+                setUpdatedImages={setUpdatedImages}
+                updatedImages={updatedImages}
+              />
               <View style={{paddingTop: 10}}/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
+                isReadOnly={isReadOnlyProject}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
@@ -73,12 +84,15 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
                 handleTagPressed={handleTagPressed}
+                isReadOnly={isReadOnlyProject}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
             </>
           }
           bounces={false}
         />
+
+        {/* Modal */}
         <WarningModal
           cancelTitle={errorMessage ? 'Ok' : 'Cancel'}
           isVisible={isDeleteReportModalVisible}
