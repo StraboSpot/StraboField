@@ -1,12 +1,16 @@
 import {useEffect, useMemo, useState} from 'react';
+import {Platform} from 'react-native';
 
-import {useImages} from './index';
-import {isEmpty} from '../../shared/Helpers';
+import {getImageThumbnailURI, getLocalImageURI} from './imageURIs.helpers';
+import useImageSize from './useImageSize';
+import useDevice from '../../services/device/useDevice';
+import {isEmpty} from '../../shared/helpers';
 
-const useImageThumbnails = ({images}) => {
+const useImageThumbnails = ({images = []} = {}) => {
   /* Data Hooks */
 
-  const {getImageThumbnailURIs} = useImages();
+  const {doesDeviceDirExist} = useDevice();
+  const {resizeImageForThumbnail} = useImageSize();
 
   /* Local State */
 
@@ -19,10 +23,33 @@ const useImageThumbnails = ({images}) => {
 
   useEffect(() => {
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageIdsKey]);
 
   /* Internal Functions */
+
+  const getImageThumbnailURIs = async (imagesToProcess) => {
+    try {
+      let thumbnailURIs = {};
+      await Promise.all(imagesToProcess.map(async (image) => {
+        if (Platform.OS === 'web') {
+          thumbnailURIs = {...thumbnailURIs, [image.id]: getImageThumbnailURI(image.id)};
+        }
+        else {
+          const imageUri = getLocalImageURI(image.id);
+          const exists = await doesDeviceDirExist(imageUri);
+          if (exists) {
+            const resizedImage = await resizeImageForThumbnail(imageUri);
+            thumbnailURIs = {...thumbnailURIs, [image.id]: resizedImage.uri};
+          }
+          else thumbnailURIs = {...thumbnailURIs, [image.id]: undefined};
+        }
+      }));
+      return thumbnailURIs;
+    }
+    catch (err) {
+      console.error('Error creating thumbnails', err);
+    }
+  };
 
   const loadImageThumbnailURIs = async () => {
     try {
@@ -42,6 +69,7 @@ const useImageThumbnails = ({images}) => {
 
   return {
     areImageThumbnailsLoading,
+    getImageThumbnailURIs,
     imageThumbnailURIs,
     setAreImageThumbnailsLoading,
     setImageThumbnailURIs,
