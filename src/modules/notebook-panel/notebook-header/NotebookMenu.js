@@ -19,7 +19,6 @@ import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import IGSNModal from '../../samples/igsn/IGSNModal';
 import useSamples from '../../samples/useSamples';
 import {useSpots} from '../../spots';
-import {setSelectedAttributes} from '../../spots/spots.slice';
 import {setInitialSesarState} from '../../user/userProfile.slice';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
@@ -67,7 +66,7 @@ const NotebookMenu = ({
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
-    ...(isSample ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
+    ...(spot.properties?.isSample ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
     ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
@@ -93,11 +92,7 @@ const NotebookMenu = ({
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
     else if (key === 'igsn') {
       if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-      else {
-        const sample = !isEmpty(selectedSample) ? selectedSample : spot.properties?.samples?.[0];
-        dispatch(setSelectedAttributes(sample ? [sample] : []));
-        setIsIGSNModalVisible(true);
-      }
+      else setIsIGSNModalVisible(true);
     }
     else if (key === 'rockd') {
       closeNotebookMenu();
@@ -200,6 +195,7 @@ const NotebookMenu = ({
         isVisible={isIGSNModalVisible}
         onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
         onModalCancel={() => setIsIGSNModalVisible(false)}
+        sampleValues={!isEmpty(selectedSample) ? selectedSample : spot.properties?.samples?.[0]}
       />
     </>
   );
