@@ -68,7 +68,11 @@ const BasicPageDetail = ({
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
+    useEffect(() => {
+      setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
+    }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
     /* Derived Variables */
 
     const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
@@ -198,10 +202,6 @@ const BasicPageDetail = ({
       }
     };
 
-    const disableSaveButton = () => {
-      return !!(pageKey === 'samples' && selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
-    };
-
     const saveButtonOnPress = () => {
       isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
     };
@@ -324,11 +324,27 @@ const BasicPageDetail = ({
               <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
               {PageTabsComponent && PageTabsComponent}
               {!isReadOnly && (
-                <SaveAndCancelButtons
-                  cancel={cancelForm}
-                  getIsDisabled={disableSaveButton()}
-                  save={saveButtonOnPress}
-                />
+                <>
+                  {pageKey === PAGE_KEYS.SAMPLES && isSaveDisabled && (
+                    <View>
+                      <Text style={{
+                        color: RED,
+                        fontSize: 16,
+                        fontWeight: '500',
+                        padding: 10,
+                        textAlign: 'center',
+                      }}>
+                        This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device
+                        is online.
+                      </Text>
+                    </View>
+                  )}
+                  <SaveAndCancelButtons
+                    cancel={cancelForm}
+                    getIsDisabled={isSaveDisabled}
+                    save={saveButtonOnPress}
+                  />
+                </>
               )}
               <FlatList
                 ListHeaderComponent={renderFormFields()}
