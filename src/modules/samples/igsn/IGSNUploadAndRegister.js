@@ -215,7 +215,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   return (
     <View>
       {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
-      {!isSample && renderIGSNUploadCheckbox()}
       {isIGSNChecked && (
         <View>
           {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}

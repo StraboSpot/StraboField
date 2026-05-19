@@ -2,6 +2,7 @@ import React, {forwardRef, useEffect, useState} from 'react';
 import {Linking, ScrollView, Text, View} from 'react-native';
 
 import {Icon, Image} from '@rn-vui/base';
+import ProgressBar from 'react-native-progress/Bar';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -10,6 +11,7 @@ import IGSNModalStyles from './IGSNModal.styles';
 import IGSNUploadAndRegister from './IGSNUploadAndRegister';
 import useIGSN from './useIGSN';
 import SesarLogo from '../../../assets/images/logos/sesar2_logo.png';
+import useUpload from '../../../services/files/useUpload';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
@@ -32,6 +34,7 @@ const IGSNModal = forwardRef(({
                                 onIGSNUpdated,
                                 onModalCancel,
                                 onSampleSaved,
+                                sampleValues,
                               }, formRef) => {
   /* Data Hooks */
 
@@ -43,7 +46,8 @@ const IGSNModal = forwardRef(({
     updateSampleIsSesar,
     uploadSample,
   } = useIGSN();
-  const {getOrcidToken, getSesarToken} = useServerRequests();
+  const {initializeUpload, uploadStatusMessage} = useUpload();
+  const {getSesarToken} = useServerRequests();
   const toast = useToast();
 
   const {sesar} = useSelector(state => state.user);
@@ -52,7 +56,7 @@ const IGSNModal = forwardRef(({
 
   /* Local State */
 
-  let formValues = formRef?.current?.values || selectedAttributes?.[0];
+  let formValues = formRef?.current?.values || selectedAttributes?.[0] || sampleValues;
   // let currentFormValues = formRef?.current?.values || {};
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
@@ -64,6 +68,8 @@ const IGSNModal = forwardRef(({
   const [modalPage, setModalPage] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [isPickerVisible, setIsPickerVisible] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStepLabel, setUploadStepLabel] = useState('');
 
   /* Side Effects */
 
@@ -99,7 +105,7 @@ const IGSNModal = forwardRef(({
       console.log('User Codes', sesar.userCodes);
       console.log('Selected User Code', sesar.selectedUserCode);
     }
-  }, [sesar.selectedUserCode, sesar.sesarToken?.access, formValues]);
+  }, [isVisible, sesar.selectedUserCode, sesar.sesarToken?.access, formValues]);
 
   /* Event Handlers */
 
@@ -175,6 +181,10 @@ const IGSNModal = forwardRef(({
     try {
       console.log('Updated FormRef', formValues);
       setIsLoading(true);
+      setUploadProgress(0);
+      setUploadStepLabel('Registering sample with SESAR...');
+
+      // Step 1: Register with SESAR
       const res = formValues.isOnMySesar
         ? await updateSampleIsSesar(mappedSesarValues)
         : await uploadSample(mappedSesarValues);
@@ -183,41 +193,58 @@ const IGSNModal = forwardRef(({
         setModalPage('error');
         setErrorMessages(res.error);
         setErrorView(true);
+        setIsLoading(false);
+        return;
       }
-      else {
-        setIsUploaded(true);
-        setStatusMessage(res.status);
-        setAssignedIgsn(res.igsn || '');
-        if (spot.properties.isSample) {
-          let newSampleSpot = {};
-          console.log('Is a sample', newSampleSpot);
-          dispatch(editedSpotProperties({
-            field: 'samples',
-            value: [{
-              ...spot.properties.samples[0],
-              Sample_IGSN: res.igsn,
-              isOnMySesar: true,
-            }],
-          }));
-          console.log('Updated Sample Spot', spot.properties.samples[0]);
-        }
-        else if (formRef?.current) {
-          await formRef?.current?.setValues({...formRef?.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
-        }
-        else if (selectedAttributes?.[0]) {
-          const sampleId = selectedAttributes[0].id;
-          const updatedSamples = (spot.properties.samples || []).map(s =>
-            s.id === sampleId ? {...s, Sample_IGSN: res.igsn, isOnMySesar: true} : s
-          );
-          dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
-        }
+
+      // SESAR success — show status view immediately
+      setIsUploaded(true);
+      setStatusMessage(res.status);
+      setAssignedIgsn(res.igsn || '');
+      setUploadProgress(0.33);
+      setUploadStepLabel('Saving sample to StraboSpot...');
+
+      // Step 2: Save sample in Redux before uploading
+      if (spot.properties.isSample) {
+        let newSampleSpot = {};
+        console.log('Is a sample', newSampleSpot);
+        dispatch(editedSpotProperties({
+          field: 'samples',
+          value: [{
+            ...spot.properties.samples[0],
+            Sample_IGSN: res.igsn,
+            isOnMySesar: true,
+          }],
+        }));
+        console.log('Updated Sample Spot', spot.properties.samples[0]);
       }
+        // else if (formRef?.current) {
+        //   await formRef?.current?.setValues({...formRef?.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
+      // }
+      else if (selectedAttributes?.[0]) {
+        const sampleId = selectedAttributes[0].id;
+        const updatedSamples = (spot.properties.samples || []).map(s =>
+          s.id === sampleId ? {...s, Sample_IGSN: res.igsn, isOnMySesar: true} : s,
+        );
+        dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
+      }
+
+      // Step 3: Upload project — turn off loading spinner so progress bar is visible
       setIsLoading(false);
+      setUploadProgress(0.66);
+      setUploadStepLabel('Uploading project to your StraboSpot account...');
+
+      await initializeUpload();
+
+      setUploadProgress(1);
+      setUploadStepLabel('Project successfully uploaded to your StraboSpot account.');
     }
     catch (err) {
       console.error(err);
       setIsLoading(false);
-      setErrorMessages(err || ['Something went wrong.']);
+      setUploadProgress(0);
+      setUploadStepLabel('');
+      setErrorMessages(err ? [err.toString()] : ['Something went wrong.']);
       setModalPage('error');
       setIsUploaded(false);
     }
@@ -286,7 +313,22 @@ const IGSNModal = forwardRef(({
         {isUploaded ? 'Success!' : 'There was an error!'}
       </Text>
       {isUploaded
-        ? <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+        ? (
+          <>
+            <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+            <View style={IGSNModalStyles.progressContainer}>
+              <ProgressBar
+                borderRadius={10}
+                height={12}
+                progress={uploadProgress}
+                width={300}
+              />
+              <Text style={IGSNModalStyles.uploadStepText}>
+                {uploadProgress < 1 ? (uploadStatusMessage || uploadStepLabel) : uploadStepLabel}
+              </Text>
+            </View>
+          </>
+        )
         : errorMessages.map(msg => (
           <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
         ))

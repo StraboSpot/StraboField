@@ -33,6 +33,17 @@ const IGSNModalStyles = {
     margin: 15,
     padding: 20,
   },
+  progressContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+    width: '100%',
+  },
+  uploadStepText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    marginTop: 6,
+    textAlign: 'center',
+  },
   fieldRow: {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
