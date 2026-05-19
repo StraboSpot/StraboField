@@ -204,27 +204,21 @@ const IGSNModal = forwardRef(({
       setUploadProgress(0.33);
       setUploadStepLabel('Saving sample to StraboSpot...');
 
-      // Step 2: Save sample in Redux before uploading
+      // Step 2: Save sample (with form edits) + IGSN to Redux after SESAR succeeds
       if (spot.properties.isSample) {
-        let newSampleSpot = {};
-        console.log('Is a sample', newSampleSpot);
         dispatch(editedSpotProperties({
           field: 'samples',
           value: [{
-            ...spot.properties.samples[0],
+            ...(formValues || spot.properties.samples?.[0]),
             Sample_IGSN: res.igsn,
             isOnMySesar: true,
           }],
         }));
-        console.log('Updated Sample Spot', spot.properties.samples[0]);
       }
-        // else if (formRef?.current) {
-        //   await formRef?.current?.setValues({...formRef?.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
-      // }
       else if (selectedAttributes?.[0]) {
         const sampleId = selectedAttributes[0].id;
         const updatedSamples = (spot.properties.samples || []).map(s =>
-          s.id === sampleId ? {...s, Sample_IGSN: res.igsn, isOnMySesar: true} : s,
+          s.id === sampleId ? {...s, ...formValues, Sample_IGSN: res.igsn, isOnMySesar: true} : s,
         );
         dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
       }

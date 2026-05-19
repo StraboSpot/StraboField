@@ -198,6 +198,10 @@ const BasicPageDetail = ({
       }
     };
 
+    const disableSaveButton = () => {
+      return !!(pageKey === 'samples' && selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
+    };
+
     const saveButtonOnPress = () => {
       isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
     };
@@ -231,6 +235,10 @@ const BasicPageDetail = ({
     const saveForm = async (formCurrent) => {
       try {
         console.log('Saving form...', formCurrent);
+        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
+          await updateIGSNAndShowModal(formCurrent);
+          return;
+        }
         if (groupKey === 'pet') {
           await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
         }
@@ -241,18 +249,8 @@ const BasicPageDetail = ({
           await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
         }
         else await saveFeature(formCurrent);
-        // closeDetailView();
         if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-        const hasIGSNRelevantChange = IGSN_RELEVANT_FIELDS.some(
-          field => formCurrent?.values[field] !== selectedFeature[field]
-        );
-        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar && hasIGSNRelevantChange) {
-          alert('Changes Saved!',
-            'Do you want to update the IGSN with SESAR?',
-            [{text: 'Yes', onPress: () => updateIGSNAndShowModal(formCurrent)}, {text: 'No', style: 'cancel'}],
-            {cancelable: false});
-        }
-        else closeDetailView();
+        closeDetailView();
         console.log('Done');
       }
       catch (err) {
@@ -328,7 +326,7 @@ const BasicPageDetail = ({
               {!isReadOnly && (
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  // getIsDisabled={!formRef?.current?.dirty}
+                  getIsDisabled={disableSaveButton()}
                   save={saveButtonOnPress}
                 />
               )}
