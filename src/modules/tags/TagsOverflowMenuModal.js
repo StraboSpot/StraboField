@@ -54,17 +54,19 @@ const TagsOverflowMenuModal = ({
           <ListItem.Title style={commonStyles.listItemTitle}>{`Create New ${singularLabel}`}</ListItem.Title>
         </ListItem>
       )}
-      <ListItem
-        bottomDivider
-        containerStyle={commonStyles.listItem}
-        onPress={() => {
-          onLoadPress();
-          closeMenu();
-        }}
-      >
-        <ListItem.Title
-          style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Load ${label}` : `Import ${label}`}</ListItem.Title>
-      </ListItem>
+      {!isReadOnlyProject && (
+        <ListItem
+          bottomDivider
+          containerStyle={commonStyles.listItem}
+          onPress={() => {
+            onLoadPress();
+            closeMenu();
+          }}
+        >
+          <ListItem.Title
+            style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? `Load ${label}` : `Import ${label}`}</ListItem.Title>
+        </ListItem>
+      )}
       <ListItem
         bottomDivider
         containerStyle={commonStyles.listItem}
