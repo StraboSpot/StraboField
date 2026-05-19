@@ -16,6 +16,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   const dispatch = useDispatch();
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {straboUserId} = useSelector(state => state.user);
 
   const {showErrors} = useForm();
 
@@ -106,6 +107,7 @@ const useReportModal = ({openSpotInNotebook}) => {
       await formRef.current.submitForm();
       let editedReport = showErrors(formRef.current);
       if (!editedReport.id) editedReport.id = getNewUUID();
+      if (!editedReport.straboUserId) editedReport.straboUserId = straboUserId;
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
       editedReport.images = updatedImages;
