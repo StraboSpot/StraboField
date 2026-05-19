@@ -33,10 +33,9 @@ const ImageCard = ({
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
-  const {getImageBasemap, setAnnotation} = useImages();
+  const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
   const {getSpotsMappedOnGivenImageBasemap} = useSpots();
-  const {deleteImageFromSpot} = useImages();
 
   /* Local State */
 
