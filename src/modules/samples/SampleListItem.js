@@ -1,15 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
+import IGSNModal from './igsn/IGSNModal';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import CheckboxList from '../../shared/ui/CheckboxList';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
@@ -19,6 +22,7 @@ const SampleListItem = ({
                           isCheckedList,
                           isItemChecked,
                           isShowAvatar,
+                          isShowIGSN,
                           isShowSubtitle,
                           onPress,
                           parentSpot,
@@ -26,6 +30,7 @@ const SampleListItem = ({
                         }) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {isSpotInReadOnlyDataset} = useProject();
@@ -38,7 +43,16 @@ const SampleListItem = ({
   const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
+  /* Local State */
+
+  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+
   /* Event Handlers */
+
+  const handleIGSNButtonPressed = () => {
+    if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    else setIsIGSNModalVisible(true);
+  };
 
   const handleCheckBoxPressed = () => {
     return addRemoveSpotFromTag(sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id,
@@ -48,6 +62,7 @@ const SampleListItem = ({
   /* View */
 
   return (
+    <>
     <ListItem
       containerStyle={commonStyles.listItem}
       key={'SampleListItem' + sampleMetadata.id}
@@ -71,9 +86,14 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        <View>
-          <IGSNLogo item={sampleMetadata}/>
-        </View>
+        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+          <View>
+            <IGSNLogo
+              item={sampleMetadata}
+              onIGSNButtonPressed={handleIGSNButtonPressed}
+            />
+          </View>
+        )}
       </ListItem.Content>
       {isCheckedList ? (
         <CheckboxList
@@ -88,6 +108,13 @@ const SampleListItem = ({
         </>
       )}
     </ListItem>
+    <IGSNModal
+      isVisible={isIGSNModalVisible}
+      onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
+      onModalCancel={() => setIsIGSNModalVisible(false)}
+      sampleValues={sampleMetadata}
+    />
+    </>
   );
 };
 
