@@ -188,8 +188,8 @@ const useUpload = () => {
       await updateProfile(userValues);
     }
     catch (err) {
-      console.error('Error uploading profile image', err);
-      throw Error('Error uploading profile image', err);
+      console.error('Error uploading profile:', err);
+      throw Error('Error uploading profile:', err);
     }
   };
 
