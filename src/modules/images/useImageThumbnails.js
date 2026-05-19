@@ -1,16 +1,12 @@
-import {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
+import {useEffect, useMemo, useState} from 'react';
 
-import {getImageThumbnailURI, getLocalImageURI} from './imageURIs.helpers';
-import useImageSize from './useImageSize';
-import useDevice from '../../services/device/useDevice';
-import {isEmpty} from '../../shared/helpers';
+import {useImages} from './index';
+import {isEmpty} from '../../shared/Helpers';
 
-const useImageThumbnails = ({images} = {}) => {
+const useImageThumbnails = ({images}) => {
   /* Data Hooks */
 
-  const {doesDeviceDirExist} = useDevice();
-  const {resizeImageForThumbnail} = useImageSize();
+  const {getImageThumbnailURIs} = useImages();
 
   /* Local State */
 
@@ -19,10 +15,12 @@ const useImageThumbnails = ({images} = {}) => {
 
   /* Side Effects */
 
+  const imageIdsKey = useMemo(() => images.map(i => i.id).join(','), [images]);
+
   useEffect(() => {
-    console.log('UE ImageThumbnail []');
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
-  }, [images]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageIdsKey]);
 
   /* Internal Functions */
 
@@ -42,35 +40,8 @@ const useImageThumbnails = ({images} = {}) => {
     }
   };
 
-  /* Exported Functions */
-
-  const getImageThumbnailURIs = async (imagesToProcess) => {
-    try {
-      let thumbnailURIs = {};
-      await Promise.all(imagesToProcess.map(async (image) => {
-        if (Platform.OS === 'web') {
-          thumbnailURIs = {...thumbnailURIs, [image.id]: getImageThumbnailURI(image.id)};
-        }
-        else {
-          const imageUri = getLocalImageURI(image.id);
-          const exists = await doesDeviceDirExist(imageUri);
-          if (exists) {
-            const resizedImage = await resizeImageForThumbnail(imageUri);
-            thumbnailURIs = {...thumbnailURIs, [image.id]: resizedImage.uri};
-          }
-          else thumbnailURIs = {...thumbnailURIs, [image.id]: undefined};
-        }
-      }));
-      return thumbnailURIs;
-    }
-    catch (err) {
-      console.error('Error creating thumbnails', err);
-    }
-  };
-
   return {
     areImageThumbnailsLoading,
-    getImageThumbnailURIs,
     imageThumbnailURIs,
     setAreImageThumbnailsLoading,
     setImageThumbnailURIs,

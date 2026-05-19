@@ -210,7 +210,7 @@ const useServerRequests = () => {
   const updateDataset = dataset => postRequest(`${baseUrl}/dataset`, dataset, basicAuth());
 
   const updateDatasetSpots = (datasetId, spotCollection) =>
-    postRequest(`${baseUrl}/datasetspots/${datasetId}`, spotCollection, basicAuth());
+    postRequest(`${baseUrl}/datasetspots/${datasetId}`, spotCollection, basicAuth(), {}, 300000);
 
   const updateProfile = data => postRequest(`${baseUrl}/profile`, data, basicAuth());
 
