@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import KeepAwake from 'react-native-keep-awake';
@@ -20,9 +20,13 @@ const useUpload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const spots = useSelector(state => state.spot.spots);
   const project = useSelector(state => state.project.project);
   const projectDatasets = useSelector(state => state.project.datasets);
   const user = useSelector(state => state.user);
+
+  const spotsRef = useRef(spots);
+  spotsRef.current = spots;
 
   const {checkValidDateTime} = useProject();
   const {
@@ -77,7 +81,8 @@ const useUpload = () => {
   const uploadSpots = async (dataset) => {
     let datasetSpots;
     if (dataset.spotIds) {
-      datasetSpots = getSpotsByIds(dataset.spotIds);
+      const idsSet = new Set(dataset.spotIds);
+      datasetSpots = Object.values(spotsRef.current).filter(spot => idsSet.has(spot.properties.id));
       datasetSpots.forEach(spotValue => checkValidDateTime(spotValue));
     }
     try {
