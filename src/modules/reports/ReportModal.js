@@ -12,6 +12,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Data Hooks */
 
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
+  const {straboUserId} = useSelector(state => state.user);
 
   const {
     checkIsSafeDelete,
@@ -33,6 +34,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Derived Variables */
 
   const isNewReport = isEmpty(initialValues);
+  const isReadOnly = isReadOnlyProject || (initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
 
   /* Local State */
 
@@ -53,21 +55,21 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       <ModalWrapper
         actionTitle={isNewReport ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
-        headerTitle={isReadOnlyProject ? 'View Report' : isNewReport ? 'Create New Report' : 'Edit Report'}
+        headerTitle={isReadOnly ? 'View Report' : isNewReport ? 'Create New Report' : 'Edit Report'}
         onActionPressed={handleSavePressed}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
-        showActionButton={!isReadOnlyProject}
+        showActionButton={!isReadOnly}
         showCancelButton={false}
         showCloseButton
-        showDeleteButton={!isNewReport && !isReadOnlyProject}
+        showDeleteButton={!isNewReport && !isReadOnly}
       >
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} isReadOnly={isReadOnlyProject} ref={formRef}/>
+              <ReportForm initialValues={initialValues} isReadOnly={isReadOnly} ref={formRef}/>
               <ReportImages
-                isReadOnly={isReadOnlyProject}
+                isReadOnly={isReadOnly}
                 setUpdatedImages={setUpdatedImages}
                 updatedImages={updatedImages}
               />
@@ -76,7 +78,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
-                isReadOnly={isReadOnlyProject}
+                isReadOnly={isReadOnly}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
@@ -84,7 +86,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
                 handleTagPressed={handleTagPressed}
-                isReadOnly={isReadOnlyProject}
+                isReadOnly={isReadOnly}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
             </>
