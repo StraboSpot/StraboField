@@ -39,6 +39,7 @@ const NotebookMenu = ({
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const pageVisible = useSelector(state => state.notebook.visibleNotebookPagesStack?.slice(-1)[0]);
   const {sesarToken} = useSelector(state => state.user.sesar);
 
   const navigation = useNavigation();
@@ -66,7 +67,7 @@ const NotebookMenu = ({
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
-    ...(spot.properties?.isSample ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
+    ...(spot.properties?.isSample && (sampleIGSN || pageVisible === PAGE_KEYS.OVERVIEW) ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
     ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
