@@ -2149,7 +2149,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-env@npm:7.29.5":
+"@babel/preset-env@npm:^7.29.5":
   version: 7.29.5
   resolution: "@babel/preset-env@npm:7.29.5"
   dependencies:
@@ -4153,9 +4153,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reduxjs/toolkit@npm:2.11.2":
-  version: 2.11.2
-  resolution: "@reduxjs/toolkit@npm:2.11.2"
+"@reduxjs/toolkit@npm:2.12.0":
+  version: 2.12.0
+  resolution: "@reduxjs/toolkit@npm:2.12.0"
   dependencies:
     "@standard-schema/spec": "npm:^1.0.0"
     "@standard-schema/utils": "npm:^0.3.0"
@@ -4171,7 +4171,7 @@ __metadata:
       optional: true
     react-redux:
       optional: true
-  checksum: 10c0/4d388b96dc4b12a577af23607c252b3647c1b3b5136dbb0212e1dbbef9bb309e93d3ba6a95795ee165e87e4286453025cd67a98b5b3bb6d244b93ea487dd1ac0
+  checksum: 10c0/2b85e31294a7139994fd78b08eb3ce706ce3b03b5081c13403b93ba4883a152d637171e4d9d969766238851f8915b1daa9f36b5a0a458aff0ff7600ee38795c9
   languageName: node
   linkType: hard
 
@@ -4211,9 +4211,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rnmapbox/maps@npm:10.3.0":
-  version: 10.3.0
-  resolution: "@rnmapbox/maps@npm:10.3.0"
+"@rnmapbox/maps@npm:10.3.1":
+  version: 10.3.1
+  resolution: "@rnmapbox/maps@npm:10.3.1"
   dependencies:
     "@turf/along": "npm:6.5.0"
     "@turf/distance": "npm:6.5.0"
@@ -4235,7 +4235,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/c660a1e90bb32c3d155be020ee2ec5cb1607a6afc39abd088e8c7f55d35e5f47e5dd7e13b021607f400758f14d76cdf8ce3ffdd140aa02453dd55b854a78b0c0
+  checksum: 10c0/f679d2facb0aa9c8f96663e849faa69792b2db10eb797c22e357edc8f99a52e55fe76b61c77535e38ea29d2a24217a6e72ede3595a9e32cb5852a7f02cc9a446
   languageName: node
   linkType: hard
 
@@ -6894,7 +6894,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.2.15":
+"@types/react@npm:^19.2.15":
   version: 19.2.15
   resolution: "@types/react@npm:19.2.15"
   dependencies:
@@ -11319,13 +11319,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grid-index@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "grid-index@npm:1.1.0"
-  checksum: 10c0/0ba2a622a52badc86642a002abee79b48c207092347e869528253e634573b9b55494db649fbd1779122d797aaa3b59e284023a96a7a5c666c7375f0e320f8f57
-  languageName: node
-  linkType: hard
-
 "handle-thing@npm:^2.0.0":
   version: 2.0.1
   resolution: "handle-thing@npm:2.0.1"
@@ -13522,9 +13515,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mapbox-gl@npm:3.23.1":
-  version: 3.23.1
-  resolution: "mapbox-gl@npm:3.23.1"
+"mapbox-gl@npm:3.24.0":
+  version: 3.24.0
+  resolution: "mapbox-gl@npm:3.24.0"
   dependencies:
     "@mapbox/mapbox-gl-supported": "npm:^3.0.0"
     "@mapbox/point-geometry": "npm:^1.1.0"
@@ -13540,7 +13533,6 @@ __metadata:
     earcut: "npm:^3.0.1"
     geojson-vt: "npm:^4.0.2"
     gl-matrix: "npm:^3.4.4"
-    grid-index: "npm:^1.1.0"
     kdbush: "npm:^4.0.2"
     martinez-polygon-clipping: "npm:^0.8.1"
     murmurhash-js: "npm:^1.0.0"
@@ -13549,7 +13541,7 @@ __metadata:
     quickselect: "npm:^3.0.0"
     supercluster: "npm:^8.0.1"
     tinyqueue: "npm:^3.0.0"
-  checksum: 10c0/f999f7aca36c8296cdb9e774ee5369aa7defa308c415f1fba865be5a5404cf136c95af766053859be4bfaf40598bdb0f862a4b190099367e48aac7b7d26484af
+  checksum: 10c0/af2c85598980a5cd3176e419895d66a726f7cd162bf46ab19a21226c904360011bb013085f321a9e12ed512bb9748058b3b08a550974cf747540da4e18056911
   languageName: node
   linkType: hard
 
@@ -15347,7 +15339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is-19@npm:react-is@^19.2.5":
+"react-is-19@npm:react-is@^19.2.5, react-is@npm:^19.2.3":
   version: 19.2.6
   resolution: "react-is@npm:19.2.6"
   checksum: 10c0/263177f370fc156b279d22570dd6e922a0ad641a4a426a4cb70284b8003b00ef532d59f2beca1d22a1ca0b37f85f9077d7733ca5d344ebecd2942e9bc2a2a3c0
@@ -15365,13 +15357,6 @@ __metadata:
   version: 19.2.3
   resolution: "react-is@npm:19.2.3"
   checksum: 10c0/2b54c422c21b8dbd68a435a1cce21ecd5b6f06f48659531f7d53dd7368365da5a67e946f352fb2010d11ca40658aa67bec90995f0f1ec5556c0f71dbffe54994
-  languageName: node
-  linkType: hard
-
-"react-is@npm:^19.2.3":
-  version: 19.2.4
-  resolution: "react-is@npm:19.2.4"
-  checksum: 10c0/477a7cfc900f24194606e315fa353856a3a13487ea8eca841678817cad4daef64339ea0d1e84e58459fc75dbe0d9ba00bb0cc626db3d07e0cf31edc64cb4fa37
   languageName: node
   linkType: hard
 
@@ -15629,26 +15614,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-safe-area-context@npm:5.7.0":
-  version: 5.7.0
-  resolution: "react-native-safe-area-context@npm:5.7.0"
+"react-native-safe-area-context@npm:5.8.0":
+  version: 5.8.0
+  resolution: "react-native-safe-area-context@npm:5.8.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/c3799e17321b41df1e0a10492c98472f8f8225ef0bbaf8146c4a9acb9519aae9ac11429059143c215e4402c2808e8445274850a339f8477522ded2461e18da80
+  checksum: 10c0/86d1375ce17d549b541d157148d9d093f9e918de47d3b0a5cbc4cb6afe619aa52e99f07dc62ee0878eaa70e8da3411193b24cfee1b7b271ffd295d0fce83d128
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:4.24.0":
-  version: 4.24.0
-  resolution: "react-native-screens@npm:4.24.0"
+"react-native-screens@npm:4.25.1":
+  version: 4.25.1
+  resolution: "react-native-screens@npm:4.25.1"
   dependencies:
     react-freeze: "npm:^1.0.0"
     warn-once: "npm:^0.1.0"
   peerDependencies:
     react: "*"
-    react-native: "*"
-  checksum: 10c0/49299e694ed20cf5a8c0f86702eb77df03f5b7353d9b73e7415bb593ac5ff3aa4dfe76b1e9d8efb0fd926917e507f02f13e0a8791c8833910080454b66d99943
+    react-native: ">=0.82.0"
+  checksum: 10c0/9657e2bb35f73b779acad5d9d2f280791842b3a830496368806170fe9b97d2c09ec792f4566ac30237334f16aa646638f5062c770828feebb4135ea62c32c61e
   languageName: node
   linkType: hard
 
@@ -17104,7 +17089,7 @@ __metadata:
     "@babel/core": "npm:^7.29.0"
     "@babel/eslint-parser": "npm:^7.28.6"
     "@babel/plugin-transform-export-namespace-from": "npm:^7.27.1"
-    "@babel/preset-env": "npm:7.29.5"
+    "@babel/preset-env": "npm:^7.29.5"
     "@babel/runtime": "npm:^7.29.2"
     "@bam.tech/react-native-image-resizer": "npm:3.0.11"
     "@react-native-async-storage/async-storage": "npm:3.0.3"
@@ -17124,15 +17109,15 @@ __metadata:
     "@react-navigation/material-top-tabs": "npm:7.4.27"
     "@react-navigation/native": "npm:7.2.4"
     "@react-navigation/stack": "npm:7.9.2"
-    "@reduxjs/toolkit": "npm:2.11.2"
+    "@reduxjs/toolkit": "npm:2.12.0"
     "@rn-vui/base": "npm:5.1.10"
     "@rn-vui/themed": "npm:5.1.10"
-    "@rnmapbox/maps": "npm:10.3.0"
+    "@rnmapbox/maps": "npm:10.3.1"
     "@sentry/cli": "npm:3.4.2"
     "@sentry/react-native": "npm:8.11.1"
     "@turf/turf": "npm:7.3.5"
     "@types/jest": "npm:^30.0.0"
-    "@types/react": "npm:19.2.15"
+    "@types/react": "npm:^19.2.15"
     "@types/react-dom": "npm:^19.2.3"
     "@types/react-test-renderer": "npm:^19.1.0"
     "@welldone-software/why-did-you-render": "npm:^10.0.1"
@@ -17155,7 +17140,7 @@ __metadata:
     jest: "npm:^30.4.2"
     js-base64: "npm:3.7.8"
     lottie-react-native: "npm:7.3.8"
-    mapbox-gl: "npm:3.23.1"
+    mapbox-gl: "npm:3.24.0"
     moment: "npm:2.30.1"
     password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
@@ -17187,8 +17172,8 @@ __metadata:
     react-native-progress: "npm:5.0.1"
     react-native-reanimated: "npm:4.3.1"
     react-native-reanimated-table: "npm:0.0.2"
-    react-native-safe-area-context: "npm:5.7.0"
-    react-native-screens: "npm:4.24.0"
+    react-native-safe-area-context: "npm:5.8.0"
+    react-native-screens: "npm:4.25.1"
     react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
     react-native-tab-view: "npm:4.3.0"
@@ -17207,7 +17192,7 @@ __metadata:
     typescript: "npm:^5.9.3"
     url-loader: "npm:^4.1.1"
     uuid: "npm:14.0.0"
-    webpack: "npm:5.107.0"
+    webpack: "npm:^5.107.0"
     webpack-cli: "npm:^7.0.2"
     webpack-dev-server: "npm:^5.2.4"
   languageName: unknown
@@ -18440,7 +18425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.107.0":
+"webpack@npm:^5.107.0":
   version: 5.107.0
   resolution: "webpack@npm:5.107.0"
   dependencies:
