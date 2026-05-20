@@ -35,13 +35,22 @@ const useImageSize = () => {
   };
 
   const resizeImageForDevice = async (imageData) => {
-    let imgHeight = imageData.height;
-    let imgWidth = imageData.width;
     const tempImageURI = Platform.OS === 'ios' ? imageData.uri || imageData.path : imageData.uri || 'file://' + imageData.path;
-    if (!imgHeight || !imgWidth) ({imgHeight, imgWidth} = await getImageHeightAndWidth(tempImageURI));
-    if (imgHeight <= IMAGE_MAX_LOCAL_SIZE && imgWidth <= IMAGE_MAX_LOCAL_SIZE) return imageData;
-    const createResizedImageProps = [tempImageURI, IMAGE_MAX_LOCAL_SIZE, IMAGE_MAX_LOCAL_SIZE, 'JPEG', 100, 0];
-    return await ImageResizer.createResizedImage(...createResizedImageProps);
+    let imgWidth = imageData.width;
+    let imgHeight = imageData.height;
+    if (!imgWidth || !imgHeight) {
+      const size = await getImageHeightAndWidth(tempImageURI);
+      imgWidth = size.width;
+      imgHeight = size.height;
+    }
+    // Always run through ImageResizer to bake EXIF orientation into pixel data.
+    // MapboxGL's ImageSource ignores EXIF tags, causing portrait images to render
+    // as landscape when used as a basemap if EXIF is not baked in.
+    // Pass the actual dimensions (capped at max) as the target so small images are
+    // not upscaled — ImageResizer scales to fit within the target box.
+    const targetWidth = Math.min(imgWidth, IMAGE_MAX_LOCAL_SIZE);
+    const targetHeight = Math.min(imgHeight, IMAGE_MAX_LOCAL_SIZE);
+    return await ImageResizer.createResizedImage(tempImageURI, targetWidth, targetHeight, 'JPEG', 100, 0);
   };
 
   const resizeImageForThumbnail = async (imageUri) => {
