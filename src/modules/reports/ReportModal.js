@@ -3,7 +3,7 @@ import {FlatList, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
+import {ReportComments, ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -18,28 +18,32 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     checkIsSafeDelete,
     checkedSpotsIds,
     checkedTagsIds,
+    comments,
     confirmCloseModal,
     deleteReport,
     formRef,
+    handleSaveComment,
     handleSavePressed,
     handleSpotChecked,
     handleSpotPressed,
     handleTagChecked,
     handleTagPressed,
+    hasUnsavedChanges,
     initialValues,
+    setIsFormDirty,
     setUpdatedImages,
     updatedImages,
   } = useReportModal({openSpotInNotebook: openSpotInNotebook});
-
-  /* Derived Variables */
-
-  const isNewReport = isEmpty(initialValues);
-  const isReadOnly = isReadOnlyProject || (initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
 
   /* Local State */
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const isNewReport = isEmpty(initialValues);
+  const isReadOnly = isReadOnlyProject || (initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
 
   /* Event Handlers */
 
@@ -53,10 +57,10 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   return (
     <>
       <ModalWrapper
-        actionTitle={isNewReport ? 'Save' : 'Update'}
+        actionTitle={isNewReport ? 'Save' : hasUnsavedChanges ? 'Update' : 'Done'}
         closeModal={confirmCloseModal}
         headerTitle={isReadOnly ? 'View Report' : isNewReport ? 'Create New Report' : 'Edit Report'}
-        onActionPressed={handleSavePressed}
+        onActionPressed={isNewReport || hasUnsavedChanges ? handleSavePressed : confirmCloseModal}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
         showActionButton={!isReadOnly}
@@ -67,7 +71,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} isReadOnly={isReadOnly} ref={formRef}/>
+              <ReportForm initialValues={initialValues} isReadOnly={isReadOnly} onDirtyChange={setIsFormDirty} ref={formRef}/>
               <ReportImages
                 isReadOnly={isReadOnly}
                 setUpdatedImages={setUpdatedImages}
@@ -88,6 +92,12 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 handleTagPressed={handleTagPressed}
                 isReadOnly={isReadOnly}
                 updateSpotsInMapExtent={updateSpotsInMapExtent}
+              />
+              <View style={{paddingTop: 10}}/>
+              <ReportComments
+                comments={comments}
+                isReadOnlyProject={isReadOnlyProject}
+                onSaveComment={handleSaveComment}
               />
             </>
           }
