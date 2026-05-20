@@ -1,10 +1,11 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID, isEmpty} from '../../shared/helpers';
+import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -172,37 +173,34 @@ const BeddingPage = ({isReadOnly, page}) => {
     return (
       <View style={{maxHeight: 300}}>
         <SectionDivider dividerText={'Shared Bedding'}/>
-        <FlatList
+        <FormFlatList
           ListEmptyComponent={
             <ListEmptyText
               text={'No shared bedding. Add bedding character of interbedded, mixed lithologies or package on the Interval Page first.'}
             />
           }
-          ListHeaderComponent={
-            !isEmpty(formName) && (
-              <>
-                <SaveAndCancelButtons
-                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-                  save={() => saveBeddingShared(beddingSharedRef.current)}
-                />
-                <Formik
-                  enableReinitialize={true}
-                  initialValues={bedding}
-                  innerRef={beddingSharedRef}
-                  onReset={() => console.log('Resetting form...')}
-                  onSubmit={() => console.log('Submitting form...')}
-                  validate={values => validateForm({formName: formName, values: values})}
-                  validateOnChange={false}
-                >
-                  {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
-                </Formik>
-              </>
-            )
-          }
-          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
           data={formName}
-          keyboardShouldPersistTaps='handled'
-        />
+        >
+          {!isEmpty(formName) && (
+            <>
+              <SaveAndCancelButtons
+                cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                save={() => saveBeddingShared(beddingSharedRef.current)}
+              />
+              <Formik
+                enableReinitialize={true}
+                initialValues={bedding}
+                innerRef={beddingSharedRef}
+                onReset={() => console.log('Resetting form...')}
+                onSubmit={() => console.log('Submitting form...')}
+                validate={values => validateForm({formName: formName, values: values})}
+                validateOnChange={false}
+              >
+                {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
+              </Formik>
+            </>
+          )}
+        </FormFlatList>
       </View>
     );
   };

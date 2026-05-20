@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -13,6 +13,7 @@ import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
@@ -534,28 +535,24 @@ const MeasurementDetail = ({
           <View style={styles.measurementsContentContainer}>
             <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
             {!isReadOnly && renderCancelSaveButtons()}
-            <FlatList
-              ListHeaderComponent={
+            <FormFlatList>
+              <View>
+                {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
+                {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
+                {!isReadOnly && selectedMeasurement && selectedMeasurement.type
+                  && (selectedMeasurement.type === 'planar_orientation'
+                    || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
                 <View>
-                  {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
-                  {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
-                  {!isReadOnly && selectedMeasurement && selectedMeasurement.type
-                    && (selectedMeasurement.type === 'planar_orientation'
-                      || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
-                  <View>
-                    {!isEmpty(formName) && renderFormFields()}
-                  </View>
-                  {selectedAttributes.length === 1 && !isReadOnly && (
-                    <DeleteButton
-                      onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
-                      title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
-                    />
-                  )}
+                  {!isEmpty(formName) && renderFormFields()}
                 </View>
-              }
-              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
-              keyboardShouldPersistTaps='handled'
-            />
+                {selectedAttributes.length === 1 && !isReadOnly && (
+                  <DeleteButton
+                    onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
+                    title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}
+                  />
+                )}
+              </View>
+            </FormFlatList>
           </View>
         )}
       </View>

@@ -43,7 +43,7 @@ const ModalWrapper = ({
                       }) => {
   /* Data Hooks */
 
-  const footerShortcutModal = useSelector(state => {
+  const footerShortcutModal = useSelector((state) => {
     if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
     return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
   });
@@ -110,6 +110,7 @@ const ModalWrapper = ({
       />
       <FlatList
         ListHeaderComponent={renderListHeader}
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         data={[]}
         keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
