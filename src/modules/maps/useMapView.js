@@ -6,7 +6,13 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  GEO_LAT_LNG_PROJECTION, LATITUDE, LONGITUDE, PIXEL_PROJECTION, STRAT_SECTION_CENTER, ZOOM, ZOOM_STRAT_SECTION,
+  GEO_LAT_LNG_PROJECTION,
+  LATITUDE,
+  LONGITUDE,
+  PIXEL_PROJECTION,
+  STRAT_SECTION_CENTER,
+  ZOOM,
+  ZOOM_STRAT_SECTION,
 } from './maps.constants';
 import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from './maps.helpers';
 import {setCenter, setZoom} from './maps.slice';
@@ -75,6 +81,7 @@ const useMapView = () => {
   };
 
   const zoomToSpotsNow = async (spotsToZoomTo, map, camera) => {
+    let southwest, northeast;
     if (spotsToZoomTo.length === 0) {
       console.log('No Spots to Zoom to');
       toast.show('No Spots to Zoom to');
@@ -96,14 +103,21 @@ const useMapView = () => {
             }
             else {
               const [maxY, maxX, minY, minX] = getBoundsPadded(centroidCoords);
-              camera.fitBounds([maxX, minY], [minX, maxY], 100, 2500);
+              southwest = [minX, minY];
+              northeast = [maxX, maxY];
+              camera.fitBounds(southwest, northeast, 100, 1500);
             }
           }
           else {
             let featureCollection = turf.featureCollection(spotsToZoomTo);
             const [minX, minY, maxX, maxY] = turf.bbox(featureCollection);
-            if (Platform.OS === 'web') map.fitBounds([[maxX, minY], [minX, maxY]], {padding: 100, duration: 2500});
-            else camera.fitBounds([maxX, minY], [minX, maxY], 100, 2500);
+            southwest = [minX, minY];
+            northeast = [maxX, maxY];
+            if (Platform.OS === 'web') map.fitBounds([southwest, northeast], {padding: 100, duration: 2500});
+            else {
+              console.log('Fitting Bounds', southwest, northeast, 100, 1500);
+              camera.fitBounds(southwest, northeast, 100, 1500);
+            }
           }
         }
         catch (err) {
