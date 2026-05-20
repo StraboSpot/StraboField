@@ -197,7 +197,9 @@ const useUpload = () => {
   const uploadProject = async () => {
     console.log(`Uploading ${project.description.project_name} Properties...`);
     setUploadStatusMessage(`Uploading ${project.description.project_name} Properties...`);
-    await updateProject(project);
+    console.log('Uploading Project JSON', JSON.stringify(project));
+    const uploadProjectResponse = await updateProject(project);
+    console.log('Response Project JSON', JSON.stringify(uploadProjectResponse));
     setUploadStatusMessage(`Finished uploading ${project.description.project_name} Properties.`);
     return true;
   };
