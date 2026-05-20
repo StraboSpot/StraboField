@@ -15760,13 +15760,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-zip-archive@npm:7.1.0":
-  version: 7.1.0
-  resolution: "react-native-zip-archive@npm:7.1.0"
+"react-native-zip-archive@npm:8.0.1":
+  version: 8.0.1
+  resolution: "react-native-zip-archive@npm:8.0.1"
   peerDependencies:
-    react: ">=16.8.6"
-    react-native: ">=0.60.0"
-  checksum: 10c0/9eadd2be231a8a568bc0e6362faa5adcd3b7cb47a06f55c4b601f5c203903ab5bd6ea6dd3767ccc4352656e720d4a5c21aad833261b8d4fd6641d3c2be16d84c
+    react: ">=18.0.0"
+    react-native: ">=0.70.0"
+  checksum: 10c0/783c001f63f18155c141238e0551548b73d4b432502dd7d8910af44d0c6b04539656f671d0463bcd3466d98ad10bdcb530c20d47f1a933681e6773dd2ecd89bc
   languageName: node
   linkType: hard
 
@@ -17182,7 +17182,7 @@ __metadata:
     react-native-web: "npm:0.21.2"
     react-native-worklets: "npm:0.8.3"
     react-native-xml2js: "npm:1.0.3"
-    react-native-zip-archive: "npm:7.1.0"
+    react-native-zip-archive: "npm:8.0.1"
     react-redux: "npm:9.3.0"
     react-test-renderer: "npm:19.2.3"
     redux-logger: "npm:3.0.6"
