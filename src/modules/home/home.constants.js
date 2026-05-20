@@ -8,6 +8,7 @@ export const MAP_ACTIONS = [
   {key: 'addToReport', title: 'Add Spot(s) to Report'},
   {key: 'mapMeasurement', title: 'Measure Distance'},
   {key: 'stratSection', title: 'Strat Section Settings'},
+  {key: 'toggleScaleBarUnits', title: 'Toggle Scale Bar Units'},
 ];
 
 export const NAVIGATION_OPTIONS = {
