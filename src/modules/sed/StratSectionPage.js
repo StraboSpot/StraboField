@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
@@ -12,7 +12,7 @@ import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, isEqual} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
+import {FormFlatList, SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -161,49 +161,43 @@ const StratSectionPage = ({isReadOnly, page}) => {
       <View style={{flex: 1, justifyContent: 'flex-start'}}>
         <PageHeader pageTitle={page.label}/>
         <View style={{flex: 1}}>
-          <FlatList
-            ListHeaderComponent={
-              <>
-                {renderStratSectionToggle()}
-                {!isEmpty(stratSection) && (
-                  <View style={{flex: 1}}>
-                    <FlatListItemSeparator/>
-                    <ListItem
-                      containerStyle={commonStyles.listItem}
-                      key={'strat_section'}
-                      onPress={() => {
-                        dispatch(setLoadingStatus({view: 'home', bool: true}));
-                        if (SMALL_SCREEN) navigation.navigate('HomeScreen', {screen: 'Map'});
-                        setTimeout(() => {
-                          dispatch(setStratSection(stratSection));
-                          dispatch(setLoadingStatus({view: 'home', bool: false}));
-                        }, 500);
-                      }}
-                    >
-                      <AvatarWrapper
-                        size={20}
-                        source={require('../../assets/icons/SedStratColumn.png')}
-                      />
-                      <ListItem.Content>
-                        <ListItem.Title style={commonStyles.listItemTitle}>View Stratigraphic Section</ListItem.Title>
-                      </ListItem.Content>
-                    </ListItem>
-                    {renderImageOverlaysSection()}
-                    {renderSectionSettingsSection()}
-                  </View>
-                )}
-                {selectedImage && (
-                  <AddImageOverlayModal
-                    closeModal={() => setSelectedImage(undefined)}
-                    image={selectedImage}
-                    isReadOnly={isReadOnly}
+          <FormFlatList>
+            {renderStratSectionToggle()}
+            {!isEmpty(stratSection) && (
+              <View style={{flex: 1}}>
+                <FlatListItemSeparator/>
+                <ListItem
+                  containerStyle={commonStyles.listItem}
+                  key={'strat_section'}
+                  onPress={() => {
+                    dispatch(setLoadingStatus({view: 'home', bool: true}));
+                    if (SMALL_SCREEN) navigation.navigate('HomeScreen', {screen: 'Map'});
+                    setTimeout(() => {
+                      dispatch(setStratSection(stratSection));
+                      dispatch(setLoadingStatus({view: 'home', bool: false}));
+                    }, 500);
+                  }}
+                >
+                  <AvatarWrapper
+                    size={20}
+                    source={require('../../assets/icons/SedStratColumn.png')}
                   />
-                )}
-              </>
-            }
-            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
-            keyboardShouldPersistTaps='handled'
-          />
+                  <ListItem.Content>
+                    <ListItem.Title style={commonStyles.listItemTitle}>View Stratigraphic Section</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+                {renderImageOverlaysSection()}
+                {renderSectionSettingsSection()}
+              </View>
+            )}
+            {selectedImage && (
+              <AddImageOverlayModal
+                closeModal={() => setSelectedImage(undefined)}
+                image={selectedImage}
+                isReadOnly={isReadOnly}
+              />
+            )}
+          </FormFlatList>
         </View>
       </View>
     );

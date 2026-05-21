@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {SectionList, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -28,14 +28,14 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const navigate = useNavigation();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {getActiveSpotsObj, getSpotsWithImages} = useSpots();
+  const {getActiveSpotsObj} = useSpots();
 
   /* Local State */
 
   const [isReverseSort, setIsReverseSort] = useState(false);
 
-  const activeSpotsObj = getActiveSpotsObj();
-  const activeSpots = Object.values(activeSpotsObj);
+  const activeSpotsObj = useMemo(() => getActiveSpotsObj(), [getActiveSpotsObj]);
+  const activeSpots = useMemo(() => Object.values(activeSpotsObj), [activeSpotsObj]);
 
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
@@ -151,7 +151,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   /* View */
 
-  return isEmpty(getSpotsWithImages()) ? renderNoImagesText() : renderSpotsWithImages();
+  const hasImages = activeSpots.some(spot => !isEmpty(spot.properties.images));
+  return hasImages ? renderSpotsWithImages() : renderNoImagesText();
 };
 
 export default ImageGallery;

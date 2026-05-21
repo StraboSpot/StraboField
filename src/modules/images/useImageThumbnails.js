@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Platform} from 'react-native';
 
 import {getImageThumbnailURI, getLocalImageURI} from './imageURIs.helpers';
@@ -6,7 +6,7 @@ import useImageSize from './useImageSize';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 
-const useImageThumbnails = ({images} = {}) => {
+const useImageThumbnails = ({images = []} = {}) => {
   /* Data Hooks */
 
   const {doesDeviceDirExist} = useDevice();
@@ -19,30 +19,13 @@ const useImageThumbnails = ({images} = {}) => {
 
   /* Side Effects */
 
+  const imageIdsKey = useMemo(() => images.map(i => i.id).join(','), [images]);
+
   useEffect(() => {
-    console.log('UE ImageThumbnail []');
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
-  }, [images]);
+  }, [imageIdsKey]);
 
   /* Internal Functions */
-
-  const loadImageThumbnailURIs = async () => {
-    try {
-      console.log('Getting Image URI Thumbnails for Images:', images);
-      setAreImageThumbnailsLoading(Object.assign({}, ...images.map(image => ({[image.id]: true}))));
-      const gotImageThumbnailURIs = await getImageThumbnailURIs(images);
-      console.log('Got Image Thumbnail URIs:', gotImageThumbnailURIs);
-      setAreImageThumbnailsLoading(Object.assign({},
-        ...Object.keys(gotImageThumbnailURIs).map(key => ({[key]: !isEmpty(gotImageThumbnailURIs[key])}))));
-      setImageThumbnailURIs(gotImageThumbnailURIs);
-    }
-    catch (err) {
-      console.error('Error getting image thumbnail URIs', err);
-      setAreImageThumbnailsLoading(Object.assign({}, ...images.map(image => ({[image.id]: false}))));
-    }
-  };
-
-  /* Exported Functions */
 
   const getImageThumbnailURIs = async (imagesToProcess) => {
     try {
@@ -65,6 +48,22 @@ const useImageThumbnails = ({images} = {}) => {
     }
     catch (err) {
       console.error('Error creating thumbnails', err);
+    }
+  };
+
+  const loadImageThumbnailURIs = async () => {
+    try {
+      console.log('Getting Image URI Thumbnails for Images:', images);
+      setAreImageThumbnailsLoading(Object.assign({}, ...images.map(image => ({[image.id]: true}))));
+      const gotImageThumbnailURIs = await getImageThumbnailURIs(images);
+      console.log('Got Image Thumbnail URIs:', gotImageThumbnailURIs);
+      setAreImageThumbnailsLoading(Object.assign({},
+        ...Object.keys(gotImageThumbnailURIs).map(key => ({[key]: !isEmpty(gotImageThumbnailURIs[key])}))));
+      setImageThumbnailURIs(gotImageThumbnailURIs);
+    }
+    catch (err) {
+      console.error('Error getting image thumbnail URIs', err);
+      setAreImageThumbnailsLoading(Object.assign({}, ...images.map(image => ({[image.id]: false}))));
     }
   };
 

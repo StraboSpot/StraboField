@@ -1,5 +1,5 @@
 PODS:
-  - AsyncStorage (3.0.2):
+  - AsyncStorage (3.0.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -27,7 +27,7 @@ PODS:
   - hermes-engine/Pre-built (250829098.0.9)
   - IQKeyboardManagerSwift (6.5.16)
   - lottie-ios (4.6.0)
-  - lottie-react-native (7.3.6):
+  - lottie-react-native (7.3.8):
     - hermes-engine
     - lottie-ios (= 4.6.0)
     - RCTRequired
@@ -50,13 +50,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - MapboxCommon (24.18.3):
+  - MapboxCommon (24.20.3):
     - Turf (= 4.0.0)
-  - MapboxCoreMaps (11.18.3):
-    - MapboxCommon (= 24.18.3)
-  - MapboxMaps (11.18.3):
-    - MapboxCommon (= 24.18.3)
-    - MapboxCoreMaps (= 11.18.3)
+  - MapboxCoreMaps (11.20.3):
+    - MapboxCommon (= 24.20.3)
+  - MapboxMaps (11.20.3):
+    - MapboxCommon (= 24.20.3)
+    - MapboxCoreMaps (= 11.20.3)
     - Turf (= 4.0.0)
   - RCTDeprecation (0.84.1)
   - RCTRequired (0.84.1)
@@ -1456,7 +1456,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-  - react-native-blob-util (0.24.7):
+  - react-native-blob-util (0.24.9):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1615,7 +1615,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (8.0.1):
+  - react-native-pager-view (8.0.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1660,7 +1660,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context (5.7.0):
+  - react-native-safe-area-context (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1672,8 +1672,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.7.0)
-    - react-native-safe-area-context/fabric (= 5.7.0)
+    - react-native-safe-area-context/common (= 5.8.0)
+    - react-native-safe-area-context/fabric (= 5.8.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1684,7 +1684,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/common (5.7.0):
+  - react-native-safe-area-context/common (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1706,7 +1706,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/fabric (5.7.0):
+  - react-native-safe-area-context/fabric (5.8.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2229,7 +2229,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.31.1):
+  - RNGestureHandler (2.31.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2251,15 +2251,15 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - rnmapbox-maps (10.3.0):
-    - MapboxMaps (~> 11.18.2)
+  - rnmapbox-maps (10.3.1):
+    - MapboxMaps (~> 11.20.1)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.3.0)
+    - rnmapbox-maps/DynamicLibrary (= 10.3.1)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.3.0):
+  - rnmapbox-maps/DynamicLibrary (10.3.1):
     - hermes-engine
-    - MapboxMaps (~> 11.18.2)
+    - MapboxMaps (~> 11.20.1)
     - RCTRequired
     - RCTTypeSafety
     - React
@@ -2278,7 +2278,7 @@ PODS:
     - ReactNativeDependencies
     - Turf
     - Yoga
-  - RNReanimated (4.3.0):
+  - RNReanimated (4.3.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2300,35 +2300,11 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/apple (= 4.3.0)
-    - RNReanimated/common (= 4.3.0)
+    - RNReanimated/apple (= 4.3.1)
+    - RNReanimated/common (= 4.3.1)
     - RNWorklets
     - Yoga
-  - RNReanimated/apple (4.3.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - RNWorklets
-    - Yoga
-  - RNReanimated/common (4.3.0):
+  - RNReanimated/apple (4.3.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2352,7 +2328,31 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNScreens (4.24.0):
+  - RNReanimated/common (4.3.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNWorklets
+    - Yoga
+  - RNScreens (4.25.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2374,9 +2374,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNScreens/common (= 4.24.0)
+    - RNScreens/common (= 4.25.1)
     - Yoga
-  - RNScreens/common (4.24.0):
+  - RNScreens/common (4.25.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2451,7 +2451,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.8.1):
+  - RNWorklets (0.8.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2473,33 +2473,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/apple (= 0.8.1)
-    - RNWorklets/common (= 0.8.1)
+    - RNWorklets/apple (= 0.8.3)
+    - RNWorklets/common (= 0.8.3)
     - Yoga
-  - RNWorklets/apple (0.8.1):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - RNWorklets/common (0.8.1):
+  - RNWorklets/apple (0.8.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2522,13 +2499,52 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNZipArchive (7.1.0):
+  - RNWorklets/common (0.8.3):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
-    - RNZipArchive/Core (= 7.1.0)
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - RNZipArchive (8.0.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
     - SSZipArchive (~> 2.5.5)
-  - RNZipArchive/Core (7.1.0):
-    - React-Core
-    - SSZipArchive (~> 2.5.5)
+    - Yoga
   - Sentry (9.13.0):
     - Sentry/Core (= 9.13.0)
   - Sentry/Core (9.13.0)
@@ -2877,15 +2893,15 @@ CHECKOUT OPTIONS:
     :git: https://github.com/douglasjunior/IQKeyboardManager.git
 
 SPEC CHECKSUMS:
-  AsyncStorage: 2e1d431842588f5af845737e6435c1fcbecdab51
+  AsyncStorage: 766629ebca8962a64ad9c1caff00bf7eae448b74
   FBLazyVector: e97c19a5a442429d1988f182a1940fb08df514da
   hermes-engine: bee04ce21e5644a8a8046fce7458719684821142
   IQKeyboardManagerSwift: 90ba81812fbbd6694924a95a271fa3affdf04a14
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
-  lottie-react-native: 6a080b2f109ef611c75c503a33ebb8ea75db0c91
-  MapboxCommon: 371fd6db596531464b6fd751ae7daa382fe2da2b
-  MapboxCoreMaps: 811c4196843f5554b10a807d1231270d372ff148
-  MapboxMaps: 0e8fdc25eb3b1c2ff5cf9317266fe984eeb0e18f
+  lottie-react-native: d954917e9e5f3217eac0ca0eb3be75de412dea93
+  MapboxCommon: bd1554a0c6e66ac04c9ecd3611f3b7d772eeac7e
+  MapboxCoreMaps: 821019cdd87447ecd895872f4095232723961627
+  MapboxMaps: 6191d857abe0da0f3bdfb5a71349c532d55d7d9d
   RCTDeprecation: af44b104091a34482596cd9bd7e8d90c4e9b4bd7
   RCTRequired: bb77b070f75f53398ce43c0aaaa58337cebe2bf6
   RCTSwiftUI: afc0a0a635860da1040a0b894bfd529da06d7810
@@ -2923,7 +2939,7 @@ SPEC CHECKSUMS:
   React-logger: b5521614afb8690420146dfc61a1447bb5d65419
   React-Mapbuffer: f4ee8c62e0ef8359d139124f35a471518a172cd3
   React-microtasksnativemodule: d1956f0eec54c619b63a379520fb4c618a55ccb9
-  react-native-blob-util: 5926090844c5d8081f065066cdb262854351777d
+  react-native-blob-util: 90bc3d2a2c0db868de9f8579092ca63ac1faf0ec
   react-native-document-picker: 29b2ee2573287f2b34c7716c98ffc3d9322fbe72
   react-native-geolocation-service: 32b2c2a3b91e70ce2a8d0c684801aaeb0a07e0ec
   react-native-get-random-values: a603782b2b222a34533c66371614790282dba3f1
@@ -2932,9 +2948,9 @@ SPEC CHECKSUMS:
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
   react-native-netinfo: 7e0b1936e928fa8ddb60da9e572a33767db7805f
   react-native-orientation-director: 7beebce58bb950290dcfab01546001b91800af44
-  react-native-pager-view: 10d0f13689f8ba17233e6d8d7286baf8771e36ce
+  react-native-pager-view: 915bebe4c77d5303a259c9589b5fd9ce015b2858
   react-native-pdf: dac049a15aec41db452e372f85184d3f15741b12
-  react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
+  react-native-safe-area-context: 5727bd761ca52fa393b40989a6483bf859622136
   react-native-slider: d535cb9791fe29bd2cd70c0c3556545aba3c1f55
   React-NativeModulesApple: 5ba0903927f6b8d335a091700e9fda143980f819
   React-networking: 3a4b7f9ed2b2d1c0441beacb79674323a24bcca6
@@ -2975,17 +2991,17 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 9025ccd219b382f246e9ceb85cd4095279b9bad1
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: b633cb9b819ffb23661496af13bd6943d66f093c
-  rnmapbox-maps: 30c5b33f811509feea581214d9973ffe3795c0c0
-  RNReanimated: 923eb30d50cea473eed734767d4c33c374fae5fc
-  RNScreens: 6cb648bdad8fe9bee9259fe144df95b6d1d5b707
+  RNGestureHandler: b4f6de20b30325ee40b693f558ad02213201ce91
+  rnmapbox-maps: 4d52c40a69e805327b4bc557d732f71052dde648
+  RNReanimated: e47df7f4580997c3a46b1e736ce3f26010985bb7
+  RNScreens: 4d43bcfdf8817289ee1950ad8c218148fafc8ce1
   RNSensors: 111159597ac51505df10413c61b28bcd28e88983
   RNSentry: 370cf5729bd39929614147f2eaeb4c5a9c0702cc
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 4351544f100d4f12cac156a7c13399e60bab3e26
-  RNWorklets: bc32c788b41ef5f9ee519d6bf3f495b73fb7741b
-  RNZipArchive: f2806ba80e24cf1984d6a7cb361d8a07d734997d
+  RNWorklets: 06ce05d69455cc14f5676c177050a39aa557d4d2
+  RNZipArchive: ffc7d30bece04a865e17864596137041d5cb8be0
   Sentry: 5c3f67235d4c16fcfab43158a8c1502a18fece9a
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d

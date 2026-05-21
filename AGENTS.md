@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -32,7 +32,7 @@ export const PASSWORD_TEST = 'your password';
 # 3. Generate Sentry properties files (auto-generated from env.json):
 npm run setup-sentry
 
-# 4. Install git hooks (keeps CLAUDE.md auto-updated on commit):
+# 4. Install git hooks (keeps AGENTS.md auto-updated on commit):
 node scripts/install-hooks.js
 ```
 
@@ -93,9 +93,9 @@ npm run debug            # Start Metro with experimental debugger
 npm run remove:packages  # Clean node_modules and iOS Pods
 ```
 
-### Pre-commit Hook (CLAUDE.md auto-update)
+### Pre-commit Hook (AGENTS.md auto-update)
 
-`scripts/update-claude-md.js` keeps CLAUDE.md in sync with the codebase (module count, dependency versions) on every commit. Git hooks are not committed to the repo, so after cloning you need to install it once:
+`scripts/update-Codex-md.js` keeps AGENTS.md in sync with the codebase (module count, dependency versions) on every commit. Git hooks are not committed to the repo, so after cloning you need to install it once:
 
 ```bash
 node scripts/install-hooks.js
@@ -115,7 +115,7 @@ Use `git checkout src/` to reset source files before re-running. Always verify o
 
 ### Feature-Based Module Structure
 
-The codebase is organized into **41 self-contained feature modules** under `/src/modules/`, each containing:
+The codebase is organized into **40 self-contained feature modules** under `/src/modules/`, each containing:
 - UI components
 - Redux slice for state management
 - Custom hooks for business logic

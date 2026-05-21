@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef} from 'react';
-import {FlatList, Platform, View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {Formik} from 'formik';
@@ -7,6 +7,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
+import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -133,17 +134,10 @@ const SiteSafetyPage = ({isReadOnly}) => {
     <View style={{flex: 1}}>
       <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
       {!isReadOnly && renderCancelSaveButtons()}
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <SectionDivider dividerText={page.label}/>
-            {renderSiteSafetyForm()}
-          </>
-        }
-        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
-        contentContainerStyle={{paddingBottom: 200}}
-        keyboardShouldPersistTaps='handled'
-      />
+      <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+        <SectionDivider dividerText={page.label}/>
+        {renderSiteSafetyForm()}
+      </FormFlatList>
     </View>
   );
 };
