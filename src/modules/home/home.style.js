@@ -84,7 +84,7 @@ const homeStyles = StyleSheet.create({
   },
   iconSizeSmallScreen: {
     height: 40,
-    marginHorizontal: -4,
+    marginHorizontal: -2,
   },
   imageSliderContainer: {
     alignItems: 'center',
