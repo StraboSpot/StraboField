@@ -3,7 +3,7 @@ import {FlatList, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {ReportComments, ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
+import {ReportComments, ReportForm, ReportImages, ReportMetadata, ReportSpots, ReportTags, useReportModal} from '.';
 import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -71,7 +71,19 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <FlatList
           ListHeaderComponent={
             <>
-              <ReportForm initialValues={initialValues} isReadOnly={isReadOnly} onDirtyChange={setIsFormDirty} ref={formRef}/>
+              <ReportForm
+                initialValues={initialValues}
+                isReadOnly={isReadOnly}
+                onDirtyChange={setIsFormDirty}
+                ref={formRef}
+              />
+              {!isNewReport && (
+                <ReportMetadata
+                  createdBy={initialValues.created_by}
+                  createdTimestamp={initialValues.created_timestamp}
+                  updatedTimestamp={initialValues.updated_timestamp}
+                />
+              )}
               <ReportImages
                 isReadOnly={isReadOnly}
                 setUpdatedImages={setUpdatedImages}

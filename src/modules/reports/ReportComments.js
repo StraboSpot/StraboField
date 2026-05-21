@@ -3,13 +3,12 @@ import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
 import {Icon} from '@rn-vui/base';
 
+import ReportMetadata from './ReportMetadata';
 import {
-  DARKGREY,
   MEDIUMGREY,
   PRIMARY_ACCENT_COLOR,
   PRIMARY_TEXT_COLOR,
   PRIMARY_TEXT_SIZE,
-  SMALL_TEXT_SIZE,
 } from '../../shared/styles.constants';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
@@ -35,7 +34,7 @@ const ReportComments = ({comments, isReadOnlyProject, onSaveComment}) => {
       {comments.map(comment => (
         <View key={comment.id} style={styles.commentItem}>
           <Text style={styles.commentText}>{comment.text}</Text>
-          <Text style={styles.commentMeta}>{comment.name} {new Date(comment.created_timestamp).toLocaleString()}</Text>
+          <ReportMetadata createdBy={comment.name} createdTimestamp={comment.created_timestamp}/>
         </View>
       ))}
       {!isReadOnlyProject && (
@@ -62,17 +61,12 @@ const styles = StyleSheet.create({
   commentItem: {
     borderBottomColor: MEDIUMGREY,
     borderBottomWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  commentMeta: {
-    color: DARKGREY,
-    fontSize: SMALL_TEXT_SIZE,
-    marginTop: 2,
+    paddingTop: 4,
   },
   commentText: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: PRIMARY_TEXT_SIZE,
+    paddingHorizontal: 10,
   },
   inputRow: {
     alignItems: 'center',

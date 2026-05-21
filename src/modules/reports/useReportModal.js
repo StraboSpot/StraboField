@@ -2,7 +2,7 @@ import {useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
@@ -113,8 +113,11 @@ const useReportModal = ({openSpotInNotebook}) => {
       console.log('Saving report ...');
       await formRef.current.submitForm();
       let editedReport = showErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewUUID();
-      if (!editedReport.straboUserId) editedReport.straboUserId = straboUserId;
+      if (!editedReport.id) editedReport.id = getNewId();
+      if (!editedReport.straboUserId || !editedReport.created_by) {
+        editedReport.straboUserId = straboUserId;
+        editedReport.created_by = userName;
+      }
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
       editedReport.comments = comments;

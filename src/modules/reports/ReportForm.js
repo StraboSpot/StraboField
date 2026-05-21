@@ -7,7 +7,9 @@ import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
 import {Form, useForm} from '../form';
 
 const FormDirtyObserver = ({isDirty, onDirtyChange}) => {
-  useEffect(() => { onDirtyChange(isDirty); }, [isDirty, onDirtyChange]);
+  useEffect(() => {
+    onDirtyChange(isDirty);
+  }, [isDirty, onDirtyChange]);
   return null;
 };
 
@@ -34,7 +36,11 @@ const ReportForm = forwardRef(({initialValues, isReadOnly, onDirtyChange}, formR
       {formProps => (
         <View style={{flex: 1}}>
           {onDirtyChange && <FormDirtyObserver isDirty={formProps.dirty} onDirtyChange={onDirtyChange}/>}
-          <Form {...{formName: REPORT_FORM_NAME, isReadOnly: isReadOnly, surveyFragment: mainFormKeysFields, ...formProps}}/>
+          <Form {...{
+            formName: REPORT_FORM_NAME,
+            isReadOnly: isReadOnly,
+            surveyFragment: mainFormKeysFields, ...formProps,
+          }}/>
         </View>
       )}
     </Formik>
