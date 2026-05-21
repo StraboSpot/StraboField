@@ -9,6 +9,7 @@ import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
+import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -364,12 +365,9 @@ const BasicPageDetail = ({
                   save={saveButtonOnPress}
                 />
               )}
-              <FlatList
-                ListHeaderComponent={renderFormFields()}
-                automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
-                contentContainerStyle={{paddingBottom: 200}}
-                keyboardShouldPersistTaps='handled'
-              />
+              <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+                {renderFormFields()}
+              </FormFlatList>
             </>
           )}
 

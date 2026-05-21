@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {SectionList, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -34,8 +34,8 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const [isReverseSort, setIsReverseSort] = useState(false);
 
-  const activeSpotsObj = getActiveSpotsObj();
-  const activeSpots = Object.values(activeSpotsObj);
+  const activeSpotsObj = useMemo(() => getActiveSpotsObj(), [getActiveSpotsObj]);
+  const activeSpots = useMemo(() => Object.values(activeSpotsObj), [activeSpotsObj]);
 
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
@@ -57,22 +57,22 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     setSpotsSorted(val);
   }, []);
 
-  /* Derived Variables */
-
-  const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
-  sortedSpotsWithImages = spotsWithImages.map((spot) => {
-    const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
-      .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
-        .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
-    return {...spot, properties: {...spot.properties, images: sortedImages}};
-  });
-  if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
-  let count = 0;
-  const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
-    count += spot.properties.images.length;
-    return [...acc, {spot: spot, data: [spot.properties.images]}];
-  }, []);
-  const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
+  // /* Derived Variables */
+  //
+  // const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
+  // sortedSpotsWithImages = spotsWithImages.map((spot) => {
+  //   const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
+  //     .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+  //       .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
+  //   return {...spot, properties: {...spot.properties, images: sortedImages}};
+  // });
+  // if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
+  // let count = 0;
+  // const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
+  //   count += spot.properties.images.length;
+  //   return [...acc, {spot: spot, data: [spot.properties.images]}];
+  // }, []);
+  // const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
 
   /* Event Handlers */
 
@@ -104,6 +104,10 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     );
   };
 
+  const renderNoImagesText = () => {
+    return <ListEmptyText text={'No Images in Visible Datasets'}/>;
+  };
+
   const renderSectionHeader = ({spot}) => {
     return (
       <SectionDividerWithRightButton
@@ -115,26 +119,41 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   };
 
   /* View */
+  const renderSpotsWithImages = () => {
+    const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
+    sortedSpotsWithImages = spotsWithImages.map((spot) => {
+      const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
+        .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+          .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
+      return {...spot, properties: {...spot.properties, images: sortedImages}};
+    });
+    if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
+    let count = 0;
+    const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
+      count += spot.properties.images.length;
+      return [...acc, {spot: spot, data: [spot.properties.images]}];
+    }, []);
+    const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
 
-  return (
-    <>
-      <SpotFilters
-        activeSpots={activeSpots}
-        setIsReverseSort={resetAndSetIsReverseSort}
-        setSpotsSearched={resetAndSetSpotsSearched}
-        setSpotsSorted={resetAndSetSpotsSorted}
-        setTextNoSpots={setTextNoSpots}
-        spotsSearched={spotsSearched}
-        updateSpotsInMapExtent={updateSpotsInMapExtent}
-      />
-      {count === 0 ? <ListEmptyText text={'No Images in Active Datasets'}/> : (
+    return (
+      <>
+        <SpotFilters
+          activeSpots={activeSpots}
+          setIsReverseSort={resetAndSetIsReverseSort}
+          setSpotsSearched={resetAndSetSpotsSearched}
+          setSpotsSorted={resetAndSetSpotsSorted}
+          setTextNoSpots={setTextNoSpots}
+          spotsSearched={spotsSearched}
+          updateSpotsInMapExtent={updateSpotsInMapExtent}
+        />
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' Image' : ' Images')} in Active Spots and Samples
+            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
           </Text>
           <LittleSpacer/>
           <SectionList
+            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
             keyExtractor={(item, index) => item + index}
             onEndReached={loadMoreSections}
             onEndReachedThreshold={0.5}
@@ -144,9 +163,15 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
             stickySectionHeadersEnabled={true}
           />
         </View>
-      )}
-    </>
-  );
+      </>
+    );
+  };
+
+
+  /* View */
+
+  const hasImages = activeSpots.some(spot => !isEmpty(spot.properties.images));
+  return hasImages ? renderSpotsWithImages() : renderNoImagesText();
 };
 
 export default ImageGallery;

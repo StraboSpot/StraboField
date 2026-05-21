@@ -9,12 +9,23 @@ import useDeviceOrientation from './useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
-import {cancelledIntervalDrag, savedIntervalDragReordering, setFreehandFeatureCoords, startedIntervalDrag} from '../maps/maps.slice';
+import {
+  cancelledIntervalDrag,
+  savedIntervalDragReordering,
+  setFreehandFeatureCoords,
+  setIsScaleBarMetric,
+  startedIntervalDrag,
+} from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
-import {clearedSelectedSpots, editedOrCreatedSpots, restoredIntervalDragSnapshot, setIntersectedSpotsForTagging} from '../spots/spots.slice';
+import {
+  clearedSelectedSpots,
+  editedOrCreatedSpots,
+  restoredIntervalDragSnapshot,
+  setIntersectedSpotsForTagging,
+} from '../spots/spots.slice';
 
 const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
   /* Data Hooks */
@@ -24,6 +35,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
+  const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const store = useStore();
@@ -177,6 +189,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         const selectedSpotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
         handleSpotSelected(selectedSpotWithThisStratSection);
         openNotebookPanel(PAGE_KEYS.STRAT_SECTION);
+        break;
+      case 'toggleScaleBarUnits':
+        dispatch(setIsScaleBarMetric(!isScaleBarMetric));
         break;
       case 'startIntervalDrag':
         dispatch(startedIntervalDrag(

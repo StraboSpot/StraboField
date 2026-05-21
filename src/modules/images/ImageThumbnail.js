@@ -39,4 +39,4 @@ const ImageThumbnail = ({
   );
 };
 
-export default ImageThumbnail;
+export default React.memo(ImageThumbnail);

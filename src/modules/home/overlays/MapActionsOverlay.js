@@ -21,6 +21,7 @@ const MapActionsOverlay = ({
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
+  const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -35,8 +36,10 @@ const MapActionsOverlay = ({
     const isStratSectionVisible = item.key === 'stratSection' && stratSection;
     const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
     const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;
+    const isToggleScaleBarUnitsVisible = item.key === 'toggleScaleBarUnits' && !stratSection && !currentImageBasemap;
 
-    const otherKeysToHide = new Set(['saveMap', 'stereonet', 'stratSection', 'selectSpots', 'mapMeasurement']);
+    const otherKeysToHide = new Set(
+      ['saveMap', 'stereonet', 'stratSection', 'selectSpots', 'mapMeasurement', 'toggleScaleBarUnits']);
     const isDefaultVisible = !otherKeysToHide.has(item.key);
 
     return (
@@ -45,8 +48,14 @@ const MapActionsOverlay = ({
       || isStratSectionVisible
       || isSelectSpotsVisible
       || isMapMeasurementVisible
+      || isToggleScaleBarUnitsVisible
       || isDefaultVisible
     );
+  };
+
+  const getItemTitle = (item) => {
+    if (item.key === 'toggleScaleBarUnits') return `Switch Scale Bar to ${isScaleBarMetric ? 'Imperial' : 'Metric'}`;
+    return item.title;
   };
 
   const mapActionItem = item => (
@@ -55,8 +64,8 @@ const MapActionsOverlay = ({
         commonStyles.listItem,
         SMALL_SCREEN && {
           minHeight: 50,
-          paddingVertical: 15,
           paddingHorizontal: 20,
+          paddingVertical: 15,
         },
       ]}
       key={item.key}
@@ -69,7 +78,7 @@ const MapActionsOverlay = ({
           fontWeight: '500',
         },
       ]}>
-        {item.title}
+        {getItemTitle(item)}
       </ListItem.Title>
     </ListItem>
   );

@@ -24,4 +24,4 @@ const PlaceholderImageIcon = ({isConnected, isInternetReachable}) => {
   else return <Image source={placeholderImage} style={imageStyles.thumbnail}/>;
 };
 
-export default PlaceholderImageIcon;
+export default React.memo(PlaceholderImageIcon);
