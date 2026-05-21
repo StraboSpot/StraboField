@@ -13,6 +13,7 @@ import {
   cancelledIntervalDrag,
   savedIntervalDragReordering,
   setFreehandFeatureCoords,
+  setIsScaleBarMetric,
   startedIntervalDrag,
 } from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
@@ -36,6 +37,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
+  const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
   const stratSection = useSelector(state => state.map.stratSection);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
@@ -223,6 +225,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         const selectedSpotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
         handleSpotSelected(selectedSpotWithThisStratSection);
         openNotebookPanel(PAGE_KEYS.STRAT_SECTION);
+        break;
+      case 'toggleScaleBarUnits':
+        dispatch(setIsScaleBarMetric(!isScaleBarMetric));
         break;
       case 'startIntervalDrag':
         dispatch(startedIntervalDrag(

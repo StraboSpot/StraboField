@@ -21,6 +21,8 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 import SpotNavigator from '../spots/SpotNavigator';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
+const Tab = createMaterialTopTabNavigator();
+
 const HomeViewSmallScreen = forwardRef(({
                                           clickHandler,
                                           closeMainMenuPanel,
@@ -58,8 +60,6 @@ const HomeViewSmallScreen = forwardRef(({
   useEffect(() => {
     Platform.OS !== 'web' && lockToPortrait();
   }, []);
-
-  const Tab = createMaterialTopTabNavigator();
 
   const toggleSpotNavigator = () => {
     dispatch(cancelledIntervalDrag());

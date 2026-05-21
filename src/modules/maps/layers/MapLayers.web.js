@@ -1,6 +1,5 @@
 import React, {useMemo} from 'react';
 
-import {ScaleControl} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
 import {
@@ -12,8 +11,7 @@ import {
   MacrostratMarkerLayer,
   MeasureLayers,
 } from '.';
-import {useWindowSize} from '../../../shared/ui/useWindowSize';
-import mapStyles from '../maps.styles';
+import MapControlsContainer from '../controls/MapControlsContainer';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import SnapLineLayer from '../strat-section/SnapLineLayer';
@@ -34,8 +32,6 @@ const MapLayers = ({
 
   const {currentImageBasemap, intervalDragState, isDragIntervalMode, stratSection} = useSelector(state => state.map);
 
-  const useDimensions = useWindowSize();
-
   /* Derived State */
 
   const spotsDisplayed = useMemo(
@@ -50,13 +46,7 @@ const MapLayers = ({
       {/* Displays the marker when macrostrat view is displayed */}
       {isShowMacrostratOverlay && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
 
-      {!stratSection && !currentImageBasemap && (
-        <ScaleControl
-          maxWidth={useDimensions.width * 0.25}
-          style={mapStyles.scaleWeb}
-          unit={'imperial'}
-        />
-      )}
+      {!currentImageBasemap && !stratSection && <MapControlsContainer/>}
 
       {/* Custom Overlay Layer */}
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}

@@ -107,7 +107,6 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
         containerStyle={commonStyles.listItem}
         disabled={!isOnline.isConnected && source !== 'device'}
         disabledStyle={{backgroundColor: 'lightgrey'}}
-        key={item.id}
         onPress={() => onProjectPress(item)}
       >
         <ListItem.Content>

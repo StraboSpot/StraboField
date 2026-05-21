@@ -43,9 +43,10 @@ const ModalWrapper = ({
                       }) => {
   /* Data Hooks */
 
-  const modalVisible = useSelector(state => state.home.modalVisible);
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const footerShortcutModal = useSelector((state) => {
+    if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
+    return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
+  });
 
   /* Local State */
 
@@ -79,25 +80,22 @@ const ModalWrapper = ({
   const renderListHeader = useCallback(() => <>{childrenRef.current}</>, []);
 
   const renderModalBottom = () => {
-    const shortcutModal = SHORTCUT_MODALS.find(m => m.key === modalVisible);
-
-    if (shortcutModal && shortcutModal.notebook_modal_key) {
-      return (
-        <ListItem
-          containerStyle={commonStyles.listItem}
-          onPress={() => onFooterButtonPress(shortcutModal.notebook_modal_key)}
-        >
-          <AvatarWrapper
-            size={20}
-            source={require('../../../assets/icons/NotebookView_pressed.png')}
-          />
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Go to Last Spot Created</ListItem.Title>
-          </ListItem.Content>
-          <ListItem.Chevron/>
-        </ListItem>
-      );
-    }
+    if (!footerShortcutModal) return null;
+    return (
+      <ListItem
+        containerStyle={commonStyles.listItem}
+        onPress={() => onFooterButtonPress(footerShortcutModal.notebook_modal_key)}
+      >
+        <AvatarWrapper
+          size={20}
+          source={require('../../../assets/icons/NotebookView_pressed.png')}
+        />
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>Go to Last Spot Created</ListItem.Title>
+        </ListItem.Content>
+        <ListItem.Chevron/>
+      </ListItem>
+    );
   };
 
   const renderModalContent = () => (
@@ -112,13 +110,14 @@ const ModalWrapper = ({
       />
       <FlatList
         ListHeaderComponent={renderListHeader}
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         data={[]}
         keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
         scrollEnabled={scrollEnabled}
         style={isAutoHeight ? undefined : {flex: 1}}
       />
-      {!isEmpty(selectedSpot) && isEmpty(selectedAttributes) && renderModalBottom()}
+      {renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}

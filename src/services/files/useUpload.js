@@ -105,8 +105,9 @@ const useUpload = () => {
       console.error(dataset.name + ': Error Uploading Project Spots.', err);
       setUploadStatusMessage(`${dataset.name}: Error Uploading Spots.\n\n ${err}\n`);
       // Added this below to handle spots that were getting added to 2 datasets, which the server will not accept
-      if (err?.startsWith('Spot(s) already exist in another dataset')) {
-        const spotId = parseInt(err.split(')')[1].split('(')[1].split(')')[0], 10);
+      const errMsg = typeof err === 'string' ? err : (err?.message ?? String(err));
+      if (errMsg.startsWith('Spot(s) already exist in another dataset')) {
+        const spotId = parseInt(errMsg.split(')')[1].split('(')[1].split(')')[0], 10);
         // console.log('dupes', spotId);
         dispatch(deletedSpotIdFromDataset({datasetId: dataset.id, spotId: spotId}));
         alert('Fixed Spot in Another Dataset Error',
@@ -189,8 +190,8 @@ const useUpload = () => {
       await updateProfile(userValues);
     }
     catch (err) {
-      console.error('Error uploading profile image', err);
-      throw Error('Error uploading profile image', err);
+      console.error('Error uploading profile:', err);
+      throw Error('Error uploading profile:', err);
     }
   };
 
@@ -198,7 +199,9 @@ const useUpload = () => {
   const uploadProject = async () => {
     console.log(`Uploading ${project.description.project_name} Properties...`);
     setUploadStatusMessage(`Uploading ${project.description.project_name} Properties...`);
-    await updateProject(project);
+    console.log('Uploading Project JSON', JSON.stringify(project));
+    const uploadProjectResponse = await updateProject(project);
+    console.log('Response Project JSON', JSON.stringify(uploadProjectResponse));
     setUploadStatusMessage(`Finished uploading ${project.description.project_name} Properties.`);
     return true;
   };

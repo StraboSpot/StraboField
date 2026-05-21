@@ -66,4 +66,4 @@ const ImagesList = ({
   );
 };
 
-export default ImagesList;
+export default React.memo(ImagesList);

@@ -1,22 +1,20 @@
-import React, {forwardRef, useEffect} from 'react';
-import {Text, View} from 'react-native';
+import React, {forwardRef, useEffect, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
+import MapControlsContainer from './controls/MapControlsContainer';
 import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
 import SnapLineLayer from './strat-section/SnapLineLayer';
 import useMapMoveEvents from './useMapMoveEvents';
 import VertexDrag from './VertexDrag';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
 import homeStyles from '../home/home.style';
 import FreehandSketch from '../sketch/FreehandSketch';
 
 MapboxGL.setAccessToken(MAPBOX_TOKEN);
 
-const scaleBarPosition = SMALL_SCREEN ? {top: 20, left: 70} : {bottom: 20, left: 80};
 
 const Map = ({
                allowMapViewMove,
@@ -50,12 +48,21 @@ const Map = ({
 
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
+  /* Local State */
+
+  const [scaleBarZoom, setScaleBarZoom] = useState(zoom);
+
+  /* Event Handlers */
+
+  const onCameraChanged = (e) => {
+    setScaleBarZoom(e.properties.zoom);
+    handleMapMoved(e);     // Update spots in extent and saved view (center and zoom)
+  };
+
   /* Derived Variables */
 
   // Track map ID changes to force re-render and prevent layer conflicts
   const currentMapId = currentImageBasemap?.id || stratSection?.strat_section_id || basemap.id;
-  const zoomTextStyle = basemap.id === 'mapbox.satellite' ? homeStyles.currentZoomTextWhite
-    : homeStyles.currentZoomTextBlack;
 
   /* Side Effects */
 
@@ -82,14 +89,7 @@ const Map = ({
 
   return (
     <>
-      {!stratSection && !currentImageBasemap && zoom && (
-        <View
-          style={SMALL_SCREEN ? homeStyles.zoomAndScaleBarContainerSmallScreen : homeStyles.zoomAndScaleBarContainer}
-        >
-          <Text style={zoomTextStyle}>Zoom: </Text>
-          <Text style={zoomTextStyle}>{zoom.toFixed(1)}</Text>
-        </View>
-      )}
+      {!currentImageBasemap && !stratSection && <MapControlsContainer zoom={scaleBarZoom}/>}
       <MapboxGL.MapView
         animated={true}
         attributionEnabled={true}
@@ -98,14 +98,13 @@ const Map = ({
         localizeLabels={true}
         logoEnabled={true}
         logoPosition={homeStyles.mapboxLogoPosition}
-        onCameraChanged={handleMapMoved}  // Update spots in extent and saved view (center and zoom)
+        onCameraChanged={onCameraChanged}
         onLongPress={handleMapLongPress}
         onPress={handleMapPress}
         pitchEnabled={false}
         ref={mapRef}
         rotateEnabled={false}
-        scaleBarEnabled={!currentImageBasemap && !stratSection}
-        scaleBarPosition={scaleBarPosition}
+        scaleBarEnabled={false}
         scrollEnabled={allowMapViewMove && !isDragIntervalMode}
         style={mapStyles.map}
         styleURL={currentImageBasemap || stratSection ? JSON.stringify(BACKGROUND) : JSON.stringify(basemap)}

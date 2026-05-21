@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/react-native';
 import {userAgent} from './userAgent';
 import {isEmpty} from '../../shared/helpers';
 
-const DEFAULT_TIMEOUT = 300000;  // 5 min
+const DEFAULT_TIMEOUT = 60000;
 
 /* Internal Functions */
 
@@ -122,13 +122,13 @@ export const postFormDataRequest = async (url, formData, auth) => {
   }
 };
 
-export const postRequest = async (url, body, auth, customHeaders = {}) => {
+export const postRequest = async (url, body, auth, customHeaders = {}, timeout = DEFAULT_TIMEOUT) => {
   try {
     const response = await timeoutPromise(fetch(url, {
       method: 'POST',
       headers: buildHeaders(auth, isEmpty(customHeaders) ? {'Content-Type': 'application/json'} : customHeaders),
       body: isEmpty(customHeaders) ? JSON.stringify(body) : body,
-    }));
+    }), timeout);
     return isEmpty(customHeaders) ? handleResponse(response) : response;
   }
   catch (err) {
@@ -137,12 +137,12 @@ export const postRequest = async (url, body, auth, customHeaders = {}) => {
   }
 };
 
-export const timeoutPromise = (promise) => {
+export const timeoutPromise = (promise, timeout = DEFAULT_TIMEOUT) => {
   let timer;
   return Promise.race([
     promise,
     new Promise((_, reject) => {
-      timer = setTimeout(() => reject(new Error('Network timeout')), DEFAULT_TIMEOUT);
+      timer = setTimeout(() => reject(new Error('Network timeout')), timeout);
     }),
   ]).finally(() => clearTimeout(timer));
 };
