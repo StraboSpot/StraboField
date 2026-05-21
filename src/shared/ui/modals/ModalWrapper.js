@@ -110,6 +110,7 @@ const ModalWrapper = ({
       />
       <FlatList
         ListHeaderComponent={renderListHeader}
+        // ListHeaderComponent={() => <>{children}</>}
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         data={[]}
         keyExtractor={(_, index) => index.toString()}

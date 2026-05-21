@@ -111,6 +111,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             isReadOnly={isReadOnly}
             isSampleOrSampleChild={isSampleOrSampleChild}
             openMainMenuPanel={openMainMenuPanel}
+            selectedSample={selectedSample}
             setSelectedSample={setSelectedSample}
             zoomToSpots={zoomToSpots}
           />

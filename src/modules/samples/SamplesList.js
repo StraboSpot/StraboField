@@ -8,7 +8,7 @@ import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
-const SamplesList = ({onPress, onPressEmpty}) => {
+const SamplesList = ({isShowIGSN, onPress, onPressEmpty}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -32,7 +32,7 @@ const SamplesList = ({onPress, onPressEmpty}) => {
       ListEmptyComponent={<ListEmptyText onPress={onPressEmpty} text={'No Samples'}/>}
       data={samplesSorted}
       keyExtractor={item => 'Sample' + (item.id || item.properties.id)}
-      renderItem={({item}) => <SampleListItem isShowSubtitle onPress={onPress} parentSpot={spot} sample={item}/>}
+      renderItem={({item}) => <SampleListItem isShowIGSN={isShowIGSN} isShowSubtitle onPress={onPress} parentSpot={spot} sample={item}/>}
     />
   );
 };

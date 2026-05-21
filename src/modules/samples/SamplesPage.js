@@ -78,6 +78,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
         showAddButton={!isReadOnly}
       />
       <SamplesList
+        isShowIGSN
         onPress={editSample}
         onPressEmpty={!isReadOnly && (() => dispatch(setModalVisible({modal: page.key})))}
       />

@@ -19,7 +19,6 @@ import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
-import IGSNUploadAndRegister from '../samples/igsn/IGSNUploadAndRegister';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
@@ -28,6 +27,14 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
 
+const IGSN_RELEVANT_FIELDS = [
+  'collection_date',
+  'main_sampling_purpose',
+  'material_type',
+  'sample_description',
+  'sample_id_name',
+  'sample_type',
+];
 
 const BasicPageDetail = ({
                            PageTabsComponent,
@@ -62,7 +69,11 @@ const BasicPageDetail = ({
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
+    useEffect(() => {
+      setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
+    }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
     /* Derived Variables */
 
     const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
@@ -97,16 +108,6 @@ const BasicPageDetail = ({
       if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
     }, [selectedFeature]);
 
-    useEffect(() => {
-      checkIfIsDisabled();
-    }, [sesar.sesarToken.access]);
-
-    /* Event Handlers */
-
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
     const onSampleSaved = async (formCurrent) => {
       console.log('Saving Sample To SESAR', formRef.current?.values);
       await saveFeature(formCurrent);
@@ -124,21 +125,6 @@ const BasicPageDetail = ({
 
     const cancelForm = async () => {
       closeDetailView();
-    };
-
-    const checkIfIsDisabled = () => {
-      console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
-      console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
-
-      if (!isIGSNChecked) return false;
-
-      if (!sesar.sesarToken.access) return true;
-
-      if (isEmpty(sesar.selectedUserCode)) {
-        return !(selectedFeature.isOnMySesar && isInternetReachable);
-      }
-
-      return false;
     };
 
     const confirmLeavePage = () => {
@@ -249,22 +235,24 @@ const BasicPageDetail = ({
 
     const saveForm = async (formCurrent) => {
       try {
-        if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
-        else {
-          if (groupKey === 'pet') {
-            await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed' && pageKey === 'bedding') {
-            await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else if (groupKey === 'sed') {
-            await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-          }
-          else await saveFeature(formCurrent);
-          closeDetailView();
-          if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-          console.log('Done');
+        console.log('Saving form...', formCurrent);
+        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
+          await updateIGSNAndShowModal(formCurrent);
+          return;
         }
+        if (groupKey === 'pet') {
+          await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else if (groupKey === 'sed' && pageKey === 'bedding') {
+          await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else if (groupKey === 'sed') {
+          await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        }
+        else await saveFeature(formCurrent);
+        if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
+        closeDetailView();
+        console.log('Done');
       }
       catch (err) {
         toast.show('Error Saving Changes', {type: 'danger'});
@@ -291,7 +279,6 @@ const BasicPageDetail = ({
       const formName = getFormName();
       return (
         <View style={{flex: 1}}>
-          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
           <Formik
             enableReinitialize={true}
             initialStatus={{formName: formName}}
@@ -305,7 +292,6 @@ const BasicPageDetail = ({
               <>
                 <Form {...{
                   ...formProps,
-                  // fieldCustomHeights: page.key === PAGE_KEYS.SAMPLES ? {sample_description: 200} : undefined, //TODO Possibly make the description higher
                   formName: formName,
                   isReadOnly: isReadOnly,
                   onMyChange: page.key === PAGE_KEYS.MINERALS
@@ -331,26 +317,6 @@ const BasicPageDetail = ({
       );
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
-    };
-
-    /* View */
-
     return (
       <>
         <View style={{flex: 1}}>
@@ -359,27 +325,41 @@ const BasicPageDetail = ({
               <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
               {PageTabsComponent && PageTabsComponent}
               {!isReadOnly && (
-                <SaveAndCancelButtons
-                  cancel={cancelForm}
-                  getIsDisabled={checkIfIsDisabled()}
-                  save={saveButtonOnPress}
-                />
+                <>
+                  {pageKey === PAGE_KEYS.SAMPLES && isSaveDisabled && (
+                    <View>
+                      <Text style={{
+                        color: RED,
+                        fontSize: 16,
+                        fontWeight: '500',
+                        padding: 10,
+                        textAlign: 'center',
+                      }}>
+                        This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device
+                        is online.
+                      </Text>
+                    </View>
+                  )}
+                  <SaveAndCancelButtons
+                    cancel={cancelForm}
+                    getIsDisabled={isSaveDisabled}
+                    save={saveButtonOnPress}
+                  />
+                </>
               )}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>
             </>
           )}
-
-          {/*{isIGSNModalVisible && (*/}
           <IGSNModal
             isVisible={isIGSNModalVisible}
+            onIGSNUpdated={closeDetailView}
             onModalCancel={() => setIsIGSNModalVisible(false)}
             onSampleSaved={onSampleSaved}
             ref={formRef}
             sampleValues={formRef.current?.values}
           />
-          {/*)}*/}
 
           {/*Modal when deleting a sample with an IGSN attached*/}
           <ModalWrapper

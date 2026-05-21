@@ -21,7 +21,7 @@ const SampleDetailOverview = () => {
 
   /* Derived Variables */
 
-  let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0])) || {};
+  let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0] ?? {}));
   delete sampleDetail.id;
 
   const formName = ['general', 'samples'];
@@ -35,10 +35,6 @@ const SampleDetailOverview = () => {
   }, {});
 
   /* Event Handlers */
-
-  const onIGSNPressed = () => {
-    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-  };
 
   const onViewDetailPressed = () => {
     dispatch(setSelectedAttributes(spot.properties?.samples?.length > 0 ? [spot.properties.samples[0]] : []));
@@ -82,14 +78,6 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        {sampleDetail.Sample_IGSN && <Pressable onPress={onIGSNPressed}>
-          <Text style={[commonStyles.listItemTitle, {
-            color: PRIMARY_ACCENT_COLOR,
-            paddingTop: 5,
-          }]}>
-            View IGSN Data
-          </Text>
-        </Pressable>}
       </View>
     </View>
   );

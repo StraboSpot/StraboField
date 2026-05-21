@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Linking, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {Button, CheckBox, Icon} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -28,14 +28,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+  const {isSample} = useSelector(state => state.spot.selectedSpot.properties) || {};
 
   const {authenticateWithSesar, getAndSaveSesarCode} = useIGSN();
   const {getOrcidToken, getSesarToken} = useServerRequests();
   const toast = useToast();
 
   /* Local State */
-
-  // const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   /* Derived Variables */
@@ -45,32 +44,12 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   /* Side Effects */
 
   useEffect(() => {
-    const subscription = Linking.addEventListener('url', handleOpenURL);
-    console.log('Subscribing');
-    return () => {
-      subscription.remove();
-      console.log('Subscription removed from linking');
-    };
-  }, []);
-
-  useEffect(() => {
     console.log('In 1st UE in IGSNUploadAndRegister page');
     isIGSNChecked && !isEmpty(sesarToken?.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
 
   /* Event Handlers */
-
-  const handleOpenURL = async ({url}) => {
-    console.log('App resumed with URL:', url);
-    if (url) {
-      const code = url.split('/')[3];
-      await getSesarTokenAndCodes(code);
-    }
-    else {
-      console.log('No code found in URL.');
-    }
-  };
 
   const handlePress = async () => {
     handleIGSNChecked(!isIGSNChecked);
@@ -80,11 +59,10 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
     dispatch(setInitialSesarState());
     console.log('Sesar credentials have beed reset');
     toast.show('Sesar credentials have beed reset', {type: 'success'});
-    // handleIGSNChecked(false);
   };
 
   const onUserCodeSelect = async (userCode) => {
-    dispatch(setSelectedUserCode(userCode));
+    dispatch(setSelectedUserCode(userCode?.sesar_code || userCode));
     closePicker();
   };
 
@@ -102,7 +80,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
         dispatch(setSesarToken(tokens));
       }
       if (tokens.access) {
-        // const accessTokenParsed = JSON.parse(atob(tokens.access.split('.')[1]));
         tokens = await authenticateWithSesar(tokens);
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
         toast.show(sesarMessage, {
@@ -116,8 +93,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
           dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
         }
         dispatch(setLoadingStatus({view: 'home', bool: false}));
-        // handleIGSNChecked(true);
-        // if (isEmpty(selectedUserCode)) setIsPickerVisible(true);
       }
       else if (tokens.errors.permissions) {
         throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
@@ -175,8 +150,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   const renderIGSNUserCodePicker = () => {
     return (
       <View style={{marginLeft: 20, padding: 10}}>
-        {/*{!isEmpty(userCodes)*/}
-        {/*  && (*/}
         {selectedFeature?.Sample_IGSN ? (
           <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
             {/*<Text style={{fontSize: MEDIUM_TEXT_SIZE, marginRight: 20}}>*/}
@@ -205,7 +178,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
             </View>
             <PickerOverlay
               closePicker={closePicker}
-              data={[...userCodes, undefined]}
+              data={[...userCodes.map(c => c?.sesar_code || c), undefined]}
               dividerText={'Select User Code'}
               isPickerVisible={isPickerVisible}
               onSelect={onUserCodeSelect}
@@ -236,18 +209,18 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       </View>
     );
   };
-  
+
   /* View */
 
   return (
     <View>
       {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
-      {renderIGSNUploadCheckbox()}
       {isIGSNChecked && (
         <View>
           {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
           {!isEmpty(sesarToken?.access) && renderIGSNUserCodePicker()}
-          {!isEmpty(sesarToken?.access) && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
+          {!isSample && !isEmpty(sesarToken?.access)
+            && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
         </View>
       )}
     </View>
