@@ -16,6 +16,7 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   const dispatch = useDispatch();
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {owner_straboUserId} = useSelector(state => state.project.project) || {};
   const {straboUserId} = useSelector(state => state.user);
 
   /* Derived Variables */
@@ -24,7 +25,8 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
     !r.report_privacy
     || r.report_privacy === 'anyone'
     || r.report_privacy === 'collaborators'
-    || (r.report_privacy === 'only_me' && (r.straboUserId === straboUserId || !r.straboUserId)),
+    || (r.report_privacy === 'only_me'
+      && (r.straboUserId ? r.straboUserId === straboUserId : straboUserId === owner_straboUserId)),
   );
   let reportsToListSorted = JSON.parse(JSON.stringify(reportsToList));
   reportsToListSorted.sort((a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
