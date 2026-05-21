@@ -1,6 +1,6 @@
 {
   "name": "strabospot2",
-  "version": "2.28.1",
+  "version": "2.28.2",
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
@@ -14,10 +14,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix --ext .js,.jsx .",
     "setup-sentry": "node scripts/setup-sentry-config.js",
-    "sentry:release:new": "npm run setup-sentry && node -e \"const pkg = require('./package.json'); const release = 'org.StraboSpot2-' + pkg.version; const {execSync} = require('child_process'); execSync('sentry-cli releases new ' + release, {stdio: 'inherit'});\"",
-    "sentry:release:finalize": "npm run setup-sentry && node -e \"const pkg = require('./package.json'); const release = 'org.StraboSpot2-' + pkg.version; const {execSync} = require('child_process'); execSync('sentry-cli releases finalize ' + release, {stdio: 'inherit'});\"",
-    "upload-sourcemaps-ios": "npm run setup-sentry && node -e \"const pkg = require('./package.json'); const release = 'org.StraboSpot2-' + pkg.version; const {execSync} = require('child_process'); try { execSync('sentry-cli releases new ' + release, {stdio: 'inherit'}); } catch(e) { console.log('Release may already exist'); } execSync('sentry-cli sourcemaps upload --release ' + release + ' --dist ' + release + ' --strip-prefix . ios/main.jsbundle.map', {stdio: 'inherit'}); execSync('sentry-cli releases finalize ' + release, {stdio: 'inherit'});\"",
-    "upload-sourcemaps-android": "npm run setup-sentry && node -e \"const pkg = require('./package.json'); const release = 'org.StraboSpot2-' + pkg.version; const {execSync} = require('child_process'); try { execSync('sentry-cli releases new ' + release, {stdio: 'inherit'}); } catch(e) { console.log('Release may already exist'); } execSync('sentry-cli sourcemaps upload --release ' + release + ' --dist ' + release + ' --strip-prefix . android/index.android.bundle.map', {stdio: 'inherit'}); execSync('sentry-cli releases finalize ' + release, {stdio: 'inherit'});\"",
+    "sentry:release:new": "node scripts/sentry-commands.js release:new",
+    "sentry:release:finalize": "node scripts/sentry-commands.js release:finalize",
+    "upload-sourcemaps-ios": "node scripts/sentry-commands.js upload:ios",
+    "upload-sourcemaps-android": "node scripts/sentry-commands.js upload:android",
     "upload-sourcemaps": "npm run sentry:release:new && concurrently \"npm:upload-sourcemaps-android\" \"npm:upload-sourcemaps-ios\"",
     "bundle:ios": "npx react-native bundle --entry-file index.js --bundle-output ios/main.jsbundle --sourcemap-output ios/main.jsbundle.map  --dev false --platform ios --sourcemap-output ios/main.jsbundle.map --reset-cache",
     "bundle:android": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --sourcemap-output android/index.android.bundle.map --assets-dest android/app/src/main/res --reset-cache && rm -rf ./android/app/src/main/res/drawable-* && rm -rf ./android/app/src/main/res/raw ",
