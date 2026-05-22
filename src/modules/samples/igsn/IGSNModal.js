@@ -1,8 +1,8 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {Linking, ScrollView, Text, View} from 'react-native';
+import {ActivityIndicator, Linking, ScrollView, Text, View} from 'react-native';
 
 import {Icon, Image} from '@rn-vui/base';
-import ProgressBar from 'react-native-progress/Bar';
+import Animated, {useAnimatedStyle, useSharedValue, withSpring} from 'react-native-reanimated';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -29,6 +29,46 @@ import {
   updatedKey,
 } from '../../user/userProfile.slice';
 
+const StepRow = ({label, status}) => {
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (status === 'done' || status === 'error') {
+      scale.value = withSpring(1, {damping: 12, stiffness: 200});
+      opacity.value = withSpring(1, {damping: 15, stiffness: 150});
+    }
+    else {
+      scale.value = 0;
+      opacity.value = 0;
+    }
+  }, [status]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{scale: scale.value}],
+  }));
+
+  return (
+    <View style={IGSNModalStyles.stepRow}>
+      <Text style={IGSNModalStyles.stepLabel}>{label}</Text>
+      <View style={IGSNModalStyles.stepIconContainer}>
+        {status === 'loading' && <ActivityIndicator color='#007AFF' size='small'/>}
+        {(status === 'done' || status === 'error') && (
+          <Animated.View style={animatedStyle}>
+            <Icon
+              color={status === 'done' ? '#34C759' : '#FF3B30'}
+              name={status === 'done' ? 'checkmark-circle' : 'close-circle'}
+              size={24}
+              type='ionicon'
+            />
+          </Animated.View>
+        )}
+      </View>
+    </View>
+  );
+};
+
 const IGSNModal = forwardRef(({
                                 isVisible,
                                 onIGSNUpdated,
@@ -46,7 +86,7 @@ const IGSNModal = forwardRef(({
     updateSampleIsSesar,
     uploadSample,
   } = useIGSN();
-  const {initializeUpload, uploadStatusMessage} = useUpload();
+  const {initializeUpload} = useUpload();
   const {getSesarToken} = useServerRequests();
   const toast = useToast();
 
@@ -56,20 +96,20 @@ const IGSNModal = forwardRef(({
 
   /* Local State */
 
-  let formValues = formRef?.current?.values || selectedAttributes?.[0] || sampleValues;
-  // let currentFormValues = formRef?.current?.values || {};
+  let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [mappedSesarValues, setMappedSesarValues] = useState([]);
   const [modalPage, setModalPage] = useState(null);
+  const [sesarStepLabel, setSesarStepLabel] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [isPickerVisible, setIsPickerVisible] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStepLabel, setUploadStepLabel] = useState('');
+  const [stepStatuses, setStepStatuses] = useState({sesar: 'idle', upload: 'idle'});
 
   /* Side Effects */
 
@@ -107,6 +147,17 @@ const IGSNModal = forwardRef(({
     }
   }, [isVisible, sesar.selectedUserCode, sesar.sesarToken?.access, formValues]);
 
+  useEffect(() => {
+    if (!isVisible) {
+      setStepStatuses({sesar: 'idle', upload: 'idle'});
+      setIsUploaded(false);
+      setIsUploading(false);
+      setAssignedIgsn('');
+      setSesarStepLabel('');
+      setStatusMessage('');
+    }
+  }, [isVisible]);
+
   /* Event Handlers */
 
   const handleClose = () => {
@@ -127,16 +178,17 @@ const IGSNModal = forwardRef(({
 
   const onReset = () => {
     dispatch(setInitialSesarState());
-    console.log('Sesar credentials have beed reset');
-    toast.show('Sesar credentials have beed reset', {type: 'success'});
+    console.log('SESAR credentials have beed reset');
+    toast.show('SESAR credentials have been reset', {type: 'success'});
   };
 
   /* Logic Helpers */
 
-  const doShowActionButton = !isEmpty(sesar.sesarToken?.access)
-    && !isLoading
-    && !isUploaded
-    && modalPage !== 'picker';
+  const doShowActionButton = isUploaded
+    || (!isEmpty(sesar.sesarToken?.access)
+      && !isLoading
+      && !isUploading
+      && modalPage !== 'picker');
 
   const isActionDisabled = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
 
@@ -179,32 +231,32 @@ const IGSNModal = forwardRef(({
 
   const registerSample = async () => {
     try {
-      console.log('Updated FormRef', formValues);
-      setIsLoading(true);
-      setUploadProgress(0);
-      setUploadStepLabel('Registering sample with SESAR...');
+      setIsUploading(true);
+      // setIsLoading(true);
+      setStatusMessage('');
+      setSesarStepLabel(formValues?.isOnMySesar ? 'Updating sample with SESAR' : 'Sending sample to SESAR');
+      setStepStatuses({sesar: 'loading', upload: 'idle'});
 
-      // Step 1: Register with SESAR
+      // Step 1: Register/update with SESAR
       const res = formValues.isOnMySesar
         ? await updateSampleIsSesar(mappedSesarValues)
         : await uploadSample(mappedSesarValues);
       if (res.error && res.error.length > 0) {
         console.log(res.error[0]);
+        setStepStatuses({sesar: 'error', upload: 'idle'});
         setModalPage('error');
         setErrorMessages(res.error);
-        setErrorView(true);
-        setIsLoading(false);
+        // setIsLoading(false);
+        setIsUploading(false);
         return;
       }
 
-      // SESAR success — show status view immediately
-      setIsUploaded(true);
-      setStatusMessage(res.status);
+      setStatusMessage(formValues.isOnMySesar ? 'Sample updated with SESAR!' : 'Sample registered with SESAR!');
       setAssignedIgsn(res.igsn || '');
-      setUploadProgress(0.33);
-      setUploadStepLabel('Saving sample to StraboSpot...');
+      setStepStatuses({sesar: 'done', upload: 'loading'});
+      // setIsLoading(false);
 
-      // Step 2: Save sample (with form edits) + IGSN to Redux after SESAR succeeds
+      // Save sample + IGSN to Redux
       if (spot.properties.isSample) {
         dispatch(editedSpotProperties({
           field: 'samples',
@@ -222,31 +274,52 @@ const IGSNModal = forwardRef(({
         );
         dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
       }
+      else if (sampleValues) {
+        // Opened from the samples list — sampleValues is the raw sample object from the parent spot
+        const sampleId = sampleValues.id ?? sampleValues.properties?.id;
+        if (sampleId != null) {
+          const updatedSamples = (spot.properties.samples || []).map(s =>
+            s.id === sampleId ? {...s, Sample_IGSN: res.igsn, isOnMySesar: true} : s,
+          );
+          dispatch(editedSpotProperties({field: 'samples', value: updatedSamples}));
+        }
+      }
 
-      // Step 3: Upload project — turn off loading spinner so progress bar is visible
-      setIsLoading(false);
-      setUploadProgress(0.66);
-      setUploadStepLabel('Uploading project to your StraboSpot account...');
-
+      // Step 3: Upload project to StraboSpot
       await initializeUpload();
 
-      setUploadProgress(1);
-      setUploadStepLabel('Project successfully uploaded to your StraboSpot account.');
+      setStepStatuses({sesar: 'done', upload: 'done'});
+
+      // Pause so the final checkmark spring is visible before Success! appears
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      setIsUploading(false);
+      setIsUploaded(true);
     }
     catch (err) {
       console.error(err);
-      setIsLoading(false);
-      setUploadProgress(0);
-      setUploadStepLabel('');
+      setStepStatuses((prev) => {
+        const failedKey = Object.keys(prev).find(k => prev[k] === 'loading') || 'upload';
+        return {...prev, [failedKey]: 'error'};
+      });
+      // setIsLoading(false);
+      setIsUploading(false);
       setErrorMessages(err ? [err.toString()] : ['Something went wrong.']);
       setModalPage('error');
-      setIsUploaded(false);
     }
   };
 
   /* Derived Variables */
 
-  const isStatusView = isUploaded || modalPage === 'error';
+  const isStatusView = isUploaded || isUploading || modalPage === 'error';
+
+  const steps = [
+    {
+      key: 'sesar',
+      label: sesarStepLabel || (formValues?.isOnMySesar ? 'Updating sample with SESAR' : 'Sending sample to SESAR'),
+    },
+    {key: 'upload', label: 'Uploading project to StraboSpot'},
+  ];
 
   const getModalHeight = () => {
     if (modalPage === 'content' && !isStatusView) return '80%';
@@ -302,31 +375,32 @@ const IGSNModal = forwardRef(({
   );
 
   const renderStatusView = () => (
-    <View style={isUploaded ? IGSNModalStyles.successContainer : IGSNModalStyles.errorContainer}>
-      <Text style={IGSNModalStyles.statusHeaderText}>
-        {isUploaded ? 'Success!' : 'There was an error!'}
-      </Text>
-      {isUploaded
-        ? (
-          <>
-            <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
-            <View style={IGSNModalStyles.progressContainer}>
-              <ProgressBar
-                borderRadius={10}
-                height={12}
-                progress={uploadProgress}
-                width={300}
-              />
-              <Text style={IGSNModalStyles.uploadStepText}>
-                {uploadProgress < 1 ? (uploadStatusMessage || uploadStepLabel) : uploadStepLabel}
-              </Text>
-            </View>
-          </>
-        )
-        : errorMessages.map(msg => (
-          <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
-        ))
-      }
+    <View
+      style={[modalPage === 'error' ? IGSNModalStyles.errorContainer : IGSNModalStyles.successContainer, {alignSelf: 'stretch'}]}>
+      {modalPage === 'error' && (
+        <>
+          <Text style={IGSNModalStyles.statusHeaderText}>There was an error!</Text>
+          {errorMessages.map(msg => (
+            <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
+          ))}
+        </>
+      )}
+      {(isUploading || isUploaded) && (
+        <View style={IGSNModalStyles.stepsContainer}>
+          {steps.map(step => (
+            <StepRow key={step.key} label={step.label} status={stepStatuses[step.key]}/>
+          ))}
+        </View>
+      )}
+      {isUploaded && (
+        <View style={IGSNModalStyles.successContainer}>
+          <Text style={IGSNModalStyles.statusHeaderText}>Success!</Text>
+          <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+          {assignedIgsn ? (
+            <Text style={IGSNModalStyles.statusMessageText}>IGSN: {assignedIgsn}</Text>
+          ) : null}
+        </View>
+      )}
     </View>
   );
 
@@ -339,13 +413,14 @@ const IGSNModal = forwardRef(({
 
   return (
     <ModalWrapper
-      actionTitle={formValues?.isOnMySesar ? 'Update' : 'Register'}
+      actionTitle={isUploaded ? 'Done' : formValues?.isOnMySesar ? 'Update' : 'Register'}
       cancelTitle={'Close'}
       closeModal={handleClose}
       disabled={isActionDisabled}
+      headerTitle={isUploading ? 'Uploading Project' : 'Upload Complete!'}
       isLoading={isLoading}
       isVisible={isVisible}
-      onActionPressed={registerSample}
+      onActionPressed={isUploaded ? handleClose : registerSample}
       onCancelPress={handleClose}
       overlayStyleOverride={{
         height: getModalHeight(),
@@ -356,12 +431,12 @@ const IGSNModal = forwardRef(({
       showCloseButton
     >
       <View style={IGSNModalStyles.container}>
-        <View style={IGSNModalStyles.sesarImageContainer}>
+        {modalPage === 'content' && !isUploading && !isUploaded && <View style={IGSNModalStyles.sesarImageContainer}>
           <Image
             source={SesarLogo}
             style={IGSNModalStyles.sesarImage}
           />
-        </View>
+        </View>}
         {renderCurrentView()}
         {!isEmpty(sesar.sesarToken?.access) && !isStatusView && (
           <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>

@@ -30,19 +30,32 @@ const IGSNModalStyles = {
   successContainer: {
     alignItems: 'center',
     borderRadius: 10,
-    margin: 15,
-    padding: 20,
+    margin: 5,
+    paddingTop: 20,
   },
-  progressContainer: {
+  stepIconContainer: {
     alignItems: 'center',
-    marginTop: 16,
-    width: '100%',
+    height: 26,
+    justifyContent: 'center',
+    width: 26,
   },
-  uploadStepText: {
+  stepLabel: {
     color: themes.PRIMARY_TEXT_COLOR,
-    fontSize: themes.SMALL_TEXT_SIZE,
-    marginTop: 6,
-    textAlign: 'center',
+    flex: 1,
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+  },
+  stepRow: {
+    alignItems: 'center',
+    borderBottomColor: themes.LIST_BORDER_COLOR,
+    borderBottomWidth: 0.5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+  },
+  stepsContainer: {
+    marginTop: 12,
+    width: '100%',
   },
   fieldRow: {
     flexDirection: 'row',

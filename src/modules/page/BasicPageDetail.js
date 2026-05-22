@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -66,6 +66,7 @@ const BasicPageDetail = ({
     const formRef = useRef(null);
 
     const [initialValues, setInitialValues] = useState(selectedFeature);
+    const [igsnFormValues, setIgsnFormValues] = useState(null);
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
@@ -267,10 +268,10 @@ const BasicPageDetail = ({
     };
 
     const updateIGSNAndShowModal = async (formCurrent) => {
+      const values = {...formCurrent.values};
+      await saveFeature(formCurrent);
+      setIgsnFormValues(values);
       setIsIGSNModalVisible(true);
-      console.log('setting form values for IGSN modals');
-      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
-      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
     };
 
     /* Render Functions */
@@ -358,7 +359,7 @@ const BasicPageDetail = ({
             onModalCancel={() => setIsIGSNModalVisible(false)}
             onSampleSaved={onSampleSaved}
             ref={formRef}
-            sampleValues={formRef.current?.values}
+            sampleValues={igsnFormValues}
           />
 
           {/*Modal when deleting a sample with an IGSN attached*/}
