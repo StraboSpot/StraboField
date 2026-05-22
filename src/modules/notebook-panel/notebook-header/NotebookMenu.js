@@ -67,7 +67,7 @@ const NotebookMenu = ({
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
-    ...(spot.properties?.isSample && (sampleIGSN || pageVisible === PAGE_KEYS.OVERVIEW) ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
+    ...(spot.properties?.isSample && pageVisible === PAGE_KEYS.OVERVIEW ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
     ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
