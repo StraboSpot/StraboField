@@ -5,6 +5,7 @@ import {isEmpty, truncateText} from '../../../shared/helpers';
 const parseString = require('react-native-xml2js').parseString;
 
 export const buildSesarXmlSchema = (data, isUpdating) => {
+  console.log('Building SESAR XML Schema', data);
   return `content=<?xml version="1.0" encoding="UTF-8"?>
   <samples xmlns="http://app.geosamples.org"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -13,6 +14,9 @@ export const buildSesarXmlSchema = (data, isUpdating) => {
            ${!isUpdating ? `<user_code>${data.user_code}</user_code>` : ''}
            <collector>${data.collector}</collector>
            ${data.igsn ? `<igsn>${data.igsn}</igsn>` : ''}
+           <sample_other_names>
+              <sample_other_name>${data.sample_other_name}</sample_other_name>
+            </sample_other_names>
            <longitude>${data.longitude}</longitude>
            <latitude>${data.latitude}</latitude>
            ${data.longitude_end ? `<longitude_end>${data.longitude_end}</longitude_end>` : ''}
