@@ -35,7 +35,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {
     getActiveSpotsObj,
     getRecentSpots,
@@ -51,7 +51,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Derived Variables */
 
-  const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = !isEmpty(spot) && isReadOnlySpot(spot.properties.id);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const spotWithThisImageBasemap = spot.properties?.image_basemap
     && getSpotWithThisImageBasemap(spot.properties.image_basemap);

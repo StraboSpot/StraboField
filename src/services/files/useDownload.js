@@ -38,7 +38,7 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-let tempActiveDatasetsIds, tempTargetDatasetId;
+let prevActiveDatasetsIds, prevTargetDatasetId;
 
 const useDownload = () => {
   /* Data Hooks */
@@ -46,7 +46,7 @@ const useDownload = () => {
   const dispatch = useDispatch();
   const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
   const spots = useSelector(state => state.spot.spots);
-  const encodedLogin = useSelector(state => state.user.encoded_login);
+  const {encoded_login: encodedLogin} = useSelector(state => state.user);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
@@ -61,8 +61,8 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    tempActiveDatasetsIds = undefined;
-    tempTargetDatasetId = undefined;
+    prevActiveDatasetsIds = undefined;
+    prevTargetDatasetId = undefined;
   };
 
   /* Internal Functions */
@@ -84,22 +84,33 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
+
+      // Same project re-downloaded — restore active/target from before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
-        // If same project set active and target dataset to same as before if they still exist
         const newDatasetIds = datasets.map(d => d.id);
-        const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
-          console.log('Checking if active dataset still exists:', tempActiveDatasetId);
-          return newDatasetIds.includes(tempActiveDatasetId) ? [...acc, tempActiveDatasetId] : acc;
-        }, []);
-        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
-        else dispatch(setTargetDataset(datasets[0].id));
+        const retainedActiveDatasetIds = prevActiveDatasetsIds.filter(id => newDatasetIds.includes(id));
+        if (retainedActiveDatasetIds.length >= 1) {
+          if (retainedActiveDatasetIds.length === 1) {
+            dispatch(setActiveDatasets({bool: true, dataset: retainedActiveDatasetIds[0]}));
+          }
+          else dispatch(setActiveDatasetsMultiple(retainedActiveDatasetIds));
+          const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
+          if (prevTargetDataset && !prevTargetDataset.isReadOnly) {
+            dispatch(setActiveDatasets({bool: true, dataset: prevTargetDatasetId}));
+            dispatch(setTargetDataset(prevTargetDatasetId));
+          }
+          else {
+            const firstWritableDataset = datasets.find(d => retainedActiveDatasetIds.includes(d.id) && !d.isReadOnly)
+              || datasets.find(d => !d.isReadOnly);
+            if (firstWritableDataset) {
+              dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
+              dispatch(setTargetDataset(firstWritableDataset.id));
+            }
+          }
+        }
+        else setFirstWritableActiveAndTarget(datasets);
       }
-      else if (datasets.length >= 1) {
-        dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setTargetDataset(datasets[0].id));
-      }
+      else if (datasets.length >= 1) setFirstWritableActiveAndTarget(datasets);
       else {
         const targetDataset = createDataset();
         dispatch(addedDataset(targetDataset));
@@ -109,9 +120,6 @@ const useDownload = () => {
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
       await doGetDatasetSpots(datasets, encodedLoginScoped);
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
-        + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
     }
     catch (e) {
       console.log('Error getting datasets...' + e);
@@ -127,8 +135,8 @@ const useDownload = () => {
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       if (!isEmpty(project)) {
         if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) tempActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) tempTargetDatasetId = targetDatasetId;
+          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
+          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
         }
         clearProject();
       }
@@ -264,6 +272,17 @@ const useDownload = () => {
     });
   };
 
+  // Sets the first non-read-only dataset as both the active and target dataset
+  // falls back to datasets[0] for the active dataset if all are read-only
+  const setFirstWritableActiveAndTarget = (datasets) => {
+    const firstWritableDataset = datasets.find(d => !d.isReadOnly);
+    if (firstWritableDataset) {
+      dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
+      dispatch(setTargetDataset(firstWritableDataset.id));
+    }
+    else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+  };
+
   /* Exported Functions */
 
   const downloadUserProfile = async (encodedLoginScoped = encodedLogin) => {
@@ -309,6 +328,7 @@ const useDownload = () => {
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
+      return datasetsObjToSave;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

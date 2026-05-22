@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Keyboard, Modal, Platform, View} from 'react-native';
+import {Keyboard, Modal, Platform, useWindowDimensions, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -43,6 +43,8 @@ const ModalWrapper = ({
                       }) => {
   /* Data Hooks */
 
+  const {height: windowHeight} = useWindowDimensions();
+
   const footerShortcutModal = useSelector((state) => {
     if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
     return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
@@ -72,7 +74,7 @@ const ModalWrapper = ({
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen) return overlayStyles.overlayContainerFullScreen;
-    return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
+    return {...overlayStyles.overlayContainer, height: windowHeight * 0.80, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
   };
 
   /* Render Functions */

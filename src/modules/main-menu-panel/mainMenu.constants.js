@@ -5,7 +5,7 @@ export const MAIN_MENU_ITEMS = {
     DATASETS: 'Datasets',
     BACKUP: 'Backup',
     DESCRIPTION: 'Project Description',
-    SETTINGS: 'Privacy',
+    SETTINGS: 'Governance',
   },
   CUSTOMIZE_AND_PRESET: {
     NAMING_CONVENTIONS: 'Naming Conventions',
@@ -76,6 +76,9 @@ export const MAIN_MENU_DATA_NO_USER = Object.entries(MAIN_MENU_ITEMS).map(([key,
 export const MAIN_MENU_DATA_NO_PROJECT_NO_USER = MAIN_MENU_DATA_NO_PROJECT.map(({title, data}) => {
   return {title, data: data.filter(val => !listItemsToHideIfNoUser.includes(val))};
 });
+
+export const MAIN_MENU_SECTIONS_TO_HIDE_IF_IS_READ_ONLY_PROJECT = ['CUSTOMIZE_AND_PRESET', 'APP_SETTINGS'];
+export const MAIN_MENU_ITEMS_TO_HIDE_IF_IS_READ_ONLY_PROJECT = [MAIN_MENU_ITEMS.ACCOUNT.USER_CONVENTIONS];
 
 export const SIDE_PANEL_VIEWS = {
   DATASET_DETAIL: 'Dataset Detail',

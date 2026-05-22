@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 
 import {Input} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
+import {useSelector} from 'react-redux';
 
 import styles from './preferences.styles';
 import * as themes from '../../shared/styles.constants';
@@ -15,6 +16,7 @@ import useMapLocation from '../maps/useMapLocation';
 const GenerateRandomSpots = () => {
   /* Data Hooks */
 
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const {generateRandomsSpotsAroundCurrentLocation} = useMapLocation();
   const toast = useToast();
 
@@ -39,6 +41,8 @@ const GenerateRandomSpots = () => {
   };
 
   /* View */
+
+  if (isReadOnlyProject) return null;
 
   return (
     <>

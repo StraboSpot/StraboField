@@ -23,6 +23,7 @@ const BackupProject = () => {
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const isOnline = useSelector(state => state.connections.isOnline);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const user = useSelector(state => state.user);
 
   const {openURL} = useDevice();
@@ -63,13 +64,17 @@ const BackupProject = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <>
-        {user.encoded_login && isOnline.isConnected ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
-          : (
-            <View style={uiStyles.spacer}>
-              <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
-            </View>
-          )}
-        <FlatListItemSeparator/>
+        {!isReadOnlyProject && (
+          <>
+            {user.encoded_login && isOnline.isConnected ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+              : (
+                <View style={uiStyles.spacer}>
+                  <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
+                </View>
+              )}
+            <FlatListItemSeparator/>
+          </>
+        )}
         <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
         <FlatListItemSeparator/>
         <MainMenuPanelListItem

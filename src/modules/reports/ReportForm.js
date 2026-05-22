@@ -1,53 +1,27 @@
-import React, {forwardRef, useState} from 'react';
-import {Text, View} from 'react-native';
+import React, {forwardRef, useEffect} from 'react';
+import {View} from 'react-native';
 
 import {Formik} from 'formik';
 
 import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 
-const ReportForm = forwardRef(({initialValues}, formRef) => {
+const FormDirtyObserver = ({isDirty, onDirtyChange}) => {
+  useEffect(() => {
+    onDirtyChange(isDirty);
+  }, [isDirty, onDirtyChange]);
+  return null;
+};
+
+const ReportForm = forwardRef(({initialValues, isReadOnly, onDirtyChange}, formRef) => {
   /* Data Hooks */
-  const {getRelevantFields, getSurvey, validateForm} = useForm();
-
-  /* Local State */
-
-  const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const {getSurvey, validateForm} = useForm();
 
   /* Derived Variables */
 
   const survey = getSurvey(REPORT_FORM_NAME);
 
   const mainFormKeysFields = REPORT_MAIN_FORM_KEYS.map(k => survey.find(f => f.name === k));
-
-  /* Event Handlers */
-
-  const onMyChange = async (name, value) => {
-    await formRef.current.setFieldValue(name, value);
-    setChoicesViewKey(null);
-  };
-
-  /* Render Functions */
-
-  const renderSubform = (formProps) => {
-    const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return (
-      <ModalWrapper
-        actionTitle={'[Action]'}
-        headerTitle={'[Subform]'}
-        onActionPressed={() => setChoicesViewKey(null)}
-        onCancelPress={() => setChoicesViewKey(null)}
-      >
-        <Text style={{textAlign: 'center'}}>This is a placeholder for the subform</Text>
-        <Form {...{
-          formName: REPORT_FORM_NAME,
-          surveyFragment: relevantFields, ...formProps,
-          onMyChange: onMyChange,
-        }}/>
-      </ModalWrapper>
-    );
-  };
 
   /* View */
 
@@ -61,8 +35,12 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
     >
       {formProps => (
         <View style={{flex: 1}}>
-          <Form {...{formName: REPORT_FORM_NAME, surveyFragment: mainFormKeysFields, ...formProps}}/>
-          {choicesViewKey && renderSubform(formProps)}
+          {onDirtyChange && <FormDirtyObserver isDirty={formProps.dirty} onDirtyChange={onDirtyChange}/>}
+          <Form {...{
+            formName: REPORT_FORM_NAME,
+            isReadOnly: isReadOnly,
+            surveyFragment: mainFormKeysFields, ...formProps,
+          }}/>
         </View>
       )}
     </Formik>

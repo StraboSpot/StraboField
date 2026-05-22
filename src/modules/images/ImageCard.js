@@ -4,7 +4,7 @@ import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
+import {imageStyles, ImageThumbnail, useImages, useImageThumbnails} from '.';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
@@ -20,7 +20,7 @@ const ImageCard = ({
                      image,
                      imageThumbnailURIs,
                      index,
-                     isReadOnly,
+                     isReadOnlyImage,
                      isThumbnailOnly,
                      onOpenImage,
                      saveUpdatedImage,
@@ -33,6 +33,7 @@ const ImageCard = ({
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
@@ -106,7 +107,7 @@ const ImageCard = ({
 
   const handleMissingImage = () => {
     setIsImageMissingOnServer(true);
-    setIsMissingImageModalVisible(true);
+    if (!isReadOnlyImage && !isReadOnlyProject) setIsMissingImageModalVisible(true);
   };
 
   const handleStartEditing = () => {
@@ -128,7 +129,8 @@ const ImageCard = ({
       : placeholderTitle;
   }
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  const getIsSwitchDisabled = () => !isEmpty(
+    getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnlyImage || isReadOnlyProject;
 
   /* View */
 
@@ -155,7 +157,7 @@ const ImageCard = ({
             />
           ) : (
             <TouchableOpacity
-              disabled={isReadOnly}
+              disabled={isReadOnlyImage}
               onPress={handleStartEditing}
               style={imageStyles.cardTitleEditingButton}>
               <Text

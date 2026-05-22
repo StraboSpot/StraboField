@@ -30,7 +30,6 @@ const Tags = ({
 
   const dispatch = useDispatch();
   const tags = useSelector(state => state.project.project?.tags) || [];
-
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
   /* Local State */

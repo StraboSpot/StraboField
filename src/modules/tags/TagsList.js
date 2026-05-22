@@ -114,7 +114,7 @@ const TagsList = ({selectedIndex, tagsSorted, type}) => {
   const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
     : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
   if (isEmpty(filteredTags)) {
-    return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+    return <ListEmptyText text={`No ${label} Found`}/>;
   }
   else {
     return (

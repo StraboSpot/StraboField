@@ -71,6 +71,7 @@ const StepRow = ({label, status}) => {
 
 const IGSNModal = forwardRef(({
                                 isVisible,
+                                isSampleSpotId,
                                 onIGSNUpdated,
                                 onModalCancel,
                                 onSampleSaved,
@@ -137,7 +138,7 @@ const IGSNModal = forwardRef(({
     console.log('FORM VALUES', formValues);
     if (isEmpty(sesar.sesarToken?.access)) setModalPage('login');
     else {
-      setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
+      // setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
       setModalPage('content');
       const sesarMappedObj = formValues ? straboSesarMapping(formValues) : [];
       setMappedSesarValues(sesarMappedObj);
@@ -267,6 +268,18 @@ const IGSNModal = forwardRef(({
           }],
         }));
       }
+      else if (isSampleSpotId) {
+        // Opened from SamplesList where the sample lives in a separate isSample spot
+        dispatch(editedSpotProperties({
+          field: 'samples',
+          spotId: isSampleSpotId,
+          value: [{
+            ...(sampleValues || {}),
+            Sample_IGSN: res.igsn,
+            isOnMySesar: true,
+          }],
+        }));
+      }
       else if (selectedAttributes?.[0]) {
         const sampleId = selectedAttributes[0].id;
         const updatedSamples = (spot.properties.samples || []).map(s =>
@@ -337,7 +350,9 @@ const IGSNModal = forwardRef(({
 
   const renderContentView = () => (
     <ScrollView style={IGSNModalStyles.contentContainer}>
-      <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      {!isUploading && !isUploaded
+        && <Text style={IGSNModalStyles.uploadContentDescription}>Below are the valid relevant fields in your MYSESAR
+          account.</Text>}
       {isVisible && mappedSesarValues?.map((item) => {
         if (item.sesarKey === 'user_code' && formRef?.current?.values?.isOnMySesar) return null;
         if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;

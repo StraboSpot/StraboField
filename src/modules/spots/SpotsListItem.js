@@ -15,6 +15,7 @@ import CheckboxList from '../../shared/ui/CheckboxList';
 const SpotsListItem = ({
                          doShowSamples,
                          doShowTags,
+                         ignoreReadOnly,
                          isCheckedList,
                          isItemChecked,
                          isSample,
@@ -29,12 +30,12 @@ const SpotsListItem = ({
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = !ignoreReadOnly && isReadOnlySpot(spot.properties.id);
 
   /* Event Handlers */
 

@@ -26,13 +26,13 @@ import ExportProject from '../project/backup/ExportProject';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
 import Datasets from '../project/datasets/Datasets';
 import DeleteProject from '../project/delete/DeleteProject';
+import Governance from '../project/governance/Governance';
 import DownloadProject from '../project/load/DownloadProject';
 import ImportProjectFromZip from '../project/load/ImportProjectFromZip';
 import NewProject from '../project/load/NewProject';
 import OpenProject from '../project/load/OpenProject';
 import NamingConventions from '../project/NamingConventions';
 import ProjectDescription from '../project/ProjectDescription';
-import ProjectPrivacy from '../project/ProjectPrivacy';
 import StraboFieldProjects from '../project/StraboFieldProjects';
 import {ReportsMenu} from '../reports';
 import Samples from '../samples/Samples';
@@ -101,7 +101,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.DESCRIPTION:
         return <ProjectDescription/>;
       case MAIN_MENU_ITEMS.MANAGE_PROJECT.SETTINGS:
-        return <ProjectPrivacy/>;
+        return <Governance/>;
 
       // Customize & Preset
       case MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.NAMING_CONVENTIONS:

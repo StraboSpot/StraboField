@@ -33,13 +33,13 @@ const SampleListItem = ({
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {getSampleSpotIconSource} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotInReadOnlyDataset(parentSpot.properties?.id);
+  const isReadOnly = isReadOnlySpot(parentSpot.properties?.id);
   const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
@@ -63,57 +63,58 @@ const SampleListItem = ({
 
   return (
     <>
-    <ListItem
-      containerStyle={commonStyles.listItem}
-      key={'SampleListItem' + sampleMetadata.id}
-      onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
-    >
-      {isShowAvatar && (
-        <AvatarWrapper
-          size={20}
-          source={getSampleSpotIconSource()}
-        />
-      )}
-      <ListItem.Content style={sampleStyles.listContentContainer}>
-        <View>
-          <ListItem.Title titleStyle={{...commonStyles.listItemTitle, textAlign: 'left'}}>
-            {sampleMetadata.sample_id_name || 'Unknown'}
-          </ListItem.Title>
-          {isShowSubtitle && (
-            <ListItem.Subtitle>
-              {oriented} - {sampleMetadata.sample_description ? truncateText(sampleMetadata.sample_description,
-              25) : 'No Description'}
-            </ListItem.Subtitle>
-          )}
-        </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
-          <View>
-            <IGSNLogo
-              item={sampleMetadata}
-              onIGSNButtonPressed={handleIGSNButtonPressed}
-            />
-          </View>
+      <ListItem
+        containerStyle={commonStyles.listItem}
+        key={'SampleListItem' + sampleMetadata.id}
+        onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
+      >
+        {isShowAvatar && (
+          <AvatarWrapper
+            size={20}
+            source={getSampleSpotIconSource()}
+          />
         )}
-      </ListItem.Content>
-      {isCheckedList ? (
-        <CheckboxList
-          handleCheckBoxPressed={handleCheckBoxPressed}
-          isItemChecked={isItemChecked}
-          isReadOnly={isReadOnly}
-        />
-      ) : (
-        <>
-          <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample ? sample : undefined}/>
-          <ListItem.Chevron/>
-        </>
-      )}
-    </ListItem>
-    <IGSNModal
-      isVisible={isIGSNModalVisible}
-      onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
-      onModalCancel={() => setIsIGSNModalVisible(false)}
-      sampleValues={sampleMetadata}
-    />
+        <ListItem.Content style={sampleStyles.listContentContainer}>
+          <View>
+            <ListItem.Title titleStyle={{...commonStyles.listItemTitle, textAlign: 'left'}}>
+              {sampleMetadata.sample_id_name || 'Unknown'}
+            </ListItem.Title>
+            {isShowSubtitle && (
+              <ListItem.Subtitle>
+                {oriented} - {sampleMetadata.sample_description ? truncateText(sampleMetadata.sample_description,
+                25) : 'No Description'}
+              </ListItem.Subtitle>
+            )}
+          </View>
+          {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+            <View>
+              <IGSNLogo
+                item={sampleMetadata}
+                onIGSNButtonPressed={handleIGSNButtonPressed}
+              />
+            </View>
+          )}
+        </ListItem.Content>
+        {isCheckedList ? (
+          <CheckboxList
+            handleCheckBoxPressed={handleCheckBoxPressed}
+            isItemChecked={isItemChecked}
+            isReadOnly={isReadOnly}
+          />
+        ) : (
+          <>
+            <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample ? sample : undefined}/>
+            <ListItem.Chevron/>
+          </>
+        )}
+      </ListItem>
+      <IGSNModal
+        isSampleSpotId={sample.properties?.isSample ? sample.properties.id : undefined}
+        isVisible={isIGSNModalVisible}
+        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        sampleValues={sampleMetadata}
+      />
     </>
   );
 };
