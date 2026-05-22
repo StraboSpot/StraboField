@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
@@ -10,20 +10,17 @@ import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui/';
-import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 
 const DatasetPreferencesListItem = ({dataset}) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
-  const {makeDatasetCurrent, setSwitchValue} = useProject();
+  const {makeDatasetCurrent, setSwitchValue, toggleActiveDataset, toggleTargetDataset} = useProject();
   const [imagesNeededCount, refreshImagesNeededCount] = useDatasetNeededImagesCount(dataset);
 
   /* Local State */
@@ -35,18 +32,15 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-  const isTarget = targetDatasetId === dataset.id;
+  const isReadOnly = dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */
 
-  const onSwitch = async (val) => {
-    const value = await setSwitchValue(val, dataset);
+  const handleToggleActiveDataset = async (val) => {
+    const value = await toggleActiveDataset(val, dataset);
     console.log('Value has been switched', value);
   };
-
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
   /* Logic Helpers */
 
@@ -64,9 +58,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
     }
   };
 
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
-  };
+  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   /* Render Functions */
 
@@ -108,20 +100,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
           </View>
         </ListItem.Content>
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
-      </ListItem>
-    );
-  };
-
-  const renderReadOnlyDatasetButton = () => {
-    return (
-      <ListItem containerStyle={[commonStyles.listItemFormField, {paddingRight: 0}]}>
-        <ListItem.Content
-          style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-        >
-          <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Read Only?'}</Text>
-        </ListItem.Content>
-        <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
+        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={handleToggleActiveDataset} value={isActive}/>
       </ListItem>
     );
   };
@@ -142,7 +121,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
           disabled={!isActive}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => makeDatasetCurrent(dataset.id)}
+          onPress={() => toggleTargetDataset(dataset.id)}
           type={'ionicon'}
         />
       </View>
@@ -173,7 +152,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
         <View style={{flex: 1, flexDirection: 'column'}}>
           {renderStateIcon()}
           {renderIsActiveDatasetSwitch()}
-          {renderReadOnlyDatasetButton()}
         </View>
       </ListItem>
     </View>

@@ -32,10 +32,13 @@ const useMapPressEvents = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const datasets = useSelector(state => state.project.datasets || {});
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
@@ -47,6 +50,11 @@ const useMapPressEvents = ({
   /* Local State */
 
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
+
+  /* Derived Variables */
+
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
+  const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset;
 
   /* Internal Functions */
 
@@ -67,7 +75,7 @@ const useMapPressEvents = ({
     const spotToEdit = await getSpotAtPress(screenPointX, screenPointY);
 
     const mappedSpots = getAllMappedSpots();
-    if (mapMode === MAP_MODES.VIEW && !isEmpty(mappedSpots) && !isEmpty(spotToEdit)) {
+    if (mapMode === MAP_MODES.VIEW && !isEditToolsDisabled && !isEmpty(mappedSpots) && !isEmpty(spotToEdit)) {
       await switchToEditing(screenPointX, screenPointY, spotToEdit, setMapModeToEdit);
     }
     else if (mapMode === MAP_MODES.EDIT) await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit);

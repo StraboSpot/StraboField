@@ -14,6 +14,7 @@ const ActionButtonsSmallScreen = ({
                                     distance,
                                     onCancel,
                                     endMeasurement,
+                                    isEditToolsDisabled,
                                     mapMode,
                                     onEndDrawPressed,
                                     selectingMode,
@@ -23,12 +24,16 @@ const ActionButtonsSmallScreen = ({
 
   const {height, width} = useWindowSize();
 
+  /* Derived Variables */
+
+  const isGeolocateLeft = height < width || isEditToolsDisabled;
+
   /* View */
 
   return (
-    <View>
+    <View style={isGeolocateLeft && {alignSelf: 'stretch'}}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-        {width < height ? <UserLocationButton clickHandler={clickHandler}/>
+        {width < height && !isEditToolsDisabled ? <UserLocationButton clickHandler={clickHandler}/>
           : <View/> //Added so 'space-between' would work correctly for DrawInfo when no UserLocationButton
         }
 
@@ -42,8 +47,10 @@ const ActionButtonsSmallScreen = ({
           selectingMode={selectingMode}
         />
       </View>
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 5}}>
-        {height < width && <UserLocationButton clickHandler={clickHandler}/>}
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingTop: 5}}>
+        {isGeolocateLeft && (
+          <View style={{flex: 1, alignItems: 'flex-start'}}><UserLocationButton clickHandler={clickHandler}/></View>
+        )}
 
         <View
           style={{
@@ -66,13 +73,17 @@ const ActionButtonsSmallScreen = ({
               toggleDialog={toggleDialog}
             />
           </View>
-          <View style={{paddingLeft: 10}}>
-            <DrawActionButtons
-              clickHandler={clickHandler}
-              mapMode={mapMode}
-            />
-          </View>
+          {!isEditToolsDisabled && (
+            <View style={{paddingLeft: 10}}>
+              <DrawActionButtons
+                clickHandler={clickHandler}
+                mapMode={mapMode}
+              />
+            </View>
+          )}
         </View>
+
+        {(isGeolocateLeft) && <View style={{flex: 1}}/>}
       </View>
     </View>
   );

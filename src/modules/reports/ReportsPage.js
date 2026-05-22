@@ -16,6 +16,7 @@ const ReportsPage = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -38,7 +39,7 @@ const ReportsPage = () => {
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={'Reports'}/>
-      <AddButton onPress={addReport} title={'Create New Report with this Spot'}/>
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Report with this Spot'}/>}
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
         Reports referencing this Spot:
       </Text>

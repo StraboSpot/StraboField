@@ -33,13 +33,13 @@ const SampleListItem = ({
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {getSampleSpotIconSource} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotInReadOnlyDataset(parentSpot.properties?.id);
+  const isReadOnly = isReadOnlySpot(parentSpot.properties?.id);
   const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 

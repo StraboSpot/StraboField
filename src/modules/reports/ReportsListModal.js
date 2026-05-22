@@ -12,6 +12,7 @@ const ReportsListModal = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
 
   /* Logic Helpers */
@@ -25,7 +26,7 @@ const ReportsListModal = () => {
 
   return (
     <ModalWrapper>
-      <AddButton onPress={addReport} title={'Create New Report'}/>
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Report'}/>}
       <ReportsList isCheckedList/>
     </ModalWrapper>
   );

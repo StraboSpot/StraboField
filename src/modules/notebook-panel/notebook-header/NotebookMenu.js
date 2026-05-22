@@ -41,6 +41,7 @@ const NotebookMenu = ({
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const pageVisible = useSelector(state => state.notebook.visibleNotebookPagesStack?.slice(-1)[0]);
   const {sesarToken} = useSelector(state => state.user.sesar);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const navigation = useNavigation();
   const toast = useToast();
@@ -60,7 +61,7 @@ const NotebookMenu = ({
   const type = isSample ? 'Sample' : 'Spot';
   const sampleIGSN = selectedSample?.Sample_IGSN ?? spot.properties?.samples?.[0]?.Sample_IGSN;
   const actions = [
-    ...(!isSample ? [{key: 'copy', title: `Copy this ${type}`}] : []),
+    ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
     {key: 'zoom', title: `Zoom to this ${type}`},
     {key: 'delete', title: `Delete this ${type}`},
     {key: 'geography', title: 'Show Geography'},
@@ -128,9 +129,9 @@ const NotebookMenu = ({
   /* Render Functions */
 
   const renderActionItem = ({item}) => {
-    if (isReadOnly && item.key === 'delete') return;
-    else if (item.key === 'rockd' && !isTestingMode
-      && (checkedInSpotIds.includes(spot.properties.id) || spot.geometry.type !== 'Point')) return;
+    if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
+    else if (item.key === 'rockd' && !isTestingMode && (checkedInSpotIds.includes(
+      spot.properties.id) || spot.geometry.type !== 'Point')) return;
     else if (item.key === 'rockd' && !isTestingMode) return;
     else {
       return (

@@ -91,14 +91,14 @@ const homeSlice = createSlice({
       state.modalVisible = action.payload.modal;
     },
     setShortcutSwitchPositions(state, action) {
-      // console.log('Toggling Shortcut', action.payload.switchName);
-      state.shortcutSwitchPosition[action.payload.switchName] = !state.shortcutSwitchPosition[action.payload.switchName];
-      if (action.payload.switchName === 'all') {
+      const {switchName, value} = action.payload;
+      const nextValue = value ?? !state.shortcutSwitchPosition[switchName];
+      state.shortcutSwitchPosition[switchName] = nextValue;
+      if (switchName === 'all') {
         Object.keys(state.shortcutSwitchPosition).forEach(
           key => (state.shortcutSwitchPosition[key] = state.shortcutSwitchPosition.all));
       }
       else state.shortcutSwitchPosition.all = false;
-      // console.log('Shortcut Switch Positions', JSON.stringify(Object.entries(state.shortcutSwitchPosition)));
     },
     setStatusMessageModalTitle(state, action) {
       state.statusMessageModalTitle = action.payload;

@@ -16,19 +16,20 @@ const MainMenuPanelListItem = ({onPress, title}) => {
 
   const dispatch = useDispatch();
   const currentProjectId = useSelector(state => state.project.project?.id);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
 
   const {getTargetDatasetFromId} = useProject();
 
   /* Local State */
 
-  const [targetDatasetName, setTargetDatasetName] = useState('');
+  const [targetDatasetName, setTargetDatasetName] = useState('[Not Set]');
 
   /* Side Effects */
 
   useEffect(() => {
     if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS && !isEmpty(currentProjectId)) {
       const targetDataset = getTargetDatasetFromId();
-      setTargetDatasetName(targetDataset?.name || '');
+      setTargetDatasetName(targetDataset?.name || '[Not Set]');
     }
   }, [currentProjectId, title]);
 
@@ -39,7 +40,7 @@ const MainMenuPanelListItem = ({onPress, title}) => {
   /* Logic Helpers */
 
   const getTitle = () => {
-    const subtitle = title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
+    const subtitle = title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS && !isReadOnlyProject
       ? '  (Target: ' + truncateText(targetDatasetName, 25) + ')'
       : undefined;
 

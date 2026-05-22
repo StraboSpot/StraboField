@@ -68,12 +68,13 @@ const SelectInputField = ({
             checked={value === item.value}
             checkedIcon={radioSelected}
             containerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0, padding: 1}}
+            disabled={isReadOnly}
             onPress={() => handleChoicePressed(item)}
             title={item.label}
             uncheckedIcon={radioUnselected}
           />
         ) : (
-          <ListItem containerStyle={commonStyles.listItemFormField} onPress={() => handleChoicePressed(item)}>
+          <ListItem containerStyle={commonStyles.listItemFormField} onPress={isReadOnly ? undefined : () => handleChoicePressed(item)}>
             <ListItem.Content>
               <ListItem.Title style={commonStyles.listItemTitle}>{item.label}</ListItem.Title>
             </ListItem.Content>
@@ -81,13 +82,14 @@ const SelectInputField = ({
               <ListItem.CheckBox
                 checked={value === item.value}
                 checkedIcon={radioSelected}
-                onPress={() => handleChoicePressed(item)}
+                onPress={isReadOnly ? undefined : () => handleChoicePressed(item)}
                 uncheckedIcon={radioUnselected}
               />
             ) : (
               <ListItem.CheckBox
                 checked={value?.includes(item.value)}
-                onPress={() => handleChoicePressed(item)}
+                disabled={isReadOnly}
+                onPress={isReadOnly ? undefined : () => handleChoicePressed(item)}
               />
             )}
           </ListItem>
