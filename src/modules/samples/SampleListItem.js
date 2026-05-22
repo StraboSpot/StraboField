@@ -86,7 +86,7 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+        {!isReadOnly && (isShowIGSN || sampleMetadata.Sample_IGSN) && (
           <View>
             <IGSNLogo
               item={sampleMetadata}
