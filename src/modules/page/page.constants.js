@@ -194,6 +194,7 @@ export const SECONDARY_PAGES = [
     icon_pressed_src: require('../../assets/icons/QAQC_pressed.png'),
     overview_component: QAQCOverview,
     page_component: QAQCPage,
+    testing: true,
   },
 ];
 
