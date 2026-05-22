@@ -17,6 +17,7 @@ const IGSNModal = forwardRef(({
                                 isVisible,
                                 onModalCancel,
                                 onSampleSaved,
+                                sampleValues,
                               }, formRef) => {
   /* Data Hooks */
 
@@ -28,6 +29,7 @@ const IGSNModal = forwardRef(({
   /* Local State */
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
+  const [igsnResult, setIgsnResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [mappedSesarValues, setMappedSesarValues] = useState({});
@@ -36,7 +38,7 @@ const IGSNModal = forwardRef(({
 
   /* Derived Variables */
 
-  const formValues = formRef.current?.values || {};
+  const formValues = sampleValues || formRef.current?.values || {};
 
   /* Side Effects */
 
@@ -66,7 +68,7 @@ const IGSNModal = forwardRef(({
   /* Event Handlers */
 
   const handleConfirmOnPress = () => {
-    if (formRef.current) onSampleSaved(formRef.current);
+    onSampleSaved({...sampleValues, ...igsnResult});
     onModalCancel();
   };
 
@@ -74,7 +76,7 @@ const IGSNModal = forwardRef(({
 
   const registerSample = async () => {
     try {
-      const currentFormValues = formRef.current?.values || {};
+      const currentFormValues = sampleValues || formRef.current?.values || {};
       console.log('Updated FormRef', formRef.current?.values);
       setIsLoading(true);
       const res = currentFormValues.isOnMySesar ? await updateSampleIsSesar(mappedSesarValues)
@@ -88,7 +90,7 @@ const IGSNModal = forwardRef(({
       else {
         setIsUploaded(true);
         setStatusMessage(res.status);
-        await formRef.current?.setValues({...formRef.current.values, Sample_IGSN: res.igsn, isOnMySesar: true});
+        setIgsnResult({Sample_IGSN: res.igsn, isOnMySesar: true});
       }
       setIsLoading(false);
     }
@@ -121,7 +123,7 @@ const IGSNModal = forwardRef(({
       }}>
         <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
         {!isUploaded && isVisible && mappedSesarValues.map((item) => {
-          if (item.sesarKey === 'user_code' && formRef.current?.values?.isOnMySesar) return null;
+          if (item.sesarKey === 'user_code' && formValues?.isOnMySesar) return null;
           if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
           return (
             <View key={item.sesarKey}
@@ -153,7 +155,7 @@ const IGSNModal = forwardRef(({
   const renderUploadContent = () => {
     return (
       <>
-        {!isEmpty(formRef.current?.values?.sample_id_name) && (
+        {!isEmpty(formValues?.sample_id_name) && (
           <ScrollView>
             {renderContentItems()}
           </ScrollView>
@@ -176,7 +178,7 @@ const IGSNModal = forwardRef(({
         maxHeight: isUploaded || errorView ? '40%' : '80%',
         width: 500,
       }}
-      showActionButton={!isEmpty(formRef.current?.values?.sample_id_name) && !isLoading}
+      showActionButton={!isEmpty(formValues?.sample_id_name) && !isLoading}
       showCancelButton={!isLoading && !isUploaded}
     >
       <View style={IGSNModalStyles.container}>
