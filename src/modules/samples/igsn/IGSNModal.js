@@ -72,6 +72,14 @@ const IGSNModal = forwardRef(({
     onModalCancel();
   };
 
+  const handleModalClose = () => {
+    setErrorView(false);
+    setIsUploaded(false);
+    setIgsnResult(null);
+    setModalPage(null);
+    setStatusMessage('');
+    onModalCancel();
+  };
   /* Logic Helpers */
 
   const registerSample = async () => {
@@ -168,18 +176,18 @@ const IGSNModal = forwardRef(({
 
   return (
     <ModalWrapper
-      actionTitle={!isUploaded ? 'Register' : 'OK'}
+      actionTitle={errorView ? 'Close' : (!isUploaded ? 'Register' : 'OK')}
       isLoading={isLoading}
       isVisible={isVisible}
-      onActionPressed={!isUploaded ? registerSample : handleConfirmOnPress}
+      onActionPressed={errorView ? handleModalClose : (!isUploaded ? registerSample : handleConfirmOnPress)}
       onCancelPress={onModalCancel}
       overlayStyleOverride={{
         flex: 1,
         maxHeight: isUploaded || errorView ? '40%' : '80%',
         width: 500,
       }}
-      showActionButton={!isEmpty(formValues?.sample_id_name) && !isLoading}
-      showCancelButton={!isLoading && !isUploaded}
+      showActionButton={errorView || (!isEmpty(formValues?.sample_id_name) && !isLoading)}
+      showCancelButton={!isLoading && !isUploaded && !errorView}
     >
       <View style={IGSNModalStyles.container}>
         <View style={IGSNModalStyles.sesarImageContainer}>
