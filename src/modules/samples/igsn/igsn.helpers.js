@@ -28,6 +28,13 @@ export const buildSesarXmlSchema = (data, isUpdating) => {
            <material>${data.material}</material>
            <sample_type>${data.sample_type}</sample_type>
            <name>${data.name}</name>
+           <external_urls>
+              <external_url>
+                 <url>${data.url}</url>
+                  <description>StraboSpot</description>
+                  <url_type>regular URL</url_type>
+              </external_url>
+           </external_urls>
       </sample>
   </samples>`;
 };
