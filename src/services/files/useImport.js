@@ -182,7 +182,7 @@ const useImport = () => {
       if (!dataFile) throw new Error('Project data file (data.json) not found in ' + selectedProject);
       if (!isEmpty(project)) await persistor.purge();
       const {projectDb, spotsDb} = dataFile;
-      if (!isEmpty(project.id) && project.id !== projectDb.project.id) clearProject();
+      if (!isEmpty(project.id)) clearProject();
       console.log('DataFile', dataFile);
       dispatch(addedSpotsFromDevice(spotsDb));
       dispatch(addedProject(projectDb.project || projectDb));
