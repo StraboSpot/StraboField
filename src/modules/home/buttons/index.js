@@ -1,4 +1,5 @@
 export {default as ActionButtonsSmallScreen} from './ActionButtonsSmallScreen';
+export {default as AutoBackupButton} from './AutoBackupButton';
 export {default as DrawActionButtons} from './DrawActionButtons';
 export {default as EditCancelSaveButtons} from './EditCancelSaveButtons';
 export {default as LeftSideButtons} from './LeftSideButtons';

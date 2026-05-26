@@ -6,6 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
+import useAutoBackup from '../../services/files/useAutoBackup';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -31,6 +32,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const autoBackupFrequency = useSelector(state => state.home.autoBackupFrequency);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -45,6 +47,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const {getTargetDatasetFromId} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
+  const {performAutoBackup} = useAutoBackup();
 
   /* Local State */
 
@@ -64,6 +67,12 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
   }, [isDragIntervalMode]);
+
+  useEffect(() => {
+    if (!autoBackupFrequency) return;
+    const interval = setInterval(performAutoBackup, autoBackupFrequency);
+    return () => clearInterval(interval);
+  }, [autoBackupFrequency]);
 
   /* Internal Functions */
 

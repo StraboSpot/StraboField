@@ -4,6 +4,7 @@ import {ScrollView} from 'react-native';
 import {Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
+import AutoBackup from './AutoBackup';
 import GenerateRandomSpots from './GenerateRandomSpots';
 import Geolocate from './Geolocate';
 import TestingMode from './TestingMode';
@@ -29,6 +30,7 @@ const Miscellaneous = () => {
   const renderPreferences = () => {
     return (
       <>
+        <AutoBackup/>
         <TestingMode
           isTestingMode={isTestingMode}
           textStyles={{flexWrap: 'wrap', flexShrink: 1}}
