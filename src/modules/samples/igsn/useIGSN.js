@@ -120,6 +120,7 @@ const useIGSN = () => {
     }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
+      {label: 'Sample ID:', sesarKey: 'sample_other_name', value: sampleValue?.id},
       {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
       {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, SAMPLE_FORM_NAME)}, //required
       {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
@@ -134,6 +135,7 @@ const useIGSN = () => {
       ...(geometryType !== 'Point' ? [longitudeEndObj] : []),
       ...(geometryType !== 'Point' ? [latitudeEndObj] : []),
       {label: 'Collector:', sesarKey: 'collector', value: name},
+      {label: 'URL:', sesarKey: 'url', value: 'http://www.strabospot.org'},
     ];
     return mappedObj;
   };

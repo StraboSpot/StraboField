@@ -101,6 +101,7 @@ const IGSNModal = forwardRef(({
   const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
+  const [igsnResult, setIgsnResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -110,6 +111,10 @@ const IGSNModal = forwardRef(({
   const [statusMessage, setStatusMessage] = useState('');
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [stepStatuses, setStepStatuses] = useState({sesar: 'idle', upload: 'idle'});
+
+  /* Derived Variables */
+
+  const formValues = sampleValues || formRef.current?.values || {};
 
   /* Side Effects */
 
