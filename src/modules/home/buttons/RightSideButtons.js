@@ -84,6 +84,7 @@ const RightSideButtons = ({
         </View>
         <DrawActionButtons
           clickHandler={clickHandler}
+          fab={true}
           mapMode={mapMode}
         />
       </Animated.View>
