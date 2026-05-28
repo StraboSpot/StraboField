@@ -8,12 +8,15 @@ import controlStyles from './controls.styles';
 const METERS_PER_FOOT = 0.3048;
 const METERS_PER_MILE = 1609.344;
 const NICE_IMPERIAL_FEET = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
-const NICE_IMPERIAL_MILES = [0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100];
-const NICE_METRIC_METERS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
+const NICE_IMPERIAL_MILES = [0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
+const NICE_METRIC_METERS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000];
 const TARGET_WIDTH_PX = 100;
 
 const MapScaleBar = ({zoom: zoomProp}) => {
+  /* Data Hooks */
   const {center, isScaleBarMetric, zoom: zoomRedux} = useSelector(state => state.map);
+
+  /* Derived Variables */
   const zoom = zoomProp ?? zoomRedux;
 
   if (zoom == null) return null;
@@ -52,6 +55,8 @@ const MapScaleBar = ({zoom: zoomProp}) => {
   }
 
   barWidthPx = Math.min(Math.max(barWidthPx, 20), 250);
+
+  /* View */
 
   return (
     <View style={[controlStyles.scaleBar, {width: barWidthPx}]}>
