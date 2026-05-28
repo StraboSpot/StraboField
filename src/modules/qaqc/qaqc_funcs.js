@@ -3,27 +3,26 @@ import {getRequest} from "../../services/network/serverRequestHelpers";
 
 const basicAuth = (token = encoded_login) => ({type: 'basic', token});
 
-export const startQAQC = async (dataset, projectID, encodedLogin, toast) => {
+export const startQAQC = async (dataset, projectID, encodedLogin, toast, toast_id) => {
+    // Check for dataset id and encoded login
     console.log("startQAQC()");
     if (!dataset.id) {
         console.error('Dataset ID is missing');
-        alert('Error: Project ID is missing');
-        return;
+        throw new Error('Project ID is missing');
     }
 
     if (!encodedLogin) {
         console.error('User credentials are missing');
-        alert('Error: User credentials are missing');
-        return;
+        throw new Error('User credentials are missing');
     }
 
-    
-    toast_id = toast.show(
+    // Update toast to show dataset name
+    toast.update(toast_id,
     `Started QAQC process for ${dataset.name}, please wait until download...`,
     {
         type: 'normal',
         animationType: 'slide-in',
-        duration: 20000,
+        duration: 120000,
         placement: 'top',
     });
         
@@ -42,8 +41,6 @@ export const startQAQC = async (dataset, projectID, encodedLogin, toast) => {
 
         // Block until response
         await response.text();
-        console.log("response.text() passed")
-
         if (!response.ok) {
             toast.hide(toast_id);
             throw new Error(`HTTP error. status: ${response.status}`);
@@ -53,7 +50,7 @@ export const startQAQC = async (dataset, projectID, encodedLogin, toast) => {
         // This just stalls for 3 seconds, the initializeDownload call is in DatasetDetails
         for (let iter = 3; iter > 0; iter--){
             toast.update(toast_id,
-                `Downloading ${dataset.name} in ${iter} seconds.`,
+                `Downloading QAQC notes in ${iter} seconds.`,
                 {type: 'warning'}
             );
             await new Promise(r => setTimeout(r, 1000));
@@ -64,21 +61,18 @@ export const startQAQC = async (dataset, projectID, encodedLogin, toast) => {
         return response;
 
     } catch(err){
-        console.error(`startQAQC(): ${err}`)
         throw(err)
     }
 
 };
 
-export const runQAQC = async (dataset, currentProjectId, setModalVisible, encodedLogin, toast) => {
+export const runQAQC = async (dataset, currentProjectId, encodedLogin, toast, toast_id) => {
     console.log("runQAQC()")
-    setModalVisible(false);
     if (dataset && dataset.id) {
         try {
-            return await startQAQC(dataset, currentProjectId, encodedLogin, toast);
+            return await startQAQC(dataset, currentProjectId, encodedLogin, toast, toast_id);
         } catch (err) {
-            console.error(`runQAQC(): ${err}`);
-            alert(`runQAQC Error: ${err.message}`);
+            throw(err);
         }
     }
     else console.error('Target dataset or id is undefined!');

@@ -24,6 +24,7 @@ import useProject from '../useProject';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {runQAQC} from '../../qaqc/qaqc_funcs';
+import useUpload from '../../../services/files/useUpload';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
@@ -66,6 +67,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {project} = useSelector(state => state.project);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const {initializeUpload} = useUpload();
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
@@ -329,18 +331,36 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const renderQAQCModal = () => {
     return (
       <ModalWrapper
-        actionTitle={'Run'}
+        actionTitle={'Upload and Run'}
         cancelTitle={'Cancel'}
         headerTitle={'QAQC Confirmation'}
         isVisible={isQAQCModalVisible}
         onActionPressed={async () => {
-          await runQAQC(dataset, project.id, setIsQAQCModalVisible, encodedLogin, toast);
-          initializeDownload(project, encodedLogin);
+          setIsQAQCModalVisible(false);
+          toast_id = toast.show(
+          `Uploading project: ${project.description.project_name}`,
+          {
+              type: 'warning',
+              animationType: 'slide-in',
+              duration: 20000,
+              placement: 'top',
+          });
+          uploadStatus = await initializeUpload();
+          if(uploadStatus.datasets == "uploaded"){
+            try{
+              await runQAQC(dataset, project.id, encodedLogin, toast, toast_id);
+              initializeDownload(project, encodedLogin);
+            } catch(err){
+              toast.update(toast_id, `Failed to run QAQC.`, {type:'error', duration: 5000,});
+            }
+          } else{
+            toast.update(toast_id, `Failed to upload datasets.`, {type: 'error', duration: 5000,});
+          }
         }}
         onCancelPress={() => setIsQAQCModalVisible(false)}
         overlayStyleOverride={{height: 'auto'}}
       >
-        <Text style={{textAlign:"center"}}>{"Confirm the target dataset:\n"+ datasetName}</Text>
+        <Text style={{textAlign:"center"}}>{"Must upload any changes on device first"}</Text>
       </ModalWrapper>
     );
   };
