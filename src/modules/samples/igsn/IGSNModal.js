@@ -96,7 +96,7 @@ const IGSNModal = forwardRef(({
 
   /* Local State */
 
-  // let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
+  let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
@@ -111,10 +111,6 @@ const IGSNModal = forwardRef(({
   const [statusMessage, setStatusMessage] = useState('');
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [stepStatuses, setStepStatuses] = useState({sesar: 'idle', upload: 'idle'});
-
-  /* Derived Variables */
-
-  const formValues = sampleValues || formRef.current?.values || {};
 
   /* Side Effects */
 
