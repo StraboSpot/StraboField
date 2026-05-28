@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/files/useDownload';
-import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
+import {MEDIUM_TEXT_SIZE, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsStatusMessagesModalVisible} from '../../home/home.slice';
@@ -102,6 +102,20 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
             title={'My StraboField Projects'}
           />
         )}
+        <View style={styles.labelContainer}>
+          <View style={styles.labelRow}>
+            <View style={styles.labelView}>
+              <Text style={styles.labelText}>My Projects</Text>
+            </View>
+            <View style={styles.labelSpacer}/>
+          </View>
+          <View style={styles.labelRow}>
+            <View style={styles.labelSpacer}/>
+            <View style={styles.labelView}>
+              <Text style={styles.labelText}>Collaborative Projects</Text>
+            </View>
+          </View>
+        </View>
         <ButtonGroup
           buttons={['Unshared', 'Shared\nby Me', 'Shared\nwith Me']}
           containerStyle={buttonStyles.buttonGroupContainer}
@@ -146,5 +160,33 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  labelContainer: {
+    marginBottom: -5,
+    marginHorizontal: 10,
+  },
+  labelRow: {
+    flexDirection: 'row',
+  },
+  labelSpacer: {
+    flex: 1,
+  },
+  labelText: {
+    fontSize: MEDIUM_TEXT_SIZE,
+    fontWeight: 'bold',
+  },
+  labelView: {
+    alignItems: 'center',
+    borderColor: 'lightgray',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderTopWidth: 1,
+    flex: 2,
+    justifyContent: 'center',
+  },
+});
 
 export default DownloadProject;
