@@ -73,9 +73,9 @@ const HomeView = forwardRef(({
       <Animated.View style={[notebookStyles.notebookDrawer, animateNotebookDrawer]}>
         <NotebookPanel
           closeNotebookPanel={closeNotebookPanel}
-          createDefaultGeom={mapComponentRef.current?.createDefaultGeom}
+          createDefaultGeom={mapComponentRef?.current?.createDefaultGeom}
           openMainMenuPanel={openMainMenuPanel}
-          zoomToSpots={mapComponentRef.current?.zoomToSpots}
+          zoomToSpots={mapComponentRef?.current?.zoomToSpots}
         />
       </Animated.View>
     </>
