@@ -348,7 +348,7 @@ const BasicPageDetail = ({
                   />
                 </>
               )}
-              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
+              {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>

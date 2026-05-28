@@ -48,6 +48,7 @@ const useIGSN = () => {
       console.log(singleResObject);
       return singleResObject;
     }
+    else if (json.results.error) throw Error(json.results.error[0]);
     else {
       console.log(json.results.sample[0]);
       return json.results.sample[0];

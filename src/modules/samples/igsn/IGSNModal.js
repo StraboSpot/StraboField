@@ -96,7 +96,7 @@ const IGSNModal = forwardRef(({
 
   /* Local State */
 
-  let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
+  // let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
@@ -400,7 +400,7 @@ const IGSNModal = forwardRef(({
       {isUploaded && (
         <View style={IGSNModalStyles.successContainer}>
           <Text style={IGSNModalStyles.statusHeaderText}>Success!</Text>
-          <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+          {/*<Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>*/}
           {assignedIgsn ? (
             <Text style={IGSNModalStyles.statusMessageText}>IGSN: {assignedIgsn}</Text>
           ) : null}
