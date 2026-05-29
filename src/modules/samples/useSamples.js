@@ -1,3 +1,4 @@
+import * as turf from '@turf/turf';
 import {useDispatch} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
@@ -23,8 +24,14 @@ const useSamples = () => {
   const createRichSample = (spot, selectedSample, sampleImages = []) => {
     let d = new Date(Date.now());
     d.setMilliseconds(0);
+    let geometry = spot.geometry;
+    if (geometry.type === 'Point' && spot.properties.lng && spot.properties.lat) {
+      geometry = turf.point([spot.properties.lng, spot.properties.lat]).geometry;
+    }
+    else if (geometry.type !== 'Point' && geometry.type !== 'LineString') geometry = turf.centroid(spot).geometry;
+
     const newEnrichedSample = {
-      geometry: spot.geometry,
+      geometry: geometry,
       properties: {
         date: d.toISOString(),
         id: selectedSample.id,
