@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {Button, CheckBox, Icon} from '@rn-vui/base';
+import {Button} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,7 +9,7 @@ import igsnStyles from './igsn.styles';
 import useIGSN from './useIGSN';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
-import {BLACK, MEDIUM_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import {BLACK, MEDIUM_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
@@ -113,39 +113,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   };
 
   /* Render Functions */
-
-  const renderIGSNUploadCheckbox = () => {
-    return (
-      <View style={{alignItems: 'center', justifyContent: 'flex-start'}}>
-        {!selectedFeature?.isOnMySesar && (
-          <>
-            <Text style={igsnStyles.mySesarUpdateDisclaimer}>
-              To upload to your SESAR account and obtain an IGSN check below:
-            </Text>
-            <View style={{alignItems: 'center', flexDirection: 'row'}}>
-              <CheckBox
-                checked={isIGSNChecked}
-                disabled={!isInternetReachable}
-                onPress={handlePress}
-                title={'Upload to SESAR'}
-              />
-              {isIGSNChecked && isEmpty(selectedUserCode) && !selectedFeature.isOnMySesar && (
-                <Icon
-                  color={WARNING_COLOR}
-                  name={'warning-outline'}
-                  onPress={() => alert('SESAR Code Required')}
-                  reverse
-                  size={10}
-                  type={'ionicon'}
-                />
-              )}
-            </View>
-          </>
-        )}
-
-      </View>
-    );
-  };
 
   const renderIGSNUserCodePicker = () => {
     return (

@@ -9,7 +9,6 @@ const IGSNModalStyles = {
   contentContainer: {
     paddingHorizontal: 15,
     paddingVertical: 10,
-    width: 400,
   },
   errorContainer: {
     alignItems: 'center',
@@ -61,7 +60,7 @@ const IGSNModalStyles = {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
     borderBottomColor: themes.LIST_BORDER_COLOR,
-    paddingVertical: 10,
+    // paddingVertical: 10,
     alignItems: 'center',
   },
   fieldValueText: {

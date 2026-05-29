@@ -425,7 +425,7 @@ const IGSNModal = forwardRef(({
       onCancelPress={handleClose}
       overlayStyleOverride={{
         height: getModalHeight(),
-        width: 400,
+        width: 500,
       }}
       showActionButton={doShowActionButton}
       showCancelButton={false}
