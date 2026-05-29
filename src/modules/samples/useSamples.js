@@ -25,7 +25,7 @@ const useSamples = () => {
     let d = new Date(Date.now());
     d.setMilliseconds(0);
     let geometry = spot.geometry;
-    if (geometry.type === 'Point' && spot.properties.lng && spot.properties.lat) {
+    if (spot.properties.lng && spot.properties.lat) {
       geometry = turf.point([spot.properties.lng, spot.properties.lat]).geometry;
     }
     else if (geometry.type !== 'Point' && geometry.type !== 'LineString') geometry = turf.centroid(spot).geometry;
