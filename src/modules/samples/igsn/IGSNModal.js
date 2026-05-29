@@ -102,6 +102,7 @@ const IGSNModal = forwardRef(({
   const [assignedIgsn, setAssignedIgsn] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
+  const [igsnResult, setIgsnResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -410,7 +411,7 @@ const IGSNModal = forwardRef(({
       {isUploaded && (
         <View style={IGSNModalStyles.successContainer}>
           <Text style={IGSNModalStyles.statusHeaderText}>Success!</Text>
-          <Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>
+          {/*<Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>*/}
           {assignedIgsn ? (
             <Text style={IGSNModalStyles.statusMessageText}>IGSN: {assignedIgsn}</Text>
           ) : null}
@@ -439,7 +440,7 @@ const IGSNModal = forwardRef(({
       onCancelPress={handleClose}
       overlayStyleOverride={{
         height: getModalHeight(),
-        width: 400,
+        width: 500,
       }}
       showActionButton={doShowActionButton}
       showCancelButton={false}

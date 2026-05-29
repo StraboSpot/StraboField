@@ -84,7 +84,7 @@ const MainMenuPanel = forwardRef(({
           && (!mainMenuPageVisible
             || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
               && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
-          && <MainMenuPanelHeader onTagsOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
+          && <MainMenuPanelHeader onOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
         }
         {renderMainMenuList()}
       </>
@@ -116,7 +116,7 @@ const MainMenuPanel = forwardRef(({
         return (
           <SpotsList
             onPress={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.IMAGES:
@@ -130,7 +130,7 @@ const MainMenuPanel = forwardRef(({
         return (
           <Samples
             openSpotInNotebook={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.REPORTS:
@@ -140,7 +140,7 @@ const MainMenuPanel = forwardRef(({
           <Tags
             closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
             isOverflowMenuVisible={isTagsOverflowMenuVisible}
-            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS:
@@ -149,7 +149,7 @@ const MainMenuPanel = forwardRef(({
             closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
             isGeologicUnits
             isOverflowMenuVisible={isTagsOverflowMenuVisible}
-            updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
+            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
@@ -159,14 +159,14 @@ const MainMenuPanel = forwardRef(({
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
-        return <ManageCustomMaps zoomToCustomMap={mapComponentRef.current?.zoomToCustomMap}/>;
+        return <ManageCustomMaps zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}/>;
       case MAIN_MENU_ITEMS.MAPS.IMAGE_BASEMAPS :
         return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS:
         return (
           <ManageOfflineMapsMenu
             closeMainMenuPanel={closeMainMenuPanel}
-            zoomToCenterOfflineTile={mapComponentRef.current?.zoomToCenterOfflineTile}
+            zoomToCenterOfflineTile={mapComponentRef?.current?.zoomToCenterOfflineTile}
           />
         );
 
@@ -223,9 +223,9 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS:
-        return <AddRemoveTagSampleSpots updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+        return <AddRemoveTagSampleSpots updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
-        return <AddRemoveTagSpots updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}/>;
+        return <AddRemoveTagSpots updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}/>;
       case SIDE_PANEL_VIEWS.TAG_DETAIL:
         return <TagDetailSidePanel openNotebookPanel={openNotebookPanel} openSpotInNotebook={openSpotInNotebook}/>;
     }

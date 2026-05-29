@@ -48,6 +48,7 @@ const useIGSN = () => {
       console.log(singleResObject);
       return singleResObject;
     }
+    else if (json.results.error) throw Error(json.results.error[0]);
     else {
       console.log(json.results.sample[0]);
       return json.results.sample[0];
@@ -120,6 +121,11 @@ const useIGSN = () => {
     }
     const mappedObj = [
       {label: 'IGSN:', sesarKey: 'igsn', value: sampleValue?.Sample_IGSN}, // required when updating sample
+      {label: 'Sample ID:', sesarKey: 'sample_other_name', value: sampleValue?.id},
+      {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
+      {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
+      ...(geometryType !== 'Point' ? [longitudeEndObj] : []),
+      ...(geometryType !== 'Point' ? [latitudeEndObj] : []),
       {label: 'User Code', sesarKey: 'user_code', value: sesar.selectedUserCode}, //required
       {label: 'Sample Type:', sesarKey: 'sample_type', value: getLabel(sampleValue?.sample_type, SAMPLE_FORM_NAME)}, //required
       {label: 'Sample Name:', sesarKey: 'name', value: sampleValue.sample_id_name}, //required
@@ -129,11 +135,8 @@ const useIGSN = () => {
       {label: 'Purpose:', sesarKey: 'purpose', value: sampleValue?.main_sampling_purpose},
       {label: 'Collection Date (Time):', sesarKey: 'collection_start_date', value: sampleValue?.collection_date},
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
-      {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
-      {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
-      ...(geometryType !== 'Point' ? [longitudeEndObj] : []),
-      ...(geometryType !== 'Point' ? [latitudeEndObj] : []),
       {label: 'Collector:', sesarKey: 'collector', value: name},
+      {label: 'URL:', sesarKey: 'url', value: 'http://www.strabospot.org'},
     ];
     return mappedObj;
   };

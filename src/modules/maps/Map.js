@@ -44,7 +44,8 @@ const Map = ({
     isDragIntervalMode,
   } = useSelector(state => state.map);
 
-  const {mapRef, cameraRef} = forwardedRef;
+  const mapRef = forwardedRef?.mapRef ?? null;
+  const cameraRef = forwardedRef?.cameraRef ?? null;
 
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
