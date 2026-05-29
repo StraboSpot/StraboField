@@ -16,6 +16,7 @@ import {
 } from '../../../shared/styles.constants';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {TAG_BACKUP_ACTIONS} from '../../tags/tags.constants';
+import {TEMPLATE_BACKUP_ACTIONS} from '../../templates/templates.constants';
 
 const SaveAndExportModalContent = ({
                                      backingUpStatus,
@@ -35,12 +36,15 @@ const SaveAndExportModalContent = ({
 
   const backupActionTitle = backupAction === 'export' ? 'project'
     : backupAction === TAG_BACKUP_ACTIONS.BACKUP_TAGS ? 'Tags'
-      : 'Geologic Units';
+      : backupAction === TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS ? 'Geologic Units'
+        : backupAction === TEMPLATE_BACKUP_ACTIONS.BACKUP_TEMPLATES ? 'Templates'
+          : 'project';
   const fileExtension = backupAction === 'export' ? '.zip' : '.json';
   const fileName = backupFileName.replace(/\s/g, '_');
   const subFolder = backupAction === TAG_BACKUP_ACTIONS.BACKUP_TAGS ? 'Tags'
     : backupAction === TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS ? 'GeologicUnits'
-      : null;
+      : backupAction === TEMPLATE_BACKUP_ACTIONS.BACKUP_TEMPLATES ? 'Templates'
+        : null;
 
   /* Logic Helpers */
 
