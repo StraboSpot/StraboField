@@ -34,6 +34,8 @@ import RockIgneousPage from '../petrology/RockIgneousPage';
 import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
+import QAQCPage from '../qaqc/QAQC';
+import QAQCOverview from '../qaqc/QAQCOverview';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
@@ -185,6 +187,14 @@ export const SECONDARY_PAGES = [
     modal_component: AddEarthquakeModal,
     overview_component: BasicOverviewList,
     action_label: 'Add an Earthquake Feature',
+  }, {
+    key: PAGE_KEYS.QAQC,
+    label: 'QA/QC',
+    icon_src: require('../../assets/icons/QAQC.png'),
+    icon_pressed_src: require('../../assets/icons/QAQC_pressed.png'),
+    overview_component: QAQCOverview,
+    page_component: QAQCPage,
+    testing: true,
   },
 ];
 
