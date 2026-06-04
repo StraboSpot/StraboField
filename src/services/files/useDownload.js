@@ -84,8 +84,10 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
+      console.log('Datasets Response:', JSON.stringify(res));
+
+      // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
-        // If same project set active and target dataset to same as before if they still exist
         const newDatasetIds = datasets.map(d => d.id);
         const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
           console.log('Checking if active dataset still exists:', tempActiveDatasetId);

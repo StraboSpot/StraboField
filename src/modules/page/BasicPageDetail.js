@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
@@ -62,6 +62,7 @@ const BasicPageDetail = ({
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+    const [igsnFormValues, setIgsnFormValues] = useState(null);
 
     /* Derived Variables */
 
@@ -107,10 +108,22 @@ const BasicPageDetail = ({
       setIsIGSNChecked(value);
     };
 
-    const onSampleSaved = async (formCurrent) => {
-      console.log('Saving Sample To SESAR', formRef.current?.values);
-      await saveFeature(formCurrent);
-      closeDetailView();
+    const onSampleSaved = async (featureValues) => {
+      try {
+        console.log('Saving Sample To SESAR', featureValues);
+        let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
+        const i = editedPageData.findIndex(f => f.id === featureValues.id);
+        if (i === -1) editedPageData.push(featureValues);
+        else editedPageData.splice(i, 1, featureValues);
+        const spotId = spot.properties.id;
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+        if (featureValues.sample_id_name) await checkSampleName(featureValues.sample_id_name);
+        closeDetailView();
+      }
+      catch (err) {
+        console.error('Error saving IGSN sample', err);
+      }
     };
 
     const onSubmitForm = (values, {resetForm}) => {
@@ -276,10 +289,10 @@ const BasicPageDetail = ({
     };
 
     const updateIGSNAndShowModal = async (formCurrent) => {
-      setIsIGSNModalVisible(true);
       console.log('setting form values for IGSN modals');
-      await formCurrent.setValues({...formCurrent.values, sesarUserCode: sesar.selectedUserCode});
-      console.log('FORMREF.CURRENT.VALUES', formCurrent.values);
+      const capturedValues = {...formCurrent.values, sesarUserCode: sesar.selectedUserCode};
+      setIgsnFormValues(capturedValues);
+      setIsIGSNModalVisible(true);
     };
 
     /* Render Functions */
@@ -288,7 +301,6 @@ const BasicPageDetail = ({
       const formName = getFormName();
       return (
         <View style={{flex: 1}}>
-          {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
           <Formik
             enableReinitialize={true}
             initialStatus={{formName: formName}}
@@ -361,6 +373,7 @@ const BasicPageDetail = ({
                   save={saveButtonOnPress}
                 />
               )}
+              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>
@@ -372,7 +385,7 @@ const BasicPageDetail = ({
             onModalCancel={() => setIsIGSNModalVisible(false)}
             onSampleSaved={onSampleSaved}
             ref={formRef}
-            sampleValues={formRef.current?.values}
+            sampleValues={igsnFormValues}
           />
           {/*)}*/}
           {/*Modal when deleting a sample with an IGSN attached*/}
