@@ -73,7 +73,7 @@ npm run lint:fix         # Auto-fix ESLint issues
 ### Versioning & Deployment
 
 ```bash
-# Version bumping (updates package.json, iOS/Android versions, creates changelog)
+# Version bumping (updates package.json, iOS/Android versions)
 npm run bump-patch       # x.x.X
 npm run bump-minor       # x.X.0
 npm run bump-major       # X.0.0
@@ -84,6 +84,33 @@ npm run commit-and-push  # Commits version bump and pushes to master
 # Deploy beta builds via Fastlane
 npm run deploy-beta
 ```
+
+### Release Process (RC → Master)
+
+**IMPORTANT:** Always follow these steps when cutting a release. Remind the user if they mention versioning, rc branch, or releasing.
+
+#### Step 1 — Start RC
+1. Cut `rc-{version}` branch from `dev`
+2. Bump version on the rc branch: `npm run bump-patch` (or minor/major)
+3. Commit and push to rc: `git push origin rc-{version}`
+4. GitHub Action auto-creates a **draft release** for testers
+
+#### Step 2 — Stabilize on RC
+- Bug fixes go directly on `rc-{version}`
+- Each push to rc **auto-updates the draft release**
+- No manual changelog needed — GitHub handles it
+
+#### Step 3 — Publish Release
+1. Merge `rc-{version}` → `master`
+2. Push master: `git push origin master`
+3. Tag on master (use `v` prefix!): `git tag v{version}`
+4. Push tag: `git push origin v{version}`
+5. GitHub Action auto-publishes the **official release** with changelog
+
+#### Common Mistakes to Avoid
+- ❌ Do NOT tag on the rc branch — always tag on master after merging
+- ❌ Do NOT forget the `v` prefix on tags (use `v2.29.1` not `2.29.1`)
+- ❌ Do NOT manually write the changelog — GitHub Actions generates it
 
 ### Other Commands
 
