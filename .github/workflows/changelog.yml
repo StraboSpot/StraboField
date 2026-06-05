@@ -1,12 +1,12 @@
-name: Generate Changelog
+name: Publish Release
 
 on:
   push:
     tags:
-      - 'v*'  # triggers on any tag like v2.29.0
+      - 'v*'
 
 jobs:
-  changelog:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -15,22 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed to get full git history
+          fetch-depth: 0
 
       - name: Get previous tag
         id: prev_tag
         run: |
-          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]' | sed -n '2p')
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
-          echo "curr_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
       - name: Generate Changelog
-        id: changelog
         run: |
           PREV=${{ steps.prev_tag.outputs.prev_tag }}
-          CURR=${{ steps.prev_tag.outputs.curr_tag }}
-          
-          
+          CURR=${{ github.ref_name }}
+
           changelog=$(git log $PREV..$CURR --pretty=format:"%s" | awk '
           /^feat/ { features[++fc] = $0 }
           /^fix/  { fixes[++bc] = $0 }
@@ -46,7 +43,6 @@ jobs:
             if (cc > 0) { print "### 🔧 Chores"; for (i=1;i<=cc;i++) print "- " chores[i]; print "" }
           }')
 
-          # Save to file for later steps
           echo "$changelog" > release_notes.md
           cat release_notes.md
 
@@ -64,10 +60,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md
           git commit -m "chore: update changelog for ${{ github.ref_name }}"
-          git push origin HEAD:main
+          git push origin HEAD:master
 
-      - name: Create GitHub Release
+      - name: Publish Official Release
         uses: softprops/action-gh-release@v2
         with:
           body_path: release_notes.md
           tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
