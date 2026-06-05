@@ -1,0 +1,59 @@
+name: Draft Release from RC
+
+on:
+  push:
+    branches:
+      - 'rc-*'
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version and previous tag
+        id: meta
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]' | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate Draft Changelog
+        run: |
+          PREV=${{ steps.meta.outputs.prev_tag }}
+          VERSION=${{ steps.meta.outputs.version }}
+
+          changelog=$(git log $PREV..HEAD --pretty=format:"%s" | awk '
+          /^feat/ { features[++fc] = $0 }
+          /^fix/  { fixes[++bc] = $0 }
+          /^chore/ { chores[++cc] = $0 }
+          /^docs/ { docs[++dc] = $0 }
+          /^refactor/ { refactors[++rc] = $0 }
+          END {
+            print "## v'"$VERSION"' - DRAFT - '"$(date +%Y-%m-%d)"'\n"
+            print "> ⚠️ This is a pre-release draft for testing purposes only.\n"
+            if (fc > 0) { print "### ✨ Features"; for (i=1;i<=fc;i++) print "- " features[i]; print "" }
+            if (bc > 0) { print "### 🐛 Bug Fixes"; for (i=1;i<=bc;i++) print "- " fixes[i]; print "" }
+            if (rc > 0) { print "### ♻️ Refactors"; for (i=1;i<=rc;i++) print "- " refactors[i]; print "" }
+            if (dc > 0) { print "### 📝 Docs"; for (i=1;i<=dc;i++) print "- " docs[i]; print "" }
+            if (cc > 0) { print "### 🔧 Chores"; for (i=1;i<=cc;i++) print "- " chores[i]; print "" }
+          }')
+
+          echo "$changelog" > release_notes.md
+          cat release_notes.md
+
+      - name: Create or Update Draft Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ steps.meta.outputs.version }} (Draft)"
+          body_path: release_notes.md
+          draft: true
+          prerelease: true
+          tag_name: "v${{ steps.meta.outputs.version }}-draft"
