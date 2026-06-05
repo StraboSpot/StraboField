@@ -1,0 +1,73 @@
+name: Generate Changelog
+
+on:
+  push:
+    tags:
+      - 'v*'  # triggers on any tag like v2.29.0
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed to get full git history
+
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]' | sed -n '2p')
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "curr_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          PREV=${{ steps.prev_tag.outputs.prev_tag }}
+          CURR=${{ steps.prev_tag.outputs.curr_tag }}
+          
+          
+          changelog=$(git log $PREV..$CURR --pretty=format:"%s" | awk '
+          /^feat/ { features[++fc] = $0 }
+          /^fix/  { fixes[++bc] = $0 }
+          /^chore/ { chores[++cc] = $0 }
+          /^docs/ { docs[++dc] = $0 }
+          /^refactor/ { refactors[++rc] = $0 }
+          END {
+            print "## '"$CURR"' - '"$(date +%Y-%m-%d)"'\n"
+            if (fc > 0) { print "### ✨ Features"; for (i=1;i<=fc;i++) print "- " features[i]; print "" }
+            if (bc > 0) { print "### 🐛 Bug Fixes"; for (i=1;i<=bc;i++) print "- " fixes[i]; print "" }
+            if (rc > 0) { print "### ♻️ Refactors"; for (i=1;i<=rc;i++) print "- " refactors[i]; print "" }
+            if (dc > 0) { print "### 📝 Docs"; for (i=1;i<=dc;i++) print "- " docs[i]; print "" }
+            if (cc > 0) { print "### 🔧 Chores"; for (i=1;i<=cc;i++) print "- " chores[i]; print "" }
+          }')
+
+          # Save to file for later steps
+          echo "$changelog" > release_notes.md
+          cat release_notes.md
+
+      - name: Prepend to CHANGELOG.md
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            cat release_notes.md CHANGELOG.md > tmp.md && mv tmp.md CHANGELOG.md
+          else
+            cp release_notes.md CHANGELOG.md
+          fi
+
+      - name: Commit CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: update changelog for ${{ github.ref_name }}"
+          git push origin HEAD:main
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          tag_name: ${{ github.ref_name }}
