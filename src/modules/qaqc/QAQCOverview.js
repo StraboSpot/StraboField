@@ -4,7 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
@@ -18,7 +18,8 @@ const QAQCOverview = ({page}) => {
 
   return (
     <>
-      {savedQAQC ? (
+      {isEmpty(savedQAQC) ? <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No QAQC'}/>
+        : (
           <ListItem
             containerStyle={commonStyles.listItem}
             onPress={() => dispatch(setNotebookPageVisible(page.key))}
@@ -28,7 +29,7 @@ const QAQCOverview = ({page}) => {
             </ListItem.Content>
           </ListItem>
         )
-        : <ListEmptyText onPress={() => dispatch(setNotebookPageVisible(page.key))} text={'No QA/QC'}/>}
+      }
     </>
   );
 };

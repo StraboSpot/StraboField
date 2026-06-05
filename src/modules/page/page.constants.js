@@ -189,7 +189,7 @@ export const SECONDARY_PAGES = [
     action_label: 'Add an Earthquake Feature',
   }, {
     key: PAGE_KEYS.QAQC,
-    label: 'QA/QC',
+    label: 'QAQC',
     icon_src: require('../../assets/icons/QAQC.png'),
     icon_pressed_src: require('../../assets/icons/QAQC_pressed.png'),
     overview_component: QAQCOverview,
