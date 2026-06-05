@@ -192,7 +192,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   /* Render Functions */
 
   const renderSectionHeader = (page) => {
-    if (page.testing) return null;
+    if (page.testing && !isTestingMode) return null;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider dividerText={page.label}/>
@@ -236,7 +236,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
           ListHeaderComponent={isTestingMode && renderRockdBadge}
           keyExtractor={item => item.key}
           renderItem={({item}) => {
-            if (item.testing) return null;
+            if (item.testing && !isTestingMode) return null;
             const SectionOverview = item.overview_component;
             return (
               <SectionOverview
