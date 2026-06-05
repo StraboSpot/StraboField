@@ -119,12 +119,12 @@ export const PRIMARY_PAGES = [
     action_label: 'Add a Sample',
   }, {
     key: PAGE_KEYS.REPORTS,
-    label: 'Reports',
+    label: 'Memos',
     icon_src: require('../../assets/icons/Reports.png'),
     icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
     page_component: ReportsPage,
     modal_component: ReportModal,
-    action_label: 'Create New Report',
+    action_label: 'Create New Memo',
   },
 ];
 
@@ -425,7 +425,7 @@ const OTHER_MODALS = [
     modal_component: AddIntervalModal,
   }, {
     key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS,
-    label: 'Add Spots To Reports',
+    label: 'Add Spots To Memos',
     modal_component: ReportsListModal,
   }, {
     key: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA,

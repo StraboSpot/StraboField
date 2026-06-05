@@ -39,7 +39,7 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
     <View style={{flex: 1}}>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={<ListEmptyText text={'No Reports Found'}/>}
+        ListEmptyComponent={<ListEmptyText text={'No Memos Found'}/>}
         data={reportsToListSorted}
         keyExtractor={report => report.id}
         renderItem={({item}) => (
