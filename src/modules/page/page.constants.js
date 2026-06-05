@@ -428,8 +428,8 @@ const OTHER_MODALS = [
     label: 'Add Spots To Reports',
     modal_component: ReportsListModal,
   }, {
-    key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_QAQC,
-    label: 'Add Spots To QAQC',
+    key: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA,
+    label: 'Inspect Spots Raw Data',
     modal_component: SpotsRawDataView,
   }, {
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
