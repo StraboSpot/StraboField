@@ -120,15 +120,16 @@ const useUpload = () => {
   /* Exported Functions */
 
   const initializeUpload = async () => {
-    Platform.OS !== 'web' && KeepAwake.activate();
+    if (Platform.OS !== 'web') KeepAwake.activate();
     try {
       await uploadProject();
       await uploadDatasets();
-      const imageStatus = await initializeImageUpload();
-      projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      // projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      dispatch(setIsImageTransferring(false));
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      if (Platform.OS !== 'web') {
+        const imageStatus = await initializeImageUpload();
+        projectUploadStatus = {...projectUploadStatus, images: imageStatus};
+        dispatch(setIsImageTransferring(false));
+        KeepAwake.deactivate();
+      }
       return projectUploadStatus;
     }
     catch (err) {

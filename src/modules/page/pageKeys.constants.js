@@ -16,6 +16,7 @@ export const PAGE_KEYS = {
   MINERALS: 'minerals',
   NESTING: 'nesting',
   NOTES: 'notes',
+  QAQC: 'qaqc',
   OTHER_FEATURES: 'other_features',
   OVERVIEW: 'overview',
   REACTIONS: 'reactions',
@@ -64,7 +65,7 @@ export const MODAL_KEYS = {
   OTHER: {
     ADD_INTERVAL: 'add_interval',
     ADD_SPOTS_TO_REPORTS: 'AddSpotsToReports',
-    ADD_SPOTS_TO_QAQC: 'AddSpotsToQAQC',
+    INSPECT_SPOTS_RAW_DATA: 'InspectSpotsRawData',
     ADD_TAGS_TO_SPOTS: 'AddTagsToSpots',
     DAILY_NOTES: 'daily_setup',
     FEATURE_TAGS: 'FeatureTags',

@@ -27,7 +27,7 @@ const ReportsMenu = ({}) => {
 
   return (
     <View style={{flex: 1}}>
-      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Report'}/>}
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo'}/>}
       <ReportsList/>
     </View>
   );

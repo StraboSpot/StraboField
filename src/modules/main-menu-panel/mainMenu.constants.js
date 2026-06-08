@@ -20,7 +20,7 @@ export const MAIN_MENU_ITEMS = {
     TAGS: 'Tags',
     GEOLOGIC_UNITS: 'Geologic Units',
     STRAT_SECTIONS: 'Stratigraphic Sections',
-    REPORTS: 'Reports',
+    REPORTS: 'Memos',
     DAILY_NOTES: 'Daily Notes',
   },
   MAPS: {

@@ -125,14 +125,14 @@ const SaveAndExportModalContent = ({
                 checkedColor={MEDIUMGREY}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 disabled
-                title={'Project Data (Spots, Datasets, Tags, Geologic Units, Reports, etc.)'}
+                title={'Project Data (Spots, Datasets, Tags, Geologic Units, Memos, etc.)'}
                 titleStyle={{color: DARKGREY, fontSize: SMALL_TEXT_SIZE}}
               />
               <CheckBox
                 checked={backupOptions.images}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 onPress={() => setBackupOptions(prev => ({...prev, images: !prev.images}))}
-                title={'Images (Spot & Report)'}
+                title={'Images (Spots & Memos)'}
                 titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
               />
               <CheckBox

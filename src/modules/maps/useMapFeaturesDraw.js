@@ -329,13 +329,13 @@ const useMapFeaturesDraw = ({
     }
   };
 
-  const selectSpotsForQAQC = (feature) => {
+  const selectSpotsForRawData = (feature) => {
     let selectedSpots = [];
     selectedSpots = getLassoedSpots(spotsNotSelected, feature);
     console.log('Selected Spots', selectedSpots);
     if (selectedSpots.length > 0) {
       dispatch(setIntersectedSpotsForTagging(selectedSpots));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_SPOTS_TO_QAQC}));
+      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA}));
     }
     else console.warn('No Spots selected.');
   };
@@ -668,7 +668,7 @@ const useMapFeaturesDraw = ({
         }
         if (selectingMode === 'report') selectReports(feature);
         else if (selectingMode === 'stereonet') await getStereonetForFeature(feature);
-        else if (selectingMode === 'selectSpots') selectSpotsForQAQC(feature);
+        else if (selectingMode === 'selectSpots') selectSpotsForRawData(feature);
         else if (selectingMode === 'tag') selectSpotsForTagging(feature);
         else {
           feature.properties.symbology = getSymbology(feature);
