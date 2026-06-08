@@ -20,27 +20,32 @@ jobs:
       - name: Fetch all tags
         run: git fetch --tags --force
 
-      - name: Get version and previous tag
+      - name: Get version and previous bump commit
         id: meta
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          # Prefer previous draft tag as boundary; fall back to last official release
-          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-draft$' | grep -v "v${VERSION}-draft" | head -1)
-          if [ -z "$PREV_TAG" ]; then
-            PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
-          fi
+
+          # Find the most recent commit that changed package.json to a DIFFERENT version
+          # That commit marks the end of the previous version's work
+          PREV_BUMP=$(git log --format="%H" -- package.json | while read hash; do
+            v=$(git show "$hash":package.json | node -p "try{JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version}catch(e){''}" 2>/dev/null)
+            if [ -n "$v" ] && [ "$v" != "$VERSION" ]; then
+              echo "$hash"
+              break
+            fi
+          done)
+
           echo "=== DEBUG ==="
           echo "VERSION: $VERSION"
-          echo "PREV_TAG: $PREV_TAG"
-          echo "All draft tags:"
-          git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-draft$'
+          echo "PREV_BUMP: $PREV_BUMP"
           echo "============="
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "prev_bump=$PREV_BUMP" >> $GITHUB_OUTPUT
 
       - name: Generate Draft Changelog
         run: |
-          PREV=${{ steps.meta.outputs.prev_tag }}
+          PREV=${{ steps.meta.outputs.prev_bump }}
           VERSION=${{ steps.meta.outputs.version }}
 
           changelog=$(git log $PREV..HEAD --pretty=format:"%s" | awk '
