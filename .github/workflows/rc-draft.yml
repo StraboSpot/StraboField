@@ -49,7 +49,18 @@ jobs:
           echo "$changelog" > release_notes.md
           cat release_notes.md
 
-      - name: Create or Update Draft Release
+      - name: Delete existing draft release if present
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DRAFT_TAG="v${{ steps.meta.outputs.version }}-draft"
+          RELEASE_ID=$(gh release view "$DRAFT_TAG" --repo ${{ github.repository }} --json id -q '.id' 2>/dev/null || echo "")
+          if [ -n "$RELEASE_ID" ]; then
+            gh release delete "$DRAFT_TAG" --repo ${{ github.repository }} --yes
+            git push origin :refs/tags/$DRAFT_TAG || true
+          fi
+
+      - name: Create Updated Draft Release
         uses: softprops/action-gh-release@v2
         with:
           name: "v${{ steps.meta.outputs.version }} (Draft)"
