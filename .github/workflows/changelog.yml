@@ -67,6 +67,12 @@ jobs:
           git commit -m "chore: update changelog for ${{ github.ref_name }}"
           git push origin HEAD:master
 
+      - name: Delete existing release if present
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete ${{ github.ref_name }} --repo ${{ github.repository }} --yes 2>/dev/null || true
+
       - name: Publish Official Release
         uses: softprops/action-gh-release@v2
         with:
