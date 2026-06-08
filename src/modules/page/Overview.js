@@ -197,7 +197,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   /* Render Functions */
 
   const renderSectionHeader = (page) => {
-    if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return;
+    if (page.testing && !isTestingMode) return null;
+    else if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return null;
     const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
@@ -242,6 +243,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
           ListHeaderComponent={isTestingMode && renderRockdBadge}
           keyExtractor={item => item.key}
           renderItem={({item}) => {
+            if (item.testing && !isTestingMode) return null;
             const SectionOverview = item.overview_component;
             return (
               <SectionOverview

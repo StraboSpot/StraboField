@@ -8,7 +8,6 @@ import useUploadImages from './useUploadImages';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {deletedSpotIdFromDataset, setIsImageTransferring} from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
-import {useSpots} from '../../modules/spots';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useServerRequests from '../network/useServerRequests';
@@ -38,7 +37,6 @@ const useUpload = () => {
     updateProject,
     uploadWebImage,
   } = useServerRequests();
-  const {getSpotsByIds} = useSpots();
   const {initializeImageUpload} = useUploadImages();
 
   /* Local State */
@@ -123,15 +121,16 @@ const useUpload = () => {
   /* Exported Functions */
 
   const initializeUpload = async () => {
-    Platform.OS !== 'web' && KeepAwake.activate();
+    if (Platform.OS !== 'web') KeepAwake.activate();
     try {
       await uploadProject();
       await uploadDatasets();
-      const imageStatus = await initializeImageUpload();
-      projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      // projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-      dispatch(setIsImageTransferring(false));
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      if (Platform.OS !== 'web') {
+        const imageStatus = await initializeImageUpload();
+        projectUploadStatus = {...projectUploadStatus, images: imageStatus};
+        dispatch(setIsImageTransferring(false));
+        KeepAwake.deactivate();
+      }
       return projectUploadStatus;
     }
     catch (err) {

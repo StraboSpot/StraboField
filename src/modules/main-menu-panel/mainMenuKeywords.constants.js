@@ -56,7 +56,7 @@ export const MENU_KEYWORDS = {
     },
     {
       key: MAIN_MENU_ITEMS.PROJECT_DATA.REPORTS,
-      keywords: ['reports'],
+      keywords: ['memos', 'reports'],
     },
     {
       key: MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES,

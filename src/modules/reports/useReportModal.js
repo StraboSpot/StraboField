@@ -43,8 +43,8 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const alertLeaveReport = (itemText, cont) => {
     alert(
-      'Leave Report',
-      'Are you sure you want to close this report and open the selected ' + itemText + '?',
+      'Leave Memo',
+      'Are you sure you want to close this memo and open the selected ' + itemText + '?',
       [{text: 'No', style: 'cancel'}, {text: 'Yes', onPress: cont}],
       {cancelable: false},
     );
@@ -58,7 +58,7 @@ const useReportModal = ({openSpotInNotebook}) => {
       const formCurrent = formRef?.current || {};
       alert(
         'Unsaved Changes',
-        'Would you like to save your report before ' + (itemText ? 'navigating to this ' + itemText : 'continuing') + '?',
+        'Would you like to save your memo before ' + (itemText ? 'navigating to this ' + itemText : 'continuing') + '?',
         [{
           text: 'No',
           style: 'cancel',
@@ -123,7 +123,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   /* Exported Functions */
 
   const checkIsSafeDelete = () => {
-    if (!isEmpty(updatedImages)) return 'Remove all images from this report before deleting.';
+    if (!isEmpty(updatedImages)) return 'Remove all images from this memo before deleting.';
   };
 
   const confirmCloseModal = () => checkReportChanged(null, closeModal);
