@@ -15,7 +15,8 @@ const RunQAQC = ({dataset}) => {
 
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
-  const {project} = useSelector(state => state.project);
+  const {datasets, project} = useSelector(state => state.project);
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
 
   const {initializeDownload} = useDownload();
   const toast = useToast();
@@ -31,7 +32,10 @@ const RunQAQC = ({dataset}) => {
 
   /* View */
 
-  if (!isTestingMode) return null;
+  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly || readOnlyDatasetsIds.includes(dataset.id);
+  const isProjectReadOnly = project?.isReadOnly;
+
+  if (!isTestingMode || isProjectReadOnly || isDatasetReadOnly) return null;
 
   return (
     <View style={{paddingBottom: 10}}>
