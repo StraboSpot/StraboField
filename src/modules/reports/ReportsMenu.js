@@ -26,7 +26,7 @@ const ReportsMenu = ({}) => {
 
   return (
     <View style={{flex: 1}}>
-      <AddButton onPress={addReport} title={'Create New Report'}/>
+      <AddButton onPress={addReport} title={'Create New Memo'}/>
       <ReportsList/>
     </View>
   );

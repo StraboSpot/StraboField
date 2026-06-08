@@ -102,11 +102,11 @@ const ModalWrapper = ({
     <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal}
+        closeModal={closeModal || onCancelPress}
         headerImage={headerImage}
         headerTitle={headerTitle}
         imageStyle={imageStyle}
-        showCloseButton={showCloseButton}
+        showCloseButton={showCloseButton || showCancelButton !== false}
       />
       <FlatList
         ListHeaderComponent={renderListHeader}

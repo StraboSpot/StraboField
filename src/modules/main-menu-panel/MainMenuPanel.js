@@ -83,7 +83,7 @@ const MainMenuPanel = forwardRef(({
           && (!mainMenuPageVisible
             || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
               && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
-          && <MainMenuPanelHeader onTagsOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
+          && <MainMenuPanelHeader onOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
         }
         {renderMainMenuList()}
       </>

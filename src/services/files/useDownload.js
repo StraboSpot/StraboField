@@ -84,8 +84,10 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
+      console.log('Datasets Response:', JSON.stringify(res));
+
+      // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
-        // If same project set active and target dataset to same as before if they still exist
         const newDatasetIds = datasets.map(d => d.id);
         const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
           console.log('Checking if active dataset still exists:', tempActiveDatasetId);
@@ -167,7 +169,7 @@ const useDownload = () => {
 
       if (!isEmpty(neededImagesIds)) {
         console.log('Downloading Needed Report Images...');
-        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Report Images...'));
+        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Memo Images...'));
         // Check path first and if it doesn't exist, then create
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
@@ -176,15 +178,15 @@ const useDownload = () => {
           else imagesFailedCount++;
         }
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('Finished Downloading Report Images'));
+        dispatch(addedStatusMessage('Finished Downloading Memo Images'));
         if (imagesFailedCount > 0) {
-          dispatch(addedStatusMessage(imagesFailedCount + ' Report Image' + (imagesFailedCount === 1 ? '' : 's')
+          dispatch(addedStatusMessage(imagesFailedCount + ' Memo Image' + (imagesFailedCount === 1 ? '' : 's')
             + ' Failed To Download'));
         }
       }
     }
     catch (err) {
-      dispatch(addedStatusMessage('Error Downloading Report Images!'));
+      dispatch(addedStatusMessage('Error Downloading Memo Images!'));
       console.warn('Error Downloading Report Images: ' + err);
     }
   };

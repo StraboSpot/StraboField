@@ -254,6 +254,45 @@ const useExport = () => {
     dispatch(clearedStatusMessages());
   };
 
+  const backupTemplates = async (backupFileName) => {
+    const rawTemplates = projectDb.project.templates || {};
+    const templatesToBackup = Object.entries(rawTemplates).reduce((acc, [key, value]) => {
+      if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
+      if (key === 'measurementTemplates') return {...acc, measurementTemplates: value};
+      if (value && typeof value === 'object' && Array.isArray(value.templates)) {
+        return {...acc, [key]: {templates: value.templates}};
+      }
+      return acc;
+    }, {});
+
+    console.log('Templates to backup:', templatesToBackup);
+
+    const jsonFileName = backupFileName + '.json';
+
+    if (Platform.OS === 'ios') {
+      const exportPath = APP_DIRECTORIES.EXPORT_FILES_IOS + 'Templates/';
+      await saveFile(exportPath, templatesToBackup, jsonFileName);
+      console.log('File saved to:', exportPath + jsonFileName);
+    }
+    else {
+      const tempPath = APP_DIRECTORIES.EXPORT_FILES_ANDROID + jsonFileName;
+      await saveFile(APP_DIRECTORIES.EXPORT_FILES_ANDROID, templatesToBackup, jsonFileName);
+      const result = await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+        {
+          name: jsonFileName,
+          parentFolder: 'StraboSpot2/Backups/Templates',
+          mimeType: 'application/json',
+        },
+        'Download',
+        tempPath,
+      );
+      console.log('File written to Downloads:', result);
+      await deleteFromDevice(APP_DIRECTORIES.EXPORT_FILES_ANDROID, jsonFileName);
+    }
+    console.log('Finished Exporting Templates');
+    dispatch(clearedStatusMessages());
+  };
+
   const initializeBackup = async (fileName, options = {images: true, offlineTiles: true, customMaps: true}) => {
     try {
       if (hasSpace(fileName)) fileName = fileName.replaceAll(' ', '_');
@@ -353,6 +392,7 @@ const useExport = () => {
 
   return {
     backupTags,
+    backupTemplates,
     initializeBackup,
     zipAndExportProjectFolder,
   };
