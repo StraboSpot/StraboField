@@ -15,6 +15,7 @@ import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConform
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import RunQAQC from '../../qaqc/RunQAQC';
 import GovernanceFields from '../governance/GovernanceFields';
 import {updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
@@ -25,9 +26,9 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const dispatch = useDispatch();
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
+  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset, isReadOnlyDataset} = useProject();
-  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
   const toast = useToast();
 
   /* Local State */
@@ -289,10 +290,13 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
             {renderSpotsField()}
             {renderImagesField()}
             <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
+            <RunQAQC dataset={dataset}/>
             {Platform.OS === 'web' && renderDeleteDatasetButton()}
           </>
         }
       />
+
+      {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );

@@ -26,7 +26,7 @@ const ReportsListModal = () => {
 
   return (
     <ModalWrapper>
-      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Report'}/>}
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo'}/>}
       <ReportsList isCheckedList/>
     </ModalWrapper>
   );

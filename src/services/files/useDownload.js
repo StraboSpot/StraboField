@@ -176,7 +176,7 @@ const useDownload = () => {
 
       if (!isEmpty(neededImagesIds)) {
         console.log('Downloading Needed Report Images...');
-        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Report Images...'));
+        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Memo Images...'));
         // Check path first and if it doesn't exist, then create
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
@@ -185,15 +185,15 @@ const useDownload = () => {
           else imagesFailedCount++;
         }
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('Finished Downloading Report Images'));
+        dispatch(addedStatusMessage('Finished Downloading Memo Images'));
         if (imagesFailedCount > 0) {
-          dispatch(addedStatusMessage(imagesFailedCount + ' Report Image' + (imagesFailedCount === 1 ? '' : 's')
+          dispatch(addedStatusMessage(imagesFailedCount + ' Memo Image' + (imagesFailedCount === 1 ? '' : 's')
             + ' Failed To Download'));
         }
       }
     }
     catch (err) {
-      dispatch(addedStatusMessage('Error Downloading Report Images!'));
+      dispatch(addedStatusMessage('Error Downloading Memo Images!'));
       console.warn('Error Downloading Report Images: ' + err);
     }
   };

@@ -33,7 +33,7 @@ const ImageThumbnail = ({
       onLoadEnd={onFinishedLoading}
       onPress={onImagePressed}
       placeholderStyle={[imageStyles.placeholderImage, {height: height, width: height}]}
-      pressableProps={{disabled: !isInternetReachable}}
+      pressableProps={{disabled: isImageMissingOnServer && !isInternetReachable}}
       source={imageThumbnailURI && {uri: imageThumbnailURI}}
     />
   );

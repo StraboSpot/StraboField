@@ -34,6 +34,8 @@ import RockIgneousPage from '../petrology/RockIgneousPage';
 import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
+import QAQCPage from '../qaqc/QAQC';
+import QAQCOverview from '../qaqc/QAQCOverview';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
 import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
@@ -118,12 +120,12 @@ export const PRIMARY_PAGES = [
     action_label: 'Add a Sample',
   }, {
     key: PAGE_KEYS.REPORTS,
-    label: 'Reports',
+    label: 'Memos',
     icon_src: require('../../assets/icons/Reports.png'),
     icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
     page_component: ReportsPage,
     modal_component: ReportModal,
-    action_label: 'Create New Report',
+    action_label: 'Create New Memo',
   },
 ];
 
@@ -186,6 +188,14 @@ export const SECONDARY_PAGES = [
     modal_component: AddEarthquakeModal,
     overview_component: BasicOverviewList,
     action_label: 'Add an Earthquake Feature',
+  }, {
+    key: PAGE_KEYS.QAQC,
+    label: 'QAQC',
+    icon_src: require('../../assets/icons/QAQC.png'),
+    icon_pressed_src: require('../../assets/icons/QAQC_pressed.png'),
+    overview_component: QAQCOverview,
+    page_component: QAQCPage,
+    testing: true,
   },
 ];
 
@@ -422,11 +432,11 @@ const OTHER_MODALS = [
     modal_component: AddIntervalModal,
   }, {
     key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS,
-    label: 'Add Spots To Reports',
+    label: 'Add Spots To Memos',
     modal_component: ReportsListModal,
   }, {
-    key: MODAL_KEYS.OTHER.ADD_SPOTS_TO_QAQC,
-    label: 'Add Spots To QAQC',
+    key: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA,
+    label: 'Inspect Spots Raw Data',
     modal_component: SpotsRawDataView,
   }, {
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,

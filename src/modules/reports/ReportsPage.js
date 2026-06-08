@@ -38,10 +38,10 @@ const ReportsPage = () => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'Reports'}/>
-      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Report with this Spot'}/>}
+      <PageHeader pageTitle={'Memos'}/>
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>}
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
-        Reports referencing this Spot:
+        Memos referencing this Spot:
       </Text>
       <ReportsList reportsSubset={reportsUsingThisSpot}/>
     </View>
