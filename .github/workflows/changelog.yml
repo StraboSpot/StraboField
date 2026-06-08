@@ -17,10 +17,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get previous tag
+      - name: Get previous release tag
         id: prev_tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          CURR=${{ github.ref_name }}
+          # Find the last published (non-draft, non-prerelease) release before this one
+          PREV_TAG=$(gh release list --repo ${{ github.repository }} \
+            --exclude-drafts \
+            --exclude-pre-releases \
+            --limit 20 \
+            --json tagName \
+            --jq '.[].tagName' | grep -v "^${CURR}$" | head -1)
+          echo "Previous release tag: $PREV_TAG"
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
       - name: Generate Changelog
