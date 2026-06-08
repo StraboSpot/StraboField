@@ -32,7 +32,7 @@ jobs:
           PREV=${{ steps.prev_tag.outputs.prev_tag }}
           CURR=${{ github.ref_name }}
 
-          changelog=$(git log $PREV..$CURR --pretty=format:"%s" | awk '
+          changelog=$(git log $PREV..$CURR --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
           /^feat/ { features[++fc] = $0 }
           /^fix/  { fixes[++bc] = $0 }
           /^chore/ { chores[++cc] = $0 }
