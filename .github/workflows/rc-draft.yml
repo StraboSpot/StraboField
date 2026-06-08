@@ -21,7 +21,7 @@ jobs:
         id: meta
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-draft)?$' | grep -v "v${VERSION}-draft" | head -1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
