@@ -17,14 +17,9 @@ import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConform
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
-
-//PADLOCK
-import ActionButton from '../../../shared/ui/buttons/ActionButton';
-import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {runQAQC} from '../../qaqc/qaqc_funcs';
-import useUpload from '../../../services/files/useUpload';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
@@ -34,9 +29,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
-  const {initializeDownloadImages, initializeDownload} = useDownload();
-  const {destroyDataset} = useProject();
   const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
+
+  const {initializeDownloadImages} = useDownload();
+  const {destroyDataset} = useProject();
   const toast = useToast();
 
   /* Local State */
@@ -60,14 +56,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   };
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
-
-  //PADLOCK
-  const [isQAQCModalVisible, setIsQAQCModalVisible] = useState(false);
-  const handleQAQCPressed = () => setIsQAQCModalVisible(true);
-  const encodedLogin = useSelector(state => state.user.encoded_login);
-  const {project} = useSelector(state => state.project);
-  const isTestingMode = useSelector(state => state.project.isTestingMode);
-  const {initializeUpload} = useUpload();
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
@@ -313,58 +301,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
-  //PADLOCK
-  // QAQC Dataset Button
-  const renderQAQCDatasetButton = () => {
-    if(isTestingMode){
-      return (
-        <View style={{paddingBottom: 10}}>
-          <ActionButton
-            onPress={handleQAQCPressed}
-            title={'Run QAQC'}
-          />
-        </View>
-      );
-    } else return;
-  };
-
-  const renderQAQCModal = () => {
-    return (
-      <ModalWrapper
-        actionTitle={'Upload and Run'}
-        cancelTitle={'Cancel'}
-        headerTitle={'QAQC Confirmation'}
-        isVisible={isQAQCModalVisible}
-        onActionPressed={async () => {
-          setIsQAQCModalVisible(false);
-          toast_id = toast.show(
-          `Uploading project: ${project.description.project_name}`,
-          {
-              type: 'warning',
-              animationType: 'slide-in',
-              duration: 20000,
-              placement: 'top',
-          });
-          uploadStatus = await initializeUpload();
-          if(uploadStatus.datasets == "uploaded"){
-            try{
-              await runQAQC(dataset, project.id, encodedLogin, toast, toast_id);
-              initializeDownload(project, encodedLogin);
-            } catch(err){
-              toast.update(toast_id, `Failed to run QAQC.`, {type:'error', duration: 5000,});
-            }
-          } else{
-            toast.update(toast_id, `Failed to upload datasets.`, {type: 'error', duration: 5000,});
-          }
-        }}
-        onCancelPress={() => setIsQAQCModalVisible(false)}
-        overlayStyleOverride={{height: 'auto'}}
-      >
-        <Text style={{textAlign:"center"}}>{"Must upload any changes on device first"}</Text>
-      </ModalWrapper>
-    );
-  };
-
   /* View */
 
   return (
@@ -380,13 +316,12 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       {renderSpotsField()}
       {renderImagesField()}
       <LittleSpacer/>
-      {renderQAQCDatasetButton()}
+      <RunQAQC dataset={dataset}/>
       {renderReadOnlyDatasetButton()}
       <LittleSpacer/>
       {Platform.OS === 'web' && renderDeleteDatasetButton()}
 
-      {/* Child Modal */}      
-      {isQAQCModalVisible && renderQAQCModal()}
+      {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );
