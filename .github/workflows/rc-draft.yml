@@ -35,11 +35,6 @@ jobs:
             fi
           done)
 
-          echo "=== DEBUG ==="
-          echo "VERSION: $VERSION"
-          echo "PREV_BUMP: $PREV_BUMP"
-          echo "============="
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "prev_bump=$PREV_BUMP" >> $GITHUB_OUTPUT
 
