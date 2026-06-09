@@ -83,10 +83,10 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           overlayStyleOverride={{height: '30%'}}
           showCancelButton={true}
           showConfirmButton={isDeleteReportModalVisible && !errorMessage}
-          title={'Delete Report?'}
+          title={'Delete Memo?'}
         >
-          {errorMessage ? <Text>Unable to delete report.{'\n'}{errorMessage}</Text>
-            : <Text>Are you sure you want to delete this report?</Text>}
+          {errorMessage ? <Text>Unable to delete memo.{'\n'}{errorMessage}</Text>
+            : <Text>Are you sure you want to delete this memo?</Text>}
         </WarningModal>
       </ModalWrapper>
 
