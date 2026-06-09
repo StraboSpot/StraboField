@@ -11,11 +11,13 @@ const DeleteConformationDialogBox = ({
                                        isVisible,
                                        headerTitle,
                                        overlayStyleOverride,
+                                       doesRenderAsView,
                                        showActionButton,
                                      }) => {
   return (
     <ModalWrapper
       actionTitle={'Delete'}
+      doesRenderAsView={doesRenderAsView}
       headerTitle={headerTitle}
       isVisible={isVisible}
       onActionPressed={onActionPressed}

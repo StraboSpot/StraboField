@@ -7,6 +7,7 @@ import {isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
+import SketchModal from '../sketch/SketchModal';
 
 const ReportImages = ({setUpdatedImages, updatedImages}) => {
   /* Data Hooks */
@@ -21,12 +22,20 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
   const handleOpenImage = (image) => {
     setImageToView(image);
     setIsImageModalVisible(true);
+  };
+
+  const handleOpenSketch = (image) => {
+    setIsImageModalVisible(false);
+    setSketchImage(image);
+    setIsSketchModalVisible(true);
   };
 
   /* Logic Helpers */
@@ -72,16 +81,23 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
         onOpenImage={handleOpenImage}
       />
 
-      {/* Modal */}
+      {/* Modals */}
       <ImageModal
         deleteImage={deleteImage}
         image={imageToView}
         isVisible={isImageModalVisible}
-        saveImages={saveImagesToReport}
+        onOpenSketch={handleOpenSketch}
         saveUpdatedImage={saveUpdatedImage}
         setImageToView={setImageToView}
         setIsImageModalVisible={setIsImageModalVisible}
       />
+      {isSketchModalVisible && (
+        <SketchModal
+          image={sketchImage}
+          saveImages={saveImagesToReport}
+          setIsSketchModalVisible={setIsSketchModalVisible}
+        />
+      )}
     </View>
   );
 
