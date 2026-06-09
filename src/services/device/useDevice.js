@@ -1,6 +1,7 @@
 import {Linking, PermissionsAndroid, Platform} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
+import moment from 'moment';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -519,6 +520,43 @@ const useDevice = () => {
     }
   };
 
+  const AUTO_SAVES_DIR = APP_DIRECTORIES.BACKUP_DIR + 'AutoBackups/';
+  const AUTO_SAVE_PREFIX = 'strabo_save_';
+
+  const pruneOldProjectSaves = async (maxSaves) => {
+    try {
+      const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
+      if (!dirExists) return;
+      const allItems = await RNFS.readdir(AUTO_SAVES_DIR);
+      const saveFiles = allItems
+        .filter(item => item.startsWith(AUTO_SAVE_PREFIX) && item.endsWith('.json'))
+        .sort()
+        .reverse();
+      const toDelete = saveFiles.slice(maxSaves);
+      for (const file of toDelete) {
+        await RNFS.unlink(AUTO_SAVES_DIR + file);
+        console.log('Auto save pruned:', file);
+      }
+    }
+    catch (err) {
+      console.error('Error pruning auto saves:', err);
+    }
+  };
+
+  const saveProjectToDevice = async (snapshot) => {
+    try {
+      const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
+      if (!dirExists) await makeDirectory(AUTO_SAVES_DIR);
+      const filename = AUTO_SAVE_PREFIX + moment().format('YYYY-MM-DDTHH-mm-ss') + '.json';
+      await writeFileToDevice(AUTO_SAVES_DIR, filename, snapshot);
+      console.log('Auto save written:', filename);
+    }
+    catch (err) {
+      console.error('Error saving project to device:', err);
+      throw Error(err);
+    }
+  };
+
   const writeFileToDevice = async (path, filename, data) => {
     try {
       console.log('Writing file to internal storage ...', path + '/' + filename);
@@ -563,6 +601,8 @@ const useDevice = () => {
     readDirectoryForMapTiles,
     readFile,
     requestReadDirectoryPermission,
+    pruneOldProjectSaves,
+    saveProjectToDevice,
     unZipAndCopyImportedData,
     writeFileToDevice,
   };

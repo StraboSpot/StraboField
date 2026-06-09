@@ -120,6 +120,7 @@ const useUpload = () => {
   const initializeUpload = async () => {
     if (Platform.OS !== 'web') KeepAwake.activate();
     try {
+      console.log('Initializing Upload...');
       await uploadProject();
       await uploadDatasets();
       if (Platform.OS !== 'web') {
