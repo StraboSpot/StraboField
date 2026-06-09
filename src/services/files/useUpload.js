@@ -165,6 +165,25 @@ const useUpload = () => {
     return true;
   };
 
+  // Synchronously Upload Datasets (only those whose IDs are in the provided list)
+  const uploadDatasetsByIds = async (datasetIds) => {
+    const datasets = datasetIds.map(id => projectDatasets[id]).filter(Boolean);
+    if (!datasets.length) return true;
+    let currentRequest = 0;
+    const makeNextRequest = async () => {
+      await uploadDataset(datasets[currentRequest]);
+      currentRequest++;
+      if (currentRequest < datasets.length) await makeNextRequest();
+    };
+    setUploadStatusMessage(`Uploading ${datasets.length} modified datasets...\n`);
+    await makeNextRequest();
+    projectUploadStatus = {...projectUploadStatus, datasets: 'uploaded'};
+    console.log('Completed uploading modified datasets!');
+    setUploadStatusMessage(
+      `Finished uploading ${datasets.length} modified Dataset${datasets.length === 1 ? '!' : 's!'}\n`);
+    return true;
+  };
+
   const uploadFromWeb = async (imageId, imageFile) => {
     try {
       dispatch(setIsImageTransferring(true));
@@ -209,6 +228,7 @@ const useUpload = () => {
   return {
     initializeUpload,
     uploadDatasets,
+    uploadDatasetsByIds,
     uploadFromWeb,
     uploadProfile,
     uploadProject,

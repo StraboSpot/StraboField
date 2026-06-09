@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {clearAllPendingDatasetIds, clearProjectDirty} from '../../modules/connections/connections.slice';
 import useUpload from '../files/useUpload';
 
-const UPLOAD_INTERVAL_MS = 60 * 1000;
+const UPLOAD_INTERVAL_MS = 30 * 1000;
 
 const useAutoUpload = () => {
   /* Data Hooks */
@@ -16,7 +16,7 @@ const useAutoUpload = () => {
   const isProjectDirty = useSelector(state => state.connections.isProjectDirty);
   const pendingIds = useSelector(state => state.connections.pendingUploadDatasetIds);
 
-  const {initializeUpload} = useUpload();
+  const {uploadProject, uploadDatasetsByIds} = useUpload();
   const prevOnlineRef = useRef(false);
 
   /* Internal Functions */
@@ -24,7 +24,8 @@ const useAutoUpload = () => {
   const tryUpload = useCallback(async () => {
     if (!isOnline || (!isProjectDirty && !pendingIds.length)) return;
     try {
-      await initializeUpload();
+      if (isProjectDirty) await uploadProject();
+      if (pendingIds.length) await uploadDatasetsByIds(pendingIds);
       dispatch(clearProjectDirty());
       dispatch(clearAllPendingDatasetIds());
       console.log('Auto upload complete.');
