@@ -25,7 +25,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
-import {editedSpotProperties} from '../spots/spots.slice';
+import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, openMainMenuPanel}) => {
   /* Data Hooks */
@@ -145,7 +145,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const saveImagesToSpot = (newImages) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
-    dispatch(editedSpotProperties({field: 'images', value: newImages}));
+    dispatch(editedSpotImages(newImages));
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
 
