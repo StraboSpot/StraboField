@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialHomeState = {
-  autoBackupFrequency: 0,
   statusMessages: [],
   geolocationTimeout: 120000,
   imageProgress: {
@@ -60,9 +59,6 @@ const homeSlice = createSlice({
     setIsErrorMessagesModalVisible(state, action) {
       state.isErrorMessagesModalVisible = action.payload;
     },
-    setAutoBackupFrequency(state, action) {
-      state.autoBackupFrequency = action.payload;
-    },
     setGeolocationTimeout(state, action) {
       state.geolocationTimeout = action.payload;
     },
@@ -115,7 +111,6 @@ export const {
   clearedStatusMessages,
   removedLastStatusMessage,
   resetHomeState,
-  setAutoBackupFrequency,
   setIsBackupModalVisible,
   setIsErrorMessagesModalVisible,
   setGeolocationTimeout,

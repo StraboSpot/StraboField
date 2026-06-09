@@ -3,7 +3,7 @@ import {Animated} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {AutoBackupButton, MainMenuButton, MapActionButtons, UserLocationButton} from './index';
+import {MainMenuButton, MapActionButtons, UserLocationButton} from './index';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import homeStyles from '../home.style';
 
@@ -40,7 +40,6 @@ const LeftSideButtons = ({
       </Animated.View>
 
       <Animated.View style={[homeStyles.bottomLeftIcons, animateLeftSide]}>
-        <AutoBackupButton/>
         <UserLocationButton clickHandler={clickHandler}/>
 
         {currentImageBasemap && (
