@@ -4,7 +4,7 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import {Image} from '@rn-vui/base';
 
 import {ImagePropertiesModal, imageStyles} from '.';
-import {getResizedImageURI, getLocalImageURI} from './imageURIs.helpers';
+import {getLocalImageURI, getResizedImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
@@ -14,14 +14,13 @@ import Loading from '../../shared/ui/Loading';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import SketchModal from '../sketch/SketchModal';
 
 const ImageModal = ({
                       deleteImage,
                       image,
                       isReadOnly,
                       isVisible,
-                      saveImages,
+                      onOpenSketch,
                       saveUpdatedImage,
                       setImageToView,
                       setIsImageModalVisible,
@@ -38,7 +37,6 @@ const ImageModal = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 
   /* Event Handlers */
 
@@ -49,15 +47,13 @@ const ImageModal = ({
   const onDeleteImage = async () => {
     setIsLoading(true);
     setIsImageDeleteModalVisible(false);
-    const isImageDeleted = await deleteImage(image);
-    setIsLoading(false);
-    if (isImageDeleted) setIsImageModalVisible(false);
-  };
-
-  /* Logic Helpers */
-
-  const openInSketch = () => {
-    setIsSketchModalVisible(true);
+    try {
+      const isImageDeleted = await deleteImage(image);
+      if (isImageDeleted) setIsImageModalVisible(false);
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   /* Render Functions */
@@ -65,6 +61,7 @@ const ImageModal = ({
   const renderDeleteImageModal = () => {
     return (
       <DeleteConformationDialogBox
+        doesRenderAsView
         headerTitle={'Delete Image'}
         isVisible={isImageDeleteModalVisible}
         onActionPressed={onDeleteImage}
@@ -76,6 +73,7 @@ const ImageModal = ({
       </DeleteConformationDialogBox>
     );
   };
+
 
   /* View */
 
@@ -116,7 +114,7 @@ const ImageModal = ({
           />
           {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
-              onPress={openInSketch}
+              onPress={() => onOpenSketch(image)}
               source={require('../../assets/icons/ImageSketchButton.png')}
               style={imageStyles.imageModalButtons}
             />
@@ -141,9 +139,6 @@ const ImageModal = ({
         />
       )}
       {renderDeleteImageModal()}
-      {isSketchModalVisible && (
-        <SketchModal image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
-      )}
       <Loading isLoading={isLoading}/>
     </ModalWrapper>
   );

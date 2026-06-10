@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {ImageModal, ImagesList, useImages} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -21,6 +22,8 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
@@ -30,6 +33,14 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
       setImageToView(image);
       setIsImageModalVisible(true);
     }
+  };
+
+  /* Event Handlers */
+
+  const handleOpenSketch = (image) => {
+    setIsImageModalVisible(false);
+    setSketchImage(image);
+    setIsSketchModalVisible(true);
   };
 
   /* Logic Helpers */
@@ -58,17 +69,24 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
         onPressEmpty={onPressEmpty}
       />
 
-      {/* Modal */}
+      {/* Modals */}
       {!onOpenImage && (
         <ImageModal
           deleteImage={deleteImage}
           image={imageToView}
           isReadOnly={isReadOnly}
           isVisible={isImageModalVisible}
-          saveImages={saveImages}
+          onOpenSketch={handleOpenSketch}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
           setIsImageModalVisible={setIsImageModalVisible}
+        />
+      )}
+      {isSketchModalVisible && (
+        <SketchModal
+          image={sketchImage}
+          saveImages={saveImages}
+          setIsSketchModalVisible={setIsSketchModalVisible}
         />
       )}
     </>
