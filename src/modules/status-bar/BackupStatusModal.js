@@ -6,6 +6,8 @@ import {useSelector} from 'react-redux';
 import commonStyles from '../../shared/common.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import AutoSaveCountdown from '../project/backup/AutoSaveCountdown';
+import AutoUploadCountdown from '../project/backup/AutoUploadCountdown';
 
 const BackupStatusModal = ({isVisible, onClose}) => {
   /* Data Hooks */
@@ -45,6 +47,9 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             dividerText={isAutoSaving ? 'Saving to Device…' : 'Pending Device Save'}
             subtitle={'All datasets · Excludes images & offline maps'}
           />
+          <View style={{paddingHorizontal: 10}}>
+            <AutoSaveCountdown/>
+          </View>
           <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
             {'Project: ' + projectName}
           </Text>
@@ -56,6 +61,9 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             dividerText={isAutoUploading ? 'Uploading to Server…' : 'Pending Server Upload'}
             subtitle={'Changed datasets only'}
           />
+          <View style={{paddingHorizontal: 10}}>
+            <AutoUploadCountdown/>
+          </View>
           {isProjectDirty && (
             <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
               {'Project: ' + projectName}
