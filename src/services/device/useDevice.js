@@ -521,7 +521,6 @@ const useDevice = () => {
   };
 
   const AUTO_SAVES_DIR = APP_DIRECTORIES.BACKUP_DIR + 'AutoBackups/';
-  const AUTO_SAVE_PREFIX = 'strabo_save_';
 
   const pruneOldProjectSaves = async (maxSaves) => {
     try {
@@ -529,9 +528,12 @@ const useDevice = () => {
       if (!dirExists) return;
       const allItems = await RNFS.readdir(AUTO_SAVES_DIR);
       const saveFiles = allItems
-        .filter(item => item.startsWith(AUTO_SAVE_PREFIX) && item.endsWith('.json'))
-        .sort()
-        .reverse();
+        .filter(item => item.endsWith('.json'))
+        .sort((a, b) => {
+          const tsA = a.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          const tsB = b.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          return tsB.localeCompare(tsA);
+        });
       const toDelete = saveFiles.slice(maxSaves);
       for (const file of toDelete) {
         await RNFS.unlink(AUTO_SAVES_DIR + file);
@@ -545,9 +547,11 @@ const useDevice = () => {
 
   const saveProjectToDevice = async (snapshot) => {
     try {
-      const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
-      if (!dirExists) await makeDirectory(AUTO_SAVES_DIR);
-      const filename = AUTO_SAVE_PREFIX + moment().format('YYYY-MM-DDTHH-mm-ss') + '.json';
+      await makeDirectory(APP_DIRECTORIES.BACKUP_DIR);
+      await makeDirectory(AUTO_SAVES_DIR);
+      const projectName = snapshot?.projectDb?.project?.description?.project_name || '';
+      const sanitizedName = projectName.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/, '');
+      const filename = moment().format('YYYY-MM-DDTHH-mm-ss') + (sanitizedName ? '_' + sanitizedName : '') + '.json';
       await writeFileToDevice(AUTO_SAVES_DIR, filename, snapshot);
       console.log('Auto save written:', filename);
     }

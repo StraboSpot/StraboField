@@ -7,7 +7,7 @@ import {isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 
 const SAVE_INTERVAL_MS = 30 * 1000;
-const MAX_SAVES = 10;
+export const MAX_SAVES = 10;
 
 const useAutoSave = () => {
   /* Data Hooks */

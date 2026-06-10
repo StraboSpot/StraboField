@@ -16,7 +16,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 
-const ProjectList = ({doRefresh, onProjectPress, source}) => {
+const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -102,7 +102,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>
-            {source === 'server' ? item.name : item.fileName}
+            {source === 'server' ? item.name : (item.displayName || item.fileName)}
           </ListItem.Title>
           {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
@@ -117,6 +117,10 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
 
   const renderProjectsList = () => {
     if (!isEmpty(userData)) {
+      const allProjects = projectsArr.projects || [];
+      const filteredProjects = source === 'device'
+        ? allProjects.filter(p => backupType === 'auto' ? p.isAutoBackup : !p.isAutoBackup)
+        : allProjects;
       return (
         <View style={{flex: 1}}>
           <FlatList
@@ -130,7 +134,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
                 {isError && renderErrorMessage()}
               </View>
             }
-            data={projectsArr.projects}
+            data={filteredProjects}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderProjectItem(item)}/>
         </View>

@@ -38,6 +38,11 @@ const connectionsSlice = createSlice({
     clearProjectDirty(state) {
       state.isProjectDirty = false;
     },
+    resetSyncState(state) {
+      state.isLocalSaveNeeded = false;
+      state.isProjectDirty = false;
+      state.pendingUploadDatasetIds = [];
+    },
     removePendingDatasetId(state, action) {
       state.pendingUploadDatasetIds = state.pendingUploadDatasetIds.filter(
         id => id !== action.payload,
@@ -73,6 +78,7 @@ export const {
   clearLocalSaveNeeded,
   clearProjectDirty,
   removePendingDatasetId,
+  resetSyncState,
   setAutoSaving,
   setAutoUploading,
   setCustomDatabaseUrl,

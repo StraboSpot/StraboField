@@ -2,6 +2,7 @@ import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {resetSyncState} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
@@ -39,6 +40,7 @@ const useImport = () => {
     moveFile,
     readDeviceJSONFile,
     readDirectory,
+    readFile,
   } = useDevice();
   const {clearProject} = useResetState();
 
@@ -167,11 +169,39 @@ const useImport = () => {
     }
   };
 
+  const loadProjectData = async (dataFile) => {
+    if (!isEmpty(project)) await persistor.purge();
+    const {projectDb, spotsDb} = dataFile;
+    if (!isEmpty(project.id)) clearProject();
+    dispatch(addedSpotsFromDevice(spotsDb));
+    dispatch(addedProject(projectDb.project || projectDb));
+    dispatch(addedDatasets(projectDb.datasets));
+    if (Object.values(projectDb.datasets).length > 0 && !isEmpty(Object.values(projectDb.datasets)[0])) {
+      dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
+      dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
+    }
+    dispatch(resetSyncState());
+    return projectDb.project;
+  };
+
   const loadProjectFromDevice = async (selectedProject, isExternal) => {
     dispatch(clearedStatusMessages());
     dispatch(addedStatusMessage(`Importing ${selectedProject}...`));
-
     console.log('SELECTED PROJECT', selectedProject);
+
+    // Auto save: flat JSON file in AutoBackups/
+    if (selectedProject.endsWith('.json')) {
+      const fileContent = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedProject);
+      if (!fileContent) throw new Error('Auto-backup file not found: ' + selectedProject);
+      const loadedProject = await loadProjectData(JSON.parse(fileContent));
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage('Project loaded.'));
+      dispatch(setSelectedProject({project: '', source: ''}));
+      dispatch(addedStatusMessage('Complete!'));
+      return {project: loadedProject};
+    }
+
+    // Manual save: directory containing data.json, optionally zipped
     if (selectedProject.includes('.zip')) {
       await unzipBackupFile(selectedProject);
       selectedProject = selectedProject.replace('.zip', '');
@@ -180,17 +210,7 @@ const useImport = () => {
     if (dirExists) {
       const dataFile = await readDeviceJSONFile(selectedProject);
       if (!dataFile) throw new Error('Project data file (data.json) not found in ' + selectedProject);
-      if (!isEmpty(project)) await persistor.purge();
-      const {projectDb, spotsDb} = dataFile;
-      if (!isEmpty(project.id)) clearProject();
-      console.log('DataFile', dataFile);
-      dispatch(addedSpotsFromDevice(spotsDb));
-      dispatch(addedProject(projectDb.project || projectDb));
-      dispatch(addedDatasets(projectDb.datasets));
-      if (Object.values(projectDb.datasets).length > 0 && !isEmpty(Object.values(projectDb.datasets)[0])) {
-        dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
-        dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
-      }
+      const loadedProject = await loadProjectData(dataFile);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage(`${selectedProject}\nProject loaded.`));
       dispatch(addedStatusMessage('Importing image files...'));
@@ -198,7 +218,7 @@ const useImport = () => {
       await checkForMaps(dataFile, selectedProject, isExternal);
       dispatch(setSelectedProject({project: '', source: ''}));
       dispatch(addedStatusMessage('Complete!'));
-      return Promise.resolve({project: dataFile.projectDb.project});
+      return {project: loadedProject};
     }
   };
 
