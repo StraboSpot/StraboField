@@ -11,6 +11,12 @@ const initialConnectionsState = {
   isLocalSaveNeeded: false,
   isOnline: {},
   isProjectDirty: false,
+  backupFrequency: {
+    save: 30,
+    upload: 30,
+  },
+  nextAutoSaveTime: null,
+  nextAutoUploadTime: null,
   pendingUploadDatasetIds: [],
 };
 
@@ -48,6 +54,9 @@ const connectionsSlice = createSlice({
         id => id !== action.payload,
       );
     },
+    setBackupFrequency(state, action) {
+      state.backupFrequency = action.payload;
+    },
     setCustomDatabaseUrl(state, action) {
       state.databaseEndpoint.endpoint = action.payload;
     },
@@ -59,6 +68,12 @@ const connectionsSlice = createSlice({
     },
     setLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = true;
+    },
+    setNextAutoSaveTime(state, action) {
+      state.nextAutoSaveTime = action.payload;
+    },
+    setNextAutoUploadTime(state, action) {
+      state.nextAutoUploadTime = action.payload;
     },
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
@@ -81,10 +96,13 @@ export const {
   resetSyncState,
   setAutoSaving,
   setAutoUploading,
+  setBackupFrequency,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
   setLocalSaveNeeded,
+  setNextAutoSaveTime,
+  setNextAutoUploadTime,
   setOnlineStatus,
   setProjectDirty,
   updatedProjectTransferProgress,
