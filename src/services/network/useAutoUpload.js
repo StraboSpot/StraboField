@@ -3,10 +3,14 @@ import {AppState} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {clearAllPendingDatasetIds, clearProjectDirty, setAutoUploading} from '../../modules/connections/connections.slice';
+import {
+  clearAllPendingDatasetIds,
+  clearProjectDirty,
+  setAutoUploading,
+} from '../../modules/connections/connections.slice';
 import useUpload from '../files/useUpload';
 
-const UPLOAD_INTERVAL_MS = 30 * 1000;
+const UPLOAD_INTERVAL_MS = 20 * 1000;
 
 const useAutoUpload = () => {
   /* Data Hooks */

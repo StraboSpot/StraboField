@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react';
-import {Animated, Easing, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, Easing, TouchableOpacity, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import BackupStatusModal from './BackupStatusModal';
 import statusBarStyles from './statusBar.styles';
 import * as themes from '../../shared/styles.constants';
 
@@ -58,33 +59,42 @@ const BackupStatusIcons = () => {
   const saveBounce = useBounceAnimation(isAutoSaving);
   const uploadBounce = useBounceAnimation(isAutoUploading);
 
+  /* Local State */
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   /* View */
 
   if (!isSaveVisible && !isUploadVisible) return null;
 
   return (
-    <View style={statusBarStyles.backupStatusContainer}>
-      {isSaveVisible && (
-        <Animated.View style={{transform: [{translateY: saveBounce}]}}>
-          <Icon
-            color={themes.PRIMARY_ACCENT_COLOR}
-            name={'content-save-alert'}
-            size={24}
-            type={'material-community'}
-          />
-        </Animated.View>
-      )}
-      {isUploadVisible && (
-        <Animated.View style={{transform: [{translateY: uploadBounce}]}}>
-          <Icon
-            color={themes.PRIMARY_ACCENT_COLOR}
-            name={'cloud-upload-outline'}
-            size={24}
-            type={'material-community'}
-          />
-        </Animated.View>
-      )}
-    </View>
+    <>
+      <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
+      <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+        <View style={statusBarStyles.backupStatusContainer}>
+          {isSaveVisible && (
+            <Animated.View style={{transform: [{translateY: saveBounce}]}}>
+              <Icon
+                color={themes.PRIMARY_ACCENT_COLOR}
+                name={'content-save-alert'}
+                size={24}
+                type={'material-community'}
+              />
+            </Animated.View>
+          )}
+          {isUploadVisible && (
+            <Animated.View style={{transform: [{translateY: uploadBounce}]}}>
+              <Icon
+                color={themes.PRIMARY_ACCENT_COLOR}
+                name={'cloud-upload-outline'}
+                size={24}
+                type={'material-community'}
+              />
+            </Animated.View>
+          )}
+        </View>
+      </TouchableOpacity>
+    </>
   );
 };
 
