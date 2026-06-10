@@ -3,7 +3,7 @@ import {AppState} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {clearAllPendingDatasetIds, clearProjectDirty} from '../../modules/connections/connections.slice';
+import {clearAllPendingDatasetIds, clearProjectDirty, setAutoUploading} from '../../modules/connections/connections.slice';
 import useUpload from '../files/useUpload';
 
 const UPLOAD_INTERVAL_MS = 30 * 1000;
@@ -24,6 +24,7 @@ const useAutoUpload = () => {
   const tryUpload = useCallback(async () => {
     if (!isOnline || (!isProjectDirty && !pendingIds.length)) return;
     try {
+      dispatch(setAutoUploading(true));
       if (isProjectDirty) await uploadProject();
       if (pendingIds.length) await uploadDatasetsByIds(pendingIds);
       dispatch(clearProjectDirty());
@@ -32,6 +33,9 @@ const useAutoUpload = () => {
     }
     catch (err) {
       console.error('Auto upload failed:', err);
+    }
+    finally {
+      dispatch(setAutoUploading(false));
     }
   }, [isOnline, isProjectDirty, pendingIds]);
 

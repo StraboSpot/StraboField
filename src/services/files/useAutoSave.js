@@ -2,11 +2,11 @@ import {useEffect} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
+import {clearLocalSaveNeeded, setAutoSaving} from '../../modules/connections/connections.slice';
 import {isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 
-const SAVE_INTERVAL_MS = 60 * 1000;
+const SAVE_INTERVAL_MS = 40 * 1000;
 const MAX_SAVES = 10;
 
 const useAutoSave = () => {
@@ -25,6 +25,7 @@ const useAutoSave = () => {
   const runSave = async () => {
     try {
       if (!isSaveNeeded || isEmpty(projectDb.project)) return;
+      dispatch(setAutoSaving(true));
       const snapshot = {
         mapNamesDb: {},
         mapTilesDb: {},
@@ -39,6 +40,9 @@ const useAutoSave = () => {
     }
     catch (err) {
       console.error('Auto save failed:', err);
+    }
+    finally {
+      dispatch(setAutoSaving(false));
     }
   };
 

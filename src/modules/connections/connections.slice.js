@@ -6,6 +6,8 @@ const initialConnectionsState = {
     isSelected: false,
     isVerified: false,
   },
+  isAutoSaving: false,
+  isAutoUploading: false,
   isLocalSaveNeeded: false,
   isOnline: {},
   isProjectDirty: false,
@@ -20,6 +22,12 @@ const connectionsSlice = createSlice({
       if (!state.pendingUploadDatasetIds.includes(action.payload)) {
         state.pendingUploadDatasetIds.push(action.payload);
       }
+    },
+    setAutoSaving(state, action) {
+      state.isAutoSaving = action.payload;
+    },
+    setAutoUploading(state, action) {
+      state.isAutoUploading = action.payload;
     },
     clearAllPendingDatasetIds(state) {
       state.pendingUploadDatasetIds = [];
@@ -65,6 +73,8 @@ export const {
   clearLocalSaveNeeded,
   clearProjectDirty,
   removePendingDatasetId,
+  setAutoSaving,
+  setAutoUploading,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
