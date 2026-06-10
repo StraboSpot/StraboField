@@ -23,8 +23,8 @@ const useAutoSave = () => {
   /* Internal Functions */
 
   const runSave = async () => {
+    if (!isSaveNeeded || isEmpty(projectDb.project)) return;
     try {
-      if (!isSaveNeeded || isEmpty(projectDb.project)) return;
       dispatch(setAutoSaving(true));
       const snapshot = {
         mapNamesDb: {},
