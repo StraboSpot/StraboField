@@ -107,6 +107,19 @@ export const getLabel = (labelTypeOn) => {
       '',
     ];
   }
+  else if (labelTypeOn === 'dipOrName') {
+    return [
+      'case', ['has', 'orientation'],
+      ['case',
+        ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
+        ['case',
+          ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
+          ['get', 'name'],
+        ],
+      ],
+      ['get', 'name'],
+    ];
+  }
   else return '';
 
   // Does not work on iOS - iOS doesn't build if there is more than 1 condition and a fallback in a case expression

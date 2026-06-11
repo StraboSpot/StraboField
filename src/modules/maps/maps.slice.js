@@ -18,7 +18,7 @@ const initialMapsState = {
   intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
-  labelTypeOn: 'dip',
+  labelTypeOn: 'dipOrName',
   isMapMoved: true,
   isScaleBarMetric: true,
   isShowOnly1stMeas: false,

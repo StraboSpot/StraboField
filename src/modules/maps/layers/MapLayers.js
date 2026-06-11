@@ -29,7 +29,7 @@ const MapLayers = ({
                      showUserLocation,
                      spotsNotSelected,
                      spotsSelected,
-                   }, cameraRef) => {
+                   }, cameraRefCallback) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -79,7 +79,7 @@ const MapLayers = ({
         centerCoordinate={initialCenter}
         // followUserLocation={true}   // Can't follow user location if wanting to zoom to extent of Spots
         // followUserMode='normal'
-        ref={cameraRef}
+        ref={cameraRefCallback}
         zoomLevel={initialZoom}
       />
 
