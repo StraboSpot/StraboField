@@ -7,9 +7,9 @@ const AutoSaveCountdown = () => {
 
   /* Data Hooks */
 
-  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
   const nextAutoSaveTime = useSelector(state => state.connections.nextAutoSaveTime);
+  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
 
   /* Local State */
 

@@ -1,9 +1,12 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {useSelector} from 'react-redux';
+import {Button, Icon} from '@rn-vui/base';
+import {useDispatch, useSelector} from 'react-redux';
 
+import {setNextAutoSaveTime, setNextAutoUploadTime} from '../../modules/connections/connections.slice';
 import commonStyles from '../../shared/common.styles';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import AutoSaveCountdown from '../project/backup/AutoSaveCountdown';
@@ -12,20 +15,22 @@ import AutoUploadCountdown from '../project/backup/AutoUploadCountdown';
 const BackupStatusModal = ({isVisible, onClose}) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
+  const datasets = useSelector(state => state.project.datasets);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
   const isAutoUploading = useSelector(state => state.connections.isAutoUploading);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
+  const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
   const isProjectDirty = useSelector(state => state.connections.isProjectDirty);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
-  const datasets = useSelector(state => state.project.datasets);
   const project = useSelector(state => state.project.project);
 
   /* Derived Variables */
 
-  const projectName = project?.description?.project_name || 'Current Project';
   const isSaveVisible = isLocalSaveNeeded || isAutoSaving;
   const isUploadVisible = isProjectDirty || pendingUploadDatasetIds.length > 0 || isAutoUploading;
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
+  const projectName = project?.description?.project_name || 'Current Project';
 
   /* View */
 
@@ -47,8 +52,20 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             dividerText={isAutoSaving ? 'Saving to Device…' : 'Pending Device Save'}
             subtitle={'All datasets · Excludes images & offline maps'}
           />
-          <View style={{paddingHorizontal: 10}}>
-            <AutoSaveCountdown/>
+          <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={'clock-outline'} size={20} type={'material-community'}/>
+            <View style={{flex: 1, paddingLeft: 6}}>
+              <AutoSaveCountdown/>
+            </View>
+            {!isAutoSaving && (
+              <Button
+                buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
+                onPress={() => dispatch(setNextAutoSaveTime(Date.now()))}
+                title={'Save Now'}
+                titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+                type={'outline'}
+              />
+            )}
           </View>
           <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
             {'Project: ' + projectName}
@@ -61,8 +78,20 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             dividerText={isAutoUploading ? 'Uploading to Server…' : 'Pending Server Upload'}
             subtitle={'Changed datasets only'}
           />
-          <View style={{paddingHorizontal: 10}}>
-            <AutoUploadCountdown/>
+          <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={'clock-outline'} size={20} type={'material-community'}/>
+            <View style={{flex: 1, paddingLeft: 6}}>
+              <AutoUploadCountdown/>
+            </View>
+            {!isAutoUploading && isOnline && (
+              <Button
+                buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
+                onPress={() => dispatch(setNextAutoUploadTime(Date.now()))}
+                title={'Upload Now'}
+                titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+                type={'outline'}
+              />
+            )}
           </View>
           {isProjectDirty && (
             <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
@@ -77,7 +106,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
         </View>
       )}
       {!isSaveVisible && !isUploadVisible && (
-        <Text style={commonStyles.noValueText}>Nothing pending.</Text>
+        <Text style={commonStyles.noValueText}>No pending auto backups.</Text>
       )}
     </ModalWrapper>
   );

@@ -50,12 +50,6 @@ const BackupStatusIcons = () => {
   const isProjectDirty = useSelector(state => state.connections.isProjectDirty);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
 
-  /* Derived Variables */
-
-  const isUploadPending = isProjectDirty || pendingUploadDatasetIds.length > 0;
-  const isSaveVisible = isLocalSaveNeeded || isAutoSaving;
-  const isUploadVisible = isUploadPending || isAutoUploading;
-
   const saveBounce = useBounceAnimation(isAutoSaving);
   const uploadBounce = useBounceAnimation(isAutoUploading);
 
@@ -63,9 +57,15 @@ const BackupStatusIcons = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  /* Derived Variables */
+
+  const isSaveVisible = isLocalSaveNeeded || isAutoSaving;
+  const isUploadPending = isProjectDirty || pendingUploadDatasetIds.length > 0;
+  const isUploadVisible = isUploadPending || isAutoUploading;
+
   /* View */
 
-  if (!isSaveVisible && !isUploadVisible) return null;
+  if (!isSaveVisible && !isUploadVisible && !isModalVisible) return null;
 
   return (
     <>

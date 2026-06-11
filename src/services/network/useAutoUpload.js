@@ -17,10 +17,11 @@ const useAutoUpload = () => {
   const dispatch = useDispatch();
   const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
   const isProjectDirty = useSelector(state => state.connections.isProjectDirty);
+  const nextAutoUploadTime = useSelector(state => state.connections.nextAutoUploadTime);
   const pendingIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const uploadFrequency = useSelector(state => state.connections.backupFrequency?.upload);
 
-  const {uploadProject, uploadDatasetsByIds} = useUpload();
+  const {uploadDatasetsByIds, uploadProject} = useUpload();
   const prevOnlineRef = useRef(false);
 
   /* Internal Functions */
@@ -61,19 +62,24 @@ const useAutoUpload = () => {
     return () => sub.remove();
   }, [tryUpload]);
 
-  // Upload on interval (only while online)
+  // Initialize or clear schedule when frequency or online status changes
   useEffect(() => {
-    if (!isOnline || !UPLOAD_INTERVAL_MS) {
-      dispatch(setNextAutoUploadTime(null));
-      return;
-    }
-    dispatch(setNextAutoUploadTime(Date.now() + UPLOAD_INTERVAL_MS));
-    const timer = setInterval(() => {
-      dispatch(setNextAutoUploadTime(Date.now() + UPLOAD_INTERVAL_MS));
-      tryUpload();
-    }, UPLOAD_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [isOnline, tryUpload, uploadFrequency]);
+    dispatch(setNextAutoUploadTime(isOnline && UPLOAD_INTERVAL_MS ? Date.now() + UPLOAD_INTERVAL_MS : null));
+  }, [isOnline, uploadFrequency]);
+
+  const tryUploadRef = useRef(tryUpload);
+  tryUploadRef.current = tryUpload;
+
+  // Fire upload when scheduled time arrives, then reschedule
+  useEffect(() => {
+    if (!nextAutoUploadTime) return;
+    const delay = Math.max(0, nextAutoUploadTime - Date.now());
+    const timer = setTimeout(async () => {
+      await tryUploadRef.current();
+      dispatch(setNextAutoUploadTime(isOnline && UPLOAD_INTERVAL_MS ? Date.now() + UPLOAD_INTERVAL_MS : null));
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [nextAutoUploadTime]);
 };
 
 export default useAutoUpload;
