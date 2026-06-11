@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
@@ -26,11 +26,12 @@ const Map = ({
                isShowMacrostratOverlay,
                location,
                mapMode,
+               mapRef,
                measureFeatures,
                onMapLoad,
                spotsNotSelected,
                spotsSelected,
-             }, forwardedRef) => {
+             }) => {
   // console.log('Rendering Map...');
 
   /* Data Hooks */
@@ -42,7 +43,6 @@ const Map = ({
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
-  const {mapRef} = forwardedRef;
   const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
 
   const [viewState, setViewState] = useState({});
@@ -143,4 +143,4 @@ const Map = ({
   );
 };
 
-export default forwardRef(Map);
+export default Map;
