@@ -24,8 +24,9 @@ import {ImageModal, useImages} from '../images';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
-import {editedSpotProperties} from '../spots/spots.slice';
+import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
 
 const Overview = ({isReadOnly, openMainMenuPanel}) => {
   /* Data Hooks */
@@ -46,6 +47,8 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
@@ -77,6 +80,12 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const handleOpenImage = (image) => {
     setImageToView(image);
     setIsImageModalVisible(true);
+  };
+
+  const handleOpenSketch = (image) => {
+    setIsImageModalVisible(false);
+    setSketchImage(image);
+    setIsSketchModalVisible(true);
   };
 
   const handleToggleShowTraceSurfaceFeatureForm = () => {
@@ -145,7 +154,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const saveImagesToSpot = (newImages) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
-    dispatch(editedSpotProperties({field: 'images', value: newImages}));
+    dispatch(editedSpotImages(newImages));
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
 
@@ -323,11 +332,18 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
         image={imageToView}
         isReadOnly={isReadOnly}
         isVisible={isImageModalVisible}
-        saveImages={saveImagesToSpot}
+        onOpenSketch={handleOpenSketch}
         saveUpdatedImage={saveUpdatedImage}
         setImageToView={setImageToView}
         setIsImageModalVisible={setIsImageModalVisible}
       />
+      {isSketchModalVisible && (
+        <SketchModal
+          image={sketchImage}
+          saveImages={saveImagesToSpot}
+          setIsSketchModalVisible={setIsSketchModalVisible}
+        />
+      )}
     </View>
   );
 };

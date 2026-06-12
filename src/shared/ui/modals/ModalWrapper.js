@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Keyboard, Modal, Platform, View} from 'react-native';
+import {Keyboard, Modal, Platform, Pressable, StyleSheet, View} from 'react-native';
 
 import {ListItem, Overlay} from '@rn-vui/base';
 import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -22,6 +22,7 @@ const ModalWrapper = ({
                         children,
                         closeModal,
                         disabled,
+                        doesRenderAsView,
                         fullscreen,
                         headerImage,
                         headerTitle,
@@ -135,6 +136,35 @@ const ModalWrapper = ({
 
   /* View */
 
+  if (doesRenderAsView) {
+    if (isVisible === false) return null;
+    if (fullscreen) {
+      return (
+        <View style={[overlayStyles.overlayContainerFullScreen, viewOverlayStyles.fullscreenOverlay]}>
+          <ModalWrapperHeader
+            buttonTitleRight={buttonTitleRight}
+            closeModal={closeModal || onCancelPress}
+            headerImage={headerImage}
+            headerTitle={headerTitle}
+            imageStyle={imageStyle}
+            showCloseButton={showCloseButton || showCancelButton !== false}
+          />
+          <View style={{flex: 1}}>
+            {children}
+          </View>
+        </View>
+      );
+    }
+    return (
+      <View style={viewOverlayStyles.backdrop}>
+        <Pressable onPress={onBackdropPress} style={StyleSheet.absoluteFill}/>
+        <View style={[overlayStyles.overlayContainer, overlayStyleOverride]}>
+          {renderModalContent()}
+        </View>
+      </View>
+    );
+  }
+
   if (SMALL_SCREEN) {
     return (
       <Modal
@@ -172,5 +202,19 @@ const ModalWrapper = ({
     </Overlay>
   );
 };
+
+const viewOverlayStyles = StyleSheet.create({
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    zIndex: 100,
+  },
+  fullscreenOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 100,
+  },
+});
 
 export default React.memo(ModalWrapper);

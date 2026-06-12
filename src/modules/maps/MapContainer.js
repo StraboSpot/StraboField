@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
@@ -127,9 +127,17 @@ const MapContainer = forwardRef(({
   const isInitialLoadZoomPendingRef = useRef(false);
   const spotsRef = useRef(null);
 
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const [isZoomToCenterOffline, setIsZoomToCenterOffline] = useState(false);
   const [showSetInCurrentViewModal, setShowSetInCurrentViewModal] = useState(false);
   const [showUserLocation, setShowUserLocation] = useState(false);
+
+  /* Derived State */
+
+  const cameraRefCallback = useCallback((node) => {
+    cameraRef.current = node;
+    setIsCameraReady(node !== null);
+  }, []);
 
   /* Side Effects */
 
@@ -158,6 +166,16 @@ const MapContainer = forwardRef(({
   useEffect(() => {
     if (isStatusMessagesModalVisible) isDatasetToggleZoomPendingRef.current = true;
   }, [activeDatasetsIds]);
+
+  // Retry zoom once the Mapbox camera mounts after a project load
+  useEffect(() => {
+    if (isCameraReady && spotsRef.current?.length > 0
+      && (isInitialLoadZoomPendingRef.current || isDatasetToggleZoomPendingRef.current)) {
+      isInitialLoadZoomPendingRef.current = false;
+      isDatasetToggleZoomPendingRef.current = false;
+      zoomToSpotsExtent().catch(console.error);
+    }
+  }, [isCameraReady]);
 
   useEffect(() => {
     // console.log('UE MapContainer [currentImageBasemap]');
@@ -369,62 +387,66 @@ const MapContainer = forwardRef(({
 
   // Fly the map to the current location
   const zoomToCurrentLocation = async () => {
-    if (cameraRef.current || Platform.OS === 'web') {
-      console.log('%cFlying to location', 'color: red');
-      const currentLocation = await getCurrentLocation();
-      const center = [currentLocation.longitude, currentLocation.latitude];
-      const currentZoom = await mapRef.current?.getZoom() || ZOOM;
-      const newZoom = Math.max(currentZoom, ZOOM);
-      if (Platform.OS === 'web') {
-        mapRef.current.flyTo({
-          animate: true,
-          center: center,
-          duration: 2000,
-          essential: true,
-          zoom: newZoom,
-        });
-      }
-      else {
-        cameraRef.current.setCamera({
-          animationDuration: 2000,
-          animationMode: 'easeTo',
-          centerCoordinate: center,
-          zoomLevel: newZoom,
-        });
-      }
+    if (Platform.OS !== 'web' && !cameraRef.current) throw 'Error Getting Map Camera';
+    console.log('%cFlying to location', 'color: red');
+    const currentLocation = await getCurrentLocation();
+    const center = [currentLocation.longitude, currentLocation.latitude];
+    const currentZoom = await mapRef.current?.getZoom() || ZOOM;
+    const newZoom = Math.max(currentZoom, ZOOM);
+    if (Platform.OS === 'web') {
+      mapRef.current.flyTo({
+        animate: true,
+        center: center,
+        duration: 2000,
+        essential: true,
+        zoom: newZoom,
+      });
     }
-    else throw 'Error Getting Map Camera';
+    else {
+      cameraRef.current.setCamera({
+        animationDuration: 2000,
+        animationMode: 'easeTo',
+        centerCoordinate: center,
+        zoomLevel: newZoom,
+      });
+    }
   };
 
   const zoomToCustomMap = (bbox, duration) => {
-    const animationDuration = duration;
-    if (bbox) {
-      const bboxArr = bbox.split(',');
-      if (Platform.OS === 'web') {
-        mapRef.current?.fitBounds([[Number(bboxArr[0]), Number(bboxArr[1])], [Number(bboxArr[2]), Number(bboxArr[3])]],
-          {padding: 100, duration: animationDuration || 1500});
-      }
-      else {
-        cameraRef.current.fitBounds([Number(bboxArr[0]), Number(bboxArr[1])], [Number(bboxArr[2]), Number(bboxArr[3])],
-          100, animationDuration || 1500);
-      }
-    }
-    else {
+    if (!bbox) {
       console.error('Error: not able to get Custom Map bbox coords...');
       dispatch(clearedStatusMessages());
       dispatch(addedStatusMessage('Not able to zoom to custom map while offline.'));
       dispatch(setIsErrorMessagesModalVisible(true));
+      return;
+    }
+    if (Platform.OS !== 'web' && !cameraRef.current) return;
+    const animationDuration = duration;
+    const bboxArr = bbox.split(',');
+    if (Platform.OS === 'web') {
+      mapRef.current?.fitBounds([[Number(bboxArr[0]), Number(bboxArr[1])], [Number(bboxArr[2]), Number(bboxArr[3])]],
+        {padding: 100, duration: animationDuration || 1500});
+    }
+    else {
+      cameraRef.current.fitBounds([Number(bboxArr[0]), Number(bboxArr[1])], [Number(bboxArr[2]), Number(bboxArr[3])],
+        100, animationDuration || 1500);
     }
   };
 
   // Zoom map to the extent of given Spots
   const zoomToSpots = (spot) => {
+    if (Platform.OS !== 'web' && !cameraRef.current) return;
     zoomToSpotsNow(spot, mapRef.current, cameraRef.current);
   };
 
   // Zoom map to the extent of the mapped Spots
   const zoomToSpotsExtent = async () => {
     if (Platform.OS === 'web' && !mapRef.current) return;
+    if (Platform.OS !== 'web' && !cameraRef.current) {
+      // Camera not ready yet; keep pending so the isCameraReady effect retries
+      isInitialLoadZoomPendingRef.current = true;
+      return;
+    }
     const spotsToZoomTo = [...spotsSelected, ...spotsNotSelected];
     await zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
   };
@@ -437,6 +459,7 @@ const MapContainer = forwardRef(({
         <Map
           allowMapViewMove={allowMapViewMove}
           basemap={currentBasemap}
+          cameraRefCallback={cameraRefCallback}
           drawFeatures={drawFeatures}
           editFeatureVertex={editFeatureVertex}
           handleMapLongPress={handleMapLongPress}
@@ -444,9 +467,9 @@ const MapContainer = forwardRef(({
           isShowMacrostratOverlay={isShowMacrostratOverlay}
           location={location}
           mapMode={mapMode}
+          mapRef={mapRef}
           measureFeatures={measureFeatures}
           onMapLoad={handleMapLoadedWeb}  // prop used in web only
-          ref={{mapRef: mapRef, cameraRef: cameraRef}}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}

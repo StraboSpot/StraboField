@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
@@ -19,6 +19,7 @@ MapboxGL.setAccessToken(MAPBOX_TOKEN);
 const Map = ({
                allowMapViewMove,
                basemap,
+               cameraRefCallback,
                drawFeatures,
                editFeatureVertex,
                handleMapLongPress,
@@ -26,11 +27,12 @@ const Map = ({
                isShowMacrostratOverlay,
                location,
                mapMode,
+               mapRef,
                measureFeatures,
                showUserLocation,
                spotsNotSelected,
                spotsSelected,
-             }, forwardedRef) => {
+             }) => {
   // console.log('Rendering Map...');
 
   /* Data Hooks */
@@ -43,8 +45,6 @@ const Map = ({
     intervalDragState,
     isDragIntervalMode,
   } = useSelector(state => state.map);
-
-  const {mapRef, cameraRef} = forwardedRef;
 
   const {handleMapMoved} = useMapMoveEvents({mapRef});
 
@@ -118,7 +118,7 @@ const Map = ({
           location={location}
           mapMode={mapMode}
           measureFeatures={measureFeatures}
-          ref={cameraRef}
+          ref={cameraRefCallback}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}
@@ -138,4 +138,4 @@ const Map = ({
   );
 };
 
-export default forwardRef(Map);
+export default Map;

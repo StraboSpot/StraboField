@@ -83,7 +83,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
 
   const toggleLabelTypeOn = () => {
     if (labelTypeOn) dispatch(setLabelTypeOn(undefined));
-    else dispatch(setLabelTypeOn('dip'));
+    else dispatch(setLabelTypeOn('dipOrName'));
   };
 
   const toggleShowTagColor = () => {
@@ -198,12 +198,12 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
             </ListItem>
             {labelTypeOn && (
               <ButtonGroup
-                buttons={['Dip/Plunge', 'Spot Name']}
+                buttons={['Dip/Plunge or\nSpot Name', 'Dip/Plunge\nOnly', 'Spot Name\nOnly']}
                 containerStyle={styles.measurementDetailSwitches}
-                onPress={i => dispatch(setLabelTypeOn(i === 0 ? 'dip' : 'name'))}
+                onPress={i => dispatch(setLabelTypeOn(i === 0 ? 'dipOrName' : i === 1 ? 'dip' : 'name'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
-                selectedIndex={labelTypeOn === 'dip' ? 0 : 1}
-                textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
+                selectedIndex={labelTypeOn === 'dipOrName' ? 0 : labelTypeOn === 'dip' ? 1 : 2}
+                textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE, textAlign: 'center'}}
               />
             )}
 
