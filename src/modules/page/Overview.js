@@ -204,7 +204,10 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     if (page.testing && !isTestingMode) return null;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
+        <SectionDivider
+          dividerText={page.label}
+          leftIcon={page.icon_src && <Image source={page.icon_src} style={{height: 18, width: 18}}/>}
+        />
       </Pressable>
     );
   };
