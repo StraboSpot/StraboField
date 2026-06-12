@@ -50,6 +50,7 @@ const BasicPageDetail = ({
 
     const dispatch = useDispatch();
     const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+    const {isOwner} = useSelector(state => state.project.project);
     const {sesar, encoded_login} = useSelector(state => state.user);
     const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -85,6 +86,8 @@ const BasicPageDetail = ({
       else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
     }
     const isTemplate = saveTemplate;
+    const isNonOwnerRegisteredSample = pageKey === PAGE_KEYS.SAMPLES && isOwner === false
+      && !!(selectedFeature.Sample_IGSN || selectedFeature.isOnMySesar);
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
@@ -109,10 +112,32 @@ const BasicPageDetail = ({
       if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
     }, [selectedFeature]);
 
-    const onSampleSaved = async (formCurrent) => {
-      console.log('Saving Sample To SESAR', formRef.current?.values);
-      await saveFeature(formCurrent);
-      closeDetailView();
+    useEffect(() => {
+      checkIfIsDisabled();
+    }, [sesar.sesarToken.access]);
+
+    /* Event Handlers */
+
+    const handleIGSNChecked = (value) => {
+      setIsIGSNChecked(value);
+    };
+
+    const onSampleSaved = async (featureValues) => {
+      try {
+        console.log('Saving Sample To SESAR', featureValues);
+        let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
+        const i = editedPageData.findIndex(f => f.id === featureValues.id);
+        if (i === -1) editedPageData.push(featureValues);
+        else editedPageData.splice(i, 1, featureValues);
+        const spotId = spot.properties.id;
+        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+        dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+        if (featureValues.sample_id_name) await checkSampleName(featureValues.sample_id_name);
+        closeDetailView();
+      }
+      catch (err) {
+        console.error('Error saving IGSN sample', err);
+      }
     };
 
     const onSubmitForm = (values, {resetForm}) => {
@@ -126,6 +151,23 @@ const BasicPageDetail = ({
 
     const cancelForm = async () => {
       closeDetailView();
+    };
+
+    const checkIfIsDisabled = () => {
+      console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
+      console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
+
+      if (isNonOwnerRegisteredSample) return true;
+
+      if (!isIGSNChecked) return false;
+
+      if (!sesar.sesarToken.access) return true;
+
+      if (isEmpty(sesar.selectedUserCode)) {
+        return !(selectedFeature.isOnMySesar && isInternetReachable);
+      }
+
+      return false;
     };
 
     const confirmLeavePage = () => {
@@ -222,9 +264,6 @@ const BasicPageDetail = ({
         dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
 
         if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
-          if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
-            dispatch(editedSpotProperties({field: 'name', value: editedFeatureData.sample_id_name, spotId: spotId}));
-          }
           await checkSampleName(editedFeatureData.sample_id_name);
         }
       }
@@ -236,24 +275,26 @@ const BasicPageDetail = ({
 
     const saveForm = async (formCurrent) => {
       try {
-        console.log('Saving form...', formCurrent);
-        if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
-          await updateIGSNAndShowModal(formCurrent);
+        if (isNonOwnerRegisteredSample) {
+          toast.show('Only project owners may update a sample with a registered IGSN', {type: 'warning'});
           return;
         }
-        if (groupKey === 'pet') {
-          await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
+        else {
+          if (groupKey === 'pet') {
+            await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else if (groupKey === 'sed' && pageKey === 'bedding') {
+            await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else if (groupKey === 'sed') {
+            await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+          }
+          else await saveFeature(formCurrent);
+          closeDetailView();
+          if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
+          console.log('Done');
         }
-        else if (groupKey === 'sed' && pageKey === 'bedding') {
-          await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-        }
-        else if (groupKey === 'sed') {
-          await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
-        }
-        else await saveFeature(formCurrent);
-        if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
-        closeDetailView();
-        console.log('Done');
       }
       catch (err) {
         toast.show('Error Saving Changes', {type: 'danger'});
@@ -268,9 +309,9 @@ const BasicPageDetail = ({
     };
 
     const updateIGSNAndShowModal = async (formCurrent) => {
-      const values = {...formCurrent.values};
-      await saveFeature(formCurrent);
-      setIgsnFormValues(values);
+      console.log('setting form values for IGSN modals');
+      const capturedValues = {...formCurrent.values, sesarUserCode: sesar.selectedUserCode};
+      setIgsnFormValues(capturedValues);
       setIsIGSNModalVisible(true);
     };
 
@@ -318,6 +359,26 @@ const BasicPageDetail = ({
       );
     };
 
+    const renderIGSNUpload = () => {
+      return (
+        <>
+          {!isEmpty(encoded_login) ? (
+            <IGSNUploadAndRegister
+              handleIGSNChecked={handleIGSNChecked}
+              isIGSNChecked={isIGSNChecked}
+              selectedFeature={selectedFeature}
+            />
+          ) : (
+            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+              You need to login to StraboSpot to upload to SESAR
+            </Text>
+          )}
+        </>
+      );
+    };
+
+    /* View */
+
     return (
       <>
         <View style={{flex: 1}}>
@@ -327,28 +388,20 @@ const BasicPageDetail = ({
               {PageTabsComponent && PageTabsComponent}
               {!isReadOnly && (
                 <>
-                  {pageKey === PAGE_KEYS.SAMPLES && isSaveDisabled && (
-                    <View>
-                      <Text style={{
-                        color: RED,
-                        fontSize: 16,
-                        fontWeight: '500',
-                        padding: 10,
-                        textAlign: 'center',
-                      }}>
-                        This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device
-                        is online.
-                      </Text>
-                    </View>
-                  )}
                   <SaveAndCancelButtons
                     cancel={cancelForm}
-                    getIsDisabled={isSaveDisabled}
+                    getIsDisabled={checkIfIsDisabled()}
                     save={saveButtonOnPress}
                   />
+                  {isNonOwnerRegisteredSample && (
+                    <Text style={{color: RED, paddingBottom: 10, paddingHorizontal: 10, textAlign: 'center'}}>
+                      Only project owners may update a sample with a registered IGSN
+                    </Text>
+                  )}
                 </>
               )}
-              {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
+              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && isOwner !== false
+                && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>

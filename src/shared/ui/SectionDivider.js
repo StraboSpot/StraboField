@@ -5,14 +5,18 @@ import styles from './ui.styles';
 
 const SectionDivider = ({
                           dividerText,
+                          leftIcon,
                           style,
-                          textStyle,
                           subtitle,
+                          textStyle,
                         }) => {
   return (
-    <View style={[styles.sectionDivider, style]}>
-      <Text style={[styles.sectionDividerText, textStyle]}>{dividerText.toUpperCase()}</Text>
-      {subtitle && <Text style={styles.sectionDividerSubtitle}>{subtitle}</Text>}
+    <View style={[styles.sectionDivider, style, leftIcon && {alignItems: 'center', flexDirection: 'row'}]}>
+      {leftIcon && <View style={{marginRight: 6}}>{leftIcon}</View>}
+      <View>
+        <Text style={[styles.sectionDividerText, textStyle]}>{dividerText.toUpperCase()}</Text>
+        {subtitle && <Text style={styles.sectionDividerSubtitle}>{subtitle}</Text>}
+      </View>
     </View>
   );
 };
