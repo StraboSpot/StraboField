@@ -9,7 +9,6 @@ import styles from './ui.styles';
 import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
 
 const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, leftIcon, onPress}) => {
-const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, onPress}) => {
 
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
 

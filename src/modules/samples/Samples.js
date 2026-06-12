@@ -3,6 +3,8 @@ import {SectionList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
+import IGSNDisplay from './igsn/IGSNDisplay';
+import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -42,8 +44,9 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         key={sample.id}
         onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])}
       >
-        <ListItem.Content>
+        <ListItem.Content style={sampleStyles.listContentContainer}>
           <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>
+          <IGSNDisplay item={sample}/>
         </ListItem.Content>
         <ListItem.Chevron/>
       </ListItem>

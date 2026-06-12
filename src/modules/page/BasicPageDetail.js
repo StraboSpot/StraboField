@@ -43,6 +43,7 @@ const BasicPageDetail = ({
 
     const dispatch = useDispatch();
     const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+    const {isOwner} = useSelector(state => state.project.project);
     const {sesar, encoded_login} = useSelector(state => state.user);
     const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -74,6 +75,8 @@ const BasicPageDetail = ({
       else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
     }
     const isTemplate = saveTemplate;
+    const isNonOwnerRegisteredSample = pageKey === PAGE_KEYS.SAMPLES && isOwner === false
+      && !!(selectedFeature.Sample_IGSN || selectedFeature.isOnMySesar);
     const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
     && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
       ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
@@ -142,6 +145,8 @@ const BasicPageDetail = ({
     const checkIfIsDisabled = () => {
       console.log('Checking is NOT on MYSESAR...' + !selectedFeature.isOnMySesar);
       console.log('Checking is Selected user code empty...' + isEmpty(sesar.selectedUserCode));
+
+      if (isNonOwnerRegisteredSample) return true;
 
       if (!isIGSNChecked) return false;
 
@@ -259,6 +264,10 @@ const BasicPageDetail = ({
 
     const saveForm = async (formCurrent) => {
       try {
+        if (isNonOwnerRegisteredSample) {
+          toast.show('Only project owners may update a sample with a registered IGSN', {type: 'warning'});
+          return;
+        }
         if (formCurrent?.values.isOnMySesar || isIGSNChecked) await updateIGSNAndShowModal(formCurrent);
         else {
           if (groupKey === 'pet') {
@@ -367,13 +376,21 @@ const BasicPageDetail = ({
               <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
               {PageTabsComponent && PageTabsComponent}
               {!isReadOnly && (
-                <SaveAndCancelButtons
-                  cancel={cancelForm}
-                  getIsDisabled={checkIfIsDisabled()}
-                  save={saveButtonOnPress}
-                />
+                <>
+                  <SaveAndCancelButtons
+                    cancel={cancelForm}
+                    getIsDisabled={checkIfIsDisabled()}
+                    save={saveButtonOnPress}
+                  />
+                  {isNonOwnerRegisteredSample && (
+                    <Text style={{color: RED, paddingBottom: 10, paddingHorizontal: 10, textAlign: 'center'}}>
+                      Only project owners may update a sample with a registered IGSN
+                    </Text>
+                  )}
+                </>
               )}
-              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
+              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && isOwner !== false
+                && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>
