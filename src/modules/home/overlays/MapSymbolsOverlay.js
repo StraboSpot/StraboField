@@ -198,7 +198,7 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
             </ListItem>
             {labelTypeOn && (
               <ButtonGroup
-                buttons={['Dip/Plunge or\nSpot Name', 'Dip/Plunge\nOnly', 'Spot Name\nOnly']}
+                buttons={['Dip/Plunge\nor Name', 'Dip/Plunge\nOnly', 'Spot Name\nOnly']}
                 containerStyle={styles.measurementDetailSwitches}
                 onPress={i => dispatch(setLabelTypeOn(i === 0 ? 'dipOrName' : i === 1 ? 'dip' : 'name'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
