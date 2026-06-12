@@ -4,6 +4,7 @@ import {Animated, Easing, TouchableOpacity, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {BACKUP_ICON_NAMES, BACKUP_ICON_TYPE} from './backupStatus.constants';
 import BackupStatusModal from './BackupStatusModal';
 import statusBarStyles from './statusBar.styles';
 import * as themes from '../../shared/styles.constants';
@@ -76,9 +77,9 @@ const BackupStatusIcons = () => {
             <Animated.View style={{transform: [{translateY: saveBounce}]}}>
               <Icon
                 color={themes.PRIMARY_ACCENT_COLOR}
-                name={'content-save-alert'}
+                name={BACKUP_ICON_NAMES.SAVE_ALERT}
                 size={24}
-                type={'material-community'}
+                type={BACKUP_ICON_TYPE}
               />
             </Animated.View>
           )}
@@ -86,9 +87,9 @@ const BackupStatusIcons = () => {
             <Animated.View style={{transform: [{translateY: uploadBounce}]}}>
               <Icon
                 color={themes.PRIMARY_ACCENT_COLOR}
-                name={'cloud-upload-outline'}
+                name={BACKUP_ICON_NAMES.UPLOAD}
                 size={24}
-                type={'material-community'}
+                type={BACKUP_ICON_TYPE}
               />
             </Animated.View>
           )}
