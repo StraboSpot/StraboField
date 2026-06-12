@@ -9,7 +9,7 @@ import IGSNLogo from '../../../assets/images/logos/IGSN_Logo_200.jpg';
 const IGSNDisplay = ({item}) => {
   return (
     <View style={igsnStyles.logoDisplayContainer}>
-      {item.Sample_IGSN && (
+      {item.isOnMySesar && (
         <Image
           source={IGSNLogo}
           style={igsnStyles.IGSNLogo}
