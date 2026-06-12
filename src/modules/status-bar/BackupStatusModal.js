@@ -51,6 +51,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
         <View>
           <SectionDivider
             dividerText={isAutoSaving ? 'Saving to Device…' : 'Pending Device Save'}
+            leftIcon={<Icon name={BACKUP_ICON_NAMES.SAVE} size={18} type={BACKUP_ICON_TYPE}/>}
             subtitle={'All datasets · Excludes images & offline maps'}
           />
           <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
@@ -77,6 +78,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
         <View>
           <SectionDivider
             dividerText={isAutoUploading ? 'Uploading to Server…' : 'Pending Server Upload'}
+            leftIcon={<Icon name={BACKUP_ICON_NAMES.UPLOAD} size={18} type={BACKUP_ICON_TYPE}/>}
             subtitle={'Changed datasets only'}
           />
           <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
