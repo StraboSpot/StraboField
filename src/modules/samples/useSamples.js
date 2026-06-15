@@ -47,6 +47,9 @@ const useSamples = () => {
 
     console.log('Creating new Enriched Sample:', newEnrichedSample);
     const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      throw new Error('No Target Dataset. A target dataset needs to be set before creating Samples.');
+    }
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
 

@@ -27,15 +27,6 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
 
-const IGSN_RELEVANT_FIELDS = [
-  'collection_date',
-  'main_sampling_purpose',
-  'material_type',
-  'sample_description',
-  'sample_id_name',
-  'sample_type',
-];
-
 const BasicPageDetail = ({
                            PageTabsComponent,
                            closeDetailView,
