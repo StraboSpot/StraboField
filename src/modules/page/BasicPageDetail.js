@@ -26,7 +26,6 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
-// import IGSNUploadAndRegister from '../samples/igsn/IGSNUploadAndRegister';
 
 const BasicPageDetail = ({
                            PageTabsComponent,
@@ -43,7 +42,7 @@ const BasicPageDetail = ({
     const dispatch = useDispatch();
     const {isInternetReachable} = useSelector(state => state.connections.isOnline);
     const {isOwner} = useSelector(state => state.project.project);
-    const {sesar, encoded_login} = useSelector(state => state.user);
+    const {sesar} = useSelector(state => state.user);
     const spot = useSelector(state => state.spot.selectedSpot);
 
     const {showErrors, validateForm} = useForm();
@@ -109,10 +108,6 @@ const BasicPageDetail = ({
     }, [sesar.sesarToken.access]);
 
     /* Event Handlers */
-
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
 
     const onSampleSaved = async (featureValues) => {
       try {
@@ -392,8 +387,6 @@ const BasicPageDetail = ({
                   )}
                 </>
               )}
-              {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && isOwner !== false*/}
-              {/*  && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}*/}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>
