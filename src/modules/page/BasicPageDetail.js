@@ -26,6 +26,7 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
+// import IGSNUploadAndRegister from '../samples/igsn/IGSNUploadAndRegister';
 
 const BasicPageDetail = ({
                            PageTabsComponent,
@@ -350,23 +351,23 @@ const BasicPageDetail = ({
       );
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
-    };
+    // const renderIGSNUpload = () => {
+    //   return (
+    //     <>
+    //       {!isEmpty(encoded_login) ? (
+    //         <IGSNUploadAndRegister
+    //           handleIGSNChecked={handleIGSNChecked}
+    //           isIGSNChecked={isIGSNChecked}
+    //           selectedFeature={selectedFeature}
+    //         />
+    //       ) : (
+    //         <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+    //           You need to login to StraboSpot to upload to SESAR
+    //         </Text>
+    //       )}
+    //     </>
+    //   );
+    // };
 
     /* View */
 
@@ -391,8 +392,8 @@ const BasicPageDetail = ({
                   )}
                 </>
               )}
-              {page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && isOwner !== false
-                && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}
+              {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && isOwner !== false*/}
+              {/*  && spot.geometry.type !== 'Polygon' && renderIGSNUpload()}*/}
               <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
                 {renderFormFields()}
               </FormFlatList>

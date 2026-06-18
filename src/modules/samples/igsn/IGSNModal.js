@@ -21,13 +21,7 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
 import {setLoadingStatus} from '../../home/home.slice';
 import {editedSpotProperties} from '../../spots/spots.slice';
-import {
-  setInitialSesarState,
-  setSelectedUserCode,
-  setSesarToken,
-  setSesarUserCodes,
-  updatedKey,
-} from '../../user/userProfile.slice';
+import {setSelectedUserCode, setSesarToken, setSesarUserCodes, updatedKey} from '../../user/userProfile.slice';
 
 const StepRow = ({label, status}) => {
   const scale = useSharedValue(0);
@@ -176,12 +170,6 @@ const IGSNModal = forwardRef(({
     else {
       console.log('No code found in URL.');
     }
-  };
-
-  const onReset = () => {
-    dispatch(setInitialSesarState());
-    console.log('SESAR credentials have beed reset');
-    toast.show('SESAR credentials have been reset', {type: 'success'});
   };
 
   /* Logic Helpers */
@@ -454,9 +442,6 @@ const IGSNModal = forwardRef(({
           />
         </View>}
         {renderCurrentView()}
-        {!isEmpty(sesar.sesarToken?.access) && !isStatusView && (
-          <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>
-        )}
       </View>
       <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
       <PickerOverlay
