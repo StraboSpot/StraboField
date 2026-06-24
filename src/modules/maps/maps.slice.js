@@ -15,6 +15,7 @@ const initialMapsState = {
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
   geometryTypesOff: [],
+  intervalDragChangedSpotIds: [],
   intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
@@ -45,10 +46,14 @@ const mapsSlice = createSlice({
     addedCustomMapsFromBackup(state, action) {
       state.customMaps = action.payload;
     },
+    addedIntervalDragChangedSpotIds(state, action) {
+      state.intervalDragChangedSpotIds = [...new Set([...state.intervalDragChangedSpotIds, ...action.payload])];
+    },
     cancelledIntervalDrag(state) {
       state.isDragIntervalMode = false;
       state.intervalDragState = null;
       state.intervalDragSnapshot = null;
+      state.intervalDragChangedSpotIds = [];
     },
     clearedIntervalDragState(state) {
       state.intervalDragState = null;
@@ -78,6 +83,7 @@ const mapsSlice = createSlice({
       state.isDragIntervalMode = false;
       state.intervalDragState = null;
       state.intervalDragSnapshot = null;
+      state.intervalDragChangedSpotIds = [];
     },
     selectedCustomMapToEdit(state, action) {
       state.selectedCustomMapToEdit = action.payload;
@@ -168,6 +174,7 @@ const mapsSlice = createSlice({
     startedIntervalDrag(state, action) {
       state.isDragIntervalMode = true;
       state.intervalDragSnapshot = action.payload;
+      state.intervalDragChangedSpotIds = [];
     },
     updateCustomMap(state, action) {
       state.customMaps[action.payload.id] = action.payload;
@@ -178,6 +185,7 @@ const mapsSlice = createSlice({
 export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
+  addedIntervalDragChangedSpotIds,
   cancelledIntervalDrag,
   clearedIntervalDragState,
   clearedMaps,
