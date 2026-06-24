@@ -2,32 +2,35 @@ import {StyleSheet} from 'react-native';
 
 const statusBarStyles = StyleSheet.create({
   backupStatusContainer: {
+    backgroundColor: 'white',
     flexDirection: 'row',
     gap: 4,
     paddingEnd: 5,
   },
   batteryLevelText: {
     color: 'black',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   batteryLevelTextContainer: {
     alignItems: 'center',
-    height: 50,
     justifyContent: 'center',
-    position: 'absolute',
-    width: 50,
+    marginLeft: 10,
+    marginTop: -6,
   },
   batteryStatusContainer: {
-    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   connectionStatusContainer: {
     padding: 5,
   },
-  statusBarIcon: {
-    backgroundColor: 'white',
+  saveAlertIconContainer: {
+    alignItems: 'center',
     borderRadius: 50,
     height: 40,
+    justifyContent: 'center',
     width: 40,
   },
 });
