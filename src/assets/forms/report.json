@@ -11,7 +11,7 @@
     {
       "type": "select_one bm0fb04",
       "name": "report_type",
-      "label": "Report Type",
+      "label": "Memo Type",
       "required": "false"
     },
     {
