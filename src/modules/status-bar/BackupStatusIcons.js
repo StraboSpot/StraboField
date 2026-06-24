@@ -4,10 +4,11 @@ import {Animated, Easing, TouchableOpacity, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {BACKUP_ICON_NAMES, BACKUP_ICON_TYPE} from './backupStatus.constants';
 import BackupStatusModal from './BackupStatusModal';
 import statusBarStyles from './statusBar.styles';
+import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 import * as themes from '../../shared/styles.constants';
+import homeStyles from '../home/home.style';
 
 const useBounceAnimation = (isActive) => {
   const bounceValue = useRef(new Animated.Value(0)).current;
@@ -74,27 +75,33 @@ const BackupStatusIcons = () => {
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={statusBarStyles.backupStatusContainer}>
           {isSaveVisible && (
-            <Animated.View style={{transform: [{translateY: saveBounce}]}}>
+            <Animated.View style={[
+              statusBarStyles.saveAlertIconContainer,
+              {transform: [{translateY: saveBounce}]}]}
+            >
               <Icon
                 color={themes.PRIMARY_ACCENT_COLOR}
                 name={BACKUP_ICON_NAMES.SAVE_ALERT}
                 size={24}
-                type={BACKUP_ICON_TYPE}
+                type={ICON_TYPE}
               />
             </Animated.View>
           )}
           {isUploadVisible && (
-            <Animated.View style={{transform: [{translateY: uploadBounce}]}}>
+            <Animated.View style={[
+              statusBarStyles.saveAlertIconContainer,
+              {transform: [{translateY: uploadBounce}]}]}>
               <Icon
                 color={themes.PRIMARY_ACCENT_COLOR}
                 name={BACKUP_ICON_NAMES.UPLOAD}
                 size={24}
-                type={BACKUP_ICON_TYPE}
+                type={ICON_TYPE}
               />
             </Animated.View>
           )}
         </View>
       </TouchableOpacity>
+      {(isSaveVisible || isUploadVisible) && <View style={homeStyles.statusBarDivider}/>}
     </>
   );
 };

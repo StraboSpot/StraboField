@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {BACKUP_ICON_NAMES, BACKUP_ICON_TYPE} from './backupStatus.constants';
+import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 import {setNextAutoSaveTime, setNextAutoUploadTime} from '../../modules/connections/connections.slice';
 import commonStyles from '../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
@@ -51,11 +51,11 @@ const BackupStatusModal = ({isVisible, onClose}) => {
         <View>
           <SectionDivider
             dividerText={isAutoSaving ? 'Saving to Device…' : 'Pending Device Save'}
-            leftIcon={<Icon name={BACKUP_ICON_NAMES.SAVE} size={18} type={BACKUP_ICON_TYPE}/>}
+            leftIcon={<Icon name={BACKUP_ICON_NAMES.SAVE} size={18} type={ICON_TYPE}/>}
             subtitle={'All datasets · Excludes images & offline maps'}
           />
           <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
-            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={BACKUP_ICON_TYPE}/>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
             <View style={{flex: 1, paddingLeft: 6}}>
               <AutoSaveCountdown/>
             </View>
@@ -78,11 +78,11 @@ const BackupStatusModal = ({isVisible, onClose}) => {
         <View>
           <SectionDivider
             dividerText={isAutoUploading ? 'Uploading to Server…' : 'Pending Server Upload'}
-            leftIcon={<Icon name={BACKUP_ICON_NAMES.UPLOAD} size={18} type={BACKUP_ICON_TYPE}/>}
+            leftIcon={<Icon name={BACKUP_ICON_NAMES.UPLOAD} size={18} type={ICON_TYPE}/>}
             subtitle={'Changed datasets only'}
           />
           <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
-            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={BACKUP_ICON_TYPE}/>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
             <View style={{flex: 1, paddingLeft: 6}}>
               <AutoUploadCountdown/>
             </View>
