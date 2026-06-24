@@ -9,15 +9,14 @@ import ConnectionStatusIcon from '../status-bar/ConnectionStatusIcon';
 const DeviceInfo = () => {
   if (Platform.OS !== 'web') {
     return (
-        <View style={homeStyles.statusBarContainer}>
+      <View style={homeStyles.statusBarContainer}>
+        <View style={homeStyles.connectionStatusIconContainer}>
           <BackupStatusIcons/>
-          <View style={homeStyles.connectionStatusIconContainer}>
-            <ConnectionStatusIcon/>
-          </View>
-          <View>
-            {<BatteryInfo/>}
-          </View>
+          <ConnectionStatusIcon/>
+          <View style={homeStyles.statusBarDivider}/>
+          <BatteryInfo/>
         </View>
+      </View>
     );
   }
 };
