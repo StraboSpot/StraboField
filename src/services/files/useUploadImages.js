@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {getImageIds} from './files.helpers';
-import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {setTransferringImages, updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
 import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
@@ -61,28 +61,37 @@ const useUploadImages = () => {
 
   const initializeImageUpload = async () => {
     let imagesStatus = {};
-    setImageUploadStatusMessage('');
-    console.log('Looking for Images to Upload in Spots...', spots);
-    setImageUploadStatusMessage('Looking for images to upload in spots...');
-    const images = getAllImages();
-    const imageIds = getImageIds(images);
-    setImageUploadStatusMessage('Checking to see if image files are on server...');
-    const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
-    setImageUploadStatusMessage(`Checking to see if ${neededImages.length} image files are on device...`);
-    console.log('Needed Images from server', neededImages);
-    const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(neededImages, images);
-    console.log('Done verifying images on device', imagesToUpload);
-    if (!isEmpty(imagesToUpload)) {
-      setImageUploadStatusMessage('Uploading needed images to server...');
-      dispatch(setIsImageTransferring(true));
-      imagesStatus = await uploadImages(imagesToUpload);
-      console.log('DONE UPLOADING IMAGES');
+    try {
+      setImageUploadStatusMessage('');
+      console.log('Looking for Images to Upload in Spots...', spots);
+      setImageUploadStatusMessage('Looking for images to upload in spots...');
+      const images = getAllImages();
+      const imageIds = getImageIds(images);
+      setImageUploadStatusMessage('Checking to see if image files are on server...');
+      const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
+      setImageUploadStatusMessage(`Checking to see if ${neededImages.length} image files are on device...`);
+      console.log('Needed Images from server', neededImages);
+      const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(neededImages, images);
+      console.log('Done verifying images on device', imagesToUpload);
+      if (!isEmpty(imagesToUpload)) {
+        setImageUploadStatusMessage('Uploading needed images to server...');
+        dispatch(setIsImageTransferring(true));
+        // Flag transferring only now that there are images to upload, so the status indicator doesn't
+        // flicker "Pending upload" during a data-only sync where the image check finds nothing.
+        dispatch(setTransferringImages(true));
+        imagesStatus = await uploadImages(imagesToUpload);
+        console.log('DONE UPLOADING IMAGES');
+      }
+      else setImageUploadStatusMessage('All images for this project are already on server.');
+      if (!isEmpty(imagesNotFoundOnDevice)) {
+        imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+      }
+      return imagesStatus;
     }
-    else setImageUploadStatusMessage('All images for this project are already on server.');
-    if (!isEmpty(imagesNotFoundOnDevice)) {
-      imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+    finally {
+      // Always clear so the status indicator can't stay stuck "transferring" for any caller.
+      dispatch(setTransferringImages(false));
     }
-    return imagesStatus;
   };
 
   const resetState = () => {

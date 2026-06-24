@@ -36,7 +36,10 @@ const useBounceAnimation = (isActive) => {
     }
     else {
       animationRef.current?.stop();
-      bounceValue.setValue(0);
+      animationRef.current = null;
+      // stopAnimation's callback fires after the native stop settles, so resetting to 0 here
+      // avoids a residual offset that would leave the icon stuck slightly elevated.
+      bounceValue.stopAnimation(() => bounceValue.setValue(0));
     }
   }, [isActive]);
 
@@ -47,13 +50,18 @@ const BackupStatusIcons = () => {
   /* Data Hooks */
 
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
-  const isAutoUploading = useSelector(state => state.connections.isAutoUploading);
+  const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
-  const isProjectDirty = useSelector(state => state.connections.isProjectDirty);
+  const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
+  const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
+  const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
+  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
+  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
+  const imagesBounce = useBounceAnimation(isTransferringImages);
   const saveBounce = useBounceAnimation(isAutoSaving);
-  const uploadBounce = useBounceAnimation(isAutoUploading);
+  const syncBounce = useBounceAnimation(isAutoSyncing);
 
   /* Local State */
 
@@ -61,13 +69,17 @@ const BackupStatusIcons = () => {
 
   /* Derived Variables */
 
-  const isSaveVisible = isLocalSaveNeeded || isAutoSaving;
-  const isUploadPending = isProjectDirty || pendingUploadDatasetIds.length > 0;
-  const isUploadVisible = isUploadPending || isAutoUploading;
+  const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
+  const isUploadPending = isProjectSyncNeeded || pendingUploadDatasetIds.length > 0;
+  const isImagesActive = isPendingImagesChanges || isTransferringImages;
+  const isSyncVisible = !!syncFrequency && (isUploadPending || isAutoSyncing);
+  // A distinct icon for when images are the only thing left to sync - if project/dataset
+  // changes are pending or a sync is running, the upload icon above already covers it.
+  const isImagesOnlyVisible = !!syncFrequency && isImagesActive && !isUploadPending && !isAutoSyncing;
 
   /* View */
 
-  if (!isSaveVisible && !isUploadVisible && !isModalVisible) return null;
+  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isModalVisible) return null;
 
   return (
     <>
@@ -87,13 +99,27 @@ const BackupStatusIcons = () => {
               />
             </Animated.View>
           )}
-          {isUploadVisible && (
+          {isSyncVisible && (
             <Animated.View style={[
               statusBarStyles.saveAlertIconContainer,
-              {transform: [{translateY: uploadBounce}]}]}>
+              {transform: [{translateY: syncBounce}]}]}
+            >
               <Icon
                 color={themes.PRIMARY_ACCENT_COLOR}
-                name={BACKUP_ICON_NAMES.UPLOAD}
+                name={BACKUP_ICON_NAMES.SYNC}
+                size={24}
+                type={ICON_TYPE}
+              />
+            </Animated.View>
+          )}
+          {isImagesOnlyVisible && (
+            <Animated.View style={[
+              statusBarStyles.saveAlertIconContainer,
+              {transform: [{translateY: imagesBounce}]}]}
+            >
+              <Icon
+                color={themes.PRIMARY_ACCENT_COLOR}
+                name={BACKUP_ICON_NAMES.IMAGE}
                 size={24}
                 type={ICON_TYPE}
               />
@@ -101,7 +127,7 @@ const BackupStatusIcons = () => {
           )}
         </View>
       </TouchableOpacity>
-      {(isSaveVisible || isUploadVisible) && <View style={homeStyles.statusBarDivider}/>}
+      {(isSaveVisible || isSyncVisible || isImagesOnlyVisible) && <View style={homeStyles.statusBarDivider}/>}
     </>
   );
 };

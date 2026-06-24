@@ -7,16 +7,19 @@ const initialConnectionsState = {
     isVerified: false,
   },
   isAutoSaving: false,
-  isAutoUploading: false,
+  isAutoSyncing: false,
   isLocalSaveNeeded: false,
   isOnline: {},
-  isProjectDirty: false,
+  isPendingImagesChanges: false,
+  isProjectSyncNeeded: false,
+  isTransferringImages: false,
   backupFrequency: {
-    save: 30,
-    upload: 30,
+    save: 60,
+    sync: 0,
   },
+  isWifiOnlyForImages: true,
   nextAutoSaveTime: null,
-  nextAutoUploadTime: null,
+  nextAutoSyncTime: null,
   pendingUploadDatasetIds: [],
 };
 
@@ -25,15 +28,17 @@ const connectionsSlice = createSlice({
   initialState: initialConnectionsState,
   reducers: {
     addPendingDatasetId(state, action) {
-      if (!state.pendingUploadDatasetIds.includes(action.payload)) {
+      // Compare as strings: ids are queued from Object.keys (strings) but removed via dataset.id
+      // (a number), so a strict-equality dedup/remove would mismatch and never clear the entry.
+      if (!state.pendingUploadDatasetIds.some(id => String(id) === String(action.payload))) {
         state.pendingUploadDatasetIds.push(action.payload);
       }
     },
     setAutoSaving(state, action) {
       state.isAutoSaving = action.payload;
     },
-    setAutoUploading(state, action) {
-      state.isAutoUploading = action.payload;
+    setAutoSyncing(state, action) {
+      state.isAutoSyncing = action.payload;
     },
     clearAllPendingDatasetIds(state) {
       state.pendingUploadDatasetIds = [];
@@ -41,17 +46,18 @@ const connectionsSlice = createSlice({
     clearLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = false;
     },
-    clearProjectDirty(state) {
-      state.isProjectDirty = false;
+    clearProjectSyncNeeded(state) {
+      state.isProjectSyncNeeded = false;
     },
     resetSyncState(state) {
       state.isLocalSaveNeeded = false;
-      state.isProjectDirty = false;
+      state.isProjectSyncNeeded = false;
       state.pendingUploadDatasetIds = [];
     },
     removePendingDatasetId(state, action) {
+      // String-coerce: ids are queued from Object.keys (strings) but removed via dataset.id (number).
       state.pendingUploadDatasetIds = state.pendingUploadDatasetIds.filter(
-        id => id !== action.payload,
+        id => String(id) !== String(action.payload),
       );
     },
     setBackupFrequency(state, action) {
@@ -66,20 +72,29 @@ const connectionsSlice = createSlice({
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
     },
+    setPendingImagesChanges(state, action) {
+      state.isPendingImagesChanges = action.payload;
+    },
     setLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = true;
     },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
     },
-    setNextAutoUploadTime(state, action) {
-      state.nextAutoUploadTime = action.payload;
+    setNextAutoSyncTime(state, action) {
+      state.nextAutoSyncTime = action.payload;
     },
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
     },
-    setProjectDirty(state) {
-      state.isProjectDirty = true;
+    setProjectSyncNeeded(state) {
+      state.isProjectSyncNeeded = true;
+    },
+    setTransferringImages(state, action) {
+      state.isTransferringImages = action.payload;
+    },
+    setWifiOnlyForImages(state, action) {
+      state.isWifiOnlyForImages = action.payload;
     },
     updatedProjectTransferProgress(state, action) {
       state.projectTransferProgress = action.payload;
@@ -91,20 +106,23 @@ export const {
   addPendingDatasetId,
   clearAllPendingDatasetIds,
   clearLocalSaveNeeded,
-  clearProjectDirty,
+  clearProjectSyncNeeded,
   removePendingDatasetId,
   resetSyncState,
   setAutoSaving,
-  setAutoUploading,
+  setAutoSyncing,
   setBackupFrequency,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
   setLocalSaveNeeded,
   setNextAutoSaveTime,
-  setNextAutoUploadTime,
+  setNextAutoSyncTime,
   setOnlineStatus,
-  setProjectDirty,
+  setPendingImagesChanges,
+  setProjectSyncNeeded,
+  setTransferringImages,
+  setWifiOnlyForImages,
   updatedProjectTransferProgress,
 } = connectionsSlice.actions;
 

@@ -2,15 +2,16 @@ export const ICON_TYPE = 'material-community';
 
 export const BACKUP_ICON_NAMES = {
   CLOCK: 'clock-outline',
+  IMAGE: 'image-multiple-outline',
   SAVE: 'content-save-outline',
-  SAVE_ALERT: 'content-save-alert',
-  UPLOAD: 'cloud-upload-outline',
+  SAVE_ALERT: 'content-save-alert-outline',
+  SYNC: 'web-sync',
 };
 
 export const CONNECTION_STATUS_ICON_NAMES = {
+  ACCESS_POINT: 'access-point',
   WIFI: 'wifi',
   WIFI_OFF: 'wifi-off',
-  ACCESS_POINT: 'access-point',
 };
 
 export const BATTERY_ICON_NAMES = {

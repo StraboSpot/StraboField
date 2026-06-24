@@ -1,11 +1,14 @@
 import {StyleSheet} from 'react-native';
 
+import {SMALL_SCREEN, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+
 const statusBarStyles = StyleSheet.create({
   backupStatusContainer: {
-    backgroundColor: 'white',
+    alignItems: 'center',
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
     flexDirection: 'row',
-    gap: 4,
-    paddingEnd: 5,
+    gap: SMALL_SCREEN ? 0 : 4,
+    paddingEnd: SMALL_SCREEN ? 0 : 5,
   },
   batteryLevelText: {
     color: 'black',
@@ -31,7 +34,7 @@ const statusBarStyles = StyleSheet.create({
     borderRadius: 50,
     height: 40,
     justifyContent: 'center',
-    width: 40,
+    width: SMALL_SCREEN ? 30 : 40,
   },
 });
 

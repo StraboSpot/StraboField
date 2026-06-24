@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {resetSyncState} from '../../modules/connections/connections.slice';
+import {resetSyncState, setTransferringImages} from '../../modules/connections/connections.slice';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -20,8 +20,9 @@ import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
+  addedDatasetFromServer,
   addedDatasets,
-  addedProject,
+  addedProjectFromServer,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
@@ -30,6 +31,7 @@ import useProject from '../../modules/project/useProject';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
@@ -45,10 +47,14 @@ const useDownload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
+  const {activeDatasetsIds, datasets: projectDatasets, project, targetDatasetId} = useSelector(state => state.project);
   const spots = useSelector(state => state.spot.spots);
   const encodedLogin = useSelector(state => state.user.encoded_login);
+  const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const connectionType = useSelector(state => state.connections.isOnline?.type);
+  const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
+  const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
@@ -135,7 +141,7 @@ const useDownload = () => {
         }
         clearProject();
       }
-      dispatch(addedProject(projectResponse));
+      dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
       }
@@ -269,6 +275,81 @@ const useDownload = () => {
 
   /* Exported Functions */
 
+  const checkAndDownloadUpdates = async () => {
+    if (!encodedLogin || isEmpty(project)) return;
+    try {
+      const serverProject = await getProject(project.id, encodedLogin);
+      if (!serverProject) return;
+
+      const res = await getDatasets(project.id, encodedLogin);
+      const serverDatasets = res?.datasets || [];
+      const staleDatasets = serverDatasets.filter((serverDataset) => {
+        if (pendingUploadDatasetIds.includes(serverDataset.id)) return false;
+        const localDataset = projectDatasets[serverDataset.id];
+        return !localDataset || serverDataset.modified_timestamp > localDataset.modified_timestamp;
+      });
+
+      if (staleDatasets.length) {
+        resetDownloadState();
+        await doGetDatasetSpots(staleDatasets, encodedLogin);
+        dispatch(addedSpotsFromServer(spotsToSave));
+        // Re-read live pending ids: a local edit may have queued one of these while downloading.
+        const livePendingIds = store.getState().connections.pendingUploadDatasetIds;
+        staleDatasets
+          .filter(serverDataset => !livePendingIds.includes(serverDataset.id))
+          .forEach((serverDataset) => {
+            // FromServer variant so the merge doesn't re-flag the dataset for sync.
+            dispatch(addedDatasetFromServer({
+              ...serverDataset,
+              modified_timestamp: serverDataset.modified_timestamp || Date.now(),
+              ...(datasetsObjToSave[serverDataset.id] || {}),
+            }));
+          });
+      }
+
+      // Check for missing images when something downloaded or a prior attempt left some pending
+      // (retries transient failures). Respect wifi-only since images are large/numerous.
+      if ((staleDatasets.length || isPendingImagesChanges) && Platform.OS !== 'web'
+        && (connectionType === 'wifi' || !isWifiOnlyForImages)) {
+        try {
+          // Read live spots: addedSpotsFromServer above isn't reflected in the `spots` selector yet.
+          const liveSpots = store.getState().spot.spots;
+          const neededImages = await gatherNeededImages(Object.values(liveSpots), {});
+          const neededImagesIds = neededImages?.neededImagesIds || [];
+          if (neededImagesIds.length) {
+            dispatch(setTransferringImages(true));
+            await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
+            for (const imageId of neededImagesIds) {
+              await downloadImageAndSave(imageId);
+            }
+          }
+          // NOTE: don't touch isPendingImagesChanges here. That flag means "local images pending
+          // UPLOAD" and is owned by the upload path. A failed download (e.g. an image referenced by
+          // a spot but missing on both device and server) must not re-flag images as pending upload,
+          // or the status would never clear for those orphaned references.
+        }
+        catch (err) {
+          console.error('Auto sync: error downloading images', err);
+        }
+        finally {
+          dispatch(setTransferringImages(false));
+        }
+      }
+
+      // Apply the server's copy unless local has unsynced edits. An equal timestamp can still
+      // carry server-side merges (tags, memos, templates), so apply on >=. Re-check live sync-needed
+      // state so an edit that landed during the downloads above isn't clobbered.
+      if (serverProject.modified_timestamp >= project.modified_timestamp
+        && !store.getState().connections.isProjectSyncNeeded) {
+        dispatch(addedProjectFromServer(serverProject));
+      }
+      console.log('Auto sync download complete.');
+    }
+    catch (err) {
+      console.error('Auto sync download failed:', err);
+    }
+  };
+
   const downloadUserProfile = async (encodedLoginScoped = encodedLogin) => {
     try {
       let userProfileRes = await getProfile(encodedLoginScoped);
@@ -376,6 +457,7 @@ const useDownload = () => {
   };
 
   return {
+    checkAndDownloadUpdates,
     downloadUserProfile,
     initializeDownload,
     initializeDownloadImages,

@@ -48,22 +48,11 @@ export const persistConfig = {
   timeout: null,
 };
 
-// backupFrequency changed from a number to {save, upload}
-const connectionsMigrations = {
-  0: state => ({
-    ...state,
-    backupFrequency: typeof state.backupFrequency === 'number'
-      ? {save: state.backupFrequency, upload: state.backupFrequency}
-      : state.backupFrequency,
-  }),
-};
-
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  version: 0,
-  blacklist: ['nextAutoSaveTime', 'nextAutoUploadTime'],
-  migrate: createMigrate(connectionsMigrations, {debug: false}),
+  blacklist: ['isAutoSaving', 'isAutoSyncing', 'isTransferringImages',
+    'nextAutoSaveTime', 'nextAutoSyncTime'],
   timeout: null,
 };
 

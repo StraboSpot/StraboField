@@ -3,14 +3,14 @@ import {Text} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-const AutoUploadCountdown = () => {
+const AutoSyncCountdown = () => {
 
   /* Data Hooks */
 
-  const isAutoUploading = useSelector(state => state.connections.isAutoUploading);
+  const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
-  const nextAutoUploadTime = useSelector(state => state.connections.nextAutoUploadTime);
-  const uploadFrequency = useSelector(state => state.connections.backupFrequency?.upload);
+  const nextAutoSyncTime = useSelector(state => state.connections.nextAutoSyncTime);
+  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
   /* Local State */
 
@@ -20,13 +20,13 @@ const AutoUploadCountdown = () => {
 
   useEffect(() => {
     const updateCountdown = () => {
-      if (!nextAutoUploadTime) setCountdown(null);
-      else setCountdown(Math.max(0, Math.ceil((nextAutoUploadTime - Date.now()) / 1000)));
+      if (!nextAutoSyncTime) setCountdown(null);
+      else setCountdown(Math.max(0, Math.ceil((nextAutoSyncTime - Date.now()) / 1000)));
     };
     updateCountdown();
     const ticker = setInterval(updateCountdown, 1000);
     return () => clearInterval(ticker);
-  }, [nextAutoUploadTime]);
+  }, [nextAutoSyncTime]);
 
   /* Logic Helpers */
 
@@ -40,12 +40,12 @@ const AutoUploadCountdown = () => {
 
   return (
     <Text style={{paddingVertical: 5}}>
-      {isAutoUploading ? 'Auto uploading...'
-        : !uploadFrequency ? 'Auto upload is off.'
-          : !isOnline ? 'Auto upload is paused while offline.'
-            : countdown !== null ? `Next auto upload in ${formatCountdown(countdown)}` : ''}
+      {isAutoSyncing ? 'Auto syncing...'
+        : !syncFrequency ? 'Auto sync is off.'
+          : !isOnline ? 'Auto sync is paused while offline.'
+            : countdown !== null ? `Next auto sync in ${formatCountdown(countdown)}` : ''}
     </Text>
   );
 };
 
-export default AutoUploadCountdown;
+export default AutoSyncCountdown;
