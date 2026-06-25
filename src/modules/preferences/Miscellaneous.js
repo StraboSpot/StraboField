@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 
 import GenerateRandomSpots from './GenerateRandomSpots';
 import Geolocate from './Geolocate';
+import ResetWarnings from './ResetWarnings';
 import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -36,6 +37,7 @@ const Miscellaneous = () => {
         <CustomEndpoint textStyles={{flexWrap: 'wrap', flexShrink: 1}}/>
         <Geolocate/>
         <GenerateRandomSpots isTestingMode={isTestingMode}/>
+        <ResetWarnings/>
       </>
     );
   };
