@@ -20,6 +20,7 @@ import {
 } from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {
@@ -206,6 +207,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
+        // Commit the deferred timestamp bump for spots actually moved during the drag, so only a
+        // real reorder dirties the dataset/project. Nothing moved → nothing to bump.
+        const changedSpotIds = store.getState().map.intervalDragChangedSpotIds;
+        if (changedSpotIds?.length > 0) dispatch(updatedModifiedTimestampsBySpotsIds(changedSpotIds));
         dispatch(savedIntervalDragReordering());
         setMapMode(MAP_MODES.VIEW);
         break;
@@ -251,7 +256,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const setMapModeToEdit = () => {
-    lockOrientation();
+    if (!SMALL_SCREEN) lockOrientation();
     setMapMode(MAP_MODES.EDIT);
   };
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {getImageMetaFromWeb, getSize, resizeFile} from './imageHelpers';
 import {imageStyles, useImages} from './index';
@@ -10,6 +10,8 @@ import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
+import DismissibleWarningModal from '../../shared/ui/modals/DismissibleWarningModal';
+import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home/home.constants';
 import {setLoadingStatus} from '../home/home.slice';
 import SketchModal from '../sketch/SketchModal';
 
@@ -18,6 +20,9 @@ const AddImageButtons = ({saveImages}) => {
 
   const dispatch = useDispatch();
 
+  const isCameraOrientationWarningHidden = useSelector(
+    state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
+
   const {getImagesFromCameraRoll, launchCameraFromNotebook} = useImages();
   const {uploadFromWeb} = useUpload();
 
@@ -25,6 +30,7 @@ const AddImageButtons = ({saveImages}) => {
 
   const inputRef = useRef(null);
 
+  const [isOrientationWarningVisible, setIsOrientationWarningVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 
   /* Side Effects */
@@ -87,6 +93,16 @@ const AddImageButtons = ({saveImages}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
+  const handleOrientationWarningContinue = () => {
+    setIsOrientationWarningVisible(false);
+    takePhoto();
+  };
+
+  const handleTakePressed = () => {
+    if (isCameraOrientationWarningHidden) takePhoto();
+    else setIsOrientationWarningVisible(true);
+  };
+
   /* Logic Helpers */
 
   const clickedFileInput = () => {
@@ -137,7 +153,7 @@ const AddImageButtons = ({saveImages}) => {
               name: 'camera-outline',
               type: 'ionicon',
             }}
-            onPress={takePhoto}
+            onPress={handleTakePressed}
             title={'Take'}
           />
         )}
@@ -164,7 +180,17 @@ const AddImageButtons = ({saveImages}) => {
           />
         )}
       </View>
+
+      {/* Modals */}
       {isSketchModalVisible && <SketchModal saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>}
+      <DismissibleWarningModal
+        headerTitle={'Camera Orientation'}
+        isVisible={isOrientationWarningVisible}
+        message={DISMISSIBLE_WARNING_MESSAGES[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]}
+        onCancel={() => setIsOrientationWarningVisible(false)}
+        onContinue={handleOrientationWarningContinue}
+        warningKey={DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION}
+      />
     </>
   );
 };
