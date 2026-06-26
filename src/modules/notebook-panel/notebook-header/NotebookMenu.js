@@ -85,8 +85,9 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && item.key === 'delete') return;
-    else if (item.key === 'rockd' && !isTestingMode && (checkedInSpotIds.includes(
-      spot.properties.id) || spot.geometry.type !== 'Point')) return;
+    else if (item.key === 'rockd' && !isTestingMode
+      && (checkedInSpotIds.includes(spot.properties.id)
+        || spot.geometry?.type !== 'Point')) return;
     else if (item.key === 'rockd' && !isTestingMode) return;
     else {
       return (

@@ -196,7 +196,7 @@ const UploadModal = ({closeModal, isVisible}) => {
         : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
       <Spacer/>
       <Text style={[overlayStyles.contentText, {textAlign: 'left', padding: 10}]}>
-        - Geologic units, tags, reports and templates will be merged into the project already on the server.{'\n'}
+        - Geologic units, tags, memos and templates will be merged into the project already on the server.{'\n'}
         - Newer datasets will <Text style={overlayStyles.importantText}>OVERWRITE</Text> older datasets already on the
         server.{'\n'}
         - Read Only datasets will not be affected unless they were removed from Read Only status and modified.

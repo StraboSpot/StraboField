@@ -252,7 +252,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const setMapModeToEdit = () => {
-    lockOrientation();
+    if (!SMALL_SCREEN) lockOrientation();
     setMapMode(MAP_MODES.EDIT);
   };
 
