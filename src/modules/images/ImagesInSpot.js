@@ -8,7 +8,7 @@ import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
+const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEmpty, saveImages}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -23,13 +23,29 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
+  const handleCloseImageModal = (isVisible) => {
+    setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
+  };
+
   const handleOpenImage = (image) => {
     if (onOpenImage) onOpenImage(image);
     else {
+      setShouldOpenImageProperties(false);
+      setImageToView(image);
+      setIsImageModalVisible(true);
+    }
+  };
+
+  const handleOpenImageProperties = (image) => {
+    if (onOpenImageProperties) onOpenImageProperties(image);
+    else {
+      setShouldOpenImageProperties(true);
       setImageToView(image);
       setIsImageModalVisible(true);
     }
@@ -66,6 +82,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
         images={images}
         isReadOnly={isReadOnly}
         onOpenImage={handleOpenImage}
+        onOpenImageProperties={handleOpenImageProperties}
         onPressEmpty={onPressEmpty}
       />
 
@@ -79,7 +96,8 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
           onOpenSketch={handleOpenSketch}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
+          setIsImageModalVisible={handleCloseImageModal}
+          shouldOpenProperties={shouldOpenImageProperties}
         />
       )}
       {isSketchModalVisible && (

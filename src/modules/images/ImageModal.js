@@ -1,14 +1,22 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
-import {Image} from '@rn-vui/base';
+import {Icon, Image} from '@rn-vui/base';
 
 import {ImagePropertiesModal, imageStyles} from '.';
 import {getLocalImageURI, getResizedImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
-import {SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
+import {
+  BLACK,
+  PRIMARY_ACCENT_COLOR,
+  SECONDARY_BACKGROUND_COLOR,
+  SMALL_SCREEN,
+  SMALL_SCREEN_STATUS_BAR_OFFSET,
+  WARNING_COLOR,
+  WHITE,
+} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
@@ -24,6 +32,7 @@ const ImageModal = ({
                       saveUpdatedImage,
                       setImageToView,
                       setIsImageModalVisible,
+                      shouldOpenProperties,
                     }) => {
   console.log('Rendering ImageModal...');
 
@@ -38,7 +47,21 @@ const ImageModal = ({
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  /* Side Effects */
+
+  // Auto-open the image properties modal on top of the image when requested from the image card
+  useEffect(() => {
+    if (isVisible && shouldOpenProperties) setIsImagePropertiesModalVisible(true);
+  }, [isVisible, shouldOpenProperties]);
+
   /* Event Handlers */
+
+  const handleCloseImageProperties = () => {
+    setIsImagePropertiesModalVisible(false);
+    // On small screens the properties modal is fullscreen, so the image modal underneath was only
+    // opened to host it (from the image card). Close it too so we return straight to the previous view.
+    if (SMALL_SCREEN && shouldOpenProperties) setIsImageModalVisible(false);
+  };
 
   const handleDeleteImageOnPress = () => {
     setIsImageDeleteModalVisible(true);
@@ -107,10 +130,16 @@ const ImageModal = ({
           />
         </ImageZoomAndPanWrapper>
         <View style={imageStyles.rightsideIcons}>
-          <IconButton
+          <Icon
+            color={isImagePropertiesModalVisible ? WHITE : BLACK}
+            containerStyle={[
+              imageStyles.imageModalIconBox,
+              isImagePropertiesModalVisible && {backgroundColor: PRIMARY_ACCENT_COLOR},
+            ]}
+            name={'information-circle-outline'}
             onPress={() => setIsImagePropertiesModalVisible(true)}
-            source={require('../../assets/icons/ImagePropertiesButton.png')}
-            style={imageStyles.imageModalButtons}
+            size={32}
+            type={'ionicon'}
           />
           {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
@@ -120,17 +149,20 @@ const ImageModal = ({
             />
           )}
           {!isReadOnly && (
-            <IconButton
+            <Icon
+              color={WARNING_COLOR}
+              containerStyle={imageStyles.imageModalIconBox}
+              name={'trash-outline'}
               onPress={() => handleDeleteImageOnPress()}
-              source={require('../../assets/icons/DeleteButton.png')}
-              style={imageStyles.imageModalButtons}
+              size={32}
+              type={'ionicon'}
             />
           )}
         </View>
       </View>
       {isImagePropertiesModalVisible && (
         <ImagePropertiesModal
-          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          closeModal={handleCloseImageProperties}
           image={image}
           isReadOnly={isReadOnly}
           isVisible={isImagePropertiesModalVisible}

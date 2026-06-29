@@ -10,6 +10,7 @@ const ImagesList = ({
                       isReadOnly,
                       isThumbnailOnly = false,
                       onOpenImage,
+                      onOpenImageProperties,
                       onPressEmpty,
                       spotWithImage,
                     }) => {
@@ -41,6 +42,7 @@ const ImagesList = ({
           isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
           onOpenImage={onOpenImage}
+          onOpenImageProperties={onOpenImageProperties}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
           spotWithImage={spotWithImage}

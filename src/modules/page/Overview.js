@@ -48,6 +48,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
@@ -72,12 +73,25 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
     setIsImageModalVisible(false);
+    setShouldOpenImageProperties(false);
     setImageToView({});
   }, [spot]);
 
   /* Event Handlers */
 
+  const handleCloseImageModal = (isVisible) => {
+    setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
+  };
+
   const handleOpenImage = (image) => {
+    setShouldOpenImageProperties(false);
+    setImageToView(image);
+    setIsImageModalVisible(true);
+  };
+
+  const handleOpenImageProperties = (image) => {
+    setShouldOpenImageProperties(true);
     setImageToView(image);
     setIsImageModalVisible(true);
   };
@@ -254,6 +268,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
               <SectionOverview
                 isReadOnly={isReadOnly}
                 onOpenImage={handleOpenImage}
+                onOpenImageProperties={handleOpenImageProperties}
                 openMainMenuPanel={openMainMenuPanel}
                 page={item}
               />
@@ -338,7 +353,8 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
         onOpenSketch={handleOpenSketch}
         saveUpdatedImage={saveUpdatedImage}
         setImageToView={setImageToView}
-        setIsImageModalVisible={setIsImageModalVisible}
+        setIsImageModalVisible={handleCloseImageModal}
+        shouldOpenProperties={shouldOpenImageProperties}
       />
       {isSketchModalVisible && (
         <SketchModal

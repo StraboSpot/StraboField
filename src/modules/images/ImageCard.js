@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
-import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -22,6 +22,7 @@ const ImageCard = ({
                      isReadOnly,
                      isThumbnailOnly,
                      onOpenImage,
+                     onOpenImageProperties,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
                      spotWithImage,
@@ -178,26 +179,26 @@ const ImageCard = ({
 
         {!isThumbnailOnly && (
           <>
-            {/* Image Basemap icon overlay */}
-            {image.annotated && (
-              <View style={{position: 'relative'}}>
+            {/* Image icon overlays */}
+            <View style={imageStyles.cardOverlayIconsContainer}>
+              {/* Image Properties icon overlay */}
+              <TouchableOpacity
+                onPress={() => onOpenImageProperties?.(image)}
+                style={[imageStyles.cardOverlayIcon, {left: 8}]}
+              >
+                <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={24} type={'ionicon'}/>
+              </TouchableOpacity>
+
+              {/* Image Basemap icon overlay */}
+              {image.annotated && (
                 <TouchableOpacity
                   onPress={() => getImageBasemap(image)}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    borderColor: MEDIUMGREY,
-                    borderRadius: 10,
-                    borderWidth: 2,
-                    bottom: 2,
-                    padding: 4,
-                    position: 'absolute',
-                    right: 8,
-                  }}
+                  style={[imageStyles.cardOverlayIcon, {right: 8}]}
                 >
                   <Icon color={PRIMARY_ACCENT_COLOR} name={'map-outline'} size={24} type={'ionicon'}/>
                 </TouchableOpacity>
-              </View>
-            )}
+              )}
+            </View>
 
             {/* Image Basemap toggle */}
             <View style={{
