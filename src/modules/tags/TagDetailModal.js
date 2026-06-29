@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
@@ -109,7 +108,9 @@ const TagDetailModal = ({closeModal}) => {
       headerTitle={headerTitle}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
+      onDeletePress={confirmDeleteTag}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
+      showDeleteButton={isEmpty(modalVisible) && !isEmpty(selectedTag?.id)}
     >
       <FlatList
         ListHeaderComponent={
@@ -126,7 +127,6 @@ const TagDetailModal = ({closeModal}) => {
               />
             </View>
             <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
-            {isEmpty(modalVisible) && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
           </>
         }
       />

@@ -294,16 +294,18 @@ const CustomMapDetails = () => {
           && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
             || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
-          <ActionButton
-            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title)
-              || isEmpty(editableCustomMapData.id) || editableCustomMapData.source === 'map_warper')}
-            onPress={saveMap}
-            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-          />
-          <DeleteButton
-            onPress={confirmDeleteMap}
-            title={'Delete Map'}
-          />
+          <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View>
+              {!isEmpty(customMapToEdit) && <DeleteButton onPress={confirmDeleteMap}/>}
+            </View>
+            <ActionButton
+              disabled={editableCustomMapData
+                && (isEmpty(editableCustomMapData.title) || isEmpty(editableCustomMapData.id)
+                  || editableCustomMapData.source === 'map_warper')}
+              onPress={saveMap}
+              title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            />
+          </View>
         </View>
       </View>
 

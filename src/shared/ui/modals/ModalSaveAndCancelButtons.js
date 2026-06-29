@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {overlayStyles} from '../../../modules/home/overlays';
 import ActionButton from '../buttons/ActionButton';
-import ClearButton from '../buttons/ClearButton';
+import DeleteButton from '../buttons/DeleteButton';
 import OutlineButton from '../buttons/OutlineButton';
 
 const ModalSaveAndCancelButtons = ({
@@ -41,17 +41,7 @@ const ModalSaveAndCancelButtons = ({
       justifyContent: 'space-between',
     }}>
       <View style={overlayStyles.buttonContainer}>
-        {showDeleteButton && (
-          <ClearButton
-            icon={{
-              color: 'red',
-              name: 'trash-outline',
-              size: 25,
-              type: 'ionicon',
-            }}
-            onPress={onDeletePress}
-          />
-        )}
+        {showDeleteButton && <DeleteButton onPress={onDeletePress}/>}
       </View>
       <View style={overlayStyles.buttonContainer}>
         {showCancelButton && (
