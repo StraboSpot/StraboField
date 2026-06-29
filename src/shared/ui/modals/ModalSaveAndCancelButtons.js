@@ -18,6 +18,23 @@ const ModalSaveAndCancelButtons = ({
                                      showCancelButton = true,
                                      showDeleteButton = false,
                                    }) => {
+  // When the action button is the only button shown, stretch it to fill the bar, but cap its
+  // width on wide modals so it stays centered rather than spanning the whole width.
+  if (showActionButton && !showCancelButton && !showDeleteButton) {
+    return (
+      <View style={{alignItems: 'center'}}>
+        <View style={{maxWidth: 400, width: '100%'}}>
+          <ActionButton
+            disabled={disabled}
+            isLoading={isLoading}
+            onPress={onActionPressed}
+            title={actionTitle || 'Save'}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={{
       flexDirection: 'row',

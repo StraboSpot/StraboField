@@ -16,7 +16,6 @@ import {
 } from './samples.constants';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
@@ -276,7 +275,6 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton isLoading={isLoading} onPress={() => saveForm(formRef.current)}/>}
       </>
     );
   };
@@ -292,9 +290,11 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
+      isLoading={isLoading}
+      onActionPressed={() => saveForm(formRef.current)}
       onFooterButtonPress={onPress}
       overlayStyleOverride={{height: '80%'}}
-      showActionButton={false}
+      showActionButton={!choicesViewKey}
       showCancelButton={false}
       showCloseButton={true}
     >

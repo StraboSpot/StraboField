@@ -6,7 +6,6 @@ import {Formik} from 'formik';
 import {imageStyles} from '.';
 import {IMAGE_PROPERTIES_FORM_NAME} from './images.constants';
 import {SwitchWrapper} from '../../shared/ui';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {formStyles, Form, useForm} from '../form';
 
@@ -50,7 +49,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       isVisible={isVisible}
       onActionPressed={saveFormAndGo}
       overlayStyleOverride={{height: windowHeight * 0.9}}
-      showActionButton={false}
+      showActionButton={!isReadOnly}
       showCancelButton={false}
       showCloseButton
     >
@@ -85,7 +84,6 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
           contentContainerStyle={{paddingBottom: 8}}
           style={{flex: 1, minHeight: 0}}
         />
-        {!isReadOnly && <ActionButton onPress={saveFormAndGo}/>}
       </View>
     </ModalWrapper>
   );
