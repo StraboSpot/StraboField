@@ -3,7 +3,7 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, Image} from '@rn-vui/base';
 
-import {imageStyles} from '.';
+import {ImagePropertiesModal, imageStyles} from '.';
 import {getLocalImageURI, getResizedImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
@@ -26,11 +26,11 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 const ImageModal = ({
                       deleteImage,
                       image,
-                      isPropertiesModalVisible,
                       isReadOnly,
                       isVisible,
-                      onOpenProperties,
                       onOpenSketch,
+                      saveUpdatedImage,
+                      setImageToView,
                       setIsImageModalVisible,
                     }) => {
   console.log('Rendering ImageModal...');
@@ -43,6 +43,7 @@ const ImageModal = ({
 
   const [isImageDeleteModalVisible, setIsImageDeleteModalVisible] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   /* Event Handlers */
@@ -115,13 +116,13 @@ const ImageModal = ({
         </ImageZoomAndPanWrapper>
         <View style={imageStyles.rightsideIcons}>
           <Icon
-            color={isPropertiesModalVisible ? WHITE : BLACK}
+            color={isImagePropertiesModalVisible ? WHITE : BLACK}
             containerStyle={[
               imageStyles.imageModalIconBox,
-              isPropertiesModalVisible && {backgroundColor: PRIMARY_ACCENT_COLOR},
+              isImagePropertiesModalVisible && {backgroundColor: PRIMARY_ACCENT_COLOR},
             ]}
             name={'information-circle-outline'}
-            onPress={() => onOpenProperties?.(image)}
+            onPress={() => setIsImagePropertiesModalVisible(true)}
             size={32}
             type={'ionicon'}
           />
@@ -144,6 +145,18 @@ const ImageModal = ({
           )}
         </View>
       </View>
+
+      {/* Modal*/}
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={image}
+          isReadOnly={isReadOnly}
+          isVisible={isImagePropertiesModalVisible}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+        />
+      )}
       {renderDeleteImageModal()}
       <Loading isLoading={isLoading}/>
     </ModalWrapper>

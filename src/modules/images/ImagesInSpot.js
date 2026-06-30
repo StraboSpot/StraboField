@@ -90,11 +90,11 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
         <ImageModal
           deleteImage={deleteImage}
           image={imageToView}
-          isPropertiesModalVisible={isImagePropertiesModalVisible}
           isReadOnly={isReadOnly}
           isVisible={isImageModalVisible}
-          onOpenProperties={() => setIsImagePropertiesModalVisible(true)}
           onOpenSketch={handleOpenSketch}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
           setIsImageModalVisible={handleCloseImageModal}
         />
       )}

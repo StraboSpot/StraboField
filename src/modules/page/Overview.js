@@ -354,11 +354,11 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
       <ImageModal
         deleteImage={deleteImage}
         image={imageToView}
-        isPropertiesModalVisible={isImagePropertiesModalVisible}
         isReadOnly={isReadOnly}
         isVisible={isImageModalVisible}
-        onOpenProperties={() => setIsImagePropertiesModalVisible(true)}
         onOpenSketch={handleOpenSketch}
+        saveUpdatedImage={saveUpdatedImage}
+        setImageToView={setImageToView}
         setIsImageModalVisible={handleCloseImageModal}
       />
       {isImagePropertiesModalVisible && (
