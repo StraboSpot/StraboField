@@ -15,11 +15,10 @@ import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtent
 
 const SpotFilters = ({
                        activeSpots,
+                       isSamplesSearch,
                        setIsReverseSort,
-                       setSpotsSearched,
                        setSpotsSorted,
                        setTextNoSpots,
-                       spotsSearched,
                        updateSpotsInMapExtent,
                      }) => {
   /* Data Hooks */
@@ -49,14 +48,14 @@ const SpotFilters = ({
 
   useEffect(() => {
     let gotSpotsFiltered = activeSpots;
-    setTextNoSpots('No Spots in Visible Datasets');
+    setTextNoSpots('No Spots in Active Datasets');
     if (sortedView === SORTED_VIEWS.MAP_EXTENT) {
       gotSpotsFiltered = getSpotsInMapExtent();
-      setTextNoSpots('No visible Spots in current map extent');
+      setTextNoSpots('No Active Spots in Current Map Extent');
     }
     else if (sortedView === SORTED_VIEWS.RECENT_VIEWS) {
       gotSpotsFiltered = getRecentSpots();
-      setTextNoSpots('No recently viewed visible Spots');
+      setTextNoSpots('No Recently Viewed Active Spots');
     }
     setSpotsFiltered(gotSpotsFiltered);
     updateSearch(undefined, gotSpotsFiltered);
@@ -81,14 +80,21 @@ const SpotFilters = ({
     let gotSpotsSearched;
     if (isEmpty(search)) gotSpotsSearched = spotsToSearch;
     else {
-      gotSpotsSearched = spotsToSearch.filter(
-        spot => spot.properties?.name?.toLowerCase().includes(search.toLowerCase()));
+      gotSpotsSearched = spotsToSearch.filter((spot) => {
+        if (isSamplesSearch) {
+          return (spot.properties?.isSample && spot.properties?.name?.toLowerCase().includes(search.toLowerCase()))
+            || !isEmpty(spot.properties.samples?.filter(
+              smpl => smpl.sample_id_name?.toLowerCase().includes(search.toLowerCase())
+                || spots[smpl.id]?.properties?.samples[0]?.sample_id_name?.toLowerCase().includes(
+                  search.toLowerCase())));
+        }
+        return spot.properties?.name?.toLowerCase().includes(search.toLowerCase());
+      });
     }
-    setSpotsSearched(gotSpotsSearched);
     updateSort(undefined, gotSpotsSearched);
   };
 
-  const updateSort = (sort = sortOrder, spotsToSort = spotsSearched) => {
+  const updateSort = (sort = sortOrder, spotsToSort) => {
     setSortOrder(sort);
     let gotSpotsSorted = [...spotsToSort];
     if (sort === SORT_ORDER.ALPHABETICAL) gotSpotsSorted = sortSpotsAlphabetically(gotSpotsSorted);
@@ -110,44 +116,48 @@ const SpotFilters = ({
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
       )}
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
-        <SearchBar
-          containerStyle={{
-            backgroundColor: SECONDARY_BACKGROUND_COLOR,
-            borderBottomColor: 'transparent',
-            borderTopColor: 'transparent',
-            flex: 1,
-            padding: 0,
-          }}
-          inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
-          inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
-          onChangeText={updateSearch}
-          placeholder={'Search Spot Names'}
-          placeholderTextColor={DARKGREY}
-          platform={'default'}
-          value={searchState}
-        />
-        <View style={{marginHorizontal: -10}}>
-          <ClearButton
-            icon={{name: 'sort', type: 'material'}}
-            onPress={openPicker}
+      {!isEmpty(activeSpots) && (
+        <>
+          <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
+            <SearchBar
+              containerStyle={{
+                backgroundColor: SECONDARY_BACKGROUND_COLOR,
+                borderBottomColor: 'transparent',
+                borderTopColor: 'transparent',
+                flex: 1,
+                padding: 0,
+              }}
+              inputContainerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR}}
+              inputStyle={{outlineStyle: 'none', fontSize: PRIMARY_TEXT_SIZE}}
+              onChangeText={updateSearch}
+              placeholder={isSamplesSearch ? 'Search Samples' : 'Search Spots'}
+              placeholderTextColor={DARKGREY}
+              platform={'default'}
+              value={searchState}
+            />
+            <View style={{marginHorizontal: -10}}>
+              <ClearButton
+                icon={{name: 'sort', type: 'material'}}
+                onPress={openPicker}
+              />
+            </View>
+            <View style={{marginHorizontal: -10}}>
+              <ClearButton
+                icon={{name: 'swap-vert', type: 'material'}}
+                onPress={toggleReverseSort}
+              />
+            </View>
+          </View>
+          <PickerOverlay
+            closePicker={closePicker}
+            data={Object.values(SORT_ORDER)}
+            dividerText={'Sort'}
+            isPickerVisible={isPickerVisible}
+            onSelect={item => updateSort(item)}
+            value={sortOrder}
           />
-        </View>
-        <View style={{marginHorizontal: -10}}>
-          <ClearButton
-            icon={{name: 'swap-vert', type: 'material'}}
-            onPress={toggleReverseSort}
-          />
-        </View>
-      </View>
-      <PickerOverlay
-        closePicker={closePicker}
-        data={Object.values(SORT_ORDER)}
-        dividerText={'Sort'}
-        isPickerVisible={isPickerVisible}
-        onSelect={item => updateSort(item)}
-        value={sortOrder}
-      />
+        </>
+      )}
     </>
   );
 };

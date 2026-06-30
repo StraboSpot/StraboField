@@ -5,8 +5,9 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
+import {NOTEBOOK_PAGES, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.constants';
 import PageHeader from './PageHeader';
+import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
@@ -28,7 +29,7 @@ import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
 import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
 
-const Overview = ({isReadOnly, openMainMenuPanel}) => {
+const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -56,7 +57,11 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   /* Derived Variables */
 
-  const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
+  const defaultSamplesPages = NOTEBOOK_PAGES.reduce((acc1, p) => {
+    return SAMPLES_OVERVIEW_SECTIONS.includes(p.key) ? [p, ...acc1] : acc1;
+  }, []);
+  const defaultPages = spot.properties?.isSample ? defaultSamplesPages : PRIMARY_PAGES;
+  const visiblePagesKeys = [...new Set([...defaultPages.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
   const sections = visiblePagesKeys.reduce((acc, key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     if (page.overview_component) {
@@ -216,10 +221,12 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const renderSectionHeader = (page) => {
     if (page.testing && !isTestingMode) return null;
+    else if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return null;
+    const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider
-          dividerText={page.label}
+          dividerText={dividerText}
           leftIcon={page.icon_src && <Image source={page.icon_src} style={{height: 18, width: 18}}/>}
         />
       </Pressable>
@@ -256,7 +263,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <PageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListHeaderComponent={isTestingMode && renderRockdBadge}
@@ -315,7 +322,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   return (
     <View style={{flex: 1}}>
-      {spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
+      {!isSample && spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
         || spot.geometry.type === 'MultiLineString' || spot.geometry.type === 'Polygon'
         || spot.geometry.type === 'MultiPolygon' || spot.geometry.type === 'GeometryCollection') && (
         <View style={notebookStyles.traceSurfaceFeatureContainer}>

@@ -11,6 +11,7 @@ import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
+  addedSpotToTags,
   addedTagToSelectedSpot,
   deletedTagIdFromReports,
   setSelectedTag,
@@ -112,6 +113,10 @@ const useTags = () => {
     saveTag(tagsToUpdate);
   };
 
+  const addSpotToTags = (spotId, tagIds) => {
+    dispatch(addedSpotToTags({spotId: spotId, tagIds: tagIds}));
+  };
+
   const addTag = () => {
     dispatch(setSelectedTag({}));
     if (modalVisible === MODAL_KEYS.NOTEBOOK.TAGS) dispatch(addedTagToSelectedSpot(true));
@@ -198,6 +203,22 @@ const useTags = () => {
     return tagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
+  const getSamplesWithThisTag = (tag) => {
+    return isEmpty(tag.spots) ? []
+      : tag.spots.filter((spotId) => {
+        const spot = spots[spotId];
+        if (!spot) return false;
+        if (spot.properties?.isSample) return true;
+        return spot.properties?.samples?.some(s => !spots[s.id]);
+      });
+  };
+
+  const getSpotsWithThisTagCount = (tag) => {
+    const validSpots = isEmpty(tag.spots) ? []
+      : tag.spots.filter(spotId => spots[spotId] && !spots[spotId].properties?.isSample);
+    return validSpots.length;
+  };
+
   const getTagFeaturesCount = (tag) => {
     const validSpots = isEmpty(tag.features) ? [] : Object.keys(tag.features).filter(spotIds => spots[spotIds]);
     return validSpots.reduce((acc, spotId) => acc + tag.features[spotId].length, 0);
@@ -265,6 +286,7 @@ const useTags = () => {
     addRemoveSpotFromTag,
     addRemoveTag,
     addSpotsToTags,
+    addSpotToTags,
     addTag,
     deleteFeatureTags,
     deleteTag,
@@ -275,6 +297,8 @@ const useTags = () => {
     getGeologicUnitTagsAtSpot,
     getNonGeologicUnitFeatureTagsAtSpot,
     getNonGeologicUnitTagsAtSpot,
+    getSamplesWithThisTag,
+    getSpotsWithThisTagCount,
     getTagFeaturesCount,
     getTagLabel,
     getTagsAtFeature,

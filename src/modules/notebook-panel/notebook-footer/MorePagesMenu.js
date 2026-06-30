@@ -16,6 +16,7 @@ import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from
 
 const MorePagesMenu = ({
                          closeMorePagesMenu,
+                         isRichSample,
                          visible,
                        }) => {
   /* Data Hooks */
@@ -27,9 +28,9 @@ const MorePagesMenu = ({
 
   /* Derived Variables */
 
-  const generalPagesToShow = getRelevantGeneralPages();
-  const petPagesToShow = getRelevantPetPages();
-  const sedPagesToShow = getRelevantSedPages();
+  const generalPagesToShow = getRelevantGeneralPages(isRichSample);
+  const petPagesToShow = getRelevantPetPages(isRichSample);
+  const sedPagesToShow = getRelevantSedPages(isRichSample);
 
   /* Logic Helpers */
 
@@ -60,7 +61,9 @@ const MorePagesMenu = ({
               size={20}
               source={page.icon_src}
             />
-            <ListItem.Title style={footerStyles.morePagesListItemTitle}>{page.label}</ListItem.Title>
+            <ListItem.Title style={footerStyles.morePagesListItemTitle}>
+              {page.label}
+            </ListItem.Title>
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
             <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>
@@ -75,7 +78,7 @@ const MorePagesMenu = ({
   return (
     <ModalWrapper
       closeModal={closeMorePagesMenu}
-      headerTitle={'More Pages'}
+      headerTitle={isRichSample ? 'More Sample Pages' : 'More Pages'}
       isVisible={visible}
       onBackdropPress={closeMorePagesMenu}
       overlayStyleOverride={footerStyles.morePagesDialog}

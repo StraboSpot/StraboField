@@ -15,7 +15,6 @@ import FreehandSketch from '../sketch/FreehandSketch';
 
 MapboxGL.setAccessToken(MAPBOX_TOKEN);
 
-
 const Map = ({
                allowMapViewMove,
                basemap,

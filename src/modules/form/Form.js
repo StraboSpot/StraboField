@@ -12,6 +12,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 
 const Form = ({
+                fieldCustomHeights,
                 getIsDisabled,
                 errors,
                 formName,

@@ -49,7 +49,7 @@ const BackupProject = () => {
     }
     else {
       dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There are no visible datasets selected.'));
+      dispatch(addedStatusMessage('There are no active datasets selected.'));
       dispatch(setIsErrorMessagesModalVisible(true));
     }
   };

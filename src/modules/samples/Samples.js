@@ -1,22 +1,21 @@
-import React, {useState} from 'react';
-import {SectionList, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Text, View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {useSelector} from 'react-redux';
 
+import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import LittleSpacer from '../../shared/ui/LittleSpacer';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
-const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Data Hooks */
 
-  const {getActiveSpotsObj, getSpotsWithSamples} = useSpots();
+  const sortedView = useSelector(state => state.mainMenu.sortedView);
+
+  const {getActiveSpotsObj} = useSpots();
 
   /* Local State */
 
@@ -24,87 +23,57 @@ const Samples = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
+  const spotsWithSamples = activeSpots.filter(spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
 
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
-  const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+  const [spotsWithSamplesSorted, setSpotsWithSamplesSorted] = useState(spotsWithSamples);
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
-  /* Render Functions */
+  /* Derived Variables */
 
-  const renderNoSamplesText = () => {
-    return <ListEmptyText text={'No Samples in Visible Datasets'}/>;
-  };
-
-  const renderSample = (sample, spot) => {
-    return (
-      <ListItem
-        containerStyle={commonStyles.listItem}
-        key={sample.id}
-        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES, [sample])}
-      >
-        <ListItem.Content>
-          <ListItem.Title style={commonStyles.listItemTitle}>{sample.sample_id_name || 'Unknown'}</ListItem.Title>
-        </ListItem.Content>
-        <ListItem.Chevron/>
-      </ListItem>
-    );
-  };
-
-  const renderSamplesList = () => {
-    let sortedSpotsWithSamples = spotsSorted.filter(spot => !isEmpty(spot.properties.samples));
-    if (isReverseSort) sortedSpotsWithSamples = sortedSpotsWithSamples.reverse();
-    let count = 0;
-    const dataSectioned = sortedSpotsWithSamples.map((s) => {
-      count += s.properties.samples.length;
-      return {title: s.properties.name, data: s.properties.samples, spot: s};
+  const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
+  let samplesCount = 0;
+  let dataSectioned;
+  if (!isEmpty(sampleSpotsSorted)) {
+    dataSectioned = sampleSpotsSorted.map((s) => {
+      samplesCount += s.properties?.samples?.length;
+      return {title: s.properties?.name, data: s.properties?.samples, spot: s};
     });
+  }
 
-    return (
-      <View style={{flex: 1}}>
-        <SpotFilters
-          activeSpots={activeSpots}
-          setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
-          setSpotsSorted={setSpotsSorted}
-          setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
-        />
-        <View style={{flex: 1}}>
-          <LittleSpacer/>
-          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' sample' : ' samples')} in visible Spots
-          </Text>
-          <SectionList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with samples found'}/>}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({item, section}) => renderSample(item, section.spot)}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            sections={dataSectioned}
-            stickySectionHeadersEnabled={true}
-          />
-        </View>
-      </View>
-    );
-  };
+  /* Side Effects */
 
-  const renderSectionHeader = ({title, spot}) => {
-    return (
-      <SectionDividerWithRightButton
-        buttonTitle={'View In Spot'}
-        dividerText={title}
-        onPress={() => openSpotInNotebook(spot, PAGE_KEYS.SAMPLES)}
-      />
-    );
-  };
+  useEffect(() => {
+    setSpotsWithSamplesSorted(spotsWithSamples);
+  }, [sortedView]);
 
   /* View */
 
   return (
-    <>
-      {isEmpty(getSpotsWithSamples()) ? renderNoSamplesText() : renderSamplesList()}
-    </>
+    <View style={{flex: 1}}>
+      <SpotFilters
+        activeSpots={spotsWithSamplesSorted}
+        isSamplesSearch={true}
+        setIsReverseSort={setIsReverseSort}
+        setSpotsSorted={setSpotsWithSamplesSorted}
+        setTextNoSpots={setTextNoSpots}
+        updateSpotsInMapExtent={updateSpotsInMapExtent}
+      />
+      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={'No Samples in Active Datasets'}/> : (
+        <View style={{flex: 1}}>
+          <Text
+            style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
+            Found {samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')} in Active Datasets
+          </Text>
+          <SamplesSectionList
+            checkedItems={checkedItems}
+            dataSectioned={dataSectioned}
+            isCheckedList={isCheckedList}
+            listEmptyText={textNoSpots + ' with samples found'}
+            openSpotInNotebook={openSpotInNotebook}
+          />
+        </View>
+      )}
+    </View>
   );
 };
 
