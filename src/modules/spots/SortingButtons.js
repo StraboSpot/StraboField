@@ -38,7 +38,7 @@ const SortingButtons = ({spots}) => {
   return (
     <ButtonGroup
       buttonStyle={{padding: 5}}
-      buttons={['In Visible\nDatasets', 'In Map\nExtent', 'In Recent\nViews']}
+      buttons={['In Active\nDatasets', 'In Map\nExtent', 'In Recent\nViews']}
       containerStyle={{height: 50}}
       onPress={selected => updateIndex(selected)}
       selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}

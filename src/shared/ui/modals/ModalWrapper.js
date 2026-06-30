@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Keyboard, Modal, Platform, Pressable, StyleSheet, View} from 'react-native';
+import {Keyboard, Modal, Platform, Pressable, StyleSheet, useWindowDimensions, View} from 'react-native';
 
-import {ListItem, Overlay} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 
@@ -13,6 +13,11 @@ import {isEmpty} from '../../helpers';
 import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
 import {AvatarWrapper} from '../avatars';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
+
+// Body fills a fullscreen/small-screen modal; shrinks-to-content (and scrolls past the cap) in a
+// max-height-capped centered modal.
+const FILL_FLEX = {flex: 1};
+const CONTENT_SIZED_FLEX = {flexShrink: 1};
 
 const ModalWrapper = ({
                         actionTitle,
@@ -49,6 +54,8 @@ const ModalWrapper = ({
     return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
   });
 
+  const {height: windowHeight} = useWindowDimensions();
+
   /* Local State */
 
   const childrenRef = useRef(children);
@@ -65,15 +72,16 @@ const ModalWrapper = ({
     };
   }, []);
 
-  /* Derived Variables */
-
-  const isAutoHeight = overlayStyleOverride?.height === 'auto';
-
   /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen) return overlayStyles.overlayContainerFullScreen;
-    return {...overlayStyles.overlayContainer, ...overlayStyleOverride, minWidth: MODAL_WIDTH};
+    // Treat any caller-provided fixed `height` (e.g. '80%') as a max so the modal shrinks to its
+    // content; cap at 85% of the screen by default so it never runs off the top/bottom.
+    const {height: overrideHeight, ...restOverride} = overlayStyleOverride || {};
+    const maxHeight = restOverride.maxHeight
+      ?? (overrideHeight && overrideHeight !== 'auto' ? overrideHeight : windowHeight * 0.85);
+    return {...overlayStyles.overlayContainer, maxHeight, minWidth: MODAL_WIDTH, ...restOverride};
   };
 
   /* Render Functions */
@@ -99,7 +107,10 @@ const ModalWrapper = ({
     );
   };
 
-  const renderModalContent = () => (
+  // `bodyFlexStyle` follows the container: fullscreen/small-screen modals fill (flex), while
+  // content-sized (max-height-capped) modals use flexShrink so the body shrinks to its content
+  // and only scrolls once it hits the cap.
+  const renderModalContent = (bodyFlexStyle = FILL_FLEX) => (
     <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
@@ -111,12 +122,13 @@ const ModalWrapper = ({
       />
       <FlatList
         ListHeaderComponent={renderListHeader}
+        // ListHeaderComponent={() => <>{children}</>}
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         data={[]}
         keyExtractor={(_, index) => index.toString()}
         keyboardShouldPersistTaps={'handled'}
         scrollEnabled={scrollEnabled}
-        style={isAutoHeight ? undefined : {flex: 1}}
+        style={bodyFlexStyle}
       />
       {renderModalBottom()}
       <ModalSaveAndCancelButtons
@@ -158,8 +170,8 @@ const ModalWrapper = ({
     return (
       <View style={viewOverlayStyles.backdrop}>
         <Pressable onPress={onBackdropPress} style={StyleSheet.absoluteFill}/>
-        <View style={[overlayStyles.overlayContainer, overlayStyleOverride]}>
-          {renderModalContent()}
+        <View style={getResponsiveOverlayStyle()}>
+          {renderModalContent(CONTENT_SIZED_FLEX)}
         </View>
       </View>
     );
@@ -183,23 +195,41 @@ const ModalWrapper = ({
     );
   }
 
-  return (
-    <Overlay
-      animationType={'fade'}
-      backdropStyle={backdropStyle || overlayStyles.backdropStyles}
-      fullScreen={fullscreen}
-      isVisible={isVisible}
-      onBackdropPress={onBackdropPress}
-      overlayStyle={getResponsiveOverlayStyle()}
-      supportedOrientations={['portrait', 'landscape']}
-    >
+  // Large-screen modal. Use a plain RN Modal with our own centered backdrop instead of the rn-vui
+  // Overlay: the Overlay wraps content in a KeyboardAvoidingView (behavior 'padding' on iOS) that
+  // re-centers the modal when the keyboard opens, pushing the top (and any focused field) off-screen.
+  // Without it the modal stays put and each form's keyboard-aware FlatList scrolls the focused field
+  // above the keyboard.
+  const bodyFlexStyle = fullscreen ? FILL_FLEX : CONTENT_SIZED_FLEX;
+  const overlayBody = (
+    <View style={getResponsiveOverlayStyle()}>
       {Platform.OS === 'android' ? (
-          <GestureHandlerRootView style={isAutoHeight ? {} : {flex: 1}}>
-            {renderModalContent()}
+          <GestureHandlerRootView style={bodyFlexStyle}>
+            {renderModalContent(bodyFlexStyle)}
           </GestureHandlerRootView>
         )
-        : renderModalContent()}
-    </Overlay>
+        : renderModalContent(bodyFlexStyle)}
+    </View>
+  );
+
+  return (
+    <Modal
+      animationType={'fade'}
+      onRequestClose={onBackdropPress}
+      supportedOrientations={['portrait', 'landscape']}
+      transparent
+      visible={isVisible}
+    >
+      {fullscreen ? overlayBody : (
+        <View pointerEvents={'box-none'} style={viewOverlayStyles.modalCentered}>
+          <Pressable
+            onPress={onBackdropPress}
+            style={[StyleSheet.absoluteFill, backdropStyle || overlayStyles.backdropStyles]}
+          />
+          {overlayBody}
+        </View>
+      )}
+    </Modal>
   );
 };
 
@@ -214,6 +244,11 @@ const viewOverlayStyles = StyleSheet.create({
   fullscreenOverlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 100,
+  },
+  modalCentered: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import KeepAwake from 'react-native-keep-awake';
@@ -19,7 +19,6 @@ import {
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
-import {useSpots} from '../../modules/spots';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
@@ -31,8 +30,12 @@ const useUpload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const spots = useSelector(state => state.spot.spots);
   const project = useSelector(state => state.project.project);
   const user = useSelector(state => state.user);
+
+  const spotsRef = useRef(spots);
+  spotsRef.current = spots;
 
   const {checkValidDateTime} = useProject();
   const {
@@ -44,7 +47,6 @@ const useUpload = () => {
     updateProject,
     uploadWebImage,
   } = useServerRequests();
-  const {getSpotsByIds} = useSpots();
   const {initializeImageUpload} = useUploadImages();
 
   /* Local State */
@@ -83,7 +85,8 @@ const useUpload = () => {
   const uploadSpots = async (dataset) => {
     let datasetSpots;
     if (dataset.spotIds) {
-      datasetSpots = getSpotsByIds(dataset.spotIds);
+      const idsSet = new Set(dataset.spotIds);
+      datasetSpots = Object.values(spotsRef.current).filter(spot => idsSet.has(spot.properties.id));
       datasetSpots.forEach(spotValue => checkValidDateTime(spotValue));
     }
     try {

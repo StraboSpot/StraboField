@@ -2,13 +2,14 @@ import React, {useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImageModal, ImagesList, useImages} from '.';
+import {ImageModal, ImagePropertiesModal, ImagesList, useImages} from '.';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
+const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEmpty, saveImages}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -22,16 +23,40 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
+  const handleCloseImageModal = (isVisible) => {
+    setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
+  };
+
   const handleOpenImage = (image) => {
     if (onOpenImage) onOpenImage(image);
     else {
+      setShouldOpenImageProperties(false);
       setImageToView(image);
       setIsImageModalVisible(true);
+    }
+  };
+
+  // Opening properties from an image card: on small screens show only the standalone properties modal
+  // so the viewer isn't a throwaway host that flashes before the fullscreen properties modal covers
+  // it. On larger screens open the viewer and let it auto-open its nested properties modal (which
+  // stacks reliably over the viewer's modal on iOS, where sibling modals don't).
+  const handleOpenImageProperties = (image) => {
+    if (onOpenImageProperties) onOpenImageProperties(image);
+    else {
+      setImageToView(image);
+      if (SMALL_SCREEN) setIsImagePropertiesModalVisible(true);
+      else {
+        setShouldOpenImageProperties(true);
+        setIsImageModalVisible(true);
+      }
     }
   };
 
@@ -66,6 +91,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
         images={images}
         isReadOnly={isReadOnly}
         onOpenImage={handleOpenImage}
+        onOpenImageProperties={handleOpenImageProperties}
         onPressEmpty={onPressEmpty}
       />
 
@@ -79,7 +105,18 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onPressEmpty, saveImages}) => {
           onOpenSketch={handleOpenSketch}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
-          setIsImageModalVisible={setIsImageModalVisible}
+          setIsImageModalVisible={handleCloseImageModal}
+          shouldOpenProperties={shouldOpenImageProperties}
+        />
+      )}
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={imageToView}
+          isReadOnly={isReadOnly}
+          isVisible={isImagePropertiesModalVisible}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
         />
       )}
       {isSketchModalVisible && (

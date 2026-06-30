@@ -46,7 +46,7 @@ const TagsListItem = ({
     <ListItem
       containerStyle={commonStyles.listItem}
       key={tag.id}
-      onPress={() => onPress ? onPress(tag) : isChevronVisible ? openTag() : onChecked()}
+      onPress={() => onPress ? onPress(tag) : isChevronVisible ? openTag() : onChecked && onChecked()}
       pad={5}
     >
       <TagColorIcon color={tag.color}/>

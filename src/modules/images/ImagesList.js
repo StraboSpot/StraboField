@@ -10,7 +10,9 @@ const ImagesList = ({
                       isReadOnly,
                       isThumbnailOnly = false,
                       onOpenImage,
+                      onOpenImageProperties,
                       onPressEmpty,
+                      saveUpdatedImage,
                       spotWithImage,
                     }) => {
   /* Data Hooks */
@@ -41,6 +43,8 @@ const ImagesList = ({
           isReadOnly={isReadOnly}
           isThumbnailOnly={isThumbnailOnly}
           onOpenImage={onOpenImage}
+          onOpenImageProperties={onOpenImageProperties}
+          saveUpdatedImage={saveUpdatedImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
           spotWithImage={spotWithImage}

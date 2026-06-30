@@ -84,7 +84,7 @@ const useMapFeaturesDraw = ({
 
   useEffect(() => {
     // console.log('UE useMapFeaturesDraw [drawFeatures]');
-    if (mapMode === MAP_MODES.DRAW.POINT && drawFeatures.length === 1) onEndDrawPressed();
+    if ((mapMode === MAP_MODES.DRAW.POINT) && drawFeatures.length === 1) onEndDrawPressed();
   }, [drawFeatures]);
 
   useEffect(() => {

@@ -39,7 +39,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
+  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
   const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
 
   const resetAndSetIsReverseSort = useCallback((val) => {
@@ -56,6 +56,23 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
     setVisibleSectionCount(SECTIONS_PER_PAGE);
     setSpotsSorted(val);
   }, []);
+
+  // /* Derived Variables */
+  //
+  // const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
+  // sortedSpotsWithImages = spotsWithImages.map((spot) => {
+  //   const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
+  //     .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
+  //       .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
+  //   return {...spot, properties: {...spot.properties, images: sortedImages}};
+  // });
+  // if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
+  // let count = 0;
+  // const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
+  //   count += spot.properties.images.length;
+  //   return [...acc, {spot: spot, data: [spot.properties.images]}];
+  // }, []);
+  // const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
 
   /* Event Handlers */
 
@@ -94,13 +111,14 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const renderSectionHeader = ({spot}) => {
     return (
       <SectionDividerWithRightButton
-        buttonTitle={'View In Spot'}
+        buttonTitle={spot.properties?.isSample ? 'View in Sample' : 'View In Spot'}
         dividerText={spot.properties.name}
         onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
       />
     );
   };
 
+  /* View */
   const renderSpotsWithImages = () => {
     const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
     sortedSpotsWithImages = spotsWithImages.map((spot) => {
@@ -148,6 +166,7 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       </>
     );
   };
+
 
   /* View */
 

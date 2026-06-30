@@ -80,6 +80,7 @@ const homeStyles = StyleSheet.create({
     right: '40%',
   },
   drawToolsContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
   },
   homeIconContainer: {

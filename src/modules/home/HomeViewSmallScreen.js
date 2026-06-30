@@ -197,9 +197,9 @@ const HomeViewSmallScreen = forwardRef(({
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}
-                createDefaultGeom={mapComponentRef.current?.createDefaultGeom}
+                createDefaultGeom={mapComponentRef?.current?.createDefaultGeom}
                 openMainMenuPanel={openMainMenuPanel}
-                zoomToSpots={mapComponentRef.current?.zoomToSpots}
+                zoomToSpots={mapComponentRef?.current?.zoomToSpots}
               />
             }
           </Tab.Screen>

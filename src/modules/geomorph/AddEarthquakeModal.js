@@ -17,7 +17,6 @@ import {
 } from './geomorph.constants';
 import {getNewUUID} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
@@ -165,7 +164,8 @@ const AddEarthquakeModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
-        showActionButton={false}
+        onActionPressed={saveEarthquake}
+        showActionButton={!choicesViewKey}
         showCancelButton={false}
         showCloseButton
       >
@@ -189,7 +189,6 @@ const AddEarthquakeModal = () => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={saveEarthquake}/>}
       </ModalWrapper>
     );
   };
