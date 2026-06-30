@@ -52,8 +52,11 @@ const ImageModal = ({
   // Auto-open the nested properties modal when the viewer is opened straight to properties from an
   // image card (large screens only — small screens open the properties modal without the viewer).
   // Nesting is required so it stacks reliably over the viewer's modal on iOS rather than as a sibling.
+  // Closing the viewer while properties is still open closes properties too, so it doesn't linger open
+  // (visually hidden with the viewer) and reappear the next time the viewer is opened.
   useEffect(() => {
     if (isVisible && shouldOpenProperties) setIsImagePropertiesModalVisible(true);
+    else if (!isVisible) setIsImagePropertiesModalVisible(false);
   }, [isVisible, shouldOpenProperties]);
 
   /* Event Handlers */
