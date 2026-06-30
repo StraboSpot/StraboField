@@ -8,7 +8,6 @@ import {isEmpty} from '../../shared/helpers';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
-import Overview from '../page/Overview';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
@@ -19,6 +18,13 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  /* Derived Variables */
+
+  // For a rich sample the spot itself is the sample, so show its detail immediately rather than
+  // waiting for the effect to set selectedSample (which briefly flashes the samples list).
+  const sampleToDisplay = spot.properties?.isSample && spot.properties?.samples?.length > 0 ? spot.properties.samples[0]
+    : selectedSample;
 
   /* Side Effects */
 
@@ -58,17 +64,14 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
 
   /* Render Functions */
 
-  const renderSampleDetail = () => {
-    if (spot.properties?.isSample && isEmpty(selectedSample)) return <Overview/>;
-    return (
-      <BasicPageDetail
-        closeDetailView={closeDetailView}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedSample}
-      />
-    );
-  };
+  const renderSampleDetail = () => (
+    <BasicPageDetail
+      closeDetailView={closeDetailView}
+      isReadOnly={isReadOnly}
+      page={page}
+      selectedFeature={sampleToDisplay}
+    />
+  );
 
   const renderSamplesMain = () => (
     <View style={{flex: 1}}>
@@ -87,7 +90,7 @@ const SamplesPage = ({isReadOnly, page, selectedSample, setSelectedSample}) => {
 
   /* View */
 
-  if (isEmpty(selectedSample)) return renderSamplesMain();
+  if (isEmpty(sampleToDisplay)) return renderSamplesMain();
 
   return renderSampleDetail();
 };
