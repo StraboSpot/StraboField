@@ -23,7 +23,7 @@ const ModalSaveAndCancelButtons = ({
   if (showActionButton && !showCancelButton && !showDeleteButton) {
     return (
       <View style={{alignItems: 'center'}}>
-        <View style={{maxWidth: 400, width: '80%'}}>
+        <View style={{maxWidth: 400, width: '90%'}}>
           <ActionButton
             disabled={disabled}
             isLoading={isLoading}
