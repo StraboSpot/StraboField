@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ImageModal, ImagePropertiesModal, ImagesList, useImages} from '.';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
@@ -24,29 +25,38 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
   const handleCloseImageModal = (isVisible) => {
     setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
   };
 
   const handleOpenImage = (image) => {
     if (onOpenImage) onOpenImage(image);
     else {
+      setShouldOpenImageProperties(false);
       setImageToView(image);
       setIsImageModalVisible(true);
     }
   };
 
-  // Opening properties straight from an image card edits the image without first showing the image
-  // viewer, so the properties modal renders on its own here rather than nested inside the image modal.
+  // Opening properties from an image card: on small screens show only the standalone properties modal
+  // so the viewer isn't a throwaway host that flashes before the fullscreen properties modal covers
+  // it. On larger screens open the viewer and let it auto-open its nested properties modal (which
+  // stacks reliably over the viewer's modal on iOS, where sibling modals don't).
   const handleOpenImageProperties = (image) => {
     if (onOpenImageProperties) onOpenImageProperties(image);
     else {
       setImageToView(image);
-      setIsImagePropertiesModalVisible(true);
+      if (SMALL_SCREEN) setIsImagePropertiesModalVisible(true);
+      else {
+        setShouldOpenImageProperties(true);
+        setIsImageModalVisible(true);
+      }
     }
   };
 
@@ -96,6 +106,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
           setIsImageModalVisible={handleCloseImageModal}
+          shouldOpenProperties={shouldOpenImageProperties}
         />
       )}
       {isImagePropertiesModalVisible && (
