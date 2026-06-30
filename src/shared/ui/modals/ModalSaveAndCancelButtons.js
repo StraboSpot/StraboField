@@ -18,12 +18,12 @@ const ModalSaveAndCancelButtons = ({
                                      showCancelButton = true,
                                      showDeleteButton = false,
                                    }) => {
-  // When the action button is the only button shown, stretch it to fill the bar, but cap its
-  // width on wide modals so it stays centered rather than spanning the whole width.
+  // When the action button is the only button shown, stretch it to 80% of the bar (capped at 400)
+  // so it stays centered and doesn't run into iOS's curved bottom edge on full-width modals.
   if (showActionButton && !showCancelButton && !showDeleteButton) {
     return (
       <View style={{alignItems: 'center'}}>
-        <View style={{maxWidth: 400, width: '100%'}}>
+        <View style={{maxWidth: 400, width: '80%'}}>
           <ActionButton
             disabled={disabled}
             isLoading={isLoading}
