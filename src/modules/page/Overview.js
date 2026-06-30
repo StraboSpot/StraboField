@@ -11,7 +11,7 @@ import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
-import {SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
+import {SMALL_SCREEN, SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -50,6 +50,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
@@ -79,6 +80,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     setIsTraceSurfaceFeatureEdit(false);
     setIsImageModalVisible(false);
     setIsImagePropertiesModalVisible(false);
+    setShouldOpenImageProperties(false);
     setImageToView({});
   }, [spot]);
 
@@ -86,18 +88,26 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const handleCloseImageModal = (isVisible) => {
     setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
   };
 
   const handleOpenImage = (image) => {
+    setShouldOpenImageProperties(false);
     setImageToView(image);
     setIsImageModalVisible(true);
   };
 
-  // Opening properties straight from an image card edits the image without first showing the image
-  // viewer, so the properties modal renders on its own here rather than nested inside the image modal.
+  // Opening properties from an image card: on small screens show only the standalone properties modal
+  // so the viewer isn't a throwaway host that flashes before the fullscreen properties modal covers
+  // it. On larger screens open the viewer and let it auto-open its nested properties modal (which
+  // stacks reliably over the viewer's modal on iOS, where sibling modals don't).
   const handleOpenImageProperties = (image) => {
     setImageToView(image);
-    setIsImagePropertiesModalVisible(true);
+    if (SMALL_SCREEN) setIsImagePropertiesModalVisible(true);
+    else {
+      setShouldOpenImageProperties(true);
+      setIsImageModalVisible(true);
+    }
   };
 
   const handleOpenSketch = (image) => {
@@ -360,6 +370,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         saveUpdatedImage={saveUpdatedImage}
         setImageToView={setImageToView}
         setIsImageModalVisible={handleCloseImageModal}
+        shouldOpenProperties={shouldOpenImageProperties}
       />
       {isImagePropertiesModalVisible && (
         <ImagePropertiesModal

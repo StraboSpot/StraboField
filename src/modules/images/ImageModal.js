@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, Image} from '@rn-vui/base';
@@ -32,6 +32,7 @@ const ImageModal = ({
                       saveUpdatedImage,
                       setImageToView,
                       setIsImageModalVisible,
+                      shouldOpenProperties,
                     }) => {
   console.log('Rendering ImageModal...');
 
@@ -45,6 +46,15 @@ const ImageModal = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  /* Side Effects */
+
+  // Auto-open the nested properties modal when the viewer is opened straight to properties from an
+  // image card (large screens only — small screens open the properties modal without the viewer).
+  // Nesting is required so it stacks reliably over the viewer's modal on iOS rather than as a sibling.
+  useEffect(() => {
+    if (isVisible && shouldOpenProperties) setIsImagePropertiesModalVisible(true);
+  }, [isVisible, shouldOpenProperties]);
 
   /* Event Handlers */
 
