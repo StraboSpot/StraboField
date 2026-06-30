@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
+import {AddImageButtons, ImageModal, ImagePropertiesModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 
@@ -22,6 +22,7 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
 
@@ -85,12 +86,21 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
       <ImageModal
         deleteImage={deleteImage}
         image={imageToView}
+        isPropertiesModalVisible={isImagePropertiesModalVisible}
         isVisible={isImageModalVisible}
+        onOpenProperties={() => setIsImagePropertiesModalVisible(true)}
         onOpenSketch={handleOpenSketch}
-        saveUpdatedImage={saveUpdatedImage}
-        setImageToView={setImageToView}
         setIsImageModalVisible={setIsImageModalVisible}
       />
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={imageToView}
+          isVisible={isImagePropertiesModalVisible}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+        />
+      )}
       {isSketchModalVisible && (
         <SketchModal
           image={sketchImage}

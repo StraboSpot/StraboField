@@ -21,7 +21,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
-import {ImageModal, useImages} from '../images';
+import {ImageModal, ImagePropertiesModal, useImages} from '../images';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -48,8 +48,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
-  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
@@ -78,7 +78,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
     setIsImageModalVisible(false);
-    setShouldOpenImageProperties(false);
+    setIsImagePropertiesModalVisible(false);
     setImageToView({});
   }, [spot]);
 
@@ -86,19 +86,18 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const handleCloseImageModal = (isVisible) => {
     setIsImageModalVisible(isVisible);
-    if (!isVisible) setShouldOpenImageProperties(false);
   };
 
   const handleOpenImage = (image) => {
-    setShouldOpenImageProperties(false);
     setImageToView(image);
     setIsImageModalVisible(true);
   };
 
+  // Opening properties straight from an image card edits the image without first showing the image
+  // viewer, so the properties modal renders on its own here rather than nested inside the image modal.
   const handleOpenImageProperties = (image) => {
-    setShouldOpenImageProperties(true);
     setImageToView(image);
-    setIsImageModalVisible(true);
+    setIsImagePropertiesModalVisible(true);
   };
 
   const handleOpenSketch = (image) => {
@@ -355,14 +354,23 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
       <ImageModal
         deleteImage={deleteImage}
         image={imageToView}
+        isPropertiesModalVisible={isImagePropertiesModalVisible}
         isReadOnly={isReadOnly}
         isVisible={isImageModalVisible}
+        onOpenProperties={() => setIsImagePropertiesModalVisible(true)}
         onOpenSketch={handleOpenSketch}
-        saveUpdatedImage={saveUpdatedImage}
-        setImageToView={setImageToView}
         setIsImageModalVisible={handleCloseImageModal}
-        shouldOpenProperties={shouldOpenImageProperties}
       />
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={imageToView}
+          isReadOnly={isReadOnly}
+          isVisible={isImagePropertiesModalVisible}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+        />
+      )}
       {isSketchModalVisible && (
         <SketchModal
           image={sketchImage}

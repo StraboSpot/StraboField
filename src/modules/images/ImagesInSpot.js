@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImageModal, ImagesList, useImages} from '.';
+import {ImageModal, ImagePropertiesModal, ImagesList, useImages} from '.';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
@@ -22,32 +22,31 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
-  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
 
   /* Event Handlers */
 
   const handleCloseImageModal = (isVisible) => {
     setIsImageModalVisible(isVisible);
-    if (!isVisible) setShouldOpenImageProperties(false);
   };
 
   const handleOpenImage = (image) => {
     if (onOpenImage) onOpenImage(image);
     else {
-      setShouldOpenImageProperties(false);
       setImageToView(image);
       setIsImageModalVisible(true);
     }
   };
 
+  // Opening properties straight from an image card edits the image without first showing the image
+  // viewer, so the properties modal renders on its own here rather than nested inside the image modal.
   const handleOpenImageProperties = (image) => {
     if (onOpenImageProperties) onOpenImageProperties(image);
     else {
-      setShouldOpenImageProperties(true);
       setImageToView(image);
-      setIsImageModalVisible(true);
+      setIsImagePropertiesModalVisible(true);
     }
   };
 
@@ -91,13 +90,22 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
         <ImageModal
           deleteImage={deleteImage}
           image={imageToView}
+          isPropertiesModalVisible={isImagePropertiesModalVisible}
           isReadOnly={isReadOnly}
           isVisible={isImageModalVisible}
+          onOpenProperties={() => setIsImagePropertiesModalVisible(true)}
           onOpenSketch={handleOpenSketch}
+          setIsImageModalVisible={handleCloseImageModal}
+        />
+      )}
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={imageToView}
+          isReadOnly={isReadOnly}
+          isVisible={isImagePropertiesModalVisible}
           saveUpdatedImage={saveUpdatedImage}
           setImageToView={setImageToView}
-          setIsImageModalVisible={handleCloseImageModal}
-          shouldOpenProperties={shouldOpenImageProperties}
         />
       )}
       {isSketchModalVisible && (
