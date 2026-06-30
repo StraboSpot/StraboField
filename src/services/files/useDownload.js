@@ -408,8 +408,10 @@ const useDownload = () => {
     }
   };
 
-  const initializeDownloadImages = async (dataset) => {
+  const initializeDownloadImages = async (dataset, onProgress) => {
     try {
+      imagesDownloadedCount = 0;
+      imagesFailedCount = 0;
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(clearedStatusMessages());
       dispatch(setIsStatusMessagesModalVisible(true));
@@ -421,11 +423,13 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloading Needed Images...'));
       if (!isEmpty(neededImagesIds)) {
+        onProgress?.(0, neededImagesIds.length);
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
           const success = await downloadImageAndSave(imageId);
           if (success) imagesDownloadedCount++;
           else imagesFailedCount++;
+          onProgress?.(imagesDownloadedCount, neededImagesIds.length);
           console.log('New/Modified Images Saved: ' + imagesDownloadedCount + '/'
             + neededImagesIds.length + ' Failed Images: ' + imagesFailedCount + '/' + neededImagesIds.length);
           dispatch(removedLastStatusMessage());
