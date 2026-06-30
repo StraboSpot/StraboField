@@ -51,6 +51,7 @@ const connectionsSlice = createSlice({
     },
     resetSyncState(state) {
       state.isLocalSaveNeeded = false;
+      state.isPendingImagesChanges = false;
       state.isProjectSyncNeeded = false;
       state.pendingUploadDatasetIds = [];
     },
