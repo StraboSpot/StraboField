@@ -4,7 +4,16 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {resetSyncState, setTransferringImages} from '../../modules/connections/connections.slice';
+import {
+  clearConflictedDatasetId,
+  clearProjectSyncNeeded,
+  removePendingDatasetId,
+  resetSyncState,
+  setLastSyncedDatasetTimestamps,
+  setLastSyncedProjectTimestamp,
+  setProjectConflicted,
+  setTransferringImages,
+} from '../../modules/connections/connections.slice';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -47,10 +56,9 @@ const useDownload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {activeDatasetsIds, datasets: projectDatasets, project, targetDatasetId} = useSelector(state => state.project);
+  const {activeDatasetsIds, project, targetDatasetId} = useSelector(state => state.project);
   const spots = useSelector(state => state.spot.spots);
   const encodedLogin = useSelector(state => state.user.encoded_login);
-  const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const connectionType = useSelector(state => state.connections.isOnline?.type);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
@@ -275,79 +283,147 @@ const useDownload = () => {
 
   /* Exported Functions */
 
-  const checkAndDownloadUpdates = async () => {
-    if (!encodedLogin || isEmpty(project)) return;
-    try {
-      const serverProject = await getProject(project.id, encodedLogin);
-      if (!serverProject) return;
+  // Route each server dataset by comparing it to the base (the server timestamp our local copy last
+  // synced from): server moved off base + local edit pending -> conflict; server moved + no pending
+  // -> pull; else in sync. Comparing to the base (not a > check) catches both edit orderings and is
+  // robust to clock skew. Read live from the store so a stale closure can't misjudge.
+  const classifyServerDatasets = async () => {
+    if (!encodedLogin || isEmpty(project)) return {conflictIds: [], toPull: []};
+    const res = await getDatasets(project.id, encodedLogin);
+    const serverDatasets = res?.datasets || [];
+    const livePendingIds = store.getState().connections.pendingUploadDatasetIds.map(String);
+    const localDatasets = store.getState().project.datasets;
+    const baseTimestamps = store.getState().connections.lastSyncedDatasetTimestamps;
+    const conflictIds = [];
+    const toPull = [];
+    serverDatasets.forEach((serverDataset) => {
+      const localDataset = localDatasets[serverDataset.id];
+      const base = baseTimestamps[serverDataset.id];
+      // Fall back to the old > check when no base is recorded yet (e.g. right after upgrade).
+      const serverMovedFromBase = base != null ? serverDataset.modified_timestamp !== base
+        : (!localDataset || serverDataset.modified_timestamp > localDataset.modified_timestamp);
+      if (!serverMovedFromBase) return;
+      if (livePendingIds.includes(String(serverDataset.id))) conflictIds.push(String(serverDataset.id));
+      else toPull.push(serverDataset);
+    });
+    return {conflictIds, toPull};
+  };
 
-      const res = await getDatasets(project.id, encodedLogin);
-      const serverDatasets = res?.datasets || [];
-      const staleDatasets = serverDatasets.filter((serverDataset) => {
-        if (pendingUploadDatasetIds.includes(serverDataset.id)) return false;
-        const localDataset = projectDatasets[serverDataset.id];
-        return !localDataset || serverDataset.modified_timestamp > localDataset.modified_timestamp;
-      });
+  // Route the server's project copy against the base (the server timestamp our local copy last synced
+  // from), mirroring classifyServerDatasets: server moved off base + local project edit pending is a
+  // conflict. The caller decides push/pull/prompt using serverMovedFromBase and serverTimestamp, since
+  // a project bump driven by dataset edits shouldn't prompt its own conflict. Read live so a stale
+  // closure can't misjudge.
+  const classifyServerProject = async () => {
+    const idle = {isConflict: false, serverMovedFromBase: false, serverTimestamp: null};
+    if (!encodedLogin || isEmpty(project)) return idle;
+    const serverProject = await getProject(project.id, encodedLogin);
+    if (isEmpty(serverProject)) return idle;
+    const liveProject = store.getState().project.project;
+    const base = store.getState().connections.lastSyncedProjectTimestamp;
+    const isPendingLocalEdit = store.getState().connections.isProjectSyncNeeded;
+    // Fall back to the old > check when no base is recorded yet (e.g. right after upgrade).
+    const serverMovedFromBase = base != null ? serverProject.modified_timestamp !== base
+      : serverProject.modified_timestamp > liveProject.modified_timestamp;
+    return {
+      isConflict: serverMovedFromBase && isPendingLocalEdit,
+      serverMovedFromBase,
+      serverTimestamp: serverProject.modified_timestamp,
+    };
+  };
 
-      if (staleDatasets.length) {
-        resetDownloadState();
-        await doGetDatasetSpots(staleDatasets, encodedLogin);
-        dispatch(addedSpotsFromServer(spotsToSave));
-        // Re-read live pending ids: a local edit may have queued one of these while downloading.
-        const livePendingIds = store.getState().connections.pendingUploadDatasetIds;
-        staleDatasets
-          .filter(serverDataset => !livePendingIds.includes(serverDataset.id))
-          .forEach((serverDataset) => {
-            // FromServer variant so the merge doesn't re-flag the dataset for sync.
-            dispatch(addedDatasetFromServer({
-              ...serverDataset,
-              modified_timestamp: serverDataset.modified_timestamp || Date.now(),
-              ...(datasetsObjToSave[serverDataset.id] || {}),
-            }));
-          });
-      }
+  // Download + merge the given server datasets' spots, then (when applyProject is set) fetch and apply
+  // the project properties. Callers pass only datasets that are safe to overwrite (no pending local edits).
+  const applyServerDownloads = async (staleDatasets, {applyProject = false} = {}) => {
+    if (staleDatasets.length) {
+      resetDownloadState();
+      await doGetDatasetSpots(staleDatasets, encodedLogin);
+      dispatch(addedSpotsFromServer(spotsToSave));
+      // Re-read live pending ids: a local edit may have queued one of these while downloading.
+      const livePendingIds = store.getState().connections.pendingUploadDatasetIds.map(String);
+      const appliedBaseTimestamps = {};
+      staleDatasets
+        .filter(serverDataset => !livePendingIds.includes(String(serverDataset.id)))
+        .forEach((serverDataset) => {
+          const timestamp = serverDataset.modified_timestamp || Date.now();
+          // FromServer variant so the merge doesn't re-flag the dataset for sync.
+          dispatch(addedDatasetFromServer({
+            ...serverDataset,
+            modified_timestamp: timestamp,
+            ...(datasetsObjToSave[serverDataset.id] || {}),
+          }));
+          // Local now matches the server for this dataset - record it as the new base.
+          appliedBaseTimestamps[serverDataset.id] = timestamp;
+        });
+      if (!isEmpty(appliedBaseTimestamps)) dispatch(setLastSyncedDatasetTimestamps(appliedBaseTimestamps));
+    }
 
-      // Check for missing images when something downloaded or a prior attempt left some pending
-      // (retries transient failures). Respect wifi-only since images are large/numerous.
-      if ((staleDatasets.length || isPendingImagesChanges) && Platform.OS !== 'web'
-        && (connectionType === 'wifi' || !isWifiOnlyForImages)) {
-        try {
-          // Read live spots: addedSpotsFromServer above isn't reflected in the `spots` selector yet.
-          const liveSpots = store.getState().spot.spots;
-          const neededImages = await gatherNeededImages(Object.values(liveSpots), {});
-          const neededImagesIds = neededImages?.neededImagesIds || [];
-          if (neededImagesIds.length) {
-            dispatch(setTransferringImages(true));
-            await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
-            for (const imageId of neededImagesIds) {
-              await downloadImageAndSave(imageId);
-            }
+    // Check for missing images when something downloaded or a prior attempt left some pending
+    // (retries transient failures). Respect wifi-only since images are large/numerous.
+    if ((staleDatasets.length || isPendingImagesChanges) && Platform.OS !== 'web'
+      && (connectionType === 'wifi' || !isWifiOnlyForImages)) {
+      try {
+        // Read live spots: addedSpotsFromServer above isn't reflected in the `spots` selector yet.
+        const liveSpots = store.getState().spot.spots;
+        const neededImages = await gatherNeededImages(Object.values(liveSpots), {});
+        const neededImagesIds = neededImages?.neededImagesIds || [];
+        if (neededImagesIds.length) {
+          dispatch(setTransferringImages(true));
+          await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
+          for (const imageId of neededImagesIds) {
+            await downloadImageAndSave(imageId);
           }
-          // NOTE: don't touch isPendingImagesChanges here. That flag means "local images pending
-          // UPLOAD" and is owned by the upload path. A failed download (e.g. an image referenced by
-          // a spot but missing on both device and server) must not re-flag images as pending upload,
-          // or the status would never clear for those orphaned references.
         }
-        catch (err) {
-          console.error('Auto sync: error downloading images', err);
-        }
-        finally {
-          dispatch(setTransferringImages(false));
-        }
+        // NOTE: don't touch isPendingImagesChanges here. That flag means "local images pending
+        // UPLOAD" and is owned by the upload path. A failed download (e.g. an image referenced by
+        // a spot but missing on both device and server) must not re-flag images as pending upload,
+        // or the status would never clear for those orphaned references.
       }
+      catch (err) {
+        console.error('Auto sync: error downloading images', err);
+      }
+      finally {
+        dispatch(setTransferringImages(false));
+      }
+    }
 
-      // Apply the server's copy unless local has unsynced edits. An equal timestamp can still
-      // carry server-side merges (tags, memos, templates), so apply on >=. Re-check live sync-needed
-      // state so an edit that landed during the downloads above isn't clobbered.
-      if (serverProject.modified_timestamp >= project.modified_timestamp
+    // Fetch and apply the server's project copy unless local has unsynced edits. An equal timestamp
+    // can still carry server-side merges (tags, memos, templates), so apply on >=. Fetch fresh here
+    // (not before the upload) and re-check live sync-needed state so an edit that landed during the
+    // uploads/downloads above isn't clobbered.
+    if (applyProject) {
+      const serverProject = await getProject(project.id, encodedLogin);
+      const liveProject = store.getState().project.project;
+      if (serverProject && serverProject.modified_timestamp >= liveProject.modified_timestamp
         && !store.getState().connections.isProjectSyncNeeded) {
         dispatch(addedProjectFromServer(serverProject));
+        // Local now matches the server for the project - record it as the new base.
+        dispatch(setLastSyncedProjectTimestamp(serverProject.modified_timestamp));
       }
-      console.log('Auto sync download complete.');
     }
-    catch (err) {
-      console.error('Auto sync download failed:', err);
-    }
+  };
+
+  // Resolve a conflict by keeping the server's copy: pull that dataset and discard the local pending edit.
+  const keepServerConflict = async (datasetId) => {
+    if (!encodedLogin || isEmpty(project)) return;
+    const res = await getDatasets(project.id, encodedLogin);
+    const serverDataset = (res?.datasets || []).find(dataset => String(dataset.id) === String(datasetId));
+    if (!serverDataset) return;
+    // Drop the pending flag first so applyServerDownloads will overwrite the dataset's properties.
+    dispatch(removePendingDatasetId(datasetId));
+    await applyServerDownloads([serverDataset]);
+    dispatch(clearConflictedDatasetId(datasetId));
+  };
+
+  // Resolve a project conflict by keeping the server's copy: pull the project and discard the local edit.
+  const keepServerProject = async () => {
+    if (!encodedLogin || isEmpty(project)) return;
+    const serverProject = await getProject(project.id, encodedLogin);
+    if (isEmpty(serverProject)) return;
+    dispatch(addedProjectFromServer(serverProject));
+    dispatch(setLastSyncedProjectTimestamp(serverProject.modified_timestamp));
+    dispatch(clearProjectSyncNeeded());
+    dispatch(setProjectConflicted(false));
   };
 
   const downloadUserProfile = async (encodedLoginScoped = encodedLogin) => {
@@ -392,6 +468,11 @@ const useDownload = () => {
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(resetSyncState());
+      // Seed the base for every downloaded dataset and the project: local now matches the server exactly.
+      dispatch(setLastSyncedDatasetTimestamps(
+        Object.fromEntries(Object.values(datasetsObjToSave).map(d => [d.id, d.modified_timestamp])),
+      ));
+      dispatch(setLastSyncedProjectTimestamp(store.getState().project.project.modified_timestamp));
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
@@ -461,10 +542,14 @@ const useDownload = () => {
   };
 
   return {
-    checkAndDownloadUpdates,
+    applyServerDownloads,
+    classifyServerDatasets,
+    classifyServerProject,
     downloadUserProfile,
     initializeDownload,
     initializeDownloadImages,
+    keepServerConflict,
+    keepServerProject,
   };
 };
 

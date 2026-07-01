@@ -6,9 +6,14 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
 import {
+  addConflictedDatasetId,
+  clearConflictedDatasetId,
   clearProjectSyncNeeded,
   removePendingDatasetId,
+  setLastSyncedDatasetTimestamp,
+  setLastSyncedProjectTimestamp,
   setPendingImagesChanges,
+  setProjectConflicted,
 } from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {
@@ -68,11 +73,14 @@ const useUpload = () => {
         setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
         await uploadSpots(dataset);
         dispatch(removePendingDatasetId(dataset.id));
+        // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
+        dispatch(setLastSyncedDatasetTimestamp({id: dataset.id, timestamp: dataset.modified_timestamp}));
       }
       else {
-        // Rejected (server copy newer). Bump the timestamp so the next cycle retries; local wins.
-        setUploadStatusMessage(`Dataset ${dataset.name} was rejected by the server; will retry.`);
-        dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
+        // Rejected: server copy is newer. Flag a conflict (leaving it pending) so the user can
+        // choose which copy to keep, rather than clobbering the server.
+        setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server; needs conflict resolution.`);
+        dispatch(addConflictedDatasetId(dataset.id));
       }
     }
     catch (err) {
@@ -122,6 +130,27 @@ const useUpload = () => {
   };
 
   /* Exported Functions */
+
+  // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts
+  // it over its newer copy, push it, then clear the conflict flag. The bump also flags the project for
+  // sync (a dataset change implies a project change) - safe now that project uploads detect conflicts too.
+  const keepDeviceConflict = async (datasetId) => {
+    const dataset = store.getState().project.datasets[datasetId];
+    if (!dataset) return;
+    dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
+    await uploadDatasetsByIds([datasetId]);
+    dispatch(clearConflictedDatasetId(datasetId));
+  };
+
+  // Resolve a project conflict by keeping the device's copy: bump the project timestamp so the server
+  // accepts it over its newer copy, push it, then clear the conflict flag.
+  const keepDeviceProject = async () => {
+    const liveProject = store.getState().project.project;
+    if (isEmpty(liveProject)) return;
+    dispatch(addedProject({...liveProject, modified_timestamp: Date.now()}));
+    await uploadProject();
+    dispatch(setProjectConflicted(false));
+  };
 
   const initializeUpload = async () => {
     if (Platform.OS !== 'web') KeepAwake.activate();
@@ -228,10 +257,13 @@ const useUpload = () => {
       // Apply server-merged data (tags, reports, templates) back; already in sync so don't re-flag for sync.
       dispatch(addedProjectFromServer(uploadProjectResponse));
       dispatch(clearProjectSyncNeeded());
+      // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
+      dispatch(setLastSyncedProjectTimestamp(uploadedTimestamp));
     }
     else if (!isAccepted && !isEmpty(uploadProjectResponse) && noNewerLocalEdit) {
-      // Rejected (server copy newer). Bump the timestamp so the next cycle retries; local wins.
-      dispatch(addedProject({...liveProject, modified_timestamp: Date.now()}));
+      // Rejected: server copy is newer. Flag a conflict (leaving it pending) so the user can choose
+      // which copy to keep, rather than clobbering the server.
+      dispatch(setProjectConflicted(true));
     }
     setUploadStatusMessage(`Finished uploading ${liveProject.description.project_name} Properties.`);
     return true;
@@ -239,6 +271,8 @@ const useUpload = () => {
 
   return {
     initializeUpload,
+    keepDeviceConflict,
+    keepDeviceProject,
     uploadDatasets,
     uploadDatasetsByIds,
     uploadFromWeb,

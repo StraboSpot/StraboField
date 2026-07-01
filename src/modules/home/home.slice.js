@@ -19,6 +19,7 @@ const initialHomeState = {
   isErrorMessagesModalVisible: false,
   isProgressModalVisible: false,
   isProjectLoadSelectionModalVisible: false,
+  isSyncConflictModalVisible: false,
   isOfflineMapModalVisible: false,
   isImageModalVisible: false,
   isMainMenuPanelVisible: false,
@@ -85,6 +86,9 @@ const homeSlice = createSlice({
     setIsStatusMessagesModalVisible(state, action) {
       state.isStatusMessagesModalVisible = action.payload;
     },
+    setIsSyncConflictModalVisible(state, action) {
+      state.isSyncConflictModalVisible = action.payload;
+    },
     setIsUploadModalVisible(state, action) {
       state.isUploadModalVisible = action.payload;
     },
@@ -128,6 +132,7 @@ export const {
   setIsProgressModalVisible,
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
+  setIsSyncConflictModalVisible,
   setIsUploadModalVisible,
   setIsWarningHidden,
   setIsWarningMessagesModalVisible,

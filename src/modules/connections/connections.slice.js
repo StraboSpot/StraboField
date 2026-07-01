@@ -11,6 +11,7 @@ const initialConnectionsState = {
   isLocalSaveNeeded: false,
   isOnline: {},
   isPendingImagesChanges: false,
+  isProjectConflicted: false,
   isProjectSyncNeeded: false,
   isTransferringImages: false,
   backupFrequency: {
@@ -18,6 +19,10 @@ const initialConnectionsState = {
     sync: 0,
   },
   isWifiOnlyForImages: true,
+  conflictedDatasetIds: [],
+  isManualSyncRequested: false,
+  lastSyncedDatasetTimestamps: {},
+  lastSyncedProjectTimestamp: null,
   nextAutoSaveTime: null,
   nextAutoSyncTime: null,
   pendingUploadDatasetIds: [],
@@ -43,6 +48,17 @@ const connectionsSlice = createSlice({
     clearAllPendingDatasetIds(state) {
       state.pendingUploadDatasetIds = [];
     },
+    addConflictedDatasetId(state, action) {
+      if (!state.conflictedDatasetIds.some(id => String(id) === String(action.payload))) {
+        state.conflictedDatasetIds.push(action.payload);
+      }
+    },
+    clearConflictedDatasetId(state, action) {
+      // String-coerce: ids may be queued as strings (Object.keys) or numbers (dataset.id).
+      state.conflictedDatasetIds = state.conflictedDatasetIds.filter(
+        id => String(id) !== String(action.payload),
+      );
+    },
     clearLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = false;
     },
@@ -50,10 +66,34 @@ const connectionsSlice = createSlice({
       state.isProjectSyncNeeded = false;
     },
     resetSyncState(state) {
+      state.conflictedDatasetIds = [];
       state.isLocalSaveNeeded = false;
       state.isPendingImagesChanges = false;
+      state.isProjectConflicted = false;
       state.isProjectSyncNeeded = false;
+      state.lastSyncedDatasetTimestamps = {};
+      state.lastSyncedProjectTimestamp = null;
       state.pendingUploadDatasetIds = [];
+    },
+    setConflictedDatasetIds(state, action) {
+      state.conflictedDatasetIds = action.payload;
+    },
+    setLastSyncedDatasetTimestamp(state, action) {
+      const {id, timestamp} = action.payload;
+      state.lastSyncedDatasetTimestamps[id] = timestamp;
+    },
+    setLastSyncedDatasetTimestamps(state, action) {
+      // Merge, not replace, so a partial update keeps the bases of datasets not in the payload.
+      state.lastSyncedDatasetTimestamps = {
+        ...state.lastSyncedDatasetTimestamps,
+        ...action.payload,
+      };
+    },
+    setLastSyncedProjectTimestamp(state, action) {
+      state.lastSyncedProjectTimestamp = action.payload;
+    },
+    setManualSyncRequested(state, action) {
+      state.isManualSyncRequested = action.payload;
     },
     removePendingDatasetId(state, action) {
       // String-coerce: ids are queued from Object.keys (strings) but removed via dataset.id (number).
@@ -88,6 +128,9 @@ const connectionsSlice = createSlice({
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
     },
+    setProjectConflicted(state, action) {
+      state.isProjectConflicted = action.payload;
+    },
     setProjectSyncNeeded(state) {
       state.isProjectSyncNeeded = true;
     },
@@ -104,8 +147,10 @@ const connectionsSlice = createSlice({
 });
 
 export const {
+  addConflictedDatasetId,
   addPendingDatasetId,
   clearAllPendingDatasetIds,
+  clearConflictedDatasetId,
   clearLocalSaveNeeded,
   clearProjectSyncNeeded,
   removePendingDatasetId,
@@ -113,14 +158,20 @@ export const {
   setAutoSaving,
   setAutoSyncing,
   setBackupFrequency,
+  setConflictedDatasetIds,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
+  setLastSyncedDatasetTimestamp,
+  setLastSyncedDatasetTimestamps,
+  setLastSyncedProjectTimestamp,
   setLocalSaveNeeded,
+  setManualSyncRequested,
   setNextAutoSaveTime,
   setNextAutoSyncTime,
   setOnlineStatus,
   setPendingImagesChanges,
+  setProjectConflicted,
   setProjectSyncNeeded,
   setTransferringImages,
   setWifiOnlyForImages,

@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import BackupStatusModal from './BackupStatusModal';
 import statusBarStyles from './statusBar.styles';
 import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
+import SyncConflictModal from './SyncConflictModal';
 import * as themes from '../../shared/styles.constants';
 import homeStyles from '../home/home.style';
 
@@ -49,10 +50,12 @@ const useBounceAnimation = (isActive) => {
 const BackupStatusIcons = () => {
   /* Data Hooks */
 
+  const conflictedDatasetIds = useSelector(state => state.connections.conflictedDatasetIds);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
   const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
+  const isProjectConflicted = useSelector(state => state.connections.isProjectConflicted);
   const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
@@ -76,16 +79,29 @@ const BackupStatusIcons = () => {
   // A distinct icon for when images are the only thing left to sync - if project/dataset
   // changes are pending or a sync is running, the upload icon above already covers it.
   const isImagesOnlyVisible = !!syncFrequency && isImagesActive && !isUploadPending && !isAutoSyncing;
+  // Conflicts persist across restart, so surface them regardless of sync frequency.
+  const isConflictVisible = conflictedDatasetIds.length > 0 || isProjectConflicted;
 
   /* View */
 
-  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isModalVisible) return null;
+  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible) return null;
 
   return (
     <>
       <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
+      <SyncConflictModal/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={statusBarStyles.backupStatusContainer}>
+          {isConflictVisible && (
+            <View style={statusBarStyles.saveAlertIconContainer}>
+              <Icon
+                color={themes.WARNING_COLOR}
+                name={BACKUP_ICON_NAMES.CONFLICT}
+                size={24}
+                type={ICON_TYPE}
+              />
+            </View>
+          )}
           {isSaveVisible && (
             <Animated.View style={[
               statusBarStyles.saveAlertIconContainer,
@@ -127,7 +143,8 @@ const BackupStatusIcons = () => {
           )}
         </View>
       </TouchableOpacity>
-      {(isSaveVisible || isSyncVisible || isImagesOnlyVisible) && <View style={homeStyles.statusBarDivider}/>}
+      {(isSaveVisible || isSyncVisible || isImagesOnlyVisible || isConflictVisible)
+        && <View style={homeStyles.statusBarDivider}/>}
     </>
   );
 };

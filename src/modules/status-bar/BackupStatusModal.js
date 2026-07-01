@@ -5,9 +5,14 @@ import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
-import {setNextAutoSaveTime, setNextAutoSyncTime} from '../../modules/connections/connections.slice';
+import {
+  setManualSyncRequested,
+  setNextAutoSaveTime,
+  setNextAutoSyncTime,
+} from '../../modules/connections/connections.slice';
+import {setIsSyncConflictModalVisible} from '../../modules/home/home.slice';
 import commonStyles from '../../shared/common.styles';
-import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import AutoSaveCountdown from '../project/backup/AutoSaveCountdown';
@@ -17,12 +22,14 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const conflictedDatasetIds = useSelector(state => state.connections.conflictedDatasetIds);
   const datasets = useSelector(state => state.project.datasets);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
   const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
+  const isProjectConflicted = useSelector(state => state.connections.isProjectConflicted);
   const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
@@ -40,8 +47,22 @@ const BackupStatusModal = ({isVisible, onClose}) => {
     && (isUploadPending || isAutoSyncing || isImagesPending);
   // When images are the only thing left to sync, show the images icon instead of the upload icon.
   const isImagesOnlyPending = isImagesPending && !isUploadPending && !isAutoSyncing;
+  const isConflictPending = conflictedDatasetIds.length > 0 || isProjectConflicted;
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
+  const conflictedDatasetNames = conflictedDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const projectName = project?.description?.project_name || 'Current Project';
+
+  /* Event Handlers */
+
+  const handleSyncNow = () => {
+    dispatch(setManualSyncRequested(true));
+    dispatch(setNextAutoSyncTime(Date.now()));
+  };
+
+  const handleResolveConflicts = () => {
+    onClose();
+    dispatch(setIsSyncConflictModalVisible(true));
+  };
 
   /* View */
 
@@ -109,7 +130,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             {!isAutoSyncing && isOnline && !!syncFrequency && (
               <Button
                 buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
-                onPress={() => dispatch(setNextAutoSyncTime(Date.now()))}
+                onPress={handleSyncNow}
                 title={'Sync Now'}
                 titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                 type={'outline'}
@@ -132,7 +153,35 @@ const BackupStatusModal = ({isVisible, onClose}) => {
           </Text>
         </View>
       )}
-      {!isSaveVisible && !isSyncVisible && (
+      {isConflictPending && (
+        <View>
+          <SectionDivider
+            dividerText={'Sync Conflicts'}
+            leftIcon={<Icon color={WARNING_COLOR} name={BACKUP_ICON_NAMES.CONFLICT} size={18} type={ICON_TYPE}/>}
+            subtitle={'Changed on this device and the server'}
+          />
+          {isProjectConflicted && (
+            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+              {'Project: ' + projectName}
+            </Text>
+          )}
+          {conflictedDatasetNames.map(name => (
+            <Text key={name} style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+              {'Dataset: ' + name}
+            </Text>
+          ))}
+          <View style={{alignItems: 'center', paddingHorizontal: 10, paddingVertical: 8}}>
+            <Button
+              buttonStyle={{borderColor: WARNING_COLOR, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
+              onPress={handleResolveConflicts}
+              title={'Resolve Conflicts'}
+              titleStyle={{color: WARNING_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              type={'outline'}
+            />
+          </View>
+        </View>
+      )}
+      {!isSaveVisible && !isSyncVisible && !isConflictPending && (
         <Text style={commonStyles.noValueText}>No pending auto backups.</Text>
       )}
     </ModalWrapper>
