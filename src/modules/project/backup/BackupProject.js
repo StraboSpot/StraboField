@@ -18,6 +18,7 @@ import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connec
 import SelectInputField from '../../form/SelectInputField';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
+import BackupStatusModal from '../../status-bar/BackupStatusModal';
 import {setSelectedProject} from '../projects.slice';
 
 const BackupProject = () => {
@@ -44,6 +45,7 @@ const BackupProject = () => {
   /* Local State */
 
   const [backupAction, setBackupAction] = useState(undefined);
+  const [isBackupStatusModalVisible, setIsBackupStatusModalVisible] = useState(false);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
   const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
@@ -149,6 +151,7 @@ const BackupProject = () => {
         {renderUploadAndBackupButtons()}
         <SectionDivider dividerText={'Backup Options'}/>
         {renderBackupOptions()}
+        <OutlineButton onPress={() => setIsBackupStatusModalVisible(true)} title={'Show Auto Backup Status'}/>
       </View>
 
       {Platform.OS === 'ios' && (
@@ -171,6 +174,10 @@ const BackupProject = () => {
       )}
 
       {/* Modals */}
+      <BackupStatusModal
+        isVisible={isBackupStatusModalVisible}
+        onClose={() => setIsBackupStatusModalVisible(false)}
+      />
       <SaveAndExportModal
         backupAction={backupAction}
         closeModal={() => setIsSaveAndExportModalVisible(false)}
