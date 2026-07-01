@@ -128,7 +128,7 @@ const SyncConflictModal = () => {
         return (
           <View key={id}>
             <SectionDivider
-              dividerText={datasets[id]?.name || `Dataset ${id}`}
+              dividerText={'Dataset: ' + (datasets[id]?.name || id)}
               leftIcon={<Icon color={WARNING_COLOR} name={BACKUP_ICON_NAMES.CONFLICT} size={18} type={ICON_TYPE}/>}
             />
             {isResolving ? (
