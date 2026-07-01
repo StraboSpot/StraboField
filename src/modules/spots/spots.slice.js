@@ -22,6 +22,14 @@ const spotSlice = createSlice({
       action.payload.forEach((spot) => {
         state.spots[spot.properties.id] = spot;
       });
+      // If the currently selected spot was among those refreshed (e.g. keeping the server copy on a
+      // conflict), update it too so the open view shows the new server data instead of the stale copy.
+      if (!isEmpty(state.selectedSpot)) {
+        const refreshedSpot = action.payload.find(
+          spot => spot.properties.id === state.selectedSpot.properties.id,
+        );
+        if (refreshedSpot) state.selectedSpot = refreshedSpot;
+      }
     },
     clearedSelectedSpots(state) {
       state.selectedSpot = {};
