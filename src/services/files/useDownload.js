@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {classifyDatasetChange, classifyProjectChange, DATASET_STATUS} from './syncConflicts.helpers';
 import {
   clearConflictedDatasetId,
   clearProjectSyncNeeded,
@@ -283,10 +284,8 @@ const useDownload = () => {
 
   /* Exported Functions */
 
-  // Route each server dataset by comparing it to the base (the server timestamp our local copy last
-  // synced from): server moved off base + local edit pending -> conflict; server moved + no pending
-  // -> pull; else in sync. Comparing to the base (not a > check) catches both edit orderings and is
-  // robust to clock skew. Read live from the store so a stale closure can't misjudge.
+  // Fetch the server datasets and route each one via classifyDatasetChange (see syncConflicts.helpers).
+  // Read live from the store so a stale closure can't misjudge.
   const classifyServerDatasets = async () => {
     if (!encodedLogin || isEmpty(project)) return {conflictIds: [], toPull: []};
     const res = await getDatasets(project.id, encodedLogin);
@@ -297,39 +296,32 @@ const useDownload = () => {
     const conflictIds = [];
     const toPull = [];
     serverDatasets.forEach((serverDataset) => {
-      const localDataset = localDatasets[serverDataset.id];
-      const base = baseTimestamps[serverDataset.id];
-      // Fall back to the old > check when no base is recorded yet (e.g. right after upgrade).
-      const serverMovedFromBase = base != null ? serverDataset.modified_timestamp !== base
-        : (!localDataset || serverDataset.modified_timestamp > localDataset.modified_timestamp);
-      if (!serverMovedFromBase) return;
-      if (livePendingIds.includes(String(serverDataset.id))) conflictIds.push(String(serverDataset.id));
-      else toPull.push(serverDataset);
+      const {status} = classifyDatasetChange({
+        serverTimestamp: serverDataset.modified_timestamp,
+        base: baseTimestamps[serverDataset.id],
+        localTimestamp: localDatasets[serverDataset.id]?.modified_timestamp,
+        isPendingLocalEdit: livePendingIds.includes(String(serverDataset.id)),
+      });
+      if (status === DATASET_STATUS.CONFLICT) conflictIds.push(String(serverDataset.id));
+      else if (status === DATASET_STATUS.PULL) toPull.push(serverDataset);
     });
     return {conflictIds, toPull};
   };
 
-  // Route the server's project copy against the base (the server timestamp our local copy last synced
-  // from), mirroring classifyServerDatasets: server moved off base + local project edit pending is a
-  // conflict. The caller decides push/pull/prompt using serverMovedFromBase and serverTimestamp, since
-  // a project bump driven by dataset edits shouldn't prompt its own conflict. Read live so a stale
-  // closure can't misjudge.
+  // Fetch the server's project copy and route it via classifyProjectChange (see syncConflicts.helpers).
+  // Read live from the store so a stale closure can't misjudge.
   const classifyServerProject = async () => {
     const idle = {isConflict: false, serverMovedFromBase: false, serverTimestamp: null};
     if (!encodedLogin || isEmpty(project)) return idle;
     const serverProject = await getProject(project.id, encodedLogin);
     if (isEmpty(serverProject)) return idle;
-    const liveProject = store.getState().project.project;
-    const base = store.getState().connections.lastSyncedProjectTimestamp;
-    const isPendingLocalEdit = store.getState().connections.isProjectSyncNeeded;
-    // Fall back to the old > check when no base is recorded yet (e.g. right after upgrade).
-    const serverMovedFromBase = base != null ? serverProject.modified_timestamp !== base
-      : serverProject.modified_timestamp > liveProject.modified_timestamp;
-    return {
-      isConflict: serverMovedFromBase && isPendingLocalEdit,
-      serverMovedFromBase,
+    const {isConflict, serverMovedFromBase} = classifyProjectChange({
       serverTimestamp: serverProject.modified_timestamp,
-    };
+      base: store.getState().connections.lastSyncedProjectTimestamp,
+      localTimestamp: store.getState().project.project.modified_timestamp,
+      isPendingLocalEdit: store.getState().connections.isProjectSyncNeeded,
+    });
+    return {isConflict, serverMovedFromBase, serverTimestamp: serverProject.modified_timestamp};
   };
 
   // Download + merge the given server datasets' spots, then (when applyProject is set) fetch and apply
