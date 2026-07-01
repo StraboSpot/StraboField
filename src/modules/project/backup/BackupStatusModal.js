@@ -4,19 +4,19 @@ import {Platform, Text, View} from 'react-native';
 import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
+import AutoSaveCountdown from './AutoSaveCountdown';
+import AutoSyncCountdown from './AutoSyncCountdown';
+import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
+import commonStyles from '../../../shared/common.styles';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import {
   setManualSyncRequested,
   setNextAutoSaveTime,
   setNextAutoSyncTime,
-} from '../../modules/connections/connections.slice';
-import {setIsSyncConflictModalVisible} from '../../modules/home/home.slice';
-import commonStyles from '../../shared/common.styles';
-import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import AutoSaveCountdown from '../project/backup/AutoSaveCountdown';
-import AutoSyncCountdown from '../project/backup/AutoSyncCountdown';
+} from '../../connections/connections.slice';
+import {setIsSyncConflictModalVisible} from '../../home/home.slice';
 
 const BackupStatusModal = ({isVisible, onClose}) => {
   /* Data Hooks */

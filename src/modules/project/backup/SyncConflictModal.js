@@ -4,14 +4,14 @@ import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
-import useDownload from '../../services/files/useDownload';
-import useUpload from '../../services/files/useUpload';
-import commonStyles from '../../shared/common.styles';
-import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import {setIsSyncConflictModalVisible} from '../home/home.slice';
+import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
+import useDownload from '../../../services/files/useDownload';
+import useUpload from '../../../services/files/useUpload';
+import commonStyles from '../../../shared/common.styles';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import SectionDivider from '../../../shared/ui/SectionDivider';
+import {setIsSyncConflictModalVisible} from '../../home/home.slice';
 
 const SyncConflictModal = () => {
   /* Data Hooks */

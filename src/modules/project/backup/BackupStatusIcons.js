@@ -4,12 +4,12 @@ import {Animated, Easing, TouchableOpacity, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
+import backupStatusStyles from './backupStatus.styles';
 import BackupStatusModal from './BackupStatusModal';
-import statusBarStyles from './statusBar.styles';
-import {BACKUP_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 import SyncConflictModal from './SyncConflictModal';
-import * as themes from '../../shared/styles.constants';
-import homeStyles from '../home/home.style';
+import * as themes from '../../../shared/styles.constants';
+import homeStyles from '../../home/home.style';
 
 const useBounceAnimation = (isActive) => {
   const bounceValue = useRef(new Animated.Value(0)).current;
@@ -91,9 +91,9 @@ const BackupStatusIcons = () => {
       <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
       <SyncConflictModal/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-        <View style={statusBarStyles.backupStatusContainer}>
+        <View style={backupStatusStyles.backupStatusContainer}>
           {isConflictVisible && (
-            <View style={statusBarStyles.saveAlertIconContainer}>
+            <View style={backupStatusStyles.saveAlertIconContainer}>
               <Icon
                 color={themes.WARNING_COLOR}
                 name={BACKUP_ICON_NAMES.CONFLICT}
@@ -104,7 +104,7 @@ const BackupStatusIcons = () => {
           )}
           {isSaveVisible && (
             <Animated.View style={[
-              statusBarStyles.saveAlertIconContainer,
+              backupStatusStyles.saveAlertIconContainer,
               {transform: [{translateY: saveBounce}]}]}
             >
               <Icon
@@ -117,7 +117,7 @@ const BackupStatusIcons = () => {
           )}
           {isSyncVisible && (
             <Animated.View style={[
-              statusBarStyles.saveAlertIconContainer,
+              backupStatusStyles.saveAlertIconContainer,
               {transform: [{translateY: syncBounce}]}]}
             >
               <Icon
@@ -130,7 +130,7 @@ const BackupStatusIcons = () => {
           )}
           {isImagesOnlyVisible && (
             <Animated.View style={[
-              statusBarStyles.saveAlertIconContainer,
+              backupStatusStyles.saveAlertIconContainer,
               {transform: [{translateY: imagesBounce}]}]}
             >
               <Icon

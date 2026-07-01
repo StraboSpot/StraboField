@@ -18,8 +18,8 @@ import {cancelledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
+import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
-import BackupStatusIcons from '../status-bar/BackupStatusIcons';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const Tab = createMaterialTopTabNavigator();

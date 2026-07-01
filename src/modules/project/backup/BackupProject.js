@@ -5,6 +5,7 @@ import {CheckBox} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import BackupStatusModal from './BackupStatusModal';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
 import useDevice from '../../../services/device/useDevice';
@@ -18,7 +19,6 @@ import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connec
 import SelectInputField from '../../form/SelectInputField';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
-import BackupStatusModal from '../../status-bar/BackupStatusModal';
 import {setSelectedProject} from '../projects.slice';
 
 const BackupProject = () => {
