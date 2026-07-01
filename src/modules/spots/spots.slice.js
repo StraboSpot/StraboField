@@ -18,8 +18,10 @@ const spotSlice = createSlice({
       state.spots = action.payload;
     },
     addedSpotsFromServer(state, action) {
-      state.spots = Object.assign({}, ...action.payload.map(spot => ({...state.spots, [spot.properties.id]: spot})));
-      console.log('ADDED Spots:', state.spots, 'in Existing Spots:', current(state));
+      // Merge each downloaded spot in by id, overwriting the local copy.
+      action.payload.forEach((spot) => {
+        state.spots[spot.properties.id] = spot;
+      });
     },
     clearedSelectedSpots(state) {
       state.selectedSpot = {};
