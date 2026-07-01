@@ -42,10 +42,10 @@ const BackupStatusModal = ({isVisible, onClose}) => {
 
   const isImagesPending = isPendingImagesChanges || isTransferringImages;
   const isUploadPending = isProjectSyncNeeded || pendingUploadDatasetIds.length > 0;
+  const isSyncPending = isUploadPending || isImagesPending;
   const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
-  const isSyncVisible = !!syncFrequency
-    && (isUploadPending || isAutoSyncing || isImagesPending);
-  // When images are the only thing left to sync, show the images icon instead of the upload icon.
+  // Auto sync still checks the server for downloads with no local changes, so show it whenever it's on.
+  const isSyncVisible = !!syncFrequency;
   const isImagesOnlyPending = isImagesPending && !isUploadPending && !isAutoSyncing;
   const isConflictPending = conflictedDatasetIds.length > 0 || isProjectConflicted;
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
@@ -64,8 +64,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   };
 
   const handleResolveConflicts = () => {
-    // iOS can't present a new native Modal while this one is still dismissing, so wait for
-    // onDismiss (iOS-only callback) before opening the conflict modal.
+    // iOS can't present a native Modal while this one is dismissing, so defer to onDismiss.
     if (Platform.OS === 'ios') isConflictModalPending.current = true;
     else dispatch(setIsSyncConflictModalVisible(true));
     onClose();
@@ -126,8 +125,9 @@ const BackupStatusModal = ({isVisible, onClose}) => {
       {isSyncVisible && (
         <View>
           <SectionDivider
-            dividerText={isImagesOnlyPending ? 'Pending Image Upload'
-              : (isAutoSyncing ? 'Syncing with Server…' : 'Pending Server Sync')}
+            dividerText={isAutoSyncing ? 'Syncing with Server…'
+              : isImagesOnlyPending ? 'Pending Image Upload'
+                : 'Pending Server Sync'}
             leftIcon={(
               <Icon
                 name={isImagesOnlyPending ? BACKUP_ICON_NAMES.IMAGE : BACKUP_ICON_NAMES.SYNC}
@@ -135,7 +135,8 @@ const BackupStatusModal = ({isVisible, onClose}) => {
                 type={ICON_TYPE}
               />
             )}
-            subtitle={isImagesOnlyPending ? 'Images only' : 'Changed datasets only'}
+            subtitle={isImagesOnlyPending ? 'Images only'
+              : isSyncPending ? 'Changed datasets only' : 'No local changes · Will check server for updates'}
           />
           <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
             <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
@@ -162,10 +163,16 @@ const BackupStatusModal = ({isVisible, onClose}) => {
               {'Dataset: ' + name}
             </Text>
           ))}
-          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-            {'Images: ' + (isImagesPending ? 'Pending upload' + (isWifiOnlyForImages ? ' (Wi-Fi only)' : '')
-              : 'None pending upload')}
-          </Text>
+          {isSyncPending ? (
+            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+              {'Images: ' + (isImagesPending ? 'Pending upload' + (isWifiOnlyForImages ? ' (Wi-Fi only)' : '')
+                : 'None pending upload')}
+            </Text>
+          ) : (
+            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+              {'No local changes to upload'}
+            </Text>
+          )}
         </View>
       )}
       {isConflictPending && (

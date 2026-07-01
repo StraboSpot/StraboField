@@ -85,7 +85,7 @@ const BackupProject = () => {
         validate={values => dispatch(
           setBackupFrequency({save: values.backupFrequency, sync: values.syncFrequency}))}
       >
-        {() => (
+        {({values}) => (
           <View style={{paddingHorizontal: 10}}>
             <View style={{paddingVertical: 5}}>
               <Field
@@ -108,13 +108,15 @@ const BackupProject = () => {
               />
               {/*<AutoSaveCountdown/>*/}
               {/*<AutoSyncCountdown/>*/}
-              <CheckBox
-                checked={isWifiOnlyForImages}
-                containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
-                onPress={() => dispatch(setWifiOnlyForImages(!isWifiOnlyForImages))}
-                title={'Auto sync images on wifi only'}
-                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
-              />
+              {!!values.syncFrequency && (
+                <CheckBox
+                  checked={isWifiOnlyForImages}
+                  containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
+                  onPress={() => dispatch(setWifiOnlyForImages(!isWifiOnlyForImages))}
+                  title={'Auto sync images on wifi only'}
+                  titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+                />
+              )}
             </View>
           </View>
         )}
