@@ -116,7 +116,7 @@ const useUpload = () => {
     catch (err) {
       console.error(dataset.name + ': Error Uploading Project Spots.', err);
       setUploadStatusMessage(`${dataset.name}: Error Uploading Spots.\n\n ${err}\n`);
-      // Added this below to handle spots that were getting added to 2 datasets, which the server will not accept
+      // The server rejects a spot that belongs to two datasets; drop it from this one and let the user retry.
       const errMsg = typeof err === 'string' ? err : (err?.message ?? String(err));
       if (errMsg.startsWith('Spot(s) already exist in another dataset')) {
         const spotId = parseInt(errMsg.split(')')[1].split('(')[1].split(')')[0], 10);
@@ -131,15 +131,16 @@ const useUpload = () => {
 
   /* Exported Functions */
 
-  // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts
-  // it over its newer copy, push it, then clear the conflict flag. The bump also flags the project for
-  // sync (a dataset change implies a project change) - safe now that project uploads detect conflicts too.
+  // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts it
+  // over its newer copy, push it, then clear the conflict flag. Bumping the dataset also flags the project
+  // for sync, so keep the device's project too - otherwise that flag lingers as a phantom "pending sync".
   const keepDeviceConflict = async (datasetId) => {
     const dataset = store.getState().project.datasets[datasetId];
     if (!dataset) return;
     dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
     await uploadDatasetsByIds([datasetId]);
     dispatch(clearConflictedDatasetId(datasetId));
+    await keepDeviceProject();
   };
 
   // Resolve a project conflict by keeping the device's copy: bump the project timestamp so the server
