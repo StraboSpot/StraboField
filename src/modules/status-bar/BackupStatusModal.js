@@ -1,5 +1,5 @@
-import React from 'react';
-import {Text, View} from 'react-native';
+import React, {useRef} from 'react';
+import {Platform, Text, View} from 'react-native';
 
 import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -52,6 +52,10 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const conflictedDatasetNames = conflictedDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const projectName = project?.description?.project_name || 'Current Project';
 
+  /* Local State */
+
+  const isConflictModalPending = useRef(false);
+
   /* Event Handlers */
 
   const handleSyncNow = () => {
@@ -60,8 +64,18 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   };
 
   const handleResolveConflicts = () => {
+    // iOS can't present a new native Modal while this one is still dismissing, so wait for
+    // onDismiss (iOS-only callback) before opening the conflict modal.
+    if (Platform.OS === 'ios') isConflictModalPending.current = true;
+    else dispatch(setIsSyncConflictModalVisible(true));
     onClose();
-    dispatch(setIsSyncConflictModalVisible(true));
+  };
+
+  const handleDismiss = () => {
+    if (isConflictModalPending.current) {
+      isConflictModalPending.current = false;
+      dispatch(setIsSyncConflictModalVisible(true));
+    }
   };
 
   /* View */
@@ -74,6 +88,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
       isVisible={isVisible}
       onActionPressed={onClose}
       onBackdropPress={onClose}
+      onDismiss={handleDismiss}
       overlayStyleOverride={{height: 'auto'}}
       showCancelButton={false}
       showCloseButton

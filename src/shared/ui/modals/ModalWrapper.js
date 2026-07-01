@@ -37,6 +37,7 @@ const ModalWrapper = ({
                         isVisible,
                         onActionPressed,
                         onBackdropPress,
+                        onDismiss,
                         onCancelPress,
                         onDeletePress,
                         onFooterButtonPress,
@@ -181,6 +182,7 @@ const ModalWrapper = ({
     return (
       <Modal
         animationType={'fade'}
+        onDismiss={onDismiss}
         onRequestClose={onBackdropPress}
         statusBarTranslucent
         supportedOrientations={['portrait', 'landscape']}
@@ -215,6 +217,7 @@ const ModalWrapper = ({
   return (
     <Modal
       animationType={'fade'}
+      onDismiss={onDismiss}
       onRequestClose={onBackdropPress}
       supportedOrientations={['portrait', 'landscape']}
       transparent
