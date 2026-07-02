@@ -28,6 +28,7 @@ import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
+  addedDatasetFromServer,
   addedDatasets,
   addedProjectFromServer,
   setActiveDatasets,
@@ -38,6 +39,7 @@ import useProject from '../../modules/project/useProject';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
@@ -57,6 +59,9 @@ const useDownload = () => {
   const spots = useSelector(state => state.spot.spots);
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const connectionType = useSelector(state => state.connections.isOnline?.type);
+  const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
+  const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
@@ -425,7 +430,12 @@ const useDownload = () => {
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
-      dispatch(clearLocalSaveNeeded());
+      dispatch(resetSyncState());
+      // Seed the base for every downloaded dataset and the project: local now matches the server exactly.
+      dispatch(setLastSyncedDatasetTimestamps(
+        Object.fromEntries(Object.values(datasetsObjToSave).map(d => [d.id, d.modified_timestamp])),
+      ));
+      dispatch(setLastSyncedProjectTimestamp(store.getState().project.project.modified_timestamp));
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }

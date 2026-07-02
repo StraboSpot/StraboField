@@ -2,7 +2,7 @@ import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
+import {resetSyncState} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
@@ -180,7 +180,7 @@ const useImport = () => {
       dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
       dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
     }
-    dispatch(clearLocalSaveNeeded());
+    dispatch(resetSyncState());
     return projectDb.project;
   };
 

@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {getImageIds} from './files.helpers';
-import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {setTransferringImages, updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
 import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
@@ -76,6 +76,9 @@ const useUploadImages = () => {
       if (!isEmpty(imagesToUpload)) {
         setImageUploadStatusMessage('Uploading needed images to server...');
         dispatch(setIsImageTransferring(true));
+        // Flag transferring only now that there are images to upload, so the status indicator doesn't
+        // flicker "Pending upload" during a data-only sync where the image check finds nothing.
+        dispatch(setTransferringImages(true));
         imagesStatus = await uploadImages(imagesToUpload);
         console.log('DONE UPLOADING IMAGES');
       }
@@ -86,7 +89,8 @@ const useUploadImages = () => {
       return imagesStatus;
     }
     finally {
-      dispatch(setIsImageTransferring(false));
+      // Always clear so the status indicator can't stay stuck "transferring" for any caller.
+      dispatch(setTransferringImages(false));
     }
   };
 

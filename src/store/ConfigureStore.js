@@ -51,7 +51,8 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  blacklist: ['isAutoSaving', 'nextAutoSaveTime'],
+  blacklist: ['isAutoSaving', 'isAutoSyncing', 'isManualSyncRequested', 'isTransferringImages', 'nextAutoSaveTime',
+    'nextAutoSyncTime'],
   timeout: null,
 };
 

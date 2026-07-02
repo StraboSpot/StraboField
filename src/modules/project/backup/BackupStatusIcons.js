@@ -50,15 +50,20 @@ const useBounceAnimation = (isActive) => {
 const BackupStatusIcons = () => {
   /* Data Hooks */
 
+  const conflictedDatasetIds = useSelector(state => state.connections.conflictedDatasetIds);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
+  const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
   const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
+  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
+  const imagesBounce = useBounceAnimation(isTransferringImages);
   const saveBounce = useBounceAnimation(isAutoSaving);
+  const syncBounce = useBounceAnimation(isAutoSyncing);
 
   /* Local State */
 
@@ -78,13 +83,24 @@ const BackupStatusIcons = () => {
 
   /* View */
 
-  if (!isSaveVisible && !isModalVisible) return null;
+  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible) return null;
 
   return (
     <>
       <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
+      <SyncConflictModal/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={backupStatusStyles.backupStatusContainer}>
+          {isConflictVisible && (
+            <View style={backupStatusStyles.saveAlertIconContainer}>
+              <Icon
+                color={themes.WARNING_COLOR}
+                name={BACKUP_ICON_NAMES.CONFLICT}
+                size={24}
+                type={ICON_TYPE}
+              />
+            </View>
+          )}
           {isSaveVisible && (
             <Animated.View style={[
               backupStatusStyles.saveAlertIconContainer,
@@ -98,9 +114,36 @@ const BackupStatusIcons = () => {
               />
             </Animated.View>
           )}
+          {isSyncVisible && (
+            <Animated.View style={[
+              backupStatusStyles.saveAlertIconContainer,
+              {transform: [{translateY: syncBounce}]}]}
+            >
+              <Icon
+                color={themes.PRIMARY_ACCENT_COLOR}
+                name={BACKUP_ICON_NAMES.SYNC}
+                size={24}
+                type={ICON_TYPE}
+              />
+            </Animated.View>
+          )}
+          {isImagesOnlyVisible && (
+            <Animated.View style={[
+              backupStatusStyles.saveAlertIconContainer,
+              {transform: [{translateY: imagesBounce}]}]}
+            >
+              <Icon
+                color={themes.PRIMARY_ACCENT_COLOR}
+                name={BACKUP_ICON_NAMES.IMAGE}
+                size={24}
+                type={ICON_TYPE}
+              />
+            </Animated.View>
+          )}
         </View>
       </TouchableOpacity>
-      {isSaveVisible && <View style={homeStyles.statusBarDivider}/>}
+      {(isSaveVisible || isSyncVisible || isImagesOnlyVisible || isConflictVisible)
+        && <View style={homeStyles.statusBarDivider}/>}
     </>
   );
 };

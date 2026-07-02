@@ -1,22 +1,31 @@
-import React from 'react';
-import {Text, View} from 'react-native';
+import React, {useRef} from 'react';
+import {Platform, Text, View} from 'react-native';
 
 import {Button, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AutoSaveCountdown from './AutoSaveCountdown';
+import AutoSyncCountdown from './AutoSyncCountdown';
 import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
 import commonStyles from '../../../shared/common.styles';
-import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import {setNextAutoSaveTime} from '../../connections/connections.slice';
+import {
+  setManualSyncRequested,
+  setNextAutoSaveTime,
+  setNextAutoSyncTime,
+} from '../../connections/connections.slice';
+import {setIsSyncConflictModalVisible} from '../../home/home.slice';
 
 const BackupStatusModal = ({isVisible, onClose}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const conflictedDatasetIds = useSelector(state => state.connections.conflictedDatasetIds);
+  const datasets = useSelector(state => state.project.datasets);
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
+  const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
@@ -26,9 +35,13 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const project = useSelector(state => state.project.project);
   const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
+  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
   /* Derived Variables */
 
+  const isImagesPending = isPendingImagesChanges || isTransferringImages;
+  const isUploadPending = isProjectSyncNeeded || pendingUploadDatasetIds.length > 0;
+  const isSyncPending = isUploadPending || isImagesPending;
   const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
   // Auto sync still checks the server for downloads with no local changes, so show it whenever it's on.
   const isSyncVisible = !!syncFrequency;
@@ -37,6 +50,31 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const conflictedDatasetNames = conflictedDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const projectName = project?.description?.project_name || 'Current Project';
+
+  /* Local State */
+
+  const isConflictModalPending = useRef(false);
+
+  /* Event Handlers */
+
+  const handleSyncNow = () => {
+    dispatch(setManualSyncRequested(true));
+    dispatch(setNextAutoSyncTime(Date.now()));
+  };
+
+  const handleResolveConflicts = () => {
+    // iOS can't present a native Modal while this one is dismissing, so defer to onDismiss.
+    if (Platform.OS === 'ios') isConflictModalPending.current = true;
+    else dispatch(setIsSyncConflictModalVisible(true));
+    onClose();
+  };
+
+  const handleDismiss = () => {
+    if (isConflictModalPending.current) {
+      isConflictModalPending.current = false;
+      dispatch(setIsSyncConflictModalVisible(true));
+    }
+  };
 
   /* View */
 
@@ -48,6 +86,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
       isVisible={isVisible}
       onActionPressed={onClose}
       onBackdropPress={onClose}
+      onDismiss={handleDismiss}
       overlayStyleOverride={{height: 'auto'}}
       showCancelButton={false}
       showCloseButton
