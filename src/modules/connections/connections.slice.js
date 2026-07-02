@@ -7,7 +7,6 @@ const initialConnectionsState = {
     isVerified: false,
   },
   isAutoSaving: false,
-  isAutoSyncing: false,
   isLocalSaveNeeded: false,
   isOnline: {},
   isPendingImagesChanges: false,
@@ -15,48 +14,16 @@ const initialConnectionsState = {
   isTransferringImages: false,
   backupFrequency: {
     save: 60,
-    sync: 0,
   },
-  isWifiOnlyForImages: true,
-  conflictedDatasetIds: [],
-  isManualSyncRequested: false,
-  lastSyncedDatasetTimestamps: {},
-  lastSyncedProjectTimestamp: null,
   nextAutoSaveTime: null,
-  nextAutoSyncTime: null,
-  pendingUploadDatasetIds: [],
 };
 
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: initialConnectionsState,
   reducers: {
-    addPendingDatasetId(state, action) {
-      // Compare as strings: ids are queued from Object.keys (strings) but removed via dataset.id
-      // (a number), so a strict-equality dedup/remove would mismatch and never clear the entry.
-      if (!state.pendingUploadDatasetIds.some(id => String(id) === String(action.payload))) {
-        state.pendingUploadDatasetIds.push(action.payload);
-      }
-    },
     setAutoSaving(state, action) {
       state.isAutoSaving = action.payload;
-    },
-    setAutoSyncing(state, action) {
-      state.isAutoSyncing = action.payload;
-    },
-    clearAllPendingDatasetIds(state) {
-      state.pendingUploadDatasetIds = [];
-    },
-    addConflictedDatasetId(state, action) {
-      if (!state.conflictedDatasetIds.some(id => String(id) === String(action.payload))) {
-        state.conflictedDatasetIds.push(action.payload);
-      }
-    },
-    clearConflictedDatasetId(state, action) {
-      // String-coerce: ids may be queued as strings (Object.keys) or numbers (dataset.id).
-      state.conflictedDatasetIds = state.conflictedDatasetIds.filter(
-        id => String(id) !== String(action.payload),
-      );
     },
     clearLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = false;
@@ -111,17 +78,11 @@ const connectionsSlice = createSlice({
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
     },
-    setPendingImagesChanges(state, action) {
-      state.isPendingImagesChanges = action.payload;
-    },
     setLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = true;
     },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
-    },
-    setNextAutoSyncTime(state, action) {
-      state.nextAutoSyncTime = action.payload;
     },
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
@@ -142,28 +103,14 @@ const connectionsSlice = createSlice({
 });
 
 export const {
-  addConflictedDatasetId,
-  addPendingDatasetId,
-  clearAllPendingDatasetIds,
-  clearConflictedDatasetId,
   clearLocalSaveNeeded,
-  clearProjectSyncNeeded,
-  removePendingDatasetId,
-  resetSyncState,
   setAutoSaving,
-  setAutoSyncing,
   setBackupFrequency,
-  setConflictedDatasetIds,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
-  setLastSyncedDatasetTimestamp,
-  setLastSyncedDatasetTimestamps,
-  setLastSyncedProjectTimestamp,
   setLocalSaveNeeded,
-  setManualSyncRequested,
   setNextAutoSaveTime,
-  setNextAutoSyncTime,
   setOnlineStatus,
   setPendingImagesChanges,
   setProjectSyncNeeded,

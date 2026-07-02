@@ -26,6 +26,7 @@ const useDeviceOrientation = () => {
   };
 
   const unlockOrientation = () => {
+    if (!RNOrientationDirector.isLocked()) return;
     RNOrientationDirector.unlock();
     toast.show('Screen orientation UNLOCKED', {...toastOptions, type: 'unlock'});
   };
