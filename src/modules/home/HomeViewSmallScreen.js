@@ -18,6 +18,7 @@ import {cancelledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
+import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
@@ -97,6 +98,7 @@ const HomeViewSmallScreen = forwardRef(({
             type={'ionicon'}
           />
         ) : <MainMenuButton closeMainMenuPanel={closeMainMenuPanel} openMainMenuPanel={openMainMenuPanel}/>}
+        rightComponent={<BackupStatusIcons/>}
       />
       {isShowingSpotNavigator && !isNotebookPanelVisible ? (
         <SpotNavigator

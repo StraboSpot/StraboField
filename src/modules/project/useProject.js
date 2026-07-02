@@ -162,10 +162,27 @@ const useProject = () => {
     const exists = await doesDeviceBackupDirExist(undefined);
     if (exists) {
       const res = await readDirectory(directory);
-      const deviceFiles = res.map((file) => {
-        return {id: id++, fileName: file};
-      });
-      return {projects: deviceFiles};
+      const deviceFiles = res
+        .filter(file => file !== 'AutoBackups')
+        .map((file) => {
+          return {id: id++, fileName: file};
+        });
+      const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
+      const autoBackupItems = autoBackupFiles
+        .filter(file => file.endsWith('.json') && /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(file))
+        .sort((a, b) => {
+          const tsA = a.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          const tsB = b.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          return tsB.localeCompare(tsA);
+        })
+        .map((file) => {
+          const tsMatch = file.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
+          const modified_timestamp = tsMatch[0].replace(/(\d{2})-(\d{2})-(\d{2})$/, '$1:$2:$3');
+          const sanitizedName = file.slice(tsMatch.index + 20, -'.json'.length);
+          const displayName = sanitizedName ? sanitizedName.replace(/_/g, ' ') : 'Auto Backup';
+          return {displayName, fileName: 'AutoBackups/' + file, id: id++, isAutoBackup: true, modified_timestamp};
+        });
+      return {projects: [...deviceFiles, ...autoBackupItems]};
     }
     else console.log('Does not exist');
   };

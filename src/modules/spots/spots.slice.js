@@ -18,8 +18,18 @@ const spotSlice = createSlice({
       state.spots = action.payload;
     },
     addedSpotsFromServer(state, action) {
-      state.spots = Object.assign({}, ...action.payload.map(spot => ({...state.spots, [spot.properties.id]: spot})));
-      console.log('ADDED Spots:', state.spots, 'in Existing Spots:', current(state));
+      // Merge each downloaded spot in by id, overwriting the local copy.
+      action.payload.forEach((spot) => {
+        state.spots[spot.properties.id] = spot;
+      });
+      // If the currently selected spot was among those refreshed (e.g. keeping the server copy on a
+      // conflict), update it too so the open view shows the new server data instead of the stale copy.
+      if (!isEmpty(state.selectedSpot)) {
+        const refreshedSpot = action.payload.find(
+          spot => spot.properties.id === state.selectedSpot.properties.id,
+        );
+        if (refreshedSpot) state.selectedSpot = refreshedSpot;
+      }
     },
     clearedSelectedSpots(state) {
       state.selectedSpot = {};

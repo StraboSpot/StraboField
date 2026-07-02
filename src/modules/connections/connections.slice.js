@@ -6,13 +6,28 @@ const initialConnectionsState = {
     isSelected: false,
     isVerified: false,
   },
+  isAutoSaving: false,
+  isLocalSaveNeeded: false,
   isOnline: {},
+  backupFrequency: {
+    save: 60,
+  },
+  nextAutoSaveTime: null,
 };
 
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: initialConnectionsState,
   reducers: {
+    setAutoSaving(state, action) {
+      state.isAutoSaving = action.payload;
+    },
+    clearLocalSaveNeeded(state) {
+      state.isLocalSaveNeeded = false;
+    },
+    setBackupFrequency(state, action) {
+      state.backupFrequency = action.payload;
+    },
     setCustomDatabaseUrl(state, action) {
       state.databaseEndpoint.endpoint = action.payload;
     },
@@ -21,6 +36,12 @@ const connectionsSlice = createSlice({
     },
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
+    },
+    setLocalSaveNeeded(state) {
+      state.isLocalSaveNeeded = true;
+    },
+    setNextAutoSaveTime(state, action) {
+      state.nextAutoSaveTime = action.payload;
     },
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
@@ -32,9 +53,14 @@ const connectionsSlice = createSlice({
 });
 
 export const {
+  clearLocalSaveNeeded,
+  setAutoSaving,
+  setBackupFrequency,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
+  setLocalSaveNeeded,
+  setNextAutoSaveTime,
   setOnlineStatus,
   updatedProjectTransferProgress,
 } = connectionsSlice.actions;

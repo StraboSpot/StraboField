@@ -47,14 +47,17 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
   /* Side Effects */
 
   useLayoutEffect(() => {
-    console.log('ULE Notes [templates]', templates);
+    console.log('ULE Notes [templates, selectedSpot]', templates);
     if (!isReadOnly && isEmpty(initialNote) && templates.notes && templates.notes.isInUse
       && !isEmpty(templates.notes.active)) {
       const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
+    else {
+      setInitialNotesValues({note: initialNote});
+    }
     return () => confirmLeavePage();
-  }, [templates]);
+  }, [templates, spot?.properties?.id]);
 
   /* Logic Helpers */
 

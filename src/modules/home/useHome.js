@@ -6,6 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
+import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -46,6 +47,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const {getTargetDatasetFromId} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
+  useAutoSave();
 
   /* Local State */
 
