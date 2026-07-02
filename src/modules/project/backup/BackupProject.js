@@ -1,7 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {CheckBox} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,13 +8,13 @@ import BackupStatusModal from './BackupStatusModal';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
 import useDevice from '../../../services/device/useDevice';
-import {BLUE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {BLUE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import uiStyles from '../../../shared/ui/ui.styles';
-import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
+import {setBackupFrequency} from '../../connections/connections.slice';
 import SelectInputField from '../../form/SelectInputField';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
@@ -37,7 +36,6 @@ const BackupProject = () => {
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const backupFrequency = useSelector(state => state.connections.backupFrequency);
   const isOnline = useSelector(state => state.connections.isOnline);
-  const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
   const user = useSelector(state => state.user);
 
   const {openURL} = useDevice();
@@ -79,13 +77,12 @@ const BackupProject = () => {
   const renderBackupOptions = () => {
     return (
       <Formik
-        initialValues={{backupFrequency: backupFrequency?.save, syncFrequency: backupFrequency?.sync}}
+        initialValues={{backupFrequency: backupFrequency?.save}}
         innerRef={preFormRef}
         onSubmit={values => console.log('Submit: ', values, ' |')}
-        validate={values => dispatch(
-          setBackupFrequency({save: values.backupFrequency, sync: values.syncFrequency}))}
+        validate={values => dispatch(setBackupFrequency({save: values.backupFrequency}))}
       >
-        {({values}) => (
+        {() => (
           <View style={{paddingHorizontal: 10}}>
             <View style={{paddingVertical: 5}}>
               <Field
@@ -97,26 +94,6 @@ const BackupProject = () => {
                 name={'backupFrequency'}
                 single
               />
-              <Field
-                choices={choices}
-                component={formProps => SelectInputField(
-                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
-                label={'Auto-Sync to Server Frequency'}
-                multiSelectStyle={{paddingVertical: 5}}
-                name={'syncFrequency'}
-                single
-              />
-              {/*<AutoSaveCountdown/>*/}
-              {/*<AutoSyncCountdown/>*/}
-              {!!values.syncFrequency && (
-                <CheckBox
-                  checked={isWifiOnlyForImages}
-                  containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
-                  onPress={() => dispatch(setWifiOnlyForImages(!isWifiOnlyForImages))}
-                  title={'Auto sync images on wifi only'}
-                  titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
-                />
-              )}
             </View>
           </View>
         )}

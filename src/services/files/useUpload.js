@@ -5,20 +5,8 @@ import KeepAwake from 'react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
-import {
-  addConflictedDatasetId,
-  clearConflictedDatasetId,
-  clearProjectSyncNeeded,
-  removePendingDatasetId,
-  setLastSyncedDatasetTimestamp,
-  setLastSyncedProjectTimestamp,
-  setPendingImagesChanges,
-  setProjectConflicted,
-} from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {
-  addedDataset,
-  addedProject,
   addedProjectFromServer,
   deletedSpotIdFromDataset,
   setIsImageTransferring,
@@ -72,15 +60,10 @@ const useUpload = () => {
         await addDatasetToProject(project.id, dataset.id);
         setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
         await uploadSpots(dataset);
-        dispatch(removePendingDatasetId(dataset.id));
-        // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
-        dispatch(setLastSyncedDatasetTimestamp({id: dataset.id, timestamp: dataset.modified_timestamp}));
       }
       else {
-        // Rejected: server copy is newer. Flag a conflict (leaving it pending) so the user can
-        // choose which copy to keep, rather than clobbering the server.
-        setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server; needs conflict resolution.`);
-        dispatch(addConflictedDatasetId(dataset.id));
+        // Rejected: the server copy is newer, so it was not overwritten.
+        setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server and was not overwritten.`);
       }
     }
     catch (err) {
@@ -131,28 +114,6 @@ const useUpload = () => {
 
   /* Exported Functions */
 
-  // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts it
-  // over its newer copy, push it, then clear the conflict flag. Bumping the dataset also flags the project
-  // for sync, so keep the device's project too - otherwise that flag lingers as a phantom "pending sync".
-  const keepDeviceConflict = async (datasetId) => {
-    const dataset = store.getState().project.datasets[datasetId];
-    if (!dataset) return;
-    dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
-    await uploadDatasetsByIds([datasetId]);
-    dispatch(clearConflictedDatasetId(datasetId));
-    await keepDeviceProject();
-  };
-
-  // Resolve a project conflict by keeping the device's copy: bump the project timestamp so the server
-  // accepts it over its newer copy, push it, then clear the conflict flag.
-  const keepDeviceProject = async () => {
-    const liveProject = store.getState().project.project;
-    if (isEmpty(liveProject)) return;
-    dispatch(addedProject({...liveProject, modified_timestamp: Date.now()}));
-    await uploadProject();
-    dispatch(setProjectConflicted(false));
-  };
-
   const initializeUpload = async () => {
     if (Platform.OS !== 'web') KeepAwake.activate();
     try {
@@ -162,9 +123,6 @@ const useUpload = () => {
       if (Platform.OS !== 'web') {
         const imageStatus = await initializeImageUpload();
         projectUploadStatus = {...projectUploadStatus, images: imageStatus};
-        // Clear the pending flag unless some images failed, so the status icon stops showing
-        // "Pending Image Upload" after a successful manual upload (mirrors the auto-sync path).
-        dispatch(setPendingImagesChanges((imageStatus?.failed || 0) > 0));
         dispatch(setIsImageTransferring(false));
         KeepAwake.deactivate();
       }
@@ -197,14 +155,6 @@ const useUpload = () => {
   // Upload all datasets in the project
   const uploadDatasets = () =>
     uploadDatasetsSequentially(Object.values(store.getState().project.datasets), '');
-
-  // Upload only the datasets whose IDs are in the provided list. Read live from the store: an async
-  // caller can close over a stale `projectDatasets` snapshot, sending an out-of-date timestamp the
-  // server rejects as not-newer (modified_on_server: false), which wastes a sync cycle.
-  const uploadDatasetsByIds = (datasetIds) => {
-    const liveDatasets = store.getState().project.datasets;
-    return uploadDatasetsSequentially(datasetIds.map(id => liveDatasets[id]).filter(Boolean), 'modified ');
-  };
 
   const uploadFromWeb = async (imageId, imageFile) => {
     try {
@@ -255,16 +205,8 @@ const useUpload = () => {
     const noNewerLocalEdit = store.getState().project.project.modified_timestamp === uploadedTimestamp;
 
     if (isAccepted && noNewerLocalEdit) {
-      // Apply server-merged data (tags, reports, templates) back; already in sync so don't re-flag for sync.
+      // Apply server-merged data (tags, reports, templates) back.
       dispatch(addedProjectFromServer(uploadProjectResponse));
-      dispatch(clearProjectSyncNeeded());
-      // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
-      dispatch(setLastSyncedProjectTimestamp(uploadedTimestamp));
-    }
-    else if (!isAccepted && !isEmpty(uploadProjectResponse) && noNewerLocalEdit) {
-      // Rejected: server copy is newer. Flag a conflict (leaving it pending) so the user can choose
-      // which copy to keep, rather than clobbering the server.
-      dispatch(setProjectConflicted(true));
     }
     setUploadStatusMessage(`Finished uploading ${liveProject.description.project_name} Properties.`);
     return true;
@@ -272,10 +214,7 @@ const useUpload = () => {
 
   return {
     initializeUpload,
-    keepDeviceConflict,
-    keepDeviceProject,
     uploadDatasets,
-    uploadDatasetsByIds,
     uploadFromWeb,
     uploadProfile,
     uploadProject,
