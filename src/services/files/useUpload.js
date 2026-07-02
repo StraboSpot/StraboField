@@ -13,12 +13,10 @@ import {
   setLastSyncedDatasetTimestamp,
   setLastSyncedProjectTimestamp,
   setPendingImagesChanges,
-  setProjectConflicted,
 } from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {
   addedDataset,
-  addedProject,
   addedProjectFromServer,
   deletedSpotIdFromDataset,
   setIsImageTransferring,
@@ -133,24 +131,15 @@ const useUpload = () => {
 
   // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts it
   // over its newer copy, push it, then clear the conflict flag. Bumping the dataset also flags the project
-  // for sync, so keep the device's project too - otherwise that flag lingers as a phantom "pending sync".
+  // for sync, so push the project too (the server merges it) - otherwise that flag lingers as a phantom
+  // "pending sync".
   const keepDeviceConflict = async (datasetId) => {
     const dataset = store.getState().project.datasets[datasetId];
     if (!dataset) return;
     dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
     await uploadDatasetsByIds([datasetId]);
     dispatch(clearConflictedDatasetId(datasetId));
-    await keepDeviceProject();
-  };
-
-  // Resolve a project conflict by keeping the device's copy: bump the project timestamp so the server
-  // accepts it over its newer copy, push it, then clear the conflict flag.
-  const keepDeviceProject = async () => {
-    const liveProject = store.getState().project.project;
-    if (isEmpty(liveProject)) return;
-    dispatch(addedProject({...liveProject, modified_timestamp: Date.now()}));
     await uploadProject();
-    dispatch(setProjectConflicted(false));
   };
 
   const initializeUpload = async () => {
@@ -248,23 +237,16 @@ const useUpload = () => {
     const uploadProjectResponse = await updateProject(liveProject);
     console.log('Response Project JSON', JSON.stringify(uploadProjectResponse));
 
-    // /project gives no accept/reject signal; acceptance = server echoed back our timestamp.
-    const isAccepted = !isEmpty(uploadProjectResponse)
-      && uploadProjectResponse.modified_timestamp === uploadedTimestamp;
-    // Skip acting on the response if a newer local edit landed mid-flight (already flagged for sync, retries next cycle).
+    // The server merges project-level data (tags, reports, templates) with its own copy and returns the
+    // merged, authoritative project - so a project push never conflicts. Apply the merged response back as
+    // the new base, unless a newer local edit landed mid-flight (already flagged for sync, retries next
+    // cycle), in which case don't clobber it.
     const noNewerLocalEdit = store.getState().project.project.modified_timestamp === uploadedTimestamp;
-
-    if (isAccepted && noNewerLocalEdit) {
-      // Apply server-merged data (tags, reports, templates) back; already in sync so don't re-flag for sync.
+    if (!isEmpty(uploadProjectResponse) && noNewerLocalEdit) {
       dispatch(addedProjectFromServer(uploadProjectResponse));
       dispatch(clearProjectSyncNeeded());
-      // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
-      dispatch(setLastSyncedProjectTimestamp(uploadedTimestamp));
-    }
-    else if (!isAccepted && !isEmpty(uploadProjectResponse) && noNewerLocalEdit) {
-      // Rejected: server copy is newer. Flag a conflict (leaving it pending) so the user can choose
-      // which copy to keep, rather than clobbering the server.
-      dispatch(setProjectConflicted(true));
+      // Local now matches the server's merged copy - record its timestamp as the new base.
+      dispatch(setLastSyncedProjectTimestamp(uploadProjectResponse.modified_timestamp));
     }
     setUploadStatusMessage(`Finished uploading ${liveProject.description.project_name} Properties.`);
     return true;
@@ -273,7 +255,6 @@ const useUpload = () => {
   return {
     initializeUpload,
     keepDeviceConflict,
-    keepDeviceProject,
     uploadDatasets,
     uploadDatasetsByIds,
     uploadFromWeb,

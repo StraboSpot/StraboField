@@ -20,11 +20,3 @@ export const classifyDatasetChange = ({serverTimestamp, base, localTimestamp, is
   if (!serverMovedFromBase) return {serverMovedFromBase, status: DATASET_STATUS.IN_SYNC};
   return {serverMovedFromBase, status: isPendingLocalEdit ? DATASET_STATUS.CONFLICT : DATASET_STATUS.PULL};
 };
-
-// Route the server's project copy, mirroring classifyDatasetChange: a moved server copy with a pending
-// local project edit is a conflict. serverMovedFromBase is returned separately because the caller decides
-// push/pull/prompt with it—a project bump driven by dataset edits shouldn't prompt its own conflict.
-export const classifyProjectChange = ({serverTimestamp, base, localTimestamp, isPendingLocalEdit}) => {
-  const serverMovedFromBase = hasServerMovedFromBase(serverTimestamp, base, localTimestamp);
-  return {serverMovedFromBase, isConflict: serverMovedFromBase && isPendingLocalEdit};
-};

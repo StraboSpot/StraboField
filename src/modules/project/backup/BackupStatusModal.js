@@ -29,7 +29,6 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isOnline = useSelector(state => state.connections.isOnline?.isConnected);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
-  const isProjectConflicted = useSelector(state => state.connections.isProjectConflicted);
   const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
@@ -47,7 +46,7 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   // Auto sync still checks the server for downloads with no local changes, so show it whenever it's on.
   const isSyncVisible = !!syncFrequency;
   const isImagesOnlyPending = isImagesPending && !isUploadPending && !isAutoSyncing;
-  const isConflictPending = conflictedDatasetIds.length > 0 || isProjectConflicted;
+  const isConflictPending = conflictedDatasetIds.length > 0;
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const conflictedDatasetNames = conflictedDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
   const projectName = project?.description?.project_name || 'Current Project';
@@ -182,11 +181,6 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             leftIcon={<Icon color={WARNING_COLOR} name={BACKUP_ICON_NAMES.CONFLICT} size={18} type={ICON_TYPE}/>}
             subtitle={'Changed on this device and the server'}
           />
-          {isProjectConflicted && (
-            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-              {'Project: ' + projectName}
-            </Text>
-          )}
           {conflictedDatasetNames.map(name => (
             <Text key={name} style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
               {'Dataset: ' + name}

@@ -11,7 +11,6 @@ const initialConnectionsState = {
   isLocalSaveNeeded: false,
   isOnline: {},
   isPendingImagesChanges: false,
-  isProjectConflicted: false,
   isProjectSyncNeeded: false,
   isTransferringImages: false,
   backupFrequency: {
@@ -69,7 +68,6 @@ const connectionsSlice = createSlice({
       state.conflictedDatasetIds = [];
       state.isLocalSaveNeeded = false;
       state.isPendingImagesChanges = false;
-      state.isProjectConflicted = false;
       state.isProjectSyncNeeded = false;
       state.lastSyncedDatasetTimestamps = {};
       state.lastSyncedProjectTimestamp = null;
@@ -128,9 +126,6 @@ const connectionsSlice = createSlice({
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
     },
-    setProjectConflicted(state, action) {
-      state.isProjectConflicted = action.payload;
-    },
     setProjectSyncNeeded(state) {
       state.isProjectSyncNeeded = true;
     },
@@ -171,7 +166,6 @@ export const {
   setNextAutoSyncTime,
   setOnlineStatus,
   setPendingImagesChanges,
-  setProjectConflicted,
   setProjectSyncNeeded,
   setTransferringImages,
   setWifiOnlyForImages,

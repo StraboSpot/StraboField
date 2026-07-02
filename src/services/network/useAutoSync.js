@@ -9,7 +9,6 @@ import {
   setManualSyncRequested,
   setNextAutoSyncTime,
   setPendingImagesChanges,
-  setProjectConflicted,
 } from '../../modules/connections/connections.slice';
 import {setIsSyncConflictModalVisible} from '../../modules/home/home.slice';
 import {setIsImageTransferring} from '../../modules/project/projects.slice';
@@ -32,7 +31,7 @@ const useAutoSync = () => {
   const projectId = useSelector(state => state.project.project?.id);
   const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
-  const {applyServerDownloads, classifyServerDatasets, classifyServerProject, keepServerProject} = useDownload();
+  const {applyServerDownloads, classifyServerDatasets} = useDownload();
   const {uploadDatasetsByIds, uploadProject} = useUpload();
   const {initializeImageUpload} = useUploadImages();
 
@@ -50,34 +49,24 @@ const useAutoSync = () => {
     const isManualSync = store.getState().connections.isManualSyncRequested;
     try {
       dispatch(setAutoSyncing(true));
-      // Classify before pushing so we never clobber something changed on both sides: conflicts wait
-      // for the user, the rest pull safely. Same base-version check for datasets and the project.
+      // Classify datasets before pushing so we never clobber something changed on both sides: dataset
+      // conflicts wait for the user, the rest pull safely. The project needs no such check - the server
+      // merges project-level data (tags, reports, templates) and returns the merged copy, so a project
+      // push never conflicts.
       const {conflictIds, toPull} = await classifyServerDatasets();
-      const projectClass = await classifyServerProject();
       const pushableIds = pendingIds.filter(id => !conflictIds.includes(String(id)));
 
-      // The app bumps the project whenever a dataset changes, so a dataset conflict makes the project
-      // look conflicted too. Only PROMPT for a project conflict when it changed on its own (no dataset
-      // conflict). Otherwise resolve it automatically by last-writer-wins (keep the newer timestamp).
-      const existingConflictIds = store.getState().connections.conflictedDatasetIds.map(String);
-      const hasDatasetConflict = conflictIds.length > 0 || existingConflictIds.length > 0;
-      const isProjectConflict = projectClass.isConflict && !hasDatasetConflict;
-
-      const localProjectTs = store.getState().project.project.modified_timestamp;
-      // Pull the server's project when it holds the newer copy (a normal server update, or auto-resolving
-      // a dataset-driven bump in the server's favor); push ours otherwise, never over a real conflict.
-      const shouldPullProject = !isProjectConflict && projectClass.serverMovedFromBase
-        && projectClass.serverTimestamp > localProjectTs;
-      const shouldPushProject = !isProjectConflict && !shouldPullProject
-        && (isProjectSyncNeeded || pushableIds.length > 0);
-      const isPushingData = shouldPushProject || pushableIds.length > 0;
+      // Push the project when we have local project edits or datasets to push (a dataset push bumps the
+      // project). uploadProject applies the server's merged response back as the new base. When we don't
+      // push, applyServerDownloads pulls the server's project (below) if it holds the newer copy.
+      const shouldPushProject = isProjectSyncNeeded || pushableIds.length > 0;
       // Each upload clears its own sync-needed/pending flag on success and re-stamps/flags on rejection.
       // If the project upload fails, datasets and images are intentionally skipped (one shared try).
       if (shouldPushProject) await uploadProject();
       if (pushableIds.length) await uploadDatasetsByIds(pushableIds);
       // Upload images when something pushed or a prior attempt left some pending (retries
       // transient failures). Respect wifi-only since images are large/numerous.
-      if ((isPushingData || isPendingImagesChanges) && Platform.OS !== 'web'
+      if ((shouldPushProject || isPendingImagesChanges) && Platform.OS !== 'web'
         && (connectionType === 'wifi' || !isWifiOnlyForImages)) {
         try {
           const imagesStatus = await initializeImageUpload();
@@ -93,22 +82,16 @@ const useAutoSync = () => {
           dispatch(setIsImageTransferring(false));
         }
       }
-      // Force-pull the server project when it wins (overwrites a local pending edit); keepServerProject
-      // records the base and clears the pending/conflict flags.
-      if (shouldPullProject) await keepServerProject();
-      // Pull safe dataset changes; apply the server project only when we didn't push or force-pull it.
-      await applyServerDownloads(toPull, {applyProject: !isProjectConflict && !shouldPullProject && !shouldPushProject});
+      // Pull safe dataset changes; apply the server's (merged) project unless we just pushed it -
+      // applyServerDownloads pulls the project when the server holds the newer copy and no local edit is
+      // pending.
+      await applyServerDownloads(toPull, {applyProject: !shouldPushProject});
       // Merge in any dataset conflicts a mid-cycle push rejection flagged (uploadDataset).
       const liveConflictIds = store.getState().connections.conflictedDatasetIds.map(String);
       const allConflictIds = [...new Set([...conflictIds, ...liveConflictIds])];
       dispatch(setConflictedDatasetIds(allConflictIds));
-      // uploadProject may have flagged a conflict on a mid-cycle rejection; keep it only when it's a
-      // real (dataset-independent) conflict - a dataset-driven one was auto-resolved above.
-      const isProjectConflicted = isProjectConflict
-        || (store.getState().connections.isProjectConflicted && !hasDatasetConflict);
-      dispatch(setProjectConflicted(isProjectConflicted));
       // Only open the modal on a manual sync; auto cycles rely on the status-bar badge.
-      if (isManualSync && (allConflictIds.length || isProjectConflicted)) {
+      if (isManualSync && allConflictIds.length) {
         dispatch(setIsSyncConflictModalVisible(true));
       }
       console.log('Auto sync complete.');

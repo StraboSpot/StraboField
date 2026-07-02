@@ -19,18 +19,16 @@ const SyncConflictModal = () => {
   const dispatch = useDispatch();
   const conflictedDatasetIds = useSelector(state => state.connections.conflictedDatasetIds);
   const datasets = useSelector(state => state.project.datasets);
-  const isProjectConflicted = useSelector(state => state.connections.isProjectConflicted);
   const isVisible = useSelector(state => state.home.isSyncConflictModalVisible);
-  const project = useSelector(state => state.project.project);
 
-  const {keepServerConflict, keepServerProject} = useDownload();
-  const {keepDeviceConflict, keepDeviceProject} = useUpload();
+  const {keepServerConflict} = useDownload();
+  const {keepDeviceConflict} = useUpload();
 
   /* Derived Variables */
 
-  const projectName = project?.description?.project_name || 'Project';
-  // Total conflicts across the project and all datasets, so we know when the last one is resolved.
-  const conflictCount = conflictedDatasetIds.length + (isProjectConflicted ? 1 : 0);
+  // Total conflicts across all datasets, so we know when the last one is resolved. The project never
+  // conflicts (the server merges project-level data), so only datasets appear here.
+  const conflictCount = conflictedDatasetIds.length;
 
   /* Local State */
 
@@ -57,21 +55,6 @@ const SyncConflictModal = () => {
     }
   };
 
-  const handleResolveProject = async (keep) => {
-    setResolvingId('project');
-    try {
-      if (keep === 'device') await keepDeviceProject();
-      else await keepServerProject();
-      if (conflictCount <= 1) handleClose();
-    }
-    catch (err) {
-      console.error('Error resolving project sync conflict:', err);
-    }
-    finally {
-      setResolvingId(null);
-    }
-  };
-
   /* View */
 
   return (
@@ -89,40 +72,6 @@ const SyncConflictModal = () => {
         These items were changed on both this device and the server. Choose which copy to keep for each.
         The copy you don't keep will be overwritten.
       </Text>
-      {isProjectConflicted && (
-        <View key={'project'}>
-          <SectionDivider
-            dividerText={'Project: ' + projectName}
-            leftIcon={<Icon color={WARNING_COLOR} name={BACKUP_ICON_NAMES.CONFLICT} size={18} type={ICON_TYPE}/>}
-          />
-          {resolvingId === 'project' ? (
-            <View style={styles.resolvingRow}>
-              <ActivityIndicator color={PRIMARY_ACCENT_COLOR} size={'small'}/>
-              <Text style={[commonStyles.listItemTitle, {paddingLeft: 8}]}>Resolving…</Text>
-            </View>
-          )
-            : (
-              <View style={styles.buttonRow}>
-                <Button
-                  buttonStyle={styles.button}
-                  disabled={!!resolvingId}
-                  onPress={() => handleResolveProject('device')}
-                  title={'Keep Device'}
-                  titleStyle={styles.buttonTitle}
-                  type={'outline'}
-                />
-                <Button
-                  buttonStyle={styles.button}
-                  disabled={!!resolvingId}
-                  onPress={() => handleResolveProject('server')}
-                  title={'Keep Server'}
-                  titleStyle={styles.buttonTitle}
-                  type={'outline'}
-                />
-              </View>
-            )}
-        </View>
-      )}
       {conflictedDatasetIds.map((id) => {
         const isResolving = String(resolvingId) === String(id);
         return (

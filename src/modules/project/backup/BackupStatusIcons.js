@@ -55,7 +55,6 @@ const BackupStatusIcons = () => {
   const isAutoSyncing = useSelector(state => state.connections.isAutoSyncing);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
-  const isProjectConflicted = useSelector(state => state.connections.isProjectConflicted);
   const isProjectSyncNeeded = useSelector(state => state.connections.isProjectSyncNeeded);
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
@@ -80,7 +79,7 @@ const BackupStatusIcons = () => {
   // changes are pending or a sync is running, the upload icon above already covers it.
   const isImagesOnlyVisible = !!syncFrequency && isImagesActive && !isUploadPending && !isAutoSyncing;
   // Conflicts persist across restart, so surface them regardless of sync frequency.
-  const isConflictVisible = conflictedDatasetIds.length > 0 || isProjectConflicted;
+  const isConflictVisible = conflictedDatasetIds.length > 0;
 
   /* View */
 

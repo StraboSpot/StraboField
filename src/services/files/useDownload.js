@@ -4,15 +4,13 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {classifyDatasetChange, classifyProjectChange, DATASET_STATUS} from './syncConflicts.helpers';
+import {classifyDatasetChange, DATASET_STATUS} from './syncConflicts.helpers';
 import {
   clearConflictedDatasetId,
-  clearProjectSyncNeeded,
   removePendingDatasetId,
   resetSyncState,
   setLastSyncedDatasetTimestamps,
   setLastSyncedProjectTimestamp,
-  setProjectConflicted,
   setTransferringImages,
 } from '../../modules/connections/connections.slice';
 import {
@@ -308,22 +306,6 @@ const useDownload = () => {
     return {conflictIds, toPull};
   };
 
-  // Fetch the server's project copy and route it via classifyProjectChange (see syncConflicts.helpers).
-  // Read live from the store so a stale closure can't misjudge.
-  const classifyServerProject = async () => {
-    const idle = {isConflict: false, serverMovedFromBase: false, serverTimestamp: null};
-    if (!encodedLogin || isEmpty(project)) return idle;
-    const serverProject = await getProject(project.id, encodedLogin);
-    if (isEmpty(serverProject)) return idle;
-    const {isConflict, serverMovedFromBase} = classifyProjectChange({
-      serverTimestamp: serverProject.modified_timestamp,
-      base: store.getState().connections.lastSyncedProjectTimestamp,
-      localTimestamp: store.getState().project.project.modified_timestamp,
-      isPendingLocalEdit: store.getState().connections.isProjectSyncNeeded,
-    });
-    return {isConflict, serverMovedFromBase, serverTimestamp: serverProject.modified_timestamp};
-  };
-
   // Download + merge the given server datasets' spots, then (when applyProject is set) fetch and apply
   // the project properties. Callers pass only datasets that are safe to overwrite (no pending local edits).
   const applyServerDownloads = async (staleDatasets, {applyProject = false} = {}) => {
@@ -405,17 +387,6 @@ const useDownload = () => {
     dispatch(removePendingDatasetId(datasetId));
     await applyServerDownloads([serverDataset]);
     dispatch(clearConflictedDatasetId(datasetId));
-  };
-
-  // Resolve a project conflict by keeping the server's copy: pull the project and discard the local edit.
-  const keepServerProject = async () => {
-    if (!encodedLogin || isEmpty(project)) return;
-    const serverProject = await getProject(project.id, encodedLogin);
-    if (isEmpty(serverProject)) return;
-    dispatch(addedProjectFromServer(serverProject));
-    dispatch(setLastSyncedProjectTimestamp(serverProject.modified_timestamp));
-    dispatch(clearProjectSyncNeeded());
-    dispatch(setProjectConflicted(false));
   };
 
   const downloadUserProfile = async (encodedLoginScoped = encodedLogin) => {
@@ -536,12 +507,10 @@ const useDownload = () => {
   return {
     applyServerDownloads,
     classifyServerDatasets,
-    classifyServerProject,
     downloadUserProfile,
     initializeDownload,
     initializeDownloadImages,
     keepServerConflict,
-    keepServerProject,
   };
 };
 
