@@ -12,9 +12,10 @@ import {TextInputField} from '../form';
 const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight, isFillHeight}) => {
   /* Derived Variables */
 
-  // Only auto-focus (and pop the keyboard) for a brand-new, empty note. An existing note opens
-  // keyboard-free so it can be read and scrolled; tapping into it focuses and shows the keyboard.
-  const autoFocus = isEmpty(initialNotesValues?.note);
+  // In the fill layout (Shortcut Notes modal) only auto-focus a brand-new, empty note, so an existing
+  // note opens keyboard-free and can be read/scrolled (tapping in focuses it). Elsewhere (regular Notes
+  // page, template editors) keep the original always-focus behavior.
+  const autoFocus = isFillHeight ? isEmpty(initialNotesValues?.note) : true;
 
   /* Render Functions */
 
