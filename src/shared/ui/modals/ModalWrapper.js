@@ -19,6 +19,11 @@ import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 const FILL_FLEX = {flex: 1};
 const CONTENT_SIZED_FLEX = {flexShrink: 1};
 
+// Filled modals get a definite, keyboard-aware height so their body can flex and their footer stays
+// sticky. Keep some breathing room from the screen/keyboard edges, and a floor so they stay usable.
+const FILLED_MODAL_MARGIN = 32;
+const MIN_FILLED_MODAL_HEIGHT = 220;
+
 const ModalWrapper = ({
                         actionTitle,
                         backdropStyle,
@@ -31,6 +36,7 @@ const ModalWrapper = ({
                         fullscreen,
                         headerImage,
                         headerTitle,
+                        isChildrenFilled = false,
                         isHideHeader = false,
                         isLoading,
                         imageStyle,
@@ -63,20 +69,42 @@ const ModalWrapper = ({
   childrenRef.current = children;
   const [kbOffset, setKbOffset] = useState(0);
 
+  // Track the keyboard height for Android small-screen modals (their fullscreen Modal doesn't inset
+  // the content), and for any filled-children modal (whose body is a plain View, not a
+  // keyboard-inset FlatList) so its sticky footer stays above the keyboard.
   useEffect(() => {
-    if (Platform.OS !== 'android' || !SMALL_SCREEN) return;
+    const isAndroidSmall = Platform.OS === 'android' && SMALL_SCREEN;
+    if (!isChildrenFilled && !isAndroidSmall) return;
     const show = Keyboard.addListener('keyboardDidShow', e => setKbOffset(e.endCoordinates.height));
     const hide = Keyboard.addListener('keyboardDidHide', () => setKbOffset(0));
     return () => {
       show.remove();
       hide.remove();
     };
-  }, []);
+  }, [isChildrenFilled]);
 
   /* Logic Helpers */
 
   const getResponsiveOverlayStyle = () => {
     if (fullscreen) return overlayStyles.overlayContainerFullScreen;
+
+    if (isChildrenFilled) {
+      // Definite height so the body flexes and the footer stays sticky. When the keyboard is open,
+      // fill the space above it; otherwise use the caller's preferred fraction (from `maxHeight`).
+      // Either way, never exceed the space above the keyboard so nothing is covered in any orientation.
+      const {height: _overrideHeight, maxHeight: overrideMaxHeight, flex: _overrideFlex, ...restOverride}
+        = overlayStyleOverride || {};
+      const availableHeight = windowHeight - kbOffset;
+      const preferredFraction = typeof overrideMaxHeight === 'string' && overrideMaxHeight.endsWith('%')
+        ? parseFloat(overrideMaxHeight) / 100 : 0.85;
+      const preferredHeight = kbOffset > 0 ? availableHeight : windowHeight * preferredFraction;
+      const height = Math.max(
+        MIN_FILLED_MODAL_HEIGHT,
+        Math.min(preferredHeight, availableHeight) - FILLED_MODAL_MARGIN,
+      );
+      return {...overlayStyles.overlayContainer, height, minWidth: MODAL_WIDTH, ...restOverride};
+    }
+
     // Treat any caller-provided fixed `height` (e.g. '80%') as a max so the modal shrinks to its
     // content; cap at 85% of the screen by default so it never runs off the top/bottom.
     const {height: overrideHeight, ...restOverride} = overlayStyleOverride || {};
@@ -121,16 +149,22 @@ const ModalWrapper = ({
         imageStyle={imageStyle}
         showCloseButton={showCloseButton || showCancelButton !== false}
       />
-      <FlatList
-        ListHeaderComponent={renderListHeader}
-        // ListHeaderComponent={() => <>{children}</>}
-        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
-        data={[]}
-        keyExtractor={(_, index) => index.toString()}
-        keyboardShouldPersistTaps={'handled'}
-        scrollEnabled={scrollEnabled}
-        style={bodyFlexStyle}
-      />
+      {isChildrenFilled ? (
+        // Fill the body with the children (which manage their own internal scrolling) so the footer
+        // below stays sticky. Keyboard handling comes from the kbOffset padding on the container.
+        <View style={FILL_FLEX}>{childrenRef.current}</View>
+      ) : (
+        <FlatList
+          ListHeaderComponent={renderListHeader}
+          // ListHeaderComponent={() => <>{children}</>}
+          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+          data={[]}
+          keyExtractor={(_, index) => index.toString()}
+          keyboardShouldPersistTaps={'handled'}
+          scrollEnabled={scrollEnabled}
+          style={bodyFlexStyle}
+        />
+      )}
       {renderModalBottom()}
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
@@ -202,7 +236,7 @@ const ModalWrapper = ({
   // re-centers the modal when the keyboard opens, pushing the top (and any focused field) off-screen.
   // Without it the modal stays put and each form's keyboard-aware FlatList scrolls the focused field
   // above the keyboard.
-  const bodyFlexStyle = fullscreen ? FILL_FLEX : CONTENT_SIZED_FLEX;
+  const bodyFlexStyle = fullscreen || isChildrenFilled ? FILL_FLEX : CONTENT_SIZED_FLEX;
   const overlayBody = (
     <View style={getResponsiveOverlayStyle()}>
       {Platform.OS === 'android' ? (
@@ -224,7 +258,10 @@ const ModalWrapper = ({
       visible={isVisible}
     >
       {fullscreen ? overlayBody : (
-        <View pointerEvents={'box-none'} style={viewOverlayStyles.modalCentered}>
+        <View
+          pointerEvents={'box-none'}
+          style={[viewOverlayStyles.modalCentered, isChildrenFilled && {paddingBottom: kbOffset}]}
+        >
           <Pressable
             onPress={onBackdropPress}
             style={[StyleSheet.absoluteFill, backdropStyle || overlayStyles.backdropStyles]}
