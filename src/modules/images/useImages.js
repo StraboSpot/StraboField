@@ -355,9 +355,15 @@ const useImages = () => {
               stopCameraAnglesCapture();
               resolve('cancelled');
             }
-            else if (response.error) {
+            else if (response.errorCode) {
+              console.error('Launch Camera Error:', response.errorCode, response.errorMessage);
               stopCameraAnglesCapture();
-              reject();
+              reject(`Camera error (${response.errorCode}): ${response.errorMessage || 'No message provided.'}`);
+            }
+            else if (!response.assets || response.assets.length === 0) {
+              console.error('Launch Camera returned no image asset:', response);
+              stopCameraAnglesCapture();
+              reject('Camera returned no image. The camera preview may have failed to start.');
             }
             else {
               const imageAsset = response.assets[0];
