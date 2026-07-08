@@ -18,12 +18,13 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import useUploadImages from '../../services/files/useUploadImages';
 import useServerRequests from '../../services/network/useServerRequests';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {persistor} from '../../store/ConfigureStore';
+import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
@@ -34,10 +35,11 @@ const UserProfile = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
   const userEncodedLogin = useSelector(state => state.user.encoded_login);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
+  const connectionTargetText = useConnectionTargetText();
   const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
@@ -86,7 +88,7 @@ const UserProfile = () => {
     if (formCurrent?.dirty) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
+  const getIsDisabled = () => !isConnectionAvailable;
 
   const openProfileImageModal = () => {
     setShouldUpdateImage(false);
@@ -146,12 +148,12 @@ const UserProfile = () => {
       if (hasErrors(formCurrent)) throw Error('Error in form.');
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
-      if (isOnline.isInternetReachable) {
+      if (isConnectionAvailable) {
         await uploadProfile(userValuesToUpdate);
         toast.show('Profile uploaded successfully!', {type: 'success'});
+        toast.show('Changes Saved!', {type: 'success'});
       }
-      else toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
-      toast.show('Changes Saved!', {type: 'success'});
+      else toast.show(`Not connected to ${connectionTargetText}. Changes Saved Locally Only`, {type: 'warning'});
     }
     catch (err) {
       console.error('Error uploading profile', err);
@@ -226,7 +228,7 @@ const UserProfile = () => {
   return (
     <>
       {!isEmpty(userData.email) && !isEmpty(userData.encoded_login) && (
-        <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
+        <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={
               <>
@@ -250,7 +252,7 @@ const UserProfile = () => {
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={true}
                 />
-                {isOnline.isInternetReachable ? (
+                {isConnectionAvailable ? (
                   <View style={userStyles.saveButtonContainer}>
                     {Platform.OS !== 'web' && (
                       <OutlineButton
@@ -270,16 +272,13 @@ const UserProfile = () => {
                       />
                     )}
                   </View>
-                ) : (
-                  <Text style={commonStyles.noValueText}>
-                    Must be online to save changes to profile or delete profile.
-                  </Text>
-                )}
+                ) : <ConnectionRequiredMessage actionText={'make changes to your profile'}/>}
+
+                {/* Modals */}
                 {renderProfileImageModal()}
                 <DeleteProfileModal
                   email={userData.email}
                   isDeleteProfileModalVisible={isDeleteProfileModalVisible}
-                  isOnline={isOnline}
                   setDeleteProfileModalVisible={val => setDeleteProfileModalVisible(val)}
                 />
               </>

@@ -51,10 +51,6 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
 
   /* Event Handlers */
 
-  const handlePress = async () => {
-    handleIGSNChecked(!isIGSNChecked);
-  };
-
   const onReset = () => {
     dispatch(setInitialSesarState());
     console.log('Sesar credentials have beed reset');
