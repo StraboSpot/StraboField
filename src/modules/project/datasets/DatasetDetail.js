@@ -103,7 +103,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         </Text>
         <Text style={overlayStyles.statusMessageText}>
           This will
-          <Text style={overlayStyles.importantText}> ERASE </Text>
+          <Text style={commonStyles.importantText}> ERASE </Text>
           everything in this dataset including Spots, images, and all other data!
         </Text>
       </DeleteConformationDialogBox>
@@ -120,7 +120,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
           title={'Delete Dataset'}
         />
         {isDisabled(dataset.id) && (
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 30}]}>
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
             *{dataset.name} can not be deleted while still set as the target (starred) dataset.
           </Text>
         )}

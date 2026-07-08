@@ -7,12 +7,14 @@ import {useToast} from 'react-native-toast-notifications';
 
 import userStyles from './user.styles';
 import useServerRequests from '../../services/network/useServerRequests';
+import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {RED} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import useResetState from '../../store/useResetState';
+import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
 const offlineText = (
   <Text style={userStyles.deleteProfileText}>
@@ -20,11 +22,12 @@ const offlineText = (
   </Text>
 );
 
-const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDeleteProfileModalVisible}) => {
+const DeleteProfileModal = ({email, isDeleteProfileModalVisible, setDeleteProfileModalVisible}) => {
   /* Data Hooks */
 
   const {clearUser} = useResetState();
   const {authenticateUser, deleteAccount} = useServerRequests();
+  const isConnectionAvailable = useIsConnectionAvailable();
   const toast = useToast();
 
   /* Local State */
@@ -38,7 +41,7 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
   const deleteModalText = (
     <View>
       <Text style={userStyles.deleteProfileText}>
-        Deleting your account will<Text style={overlayStyles.importantText}> PERMANENTLY </Text>
+        Deleting your account will<Text style={commonStyles.importantText}> PERMANENTLY </Text>
         remove all data for user{'\n'}{email}{'\n'}from StraboSpot!
       </Text>
       <Text style={userStyles.deleteProfileText}>Enter password to delete:</Text>
@@ -104,7 +107,7 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, isOnline, setDe
       showActionButton={!confirmDeleteMessageVisible}
     >
       {!confirmDeleteMessageVisible ? <View>
-          {isOnline.isInternetReachable ? deleteModalText : offlineText}
+          {isConnectionAvailable ? deleteModalText : offlineText}
           <Input
             autoCapitalize={'none'}
             errorMessage={errorMessage}

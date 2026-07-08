@@ -14,8 +14,14 @@ import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
+import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import {setLoadingStatus} from '../../home/home.slice';
-import {setInitialSesarState, setSelectedUserCode, setSesarToken, setSesarUserCodes} from '../../user/userProfile.slice';
+import {
+  setInitialSesarState,
+  setSelectedUserCode,
+  setSesarToken,
+  setSesarUserCodes,
+} from '../../user/userProfile.slice';
 
 const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
   /* Data Hooks */
@@ -138,6 +144,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       <View style={{justifyContent: 'flex-start', alignItems: 'center'}}>
         {!selectedFeature.isOnMySesar && (
           <>
+            {!isInternetReachable && <ConnectionRequiredMessage actionText={'upload to SESAR'} isInternetRequired/>}
             <Text style={igsnStyles.mySesarUpdateDisclaimer}>
               To upload to your SESAR account and obtain an IGSN check below:
             </Text>

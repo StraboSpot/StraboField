@@ -24,7 +24,8 @@ const commonStyles = StyleSheet.create({
     backgroundColor: themes.MEDIUMGREY,
   },
   importantText: {
-    color: 'red',
+    color: themes.WARNING_COLOR,
+    fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },

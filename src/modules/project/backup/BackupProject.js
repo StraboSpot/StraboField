@@ -9,8 +9,9 @@ import useDevice from '../../../services/device/useDevice';
 import {BLUE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
+import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
 import {setSelectedProject} from '../projects.slice';
@@ -22,9 +23,9 @@ const BackupProject = () => {
 
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
-  const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
   const {openURL} = useDevice();
 
   /* Local State */
@@ -63,12 +64,8 @@ const BackupProject = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <>
-        {user.encoded_login && isOnline.isConnected ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
-          : (
-            <View style={uiStyles.spacer}>
-              <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
-            </View>
-          )}
+        {user.encoded_login && isConnectionAvailable ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+          : <ConnectionRequiredMessage actionText={'upload your project'}/>}
         <FlatListItemSeparator/>
         <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
         <FlatListItemSeparator/>
