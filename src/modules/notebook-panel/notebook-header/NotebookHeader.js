@@ -185,6 +185,9 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
       >
         <TextInput
           editable={!isReadOnly}
+          onBlur={() => {
+            if (!spot.properties.name) onSpotEdit('name', 'Unknown');
+          }}
           onChangeText={text => onSpotEdit('name', text)}
           style={notebookHeaderStyles.headerSpotName}
           textAlign={'left'}
