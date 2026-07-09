@@ -55,23 +55,6 @@ jobs:
           echo "$changelog" > release_notes.md
           cat release_notes.md
 
-      - name: Prepend to CHANGELOG.md
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            cat release_notes.md CHANGELOG.md > tmp.md && mv tmp.md CHANGELOG.md
-          else
-            cp release_notes.md CHANGELOG.md
-          fi
-
-      - name: Commit CHANGELOG.md
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f CHANGELOG.md
-          git commit -m "chore: update changelog for ${{ github.ref_name }}"
-          git push origin HEAD:master
-
       - name: Delete existing release if present
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
