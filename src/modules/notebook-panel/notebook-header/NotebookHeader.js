@@ -214,7 +214,7 @@ const NotebookHeader = ({
               onChangeText={text => onSpotEdit('name', text)}
               style={notebookHeaderStyles.headerSpotName}
               textAlign={'left'}
-              value={headerTitle}
+              value={spot.properties.name || ''}
             />
           ) : (
             <Text
