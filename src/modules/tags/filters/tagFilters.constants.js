@@ -177,7 +177,5 @@ export const TEMPORAL_VALUE_RANGES = {
 export const TAG_SORT_ORDER = {
   ALPHABETICAL: 'Alphabetical',
   DATE_CREATED: 'Date Created',
-  DATE_LAST_MODIFIED: 'Date Last Modified',
-  RECENTLY_VIEWED: 'Recently Viewed',
   TEMPORAL: 'Temporal',
 };
