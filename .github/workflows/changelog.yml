@@ -37,7 +37,7 @@ jobs:
           # If there is no previous tag (first release), log the full history up to CURR.
           if [ -n "$PREV" ]; then RANGE="$PREV..$CURR"; else RANGE="$CURR"; fi
 
-          changelog=$(git log $RANGE --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
+          changelog=$(git log $RANGE --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^chore: bump version\|^chore: update changelog\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
           /^feat/ { features[++fc] = $0 }
           /^fix/  { fixes[++bc] = $0 }
           /^chore/ { chores[++cc] = $0 }
