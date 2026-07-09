@@ -25,7 +25,6 @@ import {
   addedStatusMessage,
   clearedStatusMessages,
   setIsErrorMessagesModalVisible,
-  setIsOfflineMapsModalVisible,
 } from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -336,11 +335,12 @@ const MapContainer = forwardRef(({
       return tileCountThisScope;
     }
     catch (err) {
+      // Return an error-shaped result so SaveMapsModal can show it inline. Do NOT close the offline
+      // modal and open the global ErrorModal here: dismissing one native Modal while presenting another
+      // in the same commit makes iOS drop the ErrorModal presentation and freezes the app.
       console.error(err);
-      dispatch((setIsOfflineMapsModalVisible(false)));
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error fetching data from tile count service.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      return {message: 'Error fetching data from tile count service. '
+          + 'Make sure you are pulling from the correct endpoint (Home → Miscellaneous → Custom Database Endpoint).'};
     }
   };
 
