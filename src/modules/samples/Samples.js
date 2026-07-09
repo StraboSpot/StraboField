@@ -1,7 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Text, View} from 'react-native';
-
-import {useSelector} from 'react-redux';
 
 import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
@@ -13,13 +11,9 @@ import SpotFilters from '../spots/SpotFilters';
 const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
   /* Data Hooks */
 
-  const sortedView = useSelector(state => state.mainMenu.sortedView);
-
   const {getActiveSpotsObj} = useSpots();
 
   /* Local State */
-
-  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpotsObj = getActiveSpotsObj();
   const activeSpots = Object.values(activeSpotsObj);
@@ -30,30 +24,22 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
 
   /* Derived Variables */
 
-  const sampleSpotsSorted = isReverseSort ? spotsWithSamplesSorted.reverse() : spotsWithSamplesSorted;
   let samplesCount = 0;
   let dataSectioned;
-  if (!isEmpty(sampleSpotsSorted)) {
-    dataSectioned = sampleSpotsSorted.map((s) => {
+  if (!isEmpty(spotsWithSamplesSorted)) {
+    dataSectioned = spotsWithSamplesSorted.map((s) => {
       samplesCount += s.properties?.samples?.length;
       return {title: s.properties?.name, data: s.properties?.samples, spot: s};
     });
   }
-
-  /* Side Effects */
-
-  useEffect(() => {
-    setSpotsWithSamplesSorted(spotsWithSamples);
-  }, [sortedView]);
 
   /* View */
 
   return (
     <View style={{flex: 1}}>
       <SpotFilters
-        activeSpots={spotsWithSamplesSorted}
+        activeSpots={spotsWithSamples}
         isSamplesSearch={true}
-        setIsReverseSort={setIsReverseSort}
         setSpotsSorted={setSpotsWithSamplesSorted}
         setTextNoSpots={setTextNoSpots}
         updateSpotsInMapExtent={updateSpotsInMapExtent}

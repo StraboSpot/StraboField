@@ -32,47 +32,17 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
-
   const activeSpotsObj = useMemo(() => getActiveSpotsObj(), [getActiveSpotsObj]);
   const activeSpots = useMemo(() => Object.values(activeSpotsObj), [activeSpotsObj]);
 
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
   const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
-
-  const resetAndSetIsReverseSort = useCallback((val) => {
-    setVisibleSectionCount(SECTIONS_PER_PAGE);
-    setIsReverseSort(val);
-  }, []);
-
-  const resetAndSetSpotsSearched = useCallback((val) => {
-    setVisibleSectionCount(SECTIONS_PER_PAGE);
-    setSpotsSearched(val);
-  }, []);
 
   const resetAndSetSpotsSorted = useCallback((val) => {
     setVisibleSectionCount(SECTIONS_PER_PAGE);
     setSpotsSorted(val);
   }, []);
-
-  // /* Derived Variables */
-  //
-  // const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
-  // sortedSpotsWithImages = spotsWithImages.map((spot) => {
-  //   const sortedImages = JSON.parse(JSON.stringify(spot.properties.images))
-  //     .sort((imgA, imgB) => (imgA?.title?.toString() || 'UntitledA')
-  //       .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
-  //   return {...spot, properties: {...spot.properties, images: sortedImages}};
-  // });
-  // if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
-  // let count = 0;
-  // const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
-  //   count += spot.properties.images.length;
-  //   return [...acc, {spot: spot, data: [spot.properties.images]}];
-  // }, []);
-  // const spotsAsSections = allSpotsAsSections.slice(0, visibleSectionCount);
 
   /* Event Handlers */
 
@@ -127,7 +97,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
       return {...spot, properties: {...spot.properties, images: sortedImages}};
     });
-    if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
     let count = 0;
     const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
       count += spot.properties.images.length;
@@ -139,11 +108,9 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       <>
         <SpotFilters
           activeSpots={activeSpots}
-          setIsReverseSort={resetAndSetIsReverseSort}
-          setSpotsSearched={resetAndSetSpotsSearched}
+          isImagesSearch={true}
           setSpotsSorted={resetAndSetSpotsSorted}
           setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
           updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={imageStyles.galleryImageContainer}>

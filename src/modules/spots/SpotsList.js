@@ -1,7 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
-
-import {useSelector} from 'react-redux';
 
 import {SpotsListItem, useSpots} from '.';
 import SpotFilters from './SpotFilters';
@@ -15,13 +13,9 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
 
   /* Data Hooks */
 
-  const sortedView = useSelector(state => state.mainMenu.sortedView);
-
   const {getVisibleSpots} = useSpots();
 
   /* Local State */
-
-  const [isReverseSort, setIsReverseSort] = useState(false);
 
   const activeSpots = getVisibleSpots();
 
@@ -32,19 +26,12 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
 
   const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
 
-  /* Side Effects */
-
-  useEffect(() => {
-    setSpotsSorted(getVisibleSpots());
-  }, [sortedView]);
-
   /* View */
 
   return (
     <View style={{flex: 1}}>
       <SpotFilters
-        activeSpots={spotsNoSamples}
-        setIsReverseSort={setIsReverseSort}
+        activeSpots={activeSpots}
         setSpotsSorted={setSpotsSorted}
         setTextNoSpots={setTextNoSpots}
         updateSpotsInMapExtent={updateSpotsInMapExtent}
@@ -59,7 +46,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
               Found {spotsNoSamples.length + (spotsNoSamples.length === 1 ? ' Spot' : ' Spots')} in Active Datasets
             </Text>
           )}
-          data={isReverseSort ? [...spotsNoSamples].reverse() : spotsNoSamples}
+          data={spotsNoSamples}
           keyExtractor={spot => spot.properties.id.toString()}
           renderItem={({item}) => (
             <SpotsListItem
