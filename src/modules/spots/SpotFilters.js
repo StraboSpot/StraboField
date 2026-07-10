@@ -2,16 +2,21 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 
 import {SearchBar} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {useSpots} from '.';
-import SortingButtons from './SortingButtons';
-import {SORT_ORDER, SORTED_VIEWS} from './spots.constants';
+import {PICKER_KEYS, SORT_ORDER, SORTED_VIEW_LABELS, SORTED_VIEWS} from './spots.constants';
 import {isEmpty} from '../../shared/helpers';
-import {DARKGREY, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import {
+  DARKGREY,
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  SECONDARY_BACKGROUND_COLOR,
+} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
+import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
 
 const SpotFilters = ({
                        activeSpots,
@@ -23,8 +28,9 @@ const SpotFilters = ({
                      }) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
+  const listFilters = useSelector(state => state.mainMenu.listFilters);
   const recentViews = useSelector(state => state.spot.recentViews);
-  const sortedView = useSelector(state => state.mainMenu.sortedView);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
 
@@ -39,17 +45,28 @@ const SpotFilters = ({
 
   /* Local State */
 
-  const [isPickerVisible, setIsPickerVisible] = useState(false);
+  const [isFilterPickerVisible, setIsFilterPickerVisible] = useState(false);
   const [isReverseSort, setIsReverseSort] = useState(false);
+  const [isSortPickerVisible, setIsSortPickerVisible] = useState(false);
   const [searchState, setSearchState] = useState('');
   const [sortOrder, setSortOrder] = useState('Date Created');
   const [spotsFiltered, setSpotsFiltered] = useState(activeSpots);
 
   /* Derived Variables */
 
+  // Each page (Spots/Images/Samples) keeps its own filter in Redux so selecting one doesn't affect the others.
+  let pageKey = PICKER_KEYS.SPOTS;
+  if (isImagesSearch) pageKey = PICKER_KEYS.IMAGES;
+  else if (isSamplesSearch) pageKey = PICKER_KEYS.SAMPLES;
   let searchPlaceholder = 'Search Spots';
   if (isSamplesSearch) searchPlaceholder = 'Search Samples';
   else if (isImagesSearch) searchPlaceholder = 'Search Images';
+
+  // The default (unfiltered) view is not offered as a filter option; it's reached via the Clear Filter button.
+  const filterOptions = Object.values(SORTED_VIEW_LABELS)
+    .filter(label => label !== SORTED_VIEW_LABELS[SORTED_VIEWS.CHRONOLOGICAL]);
+  const sortedView = (listFilters && listFilters[pageKey]) || SORTED_VIEWS.CHRONOLOGICAL;
+  const isFilterActive = sortedView !== SORTED_VIEWS.CHRONOLOGICAL;
 
   /* Side Effects */
 
@@ -72,15 +89,14 @@ const SpotFilters = ({
 
   /* Logic Helpers */
 
-  const closePicker = () => setIsPickerVisible(false);
-
-  const openPicker = () => setIsPickerVisible(true);
-
-  const toggleReverseSort = () => {
-    const newReverse = !isReverseSort;
-    setIsReverseSort(newReverse);
-    setSpotsSorted(getSortedSpots(sortOrder, getSearchedSpots(searchState, spotsFiltered), newReverse));
+  const clearFilter = () => {
+    dispatch(setListFilters({page: pageKey, value: SORTED_VIEWS.CHRONOLOGICAL}));
+    closeFilterPicker();
   };
+
+  const closeFilterPicker = () => setIsFilterPickerVisible(false);
+
+  const closeSortPicker = () => setIsSortPickerVisible(false);
 
   const getSearchedSpots = (search, spotsToSearch) => {
     if (isEmpty(search)) return spotsToSearch;
@@ -118,6 +134,22 @@ const SpotFilters = ({
     return reverse ? gotSpotsSorted.reverse() : gotSpotsSorted;
   };
 
+  const openFilterPicker = () => setIsFilterPickerVisible(true);
+
+  const openSortPicker = () => setIsSortPickerVisible(true);
+
+  const toggleReverseSort = () => {
+    const newReverse = !isReverseSort;
+    setIsReverseSort(newReverse);
+    setSpotsSorted(getSortedSpots(sortOrder, getSearchedSpots(searchState, spotsFiltered), newReverse));
+  };
+
+  const updateFilter = (label) => {
+    const view = Object.keys(SORTED_VIEW_LABELS).find(key => SORTED_VIEW_LABELS[key] === label);
+    dispatch(setListFilters({page: pageKey, value: view}));
+    closeFilterPicker();
+  };
+
   const updateSearch = (search = searchState, spotsToSearch = spotsFiltered) => {
     setSearchState(search);
     setSpotsSorted(getSortedSpots(sortOrder, getSearchedSpots(search, spotsToSearch), isReverseSort));
@@ -126,20 +158,13 @@ const SpotFilters = ({
   const updateSort = (sort = sortOrder) => {
     setSortOrder(sort);
     setSpotsSorted(getSortedSpots(sort, getSearchedSpots(searchState, spotsFiltered), isReverseSort));
-    closePicker();
+    closeSortPicker();
   };
 
   /* View */
 
   return (
     <>
-      <SortingButtons/>
-      {sortedView === SORTED_VIEWS.MAP_EXTENT && (
-        <UpdateSpotsInMapExtentButton
-          title={'Update Spots in Map Extent'}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
-        />
-      )}
       {!isEmpty(activeSpots) && (
         <>
           <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
@@ -161,8 +186,14 @@ const SpotFilters = ({
             />
             <View style={{marginHorizontal: -10}}>
               <ClearButton
+                icon={{name: 'filter-alt', type: 'material', color: isFilterActive ? PRIMARY_ACCENT_COLOR : undefined}}
+                onPress={openFilterPicker}
+              />
+            </View>
+            <View style={{marginHorizontal: -10}}>
+              <ClearButton
                 icon={{name: 'sort', type: 'material'}}
-                onPress={openPicker}
+                onPress={openSortPicker}
               />
             </View>
             <View style={{marginHorizontal: -10}}>
@@ -172,11 +203,28 @@ const SpotFilters = ({
               />
             </View>
           </View>
+          {sortedView === SORTED_VIEWS.MAP_EXTENT && (
+            <UpdateSpotsInMapExtentButton
+              title={'Update Spots in Map Extent'}
+              updateSpotsInMapExtent={updateSpotsInMapExtent}
+            />
+          )}
+
+          {/* Modals  */}
           <PickerOverlay
-            closePicker={closePicker}
+            closePicker={closeFilterPicker}
+            data={filterOptions}
+            dividerText={'Filters'}
+            isPickerVisible={isFilterPickerVisible}
+            onClearPress={isFilterActive ? clearFilter : undefined}
+            onSelect={item => updateFilter(item)}
+            value={isFilterActive ? SORTED_VIEW_LABELS[sortedView] : null}
+          />
+          <PickerOverlay
+            closePicker={closeSortPicker}
             data={Object.values(SORT_ORDER)}
             dividerText={'Sort'}
-            isPickerVisible={isPickerVisible}
+            isPickerVisible={isSortPickerVisible}
             onSelect={item => updateSort(item)}
             value={sortOrder}
           />

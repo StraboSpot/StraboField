@@ -19,3 +19,9 @@ export const SORTED_VIEWS = {
   MAP_EXTENT: 'MAP_EXTENT',
   RECENT_VIEWS: 'RECENT_VIEWS',
 };
+
+export const SORTED_VIEW_LABELS = {
+  [SORTED_VIEWS.CHRONOLOGICAL]: 'In Active Datasets',
+  [SORTED_VIEWS.MAP_EXTENT]: 'In Map Extent',
+  [SORTED_VIEWS.RECENT_VIEWS]: 'In Recent Views',
+};

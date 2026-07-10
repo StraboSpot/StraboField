@@ -1,7 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 
-import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BackupTagsModal from './BackupTagsModal';
@@ -10,8 +9,8 @@ import LoadTagsModal from './LoadTagsModal';
 import {TAG_TYPES} from './tags.constants';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
+import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
@@ -29,6 +28,7 @@ const Tags = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const listFilters = useSelector(state => state.mainMenu.listFilters);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
@@ -38,19 +38,23 @@ const Tags = ({
   const [isBackupTagsModalVisible, setIsBackupTagsModalVisible] = useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isLoadTagsModalVisible, setIsLoadTagsModalVisible] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [tagsSorted, setTagsSorted] = useState([]);
 
   /* Derived Variables */
+
+  const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
+  const page = PRIMARY_PAGES.find(p => p.key === pageKey);
+  const label = page.label;
+
+  // Each page (Tags/Geologic Units) keeps its own filter in Redux so selecting one doesn't affect the other.
+  const selectedIndex = (listFilters && listFilters[pageKey]) || 0;
+
+  /* Derived State */
 
   const baseTags = useMemo(() => isGeologicUnits ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
       : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS),
     [isGeologicUnits, tags],
   );
-
-  const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
-  const page = PRIMARY_PAGES.find(p => p.key === pageKey);
-  const label = page.label;
 
   /* Event Handlers */
 
@@ -66,10 +70,7 @@ const Tags = ({
 
   const closeDetailModal = () => setIsDetailModalVisible(false);
 
-  const getButtonTitle = () => {
-    if (isGeologicUnits) return ['Alphabetical', 'Map Extent'];
-    return ['Categorized', 'Map Extent'];
-  };
+  const setSelectedIndex = index => dispatch(setListFilters({page: pageKey, value: index}));
 
   /* View */
 
@@ -77,14 +78,12 @@ const Tags = ({
     <View style={{flex: 1}}>
       {!isEmpty(tags) && (
         <>
-          <ButtonGroup
-            buttonStyle={{padding: 5}}
-            buttons={getButtonTitle()}
-            containerStyle={{height: 50}}
-            onPress={index => setSelectedIndex(index)}
-            selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
+          <TagFilters
+            isGeologicUnits={isGeologicUnits}
             selectedIndex={selectedIndex}
-            textStyle={{fontSize: 12}}
+            setSelectedIndex={setSelectedIndex}
+            setTagsSorted={setTagsSorted}
+            tags={baseTags}
           />
           {selectedIndex === 1 && (
             <UpdateSpotsInMapExtentButton
@@ -92,7 +91,6 @@ const Tags = ({
               updateSpotsInMapExtent={updateSpotsInMapExtent}
             />
           )}
-          <TagFilters isGeologicUnits={isGeologicUnits} setTagsSorted={setTagsSorted} tags={baseTags}/>
         </>
       )}
       <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>

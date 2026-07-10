@@ -6,21 +6,31 @@ import {SearchBar} from '@rn-vui/base';
 import {TAG_SORT_ORDER} from './tagFilters.constants';
 import {sortTagsByOrder} from './tagFilters.helpers';
 import {isEmpty} from '../../../shared/helpers';
-import {DARKGREY, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import {
+  DARKGREY,
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  SECONDARY_BACKGROUND_COLOR,
+} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
 import {getTagTitle} from '../tags.helpers';
 
-const TagFilters = ({isGeologicUnits, setTagsSorted, tags}) => {
+const TagFilters = ({isGeologicUnits, selectedIndex, setSelectedIndex, setTagsSorted, tags}) => {
   /* Local State */
 
-  const [isPickerVisible, setIsPickerVisible] = useState(false);
+  const [isFilterPickerVisible, setIsFilterPickerVisible] = useState(false);
   const [isReverseSort, setIsReverseSort] = useState(false);
+  const [isSortPickerVisible, setIsSortPickerVisible] = useState(false);
   const [searchState, setSearchState] = useState('');
   const [sortOrder, setSortOrder] = useState(isGeologicUnits ? TAG_SORT_ORDER.TEMPORAL : TAG_SORT_ORDER.ALPHABETICAL);
   const [tagsFiltered, setTagsFiltered] = useState(tags);
 
   /* Derived Variables */
+
+  // Index 0 is the default (unfiltered) view, so only the map-extent filter is offered as an option.
+  const filterOptions = ['Map Extent'];
+  const isFilterActive = selectedIndex === 1;
 
   const sortOptions = isGeologicUnits ? Object.values(TAG_SORT_ORDER)
     : Object.values(TAG_SORT_ORDER).filter(v => v !== TAG_SORT_ORDER.TEMPORAL);
@@ -40,12 +50,24 @@ const TagFilters = ({isGeologicUnits, setTagsSorted, tags}) => {
     return tagsToSearch.filter(t => getTagTitle(t).toLowerCase().includes(search.toLowerCase()));
   };
 
-  const closePicker = () => setIsPickerVisible(false);
+  const clearFilter = () => {
+    setSelectedIndex(0);
+    closeFilterPicker();
+  };
+
+  const closeFilterPicker = () => setIsFilterPickerVisible(false);
+
+  const closeSortPicker = () => setIsSortPickerVisible(false);
 
   const toggleReverseSort = () => {
     const newReverse = !isReverseSort;
     setIsReverseSort(newReverse);
     setTagsSorted(sortTagsByOrder(tagsFiltered, sortOrder, newReverse));
+  };
+
+  const updateFilter = () => {
+    setSelectedIndex(1);
+    closeFilterPicker();
   };
 
   const updateSearch = (search) => {
@@ -58,7 +80,7 @@ const TagFilters = ({isGeologicUnits, setTagsSorted, tags}) => {
   const updateSort = (sort) => {
     setSortOrder(sort);
     setTagsSorted(sortTagsByOrder(tagsFiltered, sort, isReverseSort));
-    closePicker();
+    closeSortPicker();
   };
 
   /* View */
@@ -83,17 +105,34 @@ const TagFilters = ({isGeologicUnits, setTagsSorted, tags}) => {
           value={searchState}
         />
         <View style={{marginHorizontal: -10}}>
-          <ClearButton icon={{name: 'sort', type: 'material'}} onPress={() => setIsPickerVisible(true)}/>
+          <ClearButton
+            icon={{name: 'filter-alt', type: 'material', color: isFilterActive ? PRIMARY_ACCENT_COLOR : undefined}}
+            onPress={() => setIsFilterPickerVisible(true)}
+          />
+        </View>
+        <View style={{marginHorizontal: -10}}>
+          <ClearButton icon={{name: 'sort', type: 'material'}} onPress={() => setIsSortPickerVisible(true)}/>
         </View>
         <View style={{marginHorizontal: -10}}>
           <ClearButton icon={{name: 'swap-vert', type: 'material'}} onPress={toggleReverseSort}/>
         </View>
       </View>
+
+      {/* Modals */}
       <PickerOverlay
-        closePicker={closePicker}
+        closePicker={closeFilterPicker}
+        data={filterOptions}
+        dividerText={'Filters'}
+        isPickerVisible={isFilterPickerVisible}
+        onClearPress={isFilterActive ? clearFilter : undefined}
+        onSelect={() => updateFilter()}
+        value={isFilterActive ? filterOptions[0] : null}
+      />
+      <PickerOverlay
+        closePicker={closeSortPicker}
         data={sortOptions}
         dividerText={'Sort'}
-        isPickerVisible={isPickerVisible}
+        isPickerVisible={isSortPickerVisible}
         onSelect={item => updateSort(item)}
         value={sortOrder}
       />

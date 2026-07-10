@@ -1,12 +1,17 @@
 import React from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, View} from 'react-native';
 
-import {CheckBox} from '@rn-vui/base';
+import {Button, CheckBox} from '@rn-vui/base';
 
 import ModalWrapper from './ModalWrapper';
-import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
+import {
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_TEXT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  SECONDARY_BACKGROUND_COLOR,
+} from '../../styles.constants';
 
-const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelect, value}) => {
+const PickerOverlay = ({clearButtonTitle, closePicker, data, dividerText, isPickerVisible, onClearPress, onSelect, value}) => {
   /* Event Handlers */
 
   const handleSelect = item => onSelect(item);
@@ -40,6 +45,18 @@ const PickerOverlay = ({closePicker, data, dividerText, isPickerVisible, onSelec
           );
         }}
       />
+      {onClearPress && (
+        <View style={{padding: 10, paddingTop: 20}}>
+          <Button
+            buttonStyle={{borderColor: PRIMARY_ACCENT_COLOR, borderRadius: 10}}
+            icon={{color: PRIMARY_ACCENT_COLOR, name: 'filter-alt-off', type: 'material'}}
+            onPress={onClearPress}
+            title={clearButtonTitle || 'Clear Filters'}
+            titleStyle={{color: PRIMARY_ACCENT_COLOR}}
+            type={'outline'}
+          />
+        </View>
+      )}
     </ModalWrapper>
   );
 };
