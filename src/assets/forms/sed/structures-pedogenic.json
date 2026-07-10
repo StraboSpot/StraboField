@@ -124,13 +124,6 @@
     },
     {
       "type": "text",
-      "name": "other_paleosol_classification",
-      "label": "Other Paleosol Classification",
-      "required": "false",
-      "relevant": "selected(${paleosol_classification}, 'other')"
-    },
-    {
-      "type": "text",
       "name": "notes",
       "label": "Notes",
       "required": "false",
@@ -286,11 +279,6 @@
       "list_name": "hu6nm09",
       "name": "entisol",
       "label": "Entisol"
-    },
-    {
-      "list_name": "hu6nm09",
-      "name": "other",
-      "label": "other"
     }
   ],
   "settings": [
