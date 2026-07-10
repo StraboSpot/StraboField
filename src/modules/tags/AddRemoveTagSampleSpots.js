@@ -10,7 +10,7 @@ import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 import Samples from '../samples/Samples';
 
-const AddRemoveTagSampleSpots = ({updateSpotsInMapExtent}) => {
+const AddRemoveTagSampleSpots = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -29,7 +29,6 @@ const AddRemoveTagSampleSpots = ({updateSpotsInMapExtent}) => {
         <Samples
           checkedItems={selectedTag?.spots || []}
           isCheckedList
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
       </View>
     </View>

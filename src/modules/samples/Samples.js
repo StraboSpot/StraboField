@@ -8,7 +8,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {useSpots} from '../spots';
 import SpotFilters from '../spots/SpotFilters';
 
-const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsInMapExtent}) => {
+const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
   /* Data Hooks */
 
   const {getActiveSpotsObj} = useSpots();
@@ -19,10 +19,13 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
   const activeSpots = Object.values(activeSpotsObj);
   const spotsWithSamples = activeSpots.filter(spot => !isEmpty(spot.properties.samples) && !spot.properties.isSample);
 
+  const [scopeText, setScopeText] = useState('');
   const [spotsWithSamplesSorted, setSpotsWithSamplesSorted] = useState(spotsWithSamples);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
   /* Derived Variables */
+
+  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   let samplesCount = 0;
   let dataSectioned;
@@ -40,21 +43,20 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook, updateSpotsIn
       <SpotFilters
         activeSpots={spotsWithSamples}
         isSamplesSearch={true}
+        setScopeText={setScopeText}
         setSpotsSorted={setSpotsWithSamplesSorted}
-        setTextNoSpots={setTextNoSpots}
-        updateSpotsInMapExtent={updateSpotsInMapExtent}
       />
-      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={'No Samples in Active Datasets'}/> : (
+      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={`${filterPrefix}No Samples${scopeSuffix}`}/> : (
         <View style={{flex: 1}}>
           <Text
             style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            Found {samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')} in Active Datasets
+            {filterPrefix}{samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')}{scopeSuffix}
           </Text>
           <SamplesSectionList
             checkedItems={checkedItems}
             dataSectioned={dataSectioned}
             isCheckedList={isCheckedList}
-            listEmptyText={textNoSpots + ' with samples found'}
+            listEmptyText={`${filterPrefix}No Samples${scopeSuffix}`}
             openSpotInNotebook={openSpotInNotebook}
           />
         </View>

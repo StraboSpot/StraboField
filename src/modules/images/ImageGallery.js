@@ -19,7 +19,7 @@ import SpotFilters from '../spots/SpotFilters';
 const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];
 
-const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const ImageGallery = ({openSpotInNotebook}) => {
   console.log('Rendering ImageGallery...');
 
   /* Data Hooks */
@@ -35,9 +35,12 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const activeSpotsObj = useMemo(() => getActiveSpotsObj(), [getActiveSpotsObj]);
   const activeSpots = useMemo(() => Object.values(activeSpotsObj), [activeSpotsObj]);
 
+  const [scopeText, setScopeText] = useState('');
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
   const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
+
+  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   const resetAndSetSpotsSorted = useCallback((val) => {
     setVisibleSectionCount(SECTIONS_PER_PAGE);
@@ -109,18 +112,17 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
         <SpotFilters
           activeSpots={activeSpots}
           isImagesSearch={true}
+          setScopeText={setScopeText}
           setSpotsSorted={resetAndSetSpotsSorted}
-          setTextNoSpots={setTextNoSpots}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
         <View style={imageStyles.galleryImageContainer}>
           <LittleSpacer/>
           <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
+            {filterPrefix}{count + (count === 1 ? ' image' : ' images')}{scopeSuffix}
           </Text>
           <LittleSpacer/>
           <SectionList
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
+            ListEmptyComponent={<ListEmptyText text={`${filterPrefix}No Images${scopeSuffix}`}/>}
             keyExtractor={(item, index) => item + index}
             onEndReached={loadMoreSections}
             onEndReachedThreshold={0.5}

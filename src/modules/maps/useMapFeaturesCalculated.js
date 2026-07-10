@@ -107,6 +107,55 @@ const useMapFeaturesCalculated = (mapRef) => {
     return selectedSpots;
   };
 
+  // Get Spots within an axis-aligned map-extent bounding box given as two opposite corners in any
+  // order: bbox = [cornerA lng, cornerA lat, cornerB lng, cornerB lat] (normalized below).
+  // Uses a cheap coordinate range check for Point Spots (the common case) and only falls back to
+  // the heavier turf checks for line/polygon geometries. Mirrors getLassoedSpots' nested-children
+  // expansion so the results match, while avoiding a turf.booleanWithin call per Point Spot.
+  const getSpotsInBoundingBox = (features, bbox) => {
+    let selectedSpots = [];
+    try {
+      if (isEmpty(features) || !bbox || bbox.length < 4) return [];
+      // Normalize corners so the range check is correct regardless of the order the map SDK returns
+      // bounds in: mapbox-gl (web) returns SW→NE while @rnmapbox (native) returns NE→SW.
+      const minLng = Math.min(bbox[0], bbox[2]);
+      const maxLng = Math.max(bbox[0], bbox[2]);
+      const minLat = Math.min(bbox[1], bbox[3]);
+      const maxLat = Math.max(bbox[1], bbox[3]);
+      const bboxPoly = turf.bboxPolygon([minLng, minLat, maxLng, maxLat]);
+      let selectedFeaturesIds = [];
+      features.forEach((feature) => {
+        const geometryType = feature.geometry?.type;
+        if (geometryType === 'Point') {
+          const [lng, lat] = feature.geometry.coordinates;
+          if (lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat) {
+            selectedFeaturesIds.push(feature.properties.id);
+          }
+        }
+        else if (geometryType && geometryType !== 'GeometryCollection' && (turf.booleanWithin(feature, bboxPoly)
+          || (geometryType === 'LineString' && turf.lineIntersect(feature, bboxPoly).features.length > 0)
+          || (geometryType === 'Polygon' && turf.booleanOverlap(feature, bboxPoly)))) {
+          selectedFeaturesIds.push(feature.properties.id);
+        }
+      });
+      let selectedSpotsIds = [...new Set(selectedFeaturesIds)]; // Remove duplicate ids
+      selectedSpots = getSpotsByIds(selectedSpotsIds);
+
+      // Get nested children and add to selected Ids
+      selectedSpots.forEach((spot) => {
+        const children = getChildrenGenerationsSpots(spot, 10).flat();
+        const childrenIds = children.map(child => child.properties.id);
+        selectedSpotsIds.push(...childrenIds);
+      });
+      selectedSpotsIds = [...new Set(selectedSpotsIds)]; // Remove duplicate ids
+      selectedSpots = getSpotsByIds(selectedSpotsIds);
+    }
+    catch (e) {
+      console.log('Error getting Spots within the bounding box', e);
+    }
+    return selectedSpots;
+  };
+
   // Get the nearest feature to a target point in screen coordinates within a bounding box from given layers
   const getNearestFeatureInBBox = async ([x, y], layers) => {
     // First get all the features in the bounding box
@@ -154,6 +203,7 @@ const useMapFeaturesCalculated = (mapRef) => {
     getLassoedSpots,
     getNearestFeatureInBBox,
     getSpotAtPress,
+    getSpotsInBoundingBox,
     identifyClosestVertexOnSpotPress,
   };
 };

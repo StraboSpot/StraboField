@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -10,8 +10,8 @@ import {TAG_TYPES} from './tags.constants';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
-import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
@@ -22,7 +22,6 @@ const Tags = ({
                 isGeologicUnits,
                 isOverflowMenuVisible = false,
                 type,
-                updateSpotsInMapExtent,
               }) => {
   console.log('Rendering Tags...');
 
@@ -58,6 +57,16 @@ const Tags = ({
     [isGeologicUnits, tags],
   );
 
+  /* Side Effects */
+
+  // Let the map know a map-extent list is being viewed so it auto-recomputes the extent on move.
+  useEffect(() => {
+    if (selectedIndex === 1) {
+      dispatch(setIsMapExtentFilterActive(true));
+      return () => dispatch(setIsMapExtentFilterActive(false));
+    }
+  }, [selectedIndex]);
+
   /* Event Handlers */
 
   const handleContinuousTaggingSwitched = value => dispatch(setUseContinuousTagging(value));
@@ -88,12 +97,6 @@ const Tags = ({
             setTagsSorted={setTagsSorted}
             tags={baseTags}
           />
-          {selectedIndex === 1 && (
-            <UpdateSpotsInMapExtentButton
-              title={`Update ${label} in Map Extent`}
-              updateSpotsInMapExtent={updateSpotsInMapExtent}
-            />
-          )}
         </>
       )}
       <TagsList selectedIndex={selectedIndex} tagsSorted={tagsSorted} type={pageKey}/>

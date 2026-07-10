@@ -20,7 +20,7 @@ const initialMapsState = {
   intervalDragState: null,
   isDragIntervalMode: false,
   labelTypeOn: 'dipOrName',
-  isMapMoved: true,
+  isMapExtentFilterActive: false,
   isScaleBarMetric: true,
   isShowOnly1stMeas: false,
   isShowSamplesOn: false,
@@ -129,8 +129,8 @@ const mapsSlice = createSlice({
         }
       }
     },
-    setIsMapMoved(state, action) {
-      state.isMapMoved = action.payload;
+    setIsMapExtentFilterActive(state, action) {
+      state.isMapExtentFilterActive = action.payload;
     },
     setIsShowOnly1stMeas(state, action) {
       state.isShowOnly1stMeas = action.payload;
@@ -205,7 +205,7 @@ export const {
   setGeometryTypesOff,
   setIntervalDragState,
   setIntervalDragTargetSlot,
-  setIsMapMoved,
+  setIsMapExtentFilterActive,
   setIsScaleBarMetric,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,

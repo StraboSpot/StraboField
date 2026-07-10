@@ -12,19 +12,19 @@ import {
   PRIMARY_ACCENT_COLOR,
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
+  WHITE,
 } from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
-import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 
 const SpotFilters = ({
                        activeSpots,
                        isImagesSearch,
                        isSamplesSearch,
+                       setScopeText,
                        setSpotsSorted,
-                       setTextNoSpots,
-                       updateSpotsInMapExtent,
                      }) => {
   /* Data Hooks */
 
@@ -72,20 +72,29 @@ const SpotFilters = ({
 
   useEffect(() => {
     let gotSpotsFiltered = activeSpots;
-    setTextNoSpots('No Spots in Active Datasets');
+    // Empty string means no filter, so the list header/empty text falls back to its own default wording.
+    setScopeText?.('');
     if (sortedView === SORTED_VIEWS.MAP_EXTENT) {
       const extentIds = new Set(getSpotsInMapExtent().filter(Boolean).map(s => s.properties.id.toString()));
       gotSpotsFiltered = activeSpots.filter(s => extentIds.has(s.properties.id.toString()));
-      setTextNoSpots('No Active Spots in Current Map Extent');
+      setScopeText?.('Map Extent');
     }
     else if (sortedView === SORTED_VIEWS.RECENT_VIEWS) {
       const recentIds = new Set(getRecentSpots().filter(Boolean).map(s => s.properties.id.toString()));
       gotSpotsFiltered = activeSpots.filter(s => recentIds.has(s.properties.id.toString()));
-      setTextNoSpots('No Recently Viewed Active Spots');
+      setScopeText?.('Recent Views');
     }
     setSpotsFiltered(gotSpotsFiltered);
     updateSearch(undefined, gotSpotsFiltered);
   }, [recentViews, sortedView, spots, spotsInMapExtentIds]);
+
+  // Let the map know a map-extent list is being viewed so it auto-recomputes the extent on move.
+  useEffect(() => {
+    if (sortedView === SORTED_VIEWS.MAP_EXTENT) {
+      dispatch(setIsMapExtentFilterActive(true));
+      return () => dispatch(setIsMapExtentFilterActive(false));
+    }
+  }, [sortedView]);
 
   /* Logic Helpers */
 
@@ -186,7 +195,14 @@ const SpotFilters = ({
             />
             <View style={{marginHorizontal: -10}}>
               <ClearButton
-                icon={{name: 'filter-alt', type: 'material', color: isFilterActive ? PRIMARY_ACCENT_COLOR : undefined}}
+                icon={{
+                  color: isFilterActive ? WHITE : undefined,
+                  containerStyle: isFilterActive
+                    ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, padding: 5}
+                    : undefined,
+                  name: 'filter-alt',
+                  type: 'material',
+                }}
                 onPress={openFilterPicker}
               />
             </View>
@@ -203,13 +219,6 @@ const SpotFilters = ({
               />
             </View>
           </View>
-          {sortedView === SORTED_VIEWS.MAP_EXTENT && (
-            <UpdateSpotsInMapExtentButton
-              title={'Update Spots in Map Extent'}
-              updateSpotsInMapExtent={updateSpotsInMapExtent}
-            />
-          )}
-
           {/* Modals  */}
           <PickerOverlay
             closePicker={closeFilterPicker}

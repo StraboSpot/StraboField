@@ -31,6 +31,7 @@ const Map = ({
                showUserLocation,
                spotsNotSelected,
                spotsSelected,
+               updateSpotsInMapExtent,
              }) => {
   // console.log('Rendering Map...');
 
@@ -45,7 +46,7 @@ const Map = ({
     isDragIntervalMode,
   } = useSelector(state => state.map);
 
-  const {handleMapMoved} = useMapMoveEvents({mapRef});
+  const {handleMapMoved} = useMapMoveEvents({mapRef, onMapMoveEnd: updateSpotsInMapExtent});
 
   /* Local State */
 

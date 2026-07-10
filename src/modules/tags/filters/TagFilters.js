@@ -11,6 +11,7 @@ import {
   PRIMARY_ACCENT_COLOR,
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
+  WHITE,
 } from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
@@ -106,7 +107,14 @@ const TagFilters = ({isGeologicUnits, selectedIndex, setSelectedIndex, setTagsSo
         />
         <View style={{marginHorizontal: -10}}>
           <ClearButton
-            icon={{name: 'filter-alt', type: 'material', color: isFilterActive ? PRIMARY_ACCENT_COLOR : undefined}}
+            icon={{
+              color: isFilterActive ? WHITE : undefined,
+              containerStyle: isFilterActive
+                ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, padding: 5}
+                : undefined,
+              name: 'filter-alt',
+              type: 'material',
+            }}
             onPress={() => setIsFilterPickerVisible(true)}
           />
         </View>

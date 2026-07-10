@@ -48,6 +48,7 @@ const MapContainer = forwardRef(({
   const customBasemap = useSelector(state => state.map.customMaps);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const isMapExtentFilterActive = useSelector(state => state.map.isMapExtentFilterActive);
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
@@ -61,7 +62,7 @@ const MapContainer = forwardRef(({
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);
-  const {getLassoedSpots} = useMapFeaturesCalculated(mapRef);
+  const {getSpotsInBoundingBox} = useMapFeaturesCalculated(mapRef);
   const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
   const [vertexActionValues, setVertexActionValues] = useState(null);
   const {
@@ -124,6 +125,8 @@ const MapContainer = forwardRef(({
   const cameraRef = useRef(null);
   const isDatasetToggleZoomPendingRef = useRef(false);
   const isInitialLoadZoomPendingRef = useRef(false);
+  // Mirror the map-extent-filter flag in a ref so the debounced map-move callback reads the latest value.
+  const isMapExtentFilterActiveRef = useRef(isMapExtentFilterActive);
   const spotsRef = useRef(null);
 
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -182,6 +185,13 @@ const MapContainer = forwardRef(({
       setImageHeightAndWidth(currentImageBasemap).catch(console.error);
     }
   }, [currentImageBasemap]);
+
+  // Recompute the Spots in the map extent whenever a map-extent list (Spots/Images/Samples/Tags/
+  // Geologic Units) becomes active, so it is current when the view opens or the map regains focus.
+  useEffect(() => {
+    isMapExtentFilterActiveRef.current = isMapExtentFilterActive;
+    if (isMapExtentFilterActive) updateSpotsInMapExtent().catch(console.error);
+  }, [isMapExtentFilterActive]);
 
   useEffect(() => {
     // console.log('UE MapContainer [currentBasemap, isZoomToCenterOffline]');
@@ -245,7 +255,6 @@ const MapContainer = forwardRef(({
       saveEdits: saveEdits,
       startEditingMode: startEditingMode,
       toggleUserLocation: toggleUserLocation,
-      updateSpotsInMapExtent: updateSpotsInMapExtent,
       zoomToCenterOfflineTile: zoomToCenterOfflineTile,
       zoomToCurrentLocation: zoomToCurrentLocation,
       zoomToCustomMap: zoomToCustomMap,
@@ -339,8 +348,10 @@ const MapContainer = forwardRef(({
       // modal and open the global ErrorModal here: dismissing one native Modal while presenting another
       // in the same commit makes iOS drop the ErrorModal presentation and freezes the app.
       console.error(err);
-      return {message: 'Error fetching data from tile count service. '
-          + 'Make sure you are pulling from the correct endpoint (Home → Miscellaneous → Custom Database Endpoint).'};
+      return {
+        message: 'Error fetching data from tile count service. '
+          + 'Make sure you are pulling from the correct endpoint (Home → Miscellaneous → Custom Database Endpoint).',
+      };
     }
   };
 
@@ -363,19 +374,32 @@ const MapContainer = forwardRef(({
     }
   };
 
-  // Calculate the Spots in the current map extent and send to redux
+  // Calculate the Spots in the current map extent and send to redux. Skips the work unless a
+  // map-extent list is actually being viewed (auto-triggered on map move and on view open).
   const updateSpotsInMapExtent = async () => {
+    if (!isMapExtentFilterActiveRef.current) return;
     if (mapRef && mapRef.current) {
       console.log('Updating spots in map extent...');
-      const mapBounds = Platform.OS === 'web' ? await mapRef.current.getBounds().toArray()
-        : await mapRef.current.getVisibleBounds();
+      let mapBounds;
+      if (Platform.OS === 'web') {
+        // Derive the extent from the actual rendered container corners instead of getBounds(), which
+        // on web is translated/undersized when the map has camera padding or a stale internal size.
+        // resize() first syncs the transform to the real container so the unprojected corners match
+        // exactly what is on screen.
+        const map = mapRef.current;
+        if (typeof map.resize === 'function') map.resize();
+        const canvas = map.getCanvas();
+        const nw = map.unproject([0, 0]);
+        const se = map.unproject([canvas.clientWidth, canvas.clientHeight]);
+        mapBounds = [[nw.lng, nw.lat], [se.lng, se.lat]];
+      }
+      else mapBounds = await mapRef.current.getVisibleBounds();
       let right = mapBounds[0][0];
       let top = mapBounds[0][1];
       let left = mapBounds[1][0];
       let bottom = mapBounds[1][1];
       let bbox = [left, bottom, right, top];
-      const bboxPoly = turf.bboxPolygon(bbox);
-      const gotSpotsInMapExtent = getLassoedSpots(spotsRef.current, bboxPoly);
+      const gotSpotsInMapExtent = getSpotsInBoundingBox(spotsRef.current, bbox);
       const gotSpotsInMapExtentIds = gotSpotsInMapExtent.map(spot => spot.properties.id);
       dispatch(setSpotsInMapExtentIds(gotSpotsInMapExtentIds));
     }
@@ -473,6 +497,7 @@ const MapContainer = forwardRef(({
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}
+          updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
       ) : (
         <View style={{flex: 1, backgroundColor: '#E8E8E8'}}/>

@@ -116,21 +116,18 @@ const MainMenuPanel = forwardRef(({
         return (
           <SpotsList
             onPress={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.IMAGES:
         return (
           <ImageGallery
             openSpotInNotebook={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.SAMPLES:
         return (
           <Samples
             openSpotInNotebook={openSpotInNotebook}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.REPORTS:
@@ -140,7 +137,6 @@ const MainMenuPanel = forwardRef(({
           <Tags
             closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
             isOverflowMenuVisible={isTagsOverflowMenuVisible}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS:
@@ -149,7 +145,6 @@ const MainMenuPanel = forwardRef(({
             closeTagsOverflowMenu={() => setIsTagsOverflowMenuVisible(false)}
             isGeologicUnits
             isOverflowMenuVisible={isTagsOverflowMenuVisible}
-            updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
@@ -223,9 +218,9 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS:
-        return <AddRemoveTagSampleSpots updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}/>;
+        return <AddRemoveTagSampleSpots/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
-        return <AddRemoveTagSpots updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}/>;
+        return <AddRemoveTagSpots/>;
       case SIDE_PANEL_VIEWS.TAG_DETAIL:
         return <TagDetailSidePanel openNotebookPanel={openNotebookPanel} openSpotInNotebook={openSpotInNotebook}/>;
     }

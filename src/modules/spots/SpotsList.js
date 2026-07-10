@@ -8,7 +8,7 @@ import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
-const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
+const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress}) => {
   // console.log('Rendering SpotsList...');
 
   /* Data Hooks */
@@ -19,12 +19,14 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
 
   const activeSpots = getVisibleSpots();
 
+  const [scopeText, setScopeText] = useState('');
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Active Datasets');
 
   /* Derived Variables */
 
   const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
+  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   /* View */
 
@@ -32,18 +34,17 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress, updateSpots
     <View style={{flex: 1}}>
       <SpotFilters
         activeSpots={activeSpots}
+        setScopeText={setScopeText}
         setSpotsSorted={setSpotsSorted}
-        setTextNoSpots={setTextNoSpots}
-        updateSpotsInMapExtent={updateSpotsInMapExtent}
       />
       <View style={{flex: 1}}>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={textNoSpots + ' Found'}/>}
+          ListEmptyComponent={<ListEmptyText text={`${filterPrefix}No Spots${scopeSuffix}`}/>}
           ListHeaderComponent={!isEmpty(spotsNoSamples) && (
             <Text
               style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-              Found {spotsNoSamples.length + (spotsNoSamples.length === 1 ? ' Spot' : ' Spots')} in Active Datasets
+              {filterPrefix}{spotsNoSamples.length + (spotsNoSamples.length === 1 ? ' Spot' : ' Spots')}{scopeSuffix}
             </Text>
           )}
           data={spotsNoSamples}
