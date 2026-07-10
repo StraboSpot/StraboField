@@ -237,6 +237,9 @@ const useMapSymbology = () => {
 
   const getPolygonSymbology = (feature) => {
     if (feature.properties.surface_feature && feature.properties.surface_feature.surface_feature_type === 'strat_interval') {
+      // When the Geologic Unit / Tag Colors switch is on, show the matching tag color for the interval's spot,
+      // defaulting to white when there is no matching tag color. Otherwise use the lithology-based fill.
+      if (tagTypeForColor) return {fillColor: getTagColor(feature) || 'rgba(255, 255, 255, 1)'};
       return getStratIntervalFill(feature.properties);
     }
     else {

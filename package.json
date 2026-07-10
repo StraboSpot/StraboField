@@ -26,7 +26,7 @@
     "bump-patch": "npm version patch --no-git-tag-version && bundle exec fastlane bump",
     "bump-minor": "npm version minor --no-git-tag-version && bundle exec fastlane bump",
     "bump-major": "npm version major --no-git-tag-version && bundle exec fastlane bump",
-    "commit-and-push": "git add . && git commit -m \"chore: bump version to $(node -p \\\"require('./package.json').version\\\")\" && git push origin master",
+    "commit-and-push": "node scripts/commit-and-push.js",
     "deploy-beta": "bundle exec fastlane beta",
     "create-changelog": "changelog generate-changelog",
     "web": "webpack serve --mode development --devtool inline-source-map --config webpack.config.js --hot --color",

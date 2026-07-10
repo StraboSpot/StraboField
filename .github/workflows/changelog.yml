@@ -21,9 +21,11 @@ jobs:
         id: prev_tag
         run: |
           CURR=${{ github.ref_name }}
-          # Find the latest tag from a previous minor version (e.g. v2.28.x when releasing v2.29.x)
-          CURR_MINOR=$(echo $CURR | grep -oE '^v[0-9]+\.[0-9]+')
-          PREV_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v "^${CURR_MINOR}\." | sort -V | tail -1)
+          # Find the tag immediately preceding this release in version order.
+          # Include CURR in the sorted list so we can grab whatever sits just below it,
+          # whether the previous release was a patch, minor, or major bump.
+          PREV_TAG=$( { git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'; echo "$CURR"; } \
+            | sort -V | uniq | awk -v c="$CURR" '$0==c{print prev; exit} {prev=$0}')
           echo "Previous release tag: $PREV_TAG"
           echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
@@ -32,7 +34,10 @@ jobs:
           PREV=${{ steps.prev_tag.outputs.prev_tag }}
           CURR=${{ github.ref_name }}
 
-          changelog=$(git log $PREV..$CURR --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
+          # If there is no previous tag (first release), log the full history up to CURR.
+          if [ -n "$PREV" ]; then RANGE="$PREV..$CURR"; else RANGE="$CURR"; fi
+
+          changelog=$(git log $RANGE --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^chore: bump version\|^chore: update changelog\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
           /^feat/ { features[++fc] = $0 }
           /^fix/  { fixes[++bc] = $0 }
           /^chore/ { chores[++cc] = $0 }
@@ -49,23 +54,6 @@ jobs:
 
           echo "$changelog" > release_notes.md
           cat release_notes.md
-
-      - name: Prepend to CHANGELOG.md
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            cat release_notes.md CHANGELOG.md > tmp.md && mv tmp.md CHANGELOG.md
-          else
-            cp release_notes.md CHANGELOG.md
-          fi
-
-      - name: Commit CHANGELOG.md
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f CHANGELOG.md
-          git commit -m "chore: update changelog for ${{ github.ref_name }}"
-          git push origin HEAD:master
 
       - name: Delete existing release if present
         env:
