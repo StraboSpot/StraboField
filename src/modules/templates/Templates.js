@@ -8,6 +8,7 @@ import TemplatesOverflowMenuModal from './TemplatesOverflowMenuModal';
 import TemplatesSectionList from './TemplatesSectionList';
 import useTemplates from './useTemplates';
 import {isEmpty} from '../../shared/helpers';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
 
@@ -79,6 +80,7 @@ const Templates = () => {
     return (
       <>
         <MainMenuPanelHeader onOverflowMenuPress={() => setIsOverflowMenuVisible(true)}/>
+        <AddButton onPress={handleCreateNewTemplatePressed} title={'Create New Template'}/>
         <TemplatesSectionList handleTemplatePressed={handleTemplatePressed}/>
       </>
     );

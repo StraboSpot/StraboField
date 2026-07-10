@@ -9,6 +9,7 @@ import LoadTagsModal from './LoadTagsModal';
 import {TAG_TYPES} from './tags.constants';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
+import AddButton from '../../shared/ui/buttons/AddButton';
 import UpdateSpotsInMapExtentButton from '../../shared/ui/UpdateSpotsInMapExtentButton';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
@@ -45,6 +46,7 @@ const Tags = ({
   const pageKey = isGeologicUnits ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+  const addButtonTitle = isGeologicUnits ? 'Create New Geologic Unit' : 'Create New Tag';
 
   // Each page (Tags/Geologic Units) keeps its own filter in Redux so selecting one doesn't affect the other.
   const selectedIndex = (listFilters && listFilters[pageKey]) || 0;
@@ -76,6 +78,7 @@ const Tags = ({
 
   return (
     <View style={{flex: 1}}>
+      <AddButton onPress={addTag} title={addButtonTitle}/>
       {!isEmpty(tags) && (
         <>
           <TagFilters
