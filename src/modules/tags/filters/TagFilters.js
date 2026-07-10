@@ -14,6 +14,7 @@ import {
   WHITE,
 } from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import HorizontalLine from '../../../shared/ui/HorizontalLine';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
 import {getTagTitle} from '../tags.helpers';
 
@@ -125,6 +126,7 @@ const TagFilters = ({isGeologicUnits, selectedIndex, setSelectedIndex, setTagsSo
           <ClearButton icon={{name: 'swap-vert', type: 'material'}} onPress={toggleReverseSort}/>
         </View>
       </View>
+      <HorizontalLine style={{marginTop: 5}}/>
 
       {/* Modals */}
       <PickerOverlay

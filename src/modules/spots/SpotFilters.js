@@ -15,6 +15,7 @@ import {
   WHITE,
 } from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
+import HorizontalLine from '../../shared/ui/HorizontalLine';
 import PickerOverlay from '../../shared/ui/modals/PickerOverlay';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
@@ -219,6 +220,7 @@ const SpotFilters = ({
               />
             </View>
           </View>
+          <HorizontalLine style={{marginTop: 5}}/>
           {/* Modals  */}
           <PickerOverlay
             closePicker={closeFilterPicker}
