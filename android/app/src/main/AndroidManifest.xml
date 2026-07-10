@@ -31,7 +31,7 @@
       android:roundIcon="@mipmap/ic_launcher"
       android:allowBackup="false"
       android:theme="@style/AppTheme"
-      android:usesCleartextTraffic="${usesCleartextTraffic}"
+      android:usesCleartextTraffic="true"
       android:requestLegacyExternalStorage="true"
       android:supportsRtl="true"
       tools:replace="android:appComponentFactory"
