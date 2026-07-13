@@ -1,12 +1,11 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {FlatList, Platform} from 'react-native';
 
 const FormFlatList = ({children, ...rest}) => {
-  const renderHeader = useCallback(() => <>{children}</>, [children]);
 
   return (
     <FlatList
-      ListHeaderComponent={renderHeader}
+      ListHeaderComponent={<>{children}</>}
       automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
       data={[]}
       keyboardShouldPersistTaps='handled'
