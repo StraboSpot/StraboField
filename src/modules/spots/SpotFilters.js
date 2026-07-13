@@ -194,29 +194,28 @@ const SpotFilters = ({
               platform={'default'}
               value={searchState}
             />
-            <View style={{marginHorizontal: -10}}>
+            <View style={{alignItems: 'center', flexDirection: 'row'}}>
               <ClearButton
                 icon={{
                   color: isFilterActive ? WHITE : undefined,
                   containerStyle: isFilterActive
-                    ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, padding: 5}
-                    : undefined,
+                    ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, marginHorizontal: 0, padding: 5}
+                    : {marginHorizontal: 0},
                   name: 'filter-alt',
                   type: 'material',
                 }}
                 onPress={openFilterPicker}
+                size={'xs'}
               />
-            </View>
-            <View style={{marginHorizontal: -10}}>
               <ClearButton
-                icon={{name: 'sort', type: 'material'}}
+                icon={{containerStyle: {marginHorizontal: 0}, name: 'sort', type: 'material'}}
                 onPress={openSortPicker}
+                size={'xs'}
               />
-            </View>
-            <View style={{marginHorizontal: -10}}>
               <ClearButton
-                icon={{name: 'swap-vert', type: 'material'}}
+                icon={{containerStyle: {marginHorizontal: 0}, name: 'swap-vert', type: 'material'}}
                 onPress={toggleReverseSort}
+                size={'xs'}
               />
             </View>
           </View>
