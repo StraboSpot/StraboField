@@ -12,7 +12,6 @@
       "type": "text",
       "name": "label",
       "label": "Label",
-      "hint": "label",
       "required": "false"
     },
     {
@@ -91,11 +90,6 @@
       "label": "Line Notes",
       "required": "false",
       "appearance": "multiline"
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vdrnX5TnNCvT3e8Req7crT'"
     }
   ],
   "choices": [
@@ -141,158 +135,158 @@
     },
     {
       "list_name": "wa7uq58",
-      "name": "stretching",
-      "label": "stretching"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "intersection",
-      "label": "intersection",
-      "order": "1"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "pencil_cleav",
-      "label": "pencil cleavage",
-      "order": "2"
+      "name": "boudin",
+      "label": "boudin"
     },
     {
       "list_name": "wa7uq58",
       "name": "crenulation",
       "label": "crenulation",
-      "order": "3"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "striations",
-      "label": "striations",
-      "order": "4"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "slickenlines",
-      "label": "slickenlines",
-      "order": "5"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "fold_hinge",
-      "label": "fold hinge",
-      "order": "6"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "s_fold",
-      "label": "s-fold",
-      "order": "7"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "z_fold",
-      "label": "z-fold",
-      "order": "8"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "m_fold",
-      "label": "m-fold",
-      "order": "9"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "slickenfibers",
-      "label": "slickenfibers",
-      "order": "10"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "groove_marks",
-      "label": "groove marks",
-      "order": "11"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "parting_lineat",
-      "label": "parting lineations",
-      "order": "12"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "magmatic_miner_1",
-      "label": "magmatic mineral alignment",
-      "order": "13"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "xenolith_encla",
-      "label": "xenolith/enclave alignment",
-      "order": "14"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "mineral_align",
-      "label": "mineral alignment",
-      "order": "15"
+      "order": 1
     },
     {
       "list_name": "wa7uq58",
       "name": "deformed_marke",
       "label": "deformed marker",
-      "order": "16"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "rodding",
-      "label": "rodding",
-      "order": "17"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "boudin",
-      "label": "boudin",
-      "order": "18"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "mullions",
-      "label": "mullions",
-      "order": "19"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "mineral_streak",
-      "label": "mineral streaks",
-      "order": "20"
-    },
-    {
-      "list_name": "wa7uq58",
-      "name": "vorticity_axis",
-      "label": "vorticity axis",
-      "order": "21"
+      "order": 2
     },
     {
       "list_name": "wa7uq58",
       "name": "flow_transport",
       "label": "flow/transport direction",
-      "order": "22"
+      "order": 3
     },
     {
       "list_name": "wa7uq58",
-      "name": "vergence",
-      "label": "vergence",
-      "order": "23"
+      "name": "fold_hinge",
+      "label": "fold hinge",
+      "order": 4
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "groove_marks",
+      "label": "groove marks",
+      "order": 5
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "intersection",
+      "label": "intersection",
+      "order": 6
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "m_fold",
+      "label": "m-fold",
+      "order": 7
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "magmatic_miner_1",
+      "label": "magmatic mineral alignment",
+      "order": 8
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "mineral_align",
+      "label": "mineral alignment",
+      "order": 9
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "mineral_streak",
+      "label": "mineral streaks",
+      "order": 10
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "mullions",
+      "label": "mullions",
+      "order": 11
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "parting_lineat",
+      "label": "parting lineations",
+      "order": 12
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "pencil_cleav",
+      "label": "pencil cleavage",
+      "order": 13
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "rodding",
+      "label": "rodding",
+      "order": 14
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "s_fold",
+      "label": "s-fold",
+      "order": 15
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "slickenfibers",
+      "label": "slickenfibers",
+      "order": 16
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "slickenlines",
+      "label": "slickenlines",
+      "order": 17
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "stretching",
+      "label": "stretching",
+      "order": 18
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "striations",
+      "label": "striations",
+      "order": 19
     },
     {
       "list_name": "wa7uq58",
       "name": "vector",
       "label": "vector",
-      "order": "24"
+      "order": 20
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "vergence",
+      "label": "vergence",
+      "order": 21
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "vorticity_axis",
+      "label": "vorticity axis",
+      "order": 22
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "xenolith_encla",
+      "label": "xenolith/enclave alignment",
+      "order": 23
+    },
+    {
+      "list_name": "wa7uq58",
+      "name": "z_fold",
+      "label": "z-fold",
+      "order": 24
     },
     {
       "list_name": "wa7uq58",
       "name": "other",
       "label": "other",
-      "order": "25"
+      "order": 25
     },
     {
       "list_name": "ip7ah36",
@@ -307,9 +301,7 @@
   ],
   "settings": [
     {
-      "id_string": "linear_orientation",
-      "form_title": "Orientations - Linear",
-      "version": "2 (2022-02-15 19:10:52)"
+      "id_string": "linear_orientation"
     }
   ]
 }
