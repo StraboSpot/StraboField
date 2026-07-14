@@ -1,5 +1,5 @@
 import {getTagTitle} from '../tags.helpers';
-import {TAG_SORT_ORDER, TEMPORAL_FIELD_GROUPS, TEMPORAL_VALUE_RANGES} from './tagFilters.constants';
+import {TAG_SORT_ORDER, TEMPORAL_FIELD_GROUPS, TEMPORAL_VALUE_RANGES} from './tagQuery.constants';
 
 export const sortTagsAlphabetically = tagsToSort =>
   [...tagsToSort].sort((a, b) => getTagTitle(a).localeCompare(getTagTitle(b)));

@@ -14,7 +14,7 @@ import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
-import SpotFilters from '../spots/SpotFilters';
+import SpotQuery from '../spots/SpotQuery';
 
 const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];
@@ -109,7 +109,7 @@ const ImageGallery = ({openSpotInNotebook}) => {
 
     return (
       <>
-        <SpotFilters
+        <SpotQuery
           activeSpots={activeSpots}
           isImagesSearch={true}
           setScopeText={setScopeText}

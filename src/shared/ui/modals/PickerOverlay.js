@@ -4,14 +4,25 @@ import {FlatList, View} from 'react-native';
 import {Button, CheckBox} from '@rn-vui/base';
 
 import ModalWrapper from './ModalWrapper';
-import {
-  PRIMARY_ACCENT_COLOR,
-  PRIMARY_TEXT_COLOR,
-  PRIMARY_TEXT_SIZE,
-  SECONDARY_BACKGROUND_COLOR,
-} from '../../styles.constants';
+import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
 
-const PickerOverlay = ({clearButtonTitle, closePicker, data, dividerText, isPickerVisible, onClearPress, onSelect, value}) => {
+// checkedIcon/uncheckedIcon and the item*Style props default to a bare checkmark list; callers such as
+// ListQueryBar override them to get outlined checkboxes / radio buttons with custom text and spacing.
+const PickerOverlay = ({
+                         checkedIcon = 'check',
+                         clearButtonTitle,
+                         closePicker,
+                         data,
+                         dividerText,
+                         isPickerVisible,
+                         itemContainerStyle,
+                         itemTextStyle,
+                         onClearPress,
+                         onSelect,
+                         selectedValues,
+                         uncheckedIcon = '',
+                         value,
+                       }) => {
   /* Event Handlers */
 
   const handleSelect = item => onSelect(item);
@@ -33,14 +44,14 @@ const PickerOverlay = ({clearButtonTitle, closePicker, data, dividerText, isPick
         renderItem={({item}) => {
           return (
             <CheckBox
-              checked={item === value}
-              checkedIcon={'check'}
-              containerStyle={{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0}}
+              checked={selectedValues ? selectedValues.includes(item) : item === value}
+              checkedIcon={checkedIcon}
+              containerStyle={[{backgroundColor: SECONDARY_BACKGROUND_COLOR, borderWidth: 0}, itemContainerStyle]}
               iconType={'material'}
               onPress={() => handleSelect(item)}
+              textStyle={itemTextStyle}
               title={item}
-              titleStyle={{color: PRIMARY_TEXT_COLOR, size: PRIMARY_TEXT_SIZE}}
-              uncheckedIcon={''}
+              uncheckedIcon={uncheckedIcon}
             />
           );
         }}

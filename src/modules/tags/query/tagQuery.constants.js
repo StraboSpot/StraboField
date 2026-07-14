@@ -179,3 +179,12 @@ export const TAG_SORT_ORDER = {
   DATE_CREATED: 'Date Created',
   TEMPORAL: 'Temporal',
 };
+
+// Tag filters are multi-select and combine as an intersection; stored as an array of these keys (empty = all).
+export const TAG_FILTERS = {
+  MAP_EXTENT: 'MAP_EXTENT',
+};
+
+export const TAG_FILTER_LABELS = {
+  [TAG_FILTERS.MAP_EXTENT]: 'Map Extent',
+};

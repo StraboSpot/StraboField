@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {SpotsListItem, useSpots} from '.';
-import SpotFilters from './SpotFilters';
+import SpotQuery from './SpotQuery';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -32,7 +32,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress}) => {
 
   return (
     <View style={{flex: 1}}>
-      <SpotFilters
+      <SpotQuery
         activeSpots={activeSpots}
         setScopeText={setScopeText}
         setSpotsSorted={setSpotsSorted}

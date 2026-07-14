@@ -6,7 +6,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {useSpots} from '../spots';
-import SpotFilters from '../spots/SpotFilters';
+import SpotQuery from '../spots/SpotQuery';
 
 const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
   /* Data Hooks */
@@ -40,7 +40,7 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
 
   return (
     <View style={{flex: 1}}>
-      <SpotFilters
+      <SpotQuery
         activeSpots={spotsWithSamples}
         isSamplesSearch={true}
         setScopeText={setScopeText}
