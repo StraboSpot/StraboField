@@ -68,6 +68,7 @@ const TagQuery = ({activeFilters, isGeologicUnits, setActiveFilters, setTagsSort
   return (
     <ListQueryBar
       filterOptions={filterOptions}
+      filterTitle={isGeologicUnits ? 'Geologic Unit Filters' : 'Tag Filters'}
       filterValues={activeFilters.map(filter => TAG_FILTER_LABELS[filter])}
       onFilterClear={clearFilter}
       onFilterToggle={toggleFilter}

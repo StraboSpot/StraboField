@@ -20,6 +20,7 @@ import PickerOverlay from './modals/PickerOverlay';
 // picker open/close state; consumers supply the option data, the current values, and the callbacks.
 const ListQueryBar = ({
                         filterOptions,
+                        filterTitle = 'Filters',
                         filterValues,
                         onFilterClear,
                         onFilterToggle,
@@ -111,7 +112,7 @@ const ListQueryBar = ({
         checkedIcon={'check-box'}
         closePicker={closeFilterPicker}
         data={filterOptions}
-        dividerText={'Filters'}
+        dividerText={filterTitle}
         isPickerVisible={isFilterPickerVisible}
         itemContainerStyle={itemContainerStyle}
         itemTextStyle={itemTextStyle}

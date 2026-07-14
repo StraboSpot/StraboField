@@ -25,7 +25,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress}) => {
   /* Derived Variables */
 
   const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
-  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const scopeSuffix = scopeText ? ` ${scopeText}` : '';
   const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   /* View */
@@ -40,7 +40,7 @@ const SpotsList = ({checkedItems, isCheckedList, onChecked, onPress}) => {
       <View style={{flex: 1}}>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={`${filterPrefix}No Spots${scopeSuffix}`}/>}
+          ListEmptyComponent={<ListEmptyText text={`No Spots${scopeSuffix}`}/>}
           ListHeaderComponent={!isEmpty(spotsNoSamples) && (
             <Text
               style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>

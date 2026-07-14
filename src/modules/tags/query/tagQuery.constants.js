@@ -186,5 +186,5 @@ export const TAG_FILTERS = {
 };
 
 export const TAG_FILTER_LABELS = {
-  [TAG_FILTERS.MAP_EXTENT]: 'Map Extent',
+  [TAG_FILTERS.MAP_EXTENT]: 'In Current Map Extent',
 };

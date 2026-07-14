@@ -39,7 +39,7 @@ const ImageGallery = ({openSpotInNotebook}) => {
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
   const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
 
-  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const scopeSuffix = scopeText ? ` ${scopeText}` : '';
   const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   const resetAndSetSpotsSorted = useCallback((val) => {
@@ -115,23 +115,24 @@ const ImageGallery = ({openSpotInNotebook}) => {
           setScopeText={setScopeText}
           setSpotsSorted={resetAndSetSpotsSorted}
         />
-        <View style={imageStyles.galleryImageContainer}>
-          <LittleSpacer/>
-          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            {filterPrefix}{count + (count === 1 ? ' image' : ' images')}{scopeSuffix}
-          </Text>
-          <LittleSpacer/>
-          <SectionList
-            ListEmptyComponent={<ListEmptyText text={`${filterPrefix}No Images${scopeSuffix}`}/>}
-            keyExtractor={(item, index) => item + index}
-            onEndReached={loadMoreSections}
-            onEndReachedThreshold={0.5}
-            renderItem={({item, section}) => renderImagesInSpot(item, section)}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            sections={spotsAsSections}
-            stickySectionHeadersEnabled={true}
-          />
-        </View>
+        {isEmpty(spotsAsSections) ? <ListEmptyText text={`No Images${scopeSuffix}`}/> : (
+          <View style={imageStyles.galleryImageContainer}>
+            <LittleSpacer/>
+            <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
+              {filterPrefix}{count + (count === 1 ? ' Image' : ' Images')}{scopeSuffix}
+            </Text>
+            <LittleSpacer/>
+            <SectionList
+              keyExtractor={(item, index) => item + index}
+              onEndReached={loadMoreSections}
+              onEndReachedThreshold={0.5}
+              renderItem={({item, section}) => renderImagesInSpot(item, section)}
+              renderSectionHeader={({section}) => renderSectionHeader(section)}
+              sections={spotsAsSections}
+              stickySectionHeadersEnabled={true}
+            />
+          </View>
+        )}
       </>
     );
   };

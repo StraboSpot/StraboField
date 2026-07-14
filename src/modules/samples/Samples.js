@@ -24,7 +24,7 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
 
   /* Derived Variables */
 
-  const scopeSuffix = scopeText ? ` in ${scopeText}` : '';
+  const scopeSuffix = scopeText ? ` ${scopeText}` : '';
   const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   let samplesCount = 0;
@@ -46,7 +46,7 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
         setScopeText={setScopeText}
         setSpotsSorted={setSpotsWithSamplesSorted}
       />
-      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={`${filterPrefix}No Samples${scopeSuffix}`}/> : (
+      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={`No Samples${scopeSuffix}`}/> : (
         <View style={{flex: 1}}>
           <Text
             style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
@@ -56,7 +56,7 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
             checkedItems={checkedItems}
             dataSectioned={dataSectioned}
             isCheckedList={isCheckedList}
-            listEmptyText={`${filterPrefix}No Samples${scopeSuffix}`}
+            listEmptyText={`No Samples${scopeSuffix}`}
             openSpotInNotebook={openSpotInNotebook}
           />
         </View>

@@ -5,6 +5,7 @@ import {Button, CheckBox} from '@rn-vui/base';
 
 import ModalWrapper from './ModalWrapper';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../styles.constants';
+import SectionDivider from '../SectionDivider';
 
 // checkedIcon/uncheckedIcon and the item*Style props default to a bare checkmark list; callers such as
 // ListQueryBar override them to get outlined checkboxes / radio buttons with custom text and spacing.
@@ -42,6 +43,7 @@ const PickerOverlay = ({
       <FlatList
         data={data}
         renderItem={({item}) => {
+          if (item?.header) return <SectionDivider dividerText={item.header}/>;
           return (
             <CheckBox
               checked={selectedValues ? selectedValues.includes(item) : item === value}
