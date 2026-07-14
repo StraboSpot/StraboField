@@ -53,7 +53,7 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
         #else
         // Physical device, offline: point directly at the Mac's USB link-local IP
         // Run ifconfig | grep "inet " in terminal to get inet ip
-        return URL(string: "http://169.254.144.132:8081/index.bundle?platform=ios&dev=true")
+        return URL(string: "http://169.254.38.24:8081/index.bundle?platform=ios&dev=true")
         #endif
         #else
         return Bundle.main.url(forResource: "main", withExtension: "jsbundle")

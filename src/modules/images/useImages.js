@@ -1,4 +1,4 @@
-import {PermissionsAndroid, Platform} from 'react-native';
+import {Platform} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -40,7 +40,7 @@ const useImages = () => {
   const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
   const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
-  const {checkPermission, requestPermission} = usePermissions();
+  const {hasCameraPermission} = usePermissions();
   const toast = useToast();
 
   /* Exported Functions */
@@ -239,19 +239,9 @@ const useImages = () => {
 
   const launchCameraFromNotebook = async () => {
     try {
-      const permissionResult = Platform.OS === 'ios' ? true
-        : await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-      if (permissionResult) {
+      if (await hasCameraPermission()) {
         newImages = [];
         return launchCameraLoop();
-      }
-      else {
-        const permissionRequestResult = await requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-        if (permissionRequestResult === 'granted' || permissionRequestResult === 'never_ask_again') {
-          newImages = [];
-          return launchCameraLoop();
-        }
-        else toast.show('StraboSpot can not access your camera due to permission denial.');
       }
     }
     catch (err) {
@@ -260,25 +250,6 @@ const useImages = () => {
       dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
       dispatch(setIsErrorMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-    }
-  };
-
-  const requestCameraPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: 'Camera Permission Requested',
-          message: 'StraboSpot needs access to your camera so you can take pictures.',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) console.log('You can use the camera');
-      else console.log('Camera permission denied');
-    }
-    catch (err) {
-      console.warn(err);
     }
   };
 
@@ -340,42 +311,38 @@ const useImages = () => {
     if (!imageCopy.annotated) dispatch(setCurrentImageBasemap(undefined));
   };
 
-  // Called from Notebook Panel Footer and opens camera only
+  // Opens the camera and saves one photo. Camera permission is verified upstream in
+  // launchCameraFromNotebook before this loop is entered.
   const takePicture = async () => {
-    let permissionGranted;
-    console.log(PermissionsAndroid.PERMISSIONS.CAMERA);
-    if (Platform.OS === 'android') permissionGranted = await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-    if (permissionGranted === 'granted' || Platform.OS === 'ios') {
-      await startCameraAnglesCapture();
-      return new Promise((resolve, reject) => {
-        try {
-          launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
-            console.log('Launch Camera Response:', response);
-            if (response.didCancel) {
-              stopCameraAnglesCapture();
-              resolve('cancelled');
-            }
-            else if (response.error) {
-              stopCameraAnglesCapture();
-              reject();
-            }
-            else {
-              const imageAsset = response.assets[0];
-              const compassReading = getCurrentCameraAngles();
-              stopCameraAnglesCapture();
-              const resizedImage = await resizeImageForDevice(imageAsset);
-              console.log('Resized Image:', resizedImage);
-              const savedFile = await saveFile(resizedImage);
-              resolve({...savedFile, ...compassReading});
-            }
-          });
-        }
-        catch (e) {
-          dispatch(setLoadingStatus({view: 'home', bool: false}));
-          reject(e);
-        }
-      });
-    }
+    await startCameraAnglesCapture();
+    return new Promise((resolve, reject) => {
+      try {
+        launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
+          console.log('Launch Camera Response:', response);
+          if (response.didCancel) {
+            stopCameraAnglesCapture();
+            resolve('cancelled');
+          }
+          else if (response.error) {
+            stopCameraAnglesCapture();
+            reject();
+          }
+          else {
+            const imageAsset = response.assets[0];
+            const compassReading = getCurrentCameraAngles();
+            stopCameraAnglesCapture();
+            const resizedImage = await resizeImageForDevice(imageAsset);
+            console.log('Resized Image:', resizedImage);
+            const savedFile = await saveFile(resizedImage);
+            resolve({...savedFile, ...compassReading});
+          }
+        });
+      }
+      catch (e) {
+        dispatch(setLoadingStatus({view: 'home', bool: false}));
+        reject(e);
+      }
+    });
   };
 
   return {
@@ -389,7 +356,6 @@ const useImages = () => {
     getImageByImageId,
     getImagesFromCameraRoll,
     launchCameraFromNotebook,
-    requestCameraPermission,
     saveFile,
     saveImageFromDownloadsDir,
     setAnnotation,

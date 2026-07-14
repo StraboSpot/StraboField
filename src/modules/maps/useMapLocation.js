@@ -42,10 +42,10 @@ const useMapLocation = () => {
       });
     }
 
-    if (Platform.OS === 'android') {
-      const permissionGranted = await hasLocationPermission();
-      if (!permissionGranted) throw new Error('Location permission not granted');
-    }
+    // Native (iOS + Android): verify permission up front so a denial shows the
+    // Settings alert from usePermissions rather than failing silently in the geolocation call.
+    const permissionGranted = await hasLocationPermission();
+    if (!permissionGranted) throw new Error('Location permission not granted');
 
     const geolocationOptions = {
       enableHighAccuracy: true,

@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, PermissionsAndroid, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Formik} from 'formik';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -43,7 +43,7 @@ const UserProfile = () => {
   const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
-  const {checkPermission} = usePermissions();
+  const {hasCameraPermission} = usePermissions();
   const {deleteProfileImage} = useServerRequests();
   const toast = useToast();
   const {uploadProfile} = useUpload();
@@ -105,10 +105,7 @@ const UserProfile = () => {
       });
     }
     else {
-      let permissionGranted;
-      console.log(PermissionsAndroid.PERMISSIONS.CAMERA);
-      if (Platform.OS === 'android') permissionGranted = await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-      if (permissionGranted === 'granted' || Platform.OS === 'ios') {
+      if (await hasCameraPermission()) {
         await launchCamera({}, (response) => {
           console.log('Launch Camera Response', response);
           if (response.didCancel) return;

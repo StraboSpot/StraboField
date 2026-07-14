@@ -1,4 +1,4 @@
-import {Linking, PermissionsAndroid, Platform} from 'react-native';
+import {Linking, Platform} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
@@ -13,13 +13,12 @@ import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modul
 import {APP_DIRECTORIES} from '../files/directories.constants';
 import useServerRequests from '../network/useServerRequests';
 
-const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
 
-  const {checkPermission} = usePermissions();
+  const {hasStoragePermission} = usePermissions();
   const {handleError, safePick} = useSafeDocumentPicker();
   const {getImage, getProfileImageURL} = useServerRequests();
 
@@ -52,15 +51,14 @@ const useDevice = () => {
   const createProjectDirectories = async () => {
     console.log('Creating Project Directories...');
     if (Platform.OS === 'android') {
-      const permissionsGranted = await checkPermission(PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-      if (permissionsGranted === RESULTS.GRANTED) {
+      if (await hasStoragePermission()) {
         await makeDirectory(APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID);
         console.log('Android Downloads/StraboSpot/Backups directory created');
         await makeDirectory(APP_DIRECTORIES.EXPORT_FILES_ANDROID);
         console.log('AndroidExportFiles directory created');
       }
       else {
-        console.log('PERMISSION NOT GRANTED', permissionsGranted);
+        console.log('PERMISSION NOT GRANTED');
       }
     }
     if (Platform.OS === 'ios') {
@@ -443,31 +441,6 @@ const useDevice = () => {
     }
   };
 
-  const requestReadDirectoryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        {
-          title: 'Need permission to read Downloads Folder',
-          message:
-            'StraboField needs permission to access your Downloads Folder to retrieve backups,',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can read the folder');
-      }
-      else {
-        console.log('Folder read permission denied');
-      }
-    }
-    catch (err) {
-      console.warn(err);
-    }
-  };
-
   const unZipAndCopyImportedData = async (zipFile) => {
     try {
       if (Platform.OS === 'android') {
@@ -562,7 +535,6 @@ const useDevice = () => {
     readDirectoryForMapFiles,
     readDirectoryForMapTiles,
     readFile,
-    requestReadDirectoryPermission,
     unZipAndCopyImportedData,
     writeFileToDevice,
   };
