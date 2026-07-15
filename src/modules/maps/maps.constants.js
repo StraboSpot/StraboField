@@ -9,6 +9,10 @@ export const STRAT_SECTION_CENTER = [0.001, 0.0007];
 export const ZOOM = 14;                 // Default zoom for geographic map and image basemaps
 export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
 
+// ms to wait for the map viewport to settle (menu close / project load) before fitting to
+// the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
+export const SPOTS_EXTENT_ZOOM_DELAY = 500;
+
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 
 export const MAP_MODES = {

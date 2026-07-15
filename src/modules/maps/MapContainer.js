@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useCustomMap from './custom-maps/useCustomMap';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
 import Map from './Map';
-import {ZOOM} from './maps.constants';
+import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
 import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
@@ -426,7 +426,14 @@ const MapContainer = forwardRef(({
   const zoomToSpotsExtent = async () => {
     if (Platform.OS === 'web' && !mapRef.current) return;
     const spotsToZoomTo = [...spotsSelected, ...spotsNotSelected];
-    await zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    if (Platform.OS === 'web') return zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    // Native: this runs right as the triggering UI (map menu, project load, dataset toggle)
+    // is changing the map's layout. Fitting bounds during that relayout gets dropped on iOS,
+    // so wait for the viewport to settle first. See issue #892.
+    setTimeout(
+      () => zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current).catch(console.error),
+      SPOTS_EXTENT_ZOOM_DELAY,
+    );
   };
 
   /* View */

@@ -105,7 +105,7 @@ const useMapView = () => {
               const [maxY, maxX, minY, minX] = getBoundsPadded(centroidCoords);
               southwest = [minX, minY];
               northeast = [maxX, maxY];
-              camera.fitBounds(southwest, northeast, 100, 1500);
+              camera.fitBounds(northeast, southwest, 100, 1500);
             }
           }
           else {
@@ -115,8 +115,8 @@ const useMapView = () => {
             northeast = [maxX, maxY];
             if (Platform.OS === 'web') map.fitBounds([southwest, northeast], {padding: 100, duration: 2500});
             else {
-              console.log('Fitting Bounds', southwest, northeast, 100, 1500);
-              camera.fitBounds(southwest, northeast, 100, 1500);
+              console.log('Fitting Bounds', northeast, southwest, 100, 1500);
+              camera.fitBounds(northeast, southwest, 100, 1500);
             }
           }
         }
