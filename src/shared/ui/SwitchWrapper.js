@@ -14,7 +14,6 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
 
   const systemScheme = useColorScheme();
   const isDarkMode = systemScheme === 'dark';
-  console.log('isDarkMode', isDarkMode);
 
   if (Platform.OS === 'web') {
     return (
