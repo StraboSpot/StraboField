@@ -5,6 +5,7 @@ import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymb
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
+import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
 
 const useMapSymbology = () => {
@@ -37,8 +38,10 @@ const useMapSymbology = () => {
     point: {
       textIgnorePlacement: true,  // Need to be able to stack symbols at same location
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,       // Bundled font stack, so labels render offline (see glyphs.constants)
       textAnchor: 'left',
       textOffset: getLabelOffset(),
+      textOptional: true,         // Draw the icon even if its label glyphs can't load, so points never vanish
       iconImage: getIconImage(),
       iconRotate: getIconRotation(),
       iconAllowOverlap: true,     // Need to be able to stack symbols at same location
@@ -52,6 +55,7 @@ const useMapSymbology = () => {
     },
     lineLabel: {
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,
       symbolPlacement: 'line',
       textAnchor: 'bottom',
     },
@@ -78,6 +82,7 @@ const useMapSymbology = () => {
     },
     polygonLabel: {
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,
     },
     polygon: {
       fillColor: ['get', 'fillColor', ['get', 'symbology']],
@@ -158,6 +163,7 @@ const useMapSymbology = () => {
     },
     xAxisTickMarkLabels: {
       textField: ['get', 'label'],
+      textFont: GLYPH_FONT,
       textAnchor: 'bottom-left',
       textOffset: [1, 1],
       textRotate: 45,
@@ -166,6 +172,7 @@ const useMapSymbology = () => {
     },
     yAxisTickMarkLabels: {
       textField: ['get', 'label'],
+      textFont: GLYPH_FONT,
       textAnchor: 'bottom',
       textOffset: [-1, 0],
       textIgnorePlacement: true,
