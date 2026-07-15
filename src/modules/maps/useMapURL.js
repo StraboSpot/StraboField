@@ -1,5 +1,7 @@
 import {useSelector} from 'react-redux';
 
+import {GLYPHS_URL} from './glyphs/glyphs.constants';
+
 const useMapURL = () => {
   /* Data Hooks */
 
@@ -28,8 +30,7 @@ const useMapURL = () => {
           tileSize: 256,
         },
       },
-      sprite: 'mapbox://sprites/mapbox/bright-v8',
-      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      glyphs: GLYPHS_URL,
       layers: [
         {
           'id': 'background',

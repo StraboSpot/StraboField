@@ -74,7 +74,9 @@ const NewProjectForm = ({openMainMenuPanel}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: SECONDARY_BACKGROUND_COLOR}}>
-      <FlatList ListHeaderComponent={renderFormFields}/>
+      {/* Pass the rendered element, not the function: a function prop is a new component type each
+       render, which remounts Formik and wipes entered values (e.g. on a map tap that re-renders). */}
+      <FlatList ListHeaderComponent={renderFormFields()}/>
       <OutlineButton
         onPress={saveForm}
         title={'Save New Project'}

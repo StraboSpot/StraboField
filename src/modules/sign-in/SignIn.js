@@ -13,7 +13,6 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import {ErrorModal} from '../../shared/ui/modals';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
-import GlyphDownloader from '../maps/GlyphDownloader';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
@@ -154,7 +153,6 @@ const SignIn = ({navigation}) => {
           {renderErrorModal()}
         </View>
       </KeyboardAvoidingView>
-      <GlyphDownloader/>
     </SplashScreen>
   );
 };

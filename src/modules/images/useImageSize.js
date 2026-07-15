@@ -3,6 +3,7 @@ import {Image, Platform} from 'react-native';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {readExifOrientation} from './imageOrientation.helpers';
 import {getLocalImageURI} from './imageURIs.helpers';
 import useDevice from '../../services/device/useDevice';
 import {TEMP_IMAGES_DOWNSIZED_DIRECTORY} from '../../services/files/directories.constants';
@@ -50,7 +51,12 @@ const useImageSize = () => {
     // not upscaled — ImageResizer scales to fit within the target box.
     const targetWidth = Math.min(imgWidth, IMAGE_MAX_LOCAL_SIZE);
     const targetHeight = Math.min(imgHeight, IMAGE_MAX_LOCAL_SIZE);
-    return await ImageResizer.createResizedImage(tempImageURI, targetWidth, targetHeight, 'JPEG', 100, 0);
+    // RCTImageLoader (inside ImageResizer) applies the 90°/270° EXIF orientations but drops
+    // the 180°/"Down" case (tag 3), then strips the tag — leaving those photos upside down.
+    // Detect that case from the source EXIF and pass an explicit 180° rotation to compensate.
+    const orientation = await readExifOrientation(tempImageURI);
+    const rotation = orientation === 3 ? 180 : 0;
+    return await ImageResizer.createResizedImage(tempImageURI, targetWidth, targetHeight, 'JPEG', 100, rotation);
   };
 
   const resizeImageForThumbnail = async (imageUri) => {

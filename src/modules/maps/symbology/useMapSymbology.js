@@ -5,6 +5,7 @@ import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymb
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
+import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
 
 const useMapSymbology = () => {
@@ -18,12 +19,29 @@ const useMapSymbology = () => {
 
   /* Derived Variables */
 
+  // Null-safe line style expressions: a feature may lack a `symbology` property (or its line sub-properties),
+  // in which case `['get', ...]` returns null and Mapbox GL JS logs an error while coercing to a color/number.
+  // Fall back to Mapbox's spec defaults (line-color #000000, line-width 1) so native GL — which already
+  // silently substitutes these defaults on the null result — renders identically.
+  const lineColorExpression = [
+    'case', ['all', ['has', 'symbology'], ['has', 'lineColor', ['get', 'symbology']]],
+    ['get', 'lineColor', ['get', 'symbology']],
+    '#000000',
+  ];
+  const lineWidthExpression = [
+    'case', ['all', ['has', 'symbology'], ['has', 'lineWidth', ['get', 'symbology']]],
+    ['get', 'lineWidth', ['get', 'symbology']],
+    1,
+  ];
+
   const mapStyles = {
     point: {
       textIgnorePlacement: true,  // Need to be able to stack symbols at same location
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,       // Bundled font stack, so labels render offline (see glyphs.constants)
       textAnchor: 'left',
       textOffset: getLabelOffset(),
+      textOptional: true,         // Draw the icon even if its label glyphs can't load, so points never vanish
       iconImage: getIconImage(),
       iconRotate: getIconRotation(),
       iconAllowOverlap: true,     // Need to be able to stack symbols at same location
@@ -37,32 +55,34 @@ const useMapSymbology = () => {
     },
     lineLabel: {
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,
       symbolPlacement: 'line',
       textAnchor: 'bottom',
     },
     line: {
-      lineColor: ['get', 'lineColor', ['get', 'symbology']],
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineColor: lineColorExpression,
+      lineWidth: lineWidthExpression,
     },
     lineDotted: {
-      lineColor: ['get', 'lineColor', ['get', 'symbology']],
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineColor: lineColorExpression,
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotted,  // Can't use data-driven styling with line-dasharray - it is not supported
                                             // Used filters on the line layers instead
                                             // https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-line-line-dasharray
     },
     lineDashed: {
-      lineColor: ['get', 'lineColor', ['get', 'symbology']],
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineColor: lineColorExpression,
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dashed,
     },
     lineDotDashed: {
-      lineColor: ['get', 'lineColor', ['get', 'symbology']],
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineColor: lineColorExpression,
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotDashed,
     },
     polygonLabel: {
       textField: getLabel(labelTypeOn),
+      textFont: GLYPH_FONT,
     },
     polygon: {
       fillColor: ['get', 'fillColor', ['get', 'symbology']],
@@ -79,21 +99,21 @@ const useMapSymbology = () => {
     },
     lineSelected: {
       lineColor: 'orange',
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineWidth: lineWidthExpression,
     },
     lineSelectedDotted: {
       lineColor: 'orange',
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotted,
     },
     lineSelectedDashed: {
       lineColor: 'orange',
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dashed,
     },
     lineSelectedDotDashed: {
       lineColor: 'orange',
-      lineWidth: ['get', 'lineWidth', ['get', 'symbology']],
+      lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotDashed,
     },
     polygonSelected: {
@@ -143,6 +163,7 @@ const useMapSymbology = () => {
     },
     xAxisTickMarkLabels: {
       textField: ['get', 'label'],
+      textFont: GLYPH_FONT,
       textAnchor: 'bottom-left',
       textOffset: [1, 1],
       textRotate: 45,
@@ -151,6 +172,7 @@ const useMapSymbology = () => {
     },
     yAxisTickMarkLabels: {
       textField: ['get', 'label'],
+      textFont: GLYPH_FONT,
       textAnchor: 'bottom',
       textOffset: [-1, 0],
       textIgnorePlacement: true,

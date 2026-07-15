@@ -47,10 +47,16 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
 
     override func bundleURL() -> URL? {
         #if DEBUG
-//        RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-      return URL(string: "http://169.254.55.164:8081/index.bundle?platform=ios&dev=true")
+        #if targetEnvironment(simulator)
+        // Simulator: Metro on the host, reachable via localhost
+        return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
         #else
-        Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        // Physical device, offline: point directly at the Mac's USB link-local IP
+        // Run ifconfig | grep "inet " in terminal to get inet ip
+        return URL(string: "http://169.254.38.24:8081/index.bundle?platform=ios&dev=true")
+        #endif
+        #else
+        return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
         #endif
     }
 }

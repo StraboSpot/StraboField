@@ -13,6 +13,7 @@ const microDir = appDir + '/Micro/';
 const microZipsDir = appDir + '/Micro/Zips/';
 const tilesDir = documentDir + '/StraboSpotTiles';
 const tileCacheDir = tilesDir + '/TileCache/';
+const glyphsDir = appDir + '/Glyphs/';   // Bundled map-label glyphs, installed at startup for offline text
 const tileTempDir = tilesDir + '/TileTemp/';
 const tileZipsDir = tilesDir + '/TileZips/';
 
@@ -37,6 +38,7 @@ export const APP_DIRECTORIES = {
   ROOT_PATH: documentDir,
   APP_DIR: appDir,
   BACKUP_DIR: backupDir,
+  GLYPHS: glyphsDir,
   IMAGES: imagesDir,
   PROFILE_IMAGE: imagesDir + 'profileImage.jpg',
   MICRO: microDir,
