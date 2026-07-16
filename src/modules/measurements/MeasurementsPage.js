@@ -262,13 +262,17 @@ const MeasurementsPage = ({isReadOnly, page}) => {
       <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item, section}) => (
-          <MeasurementItem
-            item={item}
-            onPress={() => onMeasurementPressed(item, section.title)}
-            selectedIds={getIdsOfSelected()}
-          />
-        )}
+        renderItem={({item, section}) => {
+          const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
+          return (
+            <MeasurementItem
+              isSelectMode={multiSelectMode === sectionType}
+              item={item}
+              onPress={() => onMeasurementPressed(item, section.title)}
+              selectedIds={getIdsOfSelected()}
+            />
+          );
+        }}
         renderSectionFooter={({section}) => {
           const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
           return (
