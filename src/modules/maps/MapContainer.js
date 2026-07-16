@@ -10,6 +10,7 @@ import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
+import SelectSpotsAtPressModal from './SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
 import useMapCoords from './useMapCoords';
@@ -96,7 +97,9 @@ const MapContainer = forwardRef(({
   });
   const {getCurrentLocation} = useMapLocation();
   const [isShowMacrostratOverlay, setIsShowMacrostratOverlay] = useState(false);
+  const [isShowSpotsAtPressModal, setIsShowSpotsAtPressModal] = useState(false);
   const [measureFeatures, setMeasureFeatures] = useState([]);
+  const [spotsAtPress, setSpotsAtPress] = useState([]);
   const {
     handleMapLongPress,
     handleMapPress,
@@ -112,8 +115,10 @@ const MapContainer = forwardRef(({
     setDistance,
     setDrawFeaturesNew,
     setIsShowMacrostratOverlay,
+    setIsShowSpotsAtPressModal,
     setMapModeToEdit,
     setMeasureFeatures,
+    setSpotsAtPress,
     switchToEditing,
   });
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
@@ -509,6 +514,8 @@ const MapContainer = forwardRef(({
       ) : (
         <View style={{flex: 1, backgroundColor: '#E8E8E8'}}/>
       )}
+
+      {/* Modals */}
       {currentBasemap?.source === 'macrostrat' && isOnline && (
         <MacrostratOverlay
           closeModal={() => setIsShowMacrostratOverlay(false)}
@@ -533,6 +540,13 @@ const MapContainer = forwardRef(({
             setIsShowVertexActionsModal={setIsShowVertexActionsModal}
             splitLine={splitLine}
             vertexActionValues={vertexActionValues}
+          />
+        )}
+        {isShowSpotsAtPressModal && (
+          <SelectSpotsAtPressModal
+            closeModal={() => setIsShowSpotsAtPressModal(false)}
+            isVisible={isShowSpotsAtPressModal}
+            spots={spotsAtPress}
           />
         )}
       </View>

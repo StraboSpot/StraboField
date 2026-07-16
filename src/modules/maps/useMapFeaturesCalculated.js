@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 import {SPOT_LAYERS} from './maps.constants';
 import {getClosestSpotDistanceAndIndex} from './maps.helpers';
 import useMapCoords from './useMapCoords';
+import useMapFeatures from './useMapFeatures';
 import {isEmpty} from '../../shared/helpers';
 import useNesting from '../nesting/useNesting';
 import {useSpots} from '../spots';
@@ -17,6 +18,7 @@ const useMapFeaturesCalculated = (mapRef) => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {convertImagePixelsToLatLong, getBBoxPaddedInPixels} = useMapCoords();
+  const {isSpotOnCurrentMap} = useMapFeatures();
   const {getChildrenGenerationsSpots} = useNesting();
   const {getSpotById, getSpotsByIds} = useSpots();
 
@@ -62,14 +64,25 @@ const useMapFeaturesCalculated = (mapRef) => {
     return distances;
   };
 
+  // Get all rendered features within the press box for the given layers. r sets the box padding
+  // (r near 0 requires a press directly on the feature; the default gives a comfortable tolerance).
+  const getFeaturesInBBox = async ([x, y], layers, r = 15) => {
+    const bbox = getBBoxPaddedInPixels([x, y], r);
+    const nearFeaturesCollection = Platform.OS === 'web' ? mapRef.current.queryRenderedFeatures(bbox, {layers: layers})
+      : await mapRef.current.queryRenderedFeaturesInRect(bbox, null, layers);
+    const nearFeatures = Platform.OS === 'web' ? nearFeaturesCollection : nearFeaturesCollection.features;
+    if (nearFeatures?.length > 0) console.log('Near features:', nearFeatures);
+    return nearFeatures || [];
+  };
+
   /* Exported Functions */
 
-  // Get the nearest draw feature from the draw layer where the screen was pressed
+  // Get a draw feature from the draw layer where the screen was pressed
   const getDrawFeatureAtPress = async (screenPointX, screenPoint) => {
-    const nearestDrawFeature = await getNearestFeatureInBBox([screenPointX, screenPoint], ['pointLayerDraw']);
-    if (isEmpty(nearestDrawFeature)) console.log('No draw features near press.');
-    else console.log('Got draw feature:', nearestDrawFeature);
-    return Promise.resolve(nearestDrawFeature);
+    const drawFeature = await getRandomFeatureInBBox([screenPointX, screenPoint], ['pointLayerDraw']);
+    if (isEmpty(drawFeature)) console.log('No draw features near press.');
+    else console.log('Got draw feature:', drawFeature);
+    return Promise.resolve(drawFeature);
   };
 
   // Get Spots within (points) or intersecting (line or polygon) the drawn polygon
@@ -156,28 +169,34 @@ const useMapFeaturesCalculated = (mapRef) => {
     return selectedSpots;
   };
 
-  // Get the nearest feature to a target point in screen coordinates within a bounding box from given layers
-  const getNearestFeatureInBBox = async ([x, y], layers) => {
-    // First get all the features in the bounding box
-    const bbox = getBBoxPaddedInPixels([x, y]);
-    const nearFeaturesCollection = Platform.OS === 'web' ? mapRef.current.queryRenderedFeatures(bbox, {layers: layers})
-      : await mapRef.current.queryRenderedFeaturesInRect(bbox, null, layers);
-    let nearFeatures = Platform.OS === 'web' ? nearFeaturesCollection : nearFeaturesCollection.features;
-    if (nearFeatures.length > 0) console.log('Near features:', nearFeatures);
-
-    // If more than one near feature is found, return a random one (user needs to zoom in if too many features found)
+  // Get one feature at the press, chosen at random when several overlap (user zooms in to narrow it).
+  const getRandomFeatureInBBox = async ([x, y], layers) => {
+    const nearFeatures = await getFeaturesInBBox([x, y], layers);
     const randomIndex = Math.floor(Math.random() * nearFeatures.length);
     return Promise.resolve(nearFeatures[randomIndex] || []);
   };
 
   // Get the Spot where screen was pressed
   const getSpotAtPress = async (screenPointX, screenPointY) => {
-    const nearestFeature = await getNearestFeatureInBBox([screenPointX, screenPointY], SPOT_LAYERS);
-    const nearestSpot = nearestFeature?.properties?.id ? getSpotById(
-      nearestFeature.properties.id) || nearestFeature : {};
-    if (isEmpty(nearestSpot)) console.log('No spots near press.');
-    else console.log('Got nearest spot:', nearestSpot);
-    return Promise.resolve(...[nearestSpot]);
+    const featureAtPress = await getRandomFeatureInBBox([screenPointX, screenPointY], SPOT_LAYERS);
+    const spotAtPress = featureAtPress?.properties?.id ? getSpotById(
+      featureAtPress.properties.id) || featureAtPress : {};
+    if (isEmpty(spotAtPress)) console.log('No spots near press.');
+    else console.log('Got spot at press:', spotAtPress);
+    return Promise.resolve(...[spotAtPress]);
+  };
+
+  // Get every Spot overlapping the press, deduped and scoped to the current map, for the caller to
+  // disambiguate - vs getSpotAtPress (one random Spot) or getSpotsInBoundingBox (adds nested children).
+  // isPreciseHit shrinks the box so only a Spot directly under the press matches (e.g. Macrostrat).
+  const getSpotsAtPress = async (screenPointX, screenPointY, isPreciseHit = false) => {
+    const nearFeatures = await getFeaturesInBBox([screenPointX, screenPointY], SPOT_LAYERS,
+      isPreciseHit ? 1 : 15);
+    // queryRenderedFeatures returns the same Spot multiple times (across layers and tile seams), so dedupe.
+    const spotsIds = [...new Set(nearFeatures.map(feature => feature?.properties?.id).filter(id => id != null))];
+    const spotsAtPress = getSpotsByIds(spotsIds).filter(isSpotOnCurrentMap);
+    console.log('Got Spots at press:', spotsAtPress);
+    return spotsAtPress;
   };
 
   // This method is required when the draw features at press returns empty
@@ -201,8 +220,9 @@ const useMapFeaturesCalculated = (mapRef) => {
   return {
     getDrawFeatureAtPress,
     getLassoedSpots,
-    getNearestFeatureInBBox,
+    getRandomFeatureInBBox,
     getSpotAtPress,
+    getSpotsAtPress,
     getSpotsInBoundingBox,
     identifyClosestVertexOnSpotPress,
   };

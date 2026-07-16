@@ -25,8 +25,10 @@ const useMapPressEvents = ({
                              setDistance,
                              setDrawFeaturesNew,
                              setIsShowMacrostratOverlay,
+                             setIsShowSpotsAtPressModal,
                              setMapModeToEdit,
                              setMeasureFeatures,
+                             setSpotsAtPress,
                              switchToEditing,
                            }) => {
   /* Data Hooks */
@@ -39,7 +41,7 @@ const useMapPressEvents = ({
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
-  const {getSpotAtPress} = useMapFeaturesCalculated(mapRef);
+  const {getSpotAtPress, getSpotsAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
   const store = useStore();
@@ -105,14 +107,28 @@ const useMapPressEvents = ({
       if (mapMode === MAP_MODES.VIEW) {
         console.log('Selecting or unselect a feature ...');
         const [screenPointX, screenPointY] = getScreenPoint(e);
-        const spotFound = await getSpotAtPress(screenPointX, screenPointY);
-        if (currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap) {
+        const isMacrostratBasemap = currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap;
+        // A Macrostrat press is really querying the geology at that point, so use a precise hit (only a
+        // Spot directly under the press selects, not a nearby one).
+        const spotsFound = await getSpotsAtPress(screenPointX, screenPointY, isMacrostratBasemap);
+        if (isMacrostratBasemap) {
           setIsShowMacrostratOverlay(true);
           const currentZoom = await mapRef.current.getZoom();
           setLocation(
             {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
+          // Skip the picker (it would stack over the overlay); pick at random so repeated taps can cycle.
+          if (spotsFound.length >= 1) {
+            dispatch(setSelectedSpot(spotsFound[Math.floor(Math.random() * spotsFound.length)]));
+          }
+          else clearSelectedSpots();
         }
-        if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
+        // Let the user pick when several Spots overlap rather than choosing one at random.
+        else if (spotsFound.length > 1) {
+          setSpotsAtPress(spotsFound);
+          setIsShowSpotsAtPressModal(true);
+        }
+        else if (spotsFound.length === 1) dispatch(setSelectedSpot(spotsFound[0]));
+        // No Spot hit, but in a strat section: fall back to selecting the section's own Spot.
         else if (stratSection) {
           dispatch(setSelectedSpot(getSpotWithThisStratSection(stratSection.strat_section_id)));
         }

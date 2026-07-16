@@ -76,26 +76,8 @@ const useMapFeatures = () => {
     return mappedFeatures;
   };
 
-  // All Spots mapped on current map
-  const getAllMappedSpots = () => {
-    const spotsWithGeometry = getMappableSpots();      // Spots with geometry
-    let mappedSpots;
-    if (currentImageBasemap) {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => spot.properties.image_basemap && spot.properties.image_basemap === currentImageBasemap.id);
-    }
-    else if (stratSection) {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => spot.properties.strat_section_id && spot.properties.strat_section_id === stratSection.strat_section_id);
-    }
-    else {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => !spot.properties.strat_section_id && !spot.properties.image_basemap);
-    }
-    // console.log('All Mapped Active Spots on this map', mappedSpots);
-    // console.log('Number of Active Spots Mapped on this map:', mappedSpots.length);
-    return mappedSpots;
-  };
+  // All Spots (with geometry) mapped on the current map
+  const getAllMappedSpots = () => getMappableSpots().filter(isSpotOnCurrentMap);
 
   // Get selected and not selected Spots to display when not editing
   const getDisplayedSpots = (selectedSpots) => {
@@ -144,6 +126,14 @@ const useMapFeatures = () => {
     return filterFeatures(mappedFeatures);
   };
 
+  // True if the Spot belongs to the map currently being viewed: an image basemap or strat section
+  // shows only its own Spots; the regular basemap shows only Spots on neither.
+  const isSpotOnCurrentMap = (spot) => {
+    if (currentImageBasemap) return spot.properties.image_basemap === currentImageBasemap.id;
+    if (stratSection) return spot.properties.strat_section_id === stratSection.strat_section_id;
+    return !spot.properties.strat_section_id && !spot.properties.image_basemap;
+  };
+
   // Gather and set the feature types that are present in the mapped Spots
   const updateFeatureTypes = () => {
     console.log('Checking Available Feature Types...');
@@ -169,6 +159,7 @@ const useMapFeatures = () => {
     getAllMappedSpots,
     getDisplayedSpots,
     getSpotsAsFeatures,
+    isSpotOnCurrentMap,
     updateFeatureTypes,
   };
 };

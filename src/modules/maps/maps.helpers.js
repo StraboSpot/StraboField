@@ -75,10 +75,10 @@ export const convertFeatureGeometryToImagePixels = feature => convertCoords(feat
 // Convert image x,y pixels to WGS84, assuming x,y are web mercator
 export const convertImagePixelsToLatLong = feature => convertCoords(feature, PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION);
 
-// Get a pixel bounding box with padding around a point pressed on screen
-export const getBBoxPaddedInPixels = ([x, y]) => {
+// Get a pixel bounding box with padding around a point pressed on screen. A smaller r tightens the
+// tap tolerance (r near 0 requires a press directly on the feature).
+export const getBBoxPaddedInPixels = ([x, y], r = 15) => {
   const pixelRatio = PixelRatio.get();
-  const r = 15;  // padding
   const maxX = x + r;
   const minX = x - r;
   const maxY = y + r;
