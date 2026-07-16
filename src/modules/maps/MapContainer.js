@@ -193,7 +193,7 @@ const MapContainer = forwardRef(({
     // console.log('UE MapContainer [userEmail, isOnline]');
     if (isOnline) {
       if (!currentBasemap) setBasemap().catch(console.error);
-      // Only re-apply custom basemaps (URL may need rebuilding); standard basemaps are already correct.
+      // Custom basemaps: rebuild (URL may need rebuilding) and surface a fallback if it fails.
       else if (customBasemap[currentBasemap.id]) {
         setBasemap(currentBasemap.id).catch((error) => {
           console.log('Error Setting Basemap', error);
@@ -202,6 +202,10 @@ const MapContainer = forwardRef(({
           dispatch(setIsErrorMessagesModalVisible(true));
         });
       }
+      // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
+      // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
+      // making the style fail to load so Spot layers never attach. Rebuild from current runtime. Issue #919.
+      else setBasemap(currentBasemap.id).catch(console.error);
     }
     else if (isOnline === false && currentBasemap && Platform.OS !== 'web') {
       Object.values(customBasemap).forEach((map) => {
