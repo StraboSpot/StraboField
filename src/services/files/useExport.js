@@ -90,51 +90,36 @@ const useExport = () => {
 
   const gatherImagesForDistribution = async (data, fileName, isBeingExported) => {
     try {
+      imageSuccess = 0;
+      imageBackupFailures = 0;
       const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
-      console.log('data:', data);
       await doesDeviceDirectoryExist(deviceDir + fileName + '/images');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Images...'));
-      if (data.spotsDb) {
-        console.groupCollapsed('Found Spots. Gathering Images...');
-        await Promise.all(
-          Object.values(data.spotsDb).map(async (spot) => {
-            if (spot.properties.images) {
-              console.log('Spot', spot.properties.name, '(' + spot.properties.id + ') has',
-                spot.properties.images.length, 'images [' + spot.properties.images.map(i => i.id).join(', ') + ']',
-                spot.properties.images);
-              await Promise.all(spot.properties.images.map(async (image) => {
-                  await moveDistributedImage(image.id, fileName, deviceDir);
-                }),
-              );
-            }
-          }),
-        );
-        console.log('Finished Gathering Images');
-        console.groupEnd();
-        dispatch(removedLastStatusMessage());
-        if (imageBackupFailures > 0) {
-          dispatch(addedStatusMessage(
-            `Images backed up: ${imageSuccess}\nImages missing: ${imageBackupFailures}`,
-          ));
-        }
-        else dispatch(addedStatusMessage(`${imageSuccess} Images backed up.`));
+
+      // Collect every referenced image id once. The same image can be attached to multiple spots
+      // and/or reports, so de-dupe up front to avoid redundant copies and double counting.
+      const imageIds = new Set();
+      Object.values(data.spotsDb || {}).forEach((spot) => {
+        (spot.properties.images || []).forEach(image => imageIds.add(image.id));
+      });
+      Object.values(data.projectDb.project?.reports || {}).forEach((report) => {
+        if (!isEmpty(report?.images)) report.images.forEach(image => imageIds.add(image.id));
+      });
+
+      console.groupCollapsed(`Gathering ${imageIds.size} unique image(s)...`);
+      await Promise.all([...imageIds].map(id => moveDistributedImage(id, fileName, deviceDir)));
+      console.log('Finished Gathering Images');
+      console.groupEnd();
+
+      dispatch(removedLastStatusMessage());
+      if (imageBackupFailures > 0) {
+        dispatch(addedStatusMessage(
+          `Images backed up: ${imageSuccess}\n${imageBackupFailures} image${imageBackupFailures > 1 ? 's' : ''} `
+          + 'could not be found on this device and were skipped.',
+        ));
       }
-      // Copies report images to /Images folder
-      if (data.projectDb.project.reports) {
-        await Promise.all(
-          Object.values(data.projectDb.project.reports).map(async (report) => {
-            if (!isEmpty(report?.images)) {
-              console.log('Report images:');
-              await Promise.all(
-                report.images.map(async (image) => {
-                  await moveDistributedImage(image.id, fileName, deviceDir);
-                }),
-              );
-            }
-          }),
-        );
-      }
+      else dispatch(addedStatusMessage(`${imageSuccess} Images backed up.`));
     }
     catch (err) {
       console.error('Error Backing Up Images!', err);
@@ -193,15 +178,24 @@ const useExport = () => {
   };
 
   const moveDistributedImage = async (image_id, fileName, directory) => {
+    const sourcePath = APP_DIRECTORIES.IMAGES + image_id + '.jpg';
+    const targetPath = directory + fileName + '/images/' + image_id + '.jpg';
     try {
-      const imageExists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES + image_id + '.jpg');
-      if (imageExists) {
-        await copyFiles(APP_DIRECTORIES.IMAGES + image_id + '.jpg',
-          directory + fileName + '/images/' + image_id + '.jpg');
+      // Already in this backup (image files are immutable, named by id) — count it, don't re-copy.
+      if (await doesDeviceDirExist(targetPath)) {
+        imageSuccess++;
+        console.log(imageSuccess, 'Image already in backup:', image_id);
+        return;
+      }
+      if (await doesDeviceDirExist(sourcePath)) {
+        await copyFiles(sourcePath, targetPath);
         imageSuccess++;
         console.log(imageSuccess, 'Copied image to backup:', image_id);
+        return;
       }
-      else throw Error('Image not found.');
+      // Source file is gone from the device and it isn't already in the backup.
+      imageBackupFailures++;
+      console.log(imageBackupFailures, 'Image missing from device, cannot back up:', image_id);
     }
     catch (err) {
       imageBackupFailures++;
