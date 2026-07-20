@@ -565,6 +565,80 @@ const useMapFeaturesDraw = ({
     getSpotToEditCont(spotEditingCopy);
   };
 
+  // Grow a line from an endpoint: duplicate that endpoint and select the copy to drag out, leaving the
+  // original in place.
+  const extendLineFromEndpoint = (spotEditingCopy, vertexSelected) => {
+    console.log('Extending line from endpoint...');
+    if (turf.getType(spotEditingCopy) !== 'LineString' || isEmpty(vertexSelected)) {
+      console.log('Can only extend a line from a selected endpoint vertex. No action taken.');
+      return;
+    }
+    const indexOfEndpoint = getVertexIndexInSpotToEdit(vertexSelected);
+    const lastIndex = spotEditingCopy.geometry.coordinates.length - 1;
+    const isFirstEndpoint = indexOfEndpoint.includes(0);
+    const isLastEndpoint = indexOfEndpoint.includes(lastIndex);
+    if (!isFirstEndpoint && !isLastEndpoint) {
+      console.log('Selected vertex is not an endpoint of the line. No action taken.');
+      return;
+    }
+    const endpointCoord = isFirstEndpoint ? spotEditingCopy.geometry.coordinates[0]
+      : spotEditingCopy.geometry.coordinates[lastIndex];
+    const newVertexCoord = [...endpointCoord];
+    let newVertexIndex;
+    if (isFirstEndpoint) {
+      spotEditingCopy.geometry.coordinates.unshift(newVertexCoord);
+      newVertexIndex = 0;
+    }
+    else {
+      spotEditingCopy.geometry.coordinates.push(newVertexCoord);
+      newVertexIndex = spotEditingCopy.geometry.coordinates.length - 1;
+    }
+    spotEditingCopy.properties.modified_timestamp = Date.now();
+    // newVertexCoord already matches spotEditingCopy's projection, which is what setSelectedSpotToEdit wants.
+    setSelectedSpotToEdit(turf.point(newVertexCoord));
+    setVertexIndex(newVertexIndex);
+    getSpotToEditCont(spotEditingCopy);
+    // getSpotToEditCont clears editFeatureVertex; web drags off that layer (native uses vertexStartCoords),
+    // so repopulate it for an immediate drag. vertexToEdit stays empty so the drag targets by index - the
+    // duplicated coordinate is ambiguous by position.
+    if (Platform.OS === 'web') {
+      const editVertex = turf.point([...newVertexCoord]);
+      setEditFeatureVertex([currentImageBasemap || stratSection ? convertImagePixelsToLatLong(editVertex)
+        : editVertex]);
+    }
+  };
+
+  // The VertexDrag overlay swallows the map's long press on a selected vertex, so re-run it here from the
+  // vertex we already have: delete a polygon vertex, or reopen the actions modal for a line endpoint.
+  const handleSelectedVertexLongPress = () => {
+    if (isEmpty(spotEditing)) return;
+    const geometryType = turf.getType(spotEditing);
+    if (geometryType !== 'Polygon' && geometryType !== 'LineString') return;
+    // A tapped vertex is in vertexToEdit; a just-added one is tracked only by vertexIndex (Add clears
+    // vertexToEdit) - fall back to that draw feature.
+    const vertexSelected = !isEmpty(vertexToEdit) ? vertexToEdit
+      : typeof vertexIndex === 'number' ? drawFeatures[vertexIndex] : undefined;
+    if (isEmpty(vertexSelected)) return;
+    const spotEditingCopy = JSON.parse(JSON.stringify(spotEditing));
+    if (geometryType === 'Polygon') {
+      deleteSelectedVertex(spotEditingCopy, vertexSelected);
+      clearVertexes();  // remove the now-orphaned drag overlay for the deleted vertex
+    }
+    else {
+      const vertexIndices = getVertexIndexInSpotToEdit(vertexSelected);
+      const isEndpointVertex = vertexIndices.includes(0)
+        || vertexIndices.includes(spotEditingCopy.geometry.coordinates.length - 1);
+      if (!isEndpointVertex) return;
+      setVertexActionValues({
+        isEndpointVertex: true,
+        spotEditingCopy: spotEditingCopy,
+        spotToEdit: spotEditingCopy,
+        vertexSelected: vertexSelected,
+      });
+      setIsShowVertexActionsModal(true);
+    }
+  };
+
   const editSpot = async (e) => {
     // Select/Unselect new vertex to edit
     const [screenPointX, screenPointY] = Platform.OS === 'web' ? [e.point.x, e.point.y]
@@ -739,8 +813,13 @@ const useMapFeaturesDraw = ({
       if (turf.getType(spotEditingCopy) === 'LineString' || turf.getType(spotEditingCopy) === 'Polygon') {
         if (spotEditingCopy.properties.id === spotToEdit.properties.id) {
           if (turf.getType(spotEditingCopy) === 'LineString') {
+            // Flag an endpoint press (first/last coordinate) so the modal can offer "Extend Line".
+            const vertexIndices = isEmpty(vertexSelected) ? [] : getVertexIndexInSpotToEdit(vertexSelected);
+            const isEndpointVertex = vertexIndices.includes(0)
+              || vertexIndices.includes(spotEditingCopy.geometry.coordinates.length - 1);
             setVertexActionValues({
               e: e,
+              isEndpointVertex: isEndpointVertex,
               spotEditingCopy: spotEditingCopy,
               spotToEdit: spotToEdit,
               vertexSelected: isEmpty(vertexSelected) ? undefined : vertexSelected,
@@ -963,7 +1042,9 @@ const useMapFeaturesDraw = ({
     editFeatureVertex,
     editSpot,
     endDraw,
+    extendLineFromEndpoint,
     getSpotToEdit,
+    handleSelectedVertexLongPress,
     isEditingSpot: !isEmpty(spotEditing),
     moveVertex,
     saveEdits,

@@ -147,7 +147,8 @@ export const getVertexActionButtonIcon = (button) => {
   return button === 'Add Vertex' ? require('../../assets/icons/LineButton.png')
     : button === 'Delete Vertex' ? require('../../assets/icons/PointButton.png')
       : button === 'Split Line' ? require('../../assets/icons/PolygonButton.png')
-        : null;
+        : button === 'Extend Line' ? require('../../assets/icons/LineButton.png')
+          : null;
 };
 
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);

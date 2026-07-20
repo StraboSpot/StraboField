@@ -28,6 +28,7 @@ const Map = ({
                mapMode,
                mapRef,
                measureFeatures,
+               onVertexLongPress,
                showUserLocation,
                spotsNotSelected,
                spotsSelected,
@@ -132,7 +133,7 @@ const Map = ({
         </FreehandSketch>
       )}
 
-      {vertexStartCoords && <VertexDrag/>}
+      {vertexStartCoords && <VertexDrag onLongPress={onVertexLongPress}/>}
       {intervalDragState && <SnapLineLayer/>}
     </>
   );

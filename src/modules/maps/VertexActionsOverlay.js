@@ -12,6 +12,7 @@ import overlayStyles from '../../shared/ui/modals/overlay.styles';
 const VertexActionsOverlay = ({
                                 addNewVertex,
                                 deleteSelectedVertex,
+                                extendLineFromEndpoint,
                                 isShowVertexActionsModal,
                                 setIsShowVertexActionsModal,
                                 splitLine,
@@ -34,6 +35,22 @@ const VertexActionsOverlay = ({
       let {e, spotEditingCopy, spotToEdit, vertexSelected} = vertexActionValues;
       splitLine(e, spotEditingCopy, spotToEdit, vertexSelected);
     }
+    else if (button === 'Extend Line') {
+      let {spotEditingCopy, vertexSelected} = vertexActionValues;
+      extendLineFromEndpoint(spotEditingCopy, vertexSelected);
+    }
+  };
+
+  const isButtonShown = (button) => {
+    const {isEndpointVertex, spotEditingCopy, vertexSelected} = vertexActionValues;
+    const lineCoordCount = spotEditingCopy?.geometry?.coordinates?.length ?? 0;
+    // Extend only from an endpoint; no splitting at an endpoint; no deleting below a line's two-point minimum.
+    if (button === 'Extend Line') return isEndpointVertex;
+    if (button === 'Split Line' && isEndpointVertex) return false;
+    if (button === 'Delete Vertex' && vertexSelected && lineCoordCount <= 2) return false;
+    // Otherwise: vertex selected -> Delete/Split, no vertex -> Add/Split.
+    return (vertexSelected && button !== 'Add Vertex')
+      || (!vertexSelected && button !== 'Delete Vertex');
   };
 
   /* View */
@@ -52,8 +69,7 @@ const VertexActionsOverlay = ({
       <View style={[overlayStyles.overlayContent, overlayStyles.selectGeometryTypeContent]}>
         {VERTEX_ACTION_BUTTONS.map((button) => {
             return (
-              ((vertexActionValues.vertexSelected && button !== 'Add Vertex')
-                || (!vertexActionValues.vertexSelected && button !== 'Delete Vertex')) && (
+              isButtonShown(button) && (
                 <ClearButton
                   icon={
                     <IconButton

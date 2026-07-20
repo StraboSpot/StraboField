@@ -215,4 +215,4 @@ export const LAYER_IDS_SELECTED = ['polygonLayerSelected', 'polygonLayerWithPatt
 
 export const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
 
-export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line'];
+export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line', 'Extend Line'];

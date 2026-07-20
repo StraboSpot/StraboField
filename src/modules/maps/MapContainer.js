@@ -78,7 +78,9 @@ const MapContainer = forwardRef(({
     editFeatureVertex,
     editSpot,
     endDraw,
+    extendLineFromEndpoint,
     getSpotToEdit,
+    handleSelectedVertexLongPress,
     isEditingSpot,
     moveVertex,
     saveEdits,
@@ -512,6 +514,7 @@ const MapContainer = forwardRef(({
           mapRef={mapRef}
           measureFeatures={measureFeatures}
           onMapLoad={handleMapLoadedWeb}  // prop used in web only
+          onVertexLongPress={handleSelectedVertexLongPress}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}
@@ -542,6 +545,7 @@ const MapContainer = forwardRef(({
           <VertexActionsOverlay
             addNewVertex={addNewVertex}
             deleteSelectedVertex={deleteSelectedVertex}
+            extendLineFromEndpoint={extendLineFromEndpoint}
             isShowVertexActionsModal={isShowVertexActionsModal}
             setIsShowVertexActionsModal={setIsShowVertexActionsModal}
             splitLine={splitLine}
