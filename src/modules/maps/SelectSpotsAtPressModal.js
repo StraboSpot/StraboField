@@ -1,23 +1,17 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {useDispatch} from 'react-redux';
-
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {SpotsListItem} from '../spots';
-import {setSelectedSpot} from '../spots/spots.slice';
 
-// Modal shown when a map press overlaps more than one Spot, letting the user pick which to select.
-const SelectSpotsAtPressModal = ({closeModal, isVisible, spots}) => {
-  /* Data Hooks */
-
-  const dispatch = useDispatch();
-
+// Modal shown when a map press overlaps more than one Spot, letting the user pick which one to act
+// on (select in view mode, or choose which to edit on a long press).
+const SelectSpotsAtPressModal = ({closeModal, headerTitle, isVisible, onSpotPress, spots}) => {
   /* Event Handlers */
 
   const handleSpotPressed = (spot) => {
-    dispatch(setSelectedSpot(spot));
+    onSpotPress(spot);
     closeModal();
   };
 
@@ -26,7 +20,7 @@ const SelectSpotsAtPressModal = ({closeModal, isVisible, spots}) => {
   return (
     <ModalWrapper
       closeModal={closeModal}
-      headerTitle={`${spots.length} Spots Here`}
+      headerTitle={headerTitle}
       isVisible={isVisible}
       showActionButton={false}
       showCancelButton={false}

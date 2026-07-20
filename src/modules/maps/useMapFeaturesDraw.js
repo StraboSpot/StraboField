@@ -6,7 +6,7 @@ import proj4 from 'proj4';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
-import {addVertexToLine, addVertexToPolygon} from './maps.helpers';
+import {addVertexToLine, addVertexToPolygon, getClosestSpotDistanceAndIndex} from './maps.helpers';
 import {clearedVertexes, setFreehandFeatureCoords, setVertexStartCoords} from './maps.slice';
 import useMapSymbology from './symbology/useMapSymbology';
 import useMap from './useMap';
@@ -55,7 +55,7 @@ const useMapFeaturesDraw = ({
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots, getDisplayedSpots} = useMapFeatures();
   const {
-    getDrawFeatureAtPress, getLassoedSpots, getSpotAtPress, identifyClosestVertexOnSpotPress,
+    getDrawFeatureAtPress, getLassoedSpots, getSpotAtPress, getSpotsAtPress, identifyClosestVertexOnSpotPress,
   } = useMapFeaturesCalculated(mapRef);
   const {getSymbology} = useMapSymbology();
   const {getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
@@ -78,9 +78,10 @@ const useMapFeaturesDraw = ({
   /* Side Effects */
 
   useEffect(() => {
-    // console.log('UE useMapFeaturesDraw [mapMode]');
-    setAllowMapViewMove(!(isDrawMode(mapMode) || mapMode === MAP_MODES.EDIT));
-  }, [mapMode]);
+    // console.log('UE useMapFeaturesDraw [mapMode, spotEditing]');
+    // Lock the map while drawing or editing a Spot; EDIT with nothing selected stays movable for panning.
+    setAllowMapViewMove(!(isDrawMode(mapMode) || (mapMode === MAP_MODES.EDIT && !isEmpty(spotEditing))));
+  }, [mapMode, spotEditing]);
 
   useEffect(() => {
     // console.log('UE useMapFeaturesDraw [drawFeatures]');
@@ -121,8 +122,9 @@ const useMapFeaturesDraw = ({
   const clearSelectedFeatureToEdit = () => {
     console.log('Clearing selected Spot.');
     clearSelectedSpotsWhileEditing();
+    setSpotEditing({});
     setDrawFeatures([]);
-    clearSelectedVertexToEdit();                        // Not really needed here?
+    clearSelectedVertexToEdit();
     console.log('Cleared selected Spot.');
   };
 
@@ -135,9 +137,7 @@ const useMapFeaturesDraw = ({
   const clearSelectedVertexToEdit = () => {
     setVertexToEdit({});
     setEditFeatureVertex([]);
-    setAllowMapViewMove(true);
     console.log('Cleared selected vertex to edit.');
-    //if (turf.getType(spotsEditing[0]) === 'Point') clearSelectedFeatureToEdit();
     clearVertexes();
   };
 
@@ -309,6 +309,17 @@ const useMapFeaturesDraw = ({
         indexOfCoordinatesToUpdate.push(index);
       }
     }
+    // Fallback: a just-added vertex's tempEditId is regenerated (getSpotToEditCont) and can lag the render,
+    // so the id match fails. Coordinates are stable - match the closest drawFeature to the pressed vertex.
+    if (isEmpty(indexOfCoordinatesToUpdate) && vertex.geometry?.coordinates) {
+      const [vertexX, vertexY] = vertex.geometry.coordinates;
+      const distances = drawFeatures.map((feature) => {
+        const coords = feature.geometry?.coordinates;
+        return coords ? Math.abs(coords[0] - vertexX) + Math.abs(coords[1] - vertexY) : Number.MAX_VALUE;
+      });
+      const [, closestIndex] = getClosestSpotDistanceAndIndex(distances);
+      if (closestIndex !== -1) indexOfCoordinatesToUpdate.push(closestIndex);
+    }
     return indexOfCoordinatesToUpdate;
   };
 
@@ -434,6 +445,7 @@ const useMapFeaturesDraw = ({
 
   const setSelectedSpotToEdit = (spotToEdit) => {
     console.log('setSelectedSpotToEdit spotToEdit', spotToEdit);
+    clearSelectedVertexToEdit();
     setSpotEditing(spotToEdit);
     console.log('Set selected Spot to edit:', spotToEdit);
     setDisplayedSpotsWhileEditing(spotToEdit, spotsEdited, spotsNotEdited);
@@ -561,18 +573,25 @@ const useMapFeaturesDraw = ({
     console.log('Select/Unselect vertex (and thus feature with the vertex) to edit');
     console.log('Selecting feature to edit...');
 
-    // If we don't have a selected feature, check to see if point pressed was at a feature
-    //   If not, do nothing
-    //   If so, set that feature to the selected feature and set all other features as features-not-selected and
-    //   explode the vertices of the selected feature if the feature is a line or polygon and add to draw layer
-    // If we already have a selected feature check to see if we also already have a selected vertex
-    // If not, and there is a different feature at the point pressed, set that feature as the selected feature
-    // If not, and there is a vertex of the selected feature at the point pressed, set that as the selected vertex
-    // If not, and there is no feature at the point pressed, unselect the selected feature
-    // If so, check to see if point pressed was at another vertex of the selected feature
-    //     If not edit vertex coords to those of pressed point
-    //     If so switch selected vertex to vertex at pressed point
-    const spotAtPress = await getSpotAtPress(screenPointX, screenPointY);
+    // Pick what to edit from where the user pressed:
+    //
+    // No Spot is being edited yet:
+    //   - Nothing under the press -> do nothing.
+    //   - A Spot under the press -> make it the edited Spot (all others become not-selected; a line or
+    //     polygon has its vertices exploded onto the draw layer).
+    //
+    // A Spot is already being edited (prefer that Spot when it's under the press, so a nearby point Spot
+    // can't steal a vertex tap):
+    //   - Nothing under the press -> deselect the edited Spot.
+    //   - A different Spot under the press (and no vertex of the edited Spot) -> switch to editing it.
+    //   - A vertex of the edited Spot under the press -> make it the selected vertex to edit.
+    let spotAtPress;
+    if (!isEmpty(spotEditing)) {
+      const spotsAtPress = await getSpotsAtPress(screenPointX, screenPointY);
+      const isEditingSpotAtPress = spotsAtPress.some(spot => spot.properties.id === spotEditing.properties.id);
+      spotAtPress = isEditingSpotAtPress ? spotEditing : await getSpotAtPress(screenPointX, screenPointY);
+    }
+    else spotAtPress = await getSpotAtPress(screenPointX, screenPointY);
     const spotFound = !isEmpty(spotAtPress) && spotAtPress?.geometry ? turf.cleanCoords(spotAtPress) : undefined;
     // #114, while editing, click on a different spot to edit, should immediately identify it as the selected spot and hence update the notebook panel.
     if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
@@ -624,6 +643,15 @@ const useMapFeaturesDraw = ({
         }
       }
     }
+  };
+
+  // Edit the Spot picked from the overlapping-Spots picker; reuses its in-progress edited copy so a switch
+  // doesn't discard edits.
+  const setSpotToEditFromPicker = (spot) => {
+    const editedSpot = spotsEdited.find(s => s.properties.id === spot.properties.id);
+    const spotToEdit = isEmpty(editedSpot) ? spot : editedSpot;
+    dispatch(setSelectedSpot(spotToEdit));
+    setSelectedSpotToEdit(spotToEdit);
   };
 
   const endDraw = async () => {
@@ -696,11 +724,19 @@ const useMapFeaturesDraw = ({
   };
 
   const getSpotToEdit = async (e, screenPointX, screenPointY, spotToEdit) => {
+    const vertexSelected = isEmpty(spotEditing) ? {} : await getDrawFeatureAtPress(screenPointX, screenPointY);
+    // Treat the press as on the edited Spot when its body OR a vertex of it is under the press (the vertex
+    // check covers corner presses where the fill isn't under the point), so a nearby point Spot can't block it.
+    if (!isEmpty(spotEditing)) {
+      const spotsAtPress = await getSpotsAtPress(screenPointX, screenPointY);
+      const isEditingSpotAtPress = spotsAtPress.some(spot => spot.properties.id === spotEditing.properties.id)
+        || (!isEmpty(vertexSelected) && String(vertexSelected.properties.id) === String(spotEditing.properties.id));
+      if (isEditingSpotAtPress) spotToEdit = spotEditing;
+    }
     if (isEmpty(spotToEdit)) console.log('Already in editing mode and no Spot found where pressed. No action taken.');
     else if (!isEmpty(spotEditing)) {
       let spotEditingCopy = JSON.parse(JSON.stringify(spotEditing));
       if (turf.getType(spotEditingCopy) === 'LineString' || turf.getType(spotEditingCopy) === 'Polygon') {
-        const vertexSelected = await getDrawFeatureAtPress(screenPointX, screenPointY);
         if (spotEditingCopy.properties.id === spotToEdit.properties.id) {
           if (turf.getType(spotEditingCopy) === 'LineString') {
             setVertexActionValues({
@@ -928,9 +964,11 @@ const useMapFeaturesDraw = ({
     editSpot,
     endDraw,
     getSpotToEdit,
+    isEditingSpot: !isEmpty(spotEditing),
     moveVertex,
     saveEdits,
     setDrawFeaturesNew,
+    setSpotToEditFromPicker,
     splitLine,
     spotsNotSelected,
     spotsSelected,

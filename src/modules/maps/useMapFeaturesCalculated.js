@@ -78,11 +78,19 @@ const useMapFeaturesCalculated = (mapRef) => {
   /* Exported Functions */
 
   // Get a draw feature from the draw layer where the screen was pressed
-  const getDrawFeatureAtPress = async (screenPointX, screenPoint) => {
-    const drawFeature = await getRandomFeatureInBBox([screenPointX, screenPoint], ['pointLayerDraw']);
-    if (isEmpty(drawFeature)) console.log('No draw features near press.');
-    else console.log('Got draw feature:', drawFeature);
-    return Promise.resolve(drawFeature);
+  const getDrawFeatureAtPress = async (screenPointX, screenPointY) => {
+    const nearFeatures = await getFeaturesInBBox([screenPointX, screenPointY], ['pointLayerDraw']);
+    if (isEmpty(nearFeatures)) {
+      console.log('No draw features near press.');
+      return [];
+    }
+    // Return the vertex closest to the press, not a random one, so it reliably targets the vertex under
+    // the finger even when vertices sit close together (e.g. a just-added one).
+    const distances = await getDistancesFromSpot(screenPointX, screenPointY, nearFeatures);
+    const [, closestIndex] = getClosestSpotDistanceAndIndex(distances);
+    const drawFeature = nearFeatures[closestIndex] || [];
+    console.log('Got draw feature:', drawFeature);
+    return drawFeature;
   };
 
   // Get Spots within (points) or intersecting (line or polygon) the drawn polygon

@@ -79,9 +79,11 @@ const MapContainer = forwardRef(({
     editSpot,
     endDraw,
     getSpotToEdit,
+    isEditingSpot,
     moveVertex,
     saveEdits,
     setDrawFeaturesNew,
+    setSpotToEditFromPicker,
     splitLine,
     spotsNotSelected,
     spotsSelected,
@@ -103,12 +105,15 @@ const MapContainer = forwardRef(({
   const {
     handleMapLongPress,
     handleMapPress,
+    handleSpotAtPressSelected,
+    isSpotsAtPressForEdit,
     location,
     startIntervalDrag,
   } = useMapPressEvents({
     clearSelectedSpots,
     editSpot,
     getSpotToEdit,
+    isEditingSpot,
     mapMode,
     mapRef,
     measureFeatures,
@@ -119,6 +124,7 @@ const MapContainer = forwardRef(({
     setMapModeToEdit,
     setMeasureFeatures,
     setSpotsAtPress,
+    setSpotToEditFromPicker,
     switchToEditing,
   });
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
@@ -545,7 +551,9 @@ const MapContainer = forwardRef(({
         {isShowSpotsAtPressModal && (
           <SelectSpotsAtPressModal
             closeModal={() => setIsShowSpotsAtPressModal(false)}
+            headerTitle={isSpotsAtPressForEdit ? 'Select Spot to Edit' : `${spotsAtPress.length} Spots Here`}
             isVisible={isShowSpotsAtPressModal}
+            onSpotPress={handleSpotAtPressSelected}
             spots={spotsAtPress}
           />
         )}

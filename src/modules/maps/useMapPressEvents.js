@@ -19,6 +19,7 @@ const useMapPressEvents = ({
                              clearSelectedSpots,
                              editSpot,
                              getSpotToEdit,
+                             isEditingSpot,
                              mapMode,
                              mapRef,
                              measureFeatures,
@@ -29,6 +30,7 @@ const useMapPressEvents = ({
                              setMapModeToEdit,
                              setMeasureFeatures,
                              setSpotsAtPress,
+                             setSpotToEditFromPicker,
                              switchToEditing,
                            }) => {
   /* Data Hooks */
@@ -41,7 +43,7 @@ const useMapPressEvents = ({
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
-  const {getSpotAtPress, getSpotsAtPress} = useMapFeaturesCalculated(mapRef);
+  const {getDrawFeatureAtPress, getSpotAtPress, getSpotsAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
   const store = useStore();
@@ -49,6 +51,8 @@ const useMapPressEvents = ({
   /* Local State */
 
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
+  // What the picker does with the tapped Spot ('select' | 'edit' | 'switch'); holds long-press coords for 'edit'.
+  const [spotsAtPressAction, setSpotsAtPressAction] = useState(null);
 
   /* Internal Functions */
 
@@ -62,21 +66,49 @@ const useMapPressEvents = ({
 
   /* Exported Functions */
 
-  // Handle a long press on the map by making the point or vertex at the point "selected"
+  // A long press acts on the Spot(s) under the press:
+  //   VIEW mode -> start editing a Spot:
+  //     - Several overlap -> show the picker so the user chooses which to edit.
+  //     - Exactly one -> switch straight into editing it.
+  //     - None -> do nothing.
+  //   EDIT mode -> hand off to getSpotToEdit, which modifies the vertices of the Spot being edited
+  //     (add/delete a polygon vertex, or open the add/delete/split actions for a line).
   const handleMapLongPress = async (e) => {
     console.log('Map long press detected:', e);
     const [screenPointX, screenPointY] = getScreenPoint(e);
-    const spotToEdit = await getSpotAtPress(screenPointX, screenPointY);
 
-    const mappedSpots = getAllMappedSpots();
-    if (mapMode === MAP_MODES.VIEW && !isEmpty(mappedSpots) && !isEmpty(spotToEdit)) {
-      await switchToEditing(screenPointX, screenPointY, spotToEdit, setMapModeToEdit);
+    if (mapMode === MAP_MODES.VIEW && !isEmpty(getAllMappedSpots())) {
+      const spotsToEdit = await getSpotsAtPress(screenPointX, screenPointY);
+      // Several Spots overlap - let the user pick which to edit.
+      if (spotsToEdit.length > 1) {
+        setSpotsAtPress(spotsToEdit);
+        setSpotsAtPressAction({screenPointX, screenPointY, type: 'edit'});
+        setIsShowSpotsAtPressModal(true);
+      }
+      else if (spotsToEdit.length === 1) {
+        await switchToEditing(screenPointX, screenPointY, spotsToEdit[0], setMapModeToEdit);
+      }
+      else console.log('No Spots to edit. No action taken.');
     }
-    else if (mapMode === MAP_MODES.EDIT) await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit);
+    else if (mapMode === MAP_MODES.EDIT) {
+      const spotToEdit = await getSpotAtPress(screenPointX, screenPointY);
+      await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit);
+    }
     else console.log('No Spots to edit. No action taken.');
   };
 
-  // Mapbox: Handle map press
+  // A short press is routed by map mode:
+  //   INTERVAL_DRAG (strat section) -> start dragging the strat interval under the press.
+  //   MEASURE -> add the point to the measurement.
+  //   DRAW -> add a draw feature (freehand line/polygon are handled on release, not here).
+  //   VIEW -> select/deselect the Spot under the press:
+  //     - Macrostrat basemap -> open the geology overlay and select a Spot (random when several overlap).
+  //     - Several overlap -> show the picker so the user chooses which to select.
+  //     - Exactly one -> select it.
+  //     - None -> select the strat section's own Spot if in one, otherwise deselect.
+  //   EDIT -> a vertex under the press is a vertex gesture (editSpot); otherwise switch to another Spot
+  //     under the press (picker if several), deselect on empty space, or do nothing if only the edited
+  //     Spot is under the press with no vertex.
   const handleMapPress = async (e) => {
     if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
       const [x, y] = getScreenPoint(e);
@@ -125,6 +157,7 @@ const useMapPressEvents = ({
         // Let the user pick when several Spots overlap rather than choosing one at random.
         else if (spotsFound.length > 1) {
           setSpotsAtPress(spotsFound);
+          setSpotsAtPressAction({type: 'select'});
           setIsShowSpotsAtPressModal(true);
         }
         else if (spotsFound.length === 1) dispatch(setSelectedSpot(spotsFound[0]));
@@ -137,9 +170,39 @@ const useMapPressEvents = ({
       // Draw a feature
       else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
       // Edit a Spot
-      else if (mapMode === MAP_MODES.EDIT) await editSpot(e);
+      else if (mapMode === MAP_MODES.EDIT) {
+        const [screenPointX, screenPointY] = getScreenPoint(e);
+        // A vertex in the press box is a vertex gesture - let editSpot handle it.
+        const vertexAtPress = isEditingSpot ? await getDrawFeatureAtPress(screenPointX, screenPointY) : {};
+        if (!isEmpty(vertexAtPress)) await editSpot(e);
+        else {
+          // No vertex: switch Spots. Look at Spots under the press other than the one being edited.
+          const spotsAtPress = await getSpotsAtPress(screenPointX, screenPointY);
+          const editingSpotId = store.getState().spot.selectedSpot?.properties?.id;
+          const otherSpots = isEditingSpot ? spotsAtPress.filter(spot => spot.properties.id !== editingSpotId)
+            : spotsAtPress;
+          if (otherSpots.length > 1) {
+            setSpotsAtPress(otherSpots);
+            setSpotsAtPressAction({type: 'switch'});
+            setIsShowSpotsAtPressModal(true);
+          }
+          else if (otherSpots.length === 1) setSpotToEditFromPicker(otherSpots[0]);
+          else if (spotsAtPress.length === 0) await editSpot(e);  // empty press - editSpot deselects
+          // Only the edited Spot under the press, no vertex - do nothing (don't grab the nearest vertex).
+          else console.log('Only the edited Spot at press and no vertex in box. No action taken.');
+        }
+      }
       else console.log('Error. Unknown map mode:', mapMode);
     }
+  };
+
+  // Act on the Spot picked from the overlapping-Spots picker: 'edit' enters editing, 'switch' switches, else select.
+  const handleSpotAtPressSelected = async (spot) => {
+    if (spotsAtPressAction?.type === 'edit') {
+      await switchToEditing(spotsAtPressAction.screenPointX, spotsAtPressAction.screenPointY, spot, setMapModeToEdit);
+    }
+    else if (spotsAtPressAction?.type === 'switch') setSpotToEditFromPicker(spot);
+    else dispatch(setSelectedSpot(spot));
   };
 
   const startIntervalDrag = async (screenPointX, screenPointY, draggedInterval, startClientY) => {
@@ -225,6 +288,8 @@ const useMapPressEvents = ({
   return {
     handleMapLongPress,
     handleMapPress,
+    handleSpotAtPressSelected,
+    isSpotsAtPressForEdit: spotsAtPressAction?.type === 'edit' || spotsAtPressAction?.type === 'switch',
     location,
     startIntervalDrag,
   };
