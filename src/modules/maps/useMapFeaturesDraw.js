@@ -546,13 +546,13 @@ const useMapFeaturesDraw = ({
   const deleteSelectedVertex = (spotEditingCopy, vertexSelected) => {
     console.log('Deleting selected vertex...');
     const indexOfCoordinatesToUpdate = getVertexIndexInSpotToEdit(vertexSelected);
-    const isModified = deleteVertexFromGeometry(spotEditingCopy, indexOfCoordinatesToUpdate);
+    const [updatedSpot, isModified] = deleteVertexFromGeometry(spotEditingCopy, indexOfCoordinatesToUpdate);
     if (isModified) {
-      spotEditingCopy.properties.modified_timestamp = Date.now();
-      console.log('Finished deleting vertex. Edited Spot:', spotEditingCopy);
+      updatedSpot.properties.modified_timestamp = Date.now();
+      console.log('Finished deleting vertex. Edited Spot:', updatedSpot);
     }
     else console.warn('Problem editing Spot');
-    getSpotToEditCont(spotEditingCopy);
+    getSpotToEditCont(updatedSpot);
   };
 
   // Grow a line from an endpoint: duplicate that endpoint and select the copy to drag out, leaving the
@@ -569,15 +569,15 @@ const useMapFeaturesDraw = ({
       console.log('Selected vertex is not an endpoint of the line. No action taken.');
       return;
     }
-    const {newVertexCoord, newVertexIndex} = extended;
-    spotEditingCopy.properties.modified_timestamp = Date.now();
+    const {updatedFeature, newVertexCoord, newVertexIndex} = extended;
+    updatedFeature.properties.modified_timestamp = Date.now();
     // newVertexCoord already matches spotEditingCopy's projection, which is what setSelectedSpotToEdit wants.
     setSelectedSpotToEdit(turf.point(newVertexCoord));
     setVertexIndex(newVertexIndex);
-    getSpotToEditCont(spotEditingCopy);
-    // getSpotToEditCont clears editFeatureVertex; web drags off that layer (native uses vertexStartCoords),
-    // so repopulate it for an immediate drag. vertexToEdit stays empty so the drag targets by index - the
-    // duplicated coordinate is ambiguous by position.
+    getSpotToEditCont(updatedFeature);
+    // getSpotToEditCont cleared editFeatureVertex; on web the drag reads from that layer (native uses
+    // vertexStartCoords), so repopulate it for an immediate drag. Leave vertexToEdit empty so the drag
+    // targets by index - the duplicated endpoint coordinate is ambiguous by position.
     if (Platform.OS === 'web') {
       const editVertex = turf.point([...newVertexCoord]);
       setEditFeatureVertex([currentImageBasemap || stratSection ? convertImagePixelsToLatLong(editVertex)

@@ -6,30 +6,29 @@ import proj4 from 'proj4';
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
 
-// Add a new vertex to a line
+// Add a new vertex to a line. Returns [newLine, newPointOnLine]; does not mutate the input.
 export const addVertexToLine = (line, newVertex) => {
   console.log('Adding vertex to selected line feature...');
   const newPointOnLine = turf.nearestPointOnLine(line, newVertex);
   const i = newPointOnLine.properties.index;
-  line.geometry.coordinates.splice(i + 1, 0, newPointOnLine.geometry.coordinates);
-  return [line, newPointOnLine];
+  const newLine = JSON.parse(JSON.stringify(line));
+  newLine.geometry.coordinates.splice(i + 1, 0, newPointOnLine.geometry.coordinates);
+  return [newLine, newPointOnLine];
 };
 
-// Add a new vertex to a polygon
+// Add a new vertex to a polygon. Returns [newPolygon, nearestPointOnLine]; does not mutate the input.
 export const addVertexToPolygon = (polygon, newVertex) => {
   console.log('Adding vertex to selected polygon feature...');
 
-  // Get all the lines that make up the polygon
+  // Split the ring into segments and pick the one nearest newVertex, tagging each with its index.
   let lines = turf.lineSegment(polygon).features;
-
-  // Get the nearest point among all lines to the pressed screen point
   const nearestPointOnLine = lines.reduce((acc, line, i) => {
     let nearestPointToTest = turf.nearestPointOnLine(line, newVertex);
     nearestPointToTest.properties.index = i;
     return isEmpty(acc) || nearestPointToTest.properties.dist < acc.properties.dist ? nearestPointToTest : acc;
   }, {});
 
-  // Add the new vertex to the polygon
+  // Insert the new vertex right after that segment's start position.
   const newPolygon = JSON.parse(JSON.stringify(polygon));
   newPolygon.geometry.coordinates[0].splice(nearestPointOnLine.properties.index + 1, 0,
     nearestPointOnLine.geometry.coordinates);
@@ -74,42 +73,44 @@ export const convertFeatureGeometryToImagePixels = feature => convertCoords(feat
 // Convert image x,y pixels to WGS84, assuming x,y are web mercator
 export const convertImagePixelsToLatLong = feature => convertCoords(feature, PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION);
 
-// Delete the vertices at the given coordinate indices from a LineString or Polygon feature, mutating
-// it in place. A LineString must keep more than 2 vertices and a Polygon more than 4 ring positions,
-// otherwise nothing is removed. When a Polygon's first position is removed the ring is re-closed by
-// copying the new first position onto the last. Returns whether any vertex was removed.
+// Delete the vertices at the given coordinate indices from a LineString or Polygon. Returns
+// [updatedFeature, isModified]; does not mutate the input. Keeps a line's 2-vertex and a polygon's
+// 4-position minimums (nothing removed below them), and re-closes a polygon ring when its first
+// position is deleted.
 export const deleteVertexFromGeometry = (feature, indicesToDelete) => {
-  const coords = turf.getCoords(feature);
+  const updatedFeature = JSON.parse(JSON.stringify(feature));
+  const coords = turf.getCoords(updatedFeature);
   let isModified = false;
-  if (turf.getType(feature) === 'LineString' && coords.length > 2) {
+  if (turf.getType(updatedFeature) === 'LineString' && coords.length > 2) {
     for (let i = 0; i < coords.length; i++) {
       if (indicesToDelete.includes(i)) {
-        feature.geometry.coordinates.splice(i, 1);
+        updatedFeature.geometry.coordinates.splice(i, 1);
         isModified = true;
       }
     }
   }
-  else if (turf.getType(feature) === 'Polygon' && coords[0].length > 4) {
+  else if (turf.getType(updatedFeature) === 'Polygon' && coords[0].length > 4) {
+    const ring = updatedFeature.geometry.coordinates[0];
     for (let i = 0; i < coords.length; i++) {
       for (let j = 0; j < coords[i].length; j++) {
         if (indicesToDelete.includes(j)) {
-          feature.geometry.coordinates[i].splice(j, 1);
+          updatedFeature.geometry.coordinates[i].splice(j, 1);
           isModified = true;
         }
       }
     }
     if (indicesToDelete.includes(0)) {
-      // when the first spot is deleted, update the last spot to the current first spot.
-      feature.geometry.coordinates[0][feature.geometry.coordinates[0].length - 1] = feature.geometry.coordinates[0][0];
+      // Removing the first position breaks ring closure; copy the new first onto the last to re-close.
+      ring[ring.length - 1] = ring[0];
     }
   }
   else console.log('Not enough vertices in selected feature to delete one.');
-  return isModified;
+  return [updatedFeature, isModified];
 };
 
-// Grow a line by duplicating one of its endpoint coordinates: inserts a copy at whichever end the
-// given vertex indices point to, mutating the feature. Returns the duplicated coordinate and its new
-// index, or null if the feature is not a line or the vertex is not one of its endpoints.
+// Grow a line by duplicating an endpoint coordinate and inserting the copy at that end. Returns
+// {updatedFeature, newVertexCoord, newVertexIndex}; does not mutate the input. Returns null if the
+// feature is not a line or the vertex is not one of its endpoints.
 export const extendLineAtEndpoint = (feature, endpointIndices) => {
   if (turf.getType(feature) !== 'LineString') return null;
   const lastIndex = feature.geometry.coordinates.length - 1;
@@ -118,16 +119,17 @@ export const extendLineAtEndpoint = (feature, endpointIndices) => {
   if (!isFirstEndpoint && !isLastEndpoint) return null;
   const endpointCoord = isFirstEndpoint ? feature.geometry.coordinates[0] : feature.geometry.coordinates[lastIndex];
   const newVertexCoord = [...endpointCoord];
+  const updatedFeature = JSON.parse(JSON.stringify(feature));
   let newVertexIndex;
   if (isFirstEndpoint) {
-    feature.geometry.coordinates.unshift(newVertexCoord);
+    updatedFeature.geometry.coordinates.unshift(newVertexCoord);
     newVertexIndex = 0;
   }
   else {
-    feature.geometry.coordinates.push(newVertexCoord);
-    newVertexIndex = feature.geometry.coordinates.length - 1;
+    updatedFeature.geometry.coordinates.push(newVertexCoord);
+    newVertexIndex = updatedFeature.geometry.coordinates.length - 1;
   }
-  return {newVertexCoord, newVertexIndex};
+  return {updatedFeature, newVertexCoord, newVertexIndex};
 };
 
 // Get a pixel bounding box with padding around a point pressed on screen. A smaller r tightens the

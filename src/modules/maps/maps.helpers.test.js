@@ -48,13 +48,13 @@ describe('addVertexToLine', () => {
     expect(newPointOnLine.properties.index).toBe(0);
   });
 
-  it('mutates the input line in place (current behavior)', () => {
+  it('does not mutate the input line (deep-copies first)', () => {
     const line = turf.lineString([[0, 0], [10, 0]]);
     const [returnedLine] = addVertexToLine(line, turf.point([5, 0.0001]));
 
-    // Same object reference is returned and the original now has 3 coords
-    expect(returnedLine).toBe(line);
-    expect(line.geometry.coordinates).toHaveLength(3);
+    // A new feature is returned and the original is left untouched
+    expect(returnedLine).not.toBe(line);
+    expect(line.geometry.coordinates).toHaveLength(2);
   });
 });
 
@@ -85,37 +85,41 @@ describe('deleteVertexFromGeometry', () => {
   it('removes a middle vertex from a line with more than 2 vertices', () => {
     const line = turf.lineString([[0, 0], [5, 0], [10, 0]]);
 
-    const isModified = deleteVertexFromGeometry(line, [1]);
+    const [updatedLine, isModified] = deleteVertexFromGeometry(line, [1]);
 
     expect(isModified).toBe(true);
-    expect(line.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
+    expect(updatedLine.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
+    // Input left untouched
+    expect(line.geometry.coordinates).toEqual([[0, 0], [5, 0], [10, 0]]);
   });
 
   it('does nothing to a 2-vertex line (must keep more than 2)', () => {
     const line = turf.lineString([[0, 0], [10, 0]]);
 
-    const isModified = deleteVertexFromGeometry(line, [0]);
+    const [updatedLine, isModified] = deleteVertexFromGeometry(line, [0]);
 
     expect(isModified).toBe(false);
-    expect(line.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
+    expect(updatedLine.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
   });
 
   it('removes a non-first vertex from a polygon with more than 4 ring positions', () => {
     const polygon = turf.polygon([[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]]);
 
-    const isModified = deleteVertexFromGeometry(polygon, [1]);
+    const [updatedPolygon, isModified] = deleteVertexFromGeometry(polygon, [1]);
 
     expect(isModified).toBe(true);
-    expect(polygon.geometry.coordinates[0]).toEqual([[0, 0], [10, 10], [0, 10], [0, 0]]);
+    expect(updatedPolygon.geometry.coordinates[0]).toEqual([[0, 0], [10, 10], [0, 10], [0, 0]]);
+    // Input left untouched
+    expect(polygon.geometry.coordinates[0]).toEqual([[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]);
   });
 
   it('re-closes the ring when the first polygon position is removed', () => {
     const polygon = turf.polygon([[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]]);
 
-    const isModified = deleteVertexFromGeometry(polygon, [0]);
+    const [updatedPolygon, isModified] = deleteVertexFromGeometry(polygon, [0]);
 
     expect(isModified).toBe(true);
-    const ring = polygon.geometry.coordinates[0];
+    const ring = updatedPolygon.geometry.coordinates[0];
     // First position [0,0] removed; ring's last position updated to the new first ([10,0]).
     expect(ring).toEqual([[10, 0], [10, 10], [0, 10], [10, 0]]);
     expect(ring[0]).toEqual(ring[ring.length - 1]);
@@ -124,30 +128,36 @@ describe('deleteVertexFromGeometry', () => {
   it('does nothing to a triangle polygon (must keep more than 4 ring positions)', () => {
     const polygon = turf.polygon([[[0, 0], [10, 0], [5, 10], [0, 0]]]);
 
-    const isModified = deleteVertexFromGeometry(polygon, [1]);
+    const [updatedPolygon, isModified] = deleteVertexFromGeometry(polygon, [1]);
 
     expect(isModified).toBe(false);
-    expect(polygon.geometry.coordinates[0]).toEqual([[0, 0], [10, 0], [5, 10], [0, 0]]);
+    expect(updatedPolygon.geometry.coordinates[0]).toEqual([[0, 0], [10, 0], [5, 10], [0, 0]]);
   });
 });
 
 describe('extendLineAtEndpoint', () => {
-  it('duplicates the first endpoint and inserts the copy at the start', () => {
+  it('duplicates the first endpoint into a new feature and inserts the copy at the start', () => {
     const line = turf.lineString([[0, 0], [10, 0]]);
 
-    const result = extendLineAtEndpoint(line, [0]);
+    const {updatedFeature, newVertexCoord, newVertexIndex} = extendLineAtEndpoint(line, [0]);
 
-    expect(result).toEqual({newVertexCoord: [0, 0], newVertexIndex: 0});
-    expect(line.geometry.coordinates).toEqual([[0, 0], [0, 0], [10, 0]]);
+    expect(newVertexCoord).toEqual([0, 0]);
+    expect(newVertexIndex).toBe(0);
+    expect(updatedFeature.geometry.coordinates).toEqual([[0, 0], [0, 0], [10, 0]]);
+    // Input left untouched
+    expect(line.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
   });
 
-  it('duplicates the last endpoint and appends the copy at the end', () => {
+  it('duplicates the last endpoint into a new feature and appends the copy at the end', () => {
     const line = turf.lineString([[0, 0], [10, 0]]);
 
-    const result = extendLineAtEndpoint(line, [1]);
+    const {updatedFeature, newVertexCoord, newVertexIndex} = extendLineAtEndpoint(line, [1]);
 
-    expect(result).toEqual({newVertexCoord: [10, 0], newVertexIndex: 2});
-    expect(line.geometry.coordinates).toEqual([[0, 0], [10, 0], [10, 0]]);
+    expect(newVertexCoord).toEqual([10, 0]);
+    expect(newVertexIndex).toBe(2);
+    expect(updatedFeature.geometry.coordinates).toEqual([[0, 0], [10, 0], [10, 0]]);
+    // Input left untouched
+    expect(line.geometry.coordinates).toEqual([[0, 0], [10, 0]]);
   });
 
   it('returns null and leaves the line untouched when the vertex is not an endpoint', () => {
