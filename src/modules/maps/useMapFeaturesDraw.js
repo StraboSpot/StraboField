@@ -958,9 +958,13 @@ const useMapFeaturesDraw = ({
     setSpotsEdited(spotsEditedTmp);
     setSpotsNotEdited(spotsNotEditedTmp);
     setDisplayedSpotsWhileEditing(newLine1, spotsEditedTmp, spotsNotEditedTmp);
-    clearSelectedVertexToEdit();
     console.log('Finished editing Spot. Spot Editing: ', newLine1);
     setDrawFeatures(explodedFeatures);
+    // Select the split point (newLine1's new endpoint) right away so it's draggable immediately. Pass it as a
+    // name-less point in the Spot's projection so setSelectedVertexToEdit's image-basemap conversion fires.
+    const splitVertexIndex = newLine1.geometry.coordinates.length - 1;
+    setSelectedVertexToEdit(turf.point([...newLine1.geometry.coordinates[splitVertexIndex]]));
+    setVertexIndex(splitVertexIndex);
   };
 
   const startEditing = (spotToEdit, vertexToEditTemp, index, setMapModeToEdit) => {
