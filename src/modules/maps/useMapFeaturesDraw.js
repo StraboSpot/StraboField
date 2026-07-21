@@ -507,6 +507,13 @@ const useMapFeaturesDraw = ({
       setVertexIndex(vertexAdded.properties.index + 1);
     }
     getSpotToEditCont(spotEditingCopy);
+    // getSpotToEditCont clears editFeatureVertex, which web drags off; repopulate it so the just-added vertex
+    // is selected right away. Native uses vertexStartCoords instead. See extendLineFromEndpoint. On an image
+    // basemap/strat section vertexAdded was mutated to pixel coords above, so convert back to geo for the layer.
+    if (Platform.OS === 'web' && !isEmpty(vertexAdded)) {
+      const editVertex = turf.point([...turf.getCoord(vertexAdded)]);
+      setEditFeatureVertex([currentImageBasemap || stratSection ? convertImagePixelsToLatLong(editVertex) : editVertex]);
+    }
   };
 
   const cancelDraw = () => {
