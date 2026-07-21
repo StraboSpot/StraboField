@@ -135,7 +135,8 @@ const useMapFeatures = () => {
       }
       else if (spot.geometry.type === 'GeometryCollection') {
         spot.geometry.geometries.forEach((g, i) => {
-          mappedFeatures.push({...spot, geometry: g, properties: {...spot.properties, symbology: spot.properties.symbology[i]}});
+          mappedFeatures.push(
+            {...spot, geometry: g, properties: {...spot.properties, symbology: spot.properties.symbology[i]}});
         });
       }
       else mappedFeatures.push(spot);
@@ -152,7 +153,12 @@ const useMapFeatures = () => {
     const featureTypes = spotsWithGeometry.reduce((acc, spot) => {
       const spotFeatureTypes = spot.properties.orientation_data
         && spot.properties.orientation_data.reduce((acc1, orientation) => {
-          return [...new Set([...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified'])];
+          // Include associated orientations, which are rendered as their own point symbols, so any feature type not
+          // already registered by a non-associated measurement gets a toggle instead of being un-hideable
+          const associatedFeatureTypes = (orientation?.associated_orientation || []).map(
+            associatedOrientation => associatedOrientation?.feature_type ? associatedOrientation.feature_type : 'unspecified');
+          return [...new Set(
+            [...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified', ...associatedFeatureTypes])];
         }, []);
       return [...new Set([...acc, ...(spotFeatureTypes ? spotFeatureTypes : ['unspecified'])])];
     }, []);
