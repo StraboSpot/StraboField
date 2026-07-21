@@ -6,7 +6,14 @@ import proj4 from 'proj4';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
-import {addVertexToLine, addVertexToPolygon, getClosestSpotDistanceAndIndex} from './maps.helpers';
+import {
+  addVertexToLine,
+  addVertexToPolygon,
+  deleteVertexFromGeometry,
+  extendLineAtEndpoint,
+  getClosestSpotDistanceAndIndex,
+  splitLineAtVertex,
+} from './maps.helpers';
 import {clearedVertexes, setFreehandFeatureCoords, setVertexStartCoords} from './maps.slice';
 import useMapSymbology from './symbology/useMapSymbology';
 import useMap from './useMap';
@@ -531,32 +538,8 @@ const useMapFeaturesDraw = ({
 
   const deleteSelectedVertex = (spotEditingCopy, vertexSelected) => {
     console.log('Deleting selected vertex...');
-    const coords = turf.getCoords(spotEditingCopy);
     const indexOfCoordinatesToUpdate = getVertexIndexInSpotToEdit(vertexSelected);
-    let isModified = false;
-    if (turf.getType(spotEditingCopy) === 'LineString' && coords.length > 2) {
-      for (let i = 0; i < coords.length; i++) {
-        if (indexOfCoordinatesToUpdate.includes(i)) {
-          spotEditingCopy.geometry.coordinates.splice(i, 1);
-          isModified = true;
-        }
-      }
-    }
-    else if (turf.getType(spotEditingCopy) === 'Polygon' && coords[0].length > 4) {
-      for (let i = 0; i < coords.length; i++) {
-        for (let j = 0; j < coords[i].length; j++) {
-          if (indexOfCoordinatesToUpdate.includes(j)) {
-            spotEditingCopy.geometry.coordinates[i].splice(j, 1);
-            isModified = true;
-          }
-        }
-      }
-      if (indexOfCoordinatesToUpdate.includes(0)) {
-        // when the first spot is deleted, update the last spot to the current first spot.
-        spotEditingCopy.geometry.coordinates[0][spotEditingCopy.geometry.coordinates[0].length - 1] = spotEditingCopy.geometry.coordinates[0][0];
-      }
-    }
-    else console.log('Not enough vertices in selected feature to delete one.');
+    const isModified = deleteVertexFromGeometry(spotEditingCopy, indexOfCoordinatesToUpdate);
     if (isModified) {
       spotEditingCopy.properties.modified_timestamp = Date.now();
       console.log('Finished deleting vertex. Edited Spot:', spotEditingCopy);
@@ -574,25 +557,12 @@ const useMapFeaturesDraw = ({
       return;
     }
     const indexOfEndpoint = getVertexIndexInSpotToEdit(vertexSelected);
-    const lastIndex = spotEditingCopy.geometry.coordinates.length - 1;
-    const isFirstEndpoint = indexOfEndpoint.includes(0);
-    const isLastEndpoint = indexOfEndpoint.includes(lastIndex);
-    if (!isFirstEndpoint && !isLastEndpoint) {
+    const extended = extendLineAtEndpoint(spotEditingCopy, indexOfEndpoint);
+    if (!extended) {
       console.log('Selected vertex is not an endpoint of the line. No action taken.');
       return;
     }
-    const endpointCoord = isFirstEndpoint ? spotEditingCopy.geometry.coordinates[0]
-      : spotEditingCopy.geometry.coordinates[lastIndex];
-    const newVertexCoord = [...endpointCoord];
-    let newVertexIndex;
-    if (isFirstEndpoint) {
-      spotEditingCopy.geometry.coordinates.unshift(newVertexCoord);
-      newVertexIndex = 0;
-    }
-    else {
-      spotEditingCopy.geometry.coordinates.push(newVertexCoord);
-      newVertexIndex = spotEditingCopy.geometry.coordinates.length - 1;
-    }
+    const {newVertexCoord, newVertexIndex} = extended;
     spotEditingCopy.properties.modified_timestamp = Date.now();
     // newVertexCoord already matches spotEditingCopy's projection, which is what setSelectedSpotToEdit wants.
     setSelectedSpotToEdit(turf.point(newVertexCoord));
@@ -933,15 +903,7 @@ const useMapFeaturesDraw = ({
     console.log('new vertex', vertexAdded);
 
     // Get geometries for split lines
-    const lineCoords = turf.getCoords(spotEditingCopy);
-    const endCoords1 = lineCoords[0];
-    const endCoords2 = lineCoords[lineCoords.length - 1];
-    const endPoint1 = turf.point(endCoords1);
-    const endPoint2 = turf.point(endCoords2);
-    const lineSplitTemp1 = turf.lineSlice(endPoint1, vertexAdded, spotEditingCopy);
-    const lineSplitTemp2 = turf.lineSlice(vertexAdded, endPoint2, spotEditingCopy);
-    const lineSplit1 = turf.cleanCoords(lineSplitTemp1);
-    const lineSplit2 = turf.cleanCoords(lineSplitTemp2);
+    const [lineSplit1, lineSplit2] = splitLineAtVertex(spotEditingCopy, vertexAdded);
     console.log('Split Line 1 Geometry', lineSplit1.geometry);
     console.log('Split Line 2 Geometry', lineSplit2.geometry);
 

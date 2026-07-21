@@ -75,6 +75,62 @@ export const convertFeatureGeometryToImagePixels = feature => convertCoords(feat
 // Convert image x,y pixels to WGS84, assuming x,y are web mercator
 export const convertImagePixelsToLatLong = feature => convertCoords(feature, PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION);
 
+// Delete the vertices at the given coordinate indices from a LineString or Polygon feature, mutating
+// it in place. A LineString must keep more than 2 vertices and a Polygon more than 4 ring positions,
+// otherwise nothing is removed. When a Polygon's first position is removed the ring is re-closed by
+// copying the new first position onto the last. Returns whether any vertex was removed.
+export const deleteVertexFromGeometry = (feature, indicesToDelete) => {
+  const coords = turf.getCoords(feature);
+  let isModified = false;
+  if (turf.getType(feature) === 'LineString' && coords.length > 2) {
+    for (let i = 0; i < coords.length; i++) {
+      if (indicesToDelete.includes(i)) {
+        feature.geometry.coordinates.splice(i, 1);
+        isModified = true;
+      }
+    }
+  }
+  else if (turf.getType(feature) === 'Polygon' && coords[0].length > 4) {
+    for (let i = 0; i < coords.length; i++) {
+      for (let j = 0; j < coords[i].length; j++) {
+        if (indicesToDelete.includes(j)) {
+          feature.geometry.coordinates[i].splice(j, 1);
+          isModified = true;
+        }
+      }
+    }
+    if (indicesToDelete.includes(0)) {
+      // when the first spot is deleted, update the last spot to the current first spot.
+      feature.geometry.coordinates[0][feature.geometry.coordinates[0].length - 1] = feature.geometry.coordinates[0][0];
+    }
+  }
+  else console.log('Not enough vertices in selected feature to delete one.');
+  return isModified;
+};
+
+// Grow a line by duplicating one of its endpoint coordinates: inserts a copy at whichever end the
+// given vertex indices point to, mutating the feature. Returns the duplicated coordinate and its new
+// index, or null if the feature is not a line or the vertex is not one of its endpoints.
+export const extendLineAtEndpoint = (feature, endpointIndices) => {
+  if (turf.getType(feature) !== 'LineString') return null;
+  const lastIndex = feature.geometry.coordinates.length - 1;
+  const isFirstEndpoint = endpointIndices.includes(0);
+  const isLastEndpoint = endpointIndices.includes(lastIndex);
+  if (!isFirstEndpoint && !isLastEndpoint) return null;
+  const endpointCoord = isFirstEndpoint ? feature.geometry.coordinates[0] : feature.geometry.coordinates[lastIndex];
+  const newVertexCoord = [...endpointCoord];
+  let newVertexIndex;
+  if (isFirstEndpoint) {
+    feature.geometry.coordinates.unshift(newVertexCoord);
+    newVertexIndex = 0;
+  }
+  else {
+    feature.geometry.coordinates.push(newVertexCoord);
+    newVertexIndex = feature.geometry.coordinates.length - 1;
+  }
+  return {newVertexCoord, newVertexIndex};
+};
+
 // Get a pixel bounding box with padding around a point pressed on screen. A smaller r tightens the
 // tap tolerance (r near 0 requires a press directly on the feature).
 export const getBBoxPaddedInPixels = ([x, y], r = 15) => {
@@ -159,3 +215,14 @@ export const isOnGeoMap = feature => isEmpty(feature) ? false
 export const isOnImageBasemap = feature => feature.properties?.image_basemap;
 
 export const isOnStratSection = feature => feature.properties?.strat_section_id;
+
+// Slice a line feature into two at an added vertex point, returning the two cleaned line features
+// (geometry only). The caller assigns identity and properties to each resulting Spot.
+export const splitLineAtVertex = (lineFeature, vertexAdded) => {
+  const lineCoords = turf.getCoords(lineFeature);
+  const endPoint1 = turf.point(lineCoords[0]);
+  const endPoint2 = turf.point(lineCoords[lineCoords.length - 1]);
+  const lineSplit1 = turf.cleanCoords(turf.lineSlice(endPoint1, vertexAdded, lineFeature));
+  const lineSplit2 = turf.cleanCoords(turf.lineSlice(vertexAdded, endPoint2, lineFeature));
+  return [lineSplit1, lineSplit2];
+};
