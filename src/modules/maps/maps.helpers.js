@@ -3,7 +3,7 @@ import {PixelRatio, Platform} from 'react-native';
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 
-import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
+import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION, PRESS_BOX_PADDING} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
 
 // Add a new vertex to a line. Returns [newLine, newPointOnLine]; does not mutate the input.
@@ -134,7 +134,7 @@ export const extendLineAtEndpoint = (feature, endpointIndices) => {
 
 // Get a pixel bounding box with padding around a point pressed on screen. A smaller r tightens the
 // tap tolerance (r near 0 requires a press directly on the feature).
-export const getBBoxPaddedInPixels = ([x, y], r = 15) => {
+export const getBBoxPaddedInPixels = ([x, y], r = PRESS_BOX_PADDING) => {
   const pixelRatio = PixelRatio.get();
   const maxX = x + r;
   const minX = x - r;

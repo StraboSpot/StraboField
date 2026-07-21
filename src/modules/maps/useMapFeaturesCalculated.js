@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
-import {SPOT_LAYERS} from './maps.constants';
+import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE, SPOT_LAYERS} from './maps.constants';
 import {getClosestSpotDistanceAndIndex} from './maps.helpers';
 import useMapCoords from './useMapCoords';
 import useMapFeatures from './useMapFeatures';
@@ -66,7 +66,7 @@ const useMapFeaturesCalculated = (mapRef) => {
 
   // Get all rendered features within the press box for the given layers. r sets the box padding
   // (r near 0 requires a press directly on the feature; the default gives a comfortable tolerance).
-  const getFeaturesInBBox = async ([x, y], layers, r = 15) => {
+  const getFeaturesInBBox = async ([x, y], layers, r = PRESS_BOX_PADDING) => {
     const bbox = getBBoxPaddedInPixels([x, y], r);
     const nearFeaturesCollection = Platform.OS === 'web' ? mapRef.current.queryRenderedFeatures(bbox, {layers: layers})
       : await mapRef.current.queryRenderedFeaturesInRect(bbox, null, layers);
@@ -199,7 +199,7 @@ const useMapFeaturesCalculated = (mapRef) => {
   // isPreciseHit shrinks the box so only a Spot directly under the press matches (e.g. Macrostrat).
   const getSpotsAtPress = async (screenPointX, screenPointY, isPreciseHit = false) => {
     const nearFeatures = await getFeaturesInBBox([screenPointX, screenPointY], SPOT_LAYERS,
-      isPreciseHit ? 1 : 15);
+      isPreciseHit ? PRESS_BOX_PADDING_PRECISE : PRESS_BOX_PADDING);
     // queryRenderedFeatures returns the same Spot multiple times (across layers and tile seams), so dedupe.
     const spotsIds = [...new Set(nearFeatures.map(feature => feature?.properties?.id).filter(id => id != null))];
     const spotsAtPress = getSpotsByIds(spotsIds).filter(isSpotOnCurrentMap);

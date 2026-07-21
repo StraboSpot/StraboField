@@ -14,6 +14,11 @@ export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
 // the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
 export const SPOTS_EXTENT_ZOOM_DELAY = 500;
 
+// Half-width (DIP) of the press box for finding Spots/vertices under the finger; _PRECISE requires
+// a press directly on the feature (e.g. Macrostrat).
+export const PRESS_BOX_PADDING = 10;
+export const PRESS_BOX_PADDING_PRECISE = 1;
+
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 
 export const MAP_MODES = {
