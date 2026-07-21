@@ -24,6 +24,13 @@ const EditLayers = ({editFeatureVertex}) => {
         paint={getPaintSymbology().pointEdit}
         type={'circle'}
       />
+      <Layer
+        beforeId={'pointLayerEdit'}
+        filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerEditHalo'}
+        paint={getPaintSymbology().pointEditHalo}
+        type={'circle'}
+      />
     </Source>
   );
 };

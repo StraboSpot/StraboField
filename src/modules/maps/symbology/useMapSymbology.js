@@ -131,6 +131,11 @@ const useMapSymbology = () => {
       circleStrokeColor: 'white',
       circleStrokeWidth: 2,
     },
+    // Dark disc behind pointDraw so drawn/edited vertices keep a visible rim on light backgrounds (e.g. a white strat section)
+    pointDrawHalo: {
+      circleRadius: 7.5,
+      circleColor: 'black',
+    },
     lineDraw: {
       lineColor: 'orange',
       lineWidth: 3,
@@ -145,6 +150,11 @@ const useMapSymbology = () => {
       circleColor: 'orange',
       circleStrokeColor: 'white',
       circleStrokeWidth: 2,
+    },
+    // Dark disc drawn behind pointEdit so the vertex has a dark rim on light backgrounds (e.g. a white strat section)
+    pointEditHalo: {
+      circleRadius: 12.5,
+      circleColor: 'black',
     },
     pointMeasure: {
       circleRadius: 5,

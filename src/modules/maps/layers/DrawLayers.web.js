@@ -25,6 +25,13 @@ const DrawLayers = ({drawFeatures}) => {
         type={'circle'}
       />
       <Layer
+        beforeId={'pointLayerDraw'}
+        filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerDrawHalo'}
+        paint={getPaintSymbology().pointDrawHalo}
+        type={'circle'}
+      />
+      <Layer
         filter={['==', ['geometry-type'], 'LineString']}
         id={'lineLayerDraw'}
         paint={getPaintSymbology().lineDraw}
