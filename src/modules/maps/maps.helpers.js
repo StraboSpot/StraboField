@@ -1,7 +1,6 @@
 import {PixelRatio, Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
-import moment from 'moment/moment';
 import proj4 from 'proj4';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
@@ -181,30 +180,6 @@ export const getCoordQuad = (imageBasemapProps, altOrigin) => {
   let coordQuad = [topLeft, topRight, bottomRight, bottomLeft];
   console.log('The coordinates identified for image-basemap :', coordQuad);
   return coordQuad;
-};
-
-export const getSetInCurrentViewButtonIcon = (button) => {
-  return button === 'LineString' ? require('../../assets/icons/LineButton.png')
-    : button === 'Point' ? require('../../assets/icons/PointButton.png')
-      : button === 'Polygon' ? require('../../assets/icons/PolygonButton.png')
-        : null;
-};
-
-export const getTimeAndDateFromModifiedTimestamp = (field) => {
-  return {
-    time: moment(field).format('HH:mm:ss'),
-    day: moment(field).format('D'),
-    month: moment(field).format('MM'),
-    year: moment(field).format('YYYY'),
-  };
-};
-
-export const getVertexActionButtonIcon = (button) => {
-  return button === 'Add Vertex' ? require('../../assets/icons/LineButton.png')
-    : button === 'Delete Vertex' ? require('../../assets/icons/PointButton.png')
-      : button === 'Split Line' ? require('../../assets/icons/PolygonButton.png')
-        : button === 'Extend Line' ? require('../../assets/icons/LineButton.png')
-          : null;
 };
 
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);

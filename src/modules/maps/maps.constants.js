@@ -215,4 +215,17 @@ export const LAYER_IDS_SELECTED = ['polygonLayerSelected', 'polygonLayerWithPatt
 
 export const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
 
+export const SET_IN_CURRENT_VIEW_BUTTON_ICONS = {
+  LineString: require('../../assets/icons/LineButton.png'),
+  Point: require('../../assets/icons/PointButton.png'),
+  Polygon: require('../../assets/icons/PolygonButton.png'),
+};
+
 export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line', 'Extend Line'];
+
+export const VERTEX_ACTION_BUTTON_ICONS = {
+  'Add Vertex': require('../../assets/icons/LineButton.png'),
+  'Delete Vertex': require('../../assets/icons/PointButton.png'),
+  'Extend Line': require('../../assets/icons/LineButton.png'),
+  'Split Line': require('../../assets/icons/PolygonButton.png'),
+};

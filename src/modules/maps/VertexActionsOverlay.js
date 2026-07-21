@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {VERTEX_ACTION_BUTTONS} from './maps.constants';
-import {getVertexActionButtonIcon} from './maps.helpers';
+import {VERTEX_ACTION_BUTTON_ICONS, VERTEX_ACTION_BUTTONS} from './maps.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -74,7 +73,7 @@ const VertexActionsOverlay = ({
                   icon={
                     <IconButton
                       onPress={() => handleActionPressed(button)}
-                      source={getVertexActionButtonIcon(button)}
+                      source={VERTEX_ACTION_BUTTON_ICONS[button]}
                       style={{paddingRight: 15}}
                     />
                   }

@@ -1,8 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {SET_IN_CURRENT_VIEW_BUTTONS} from './maps.constants';
-import {getSetInCurrentViewButtonIcon} from './maps.helpers';
+import {SET_IN_CURRENT_VIEW_BUTTON_ICONS, SET_IN_CURRENT_VIEW_BUTTONS} from './maps.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -38,7 +37,7 @@ const SetInCurrentViewOverlay = ({
             icon={
               <IconButton
                 onPress={() => updateDefaultGeomType(button)}
-                source={getSetInCurrentViewButtonIcon(button)}
+                source={SET_IN_CURRENT_VIEW_BUTTON_ICONS[button]}
                 style={{paddingRight: 10}}
               />
             }
