@@ -57,12 +57,22 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
+  /* Derived Variables */
+
+  const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
+
   /* Side Effects */
 
   useEffect(() => {
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
+
+  // Switching to an image basemap or strat section leaves the current map, so cancel any in-progress
+  // editing or drawing (those changes belong to the map you were on).
+  useEffect(() => {
+    if (isEditingOrDrawing) onCancel();
+  }, [currentImageBasemap, stratSection]);
 
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
