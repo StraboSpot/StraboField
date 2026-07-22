@@ -251,7 +251,7 @@ const useSpots = () => {
       if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         updatedPreferences = {
           ...(updatedPreferences || preferences),
-          starting_sample_number: (preferences.starting_sample_number || 1) + 1,
+          starting_sample_number: (Number(preferences.starting_sample_number) || 1) + 1,
         };
       }
       if (updatedPreferences) dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));

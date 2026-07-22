@@ -9,7 +9,6 @@ import {configureReanimatedLogger, ReanimatedLogLevel} from 'react-native-reanim
 
 import App from './App';
 import {name as appName} from './app.json';
-import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
 
 global.React = React;
 
@@ -33,9 +32,5 @@ LogBox.ignoreLogs([
   'Mapbox error You\'re calling ',
   isWeb,
 ]);
-
-// Install bundled map-label glyphs at cold start, before the map mounts, so labels render
-// offline on first launch too. Fire-and-forget; idempotent.
-installGlyphs();
 
 AppRegistry.registerComponent(appName, () => App);
