@@ -93,7 +93,10 @@ const useExport = () => {
       imageSuccess = 0;
       imageBackupFailures = 0;
       const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
-      await doesDeviceDirectoryExist(deviceDir + fileName + '/images');
+      // Start from a clean images folder so each backup is a fresh snapshot (drops any stale/deleted images).
+      const imagesDir = deviceDir + fileName + '/images';
+      if (await doesDeviceDirExist(imagesDir)) await deleteFromDevice(imagesDir);
+      await doesDeviceDirectoryExist(imagesDir);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Images...'));
 
