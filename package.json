@@ -1,6 +1,6 @@
 {
   "name": "strabospot2",
-  "version": "2.29.10",
+  "version": "2.29.11",
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
