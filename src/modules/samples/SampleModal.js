@@ -96,7 +96,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     }
     else {
       setStartingNumber(
-        preferences.starting_sample_number
+        Number(preferences.starting_sample_number)  // Coerce: integer prefs persist as strings, so + 1 must not concatenate
         || spot.properties?.samples?.length + 1
         || 1,
       );
