@@ -14,6 +14,11 @@ const initialMapsState = {
   },
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
+  freehandVertexSpacing: {
+    unit: 'pixels', // 'pixels' | 'distance'
+    pixelSpacing: 20, // screen points between kept vertices
+    distanceSpacing: 50, // meters between kept vertices
+  },
   geometryTypesOff: [],
   intervalDragChangedSpotIds: [],
   intervalDragSnapshot: null,
@@ -112,6 +117,9 @@ const mapsSlice = createSlice({
     setFreehandFeatureCoords(state, action) {
       state.freehandFeatureCoords = action.payload;
     },
+    setFreehandVertexSpacing(state, action) {
+      state.freehandVertexSpacing = {...state.freehandVertexSpacing, ...action.payload};
+    },
     setGeometryTypesOff(state, action) {
       console.log('Map Geometry Types Off', action.payload);
       state.geometryTypesOff = action.payload;
@@ -202,6 +210,7 @@ export const {
   setDrawGeometries,
   setFeatureTypesOff,
   setFreehandFeatureCoords,
+  setFreehandVertexSpacing,
   setGeometryTypesOff,
   setIntervalDragState,
   setIntervalDragTargetSlot,

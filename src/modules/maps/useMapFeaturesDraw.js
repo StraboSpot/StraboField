@@ -27,6 +27,7 @@ import {setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdsToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
+import {getIsFreehandDrawing} from '../sketch/FreehandSketch';
 import {
   clearedSelectedSpots,
   editedOrCreatedSpots,
@@ -52,6 +53,7 @@ const useMapFeaturesDraw = ({
   const datasets = useSelector(state => state.project.datasets);
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const freehandFeatureCoords = useSelector(state => state.map.freehandFeatureCoords);
+  const freehandVertexSpacing = useSelector(state => state.map.freehandVertexSpacing);
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
@@ -111,6 +113,25 @@ const useMapFeaturesDraw = ({
     //conditional call to avoid multiple renders during edit mode.
     if (mapMode !== MAP_MODES.EDIT) setDisplayedSpots((isEmpty(selectedSpot) ? [] : [{...selectedSpot}]));
   }, [selectedSpot, activeDatasetsIds]);
+
+  useEffect(() => {
+    // Preview the thinned freehand line/polygon (with vertices) after finger-lift, so the user sees it before save.
+    if (mapMode !== MAP_MODES.DRAW.FREEHANDLINE && mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON) return;
+    if (!freehandFeatureCoords || freehandFeatureCoords.length <= 2) {
+      setDrawFeatures([]);
+      return;
+    }
+    let isCancelled = false;
+    (async () => {
+      const feature = await buildFreehandFeature(freehandFeatureCoords);
+      // Bail if a new stroke started while building — setDrawFeatures would re-render the map and truncate it.
+      if (isCancelled || !feature || getIsFreehandDrawing()) return;
+      setDrawFeatures([feature, ...turf.explode(feature).features]);
+    })();
+    return () => {
+      isCancelled = true;
+    };
+  }, [freehandFeatureCoords]);
 
   /* Internal Functions */
 
@@ -705,26 +726,66 @@ const useMapFeaturesDraw = ({
     setSelectedSpotToEdit(spotToEdit);
   };
 
+  // Thin freehand screen points so kept vertices are at least minPixels apart (always keeps first and last).
+  const thinCoordsByPixels = (coords, minPixels) => {
+    if (!minPixels || coords.length < 3) return coords;
+    const thinned = [coords[0]];
+    let last = coords[0];
+    for (let i = 1; i < coords.length - 1; i++) {
+      if (Math.hypot(coords[i][0] - last[0], coords[i][1] - last[1]) >= minPixels) {
+        thinned.push(coords[i]);
+        last = coords[i];
+      }
+    }
+    thinned.push(coords[coords.length - 1]);
+    return thinned;
+  };
+
+  // Thin geographic coords so kept vertices are at least minMeters apart (always keeps first and last).
+  const thinCoordsByDistance = (coords, minMeters) => {
+    if (!minMeters || coords.length < 3) return coords;
+    const thinned = [coords[0]];
+    let last = turf.point(coords[0]);
+    for (let i = 1; i < coords.length - 1; i++) {
+      const current = turf.point(coords[i]);
+      if (turf.distance(last, current, {units: 'meters'}) >= minMeters) {
+        thinned.push(coords[i]);
+        last = current;
+      }
+    }
+    thinned.push(coords[coords.length - 1]);
+    return thinned;
+  };
+
+  // Convert thinned freehand screen points into a geographic line/polygon feature (without properties).
+  const buildFreehandFeature = async (screenPoints) => {
+    if (!screenPoints || screenPoints.length <= 2) return undefined;
+    const screenCoordinates = freehandVertexSpacing?.unit === 'pixels'
+      ? thinCoordsByPixels(screenPoints, freehandVertexSpacing.pixelSpacing)
+      : screenPoints;
+    let featureCoordinates = [];
+    for (let i = 0; i < screenCoordinates.length; i++) {
+      const geoCoordinates = Platform.OS === 'web' ? mapRef.current.unproject(screenCoordinates[i]).toArray()
+        : await mapRef.current.getCoordinateFromView(screenCoordinates[i]);
+      featureCoordinates.push(geoCoordinates);
+    }
+    if (freehandVertexSpacing?.unit === 'distance') {
+      featureCoordinates = thinCoordsByDistance(featureCoordinates, freehandVertexSpacing.distanceSpacing);
+    }
+    if (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON) {
+      featureCoordinates.push(featureCoordinates[0]); // First and Last coordinates of polygon should match
+      return turf.polygon([featureCoordinates]);
+    }
+    return turf.lineString(featureCoordinates);
+  };
+
   const endDraw = async () => {
     let newOrEditedSpot = {};
     if (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE) {
-      if (freehandFeatureCoords && freehandFeatureCoords.length > 2) {
-        let screenCoordinates = freehandFeatureCoords;
-        let featureCoordinates = [];
-        let screenX, screenY = 0;
-        for (let i = 0; i < screenCoordinates.length; i++) {
-          screenX = screenCoordinates[i][0];
-          screenY = screenCoordinates[i][1];
-          let geoCoordinates = Platform.OS === 'web' ? mapRef.current.unproject([screenX, screenY]).toArray()
-            : await mapRef.current.getCoordinateFromView([screenX, screenY]);
-          featureCoordinates.push(geoCoordinates);
-        }
-        let feature = {};
-        if (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON) {
-          featureCoordinates.push(featureCoordinates[0]); // First and Last coordinates of polygon should match
-          feature = turf.polygon([featureCoordinates]);
-        }
-        else feature = turf.lineString(featureCoordinates);
+      // Save the same thinned feature that was previewed on finger-lift (rebuild if the preview isn't ready).
+      let feature = drawFeatures.find(f => f.geometry.type !== 'Point')
+        || await buildFreehandFeature(freehandFeatureCoords);
+      if (feature) {
         if (currentImageBasemap) { //create new spot for imagebasemap - needs lat long to pixel conversion
           feature = convertFeatureGeometryToImagePixels(feature);
           feature.properties.image_basemap = currentImageBasemap.id;
@@ -741,8 +802,9 @@ const useMapFeaturesDraw = ({
           feature.properties.symbology = getSymbology(feature);
           newOrEditedSpot = await createSpot(feature);
           dispatch(setSelectedSpot(newOrEditedSpot));
-          dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
         }
+        setDrawFeatures([]);
+        dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
       }
     }
     else if (!isEmpty(drawFeatures)) {
