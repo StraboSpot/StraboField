@@ -61,6 +61,10 @@ const TagsModal = ({
     ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+  const isSaveButtonVisible = !isEmpty(tags)
+    && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+    && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS
+    && modalVisible !== MODAL_KEYS.NOTEBOOK.SAMPLES && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE;
 
   /* Logic Helpers */
 
@@ -164,6 +168,8 @@ const TagsModal = ({
           data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => renderTagItem(item)}
+          // When the Save button shows, the list must flex so it scrolls internally and the button stays pinned.
+          style={isSaveButtonVisible ? {flex: 1} : undefined}
         />
       </>
     );
@@ -218,14 +224,11 @@ const TagsModal = ({
               : <Text style={modalStyles.textStyle}>No {label}</Text>}
           </View>
           {renderSpotTagsList()}
-          {(!isEmpty(tags)
-            && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-            && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS
-            && modalVisible !== MODAL_KEYS.NOTEBOOK.SAMPLES && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) && (
+          {isSaveButtonVisible && (
             <ActionButton
               disabled={isEmpty(checkedTagsTemp)}
               onPress={save}
-              title={`Save ${label}`}
+              title={`Select ${label}`}
             />
           )}
         </View>
