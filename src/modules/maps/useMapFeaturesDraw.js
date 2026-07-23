@@ -127,7 +127,8 @@ const useMapFeaturesDraw = ({
       const feature = await buildFreehandFeature(freehandFeatureCoords);
       // Bail if a new stroke started while building — setDrawFeatures would re-render the map and truncate it.
       if (isCancelled || !feature || getIsFreehandDrawing()) return;
-      setDrawFeatures([feature, ...turf.explode(feature).features]);
+      // In a selecting mode the area isn't saved, so show just the lasso outline without the vertex points.
+      setDrawFeatures(selectingMode ? [feature] : [feature, ...turf.explode(feature).features]);
     })();
     return () => {
       isCancelled = true;
@@ -676,7 +677,10 @@ const useMapFeaturesDraw = ({
   // Convert thinned freehand screen points into a geographic line/polygon feature (without properties).
   const buildFreehandFeature = async (screenPoints) => {
     if (!screenPoints || screenPoints.length <= 2) return undefined;
-    const screenCoordinates = freehandVertexSpacing?.unit === 'pixels'
+    // Selecting modes lasso existing Spots without saving the area, so keep the full-resolution outline -
+    // thinning is a save-time concern and would coarsen the selection boundary and miss Spots.
+    const isThinning = !selectingMode;
+    const screenCoordinates = isThinning && freehandVertexSpacing?.unit === 'pixels'
       ? thinCoordsByPixels(screenPoints, freehandVertexSpacing.pixelSpacing)
       : screenPoints;
     let featureCoordinates = [];
@@ -685,7 +689,7 @@ const useMapFeaturesDraw = ({
         : await mapRef.current.getCoordinateFromView(screenCoordinates[i]);
       featureCoordinates.push(geoCoordinates);
     }
-    if (freehandVertexSpacing?.unit === 'distance') {
+    if (isThinning && freehandVertexSpacing?.unit === 'distance') {
       featureCoordinates = thinCoordsByDistance(featureCoordinates, freehandVertexSpacing.distanceSpacing);
     }
     if (mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON) {
