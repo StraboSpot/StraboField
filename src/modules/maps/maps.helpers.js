@@ -184,6 +184,14 @@ export const getCoordQuad = (imageBasemapProps, altOrigin) => {
   return coordQuad;
 };
 
+// Add a vertex at the pressed location to a line or polygon feature. Returns [updatedFeature, newVertexPoint].
+export const getFeatureWithNewVertex = (e, spotEditingCopy) => {
+  const newVertexCoords = Platform.OS === 'web' ? [e.lngLat.lng, e.lngLat.lat] : turf.getCoord(e);
+  const newVertex = turf.point(newVertexCoords);
+  return turf.getType(spotEditingCopy) === 'LineString' ? addVertexToLine(spotEditingCopy, newVertex)
+    : addVertexToPolygon(spotEditingCopy, newVertex);
+};
+
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 
 export const isOnGeoMap = feature => isEmpty(feature) ? false
@@ -202,4 +210,35 @@ export const splitLineAtVertex = (lineFeature, vertexAdded) => {
   const lineSplit1 = turf.cleanCoords(turf.lineSlice(endPoint1, vertexAdded, lineFeature));
   const lineSplit2 = turf.cleanCoords(turf.lineSlice(vertexAdded, endPoint2, lineFeature));
   return [lineSplit1, lineSplit2];
+};
+
+// Thin geographic coords so kept vertices are at least minMeters apart (always keeps first and last).
+export const thinCoordsByDistance = (coords, minMeters) => {
+  if (!minMeters || coords.length < 3) return coords;
+  const thinned = [coords[0]];
+  let last = turf.point(coords[0]);
+  for (let i = 1; i < coords.length - 1; i++) {
+    const current = turf.point(coords[i]);
+    if (turf.distance(last, current, {units: 'meters'}) >= minMeters) {
+      thinned.push(coords[i]);
+      last = current;
+    }
+  }
+  thinned.push(coords[coords.length - 1]);
+  return thinned;
+};
+
+// Thin freehand screen points so kept vertices are at least minPixels apart (always keeps first and last).
+export const thinCoordsByPixels = (coords, minPixels) => {
+  if (!minPixels || coords.length < 3) return coords;
+  const thinned = [coords[0]];
+  let last = coords[0];
+  for (let i = 1; i < coords.length - 1; i++) {
+    if (Math.hypot(coords[i][0] - last[0], coords[i][1] - last[1]) >= minPixels) {
+      thinned.push(coords[i]);
+      last = coords[i];
+    }
+  }
+  thinned.push(coords[coords.length - 1]);
+  return thinned;
 };

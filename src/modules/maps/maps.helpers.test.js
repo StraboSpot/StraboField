@@ -6,7 +6,10 @@ import {
   deleteVertexFromGeometry,
   extendLineAtEndpoint,
   getClosestSpotDistanceAndIndex,
+  getFeatureWithNewVertex,
   splitLineAtVertex,
+  thinCoordsByDistance,
+  thinCoordsByPixels,
 } from './maps.helpers';
 
 // Characterization tests: these pin the CURRENT behavior of the pure geometry helpers
@@ -193,5 +196,80 @@ describe('splitLineAtVertex', () => {
     expect(coords1[coords1.length - 1][0]).toBeCloseTo(5, 6);
     expect(coords2[0][0]).toBeCloseTo(5, 6);
     expect(coords2[coords2.length - 1]).toEqual([10, 0]);
+  });
+});
+
+describe('getFeatureWithNewVertex', () => {
+  it('adds a vertex to a LineString at the pressed native coordinate', () => {
+    const line = turf.lineString([[0, 0], [10, 0]]);
+    const e = turf.point([5, 0.0001]);
+
+    const [updatedFeature, newVertex] = getFeatureWithNewVertex(e, line);
+
+    expect(turf.getType(updatedFeature)).toBe('LineString');
+    expect(updatedFeature.geometry.coordinates).toHaveLength(3);
+    expect(newVertex.geometry.coordinates[0]).toBeCloseTo(5, 3);
+  });
+
+  it('adds a vertex to a Polygon ring at the pressed native coordinate', () => {
+    const polygon = turf.polygon([[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]]);
+    const e = turf.point([5, 0.0001]);
+
+    const [updatedFeature, newVertex] = getFeatureWithNewVertex(e, polygon);
+
+    expect(turf.getType(updatedFeature)).toBe('Polygon');
+    expect(updatedFeature.geometry.coordinates[0]).toHaveLength(6);
+    expect(newVertex.geometry.coordinates[0]).toBeCloseTo(5, 3);
+  });
+});
+
+describe('thinCoordsByDistance', () => {
+  it('returns coords unchanged when minMeters is falsy', () => {
+    const coords = [[0, 0], [0, 1], [0, 2]];
+    expect(thinCoordsByDistance(coords, 0)).toBe(coords);
+  });
+
+  it('returns coords unchanged when there are fewer than 3 points', () => {
+    const coords = [[0, 0], [0, 5]];
+    expect(thinCoordsByDistance(coords, 1)).toBe(coords);
+  });
+
+  it('always keeps the first and last points', () => {
+    const coords = [[0, 0], [0, 0.00001], [0, 0.00002], [0, 5]];
+    const thinned = thinCoordsByDistance(coords, 1000);
+    expect(thinned[0]).toEqual([0, 0]);
+    expect(thinned[thinned.length - 1]).toEqual([0, 5]);
+  });
+
+  it('drops intermediate points closer than minMeters to the last kept point', () => {
+    // ~111 m per 0.001 deg latitude; keep points at least ~5 km apart.
+    const coords = [[0, 0], [0, 0.001], [0, 0.05], [0, 0.051], [0, 0.1]];
+    const thinned = thinCoordsByDistance(coords, 5000);
+    expect(thinned).toEqual([[0, 0], [0, 0.05], [0, 0.1]]);
+  });
+});
+
+describe('thinCoordsByPixels', () => {
+  it('returns coords unchanged when minPixels is falsy', () => {
+    const coords = [[0, 0], [1, 1], [2, 2]];
+    expect(thinCoordsByPixels(coords, 0)).toBe(coords);
+  });
+
+  it('returns coords unchanged when there are fewer than 3 points', () => {
+    const coords = [[0, 0], [10, 10]];
+    expect(thinCoordsByPixels(coords, 5)).toBe(coords);
+  });
+
+  it('always keeps the first and last points', () => {
+    const coords = [[0, 0], [1, 0], [2, 0], [100, 0]];
+    const thinned = thinCoordsByPixels(coords, 50);
+    expect(thinned[0]).toEqual([0, 0]);
+    expect(thinned[thinned.length - 1]).toEqual([100, 0]);
+  });
+
+  it('drops intermediate points closer than minPixels to the last kept point', () => {
+    const coords = [[0, 0], [3, 0], [10, 0], [12, 0], [20, 0]];
+    const thinned = thinCoordsByPixels(coords, 10);
+    expect(thinned).toEqual([[0, 0], [10, 0], [20, 0]]);
   });
 });

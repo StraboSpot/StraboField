@@ -7,12 +7,13 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
 import {
-  addVertexToLine,
-  addVertexToPolygon,
   deleteVertexFromGeometry,
   extendLineAtEndpoint,
   getClosestSpotDistanceAndIndex,
+  getFeatureWithNewVertex,
   splitLineAtVertex,
+  thinCoordsByDistance,
+  thinCoordsByPixels,
 } from './maps.helpers';
 import {clearedVertexes, setFreehandFeatureCoords, setVertexStartCoords} from './maps.slice';
 import useMapSymbology from './symbology/useMapSymbology';
@@ -275,13 +276,6 @@ const useMapFeaturesDraw = ({
         console.log('Finished editing Spot. Spot Editing: ', spotEditingCopy);
       }
     }
-  };
-
-  const getFeatureWithNewVertex = (e, spotEditingCopy) => {
-    const newVertexCoords = Platform.OS === 'web' ? [e.lngLat.lng, e.lngLat.lat] : turf.getCoord(e);
-    const newVertex = turf.point(newVertexCoords);
-    return turf.getType(spotEditingCopy) === 'LineString' ? addVertexToLine(spotEditingCopy, newVertex)
-      : addVertexToPolygon(spotEditingCopy, newVertex);
   };
 
   const getSpotToEditCont = (spotEditingCopy) => {
@@ -724,37 +718,6 @@ const useMapFeaturesDraw = ({
     const spotToEdit = isEmpty(editedSpot) ? spot : editedSpot;
     dispatch(setSelectedSpot(spotToEdit));
     setSelectedSpotToEdit(spotToEdit);
-  };
-
-  // Thin freehand screen points so kept vertices are at least minPixels apart (always keeps first and last).
-  const thinCoordsByPixels = (coords, minPixels) => {
-    if (!minPixels || coords.length < 3) return coords;
-    const thinned = [coords[0]];
-    let last = coords[0];
-    for (let i = 1; i < coords.length - 1; i++) {
-      if (Math.hypot(coords[i][0] - last[0], coords[i][1] - last[1]) >= minPixels) {
-        thinned.push(coords[i]);
-        last = coords[i];
-      }
-    }
-    thinned.push(coords[coords.length - 1]);
-    return thinned;
-  };
-
-  // Thin geographic coords so kept vertices are at least minMeters apart (always keeps first and last).
-  const thinCoordsByDistance = (coords, minMeters) => {
-    if (!minMeters || coords.length < 3) return coords;
-    const thinned = [coords[0]];
-    let last = turf.point(coords[0]);
-    for (let i = 1; i < coords.length - 1; i++) {
-      const current = turf.point(coords[i]);
-      if (turf.distance(last, current, {units: 'meters'}) >= minMeters) {
-        thinned.push(coords[i]);
-        last = current;
-      }
-    }
-    thinned.push(coords[coords.length - 1]);
-    return thinned;
   };
 
   // Convert thinned freehand screen points into a geographic line/polygon feature (without properties).
