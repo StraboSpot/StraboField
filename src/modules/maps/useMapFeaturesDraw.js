@@ -22,20 +22,12 @@ import useMapCoords from './useMapCoords';
 import useMapDisplayedSpots from './useMapDisplayedSpots';
 import useMapFeatures from './useMapFeatures';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
-import useStereonet from './useStereonet';
+import useMapSelectionModes from './useMapSelectionModes';
 import {getNewId, getNewUUID, isEmpty} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdsToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {getIsFreehandDrawing} from '../sketch/FreehandSketch';
-import {
-  clearedSelectedSpots,
-  editedOrCreatedSpots,
-  setIntersectedSpotsForTagging,
-  setSelectedSpot,
-} from '../spots/spots.slice';
+import {clearedSelectedSpots, editedOrCreatedSpots, setSelectedSpot} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
 const useMapFeaturesDraw = ({
@@ -67,12 +59,12 @@ const useMapFeaturesDraw = ({
   const {setDisplayedSpots, setDisplayedSpotsWhileEditing, spotsNotSelected, spotsSelected} = useMapDisplayedSpots();
   const {getAllMappedSpots} = useMapFeatures();
   const {
-    getDrawFeatureAtPress, getLassoedSpots, getSpotAtPress, getSpotsAtPress, identifyClosestVertexOnSpotPress,
+    getDrawFeatureAtPress, getSpotAtPress, getSpotsAtPress, identifyClosestVertexOnSpotPress,
   } = useMapFeaturesCalculated(mapRef);
+  const {applySelectingMode} = useMapSelectionModes({mapRef, spotsNotSelected});
   const {getSymbology} = useMapSymbology();
-  const {getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
+  const {getTargetDatasetFromId} = useProject();
   const {createSpot} = useSpots();
-  const {getStereonet} = useStereonet();
 
   /* Local State */
 
@@ -315,12 +307,6 @@ const useMapFeaturesDraw = ({
     setDrawFeatures(explodedFeatures);
   };
 
-  const getStereonetForFeature = async (feature) => {
-    const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
-    console.log('Selected Spots', selectedSpots);
-    await getStereonet(selectedSpots);
-  };
-
   // Identify the vertex which has to be updated
   const getVertexIndexInSpotToEdit = (vertex) => {
     if (isEmpty(vertex)) {
@@ -344,57 +330,6 @@ const useMapFeaturesDraw = ({
       if (closestIndex !== -1) indexOfCoordinatesToUpdate.push(closestIndex);
     }
     return indexOfCoordinatesToUpdate;
-  };
-
-  const selectReports = (feature) => {
-    const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
-    if (selectedSpots.length > 0) {
-      dispatch(setIntersectedSpotsForTagging(selectedSpots));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS}));
-    }
-    else {
-      alert(
-        'Error!',
-        'No Spots selected.',
-      );
-    }
-  };
-
-  const selectSpotsForRawData = (feature) => {
-    let selectedSpots = [];
-    selectedSpots = getLassoedSpots(spotsNotSelected, feature);
-    console.log('Selected Spots', selectedSpots);
-    if (selectedSpots.length > 0) {
-      dispatch(setIntersectedSpotsForTagging(selectedSpots));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA}));
-    }
-    else console.warn('No Spots selected.');
-  };
-
-  const selectSpotsForTagging = (feature) => {
-    const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
-
-    // Filter out Read Only Spots
-    const selectedSpotsFiltered = selectedSpots.filter((spot) => {
-      if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
-    });
-
-    if (selectedSpotsFiltered.length > 0) {
-      dispatch(setIntersectedSpotsForTagging(selectedSpotsFiltered));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS}));
-    }
-    else if (selectedSpots.length > 0) {
-      alert(
-        'Error!',
-        'Only Read Only Spots Selected',
-      );
-    }
-    else {
-      alert(
-        'Error!',
-        'No Spots Selected',
-      );
-    }
   };
 
   const setEditFeatures = (spotToEdit) => {
@@ -481,7 +416,8 @@ const useMapFeaturesDraw = ({
     // basemap/strat section vertexAdded was mutated to pixel coords above, so convert back to geo for the layer.
     if (Platform.OS === 'web' && !isEmpty(vertexAdded)) {
       const editVertex = turf.point([...turf.getCoord(vertexAdded)]);
-      setEditFeatureVertex([currentImageBasemap || stratSection ? convertImagePixelsToLatLong(editVertex) : editVertex]);
+      setEditFeatureVertex(
+        [currentImageBasemap || stratSection ? convertImagePixelsToLatLong(editVertex) : editVertex]);
     }
   };
 
@@ -714,11 +650,8 @@ const useMapFeaturesDraw = ({
           feature = convertFeatureGeometryToImagePixels(feature);
           feature.properties.strat_section_id = stratSection.strat_section_id;
         }
-        if (selectingMode === 'report') selectReports(feature);
-        else if (selectingMode === 'stereonet') await getStereonetForFeature(feature);
-        else if (selectingMode === 'selectSpots') selectSpotsForRawData(feature);
-        else if (selectingMode === 'tag') selectSpotsForTagging(feature);
-        else {
+        const isHandledBySelectingMode = await applySelectingMode(feature, selectingMode);
+        if (!isHandledBySelectingMode) {
           feature.properties.symbology = getSymbology(feature);
           newOrEditedSpot = await createSpot(feature);
           dispatch(setSelectedSpot(newOrEditedSpot));
@@ -742,10 +675,8 @@ const useMapFeaturesDraw = ({
         newFeature = convertFeatureGeometryToImagePixels(newFeature);
         newFeature.properties.strat_section_id = stratSection.strat_section_id;
       }
-      if (selectingMode === 'report') selectReports(newFeature);
-      else if (selectingMode === 'stereonet') await getStereonetForFeature(newFeature);
-      else if (selectingMode === 'tag') selectSpotsForTagging(newFeature);
-      else {
+      const isHandledBySelectingMode = await applySelectingMode(newFeature, selectingMode);
+      if (!isHandledBySelectingMode) {
         newOrEditedSpot = await createSpot(newFeature);
         dispatch(setSelectedSpot(newOrEditedSpot));
       }

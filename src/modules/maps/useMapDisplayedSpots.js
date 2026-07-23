@@ -6,9 +6,8 @@ import useMapCoords from './useMapCoords';
 import useMapFeatures from './useMapFeatures';
 import {isEmpty, isEqual} from '../../shared/helpers';
 
-// Owns the selected/not-selected Spots rendered on the map. Both setters partition the Spots into the
-// two display buckets (selected is highlighted); setDisplayedSpotsWhileEditing keeps the in-progress edit
-// separate from the already-edited and untouched Spots.
+// Owns the selected/not-selected Spots rendered on the map. The two setters partition Spots into those
+// buckets; the WhileEditing variant keeps the in-progress edit separate from the rest.
 const useMapDisplayedSpots = () => {
   /* Data Hooks */
 
