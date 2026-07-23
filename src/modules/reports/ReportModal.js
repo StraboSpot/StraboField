@@ -45,6 +45,7 @@ const ReportModal = ({openSpotInNotebook}) => {
       <ModalWrapper
         actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
+        headerTitle={isEmpty(initialValues) ? 'Create New Memo' : 'Update Memo'}
         onActionPressed={handleSavePressed}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}

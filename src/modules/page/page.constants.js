@@ -125,7 +125,6 @@ export const PRIMARY_PAGES = [
     icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
     page_component: ReportsPage,
     modal_component: ReportModal,
-    action_label: 'Create New Memo',
   },
 ];
 
