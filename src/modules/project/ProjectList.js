@@ -119,6 +119,8 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
 
   const renderProjectsList = () => {
     if (!isEmpty(userData)) {
+      const allProjects = projectsArr.projects || [];
+      const filteredProjects = source === 'device' ? allProjects : allProjects.filter(p => !p.isCollaborativeProject);
       return (
         <View style={{flex: 1}}>
           {source === 'server' && !isConnectionAvailable && (
@@ -135,7 +137,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
                 {isError && renderErrorMessage()}
               </View>
             }
-            data={projectsArr.projects}
+            data={filteredProjects}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderProjectItem(item)}/>
         </View>
