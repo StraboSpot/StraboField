@@ -4,8 +4,8 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {runOnJS, useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setVertexEndCoords} from './maps.slice';
-import mapStyles from './maps.styles';
+import {setVertexEndCoords} from '../maps.slice';
+import mapStyles from '../maps.styles';
 
 const selectedVertexOffset = 10;
 

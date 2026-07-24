@@ -5,21 +5,21 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useCustomMap from './custom-maps/useCustomMap';
+import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
+import useMapEditor from './editing/useMapEditor';
+import VertexActionsOverlay from './editing/VertexActionsOverlay';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
 import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
-import SelectSpotsAtPressModal from './SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
 import useMapCoords from './useMapCoords';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
-import useMapFeaturesDraw from './useMapFeaturesDraw';
 import useMapLocation from './useMapLocation';
 import useMapPressEvents from './useMapPressEvents';
 import useMapView from './useMapView';
-import VertexActionsOverlay from './VertexActionsOverlay';
 import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
 import {
@@ -91,7 +91,7 @@ const MapContainer = forwardRef(({
     spotsSelected,
     startEditing,
     switchToEditing,
-  } = useMapFeaturesDraw({
+  } = useMapEditor({
     mapMode: mapMode,
     mapRef: mapRef,
     onEndDrawPressed: onEndDrawPressed,
