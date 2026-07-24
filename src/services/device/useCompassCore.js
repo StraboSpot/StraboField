@@ -6,8 +6,8 @@ import {useSelector} from 'react-redux';
 
 import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge} from './compassMath.helpers';
 import CompassModule from './CompassModule';
-import useMapCoords from '../../modules/maps/useMapCoords';
-import useMapLocation from '../../modules/maps/useMapLocation';
+import useMapCoords from '../../modules/maps/view/useMapCoords';
+import useMapLocation from '../../modules/maps/view/useMapLocation';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
 
 let matrixArray = [];

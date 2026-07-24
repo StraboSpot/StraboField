@@ -10,9 +10,9 @@ import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {MAP_MODES} from '../maps.constants';
 import {setFreehandFeatureCoords} from '../maps.slice';
-import useMapSymbology from '../symbology/useMapSymbology';
-import useMapCoords from '../useMapCoords';
 import {thinCoordsByDistance, thinCoordsByPixels} from './editing.helpers';
+import useMapSymbology from '../symbology/useMapSymbology';
+import useMapCoords from '../view/useMapCoords';
 
 const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, selectingMode}) => {
   /* Data Hooks */

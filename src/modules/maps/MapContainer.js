@@ -16,17 +16,13 @@ import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
 import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
-import useMapCoords from './useMapCoords';
 import useMapFeaturesCalculated from './useMapFeaturesCalculated';
-import useMapLocation from './useMapLocation';
-import useMapView from './useMapView';
+import useMapCoords from './view/useMapCoords';
+import useMapLocation from './view/useMapLocation';
+import useMapView from './view/useMapView';
 import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-} from '../home/home.slice';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
@@ -243,8 +239,8 @@ const MapContainer = forwardRef(({
           dispatch(setIsErrorMessagesModalVisible(true));
         });
       }
-      // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
-      // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
+        // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
+        // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
       // making the style fail to load so Spot layers never attach. Rebuild from current runtime. Issue #919.
       else setBasemap(currentBasemap.id).catch(console.error);
     }

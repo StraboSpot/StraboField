@@ -5,10 +5,11 @@ import {useSelector} from 'react-redux';
 
 import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE, SPOT_LAYERS} from './maps.constants';
 import {getClosestSpotDistanceAndIndex} from './maps.helpers';
-import useMapCoords from './useMapCoords';
 import useMapFeatures from './useMapFeatures';
+import useMapCoords from './view/useMapCoords';
 import {isEmpty} from '../../shared/helpers';
 import useNesting from '../nesting/useNesting';
+// eslint-disable-next-line import/order -- import/order has no stable sort for a ./view/ subdir import alongside these parent imports (non-transitive comparator)
 import {useSpots} from '../spots';
 
 const useMapFeaturesCalculated = (mapRef) => {

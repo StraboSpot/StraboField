@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/helpers';
 import {useWindowSize} from '../../../shared/ui/useWindowSize';
 import {getResizedImageURI} from '../../images/imageURIs.helpers';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const ImageBasemapLayer = () => {
   const {currentImageBasemap} = useSelector(state => state.map);

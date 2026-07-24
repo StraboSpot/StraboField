@@ -11,7 +11,7 @@ import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBO
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
-import useMapView from './useMapView';
+import useMapView from './view/useMapView';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
 

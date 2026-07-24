@@ -17,8 +17,8 @@ import {
 } from './editing.helpers';
 import {clearedVertexes, setVertexStartCoords} from '../maps.slice';
 import useMap from '../useMap';
-import useMapCoords from '../useMapCoords';
 import useMapFeatures from '../useMapFeatures';
+import useMapCoords from '../view/useMapCoords';
 
 // Owns the in-progress edit session: which Spot/vertex is being edited, the exploded draw-vertex overlay it
 // projects onto the draw layer, and every geometry-mutation primitive (move/add/delete/split/extend a vertex).

@@ -1,17 +1,17 @@
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {STRABO_APIS} from '../../../services/network/urls.constants';
+import useServerRequests from '../../../services/network/useServerRequests';
+import {isEmpty} from '../../../shared/helpers';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import {
   convertFeatureGeometryToImagePixels,
   convertImagePixelsToLatLong,
   getBBoxPaddedInPixels,
   getBoundsPadded,
   getCoordQuad,
-} from './maps.helpers';
-import {STRABO_APIS} from '../../services/network/urls.constants';
-import useServerRequests from '../../services/network/useServerRequests';
-import {isEmpty} from '../../shared/helpers';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+} from '../maps.helpers';
 
 const useMapCoords = () => {
   /* Data Hooks */

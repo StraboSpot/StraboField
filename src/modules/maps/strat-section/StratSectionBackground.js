@@ -7,7 +7,7 @@ import XAxes from './XAxes';
 import YAxis from './YAxis';
 import {getLocalImageURI} from '../../images/imageURIs.helpers';
 import {useSpots} from '../../spots';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const StratSectionBackground = () => {
   console.log('Rendering StratSectionBackground...');

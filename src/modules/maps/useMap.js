@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {BASEMAPS} from './maps.constants';
 import {isDrawMode} from './maps.helpers';
 import {setCurrentBasemap} from './maps.slice';
-import useMapCoords from './useMapCoords';
 import useMapURL from './useMapURL';
+import useMapCoords from './view/useMapCoords';
 import {STRABO_APIS} from '../../services/network/urls.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {

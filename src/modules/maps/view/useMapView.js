@@ -5,6 +5,7 @@ import proj4 from 'proj4';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {isEmpty, isEqual} from '../../../shared/helpers';
 import {
   GEO_LAT_LNG_PROJECTION,
   LATITUDE,
@@ -13,11 +14,10 @@ import {
   STRAT_SECTION_CENTER,
   ZOOM,
   ZOOM_STRAT_SECTION,
-} from './maps.constants';
-import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from './maps.helpers';
-import {setCenter, setZoom} from './maps.slice';
+} from '../maps.constants';
+import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from '../maps.helpers';
+import {setCenter, setZoom} from '../maps.slice';
 import useMapCoords from './useMapCoords';
-import {isEmpty, isEqual} from '../../shared/helpers';
 
 const useMapView = () => {
   /* Data Hooks */

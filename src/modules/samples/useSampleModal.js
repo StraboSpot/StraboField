@@ -8,7 +8,7 @@ import useSamples from './useSamples';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedProject} from '../project/projects.slice';
 import {useSpots} from '../spots';
