@@ -122,7 +122,7 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
       const allProjects = projectsArr.projects || [];
       const filteredProjects = source === 'device'
         ? allProjects.filter(p => backupType === 'auto' ? p.isAutoBackup : !p.isAutoBackup)
-        : allProjects;
+        : allProjects.filter(p => !p.isCollaborativeProject);
       return (
         <View style={{flex: 1}}>
           {source === 'server' && !isConnectionAvailable && (
