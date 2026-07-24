@@ -12,10 +12,11 @@ import useDevice from '../../../services/device/useDevice';
 import {BLUE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
+import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import SelectInputField from '../../form/SelectInputField';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
@@ -36,10 +37,10 @@ const BackupProject = () => {
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const backupFrequency = useSelector(state => state.connections.backupFrequency);
-  const isOnline = useSelector(state => state.connections.isOnline);
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
   const user = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
   const {openURL} = useDevice();
 
   /* Local State */
@@ -128,12 +129,8 @@ const BackupProject = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <>
-        {user.encoded_login && isOnline.isConnected ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
-          : (
-            <View style={uiStyles.spacer}>
-              <Text style={overlayStyles.importantText}>Please log in to upload your project.</Text>
-            </View>
-          )}
+        {user.encoded_login && isConnectionAvailable ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+          : <ConnectionRequiredMessage actionText={'upload your project'}/>}
         <FlatListItemSeparator/>
         <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
         <FlatListItemSeparator/>

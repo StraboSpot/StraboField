@@ -145,6 +145,10 @@ const spotSlice = createSlice({
         state.selectedSpot = spots[state.selectedSpot.properties.id];
       }
     },
+    restoredSpots(state, action) {
+      // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots.
+      state.spots = {...state.spots, ...action.payload};
+    },
     setIntersectedSpotsForTagging(state, action) {
       state.intersectedSpotsForTagging = action.payload;
     },
@@ -179,6 +183,7 @@ export const {
   editedSpotProperties,
   resetSpotState,
   restoredIntervalDragSnapshot,
+  restoredSpots,
   setIntersectedSpotsForTagging,
   setSelectedAttributes,
   setSelectedSpot,

@@ -17,6 +17,7 @@ import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} f
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import UrlLinkButton from '../help/UrlLinkButton';
 
 const MicroProjectsList = () => {
@@ -66,7 +67,7 @@ const MicroProjectsList = () => {
   /* Logic Helpers */
 
   const checkForMicroProject = async (item, i) => {
-    if (!projectsExistsArr[i] || (isConnected && isInternetReachable && projectsUpdateAvailableArr[i])) {
+    if (!projectsExistsArr[i] || (isInternetReachable && projectsUpdateAvailableArr[i])) {
       console.log('Need to download project');
       try {
         await downloadZip(item.id, item.name);
@@ -101,44 +102,53 @@ const MicroProjectsList = () => {
 
     let projectsResponse;
     setLoading(true);
-    if (isConnected && isInternetReachable) {
-      projectsResponse = await getAllServerMicroProjects();
-      if (!projectsResponse || !projectsResponse.projects) setErrorMessage('Error Getting StraboMicro Projects');
-      else if (isEmpty(projectsResponse.projects)) setErrorMessage('No StraboMico Projects');
-      else {
-        setIsError(false);
-        console.log('List of Projects on Server:', projectsResponse);
-        setProjectsArr(projectsResponse);
-        if (Platform.OS !== 'web') {
-          let projectsExistsArrTemp = [];
-          let projectsExistsUpdateAvailableTemp = [];
-          await Promise.all(projectsResponse.projects.map(async (project, i) => {
-            const exists = await doesMicroProjectPDFExist(project.id);
-            projectsExistsArrTemp[i] = exists;
-            if (exists) {
-              const modifiedTimestamp = await getSavedMicroProjectModifiedTimestamp(project.id);
-              if (modifiedTimestamp && project.modifiedtimestamp > modifiedTimestamp) {
-                projectsExistsUpdateAvailableTemp[i] = true;
+    try {
+      if (isInternetReachable) {
+        projectsResponse = await getAllServerMicroProjects();
+        if (!projectsResponse || !projectsResponse.projects) setErrorMessage('Error Getting StraboMicro Projects');
+        else if (isEmpty(projectsResponse.projects)) setErrorMessage('No StraboMico Projects');
+        else {
+          setIsError(false);
+          console.log('List of Projects on Server:', projectsResponse);
+          setProjectsArr(projectsResponse);
+          if (Platform.OS !== 'web') {
+            let projectsExistsArrTemp = [];
+            let projectsExistsUpdateAvailableTemp = [];
+            await Promise.all(projectsResponse.projects.map(async (project, i) => {
+              const exists = await doesMicroProjectPDFExist(project.id);
+              projectsExistsArrTemp[i] = exists;
+              if (exists) {
+                const modifiedTimestamp = await getSavedMicroProjectModifiedTimestamp(project.id);
+                if (modifiedTimestamp && project.modifiedtimestamp > modifiedTimestamp) {
+                  projectsExistsUpdateAvailableTemp[i] = true;
+                }
+                else projectsExistsUpdateAvailableTemp[i] = false;
               }
-              else projectsExistsUpdateAvailableTemp[i] = false;
-            }
-          }));
-          setProjectsExistsArr(projectsExistsArrTemp);
-          setProjectsUpdateAvailableArr(projectsExistsUpdateAvailableTemp);
+            }));
+            setProjectsExistsArr(projectsExistsArrTemp);
+            setProjectsUpdateAvailableArr(projectsExistsUpdateAvailableTemp);
+          }
+        }
+      }
+      else {
+        projectsResponse = await getAllLocalMicroProjects();
+        if (!projectsResponse || !projectsResponse.projects) setErrorMessage('No Offline StraboMicro Projects Found');
+        else {
+          setIsError(false);
+          console.log('List of Projects on Device:', projectsResponse);
+          setProjectsArr(projectsResponse);
+          setProjectsExistsArr(Array(projectsResponse.projects.length).fill(true));
         }
       }
     }
-    else {
-      projectsResponse = await getAllLocalMicroProjects();
-      if (!projectsResponse || !projectsResponse.projects) setErrorMessage('No Offline StraboMicro Projects Found');
-      else {
-        setIsError(false);
-        console.log('List of Projects on Device:', projectsResponse);
-        setProjectsArr(projectsResponse);
-        setProjectsExistsArr(Array(projectsResponse.projects.length).fill(true));
-      }
+    catch (err) {
+      console.error('Error getting StraboMicro projects', err);
+      setIsError(true);
+      setErrorMessage('Error Getting StraboMicro Projects');
     }
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   };
 
   /* Render Functions */
@@ -159,7 +169,7 @@ const MicroProjectsList = () => {
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>Updated: {modifiedTimeAndDate}</ListItem.Subtitle>
           )}
         </ListItem.Content>
-        {isConnected && isInternetReachable && projectsUpdateAvailableArr[i] ? (
+        {isInternetReachable && projectsUpdateAvailableArr[i] ? (
             <Icon
               color={MEDIUMGREY}
               name={'sync'}
@@ -183,6 +193,9 @@ const MicroProjectsList = () => {
     if (!isEmpty(userData)) {
       return (
         <View style={{flex: 1}}>
+          {!isInternetReachable && (
+            <ConnectionRequiredMessage actionText={'download StraboMicro projects'} isInternetRequired/>
+          )}
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={errorMessage}/>}

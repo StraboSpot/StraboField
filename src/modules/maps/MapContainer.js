@@ -7,9 +7,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import useCustomMap from './custom-maps/useCustomMap';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
 import Map from './Map';
-import {ZOOM} from './maps.constants';
+import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
+import SelectSpotsAtPressModal from './SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
 import useMapCoords from './useMapCoords';
@@ -25,7 +26,6 @@ import {
   addedStatusMessage,
   clearedStatusMessages,
   setIsErrorMessagesModalVisible,
-  setIsOfflineMapsModalVisible,
 } from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -49,6 +49,7 @@ const MapContainer = forwardRef(({
   const customBasemap = useSelector(state => state.map.customMaps);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
+  const isMapExtentFilterActive = useSelector(state => state.map.isMapExtentFilterActive);
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
@@ -62,7 +63,7 @@ const MapContainer = forwardRef(({
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);
-  const {getLassoedSpots} = useMapFeaturesCalculated(mapRef);
+  const {getSpotsInBoundingBox} = useMapFeaturesCalculated(mapRef);
   const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
   const [vertexActionValues, setVertexActionValues] = useState(null);
   const {
@@ -77,10 +78,14 @@ const MapContainer = forwardRef(({
     editFeatureVertex,
     editSpot,
     endDraw,
+    extendLineFromEndpoint,
     getSpotToEdit,
+    handleSelectedVertexLongPress,
+    isEditingSpot,
     moveVertex,
     saveEdits,
     setDrawFeaturesNew,
+    setSpotToEditFromPicker,
     splitLine,
     spotsNotSelected,
     spotsSelected,
@@ -96,24 +101,32 @@ const MapContainer = forwardRef(({
   });
   const {getCurrentLocation} = useMapLocation();
   const [isShowMacrostratOverlay, setIsShowMacrostratOverlay] = useState(false);
+  const [isShowSpotsAtPressModal, setIsShowSpotsAtPressModal] = useState(false);
   const [measureFeatures, setMeasureFeatures] = useState([]);
+  const [spotsAtPress, setSpotsAtPress] = useState([]);
   const {
     handleMapLongPress,
     handleMapPress,
+    handleSpotAtPressSelected,
+    isSpotsAtPressForEdit,
     location,
     startIntervalDrag,
   } = useMapPressEvents({
     clearSelectedSpots,
     editSpot,
     getSpotToEdit,
+    isEditingSpot,
     mapMode,
     mapRef,
     measureFeatures,
     setDistance,
     setDrawFeaturesNew,
     setIsShowMacrostratOverlay,
+    setIsShowSpotsAtPressModal,
     setMapModeToEdit,
     setMeasureFeatures,
+    setSpotsAtPress,
+    setSpotToEditFromPicker,
     switchToEditing,
   });
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
@@ -125,6 +138,8 @@ const MapContainer = forwardRef(({
   const cameraRef = useRef(null);
   const isDatasetToggleZoomPendingRef = useRef(false);
   const isInitialLoadZoomPendingRef = useRef(false);
+  // Mirror the map-extent-filter flag in a ref so the debounced map-move callback reads the latest value.
+  const isMapExtentFilterActiveRef = useRef(isMapExtentFilterActive);
   const spotsRef = useRef(null);
 
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -184,6 +199,13 @@ const MapContainer = forwardRef(({
     }
   }, [currentImageBasemap]);
 
+  // Recompute the Spots in the map extent whenever a map-extent list (Spots/Images/Samples/Tags/
+  // Geologic Units) becomes active, so it is current when the view opens or the map regains focus.
+  useEffect(() => {
+    isMapExtentFilterActiveRef.current = isMapExtentFilterActive;
+    if (isMapExtentFilterActive) updateSpotsInMapExtent().catch(console.error);
+  }, [isMapExtentFilterActive]);
+
   useEffect(() => {
     // console.log('UE MapContainer [currentBasemap, isZoomToCenterOffline]');
     updateMapView().catch(err => console.warn('Error getting center of custom map:', err));
@@ -212,7 +234,7 @@ const MapContainer = forwardRef(({
     // console.log('UE MapContainer [userEmail, isOnline]');
     if (isOnline) {
       if (!currentBasemap) setBasemap().catch(console.error);
-      // Only re-apply custom basemaps (URL may need rebuilding); standard basemaps are already correct.
+      // Custom basemaps: rebuild (URL may need rebuilding) and surface a fallback if it fails.
       else if (customBasemap[currentBasemap.id]) {
         setBasemap(currentBasemap.id).catch((error) => {
           console.log('Error Setting Basemap', error);
@@ -221,6 +243,10 @@ const MapContainer = forwardRef(({
           dispatch(setIsErrorMessagesModalVisible(true));
         });
       }
+      // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
+      // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
+      // making the style fail to load so Spot layers never attach. Rebuild from current runtime. Issue #919.
+      else setBasemap(currentBasemap.id).catch(console.error);
     }
     else if (isOnline === false && currentBasemap && Platform.OS !== 'web') {
       Object.values(customBasemap).forEach((map) => {
@@ -246,7 +272,6 @@ const MapContainer = forwardRef(({
       saveEdits: saveEdits,
       startEditingMode: startEditingMode,
       toggleUserLocation: toggleUserLocation,
-      updateSpotsInMapExtent: updateSpotsInMapExtent,
       zoomToCenterOfflineTile: zoomToCenterOfflineTile,
       zoomToCurrentLocation: zoomToCurrentLocation,
       zoomToCustomMap: zoomToCustomMap,
@@ -336,11 +361,14 @@ const MapContainer = forwardRef(({
       return tileCountThisScope;
     }
     catch (err) {
+      // Return an error-shaped result so SaveMapsModal can show it inline. Do NOT close the offline
+      // modal and open the global ErrorModal here: dismissing one native Modal while presenting another
+      // in the same commit makes iOS drop the ErrorModal presentation and freezes the app.
       console.error(err);
-      dispatch((setIsOfflineMapsModalVisible(false)));
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error fetching data from tile count service.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      return {
+        message: 'Error fetching data from tile count service. '
+          + 'Make sure you are pulling from the correct endpoint (Home → Miscellaneous → Custom Database Endpoint).',
+      };
     }
   };
 
@@ -363,19 +391,32 @@ const MapContainer = forwardRef(({
     }
   };
 
-  // Calculate the Spots in the current map extent and send to redux
+  // Calculate the Spots in the current map extent and send to redux. Skips the work unless a
+  // map-extent list is actually being viewed (auto-triggered on map move and on view open).
   const updateSpotsInMapExtent = async () => {
+    if (!isMapExtentFilterActiveRef.current) return;
     if (mapRef && mapRef.current) {
       console.log('Updating spots in map extent...');
-      const mapBounds = Platform.OS === 'web' ? await mapRef.current.getBounds().toArray()
-        : await mapRef.current.getVisibleBounds();
+      let mapBounds;
+      if (Platform.OS === 'web') {
+        // Derive the extent from the actual rendered container corners instead of getBounds(), which
+        // on web is translated/undersized when the map has camera padding or a stale internal size.
+        // resize() first syncs the transform to the real container so the unprojected corners match
+        // exactly what is on screen.
+        const map = mapRef.current;
+        if (typeof map.resize === 'function') map.resize();
+        const canvas = map.getCanvas();
+        const nw = map.unproject([0, 0]);
+        const se = map.unproject([canvas.clientWidth, canvas.clientHeight]);
+        mapBounds = [[nw.lng, nw.lat], [se.lng, se.lat]];
+      }
+      else mapBounds = await mapRef.current.getVisibleBounds();
       let right = mapBounds[0][0];
       let top = mapBounds[0][1];
       let left = mapBounds[1][0];
       let bottom = mapBounds[1][1];
       let bbox = [left, bottom, right, top];
-      const bboxPoly = turf.bboxPolygon(bbox);
-      const gotSpotsInMapExtent = getLassoedSpots(spotsRef.current, bboxPoly);
+      const gotSpotsInMapExtent = getSpotsInBoundingBox(spotsRef.current, bbox);
       const gotSpotsInMapExtentIds = gotSpotsInMapExtent.map(spot => spot.properties.id);
       dispatch(setSpotsInMapExtentIds(gotSpotsInMapExtentIds));
     }
@@ -448,7 +489,14 @@ const MapContainer = forwardRef(({
       return;
     }
     const spotsToZoomTo = [...spotsSelected, ...spotsNotSelected];
-    await zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    if (Platform.OS === 'web') return zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current);
+    // Native: this runs right as the triggering UI (map menu, project load, dataset toggle)
+    // is changing the map's layout. Fitting bounds during that relayout gets dropped on iOS,
+    // so wait for the viewport to settle first. See issue #892.
+    setTimeout(
+      () => zoomToSpotsNow(spotsToZoomTo, mapRef.current, cameraRef.current).catch(console.error),
+      SPOTS_EXTENT_ZOOM_DELAY,
+    );
   };
 
   /* View */
@@ -470,13 +518,17 @@ const MapContainer = forwardRef(({
           mapRef={mapRef}
           measureFeatures={measureFeatures}
           onMapLoad={handleMapLoadedWeb}  // prop used in web only
+          onVertexLongPress={handleSelectedVertexLongPress}
           showUserLocation={showUserLocation}
           spotsNotSelected={spotsNotSelected}
           spotsSelected={spotsSelected}
+          updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
       ) : (
         <View style={{flex: 1, backgroundColor: '#E8E8E8'}}/>
       )}
+
+      {/* Modals */}
       {currentBasemap?.source === 'macrostrat' && isOnline && (
         <MacrostratOverlay
           closeModal={() => setIsShowMacrostratOverlay(false)}
@@ -497,10 +549,20 @@ const MapContainer = forwardRef(({
           <VertexActionsOverlay
             addNewVertex={addNewVertex}
             deleteSelectedVertex={deleteSelectedVertex}
+            extendLineFromEndpoint={extendLineFromEndpoint}
             isShowVertexActionsModal={isShowVertexActionsModal}
             setIsShowVertexActionsModal={setIsShowVertexActionsModal}
             splitLine={splitLine}
             vertexActionValues={vertexActionValues}
+          />
+        )}
+        {isShowSpotsAtPressModal && (
+          <SelectSpotsAtPressModal
+            closeModal={() => setIsShowSpotsAtPressModal(false)}
+            headerTitle={isSpotsAtPressForEdit ? 'Select Spot to Edit' : `${spotsAtPress.length} Spots Here`}
+            isVisible={isShowSpotsAtPressModal}
+            onSpotPress={handleSpotAtPressSelected}
+            spots={spotsAtPress}
           />
         )}
       </View>

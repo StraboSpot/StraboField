@@ -179,8 +179,9 @@ const AddMeasurementModal = ({onPress}) => {
       : measurementTypeForForm;
     // If plane with associated line copy label from plane data to line data
     if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      if (formRef.current?.values?.label) {
-        formRef.current.setFieldValue('associated_orientation[0].label', formRef.current.values.label);
+      if (formRef.current.values.associated_orientation?.[0]?.label || formRef.current.values.label) {
+        formRef.current.setFieldValue('associated_orientation[0].label',
+          formRef.current.values.associated_orientation?.[0]?.label);
       }
     }
     try {

@@ -11,7 +11,7 @@ const useMicro = () => {
   /* Exported Functions */
 
   const getAllLocalMicroProjects = async () => {
-    const localMicroProjects = await readDirectory(APP_DIRECTORIES.MICRO);
+    const localMicroProjects = await readDirectory(APP_DIRECTORIES.MICRO) || [];
     console.log('localMicroProjects', localMicroProjects);
     const projects = [];
     await Promise.all(localMicroProjects.map(async (projectId) => {

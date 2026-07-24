@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -13,48 +13,55 @@ import FeatureTagsList from '../tags/FeatureTagsList';
 // Render a measurement item in a list
 const MeasurementItem = ({
                            isDetail,
+                           isSelectMode,
                            item,
                            onPress,
                            selectedIds,
                          }) => {
 
-  const spot = useSelector(state => state.spot.selectedSpot);
-  const {setFeaturesSelectedForMultiTagging} = useTags();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
+  const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
+  const spot = useSelector(state => state.spot.selectedSpot);
 
-  useEffect(() => {
-    console.log('UE MeasurementItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
-    if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
-  }, [isMultipleFeaturesTaggingEnabled]);
+  const {setFeaturesSelectedForMultiTagging} = useTags();
+
+  const isFeatureSelectedForTagging = selectedFeaturesForTagging.some(feature => feature.id === item.id);
+  const isSelected = selectedIds.includes(item.id);
+  const isInverse = isSelected && !isSelectMode;  // accent-highlight the currently-edited item, but not in Select mode
 
   const onMeasurementPress = () => {
-    if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(item));
+    if (isMultipleFeaturesTaggingEnabled) setFeaturesSelectedForMultiTagging(item);
     else onPress();
   };
 
   if (!isEmpty(item)) {
     return (
       <ListItem
-        containerStyle={selectedIds.includes(item.id) ? commonStyles.listItemInverse
-          : [commonStyles.listItem, {
-            backgroundColor: featureSelectedForTagging
-              ? themes.PRIMARY_ACCENT_COLOR : themes.SECONDARY_BACKGROUND_COLOR,
-          }]}
+        containerStyle={isInverse ? commonStyles.listItemInverse
+          : [commonStyles.listItem, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}
         key={item.id}
         onPress={() => onMeasurementPress()}
         pad={5}
       >
+        {isMultipleFeaturesTaggingEnabled && (
+          <ListItem.CheckBox
+            checked={isFeatureSelectedForTagging}
+            onPress={() => onMeasurementPress()}
+          />
+        )}
+        {isSelectMode && (
+          <ListItem.CheckBox
+            checked={isSelected}
+            onPress={() => onMeasurementPress()}
+          />
+        )}
         <ListItem.Content>
-          <ListItem.Title
-            style={selectedIds.includes(item.id) ? commonStyles.listItemTitleInverse
-              : commonStyles.listItemTitle}
-          >
+          <ListItem.Title style={isInverse ? commonStyles.listItemTitleInverse : commonStyles.listItemTitle}>
             <MeasurementLabel isDetail={isDetail} item={item}/>
           </ListItem.Title>
           <FeatureTagsList featureId={item.id} spotId={spot.properties.id}/>
         </ListItem.Content>
-        <ListItem.Chevron/>
+        {!isMultipleFeaturesTaggingEnabled && !isSelectMode && <ListItem.Chevron/>}
       </ListItem>
     );
   }

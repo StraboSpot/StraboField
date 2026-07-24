@@ -11,6 +11,7 @@ import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
+import {GLYPHS_URL} from '../glyphs/glyphs.constants';
 import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
 import useMapURL from '../useMapURL';
@@ -78,7 +79,7 @@ const useMapsOffline = () => {
           tileSize: 256,
         },
       },
-      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      glyphs: GLYPHS_URL,
       layers: [{
         id: mapId,
         type: 'raster',

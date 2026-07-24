@@ -17,6 +17,13 @@ end
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
+# react-native-permissions setup (permission handlers compiled into the RNPermissions pod)
+require_relative '../node_modules/react-native-permissions/scripts/setup'
+setup_permissions([
+  'Camera',
+  'LocationWhenInUse',
+])
+
 $RNMapboxMapsImpl = 'mapbox'
 
 linkage = ENV['USE_FRAMEWORKS']

@@ -45,11 +45,27 @@ class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
         self.bundleURL()
     }
 
-    override func bundleURL() -> URL? {
-        #if DEBUG
-        RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        #else
-        Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-        #endif
-    }
+  override func bundleURL() -> URL? {
+          #if DEBUG
+          #if targetEnvironment(simulator)
+          // Simulator: Metro on the host, reachable via localhost
+          return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+          #else
+
+          // ============================================
+          // MANUALLY TOGGLE ONE OF THE TWO BLOCKS BELOW
+          // ============================================
+
+          // --- HOME (on Wi-Fi, uses dev menu IP) ---
+          return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+
+          // --- TRAVELING (USB link-local, no hotspot data) ---
+          // Run `ifconfig | grep "inet "` to get the current IP, then uncomment:
+          // return URL(string: "http://169.254.149.39:8081/index.bundle?platform=ios&dev=true")
+
+          #endif
+          #else
+          return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+          #endif
+      }
 }

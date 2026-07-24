@@ -244,6 +244,13 @@ const projectSlice = createSlice({
     resetProjectState() {
       return initialProjectState;
     },
+    restoredSpotReferences(state, action) {
+      // Undo delete: put the datasets/reports/tags back exactly as they were before the Spot was deleted.
+      const {datasets, reports, tags} = action.payload;
+      state.datasets = datasets;
+      if (reports) state.project.reports = reports;
+      if (tags) state.project.tags = tags;
+    },
     setActiveDatasets(state, action) {
       const {bool, dataset} = action.payload;
       if (bool) state.activeDatasetsIds = [...new Set([...state.activeDatasetsIds, dataset])];
@@ -372,6 +379,7 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   resetProjectState,
+  restoredSpotReferences,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setActiveTemplates,

@@ -207,11 +207,14 @@ const NotebookHeader = ({
           {isEditingTitle && !isReadOnly && !isLegacySample ? (
             <TextInput
               autoFocus
-              onBlur={() => setIsEditingTitle(false)}
+              onBlur={() => {
+                if (!spot.properties.name) onSpotEdit('name', 'Unknown');
+                setIsEditingTitle(false);
+              }}
               onChangeText={text => onSpotEdit('name', text)}
               style={notebookHeaderStyles.headerSpotName}
               textAlign={'left'}
-              value={headerTitle}
+              value={spot.properties.name || ''}
             />
           ) : (
             <Text

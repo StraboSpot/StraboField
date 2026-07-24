@@ -114,7 +114,7 @@ const mapConfig = {
   timeout: null,
   blacklist: [
     'freehandFeatureCoords',
-    'isMapMoved',
+    'isMapExtentFilterActive',
     'selectedCustomMapToEdit',
     'vertexEndCoords',
     'vertexStartCoords',

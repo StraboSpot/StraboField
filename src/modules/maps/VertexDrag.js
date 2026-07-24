@@ -9,7 +9,7 @@ import mapStyles from './maps.styles';
 
 const selectedVertexOffset = 10;
 
-const VertexDrag = () => {
+const VertexDrag = ({onLongPress}) => {
   // console.log('Rendering VertexDrag...');
 
   /* Data Hooks */
@@ -39,7 +39,7 @@ const VertexDrag = () => {
 
   /* Derived Variables */
 
-  const gesture = Gesture.Pan()
+  const panGesture = Gesture.Pan()
     .onBegin(() => {
       isPressed.value = true;
       // console.log('Start Coords:', vertexStartCoords);
@@ -65,9 +65,21 @@ const VertexDrag = () => {
       isPressed.value = false;
     });
 
+  // This overlay swallows the map's long press, so handle it here. Race with the pan: hold still opens the
+  // modal, drag still moves the vertex.
+  const longPressGesture = Gesture.LongPress()
+    .minDuration(500)
+    .onStart(() => runOnJS(handleLongPress)());
+
+  const gesture = Gesture.Race(panGesture, longPressGesture);
+
   /* Logic Helpers */
 
-  // Using function declaration (not const) so it is hoisted and available to runOnJS above
+  // Using function declarations (not const) so they are hoisted and available to runOnJS above
+  function handleLongPress() {
+    if (onLongPress) onLongPress();
+  }
+
   function saveEnd(endCoords) {
     dispatch(setVertexEndCoords(endCoords));
   }

@@ -1,5 +1,5 @@
 import {getTagTitle} from '../tags.helpers';
-import {TAG_SORT_ORDER, TEMPORAL_FIELD_GROUPS, TEMPORAL_VALUE_RANGES} from './tagFilters.constants';
+import {TAG_SORT_ORDER, TEMPORAL_FIELD_GROUPS, TEMPORAL_VALUE_RANGES} from './tagQuery.constants';
 
 export const sortTagsAlphabetically = tagsToSort =>
   [...tagsToSort].sort((a, b) => getTagTitle(a).localeCompare(getTagTitle(b)));
@@ -65,9 +65,7 @@ export const sortTagsTemporally = (tagsToSort, reverse = false) => {
 
 export const sortTagsByOrder = (tagsToSort, order, reverse = false) => {
   if (order === TAG_SORT_ORDER.TEMPORAL) return sortTagsTemporally(tagsToSort, reverse);
-  let sorted;
-  if (order === TAG_SORT_ORDER.DATE_CREATED || order === TAG_SORT_ORDER.DATE_LAST_MODIFIED
-    || order === TAG_SORT_ORDER.RECENTLY_VIEWED) sorted = sortTagsByDateCreated(tagsToSort);
-  else sorted = sortTagsAlphabetically(tagsToSort);
+  const sorted = order === TAG_SORT_ORDER.DATE_CREATED ? sortTagsByDateCreated(tagsToSort)
+    : sortTagsAlphabetically(tagsToSort);
   return reverse ? [...sorted].reverse() : sorted;
 };

@@ -6,7 +6,7 @@ import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const ReportModal = ({openSpotInNotebook}) => {
   /* Data Hooks */
 
   const {
@@ -45,6 +45,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       <ModalWrapper
         actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
+        headerTitle={isEmpty(initialValues) ? 'Create New Memo' : 'Update Memo'}
         onActionPressed={handleSavePressed}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
@@ -62,14 +63,12 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
-                updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
                 handleTagPressed={handleTagPressed}
-                updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
             </>
           }

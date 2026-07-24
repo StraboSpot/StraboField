@@ -73,8 +73,8 @@ const useProject = () => {
         break;
       }
     }
-    console.log('HERE IS THE DATASET', datasetIdFound);
-    if (!datasetIdFound) console.error('Dataset for Spot ' + spotId + ' not found');
+    // A Spot legitimately maps to no dataset at times (e.g. a just-split line before Save Edits adds it
+    // to the target dataset); the sole caller treats undefined as "not read-only", so return quietly.
     return datasetIdFound;
   };
 

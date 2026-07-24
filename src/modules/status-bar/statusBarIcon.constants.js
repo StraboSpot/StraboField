@@ -7,6 +7,7 @@ export const CONNECTION_STATUS_ICON_NAMES = {
 };
 
 export const BATTERY_ICON_NAMES = {
+  CHARGING: 'battery-charging',
   FULL: 'battery',
   NINTY: 'battery-90',
   EIGHTY: 'battery-80',

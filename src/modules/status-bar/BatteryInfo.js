@@ -2,13 +2,15 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {useBatteryLevel} from 'react-native-device-info';
+import {useBatteryLevel, usePowerState} from 'react-native-device-info';
 
 import statusBarStyles from './statusBar.styles';
 import {BATTERY_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 
 const BatteryInfo = () => {
   const batteryLevel = useBatteryLevel();
+  const {batteryState} = usePowerState();
+  console.log('powerState', batteryState);
 
   const batteryPercentage = (batteryLevel * 100).toFixed(0);
 
@@ -19,6 +21,7 @@ const BatteryInfo = () => {
   };
 
   const getBatteryImage = () => {
+    if (batteryState === 'charging') return BATTERY_ICON_NAMES.CHARGING;
     if (batteryLevel >= 0.95) return BATTERY_ICON_NAMES.FULL;
     else if (batteryLevel >= 0.85) return BATTERY_ICON_NAMES.NINTY;
     else if (batteryLevel >= 0.75) return BATTERY_ICON_NAMES.EIGHTY;

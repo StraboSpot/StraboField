@@ -48,15 +48,9 @@ const styles = StyleSheet.create({
     color: themes.PRIMARY_TEXT_COLOR,
   },
   headerText: {
-    color: 'red',
+    color: themes.WARNING_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  importantText: {
-    color: 'red',
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   inputContainer: {

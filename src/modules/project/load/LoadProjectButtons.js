@@ -1,11 +1,12 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
-import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
+import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 
 const LoadProjectButtons = ({
                               onLoadProjectsFromDevice,
@@ -15,19 +16,21 @@ const LoadProjectButtons = ({
                             }) => {
   /* Data Hooks */
 
-  const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
+
+  const isConnectionAvailable = useIsConnectionAvailable();
 
   /* View */
 
   return (
     <>
+      {!isEmpty(user.name) && !isConnectionAvailable && <ConnectionRequiredMessage actionText={'download a project'}/>}
       <View style={{paddingHorizontal: 10}}>
         <OutlineButton
           onPress={onStartNewProject}
           title={'New'}
         />
-        {!isEmpty(user.name) && isOnline.isConnected && (
+        {!isEmpty(user.name) && isConnectionAvailable && (
           <OutlineButton
             onPress={onLoadProjectsFromServer}
             title={'Download'}
@@ -37,11 +40,6 @@ const LoadProjectButtons = ({
           onPress={onLoadProjectsFromDevice}
           title={'Open'}
         />
-        {!isEmpty(user.name) && !isOnline.isConnected && (
-          <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
-            Please connect to the Internet.
-          </Text>
-        )}
         <OutlineButton
           onPress={onLoadProjectsFromDownloadsFolder}
           title={'Import'}

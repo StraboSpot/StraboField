@@ -8,6 +8,7 @@ import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
+import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
 import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
 import Routes from './src/routes/Routes';
 import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
@@ -84,7 +85,7 @@ const App = () => {
       <SafeAreaView style={uiStyles.container}>
         <Provider store={store}>
           <ToastWrapper>
-            <PersistGate loading={null} persistor={persistor}>
+            <PersistGate loading={null} onBeforeLift={installGlyphs} persistor={persistor}>
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>

@@ -4,6 +4,7 @@ import {
   BLACK,
   DARKGREY,
   GOLD,
+  LIST_BORDER_COLOR,
   MEDIUM_TEXT_SIZE,
   MODAL_BACKDROP,
   PRIMARY_BACKGROUND_COLOR,
@@ -70,6 +71,10 @@ const styles = StyleSheet.create({
   customEndpointVerifyInputContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  horizontalLine: {
+    borderBottomColor: LIST_BORDER_COLOR,
+    borderBottomWidth: 1,
   },
   imageIcon: {
     height: Platform.OS === 'web' ? 50 : 55,

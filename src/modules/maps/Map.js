@@ -28,9 +28,11 @@ const Map = ({
                mapMode,
                mapRef,
                measureFeatures,
+               onVertexLongPress,
                showUserLocation,
                spotsNotSelected,
                spotsSelected,
+               updateSpotsInMapExtent,
              }) => {
   // console.log('Rendering Map...');
 
@@ -45,7 +47,7 @@ const Map = ({
     isDragIntervalMode,
   } = useSelector(state => state.map);
 
-  const {handleMapMoved} = useMapMoveEvents({mapRef});
+  const {handleMapMoved} = useMapMoveEvents({mapRef, onMapMoveEnd: updateSpotsInMapExtent});
 
   /* Local State */
 
@@ -131,7 +133,7 @@ const Map = ({
         </FreehandSketch>
       )}
 
-      {vertexStartCoords && <VertexDrag/>}
+      {vertexStartCoords && <VertexDrag onLongPress={onVertexLongPress}/>}
       {intervalDragState && <SnapLineLayer/>}
     </>
   );

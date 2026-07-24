@@ -177,7 +177,14 @@ export const TEMPORAL_VALUE_RANGES = {
 export const TAG_SORT_ORDER = {
   ALPHABETICAL: 'Alphabetical',
   DATE_CREATED: 'Date Created',
-  DATE_LAST_MODIFIED: 'Date Last Modified',
-  RECENTLY_VIEWED: 'Recently Viewed',
   TEMPORAL: 'Temporal',
+};
+
+// Tag filters are multi-select and combine as an intersection; stored as an array of these keys (empty = all).
+export const TAG_FILTERS = {
+  MAP_EXTENT: 'MAP_EXTENT',
+};
+
+export const TAG_FILTER_LABELS = {
+  [TAG_FILTERS.MAP_EXTENT]: 'In Current Map Extent',
 };

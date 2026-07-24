@@ -27,7 +27,7 @@ const useTags = () => {
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const projectTags = useSelector(state => state.project.project?.tags) || [];
-  const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
+  const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
 

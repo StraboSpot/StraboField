@@ -65,6 +65,13 @@ const styles = StyleSheet.create({
     padding: 5,
     width: '100%',
   },
+  fieldValueFill: {
+    borderColor: themes.MEDIUMGREY,
+    borderWidth: 0.5,
+    flex: 1,
+    minHeight: 75,
+    verticalAlign: 'top',
+  },
   fieldValueFull: {
     borderColor: themes.MEDIUMGREY,
     borderWidth: 0.5,

@@ -14,13 +14,18 @@ const initialMapsState = {
   },
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
+  freehandVertexSpacing: {
+    unit: 'pixels', // 'pixels' | 'distance'
+    pixelSpacing: 20, // screen points between kept vertices
+    distanceSpacing: 50, // meters between kept vertices
+  },
   geometryTypesOff: [],
   intervalDragChangedSpotIds: [],
   intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
   labelTypeOn: 'dipOrName',
-  isMapMoved: true,
+  isMapExtentFilterActive: false,
   isScaleBarMetric: true,
   isShowOnly1stMeas: false,
   isShowSamplesOn: false,
@@ -112,6 +117,9 @@ const mapsSlice = createSlice({
     setFreehandFeatureCoords(state, action) {
       state.freehandFeatureCoords = action.payload;
     },
+    setFreehandVertexSpacing(state, action) {
+      state.freehandVertexSpacing = {...state.freehandVertexSpacing, ...action.payload};
+    },
     setGeometryTypesOff(state, action) {
       console.log('Map Geometry Types Off', action.payload);
       state.geometryTypesOff = action.payload;
@@ -129,8 +137,8 @@ const mapsSlice = createSlice({
         }
       }
     },
-    setIsMapMoved(state, action) {
-      state.isMapMoved = action.payload;
+    setIsMapExtentFilterActive(state, action) {
+      state.isMapExtentFilterActive = action.payload;
     },
     setIsShowOnly1stMeas(state, action) {
       state.isShowOnly1stMeas = action.payload;
@@ -202,10 +210,11 @@ export const {
   setDrawGeometries,
   setFeatureTypesOff,
   setFreehandFeatureCoords,
+  setFreehandVertexSpacing,
   setGeometryTypesOff,
   setIntervalDragState,
   setIntervalDragTargetSlot,
-  setIsMapMoved,
+  setIsMapExtentFilterActive,
   setIsScaleBarMetric,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,

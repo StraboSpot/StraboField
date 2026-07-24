@@ -39,7 +39,6 @@ const OverlaysContainer = forwardRef(({
           closeNotebookPanel={closeNotebookPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
-          updateSpotsInMapExtent={mapComponentRef?.current?.updateSpotsInMapExtent}
           zoomToCurrentLocation={zoomToCurrentLocation}
         />
       )}

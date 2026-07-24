@@ -10,6 +10,9 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
 
   const {getPaintSymbology} = useMapSymbology();
 
+  // Pin the halos just below the point symbols so the point icons stay on top (full stack order in FeaturesLayers).
+  const beforeId = 'pointLayerNotSelected';
+
   /* View */
 
   return (
@@ -21,6 +24,7 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
         type={'geojson'}
       >
         <Layer
+          beforeId={beforeId}
           filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerSelectedHalo'}
           paint={getPaintSymbology().pointSelected}
@@ -29,12 +33,14 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
       </Source>
 
       {/* Colored Halo Around Points Layer */}
+      {/* Include selected features too so a selected spot keeps its tag/geologic-unit color halo. */}
       <Source
-        data={turf.featureCollection(featuresNotSelected)}
+        data={turf.featureCollection([...featuresNotSelected, ...featuresSelected])}
         id={'pointSourceColorHalo'}
         type={'geojson'}
       >
         <Layer
+          beforeId={beforeId}
           filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerColorHalo'}
           paint={getPaintSymbology().pointColorHalo}

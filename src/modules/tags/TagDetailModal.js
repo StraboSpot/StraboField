@@ -119,6 +119,7 @@ const TagDetailModal = ({closeModal}) => {
       <FlatList
         ListHeaderComponent={
           <>
+            <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
             <View style={{flex: 1}}>
               <Formik
                 component={formProps => Form({formName: formName, ...formProps})}
@@ -130,7 +131,6 @@ const TagDetailModal = ({closeModal}) => {
                 validate={values => validateForm({formName: formName, values: values})}
               />
             </View>
-            <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
           </>
         }
       />

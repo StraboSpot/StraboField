@@ -100,6 +100,9 @@ const addedForReactNavigation = {
 
 module.exports = (env, argv) => {
   const mode = argv.mode || 'development'; // dev mode by default
+
+  console.log('Webpack Mode Variable:', mode);
+
   return {
     // stats: {
     //   errorDetails: true,
@@ -166,12 +169,12 @@ module.exports = (env, argv) => {
       maxAssetSize: 512000,
     },
     optimization: {
-      minimize: true,
+      minimize: mode === 'production',
       minimizer: [
         new TerserPlugin({
           terserOptions: {
             compress: {
-              drop_console: true,
+              drop_console: mode === 'production',
             },
           },
         }),
@@ -182,4 +185,4 @@ module.exports = (env, argv) => {
     },
   };
 };
-console.log('NODE_ENV from shell:', process.env.NODE_ENV);
+
