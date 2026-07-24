@@ -22,7 +22,6 @@ import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
@@ -180,8 +179,9 @@ const AddMeasurementModal = ({onPress}) => {
       : measurementTypeForForm;
     // If plane with associated line copy label from plane data to line data
     if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      if (formRef.current?.values?.label) {
-        formRef.current.setFieldValue('associated_orientation[0].label', formRef.current.values.label);
+      if (formRef.current.values.associated_orientation?.[0]?.label || formRef.current.values.label) {
+        formRef.current.setFieldValue('associated_orientation[0].label',
+          formRef.current.values.associated_orientation?.[0]?.label);
       }
     }
     try {
@@ -405,9 +405,10 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
-        showActionButton={false}
+        showActionButton={!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement}
         showCancelButton={false}
         showCloseButton
       >
@@ -431,9 +432,6 @@ const AddMeasurementModal = ({onPress}) => {
               bounces={false}
               listKey={'form'}
             />
-          )}
-          {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <ActionButton onPress={saveMeasurement}/>
           )}
         </>
       </ModalWrapper>

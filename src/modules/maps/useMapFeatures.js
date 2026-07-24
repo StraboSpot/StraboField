@@ -76,26 +76,8 @@ const useMapFeatures = () => {
     return mappedFeatures;
   };
 
-  // All Spots mapped on current map
-  const getAllMappedSpots = () => {
-    const spotsWithGeometry = getMappableSpots();      // Spots with geometry
-    let mappedSpots;
-    if (currentImageBasemap) {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => spot.properties.image_basemap && spot.properties.image_basemap === currentImageBasemap.id);
-    }
-    else if (stratSection) {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => spot.properties.strat_section_id && spot.properties.strat_section_id === stratSection.strat_section_id);
-    }
-    else {
-      mappedSpots = spotsWithGeometry.filter(
-        spot => !spot.properties.strat_section_id && !spot.properties.image_basemap);
-    }
-    // console.log('All Mapped Active Spots on this map', mappedSpots);
-    // console.log('Number of Active Spots Mapped on this map:', mappedSpots.length);
-    return mappedSpots;
-  };
+  // All Spots (with geometry) mapped on the current map
+  const getAllMappedSpots = () => getMappableSpots().filter(isSpotOnCurrentMap);
 
   // Get selected and not selected Spots to display when not editing
   const getDisplayedSpots = (selectedSpots) => {
@@ -135,13 +117,22 @@ const useMapFeatures = () => {
       }
       else if (spot.geometry.type === 'GeometryCollection') {
         spot.geometry.geometries.forEach((g, i) => {
-          mappedFeatures.push({...spot, geometry: g, properties: {...spot.properties, symbology: spot.properties.symbology[i]}});
+          mappedFeatures.push(
+            {...spot, geometry: g, properties: {...spot.properties, symbology: spot.properties.symbology[i]}});
         });
       }
       else mappedFeatures.push(spot);
     });
     console.log('Mapped Features:', mappedFeatures);
     return filterFeatures(mappedFeatures);
+  };
+
+  // True if the Spot belongs to the map currently being viewed: an image basemap or strat section
+  // shows only its own Spots; the regular basemap shows only Spots on neither.
+  const isSpotOnCurrentMap = (spot) => {
+    if (currentImageBasemap) return spot.properties.image_basemap === currentImageBasemap.id;
+    if (stratSection) return spot.properties.strat_section_id === stratSection.strat_section_id;
+    return !spot.properties.strat_section_id && !spot.properties.image_basemap;
   };
 
   // Gather and set the feature types that are present in the mapped Spots
@@ -152,7 +143,12 @@ const useMapFeatures = () => {
     const featureTypes = spotsWithGeometry.reduce((acc, spot) => {
       const spotFeatureTypes = spot.properties.orientation_data
         && spot.properties.orientation_data.reduce((acc1, orientation) => {
-          return [...new Set([...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified'])];
+          // Include associated orientations, which are rendered as their own point symbols, so any feature type not
+          // already registered by a non-associated measurement gets a toggle instead of being un-hideable
+          const associatedFeatureTypes = (orientation?.associated_orientation || []).map(
+            associatedOrientation => associatedOrientation?.feature_type ? associatedOrientation.feature_type : 'unspecified');
+          return [...new Set(
+            [...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified', ...associatedFeatureTypes])];
         }, []);
       return [...new Set([...acc, ...(spotFeatureTypes ? spotFeatureTypes : ['unspecified'])])];
     }, []);
@@ -169,6 +165,7 @@ const useMapFeatures = () => {
     getAllMappedSpots,
     getDisplayedSpots,
     getSpotsAsFeatures,
+    isSpotOnCurrentMap,
     updateFeatureTypes,
   };
 };

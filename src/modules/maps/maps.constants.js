@@ -1,3 +1,4 @@
+import {GLYPHS_URL} from './glyphs/glyphs.constants';
 import {STRABO_APIS} from '../../services/network/urls.constants';
 import config from '../../utils/config';
 
@@ -8,6 +9,15 @@ export const PIXEL_PROJECTION = 'EPSG:3857';
 export const STRAT_SECTION_CENTER = [0.001, 0.0007];
 export const ZOOM = 14;                 // Default zoom for geographic map and image basemaps
 export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
+
+// ms to wait for the map viewport to settle (menu close / project load) before fitting to
+// the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
+export const SPOTS_EXTENT_ZOOM_DELAY = 500;
+
+// Half-width (DIP) of the press box for finding Spots/vertices under the finger; _PRECISE requires
+// a press directly on the feature (e.g. Macrostrat).
+export const PRESS_BOX_PADDING = 10;
+export const PRESS_BOX_PADDING_PRECISE = 1;
 
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 
@@ -133,7 +143,7 @@ export const BASEMAPS = DEFAULT_MAPS.map((map) => {
       attribution: MAP_PROVIDERS[map.source].attributions,
     },
   };
-  map.glyphs = 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf';
+  map.glyphs = GLYPHS_URL;
   map.layers = [{
     id: map.id,
     type: 'raster',
@@ -152,7 +162,7 @@ export const CUSTOMBASEMAPS = CUSTOM_MAP_TYPES.map((map) => {
 export const BACKGROUND = {
   title: 'Background',
   id: 'background',
-  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+  glyphs: GLYPHS_URL,
   sources: {},
   layers: [{
     id: 'background',
@@ -199,17 +209,6 @@ export const STEREONET_HEADERS = [
   'Method',
 ];
 
-export const GLYPH_CENTER_COORDINATE = [-71.416555631, 42.662938497];
-
-export const GLYPH_TEXT_SHAPE = {
-  'type': 'Feature',
-  'properties': {},
-  'geometry': {
-    'type': 'Point',
-    'coordinates': GLYPH_CENTER_COORDINATE,
-  },
-};
-
 export const LAYER_IDS_NOT_SELECTED = ['polygonLayerNotSelected', 'polygonLayerWithPatternNotSelected',
   'polygonLayerNotSelectedBorder', 'polygonLabelLayerNotSelected', 'lineLayerNotSelected',
   'lineLayerNotSelectedDotted', 'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed',
@@ -221,4 +220,17 @@ export const LAYER_IDS_SELECTED = ['polygonLayerSelected', 'polygonLayerWithPatt
 
 export const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
 
-export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line'];
+export const SET_IN_CURRENT_VIEW_BUTTON_ICONS = {
+  LineString: require('../../assets/icons/LineButton.png'),
+  Point: require('../../assets/icons/PointButton.png'),
+  Polygon: require('../../assets/icons/PolygonButton.png'),
+};
+
+export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line', 'Extend Line'];
+
+export const VERTEX_ACTION_BUTTON_ICONS = {
+  'Add Vertex': require('../../assets/icons/LineButton.png'),
+  'Delete Vertex': require('../../assets/icons/PointButton.png'),
+  'Extend Line': require('../../assets/icons/LineButton.png'),
+  'Split Line': require('../../assets/icons/PolygonButton.png'),
+};

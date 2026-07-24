@@ -12,11 +12,13 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 
 const Form = ({
+                fieldCustomHeights,
                 getIsDisabled,
                 errors,
                 formName,
                 isReadOnly,
                 onMyChange,
+                renderInline,
                 setFieldValue,
                 subkey,
                 surveyFragment,
@@ -207,7 +209,10 @@ const Form = ({
 
   /* View */
 
-  if (Platform.OS === 'web') return renderFields();
+  // Render fields inline (no internal FlatList) on web, or when the caller already provides a single
+  // scroll container. Nesting this FlatList inside another scroll view breaks iOS keyboard-focus
+  // scrolling — the focused input's nearest scroll ancestor differs from the one adjusting insets.
+  if (Platform.OS === 'web' || renderInline) return renderFields();
 
   return (
     <FlatList

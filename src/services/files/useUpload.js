@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import KeepAwake from 'react-native-keep-awake';
@@ -6,23 +6,29 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
 import {addedStatusMessage} from '../../modules/home/home.slice';
-import {deletedSpotIdFromDataset, setIsImageTransferring} from '../../modules/project/projects.slice';
+import {
+  addedProjectFromServer,
+  deletedSpotIdFromDataset,
+  setIsImageTransferring,
+} from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
-import {useSpots} from '../../modules/spots';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
+import {store} from '../../store/ConfigureStore';
 import useServerRequests from '../network/useServerRequests';
 
-const datasetsNotUploaded = [];
 let projectUploadStatus = {};
 
 const useUpload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const spots = useSelector(state => state.spot.spots);
   const project = useSelector(state => state.project.project);
-  const projectDatasets = useSelector(state => state.project.datasets);
   const user = useSelector(state => state.user);
+
+  const spotsRef = useRef(spots);
+  spotsRef.current = spots;
 
   const {checkValidDateTime} = useProject();
   const {
@@ -34,7 +40,6 @@ const useUpload = () => {
     updateProject,
     uploadWebImage,
   } = useServerRequests();
-  const {getSpotsByIds} = useSpots();
   const {initializeImageUpload} = useUploadImages();
 
   /* Local State */
@@ -46,7 +51,6 @@ const useUpload = () => {
   const uploadDataset = async (dataset) => {
     try {
       if (!dataset.isReadOnly) {
-        // dispatch(addedStatusMessage(`\n${dataset.name}\n`));
         setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
         let datasetCopy = JSON.parse(JSON.stringify(dataset));
         delete datasetCopy.spotIds;
@@ -54,23 +58,18 @@ const useUpload = () => {
         const resJSON = await updateDataset(datasetCopy);
         if (resJSON.modified_on_server && !resJSON.isReadOnly) {
           console.log('Dataset that was uploaded:', resJSON);
-          // console.log(dataset.name + ': Uploading Dataset Properties...');
-          // dispatch(addedStatusMessage('Uploading properties...'));
           await addDatasetToProject(project.id, dataset.id);
           setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
-          // dispatch(removedLastStatusMessage());
           await uploadSpots(dataset);
         }
         else {
-          setUploadStatusMessage(`Dataset ${dataset.name} had no changes.`);
-          datasetsNotUploaded.push(datasetCopy);
-          // console.log(`Did not upload: Dataset ${datasetCopy.name} has not changed or is newer.`);
+          // Rejected: the server copy is newer, so it was not overwritten.
+          setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server and was not overwritten.`);
         }
       }
     }
     catch (err) {
       console.error(dataset.name + ': Error Uploading Dataset Properties...', err);
-      // dispatch(addedStatusMessage(`Error Uploading Dataset Properties!\n ${err}`));
       throw Error(err);
     }
   };
@@ -79,7 +78,8 @@ const useUpload = () => {
   const uploadSpots = async (dataset) => {
     let datasetSpots;
     if (dataset.spotIds) {
-      datasetSpots = getSpotsByIds(dataset.spotIds);
+      const idsSet = new Set(dataset.spotIds);
+      datasetSpots = Object.values(spotsRef.current).filter(spot => idsSet.has(spot.properties.id));
       datasetSpots.forEach(spotValue => checkValidDateTime(spotValue));
     }
     try {
@@ -96,15 +96,12 @@ const useUpload = () => {
         setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
         await updateDatasetSpots(dataset.id, spotCollection);
         setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
-        // dispatch(removedLastStatusMessage());
-        // dispatch(addedStatusMessage('\nFinished uploading spots.\n'));
-        // await uploadImages(Object.values(datasetSpots), dataset.name);
       }
     }
     catch (err) {
       console.error(dataset.name + ': Error Uploading Project Spots.', err);
       setUploadStatusMessage(`${dataset.name}: Error Uploading Spots.\n\n ${err}\n`);
-      // Added this below to handle spots that were getting added to 2 datasets, which the server will not accept
+      // The server rejects a spot that belongs to two datasets; drop it from this one and let the user retry.
       const errMsg = typeof err === 'string' ? err : (err?.message ?? String(err));
       if (errMsg.startsWith('Spot(s) already exist in another dataset')) {
         const spotId = parseInt(errMsg.split(')')[1].split('(')[1].split(')')[0], 10);
@@ -122,6 +119,7 @@ const useUpload = () => {
   const initializeUpload = async () => {
     if (Platform.OS !== 'web') KeepAwake.activate();
     try {
+      console.log('Initializing Upload...');
       await uploadProject();
       await uploadDatasets();
       if (Platform.OS !== 'web') {
@@ -139,32 +137,26 @@ const useUpload = () => {
     }
   };
 
-  // Synchronously Upload Datasets
-  const uploadDatasets = async () => {
-    let currentRequest = 0;
-    const datasets = Object.values(projectDatasets);
-
-    const makeNextDatasetRequest = async () => {
-      await uploadDataset(datasets[currentRequest]);
-      currentRequest++;
-      if (currentRequest < datasets.length) await makeNextDatasetRequest();
-    };
-
-    if (Object.values(projectDatasets).length === 0) {
+  // Upload the given datasets sequentially (server can't handle parallel dataset writes)
+  const uploadDatasetsSequentially = async (datasets, label) => {
+    if (!datasets.length) {
       console.log('No Datasets Found.');
-      // throw Error('No Datasets Found.');
+      return true;
     }
-    else if (currentRequest < Object.values(projectDatasets).length) {
-      setUploadStatusMessage(`Uploading ${datasets.length} datasets...\n`);
-      await makeNextDatasetRequest();
-      // projectUploadStatus = {...projectUploadStatus, datasets: true};
-      projectUploadStatus = {...projectUploadStatus, datasets: 'uploaded'};
-      console.log('Completed Uploading Datasets!');
-      setUploadStatusMessage(
-        `Finished uploading ${datasets.length} Dataset${(datasets.length === 1 ? '!' : 's!')}\n`);
+    setUploadStatusMessage(`Uploading ${datasets.length} ${label}datasets...\n`);
+    for (const dataset of datasets) {
+      await uploadDataset(dataset);
     }
+    projectUploadStatus = {...projectUploadStatus, datasets: 'uploaded'};
+    console.log('Completed uploading datasets!');
+    setUploadStatusMessage(
+      `Finished uploading ${datasets.length} ${label}Dataset${datasets.length === 1 ? '!' : 's!'}\n`);
     return true;
   };
+
+  // Upload all datasets in the project
+  const uploadDatasets = () =>
+    uploadDatasetsSequentially(Object.values(store.getState().project.datasets), '');
 
   const uploadFromWeb = async (imageId, imageFile) => {
     try {
@@ -198,12 +190,27 @@ const useUpload = () => {
 
   // Upload Project Properties
   const uploadProject = async () => {
-    console.log(`Uploading ${project.description.project_name} Properties...`);
-    setUploadStatusMessage(`Uploading ${project.description.project_name} Properties...`);
-    console.log('Uploading Project JSON', JSON.stringify(project));
-    const uploadProjectResponse = await updateProject(project);
+    // Read live from the store: an async caller (e.g. trySync) can close over a stale `project`
+    // snapshot, which would make uploadedTimestamp mismatch the live store and never clear the flag.
+    const liveProject = store.getState().project.project;
+    console.log(`Uploading ${liveProject.description.project_name} Properties...`);
+    setUploadStatusMessage(`Uploading ${liveProject.description.project_name} Properties...`);
+    console.log('Uploading Project JSON', JSON.stringify(liveProject));
+    const uploadedTimestamp = liveProject.modified_timestamp;
+    const uploadProjectResponse = await updateProject(liveProject);
     console.log('Response Project JSON', JSON.stringify(uploadProjectResponse));
-    setUploadStatusMessage(`Finished uploading ${project.description.project_name} Properties.`);
+
+    // /project gives no accept/reject signal; acceptance = server echoed back our timestamp.
+    const isAccepted = !isEmpty(uploadProjectResponse)
+      && uploadProjectResponse.modified_timestamp === uploadedTimestamp;
+    // Skip acting on the response if a newer local edit landed mid-flight (already flagged for sync, retries next cycle).
+    const noNewerLocalEdit = store.getState().project.project.modified_timestamp === uploadedTimestamp;
+
+    if (isAccepted && noNewerLocalEdit) {
+      // Apply server-merged data (tags, reports, templates) back.
+      dispatch(addedProjectFromServer(uploadProjectResponse));
+    }
+    setUploadStatusMessage(`Finished uploading ${liveProject.description.project_name} Properties.`);
     return true;
   };
 

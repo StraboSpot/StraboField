@@ -11,7 +11,6 @@ import IgneousRockFabric from './IgneousRockFabric';
 import MetamRockFabric from './MetamRockFabric';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -144,33 +143,31 @@ const AddFabricModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
-        showActionButton={false}
+        onActionPressed={saveFabric}
+        showActionButton={!choicesViewKey}
         showCancelButton={false}
         showCloseButton
       >
-        <>
-          <FlatList
-            ListHeaderComponent={
-              <View style={{flex: 1}}>
-                <Formik
-                  initialValues={{}}
-                  innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
-                  validateOnChange={false}
-                >
-                  {formProps => (
-                    <View style={{flex: 1}}>
-                      {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
-                    </View>
-                  )}
-                </Formik>
-              </View>
-            }
-            bounces={false}
-          />
-        </>
-        {!choicesViewKey && <ActionButton onPress={saveFabric}/>}
+        <FlatList
+          ListHeaderComponent={
+            <View style={{flex: 1}}>
+              <Formik
+                initialValues={{}}
+                innerRef={formRef}
+                onSubmit={values => console.log('Submitting form...', values)}
+                validate={values => validateForm({formName: formName, values: values})}
+                validateOnChange={false}
+              >
+                {formProps => (
+                  <View style={{flex: 1}}>
+                    {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
+                  </View>
+                )}
+              </Formik>
+            </View>
+          }
+          bounces={false}
+        />
       </ModalWrapper>
     );
   };

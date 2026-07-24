@@ -6,6 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
+import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -18,6 +19,7 @@ import {
 } from '../maps/maps.slice';
 import useMapLocation from '../maps/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {
@@ -49,6 +51,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const {getTargetDatasetFromId, isReadOnlySpot} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
+  useAutoSave();
 
   /* Local State */
 
@@ -68,6 +71,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const isCreateToolsDisabled = isEmpty(
     targetDatasetId) || isReadOnlyProject || isReadOnlyBasemap || isReadOnlyStratSection;
   const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyBasemap || isReadOnlyStratSection;
+  const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
 
   /* Side Effects */
 
@@ -75,6 +79,12 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
+
+  // Switching to an image basemap or strat section leaves the current map, so cancel any in-progress
+  // editing or drawing (those changes belong to the map you were on).
+  useEffect(() => {
+    if (isEditingOrDrawing) onCancel();
+  }, [currentImageBasemap, stratSection]);
 
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
@@ -238,6 +248,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
+        // Commit the deferred timestamp bump for spots actually moved during the drag, so only a
+        // real reorder dirties the dataset/project. Nothing moved → nothing to bump.
+        const changedSpotIds = store.getState().map.intervalDragChangedSpotIds;
+        if (changedSpotIds?.length > 0) dispatch(updatedModifiedTimestampsBySpotsIds(changedSpotIds));
         dispatch(savedIntervalDragReordering());
         setMapMode(MAP_MODES.VIEW);
         break;
@@ -283,7 +297,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const setMapModeToEdit = () => {
-    lockOrientation();
+    if (!SMALL_SCREEN) lockOrientation();
     setMapMode(MAP_MODES.EDIT);
   };
 

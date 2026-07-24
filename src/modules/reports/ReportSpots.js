@@ -15,7 +15,7 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {imageStyles} from '../images';
 import {SpotsList, SpotsListItem} from '../spots';
 
-const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly, updateSpotsInMapExtent}) => {
+const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly}) => {
   /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
@@ -89,7 +89,6 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
                 ignoreReadOnly={true}
                 isCheckedList={true}
                 onChecked={handleSpotChecked}
-                updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
             </ScrollView>
           ) : (
@@ -100,7 +99,6 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
                   ignoreReadOnly={true}
                   isCheckedList={true}
                   onChecked={handleSpotChecked}
-                  updateSpotsInMapExtent={updateSpotsInMapExtent}
                 />
               }
             />

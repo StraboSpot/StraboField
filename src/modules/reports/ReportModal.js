@@ -8,7 +8,7 @@ import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const ReportModal = ({openSpotInNotebook}) => {
   /* Data Hooks */
 
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
@@ -59,7 +59,7 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
       <ModalWrapper
         actionTitle={isNewReport ? 'Save' : hasUnsavedChanges ? 'Update' : 'Done'}
         closeModal={confirmCloseModal}
-        headerTitle={isReadOnly ? 'View Report' : isNewReport ? 'Create New Report' : 'Edit Report'}
+        headerTitle={isReadOnly ? 'View Memo' : isNewReport ? 'Create New Memo' : 'Update Memo'}
         onActionPressed={isNewReport || hasUnsavedChanges ? handleSavePressed : confirmCloseModal}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
@@ -95,7 +95,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 handleSpotChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
                 isReadOnly={isReadOnly}
-                updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
               <ReportTags
@@ -103,7 +102,6 @@ const ReportModal = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
                 handleTagChecked={handleTagChecked}
                 handleTagPressed={handleTagPressed}
                 isReadOnly={isReadOnly}
-                updateSpotsInMapExtent={updateSpotsInMapExtent}
               />
               <View style={{paddingTop: 10}}/>
               <ReportComments

@@ -96,7 +96,7 @@ const ImageSlider = ({route, navigation}) => {
 
   return (
     <View>
-      <View style={imageSliderStyles.buttonsContainer}>
+      <View pointerEvents={'box-none'} style={imageSliderStyles.buttonsContainer}>
         <IconButton
           onPress={getSpotFromId}
           source={require('../../assets/icons/NotebookNavButton.png')}
@@ -125,7 +125,7 @@ const ImageSlider = ({route, navigation}) => {
           source={imageURI && {uri: imageURI}}
         />
       </ImageZoomAndPanWrapper>
-      <View style={imageSliderStyles.navButtonsContainer}>
+      <View pointerEvents={'box-none'} style={imageSliderStyles.navButtonsContainer}>
         <ClearButton
           icon={{
             containerStyle: {borderRadius: 50, borderWidth: 1, backgroundColor: MEDIUMGREY},

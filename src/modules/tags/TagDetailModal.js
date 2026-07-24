@@ -5,15 +5,15 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
 import TagColor from './color/TagColor';
+import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 
 let initialValues;
 
@@ -37,6 +37,9 @@ const TagDetailModal = ({closeModal}) => {
 
   /* Derived Variables */
 
+  const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
+  const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT;
+
   let formName = TAG_FORM_NAMES.TAGS;
   if (modalVisible) {
     let tagType = TAG_TYPES.CONCEPT;
@@ -47,18 +50,18 @@ const TagDetailModal = ({closeModal}) => {
     initialValues = {type: tagType};
   }
   else if (!isEmpty(selectedTag)) {
-    formName = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
+    formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
     initialValues = selectedTag;
   }
   else console.error('Tag Problem. No modals and no selected tag');
-  const modalHeight = selectedTag?.type === PAGE_KEYS.GEOLOGIC_UNITS ? '80%' : 475;
-  const headerTitle = initialValues?.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit' : 'Tag';
+  const label = isGeologicUnit ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
+  const modalHeight = isGeologicUnit ? '80%' : 475;
 
   /* Logic Helpers */
 
   const confirmDeleteTag = () => {
     alert(
-      'Delete Tag',
+      'Delete ' + label,
       'Are you sure you want to delete ' + selectedTag.name + '?',
       [
         {
@@ -107,14 +110,17 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
-      headerTitle={headerTitle}
+      headerTitle={`${actionLabel} ${toTitleCase(label).slice(0, -1)}`}
       onActionPressed={isReadOnlyProject ? undefined : saveFormAndClose}
       onCancelPress={closeModal}
+      onDeletePress={confirmDeleteTag}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
+      showDeleteButton={isEmpty(modalVisible) && !isEmpty(selectedTag?.id) && !isReadOnlyProject}
     >
       <FlatList
         ListHeaderComponent={
           <>
+            <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
             <View style={{flex: 1}}>
               <Formik
                 component={formProps => Form({formName: formName, ...formProps})}
@@ -126,9 +132,6 @@ const TagDetailModal = ({closeModal}) => {
                 validate={values => validateForm({formName: formName, values: values})}
               />
             </View>
-            <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
-            {isEmpty(modalVisible) && !isReadOnlyProject
-              && <DeleteButton onPress={confirmDeleteTag} title={'Delete Tag'}/>}
           </>
         }
       />

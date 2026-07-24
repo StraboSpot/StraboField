@@ -37,6 +37,7 @@ import TernaryPage from '../petrology/TernaryPage';
 import QAQCPage from '../qaqc/QAQC';
 import QAQCOverview from '../qaqc/QAQCOverview';
 import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
+import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
 import SamplesPage from '../samples/SamplesPage';
@@ -107,7 +108,7 @@ export const PRIMARY_PAGES = [
     overview_component: TagsAtSpotList,
     page_component: TagsNotebook,
     modal_component: TagsNotebookModal,
-    action_label: 'Add Spot Tags',
+    action_label: 'Add Tags',
   }, {
     key: PAGE_KEYS.SAMPLES,
     label: 'Samples',
@@ -124,7 +125,6 @@ export const PRIMARY_PAGES = [
     icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
     page_component: ReportsPage,
     modal_component: ReportModal,
-    action_label: 'Create New Memo',
   },
 ];
 
@@ -203,7 +203,13 @@ export const SUBPAGES = [
     key: PAGE_KEYS.GEOGRAPHY,
     label: 'Geography',
     page_component: Geography,
-  }, {
+  },
+  {
+    key: PAGE_KEYS.IGSN,
+    label: 'Igsn',
+    page_component: IGSNPage,
+  },
+  {
     key: PAGE_KEYS.NESTING,
     label: 'Nesting',
     page_component: Nesting,
@@ -447,3 +453,7 @@ const OTHER_MODALS = [
 ];
 
 export const MODALS = [...NOTEBOOK_MODELS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
+
+export const SAMPLES_OVERVIEW_SECTIONS = [PAGE_KEYS.SAMPLES, PAGE_KEYS.IMAGES, PAGE_KEYS.GEOLOGIC_UNITS];
+
+export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.SAMPLES, PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.STRAT_SECTION, PAGE_KEYS.INTERVAL, PAGE_KEYS.INTERPRETATIONS];

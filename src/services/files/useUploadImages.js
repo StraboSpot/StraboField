@@ -61,28 +61,33 @@ const useUploadImages = () => {
 
   const initializeImageUpload = async () => {
     let imagesStatus = {};
-    setImageUploadStatusMessage('');
-    console.log('Looking for Images to Upload in Spots...', spots);
-    setImageUploadStatusMessage('Looking for images to upload in spots...');
-    const images = getAllImages();
-    const imageIds = getImageIds(images);
-    setImageUploadStatusMessage('Checking to see if image files are on server...');
-    const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
-    setImageUploadStatusMessage(`Checking to see if ${neededImages.length} image files are on device...`);
-    console.log('Needed Images from server', neededImages);
-    const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(neededImages, images);
-    console.log('Done verifying images on device', imagesToUpload);
-    if (!isEmpty(imagesToUpload)) {
-      setImageUploadStatusMessage('Uploading needed images to server...');
-      dispatch(setIsImageTransferring(true));
-      imagesStatus = await uploadImages(imagesToUpload);
-      console.log('DONE UPLOADING IMAGES');
+    try {
+      setImageUploadStatusMessage('');
+      console.log('Looking for Images to Upload in Spots...', spots);
+      setImageUploadStatusMessage('Looking for images to upload in spots...');
+      const images = getAllImages();
+      const imageIds = getImageIds(images);
+      setImageUploadStatusMessage('Checking to see if image files are on server...');
+      const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
+      setImageUploadStatusMessage(`Checking to see if ${neededImages.length} image files are on device...`);
+      console.log('Needed Images from server', neededImages);
+      const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(neededImages, images);
+      console.log('Done verifying images on device', imagesToUpload);
+      if (!isEmpty(imagesToUpload)) {
+        setImageUploadStatusMessage('Uploading needed images to server...');
+        dispatch(setIsImageTransferring(true));
+        imagesStatus = await uploadImages(imagesToUpload);
+        console.log('DONE UPLOADING IMAGES');
+      }
+      else setImageUploadStatusMessage('All images for this project are already on server.');
+      if (!isEmpty(imagesNotFoundOnDevice)) {
+        imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+      }
+      return imagesStatus;
     }
-    else setImageUploadStatusMessage('All images for this project are already on server.');
-    if (!isEmpty(imagesNotFoundOnDevice)) {
-      imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+    finally {
+      dispatch(setIsImageTransferring(false));
     }
-    return imagesStatus;
   };
 
   const resetState = () => {

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,7 +16,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {setModalVisible} from '../home/home.slice';
 import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import useProject from '../project/useProject';
@@ -30,16 +30,32 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
   const {isReadOnlySpot} = useProject();
-  const {getActiveSpotsObj, getRecentSpots, getRootSpot, handleSpotSelected, sortSpotsByDateCreated} = useSpots();
+  const {
+    getActiveSpotsObj,
+    getRecentSpots,
+    getRootSpot,
+    getSpotWithThisImageBasemap,
+    handleSpotSelected,
+    sortSpotsByDateCreated,
+  } = useSpots();
+
+  /* Local State */
+
+  const [selectedSample, setSelectedSample] = useState({});
 
   /* Derived Variables */
 
   const isReadOnly = !isEmpty(spot) && isReadOnlySpot(spot.properties.id);
+  const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
+  const spotWithThisImageBasemap = spot.properties?.image_basemap
+    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+  const isSampleOrSampleChild = isSample || spotWithThisImageBasemap?.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
 
   /* Side Effects */
@@ -47,6 +63,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
+    if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
+      dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
+    }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
       || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
       || getRelevantPetPages().map(p => p.key).includes(pageVisible)
@@ -74,8 +93,15 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const renderNotebookContent = () => {
     const page = NOTEBOOK_PAGES.find(p => p.key === pageVisible);
     const Page = page?.page_component || Overview;
-    let pageProps = {isReadOnly: isReadOnly, openMainMenuPanel: openMainMenuPanel, page: page};
-    if (page?.key === PAGE_KEYS.IMAGES) pageProps = {...pageProps};
+    let pageProps = {isReadOnly: isReadOnly, isSample: isSample, openMainMenuPanel: openMainMenuPanel, page: page};
+    if (page?.key === PAGE_KEYS.SAMPLES) {
+      pageProps = {
+        ...pageProps,
+        selectedSample: selectedSample,
+        setSelectedSample: setSelectedSample,
+      };
+    }
+
     return (
       <>
         <View style={notebookStyles.headerContainer}>
@@ -83,15 +109,22 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             closeNotebookPanel={closeNotebookPanel}
             createDefaultGeom={createDefaultGeom}
             isReadOnly={isReadOnly}
+            isSampleOrSampleChild={isSampleOrSampleChild}
             openMainMenuPanel={openMainMenuPanel}
+            selectedSample={selectedSample}
+            setSelectedSample={setSelectedSample}
             zoomToSpots={zoomToSpots}
           />
         </View>
-        <View style={{...notebookStyles.centerContainer}}>
-          <Page {...pageProps}/>
-        </View>
-        <View style={notebookStyles.footerContainer}>
-          <NotebookFooter openPage={openPage}/>
+        <View style={[{flex: 1}, isSampleOrSampleChild && notebookStyles.sampleBorder]}>
+          <View style={notebookStyles.centerContainer}>
+            <Page {...pageProps}/>
+          </View>
+          <NotebookFooter
+            isRichSample={spot.properties?.isSample}
+            openPage={openPage}
+            selectedSample={selectedSample}
+          />
         </View>
       </>
     );
@@ -129,10 +162,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   const renderRecentSpotsList = () => {
     let spotsList = getRecentSpots();
+    spotsList = spotsList.reduce((acc, s) => s.properties?.isSample ? acc : [...acc, s], []);
     if (isEmpty(spotsList)) {
       const activeSpotsObj = getActiveSpotsObj();
       const activeSpots = Object.values(activeSpotsObj);
       spotsList = sortSpotsByDateCreated(activeSpots);
+      spotsList = spotsList.reduce((acc, s) => s.properties?.isSample ? acc : [...acc, s], []);
     }
 
     return (
@@ -141,7 +176,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         <SectionDivider dividerText={'Recent Spots'}/>
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Spots in Visible Datasets'}/>}
+          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
           data={spotsList}
           keyExtractor={item => item.properties.id.toString()}
           renderItem={({item}) => (

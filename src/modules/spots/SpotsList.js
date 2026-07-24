@@ -1,79 +1,68 @@
 import React, {useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {SpotsListItem, useSpots} from '.';
-import SpotFilters from './SpotFilters';
+import SpotQuery from './SpotQuery';
+import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDivider from '../../shared/ui/SectionDivider';
 
-const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPress, updateSpotsInMapExtent}) => {
+const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPress}) => {
   // console.log('Rendering SpotsList...');
 
   /* Data Hooks */
 
-  const {getActiveSpotsObj} = useSpots();
+  const {getVisibleSpots} = useSpots();
 
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
+  const activeSpots = getVisibleSpots();
 
-  const activeSpotsObj = getActiveSpotsObj();
-  const activeSpots = Object.values(activeSpotsObj);
-
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
+  const [scopeText, setScopeText] = useState('');
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
 
-  /* Render Functions */
+  /* Derived Variables */
 
-  const renderNoSpotsText = () => <ListEmptyText text={textNoSpots}/>;
-
-  const renderSpotsList = () => {
-    return (
-      <View style={{flex: 1}}>
-        <SpotFilters
-          activeSpots={activeSpots}
-          setIsReverseSort={setIsReverseSort}
-          setSpotsSearched={setSpotsSearched}
-          setSpotsSorted={setSpotsSorted}
-          setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
-        />
-        <SectionDivider
-          dividerText={spotsSearched.length + ' Visible ' + (spotsSearched.length === 1 ? 'Spot' : 'Spots')}
-        />
-        <View style={{flex: 1}}>
-          <FlatList
-            ItemSeparatorComponent={FlatListItemSeparator}
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' found'}/>}
-            data={isReverseSort ? [...spotsSorted].reverse() : spotsSorted}
-            keyExtractor={spot => spot.properties.id.toString()}
-            renderItem={({item}) => (
-              <SpotsListItem
-                doShowTags={true}
-                ignoreReadOnly={ignoreReadOnly}
-                isCheckedList={isCheckedList}
-                isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
-                onChecked={onChecked}
-                onPress={onPress}
-                spot={item}
-              />
-            )}
-          />
-        </View>
-      </View>
-    );
-  };
+  const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
+  const scopeSuffix = scopeText ? ` ${scopeText}` : '';
+  const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   /* View */
 
   return (
-    <>
-      {isEmpty(activeSpots) ? renderNoSpotsText() : renderSpotsList()}
-    </>
+    <View style={{flex: 1}}>
+      <SpotQuery
+        activeSpots={activeSpots}
+        setScopeText={setScopeText}
+        setSpotsSorted={setSpotsSorted}
+      />
+      <View style={{flex: 1}}>
+        <FlatList
+          ItemSeparatorComponent={FlatListItemSeparator}
+          ListEmptyComponent={<ListEmptyText text={`No Spots${scopeSuffix}`}/>}
+          ListHeaderComponent={!isEmpty(spotsNoSamples) && (
+            <Text
+              style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
+              {filterPrefix}{spotsNoSamples.length + (spotsNoSamples.length === 1 ? ' Spot' : ' Spots')}{scopeSuffix}
+            </Text>
+          )}
+          data={spotsNoSamples}
+          keyExtractor={spot => spot.properties.id.toString()}
+          renderItem={({item}) => (
+            <SpotsListItem
+              doShowTags={true}
+              ignoreReadOnly={ignoreReadOnly}
+              isCheckedList={isCheckedList}
+              isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
+              onChecked={onChecked}
+              onPress={onPress}
+              spot={item}
+            />
+          )}
+        />
+      </View>
+    </View>
   );
 };
 

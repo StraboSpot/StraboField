@@ -15,6 +15,7 @@ const SelectInputField = ({
                             errors,
                             isReadOnly,
                             label,
+                            multiSelectStyle,
                             name,
                             onMyChange,
                             onShowFieldInfo,
@@ -136,7 +137,7 @@ const SelectInputField = ({
     return (
       <>
         {renderFieldLabel()}
-        <View style={[formStyles.fieldValue, {paddingBottom: 0}]}>
+        <View style={[formStyles.fieldValue, {paddingBottom: 0}, multiSelectStyle]}>
           <MultiSelect
             displayKey={'label'}
             fontSize={themes.PRIMARY_TEXT_SIZE}

@@ -1,490 +1,195 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository.
 
-## Project Overview
+## Working Style
 
-StraboSpot2 is a React Native mobile/web application for collecting geologic field data, part of the StraboSpot ecosystem. It supports offline-first field data collection with synchronization to a Neo4j graph database backend. The app runs on iOS, Android, and web browsers.
+- **Ask before assuming.** If a request has multiple interpretations, surface them — don't pick silently. If something's
+  unclear, stop and name it. (Skip this for trivial edits — use judgment.)
+- **Simplest thing that works.** No speculative abstractions, config, or error handling for impossible cases. If it's
+  200 lines and could be 50, rewrite it.
+- **Surgical diffs.** Touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code; match
+  existing style. Flag unrelated dead code — don't delete it. Every changed line should trace to the request.
+- **Verify, don't hope.** For bugs/features, prefer writing a test that reproduces/defines success, then making it pass.
+  State a brief plan for multi-step work.
+
+## Critical / Non-obvious (read first)
+
+- **Android `compileSdkVersion` must be 36** — `react-native-screens` pulls in `androidx.core:core-ktx:1.17.0` which
+  requires SDK 36. Set in `android/app/build.gradle`.
+- **Run `npm run bundle:android` before every PlayStore deploy** — it bundles JS and removes duplicate resources;
+  skipping it breaks the build.
+- **`@rnmapbox/maps` bridgeless patch** — requires `RCTBridge!` → `RCTBridge?` with a URLSession fallback in
+  `RNMBXImageQueue`, applied via `patches/@rnmapbox+maps+10.3.1.patch`. Rename the patch when upgrading Mapbox.
+- **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
+  hand-write the changelog. See [Release Process](#release-process-rc--master).
+- **Package manager is Yarn 4.13.0** (install with `yarn`); npm-script names below run fine via `npm run` or `yarn`.
+- **CLAUDE.md is auto-edited on commit** by `scripts/update-claude-md.js` (module count + dep versions). Keep the anchor
+  lines it matches intact — see the Architecture/Dependencies sections.
+
+## Gotchas / Lessons Learned
+
+<!-- Append-only. Each entry: symptom → cause → fix. Newest at top. -->
+
+- **iPad form modals slide off-screen** → rn-vui Overlay's KeyboardAvoidingView pushes them → set `doesRenderAsView` +
+  Form `renderInline`.
+- **Second modal never appears on iOS** → a Modal presented while another dismisses gets dropped → chain via
+  ModalWrapper's `onDismiss`.
 
 ## Development Commands
 
-### Setup
-
 ```bash
-# Install dependencies
-yarn
+# Setup
+yarn                       # install deps
+bundle install && bundle exec pod install   # iOS CocoaPods (first time)
+npm run setup-sentry       # generate Sentry props from env.json
+node scripts/install-hooks.js   # install git hooks (CLAUDE.md auto-update)
 
-# iOS: Install CocoaPods (first time only)
-bundle install
-bundle exec pod install
+# Run
+npm run ios | android | web            # dev
+npm run ios-sim                        # iPad Pro simulator
+npm run ios-release | android-release  # release mode
+npm run web-deploy                     # production web build
 
-# Create required configuration files:
-# 1. env.json at project root:
-{
-  "mapbox_access_token": "Your Mapbox public access token",
-  "Error_reporting_DSN": "Optional Sentry DSN"
-}
+# Bundle (required before store deploys)
+npm run bundle:ios
+npm run bundle:android     # also strips duplicate resources
+npm run deploy:android     # creates .aab
 
-# 2. dev-test-logins.js at project root:
-export const USERNAME_TEST = 'your username/email';
-export const PASSWORD_TEST = 'your password';
+# Test / lint
+npm test
+npm run lint
+npm run lint:fix           # run before committing
 
-# 3. Generate Sentry properties files (auto-generated from env.json):
-npm run setup-sentry
+# Version bump (package.json + iOS/Android via Fastlane)
+npm run bump-patch | bump-minor | bump-major
+npm run commit-and-push    # commits bump, stamps version, pushes to master
+npm run deploy-beta        # Fastlane beta
 
-# 4. Install git hooks (keeps CLAUDE.md auto-updated on commit):
-node scripts/install-hooks.js
+# Misc
+npm start                  # Metro
+npm run remove:packages    # clean node_modules + iOS Pods
 ```
 
-### Running the App
+**Required config files** (project root, gitignored):
 
-```bash
-# Development
-npm run android          # Run on Android
-npm run ios              # Run on iOS
-npm run ios-sim          # Run on iPad Pro simulator
-npm run web              # Run web version (dev mode)
+- `env.json` — `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`
+- `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
-# Production/Release
-npm run android-release  # Run Android in release mode
-npm run ios-release      # Run iOS in release mode
-npm run web-deploy       # Build web for production
-```
+**Two helper scripts to know:**
 
-### Building & Bundling
+- `scripts/organize-file.js src/modules/[feature]/[File].js` — reorders a component/hook into canonical section order.
+  Reset with `git checkout src/`; always verify output for use-before-declaration errors.
 
-```bash
-# Bundle JavaScript for platforms (required before deploying to stores)
-npm run bundle:ios       # Bundle for iOS
-npm run bundle:android   # Bundle for Android (must run before PlayStore deploy)
+## Domain Glossary
 
-# Deploy
-npm run deploy:android   # Creates .aab file in app/build/outputs/bundle/release
-```
+- **Spot** — a single field observation (the core record); not a map pin.
+- **Dataset** — a collection of spots within a project.
+- **Strat section** — stratigraphic column view, one of three map types.
+- **Nesting** — parent/child spot hierarchy via `properties.nesting`.
+- **Feature type** — the category/schema a spot's measurements follow.
+- **Tag** — cross-cutting label linking spots (lives in projects.slice).
 
-### Testing & Linting
+## Why It's Built This Way
 
-```bash
-npm test                 # Run Jest tests
-npm run lint             # Run ESLint
-npm run lint:fix         # Auto-fix ESLint issues
-```
+- **Offline-first** — geologists work with no signal; local writes are the source of truth, server sync is best-effort.
+  Never assume network.
+- **`.web.js` overrides over `Platform.OS`** for anything touching native modules (file system, Mapbox, compass) — web
+  has no equivalent, so full-file swaps are cleaner than branches.
+- **Neo4j backend** — the data model is a graph (nested spots, tags, relationships); it's not a REST-CRUD app.
 
-### Versioning & Deployment
+## Release Process (RC → Master)
 
-```bash
-# Version bumping (updates package.json, iOS/Android versions)
-npm run bump-patch       # x.x.X
-npm run bump-minor       # x.X.0
-npm run bump-major       # X.0.0
+**Remind the user of these steps whenever they mention versioning, the rc branch, or releasing.**
 
-# After bumping, commit and push
-npm run commit-and-push  # Commits version bump and pushes to master
+1. **Start RC:** cut `rc-{version}` from `dev` → bump version → push. A GitHub Action auto-creates a **draft release**.
+2. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. No manual changelog.
+3. **Publish:** merge `rc-{version}` → `master` and push → `git tag v{version}` on master →
+   `git push origin v{version}`. The Action publishes the official release + changelog.
 
-# Deploy beta builds via Fastlane
-npm run deploy-beta
-```
+Common mistakes: tagging on rc instead of master; missing the `v` prefix; hand-writing the changelog.
 
-### Release Process (RC → Master)
+The changelog is generated by `.github/workflows/changelog.yml`, which triggers on the `v*` tag (not the master push)
+and diffs against the immediately preceding version tag in `sort -V` order — so any changelog-affecting fix must be on
+`master` **before** you tag. Notes publish to the GitHub Release page only (no `CHANGELOG.md` is committed; `master` is
+protected). Write meaningful `feat(...)`/`fix(...)` commit subjects — they become the changelog verbatim.
 
-**IMPORTANT:** Always follow these steps when cutting a release. Remind the user if they mention versioning, rc branch, or releasing.
+## Architecture
 
-#### Step 1 — Start RC
-1. Cut `rc-{version}` branch from `dev`
-2. Bump version on the rc branch: `npm run bump-patch` (or minor/major)
-3. Commit and push to rc: `git push origin rc-{version}`
-4. GitHub Action auto-creates a **draft release** for testers
+**React Native app (iOS/Android/web)** for offline-first geologic field data collection, syncing to a Neo4j graph
+backend via REST. Entry points: `index.js` (mobile), `index.web.js` (web). Web bundles via `webpack.config.js`; mobile
+via `metro.config.js`.
 
-#### Step 2 — Stabilize on RC
-- Bug fixes go directly on `rc-{version}`
-- Each push to rc **auto-updates the draft release**
-- No manual changelog needed — GitHub handles it
+- **Feature modules** — **41 self-contained feature modules** under `/src/modules/`, each with UI components, a
+  `.slice.js` Redux slice, `use[Feature].js` hooks, constants, and `.web.js` platform overrides. Core: `spots/` (the
+  central data model), `maps/`, `compass/`, `project/`, `form/` (dynamic form engine), `notebook-panel/`.
+- **State** — Redux Toolkit, 10 slices (`spots`, `projects` (largest), `maps`, `offlineMaps`, `userProfile`, `compass`,
+  `notebook`, `home`, `mainMenuPanel`, `connections`). Redux Persist + AsyncStorage with selective blacklist/whitelist
+  persistence.
+- **Navigation** — React Navigation v7 in `/src/routes/Routes.js`: `AuthStack` when `!isAuthenticated`, else `AppStack`.
+  Deep linking via `strabofield://`.
+- **Services** (`/src/services/`) — `device/` (useDevice, useCompass, usePermissions, CompassModule), `files/` (
+  useUpload/useDownload/useExport/useImport, directories.constants.js), `network/` (useServerRequests, serverAPI,
+  urls.constants.js).
+- **Shared** — `/src/shared/helpers.js` (isEmpty, isEqual, deepObjectExtend, getNewUUID, validate, geo/date/CSV helpers)
+  and `/src/shared/ui/` (buttons, modals, alerts, toasts, form inputs).
+- **Platform code** — prefer `.web.js` file overrides for full component swaps; use `Platform.OS` for small branches.
 
-#### Step 3 — Publish Release
-1. Merge `rc-{version}` → `master`
-2. Push master: `git push origin master`
-3. Tag on master (use `v` prefix!): `git tag v{version}`
-4. Push tag: `git push origin v{version}`
-5. GitHub Action auto-publishes the **official release** with changelog
+**Data model:** Projects → datasets → spots. A **spot** = geometry (Point/LineString/Polygon/GeometryCollection) +
+properties (measurements, images, notes, samples) + modified timestamp, with a parent-child hierarchy via
+`properties.nesting`. Spot CRUD lives in `useSpots.js` (`createSpot`, `editSpot`, `deleteSpot`, `setSelectedSpot`).
 
-#### Common Mistakes to Avoid
-- ❌ Do NOT tag on the rc branch — always tag on master after merging
-- ❌ Do NOT forget the `v` prefix on tags (use `v2.29.1` not `2.29.1`)
-- ❌ Do NOT manually write the changelog — GitHub Actions generates it
+**Dynamic forms:** XLSForm-style JSON in `/src/assets/forms/` (`survey` + `choices`), 14 categories, with skip logic,
+constraint validation, and a label dictionary. Rendered by `/src/modules/form/`. To add a field: edit the form JSON, add
+a custom component in `form/` if needed, wire validation and slice state.
 
-### Other Commands
+**Maps:** three types — regular basemaps, georeferenced image basemaps, strat sections. State in `maps.slice.js`. Native
+uses `@rnmapbox/maps`; web uses `mapbox-gl` + `react-map-gl`.
 
-```bash
-npm start                # Start Metro bundler
-npm run debug            # Start Metro with experimental debugger
-npm run remove:packages  # Clean node_modules and iOS Pods
-```
-
-### Pre-commit Hook (CLAUDE.md auto-update)
-
-`scripts/update-claude-md.js` keeps CLAUDE.md in sync with the codebase (module count, dependency versions) on every commit. Git hooks are not committed to the repo, so after cloning you need to install it once:
-
-```bash
-node scripts/install-hooks.js
-```
-
-### File Organizer Script
-
-`scripts/organize-file.js` — reorganizes React component/hook files into canonical section order: imports, preamble (Data Hooks, Local State, Derived Variables, Side Effects), functions (Event Handlers, Logic Helpers, Render Functions), then the return/view.
-
-```bash
-node scripts/organize-file.js src/modules/[feature]/[File].js
-```
-
-Use `git checkout src/` to reset source files before re-running. Always verify output for correctness (use-before-declaration errors, broken chains, etc.).
-
-## Architecture Overview
-
-### Feature-Based Module Structure
-
-The codebase is organized into **41 self-contained feature modules** under `/src/modules/`, each containing:
-- UI components
-- Redux slice for state management
-- Custom hooks for business logic
-- Constants and utilities
-- Platform-specific overrides (`.web.js` files)
-
-Key modules include:
-- **maps/** - Mapping (basemaps, offline maps, drawing)
-- **spots/** - Observation/spot management (core data model)
-- **compass/** - Device sensor integration for measurements
-- **project/** - Project and dataset management
-- **images/** - Image capture and management
-- **form/** - Dynamic form rendering engine
-- **notebook-panel/** - Main data entry interface
-- **three-d-structures/**, **sed/**, **petrology/** - Geology-specific features
-
-### State Management (Redux Toolkit)
-
-**10 main Redux slices** manage application state:
-- `home.slice.js` - UI state, modals, loading indicators
-- `spots.slice.js` - Spot (observation) data
-- `projects.slice.js` - Projects, datasets, templates, tags (largest slice)
-- `maps.slice.js` - Map state, basemaps, symbols
-- `offlineMaps.slice.js` - Offline tile management
-- `userProfile.slice.js` - Authentication and user data
-- `compass.slice.js` - Compass measurements
-- `notebook.slice.js` - Notebook navigation state
-- `mainMenuPanel.slice.js` - Menu visibility
-- `connections.slice.js` - Network connectivity
-
-**Redux Persist** with AsyncStorage provides local persistence with selective slice persistence (blacklist/whitelist configurations).
-
-### Navigation (React Navigation v7)
-
-Two main navigation stacks:
-- **AuthStack** - Sign-in/Sign-up screens (shown when `!isAuthenticated`)
-- **AppStack** - Main app screens (HomeScreen, ImageSlider, Documentation)
-
-Navigation logic in `/src/routes/Routes.js` with deep linking support (`strabofield://` scheme).
-
-### Custom Hooks Pattern
-
-60+ custom hooks encapsulate business logic, following the pattern `use[Feature].js`:
-- `useProject.js`, `useSpots.js`, `useTags.js` - Data management
-- `useServerRequests.js` - API calls
-- `useUpload.js`, `useDownload.js` - Data sync
-- `useDevice.js` - File system operations (RNFS)
-- `useCompass.js` - Sensor integration
-- `usePermissions.js` - Device permissions
-
-Hooks keep components presentational and logic reusable.
-
-### Platform-Specific Code
-
-**Web overrides** use `.web.js` suffix (41 files):
-- `Map.web.js` - Uses MapboxGL for web vs RNMapbox for mobile
-- `useDevice.web.js` - Stubs for web (no file system)
-- Various component adaptations for browser environment
-
-**Build configuration:**
-- `webpack.config.js` - Web bundling with React Native Web aliasing
-- `metro.config.js` - React Native Metro bundler
-- Entry points: `index.js` (mobile), `index.web.js` (web)
-
-### Data Architecture
-
-**Local Storage:**
-- Redux Persist for app state
-- File system (RNFS) for structured data:
-  - Projects in device backup directory
-  - Images in dedicated directory
-  - Offline map tiles cached locally
-  - Directory structure managed by `src/services/files/directories.constants.js`
-
-**Data Model:**
-- **Projects** contain datasets, templates, tags, reports
-- **Datasets** are collections of spots with feature types
-- **Spots** are observations with:
-  - Geometry (Point, LineString, Polygon, GeometryCollection)
-  - Properties (measurements, images, notes, samples)
-  - Modified timestamps for sync
-  - Nested relationships (parent-child hierarchy)
-
-**Server Sync:**
-- Neo4j graph database backend (via REST API)
-- Offline-first: works without network, syncs when available
-- Upload/download via `useServerRequests.js`
-- Modified timestamps track changes
-
-### Dynamic Form System
-
-**JSON-based form definitions** in `/src/assets/forms/` (58 forms):
-- XLSForm-style structure: `survey` (field definitions) + `choices` (options)
-- 14 form categories (measurement, petrology, sedimentology, 3d_structures, etc.)
-- Features:
-  - Skip logic with JavaScript conversion
-  - Validation with constraints
-  - Required field handling
-  - Label dictionary for display names
-  - Supports complex nested structures
-
-Form rendering in `/src/modules/form/` with custom field components.
-
-### Services Layer
-
-`/src/services/` is split into three subdirectories:
-
-**`device/`**
-- `useDevice.js` - File operations, storage management
-- `useCompass.js` - Compass and sensor integration
-- `usePermissions.js` - Device permissions
-- `CompassModule.js` - Native compass module bridge
-
-**`files/`**
-- `useUpload.js` / `useDownload.js` - Data synchronization
-- `useExport.js` / `useImport.js` - Data import/export
-- `useUploadImages.js` - Image upload
-- `directories.constants.js` - File system directory paths
-
-**`network/`**
-- `useServerRequests.js` - API calls to StraboSpot server
-- `serverAPI.js` - Server API helpers
-- `urls.constants.js` - API URL constants
-
-### Shared Code
-
-**Utilities** (`/src/shared/helpers.js`):
-- `isEmpty()`, `isEqual()`, `deepObjectExtend()` - Object utilities
-- `getNewId()`, `getNewUUID()` - ID generation
-- `validate()` - Form validation
-- Geographic helpers, date/time conversions, CSV parsing
-
-**UI Components** (`/src/shared/ui/`):
-- Buttons: AddButton, DeleteButton, SaveAndCancelButtons
-- Modals, alerts, toasts
-- Form inputs, lists, dividers
-- Custom: SliderBar, TruncatedText, Loading
-
-**Assets** (`/src/assets/`):
-- `/forms/` - JSON form definitions
-- `/icons/` - UI icons
-- `/lottie-animations/` - Animations
+**Offline & sync:** Redux Persist + RNFS (mobile) / IndexedDB (web) + locally cached map tiles; modified timestamps
+track sync state. Check network via `ConnectionStatus` before any server call.
 
 ## Code Style
 
-### ESLint Configuration (`.eslintrc.js`)
+ESLint (`.eslintrc.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
+external → internal, alphabetical); alphabetized JSX props and StyleSheet keys; no unused vars (except function args).
+Run `npm run lint:fix` before committing.
 
-**Key rules enforced:**
-- Single quotes for strings and JSX
-- Stroustrup brace style (else/catch on new line)
-- Import sorting: React/React Native first, then external, then internal, alphabetically
-- JSX props must be sorted alphabetically
-- StyleSheets must be sorted alphabetically
-- No unused variables (except function args)
-
-**Auto-fix:** Run `npm run lint:fix` before committing.
-
-### File Naming Conventions
-
-- Components: PascalCase (e.g., `SpotsList.js`)
-- Hooks: camelCase with `use` prefix (e.g., `useProject.js`)
-- Redux slices: camelCase with `.slice.js` suffix (e.g., `spots.slice.js`)
-- Constants: camelCase with `.constants.js` suffix
-- Styles: camelCase with `.styles.js` suffix
-- Platform overrides: `.web.js` suffix for web-specific code
-
-### Component Organization
-
-Module structure:
-```
-/src/modules/[feature]/
-├── [Feature].js              # Main component
-├── [Feature]List.js          # List view
-├── [Feature]Detail.js        # Detail view
-├── use[Feature].js           # Custom hook
-├── [feature].slice.js        # Redux slice
-├── [feature].constants.js    # Constants
-├── [Feature].styles.js       # Styles
-└── [Component].web.js        # Web overrides
-```
-
-## Important Implementation Details
-
-### Adding New Form Fields
-
-1. Add field definition to appropriate form JSON in `/src/assets/forms/`
-2. Update form rendering logic in `/src/modules/form/` if custom component needed
-3. Add validation rules if required
-4. Update Redux slice if new state needed
-
-### Working with Spots (Observations)
-
-Spots are the core data model. Key functions in `useSpots.js`:
-- `createSpot()` - Create new spot
-- `editSpot()` - Modify existing spot
-- `deleteSpot()` - Remove spot
-- `setSelectedSpot()` - Set active spot for editing
-
-Spots have a nested hierarchy via `properties.nesting` relationships.
-
-### Map Interactions
-
-Three map types:
-1. **Regular maps** - Standard basemaps with spot overlay
-2. **Image basemaps** - Custom georeferenced images
-3. **Strat sections** - Stratigraphic column display
-
-Map state managed in `maps.slice.js`. Platform-specific implementations:
-- Mobile: `@rnmapbox/maps` (native Mapbox SDK)
-- Web: `mapbox-gl` + `react-map-gl`
-
-### Offline Support
-
-Offline functionality via:
-- Redux Persist for app state
-- Local file storage via RNFS (mobile) or IndexedDB (web)
-- Offline map tiles cached locally
-- Modified timestamps track sync status
-
-Always check network state before server operations using `ConnectionStatus`.
-
-### Error Tracking
-
-Sentry integration for error reporting:
-- Configure DSN in `env.json`
-- Errors automatically captured
-- Sourcemaps uploaded via `npm run upload-sourcemaps`
-
-### Android Release Builds
-
-**Critical:** Must run `npm run bundle:android` before every PlayStore deployment. This command bundles JavaScript and removes duplicate resources.
-
-**`compileSdkVersion` must be 36** — `react-native-screens` pulls in `androidx.core:core-ktx:1.17.0` which requires SDK 36. Set in `android/app/build.gradle`.
-
-### iOS Bridgeless Mode Patch (@rnmapbox/maps)
-
-`@rnmapbox/maps` requires a patch for bridgeless mode: `RCTBridge!` → `RCTBridge?` with a URLSession fallback in `RNMBXImageQueue`. Applied via `patches/@rnmapbox+maps+10.3.1.patch` (update the filename when upgrading Mapbox).
-
-### Version Bumping
-
-Use npm scripts for version management:
-1. `npm run bump-[patch|minor|major]` - Updates all version files + creates changelog
-2. `npm run commit-and-push` - Commits changes and pushes to master
-3. `npm run deploy-beta` - Deploys via Fastlane (requires Fastlane setup)
-
-Version is tracked in:
-- `package.json`
-- `android/app/build.gradle` (versionCode, versionName)
-- `ios/StraboSpot2/Info.plist` (CFBundleVersion, CFBundleShortVersionString)
-
-## Testing
-
-Minimal test coverage currently. Tests in `__tests__/`:
-- Basic App rendering test exists
-- Jest configured with React Native preset
-- Run with `npm test`
+**Naming:** Components PascalCase; hooks `use`-prefixed camelCase; `*.slice.js`, `*.constants.js`, `*.styles.js`
+suffixes; `.web.js` for web overrides.
 
 ## Dependencies
 
-**Key dependencies:**
 - React 19.2.3 + React Native 0.84.1
 - Redux Toolkit 2.12.0 + Redux Persist 6.0.0
 - React Navigation 7.x
 - Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 2.x for web)
 - Formik 2.4.9 - Form management
-- Turf.js 7.x - Geospatial calculations
-- RNFS - File system access
-- Sentry - Error tracking
+- Turf.js 7.x, RNFS, Sentry
 
-**Node version:** >=18 (specified in `package.json`)
-
-**Package manager:** Yarn 4.13.0
+**Node version:** >=22.11.0. **Package manager:** Yarn 4.13.0
 
 ## Deployment Checklist
 
-### Android
-1. Create `keystore.properties` in `/android/` with signing credentials
-2. Add `.jks` keystore file to `/android/app/`
-3. Run `npm run bundle:android` (required - removes duplicate resources)
-4. Run `npm run deploy:android` to create `.aab`
-5. Upload `.aab` from `android/app/build/outputs/bundle/release/` to PlayStore
+**Android** — 1) `keystore.properties` in `/android/` + `.jks` in `/android/app/`; 2) `npm run bundle:android`; 3)
+`npm run deploy:android`; 4) upload `.aab` from `android/app/build/outputs/bundle/release/`.
 
-### iOS
-1. Ensure CocoaPods dependencies installed: `bundle exec pod install`
-2. Run `npm run bundle:ios` to bundle JavaScript
-3. Open Xcode, configure signing
-4. Archive and upload via Xcode or `npm run deploy-beta` (Fastlane)
+**iOS** — 1) `bundle exec pod install`; 2) `npm run bundle:ios`; 3) Xcode signing → archive/upload, or
+`npm run deploy-beta`.
 
-### Web
-1. Run `npm run web-deploy` to create production build
-2. Deploy `/dist/` directory contents to web server
+**Web** — `npm run web-deploy`, then deploy `/dist/` contents.
 
-## Common Patterns
+Version lives in `package.json`, `android/app/build.gradle`, and `ios/StraboSpot2/Info.plist`. Sentry: DSN in
+`env.json`, sourcemaps via `npm run upload-sourcemaps`.
 
-### Accessing Redux State
-```javascript
-import {useSelector} from 'react-redux';
+## Testing
 
-const spots = useSelector(state => state.spot.spots);
-const selectedSpot = useSelector(state => state.spot.selectedSpot);
-```
+Minimal coverage. Jest + React Native preset; basic App render test in `__tests__/`. Run `npm test`.
 
-### Dispatching Actions
-```javascript
-import {useDispatch} from 'react-redux';
-import {setSelectedSpot} from '../modules/spots/spots.slice';
+## References
 
-const dispatch = useDispatch();
-dispatch(setSelectedSpot(spot));
-```
+<!-- Fill in URLs so Claude can be told to fetch them instead of guessing. -->
 
-### Using Custom Hooks
-```javascript
-import useSpots from '../modules/spots/useSpots';
-
-const MyComponent = () => {
-  const {createSpot, editSpot, deleteSpot} = useSpots();
-  // Use hook methods
-};
-```
-
-### Platform-Specific Code
-```javascript
-import {Platform} from 'react-native';
-
-if (Platform.OS === 'ios') {
-  // iOS-specific code
-} else if (Platform.OS === 'android') {
-  // Android-specific code
-} else if (Platform.OS === 'web') {
-  // Web-specific code
-}
-```
-
-Or create `.web.js` files for complete component overrides.
-
-### File Operations
-```javascript
-import useDevice from '../services/useDevice';
-
-const MyComponent = () => {
-  const {readDirectoryForData, writeDataToDevice} = useDevice();
-  // Use device methods for file I/O
-};
-```
+- StraboSpot server API list: https://strabospot.org/api
+- Data model / schema reference: <TODO>
+- Issue tracker: https://github.com/StraboSpot/StraboField/issues

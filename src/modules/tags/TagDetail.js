@@ -12,15 +12,18 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
+import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
 import TagDetailSummaryText from './TagDetailSummaryText';
 import {useTags} from '../tags';
 
 const TagDetail = ({
                      addRemoveFeatures,
+                     addRemoveSampleSpots,
                      addRemoveSpots,
                      openFeatureDetail,
                      openSpot,
+                     openSpotInNotebook,
                      setIsDetailModalVisible,
                    }) => {
   /* Data Hooks */
@@ -32,10 +35,46 @@ const TagDetail = ({
   // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
 
   const {isReadOnlySpot} = useProject();
-  const {getSpotById} = useSpots();
+  const {getSpotById, getSpotWithThisSample} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
   /* Render Functions */
+
+  const renderSamples = () => {
+    const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
+      const spot = spots[spotId];
+      if (spot?.properties?.isSample) {
+        const parentSpot = getSpotWithThisSample(spotId);
+        if (!parentSpot) {
+          console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
+          // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
+          return acc;
+        }
+        const parentSpotId = parentSpot?.properties?.id;
+        return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
+          : {...acc, [parentSpotId]: [spot]};
+      }
+      else if (!isEmpty(spot?.properties?.samples)) {
+        return {...acc, [spot.properties.id]: spot.properties.samples};
+      }
+      else return acc;
+    }, {});
+
+    let dataSectioned = [];
+    if (!isEmpty(sampleSpots)) {
+      dataSectioned = Object.keys(sampleSpots).map((parentId) => {
+        const parentSpot = spots[parentId];
+        return {title: parentSpot.properties.name, data: sampleSpots[parentId], spot: parentSpot};
+      });
+    }
+    return (
+      <SamplesSectionList
+        dataSectioned={dataSectioned}
+        listEmptyText={'No Samples'}
+        openSpotInNotebook={openSpotInNotebook}
+      />
+    );
+  };
 
   const renderSpotFeatureItem = (feature) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -72,15 +111,9 @@ const TagDetail = ({
     }
   };
 
-  const renderSpotItem = (id) => {
-    const spot = getSpotById(id);
-    return (
-      <SpotsListItem
-        doShowTags={true}
-        onPress={openSpot}
-        spot={spot}
-      />
-    );
+  const renderSpotItem = ({item}) => {
+    const spot = getSpotById(item);
+    if (!isEmpty(spot)) return <SpotsListItem doShowTags={true} onPress={openSpot} spot={spot}/>;
   };
 
   const renderTaggedFeaturesList = () => {
@@ -109,6 +142,8 @@ const TagDetail = ({
             onPress={isReadOnlyProject ? undefined : setIsDetailModalVisible}
           />
           {selectedTag && <TagDetailSummaryText onPress={isReadOnlyProject ? undefined : setIsDetailModalVisible}/>}
+
+          {/* Spots with this Tag */}
           <SectionDividerWithRightButton
             buttonTitle={isReadOnlyProject ? undefined : 'Add/Remove'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}
@@ -117,11 +152,22 @@ const TagDetail = ({
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No Spots'}/>}
-            data={selectedTag.spots && selectedTag.spots.filter(spotId => spots[spotId])}
+            data={selectedTag.spots && selectedTag.spots.filter(
+              spotId => spots[spotId] && !spots[spotId].properties.isSample)}
             keyExtractor={item => 'Spot' + item.toString()}
             listKey={'spots'}
-            renderItem={({item}) => renderSpotItem(item)}
+            renderItem={renderSpotItem}
           />
+
+          {/* Samples with this Tag */}
+          <SectionDividerWithRightButton
+            buttonTitle={'Add/Remove'}
+            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Samples W/Geologic Unit' : 'Tagged Samples'}
+            onPress={addRemoveSampleSpots}
+          />
+          {renderSamples()}
+
+          {/* Features with this Tag */}
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
               <SectionDividerWithRightButton

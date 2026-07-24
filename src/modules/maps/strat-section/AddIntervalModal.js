@@ -11,7 +11,6 @@ import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend, isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
-import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {Form, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
@@ -235,7 +234,8 @@ const AddIntervalModal = () => {
       <ModalWrapper
         closeModal={close}
         headerTitle={'Add Interval'}
-        showActionButton={false}
+        onActionPressed={() => saveInterval(formRef?.current?.values)}
+        showActionButton
         showCancelButton={false}
         showCloseButton
       >
@@ -243,7 +243,6 @@ const AddIntervalModal = () => {
           ListFooterComponent={renderAddIntervalFormFields()}
           ListHeaderComponent={renderAddIntervalNameField()}
         />
-        <ActionButton onPress={() => saveInterval(formRef?.current?.values)}/>
       </ModalWrapper>
     );
   };

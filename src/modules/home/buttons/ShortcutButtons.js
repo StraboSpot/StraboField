@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
 import {useImages} from '../../images';
 import useMapLocation from '../../maps/useMapLocation';
 import {SHORTCUT_MODALS} from '../../page/page.constants';
@@ -14,6 +15,7 @@ import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
+import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.constants';
 import {setLoadingStatus, setModalVisible, setShortcutSwitchPositions} from '../home.slice';
 
 const ShortcutButtons = ({openNotebookPanel}) => {
@@ -22,6 +24,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isCameraOrientationWarningHidden = useSelector(
+    state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
@@ -33,6 +37,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
 
   /* Local State */
 
+  const [isOrientationWarningVisible, setIsOrientationWarningVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
 
   /* Derived Variables */
@@ -48,7 +53,33 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     }
   }, [dispatch, isTargetDatasetMissing, shortcutSwitchPositions]);
 
+  /* Event Handlers */
+
+  const handleOrientationWarningContinue = () => {
+    setIsOrientationWarningVisible(false);
+    capturePhotoAtCurrentLocation();
+  };
+
   /* Logic Helpers */
+
+  const capturePhotoAtCurrentLocation = async () => {
+    dispatch(setLoadingStatus({view: 'home', bool: true}));
+    const point = await setPointAtCurrentLocation();
+    if (point) {
+      const newImages = await launchCameraFromNotebook();
+      const imagesSavedLength = newImages.length;
+      if (imagesSavedLength > 0) {
+        dispatch(updatedModifiedTimestampsBySpotsIds([point.properties.id]));
+        dispatch(editedSpotImages(newImages));
+        toast.show(
+          imagesSavedLength + ' photo' + (imagesSavedLength === 1 ? '' : 's') + ' saved in new Spot '
+          + point.properties.name, {type: 'success'},
+        );
+      }
+      if (!SMALL_SCREEN) openNotebookPanel();
+    }
+    dispatch(setLoadingStatus({view: 'home', bool: false}));
+  };
 
   const saveImagesToSpot = (newImages) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
@@ -61,20 +92,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     dispatch(clearedSelectedSpots());
     switch (key) {
       case 'photo': {
-        const point = await setPointAtCurrentLocation();
-        if (point) {
-          const newImages = await launchCameraFromNotebook();
-          const imagesSavedLength = newImages.length;
-          if (imagesSavedLength > 0) {
-            dispatch(updatedModifiedTimestampsBySpotsIds([point.properties.id]));
-            dispatch(editedSpotImages(newImages));
-            toast.show(
-              imagesSavedLength + ' photo' + (imagesSavedLength === 1 ? '' : 's') + ' saved in new Spot '
-              + point.properties.name, {type: 'success'},
-            );
-          }
-          if (!SMALL_SCREEN) openNotebookPanel();
-        }
+        if (isCameraOrientationWarningHidden) await capturePhotoAtCurrentLocation();
+        else setIsOrientationWarningVisible(true);
         break;
       }
       case 'sketch': {
@@ -107,9 +126,19 @@ const ShortcutButtons = ({openNotebookPanel}) => {
         }
         else return acc;
       }, [])}
+
+      {/* Modals */}
       {isSketchModalVisible && (
         <SketchModal saveImages={saveImagesToSpot} setIsSketchModalVisible={setIsSketchModalVisible}/>
       )}
+      <DismissibleWarningModal
+        headerTitle={'Camera Orientation'}
+        isVisible={isOrientationWarningVisible}
+        message={DISMISSIBLE_WARNING_MESSAGES[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]}
+        onCancel={() => setIsOrientationWarningVisible(false)}
+        onContinue={handleOrientationWarningContinue}
+        warningKey={DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION}
+      />
     </>
   );
 };

@@ -12,7 +12,6 @@ const Dialog = ({
                   closeNotebookPanel,
                   openNotebookPanel,
                   openSpotInNotebook,
-                  updateSpotsInMapExtent,
                   zoomToCurrentLocation,
                 }) => {
   console.log('Rendering Dialog...');
@@ -49,7 +48,6 @@ const Dialog = ({
           modalKey={modal.key}
           onPress={modalHandler}
           openSpotInNotebook={openSpotInNotebook}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
           zoomToCurrentLocation={zoomToCurrentLocation}
         />
       );

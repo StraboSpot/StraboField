@@ -11,7 +11,7 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 import {TagDetail, TagDetailModal} from '../tags';
 
-const TagDetailSidePanel = ({openNotebookPanel}) => {
+const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -51,6 +51,9 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
           addRemoveFeatures={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES}));
           }}
+          addRemoveSampleSpots={() => {
+            dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS}));
+          }}
           addRemoveSpots={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS}));
           }}
@@ -59,6 +62,7 @@ const TagDetailSidePanel = ({openNotebookPanel}) => {
             dispatch(setSelectedSpot(spot));
             openNotebookPanel();
           }}
+          openSpotInNotebook={openSpotInNotebook}
           setIsDetailModalVisible={() => setIsDetailModalVisible(true)}
         />
       </View>

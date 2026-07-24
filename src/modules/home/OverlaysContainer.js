@@ -39,15 +39,14 @@ const OverlaysContainer = forwardRef(({
           closeNotebookPanel={closeNotebookPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
-          updateSpotsInMapExtent={mapComponentRef.current?.updateSpotsInMapExtent}
           zoomToCurrentLocation={zoomToCurrentLocation}
         />
       )}
       {isOfflineMapModalVisible && (
         <SaveMapsModal
-          getCurrentZoom={mapComponentRef.current.getCurrentZoom}
-          getExtentString={mapComponentRef.current.getExtentString}
-          getTileCount={mapComponentRef.current.getTileCount}
+          getCurrentZoom={mapComponentRef?.current?.getCurrentZoom}
+          getExtentString={mapComponentRef?.current?.getExtentString}
+          getTileCount={mapComponentRef?.current?.getTileCount}
         />
       )}
     </>

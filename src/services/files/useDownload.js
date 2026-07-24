@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -20,7 +21,7 @@ import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
   addedDatasets,
-  addedProject,
+  addedProjectFromServer,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
@@ -141,7 +142,7 @@ const useDownload = () => {
         }
         clearProject();
       }
-      dispatch(addedProject(projectResponse));
+      dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
       }
@@ -327,6 +328,7 @@ const useDownload = () => {
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
+      dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       return datasetsObjToSave;
@@ -344,8 +346,10 @@ const useDownload = () => {
     }
   };
 
-  const initializeDownloadImages = async (dataset) => {
+  const initializeDownloadImages = async (dataset, onProgress) => {
     try {
+      imagesDownloadedCount = 0;
+      imagesFailedCount = 0;
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(clearedStatusMessages());
       dispatch(setIsStatusMessagesModalVisible(true));
@@ -357,11 +361,13 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloading Needed Images...'));
       if (!isEmpty(neededImagesIds)) {
+        onProgress?.(0, neededImagesIds.length);
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
           const success = await downloadImageAndSave(imageId);
           if (success) imagesDownloadedCount++;
           else imagesFailedCount++;
+          onProgress?.(imagesDownloadedCount, neededImagesIds.length);
           console.log('New/Modified Images Saved: ' + imagesDownloadedCount + '/'
             + neededImagesIds.length + ' Failed Images: ' + imagesFailedCount + '/' + neededImagesIds.length);
           dispatch(removedLastStatusMessage());

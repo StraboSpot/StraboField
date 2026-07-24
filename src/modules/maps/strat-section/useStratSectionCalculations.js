@@ -9,16 +9,25 @@ import {X_INTERVAL, Y_MULTIPLIER} from '../../sed/sed.constants';
 import {getBasicLithologyIndex, getSiliciclasticGrainSize} from '../../sed/sed.helpers';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedOrCreatedSpots} from '../../spots/spots.slice';
+import {addedIntervalDragChangedSpotIds} from '../maps.slice';
 
 const useStratSectionCalculations = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
 
   /* Internal Functions */
+
+  // During an interval drag, defer the dataset/project timestamp bump until the user saves the
+  // reorder, so a cancel reverts cleanly without flagging anything for save/sync. Outside drag mode, bump now.
+  const bumpModifiedTimestampsForSpots = (spotIds) => {
+    if (isDragIntervalMode) dispatch(addedIntervalDragChangedSpotIds(spotIds));
+    else dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
+  };
 
   const getIntervalWidth = (sedData, stratSectionId, interbed) => {
     const character = sedData.character;
@@ -247,7 +256,7 @@ const useStratSectionCalculations = () => {
       });
     }
     console.log('interval w new geom:', targetIntervalModified);
-    dispatch(updatedModifiedTimestampsBySpotsIds([targetIntervalModified.properties.id]));
+    bumpModifiedTimestampsForSpots([targetIntervalModified.properties.id]);
     dispatch(editedOrCreatedSpot(targetIntervalModified));
     targetIntervalExtent = turf.bbox(targetIntervalModified);
     // For core: push spots below the new interval deeper (negative direction).
@@ -277,6 +286,7 @@ const useStratSectionCalculations = () => {
       })
       .map(spot => moveSpotByPixels(spot, pixels));
     console.log('Dispatching', movedSpots);
+    bumpModifiedTimestampsForSpots(movedSpots.map(s => s.properties.id));
     dispatch(editedOrCreatedSpots(movedSpots));
   };
 
@@ -289,7 +299,7 @@ const useStratSectionCalculations = () => {
     const updatedGeometry = calculateIntervalGeometry(spot.properties.strat_section_id, spot.properties.sed, anchorY);
     const editedSpot = {...spot, geometry: updatedGeometry};
     console.log('Spot after geometry recalculation', editedSpot);
-    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
+    bumpModifiedTimestampsForSpots([editedSpot.properties.id]);
     dispatch(editedOrCreatedSpot(editedSpot));
     console.log('Dispatching', editedSpot);
     return editedSpot;
@@ -380,7 +390,7 @@ const useStratSectionCalculations = () => {
 
     // Dispatch all changes at once
     const allChanged = [...updatedSpots, newTarget];
-    dispatch(updatedModifiedTimestampsBySpotsIds(allChanged.map(s => s.properties.id)));
+    bumpModifiedTimestampsForSpots(allChanged.map(s => s.properties.id));
     dispatch(editedOrCreatedSpots(allChanged));
   };
 

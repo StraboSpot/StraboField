@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {setTestingMode} from '../project/projects.slice';
 
 const errorMessage = 'Wrong Password!';
@@ -77,7 +76,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
       onCancelPress={closeModal}
       overlayStyleOverride={{height: 'auto'}}
     >
-      <Text style={overlayStyles.importantText}>
+      <Text style={commonStyles.importantText}>
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.
       </Text>
       <Input

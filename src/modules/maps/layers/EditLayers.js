@@ -23,6 +23,13 @@ const EditLayers = ({editFeatureVertex}) => {
         minZoomLevel={1}
         style={getMapSymbology().pointEdit}
       />
+      <MapboxGL.CircleLayer
+        belowLayerID={'pointLayerEdit'}
+        filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerEditHalo'}
+        minZoomLevel={1}
+        style={getMapSymbology().pointEditHalo}
+      />
     </MapboxGL.ShapeSource>
   );
 };

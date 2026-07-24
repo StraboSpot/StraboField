@@ -12,9 +12,10 @@ const TagsShortcutModal = ({
   const renderTagsShortcutModal = (closeModal) => {
     return (
       <ModalWrapper
+        isChildrenFilled={true}
         onCancelPress={closeModal}
         onFooterButtonPress={onPress}
-        overlayStyleOverride={{height: '80%'}}
+        overlayStyleOverride={{maxHeight: '80%'}}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton={true}

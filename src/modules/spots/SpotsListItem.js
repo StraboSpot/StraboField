@@ -1,25 +1,35 @@
 import React from 'react';
-import {FlatList} from 'react-native';
 
-import {Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import {MEDIUMGREY} from '../../shared/styles.constants';
-import {NotebookPageAvatar, SpotGeometryAvatar} from '../../shared/ui/avatars';
-import usePage from '../page/usePage';
+import {SAMPLES_COLOR} from '../../shared/styles.constants';
+import {SpotGeometryAvatar} from '../../shared/ui/avatars';
 import useProject from '../project/useProject';
 import {useTags} from '../tags';
+import SpotDataIcons from './SpotDataIcons';
+import CheckboxList from '../../shared/ui/CheckboxList';
 
-const SpotsListItem = ({doShowTags, ignoreReadOnly, isCheckedList, isItemChecked, onChecked, onPress, spot}) => {
+const SpotsListItem = ({
+                         doShowSamples,
+                         doShowTags,
+                         ignoreReadOnly,
+                         isCheckedList,
+                         isItemChecked,
+                         isSample,
+                         onChecked,
+                         onPress,
+                         spot,
+                       }) => {
   // console.log('Rendering SpotsListItem', spot.properties?.name, spot.properties?.id?.toString(), '...');
 
   /* Data Hooks */
 
   const selectedTag = useSelector(state => state.project.selectedTag);
+  const spots = useSelector(state => state.spot.spots);
 
-  const {getPopulatedPagesKeys} = usePage();
   const {isReadOnlySpot} = useProject();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
@@ -33,62 +43,16 @@ const SpotsListItem = ({doShowTags, ignoreReadOnly, isCheckedList, isItemChecked
     return onChecked ? onChecked(spot.properties.id) : addRemoveSpotFromTag(spot.properties.id, selectedTag);
   };
 
-  /* Logic Helpers */
-
-  const getSpotDataIcons = () => {
-    const populatedPagesKeys = getPopulatedPagesKeys(spot);
-    return isReadOnly ? ['isReadOnly', ...populatedPagesKeys] : populatedPagesKeys;
-  };
-
   /* Render Functions */
 
-  const renderCheckboxes = () => {
-    return (
-      <>
-        {isReadOnly && (
-          <Icon
-            color={MEDIUMGREY}
-            containerStyle={{justifyContent: 'center', paddingRight: 5}}
-            name={'lock-closed'}
-            size={20}
-            type={'ionicon'}
-          />
-        )}
-        <ListItem.CheckBox
-          checked={isItemChecked}
-          disabled={isReadOnly}
-          onPress={handleCheckBoxPressed}
-        />
-      </>
-    );
+  const renderSamplesText = () => {
+    const sampleNames = spot.properties?.samples?.reduce(
+      (acc, s) => spots[s.id] ? [...acc, spots[s.id].properties.name] : [...acc, s.sample_id_name], []);
+    const samplesString = sampleNames?.sort()?.join(', ');
+    return !isEmpty(samplesString) && <ListItem.Subtitle>{samplesString}</ListItem.Subtitle>;
   };
 
-  const renderSpotDataIcon = ({item}) => {
-    if (item === 'isReadOnly') {
-      return (
-        <Icon
-          containerStyle={{justifyContent: 'center'}}
-          name={'lock-closed'}
-          size={12}
-          type={'ionicon'}
-        />
-      );
-    }
-    else return <NotebookPageAvatar pageKey={item}/>;
-  };
-
-  const renderSpotDataIcons = () => (
-    <FlatList
-      data={getSpotDataIcons()}
-      horizontal={false}
-      keyExtractor={(item, index) => index.toString()}
-      listKey={new Date().toISOString()}
-      numColumns={5}
-      renderItem={renderSpotDataIcon}
-    />
-  );
-
-  const renderTags = () => {
+  const renderTagsText = () => {
     const tags = getTagsAtSpot(spot.properties.id);
     const tagsString = tags.map(tag => tag.name).sort().join(', ');
     return !isEmpty(tagsString) && <ListItem.Subtitle>{tagsString}</ListItem.Subtitle>;
@@ -98,18 +62,25 @@ const SpotsListItem = ({doShowTags, ignoreReadOnly, isCheckedList, isItemChecked
 
   return (
     <ListItem
-      containerStyle={commonStyles.listItem}
+      containerStyle={[commonStyles.listItem, isSample && {borderColor: SAMPLES_COLOR, borderWidth: 2.5}]}
       keyExtractor={(item, index) => item?.properties?.id?.toString() || index.toString()}
       onPress={() => onPress && ((isCheckedList && !isReadOnly) || !isCheckedList) && onPress(spot)}
     >
       <SpotGeometryAvatar spot={spot}/>
       <ListItem.Content>
         <ListItem.Title style={commonStyles.listItemTitle}>{spot?.properties?.name}</ListItem.Title>
-        {doShowTags && spot && renderTags()}
+        {doShowTags && spot && renderTagsText()}
+        {doShowSamples && spot && renderSamplesText()}
       </ListItem.Content>
-      {isCheckedList ? renderCheckboxes() : (
+      {isCheckedList ? (
+        <CheckboxList
+          handleCheckBoxPressed={handleCheckBoxPressed}
+          isItemChecked={isItemChecked}
+          isReadOnly={isReadOnly}
+        />
+      ) : (
         <>
-          {spot && renderSpotDataIcons()}
+          {spot && <SpotDataIcons isReadOnly={isReadOnly} spot={spot}/>}
           {spot && <ListItem.Chevron/>}
         </>
       )}

@@ -13,6 +13,7 @@ const initialHomeState = {
   },
   modalValues: {},
   modalVisible: null,
+  hiddenWarnings: {},
   isBackupModalVisible: false,
   isStatusMessagesModalVisible: false,
   isErrorMessagesModalVisible: false,
@@ -50,11 +51,18 @@ const homeSlice = createSlice({
     removedLastStatusMessage(state) {
       state.statusMessages = state.statusMessages.slice(0, -1);
     },
+    resetHiddenWarnings(state) {
+      state.hiddenWarnings = {};
+    },
     resetHomeState() {
       return initialHomeState;
     },
     setIsBackupModalVisible(state, action) {
       state.isBackupModalVisible = action.payload;
+    },
+    setIsWarningHidden(state, action) {
+      const {key, isHidden} = action.payload;
+      state.hiddenWarnings[key] = isHidden;
     },
     setIsErrorMessagesModalVisible(state, action) {
       state.isErrorMessagesModalVisible = action.payload;
@@ -110,6 +118,7 @@ export const {
   addedStatusMessage,
   clearedStatusMessages,
   removedLastStatusMessage,
+  resetHiddenWarnings,
   resetHomeState,
   setIsBackupModalVisible,
   setIsErrorMessagesModalVisible,
@@ -120,6 +129,7 @@ export const {
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setIsUploadModalVisible,
+  setIsWarningHidden,
   setIsWarningMessagesModalVisible,
   setLoadingStatus,
   setModalValues,

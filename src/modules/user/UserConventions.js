@@ -13,8 +13,9 @@ import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
@@ -24,10 +25,11 @@ const UserProfile = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
+  const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
   const {isReadOnlySpot} = useProject();
@@ -111,7 +113,7 @@ const UserProfile = () => {
     if (formCurrent?.dirty) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
+  const getIsDisabled = () => !isConnectionAvailable;
 
   const saveForm = async (formCurrent) => {
     try {
@@ -120,7 +122,7 @@ const UserProfile = () => {
       if (hasErrors(formCurrent)) throw Error('Error in form.');
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
-      if (isOnline.isInternetReachable) {
+      if (isConnectionAvailable) {
         if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
         else {
           await uploadProfile(userValuesToUpdate);
@@ -129,7 +131,7 @@ const UserProfile = () => {
         }
       }
       else {
-        toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
+        toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
         toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
     }
@@ -150,7 +152,7 @@ const UserProfile = () => {
           title={'Convert Strike <-> Dip Direction'}
         />
         <View style={{paddingHorizontal: 10}}>
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 10}]}>
             *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
             updated.
           </Text>
@@ -163,7 +165,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
+      <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
@@ -177,9 +179,9 @@ const UserProfile = () => {
                 validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
-              {renderBulkUpdatesSection()}
-              {isOnline.isInternetReachable ? (
+              {isConnectionAvailable ? (
                 <>
+                  {renderBulkUpdatesSection()}
                   {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
                     <View style={userStyles.saveButtonContainer}>
                       <OutlineButton
@@ -190,11 +192,7 @@ const UserProfile = () => {
                     </View>
                   )}
                 </>
-              ) : (
-                <Text style={commonStyles.noValueText}>
-                  Must be online to save changes to user conventions.
-                </Text>
-              )}
+              ) : <ConnectionRequiredMessage actionText={'make changes to user conventions'}/>}
             </>
           }
         />

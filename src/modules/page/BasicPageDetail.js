@@ -28,7 +28,6 @@ import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice'
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
 
-
 const BasicPageDetail = ({
                            PageTabsComponent,
                            closeDetailView,
@@ -60,10 +59,10 @@ const BasicPageDetail = ({
     const formRef = useRef(null);
 
     const [initialValues, setInitialValues] = useState(selectedFeature);
+    const [igsnFormValues, setIgsnFormValues] = useState(null);
     const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
     const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
     const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-    const [igsnFormValues, setIgsnFormValues] = useState(null);
 
     /* Derived Variables */
 
@@ -101,32 +100,10 @@ const BasicPageDetail = ({
       if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
     }, [selectedFeature]);
 
-    useEffect(() => {
-      checkIfIsDisabled();
-    }, [sesar.sesarToken.access]);
-
-    /* Event Handlers */
-
-    const handleIGSNChecked = (value) => {
-      setIsIGSNChecked(value);
-    };
-
-    const onSampleSaved = async (featureValues) => {
-      try {
-        console.log('Saving Sample To SESAR', featureValues);
-        let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
-        const i = editedPageData.findIndex(f => f.id === featureValues.id);
-        if (i === -1) editedPageData.push(featureValues);
-        else editedPageData.splice(i, 1, featureValues);
-        const spotId = spot.properties.id;
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
-        dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
-        if (featureValues.sample_id_name) await checkSampleName(featureValues.sample_id_name);
-        closeDetailView();
-      }
-      catch (err) {
-        console.error('Error saving IGSN sample', err);
-      }
+    const onSampleSaved = async (formCurrent) => {
+      console.log('Saving Sample To SESAR', formRef.current?.values);
+      await saveFeature(formCurrent);
+      closeDetailView();
     };
 
     const onSubmitForm = (values, {resetForm}) => {
@@ -253,6 +230,9 @@ const BasicPageDetail = ({
         dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
 
         if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
+          if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
+            dispatch(editedSpotProperties({field: 'name', value: editedFeatureData.sample_id_name, spotId: spotId}));
+          }
           await checkSampleName(editedFeatureData.sample_id_name);
         }
       }
@@ -298,13 +278,35 @@ const BasicPageDetail = ({
     };
 
     const updateIGSNAndShowModal = async (formCurrent) => {
-      console.log('setting form values for IGSN modals');
-      const capturedValues = {...formCurrent.values, sesarUserCode: sesar.selectedUserCode};
-      setIgsnFormValues(capturedValues);
+      const values = {...formCurrent.values};
+      await saveFeature(formCurrent);
+      setIgsnFormValues(values);
       setIsIGSNModalVisible(true);
     };
 
+    const handleIGSNChecked = (value) => {
+      setIsIGSNChecked(value);
+    };
+
     /* Render Functions */
+
+    const renderIGSNUpload = () => {
+      return (
+        <>
+          {!isEmpty(encoded_login) ? (
+            <IGSNUploadAndRegister
+              handleIGSNChecked={handleIGSNChecked}
+              isIGSNChecked={isIGSNChecked}
+              selectedFeature={selectedFeature}
+            />
+          ) : (
+            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
+              You need to login to StraboSpot to upload to SESAR
+            </Text>
+          )}
+        </>
+      );
+    };
 
     const renderFormFields = () => {
       const formName = getFormName();
@@ -348,26 +350,6 @@ const BasicPageDetail = ({
       );
     };
 
-    const renderIGSNUpload = () => {
-      return (
-        <>
-          {!isEmpty(encoded_login) ? (
-            <IGSNUploadAndRegister
-              handleIGSNChecked={handleIGSNChecked}
-              isIGSNChecked={isIGSNChecked}
-              selectedFeature={selectedFeature}
-            />
-          ) : (
-            <Text style={{textAlign: 'center', padding: 20, fontSize: 16}}>
-              You need to login to StraboSpot to upload to SESAR
-            </Text>
-          )}
-        </>
-      );
-    };
-
-    /* View */
-
     return (
       <>
         <View style={{flex: 1}}>
@@ -396,15 +378,15 @@ const BasicPageDetail = ({
               </FormFlatList>
             </>
           )}
-          {/*{isIGSNModalVisible && (*/}
           <IGSNModal
             isVisible={isIGSNModalVisible}
+            onIGSNUpdated={closeDetailView}
             onModalCancel={() => setIsIGSNModalVisible(false)}
             onSampleSaved={onSampleSaved}
             ref={formRef}
             sampleValues={igsnFormValues}
           />
-          {/*)}*/}
+
           {/*Modal when deleting a sample with an IGSN attached*/}
           <ModalWrapper
             actionTitle={'Delete'}

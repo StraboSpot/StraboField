@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -13,25 +13,19 @@ const OtherFeatureItem = ({editFeature, feature}) => {
   /* Data Hooks */
 
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {setFeaturesSelectedForMultiTagging} = useTags();
 
-  /* Local State */
+  /* Derived Variables */
 
-  const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE OtherFeatureItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
-    if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
-  }, [isMultipleFeaturesTaggingEnabled]);
+  const isFeatureSelectedForTagging = selectedFeaturesForTagging.some(f => f.id === feature.id);
 
   /* Logic Helpers */
 
   const editFeatureItem = (featureItem) => {
-    if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(featureItem));
+    if (isMultipleFeaturesTaggingEnabled) setFeaturesSelectedForMultiTagging(featureItem);
     else editFeature(featureItem);
   };
 
@@ -39,18 +33,23 @@ const OtherFeatureItem = ({editFeature, feature}) => {
 
   return (
     <ListItem
-      containerStyle={[commonStyles.listItem,
-        {backgroundColor: featureSelectedForTagging ? themes.PRIMARY_ACCENT_COLOR : themes.SECONDARY_BACKGROUND_COLOR}]}
+      containerStyle={[commonStyles.listItem, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}
       key={feature.id}
       onPress={() => editFeatureItem(feature)}
     >
+      {isMultipleFeaturesTaggingEnabled && (
+        <ListItem.CheckBox
+          checked={isFeatureSelectedForTagging}
+          onPress={() => editFeatureItem(feature)}
+        />
+      )}
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>
           <OtherFeatureLabel item={feature}/>
         </ListItem.Title>
         <FeatureTagsList featureId={feature.id} spotId={spot.properties.id}/>
       </ListItem.Content>
-      <ListItem.Chevron/>
+      {!isMultipleFeaturesTaggingEnabled && <ListItem.Chevron/>}
     </ListItem>
   );
 };

@@ -3,6 +3,7 @@ import {FlatList, Text} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import RockdModal from '../../../services/data-intergration/macrostrat/RockdModal';
@@ -15,12 +16,23 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import IGSNModal from '../../samples/igsn/IGSNModal';
+import useSamples from '../../samples/useSamples';
 import {useSpots} from '../../spots';
-import {NOTEBOOK_MENU_ACTIONS} from '../notebook.constants';
+import {setInitialSesarState} from '../../user/userProfile.slice';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisible, isReadOnly, zoomToSpots}) => {
+const NotebookMenu = ({
+                        closeNotebookMenu,
+                        closeNotebookPanel,
+                        isNotebookMenuVisible,
+                        isReadOnly,
+                        isSample,
+                        parentSpot,
+                        selectedSample,
+                        zoomToSpots,
+                      }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -28,8 +40,12 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+  const pageVisible = useSelector(state => state.notebook.visibleNotebookPagesStack?.slice(-1)[0]);
+  const {sesarToken} = useSelector(state => state.user.sesar);
 
   const navigation = useNavigation();
+  const toast = useToast();
+  const {deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
@@ -37,11 +53,25 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
 
   /* Derived Variables */
 
-  const notebookMenuActions = NOTEBOOK_MENU_ACTIONS.filter(item => item.key !== 'copy' || !isEmpty(targetDatasetId));
+  const type = isSample ? 'Sample' : 'Spot';
+  const sampleIGSN = selectedSample?.Sample_IGSN ?? spot.properties?.samples?.[0]?.Sample_IGSN;
+  const actions = [
+    ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
+    {key: 'zoom', title: `Zoom to this ${type}`},
+    {key: 'delete', title: `Delete this ${type}`},
+    {key: 'geography', title: 'Show Geography'},
+    {key: 'metadata', title: 'Show Metadata'},
+    {key: 'nesting', title: 'Show Nesting'},
+    ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
+    ...(spot.properties?.isSample && pageVisible === PAGE_KEYS.OVERVIEW ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
+    ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
+    ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
+  ];
 
   /* Event Handlers */
 
@@ -62,9 +92,17 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else if (key === 'igsn') {
+      if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+      else setIsIGSNModalVisible(true);
+    }
     else if (key === 'rockd') {
       closeNotebookMenu();
       setIsRockdModalVisible(true);
+    }
+    else if (key === 'resetSesar') {
+      dispatch(setInitialSesarState());
+      toast.show('Sesar credentials have been reset', {type: 'success'});
     }
     else closeNotebookPanel();
     closeNotebookMenu();
@@ -77,8 +115,9 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
       setErrorMessage('');
       setIsDeleteSpotModalVisible(false);
     }
+    else if (spot.properties?.isSample) deleteRichSample(spot, parentSpot);
     else if (isStratInterval(spot)) deleteInterval(spot);
-    else deleteSpot(spot.properties.id);
+    else deleteSpot(spot);
   };
 
   const deleteSelectedSpot = () => {
@@ -91,8 +130,9 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
-    else if (item.key === 'rockd' && !isTestingMode && (checkedInSpotIds.includes(
-      spot.properties.id) || spot.geometry.type !== 'Point')) return;
+    else if (item.key === 'rockd' && !isTestingMode
+      && (checkedInSpotIds.includes(spot.properties.id)
+        || spot.geometry?.type !== 'Point')) return;
     else if (item.key === 'rockd' && !isTestingMode) return;
     else {
       return (
@@ -110,7 +150,11 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
   const renderDeleteMessage = () => {
     return (
       errorMessage ? <Text>Unable to delete spot.{'\n'}{errorMessage}</Text>
-        : <Text>Are you sure you want to delete Spot: {spot.properties.name}?</Text>
+        : (
+          <Text>
+            Are you sure you want to delete {isSample ? 'Sample' : 'Spot'}: {spot.properties.name}?
+          </Text>
+        )
     );
   };
 
@@ -120,7 +164,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
     <>
       <ModalWrapper
         closeModal={closeNotebookMenu}
-        headerTitle={'Spot Actions'}
+        headerTitle={isSample ? 'Sample Actions' : 'Spot Actions'}
         isVisible={isNotebookMenuVisible}
         onBackdropPress={closeNotebookMenu}
         overlayStyleOverride={notebookStyles.dialogContainer}
@@ -131,7 +175,7 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           contentContainerStyle={{alignItems: 'center'}}
-          data={notebookMenuActions}
+          data={actions}
           key={'notebookActions'}
           renderItem={renderActionItem}
         />
@@ -142,13 +186,19 @@ const NotebookMenu = ({closeNotebookMenu, closeNotebookPanel, isNotebookMenuVisi
         onCancelPress={() => setIsDeleteSpotModalVisible(false)}
         onConfirmPress={continueDeleteSelectedSpot}
         showCancelButton={!errorMessage}
-        title={errorMessage ? 'Can\'t Delete Spot' : 'Delete Spot?'}
+        title={isSample ? 'Delete Sample?' : 'Delete Spot?'}
       >
         {renderDeleteMessage()}
       </WarningModal>
       <RockdModal
         closeModal={() => setIsRockdModalVisible(false)}
         isVisible={isRockdModalVisible}
+      />
+      <IGSNModal
+        isVisible={isIGSNModalVisible}
+        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        sampleValues={!isEmpty(selectedSample) ? selectedSample : spot.properties?.samples?.[0]}
       />
     </>
   );

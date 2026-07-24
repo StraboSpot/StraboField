@@ -16,14 +16,15 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
+import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
-const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) => {
+const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
   const {getAllDeviceProjects, getAllServerProjects} = useProject();
 
   /* Local State */
@@ -61,7 +62,11 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
   /* Logic Helpers */
 
   const filteredProjectsList = () => {
-    const projects = projectsArr.projects ?? [];
+    let projects = projectsArr.projects ?? [];
+    // Device projects are split into manual and auto backups.
+    if (source === 'device' && backupType) {
+      projects = projects.filter(p => backupType === 'auto' ? p.isAutoBackup : !p.isAutoBackup);
+    }
     if (selectedButtonIndex === undefined) return projects;
     if (selectedButtonIndex === 0) return projects.filter(p => !p?.isCollaborativeProject);
     if (selectedButtonIndex === 1) return projects.filter(p => p?.isCollaborativeProject && p?.isOwner);
@@ -105,13 +110,13 @@ const ProjectList = ({doRefresh, onProjectPress, selectedButtonIndex, source}) =
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
-        disabled={!isOnline.isConnected && source !== 'device'}
+        disabled={!isConnectionAvailable && source !== 'device'}
         disabledStyle={{backgroundColor: 'lightgrey'}}
         onPress={() => onProjectPress(item)}
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>
-            <Text>{source === 'server' ? item.name : item.fileName}</Text>
+            {source === 'server' ? item.name : (item.displayName || item.fileName)}
           </ListItem.Title>
           {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>

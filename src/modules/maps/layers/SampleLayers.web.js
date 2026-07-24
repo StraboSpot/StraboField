@@ -24,7 +24,8 @@ const SampleLayers = ({features}) => {
           type={'geojson'}
         >
           <Layer
-            beforeId={'polygonLayerNotSelected'}
+            // Pin the starburst just below the point symbols: above the halos, below the point icon.
+            beforeId={'pointLayerNotSelected'}
             filter={['==', ['geometry-type'], 'Point']}
             id={'pointLayerSampleSymbols'}
             layout={getLayoutSymbology().sample}

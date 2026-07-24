@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TextInput, View} from 'react-native';
+import {Text, TextInput, View} from 'react-native';
 
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
@@ -17,6 +17,7 @@ import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import useMapLocation from '../../maps/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import projectStyles from '../../project/project.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
@@ -24,25 +25,60 @@ import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
-const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, openMainMenuPanel, zoomToSpots}) => {
+const NotebookHeader = ({
+                          closeNotebookPanel,
+                          createDefaultGeom,
+                          isReadOnly,
+                          isSampleOrSampleChild,
+                          openMainMenuPanel,
+                          selectedSample,
+                          setSelectedSample,
+                          zoomToSpots,
+                        }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getCurrentLocation} = useMapLocation();
-  const {checkSpotName, getRootSpot, getSpotGeometryIconSource, getSpotWithThisStratSection} = useSpots();
+  const {
+    checkSpotName,
+    getRootSpot,
+    getSampleSpotIconSource,
+    getSpotGeometryIconSource,
+    getSpotWithThisImageBasemap,
+    getSpotWithThisSample,
+    getSpotWithThisStratSection,
+  } = useSpots();
   const toast = useToast();
 
   /* Local State */
 
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isNotebookMenuVisible, setIsNotebookMenuVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
+  const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
+  const spotWithThisImageBasemap = spot.properties?.image_basemap
+    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+  const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id)
+    : !isEmpty(spotWithThisImageBasemap) ? spotWithThisImageBasemap
+      : null;
 
   /* Event Handlers */
 
   const onSpotEdit = async (field, value) => {
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: field, value: value}));
+    if (spot.properties?.isSample) {
+      const sampleMetadataCopy = isEmpty(spot.properties?.samples?.[0]) ? {id: spot.properties.id}
+        : JSON.parse(JSON.stringify(spot.properties.samples[0]));
+      sampleMetadataCopy.sample_id_name = value;
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [sampleMetadataCopy]}));
+    }
     await checkSpotName(value);
   };
 
@@ -113,6 +149,14 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return traceText;
   };
 
+  const goBackToParentSpot = () => {
+    setSelectedSample({});
+    if (!isEmpty(parentSpot)) {
+      dispatch(setSelectedSpot(parentSpot));
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+  };
+
   const goToDatasetsPage = () => {
     toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
       {duration: 4000, placement: 'top', type: 'warning'});
@@ -138,11 +182,117 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
     return (
       <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
         <ClearButton
-          onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+          onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
           title={getSpotCoordText()}
           titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
         />
       </View>
+    );
+  };
+
+  const renderNotebookHeaderContent = () => {
+    return (
+      <>
+        <View style={{paddingLeft: 10, paddingRight: 5}}>
+          <Image
+            onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
+            resizeMode={'contain'}
+            source={spot.properties.isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
+            style={notebookHeaderStyles.headerImage}
+          />
+        </View>
+        <View
+          style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
+        >
+          {isEditingTitle && !isReadOnly && !isLegacySample ? (
+            <TextInput
+              autoFocus
+              onBlur={() => {
+                if (!spot.properties.name) onSpotEdit('name', 'Unknown');
+                setIsEditingTitle(false);
+              }}
+              onChangeText={text => onSpotEdit('name', text)}
+              style={notebookHeaderStyles.headerSpotName}
+              textAlign={'left'}
+              value={spot.properties.name || ''}
+            />
+          ) : (
+            <Text
+              ellipsizeMode={'tail'}
+              numberOfLines={1}
+              onPress={() => !isReadOnly && !isLegacySample && setIsEditingTitle(true)}
+              style={notebookHeaderStyles.headerSpotName}
+            >
+              {headerTitle}
+            </Text>
+          )}
+          {getSpotCoordText() ? renderCoordsText() : !isReadOnly && !isLegacySample && renderSetCoordsText()}
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          {isReadOnly && (
+            <Button
+              buttonStyle={{
+                backgroundColor: 'transparent',
+                paddingVertical: 0,
+                paddingHorizontal: 2,
+                height: 50,
+                width: 40,
+              }}
+              icon={{type: 'ionicon', name: 'lock-closed'}}
+              onPress={goToDatasetsPage}
+            />
+          )}
+          <IconButton
+            onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
+            source={require('../../../assets/icons/MapActions.png')}
+            style={notebookHeaderStyles.threeDotMenu}
+          />
+        </View>
+        <NotebookMenu
+          closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
+          closeNotebookPanel={closeNotebookPanel}
+          isNotebookMenuVisible={isNotebookMenuVisible}
+          isReadOnly={isReadOnly}
+          isSample={spot.properties.isSample || !isEmpty(selectedSample)}
+          overlayStyle={notebookStyles.dialogBoxPosition}
+          parentSpot={parentSpot}
+          selectedSample={selectedSample}
+          zoomToSpots={zoomToSpots}
+        />
+      </>
+    );
+  };
+
+  const renderNotebookSampleHeaderContent = () => {
+    return (
+      <>
+        <View style={{alignItems: 'flex-start', flex: 1}}>
+          <ClearButton
+            icon={{
+              iconStyle: projectStyles.buttons,
+              name: 'arrow-back',
+              size: 20,
+              type: 'ionicon',
+            }}
+            onPress={goBackToParentSpot}
+            title={parentSpot?.properties?.name || spot.properties.name || ''}
+          />
+          <View style={[{width: '100%'}, isSampleOrSampleChild && notebookHeaderStyles.sampleSideBorders]}>
+            {isSampleOrSampleChild && (
+              <View style={notebookHeaderStyles.sampleBanner}>
+                {spot.properties.isSample && (
+                  <Text style={notebookHeaderStyles.sampleBannerText}>
+                    {'S      A      M      P      L      E'}
+                  </Text>
+                )}
+              </View>
+            )}
+            <View style={{alignItems: 'center', flexDirection: 'row'}}>
+              {renderNotebookHeaderContent()}
+            </View>
+          </View>
+        </View>
+      </>
     );
   };
 
@@ -174,52 +324,7 @@ const NotebookHeader = ({closeNotebookPanel, createDefaultGeom, isReadOnly, open
 
   return (
     <>
-      <Image
-        onPress={() => dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
-        resizeMode={'contain'}
-        source={getSpotGeometryIconSource(spot)}
-        style={notebookHeaderStyles.headerImage}
-      />
-      <View
-        style={[notebookHeaderStyles.headerSpotNameAndCoordsContainer, isReadOnly && !getSpotCoordText() && {height: 60}]}
-      >
-        <TextInput
-          editable={!isReadOnly}
-          onChangeText={text => onSpotEdit('name', text)}
-          style={notebookHeaderStyles.headerSpotName}
-          textAlign={'left'}
-          value={spot.properties.name || ''}
-        />
-        {getSpotCoordText() ? renderCoordsText() : !isReadOnly && renderSetCoordsText()}
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        {isReadOnly && (
-          <Button
-            buttonStyle={{
-              backgroundColor: 'transparent',
-              paddingVertical: 0,
-              paddingHorizontal: 2,
-              height: 50,
-              width: 40,
-            }}
-            icon={{type: 'ionicon', name: 'lock-closed'}}
-            onPress={goToDatasetsPage}
-          />
-        )}
-        <IconButton
-          onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
-          source={require('../../../assets/icons/MapActions.png')}
-          style={notebookHeaderStyles.threeDotMenu}
-        />
-      </View>
-      <NotebookMenu
-        closeNotebookMenu={() => setIsNotebookMenuVisible(false)}
-        closeNotebookPanel={closeNotebookPanel}
-        isNotebookMenuVisible={isNotebookMenuVisible}
-        isReadOnly={isReadOnly}
-        overlayStyle={notebookStyles.dialogBoxPosition}
-        zoomToSpots={zoomToSpots}
-      />
+      {isSampleOrSampleChild ? renderNotebookSampleHeaderContent() : renderNotebookHeaderContent()}
     </>
   );
 };

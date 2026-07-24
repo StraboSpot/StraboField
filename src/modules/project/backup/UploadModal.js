@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import uploadModalStyles from './uploadModal.styles';
 import useUpload from '../../../services/files/useUpload';
 import useUploadImages from '../../../services/files/useUploadImages';
+import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
@@ -192,12 +193,12 @@ const UploadModal = ({closeModal, isVisible}) => {
       <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
         {!isEmpty(currentProject) && currentProject.description?.project_name}
       </Text>
-      {endpoint.isSelected ? <Text style={overlayStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
+      {endpoint.isSelected ? <Text style={commonStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
         : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
       <Spacer/>
       <Text style={[overlayStyles.contentText, {textAlign: 'left', padding: 10}]}>
-        - Geologic units, tags, reports and templates will be merged into the project already on the server.{'\n'}
-        - Newer datasets will <Text style={overlayStyles.importantText}>OVERWRITE</Text> older datasets already on the
+        - Geologic units, tags, memos and templates will be merged into the project already on the server.{'\n'}
+        - Newer datasets will <Text style={commonStyles.importantText}>OVERWRITE</Text> older datasets already on the
         server.{'\n'}
         - Read Only datasets will not be affected unless they were removed from Read Only status and modified.
       </Text>
