@@ -4,6 +4,7 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {runOnJS, useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {ORANGE} from '../../../shared/styles.constants';
 import {setVertexEndCoords} from '../maps.slice';
 import mapStyles from '../maps.styles';
 
@@ -31,7 +32,7 @@ const VertexDrag = ({onLongPress}) => {
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{translateX: offset.value.x}, {translateY: offset.value.y}],
-      backgroundColor: isPressed.value ? 'yellow' : 'orange',
+      backgroundColor: isPressed.value ? 'yellow' : ORANGE,
     };
   });
 
