@@ -172,7 +172,11 @@ suffixes; `.web.js` for web overrides.
 ## Deployment Checklist
 
 **Android** — 1) `keystore.properties` in `/android/` + `.jks` in `/android/app/`; 2) `npm run bundle:android`; 3)
-`npm run deploy:android`; 4) upload `.aab` from `android/app/build/outputs/bundle/release/`.
+`npm run deploy:android`; 4) verify the AAB dropped the 16 KB-flagged SQLite lib —
+`unzip -l android/app/build/outputs/bundle/release/app-release.aab | grep -i libsqliteJni` should print **nothing**
+(it ships a prebuilt NDK r20 `.so`; excluded in `android/app/build.gradle` via `configurations.all`, since async-storage
+uses the framework SQLite driver — bumping NDK/androidx.sqlite does *not* fix it); 5) upload `.aab` from
+`android/app/build/outputs/bundle/release/`.
 
 **iOS** — 1) `bundle exec pod install`; 2) `npm run bundle:ios`; 3) Xcode signing → archive/upload, or
 `npm run deploy-beta`.

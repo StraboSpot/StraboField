@@ -135,6 +135,16 @@ android {
     }
 }
 
+// androidx.sqlite:sqlite-bundled ships a prebuilt libsqliteJni.so compiled with NDK r20,
+// which Google Play flags as not 16 KB-safe (our own ndkVersion can't fix a prebuilt lib).
+// It arrives only transitively via async-storage's Room dependency, and that store uses the
+// framework AndroidSQLiteDriver (system SQLite, no native lib), so the bundled driver is never
+// loaded. Exclude it to drop the flagged native library entirely.
+configurations.all {
+    exclude group: "androidx.sqlite", module: "sqlite-bundled"
+    exclude group: "androidx.sqlite", module: "sqlite-bundled-android"
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
