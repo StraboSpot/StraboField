@@ -5,7 +5,14 @@ import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import {SET_IN_CURRENT_VIEW_BUTTON_ICONS, SET_IN_CURRENT_VIEW_BUTTONS} from '../maps.constants';
+
+const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
+
+const SET_IN_CURRENT_VIEW_BUTTON_ICONS = {
+  LineString: require('../../../assets/icons/LineButton.png'),
+  Point: require('../../../assets/icons/PointButton.png'),
+  Polygon: require('../../../assets/icons/PolygonButton.png'),
+};
 
 // Modal to prompt the user to select a geometry if no geometry has been set
 const SetInCurrentViewOverlay = ({

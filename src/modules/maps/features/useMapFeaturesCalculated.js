@@ -3,14 +3,18 @@ import {Platform} from 'react-native';
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
+import useMapFeatures from './useMapFeatures';
 import {isEmpty} from '../../../shared/helpers';
 import useNesting from '../../nesting/useNesting';
-import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE, SPOT_LAYERS} from '../maps.constants';
-import {getClosestSpotDistanceAndIndex} from '../maps.helpers';
-import useMapFeatures from './useMapFeatures';
-// eslint-disable-next-line import/order -- import/order has no stable sort for a ./view/ subdir import alongside these parent imports (non-transitive comparator)
 import {useSpots} from '../../spots';
+import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE} from '../maps.constants';
+import {getClosestSpotDistanceAndIndex} from '../maps.helpers';
 import useMapCoords from '../view/useMapCoords';
+
+const SPOT_LAYERS = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
+  'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
+  'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
+  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
 const useMapFeaturesCalculated = (mapRef) => {
   /* Data Hooks */

@@ -11,13 +11,14 @@ import {
   LATITUDE,
   LONGITUDE,
   PIXEL_PROJECTION,
-  STRAT_SECTION_CENTER,
   ZOOM,
   ZOOM_STRAT_SECTION,
 } from '../maps.constants';
+import useMapCoords from './useMapCoords';
 import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from '../maps.helpers';
 import {setCenter, setZoom} from '../maps.slice';
-import useMapCoords from './useMapCoords';
+
+const STRAT_SECTION_CENTER = [0.001, 0.0007];
 
 const useMapView = () => {
   /* Data Hooks */

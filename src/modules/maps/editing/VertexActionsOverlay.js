@@ -5,7 +5,15 @@ import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import {VERTEX_ACTION_BUTTON_ICONS, VERTEX_ACTION_BUTTONS} from '../maps.constants';
+
+const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line', 'Extend Line'];
+
+const VERTEX_ACTION_BUTTON_ICONS = {
+  'Add Vertex': require('../../../assets/icons/LineButton.png'),
+  'Delete Vertex': require('../../../assets/icons/PointButton.png'),
+  'Extend Line': require('../../../assets/icons/LineButton.png'),
+  'Split Line': require('../../../assets/icons/PolygonButton.png'),
+};
 
 // Modal to prompt the user to select a geometry if no geometry has been set
 const VertexActionsOverlay = ({
