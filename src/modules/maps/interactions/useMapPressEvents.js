@@ -7,12 +7,12 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 import {isEmpty} from '../../../shared/helpers';
 import {useSpots} from '../../spots';
 import {setSelectedSpot} from '../../spots/spots.slice';
+import useMapFeatures from '../features/useMapFeatures';
+import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import {MAP_MODES} from '../maps.constants';
 import {convertImagePixelsToLatLong} from '../maps.helpers';
 import {setIntervalDragState} from '../maps.slice';
 import useMap from '../useMap';
-import useMapFeatures from '../useMapFeatures';
-import useMapFeaturesCalculated from '../useMapFeaturesCalculated';
 import useMapMeasure from '../useMapMeasure';
 
 const useMapPressEvents = ({

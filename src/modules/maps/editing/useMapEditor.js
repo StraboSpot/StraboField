@@ -12,8 +12,8 @@ import {isEmpty} from '../../../shared/helpers';
 import {addedNewSpotIdsToDataset, updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import useProject from '../../project/useProject';
 import {clearedSelectedSpots, editedOrCreatedSpots, setSelectedSpot} from '../../spots/spots.slice';
+import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import {MAP_MODES} from '../maps.constants';
-import useMapFeaturesCalculated from '../useMapFeaturesCalculated';
 
 // Orchestrates map editing: routes a raw map press/long-press (plus the current mapMode) to the right action
 // and owns the edit lifecycle (enter/save/cancel) and displayed-Spot sync. Composes the geometry workers -

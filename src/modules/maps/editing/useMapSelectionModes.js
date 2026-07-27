@@ -5,7 +5,7 @@ import {setModalVisible} from '../../home/home.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import useProject from '../../project/useProject';
 import {setIntersectedSpotsForTagging} from '../../spots/spots.slice';
-import useMapFeaturesCalculated from '../useMapFeaturesCalculated';
+import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import useStereonet from '../useStereonet';
 
 // In a "selecting" mode, a finished draw lassos existing Spots for a report/stereonet/inspect/tag action

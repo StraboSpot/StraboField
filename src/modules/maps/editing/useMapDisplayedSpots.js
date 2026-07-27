@@ -3,7 +3,7 @@ import {useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import {isEmpty, isEqual} from '../../../shared/helpers';
-import useMapFeatures from '../useMapFeatures';
+import useMapFeatures from '../features/useMapFeatures';
 import useMapCoords from '../view/useMapCoords';
 
 // Owns the selected/not-selected Spots rendered on the map. The two setters partition Spots into those

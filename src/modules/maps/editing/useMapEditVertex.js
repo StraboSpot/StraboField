@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, getNewUUID, isEmpty} from '../../../shared/helpers';
 import {clearedSelectedSpots, setSelectedSpot} from '../../spots/spots.slice';
+import useMapFeatures from '../features/useMapFeatures';
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from '../maps.constants';
 import {getClosestSpotDistanceAndIndex} from '../maps.helpers';
 import {
@@ -17,7 +18,6 @@ import {
 } from './editing.helpers';
 import {clearedVertexes, setVertexStartCoords} from '../maps.slice';
 import useMap from '../useMap';
-import useMapFeatures from '../useMapFeatures';
 import useMapCoords from '../view/useMapCoords';
 
 // Owns the in-progress edit session: which Spot/vertex is being edited, the exploded draw-vertex overlay it

@@ -3,14 +3,14 @@ import {Platform} from 'react-native';
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
-import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE, SPOT_LAYERS} from './maps.constants';
-import {getClosestSpotDistanceAndIndex} from './maps.helpers';
+import {isEmpty} from '../../../shared/helpers';
+import useNesting from '../../nesting/useNesting';
+import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE, SPOT_LAYERS} from '../maps.constants';
+import {getClosestSpotDistanceAndIndex} from '../maps.helpers';
 import useMapFeatures from './useMapFeatures';
-import useMapCoords from './view/useMapCoords';
-import {isEmpty} from '../../shared/helpers';
-import useNesting from '../nesting/useNesting';
 // eslint-disable-next-line import/order -- import/order has no stable sort for a ./view/ subdir import alongside these parent imports (non-transitive comparator)
-import {useSpots} from '../spots';
+import {useSpots} from '../../spots';
+import useMapCoords from '../view/useMapCoords';
 
 const useMapFeaturesCalculated = (mapRef) => {
   /* Data Hooks */
