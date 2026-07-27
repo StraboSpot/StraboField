@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useCustomMap from './custom-maps/useCustomMap';
 import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
+import SetInCurrentViewOverlay from './editing/SetInCurrentViewOverlay';
 import useMapEditor from './editing/useMapEditor';
 import VertexActionsOverlay from './editing/VertexActionsOverlay';
 import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
@@ -15,7 +16,6 @@ import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
-import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
 import useMapCoords from './view/useMapCoords';
 import useMapLocation from './view/useMapLocation';
