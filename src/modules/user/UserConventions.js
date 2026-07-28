@@ -44,6 +44,7 @@ const UserProfile = () => {
   /* Local State */
 
   const formRef = useRef(null);
+  const hasUnsavedConventionRef = useRef(false);
 
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -62,6 +63,13 @@ const UserProfile = () => {
     setIsDownloading(true);
     await downloadUserProfile();
     setIsDownloading(false);
+  };
+
+  // Update Redux immediately so the toggle stays in sync, and flag that a convention changed. The server upload is
+  // deferred to page close (doCleanup) so rapid toggling doesn't fire a request on every change.
+  const onToggleUserConvention = (key, value) => {
+    dispatch(setUserData({[key]: value}));
+    hasUnsavedConventionRef.current = true;
   };
 
   /* Logic Helpers */
@@ -118,7 +126,9 @@ const UserProfile = () => {
 
   const doCleanup = async () => {
     const formCurrent = formRef.current;
-    if (formCurrent?.dirty) await saveForm(formCurrent);
+    // Save on close if the form changed or a convention switch was toggled. The switch value is already in the form's
+    // reinitialized values (initialValues={userData}), so saveForm uploads it along with any form edits.
+    if (formCurrent && (formCurrent.dirty || hasUnsavedConventionRef.current)) await saveForm(formCurrent);
   };
 
   const getIsDisabled = () => !isConnectionAvailable;
@@ -160,7 +170,7 @@ const UserProfile = () => {
     return (
       <View style={{alignItems: 'center', flexDirection: 'row', paddingBottom: 10, paddingHorizontal: 10, paddingTop: 5}}>
         <SwitchWrapper
-          onValueChange={value => dispatch(setUserData({default_manual_measurement: value}))}
+          onValueChange={value => onToggleUserConvention('default_manual_measurement', value)}
           value={defaultManualMeasurement}
         />
         <Text style={[commonStyles.listItemTitle, {flex: 1, fontWeight: 'bold', paddingLeft: 5}]}>
