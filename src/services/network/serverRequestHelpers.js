@@ -124,6 +124,7 @@ export const postFormDataRequest = async (url, formData, auth) => {
 
 export const postRequest = async (url, body, auth, customHeaders = {}, timeout = DEFAULT_TIMEOUT) => {
   try {
+    console.log('POST', url, body, auth, customHeaders, timeout);
     const response = await timeoutPromise(fetch(url, {
       method: 'POST',
       headers: buildHeaders(auth, isEmpty(customHeaders) ? {'Content-Type': 'application/json'} : customHeaders),
