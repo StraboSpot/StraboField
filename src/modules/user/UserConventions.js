@@ -1,6 +1,7 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,11 +13,14 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
+import {showFieldInfo} from '../form/form.helpers';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
@@ -25,6 +29,7 @@ const UserProfile = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
@@ -43,6 +48,9 @@ const UserProfile = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   /* Side Effects */
+  useEffect(() => {
+    console.log('Default Manual Measurement', defaultManualMeasurement);
+  }, [defaultManualMeasurement]);
 
   useLayoutEffect(() => {
     return () => doCleanup();
@@ -143,6 +151,31 @@ const UserProfile = () => {
 
   /* Render Functions */
 
+  // Default input mode for new measurements. Kept as a live Redux setting (not a deferred form field) so the change
+  // dispatches immediately and propagates to the MeasurementsModal toggle.
+  const renderMeasurementInputDefault = () => {
+    const label = 'Default to Manual Measurement Entry';
+    const info = 'When on, new measurements open in Manual entry mode. When off, they open in Compass (automatic) '
+      + 'mode. You can still switch modes when taking a measurement.';
+    return (
+      <View style={{alignItems: 'center', flexDirection: 'row', paddingBottom: 10, paddingHorizontal: 10, paddingTop: 5}}>
+        <SwitchWrapper
+          onValueChange={value => dispatch(setUserData({default_manual_measurement: value}))}
+          value={defaultManualMeasurement}
+        />
+        <Text style={[commonStyles.listItemTitle, {flex: 1, fontWeight: 'bold', paddingLeft: 5}]}>
+          {label}
+        </Text>
+        <Icon
+          color={PRIMARY_ACCENT_COLOR}
+          name={'information-circle-outline'}
+          onPress={() => showFieldInfo(label, info)}
+          type={'ionicon'}
+        />
+      </View>
+    );
+  };
+
   const renderBulkUpdatesSection = () => {
     return (
       <>
@@ -179,6 +212,7 @@ const UserProfile = () => {
                 validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
+              {renderMeasurementInputDefault()}
               {isConnectionAvailable ? (
                 <>
                   {renderBulkUpdatesSection()}
