@@ -31,6 +31,12 @@ Guidance for Claude Code when working in this repository.
 
 <!-- Append-only. Each entry: symptom → cause → fix. Newest at top. -->
 
+- **Sketch-on-image: compressed basemap / stray pinch marks / dead Android zoom** → `@StraboSpot/react-native-sketch-canvas`
+  exports the full canvas (aspect mismatch with the image basemap's stored width/height) and its `PanResponder` draws in
+  screen-space translation-only coords, ignores multi-touch, and blocks native gestures on Android → `Sketch.js` sizes the
+  canvas to the image aspect + saves with `cropToImageSize: true`; the rest is `patches/@StraboSpot+react-native-sketch-canvas+0.8.0.patch`
+  (transform-aware `locationX/locationY`, a `touches.length > 1` draw guard, and `onShouldBlockNativeResponder → false`).
+  JS-only — no native rebuild. **Rename the patch on any version bump** or patch-package skips it.
 - **iPad form modals slide off-screen** → rn-vui Overlay's KeyboardAvoidingView pushes them → set `doesRenderAsView` +
   Form `renderInline`.
 - **Second modal never appears on iOS** → a Modal presented while another dismisses gets dropped → chain via
