@@ -70,7 +70,9 @@ const useImageSize = () => {
       let imageHeight = imageProps?.height;
       let imageWidth = imageProps?.width;
 
-      if (!imageWidth || !imageHeight) ({imageWidth, imageHeight} = await getImageHeightAndWidth(imageProps.uri));
+      if (!imageWidth || !imageHeight) {
+        ({width: imageWidth, height: imageHeight} = await getImageHeightAndWidth(imageProps.uri));
+      }
 
       if (imageWidth > IMAGE_MAX_UPLOAD_SIZE || imageHeight > IMAGE_MAX_UPLOAD_SIZE) {
         if (imageWidth > imageHeight && imageWidth > IMAGE_MAX_UPLOAD_SIZE) {
