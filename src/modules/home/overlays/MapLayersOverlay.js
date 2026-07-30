@@ -66,7 +66,10 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
 
   const determineWhatCustomMapListToRender = () => {
-    if (isInternetReachable && isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
+    // Saved (offline) basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
+    if (isInternetReachable && isConnected) {
+      return [renderCustomMapsList(), renderOfflineCustomMapsList(), renderCustomOverlaysList()];
+    }
     else if (!isInternetReachable && isConnected) {
       return [
         renderCustomMapsList(),
