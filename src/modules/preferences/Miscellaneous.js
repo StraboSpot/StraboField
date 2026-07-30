@@ -4,6 +4,7 @@ import {ScrollView} from 'react-native';
 import {Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
+import ForceOfflineMode from './ForceOfflineMode';
 import GenerateRandomSpots from './GenerateRandomSpots';
 import Geolocate from './Geolocate';
 import ResetWarnings from './ResetWarnings';
@@ -34,6 +35,7 @@ const Miscellaneous = () => {
           isTestingMode={isTestingMode}
           textStyles={{flexWrap: 'wrap', flexShrink: 1}}
         />
+        <ForceOfflineMode textStyles={{flexWrap: 'wrap', flexShrink: 1}}/>
         <CustomEndpoint textStyles={{flexWrap: 'wrap', flexShrink: 1}}/>
         <Geolocate/>
         <GenerateRandomSpots isTestingMode={isTestingMode}/>

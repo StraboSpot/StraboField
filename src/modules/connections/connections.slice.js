@@ -7,6 +7,7 @@ const initialConnectionsState = {
     isVerified: false,
   },
   isAutoSaving: false,
+  isForceOffline: false,
   isLocalSaveNeeded: false,
   isOnline: {},
   backupFrequency: {
@@ -37,6 +38,9 @@ const connectionsSlice = createSlice({
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
     },
+    setForceOffline(state, action) {
+      state.isForceOffline = action.payload;
+    },
     setLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = true;
     },
@@ -59,6 +63,7 @@ export const {
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
+  setForceOffline,
   setLocalSaveNeeded,
   setNextAutoSaveTime,
   setOnlineStatus,
