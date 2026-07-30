@@ -3,7 +3,7 @@ import {Image, Platform} from 'react-native';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {readExifOrientation} from './imageOrientation.helpers';
+import {readExifOrientation, readJpegSize} from './imageOrientation.helpers';
 import {getLocalImageURI} from './imageURIs.helpers';
 import useDevice from '../../services/device/useDevice';
 import {TEMP_IMAGES_DOWNSIZED_DIRECTORY} from '../../services/files/directories.constants';
@@ -24,7 +24,13 @@ const useImageSize = () => {
 
   /* Exported Functions */
 
-  const getImageHeightAndWidth = (imageURI) => {
+  // Measures from the JPEG header first: on Android Image.getSize reports Fresco's decoded size,
+  // which caps at 2048px and so halves anything larger. Wrong dimensions matter because getCoordQuad
+  // turns them into an image basemap's geographic extent, which is what its Spots are placed against.
+  // Falls back to Image.getSize for a non-JPEG or a URI RNFS cannot read.
+  const getImageHeightAndWidth = async (imageURI) => {
+    const headerSize = await readJpegSize(imageURI);
+    if (headerSize) return headerSize;
     return new Promise((resolve, reject) => {
       Image.getSize(imageURI, (imageWidth, imageHeight) => {
         resolve({height: imageHeight, width: imageWidth});
