@@ -14,7 +14,7 @@ const IGSNLogo = ({item, onIGSNButtonPressed}) => {
         onPress={onIGSNButtonPressed}
         pressRetentionOffset={{top: 2, left: 2, right: 2, bottom: 2}}
         style={{
-          borderWidth: !item.isOnMySesar && 1,
+          borderWidth: item.isOnMySesar ? 0 : 1,
           borderColor: 'black',
           borderRadius: 7,
           padding: 2,
