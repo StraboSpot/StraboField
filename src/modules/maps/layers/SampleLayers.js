@@ -23,7 +23,8 @@ const SampleLayers = ({features}) => {
           shape={turf.featureCollection(featuresWithSamples)}
         >
           <MapboxGL.SymbolLayer
-            aboveLayerID={'pointLayerColorHalo'}
+            // Pin the starburst just below the point symbols: above the halos, below the point icon.
+            belowLayerID={'pointLayerNotSelected'}
             filter={['==', ['geometry-type'], 'Point']}
             id={'pointLayerSampleSymbols'}
             minZoomLevel={1}

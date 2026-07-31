@@ -4,9 +4,10 @@ import MapboxGL from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import {useSelector} from 'react-redux';
 
+import {ORANGE} from '../../../shared/styles.constants';
 import {convertImagePixelsToLatLong} from '../maps.helpers';
 
-const FILL_STYLE = {fillColor: 'orange', fillOpacity: 0.7};
+const FILL_STYLE = {fillColor: ORANGE, fillOpacity: 0.7};
 const BORDER_STYLE = {lineColor: 'white', lineWidth: 3};
 
 const DraggedIntervalLayer = () => {

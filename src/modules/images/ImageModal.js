@@ -1,30 +1,38 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
-import {Image} from '@rn-vui/base';
+import {Icon, Image} from '@rn-vui/base';
 
 import {ImagePropertiesModal, imageStyles} from '.';
-import {getResizedImageURI, getLocalImageURI} from './imageURIs.helpers';
+import {getLocalImageURI, getResizedImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import commonStyles from '../../shared/common.styles';
-import {SECONDARY_BACKGROUND_COLOR, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
+import {
+  BLACK,
+  PRIMARY_ACCENT_COLOR,
+  SECONDARY_BACKGROUND_COLOR,
+  SMALL_SCREEN,
+  SMALL_SCREEN_STATUS_BAR_OFFSET,
+  WARNING_COLOR,
+  WHITE,
+} from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import Loading from '../../shared/ui/Loading';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import SketchModal from '../sketch/SketchModal';
 
 const ImageModal = ({
                       deleteImage,
                       image,
                       isReadOnly,
                       isVisible,
-                      saveImages,
+                      onOpenSketch,
                       saveUpdatedImage,
                       setImageToView,
                       setIsImageModalVisible,
+                      shouldOpenProperties,
                     }) => {
   console.log('Rendering ImageModal...');
 
@@ -38,7 +46,18 @@ const ImageModal = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+
+  /* Side Effects */
+
+  // Auto-open the nested properties modal when the viewer is opened straight to properties from an
+  // image card (large screens only — small screens open the properties modal without the viewer).
+  // Nesting is required so it stacks reliably over the viewer's modal on iOS rather than as a sibling.
+  // Closing the viewer while properties is still open closes properties too, so it doesn't linger open
+  // (visually hidden with the viewer) and reappear the next time the viewer is opened.
+  useEffect(() => {
+    if (isVisible && shouldOpenProperties) setIsImagePropertiesModalVisible(true);
+    else if (!isVisible) setIsImagePropertiesModalVisible(false);
+  }, [isVisible, shouldOpenProperties]);
 
   /* Event Handlers */
 
@@ -49,15 +68,13 @@ const ImageModal = ({
   const onDeleteImage = async () => {
     setIsLoading(true);
     setIsImageDeleteModalVisible(false);
-    const isImageDeleted = await deleteImage(image);
-    setIsLoading(false);
-    if (isImageDeleted) setIsImageModalVisible(false);
-  };
-
-  /* Logic Helpers */
-
-  const openInSketch = () => {
-    setIsSketchModalVisible(true);
+    try {
+      const isImageDeleted = await deleteImage(image);
+      if (isImageDeleted) setIsImageModalVisible(false);
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   /* Render Functions */
@@ -65,6 +82,7 @@ const ImageModal = ({
   const renderDeleteImageModal = () => {
     return (
       <DeleteConformationDialogBox
+        doesRenderAsView
         headerTitle={'Delete Image'}
         isVisible={isImageDeleteModalVisible}
         onActionPressed={onDeleteImage}
@@ -76,6 +94,7 @@ const ImageModal = ({
       </DeleteConformationDialogBox>
     );
   };
+
 
   /* View */
 
@@ -109,27 +128,38 @@ const ImageModal = ({
           />
         </ImageZoomAndPanWrapper>
         <View style={imageStyles.rightsideIcons}>
-          <IconButton
+          <Icon
+            color={isImagePropertiesModalVisible ? WHITE : BLACK}
+            containerStyle={[
+              imageStyles.imageModalIconBox,
+              isImagePropertiesModalVisible && {backgroundColor: PRIMARY_ACCENT_COLOR},
+            ]}
+            name={'information-circle-outline'}
             onPress={() => setIsImagePropertiesModalVisible(true)}
-            source={require('../../assets/icons/ImagePropertiesButton.png')}
-            style={imageStyles.imageModalButtons}
+            size={32}
+            type={'ionicon'}
           />
           {Platform.OS !== 'web' && !isReadOnly && (
             <IconButton
-              onPress={openInSketch}
+              onPress={() => onOpenSketch(image)}
               source={require('../../assets/icons/ImageSketchButton.png')}
               style={imageStyles.imageModalButtons}
             />
           )}
           {!isReadOnly && (
-            <IconButton
+            <Icon
+              color={WARNING_COLOR}
+              containerStyle={imageStyles.imageModalIconBox}
+              name={'trash-outline'}
               onPress={() => handleDeleteImageOnPress()}
-              source={require('../../assets/icons/DeleteButton.png')}
-              style={imageStyles.imageModalButtons}
+              size={32}
+              type={'ionicon'}
             />
           )}
         </View>
       </View>
+
+      {/* Modal*/}
       {isImagePropertiesModalVisible && (
         <ImagePropertiesModal
           closeModal={() => setIsImagePropertiesModalVisible(false)}
@@ -141,9 +171,6 @@ const ImageModal = ({
         />
       )}
       {renderDeleteImageModal()}
-      {isSketchModalVisible && (
-        <SketchModal image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
-      )}
       <Loading isLoading={isLoading}/>
     </ModalWrapper>
   );

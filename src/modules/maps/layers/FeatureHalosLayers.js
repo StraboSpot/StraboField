@@ -10,6 +10,9 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
 
   const {getMapSymbology} = useMapSymbology();
 
+  // Pin the halos just below the point symbols so the point icons stay on top (full stack order in FeaturesLayers).
+  const belowLayerID = 'pointLayerNotSelected';
+
   /* View */
 
   return (
@@ -20,6 +23,7 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
         shape={turf.featureCollection(featuresSelected)}
       >
         <MapboxGL.CircleLayer
+          belowLayerID={belowLayerID}
           filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerSelectedHalo'}
           minZoomLevel={1}
@@ -28,11 +32,13 @@ const FeatureHalosLayers = ({featuresNotSelected, featuresSelected}) => {
       </MapboxGL.ShapeSource>
 
       {/* Colored Halo Around Points Layer */}
+      {/* Include selected features too so a selected spot keeps its tag/geologic-unit color halo. */}
       <MapboxGL.ShapeSource
         id={'pointSourceColorHalo'}
-        shape={turf.featureCollection(featuresNotSelected)}
+        shape={turf.featureCollection([...featuresNotSelected, ...featuresSelected])}
       >
         <MapboxGL.CircleLayer
+          belowLayerID={belowLayerID}
           filter={['==', ['geometry-type'], 'Point']}
           id={'pointLayerColorHalo'}
           minZoomLevel={1}

@@ -1,8 +1,7 @@
 import React from 'react';
-import {Platform, Switch, View} from 'react-native';
+import {Platform, Switch, useColorScheme, View} from 'react-native';
 
 import {
-  DARKGREY,
   LIGHTGREY,
   MEDIUMGREY,
   PRIMARY_ACCENT_COLOR,
@@ -12,6 +11,10 @@ import {
 } from '../styles.constants';
 
 const SwitchWrapper = ({disabled, onValueChange, value}) => {
+
+  const systemScheme = useColorScheme();
+  const isDarkMode = systemScheme === 'dark';
+
   if (Platform.OS === 'web') {
     return (
       <Switch
@@ -30,10 +33,9 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
       <View style={{transform: [{scaleX: 0.7}, {scaleY: 0.8}], marginRight: 5}}>
         <Switch
           disabled={disabled}
+          ios_backgroundColor={isDarkMode ? MEDIUMGREY : LIGHTGREY}
           onValueChange={onValueChange}
-          thumbColor={DARKGREY}
-          // style={{transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
-          trackColor={{false: MEDIUMGREY, true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
+          trackColor={{true: disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}}
           value={value}
         />
       </View>

@@ -11,6 +11,8 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import Spacer from '../../shared/ui/Spacer';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import useIsConnectionAvailable from '../connections/useConnectionStatus';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
@@ -23,9 +25,9 @@ const StraboFieldProjects = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const user = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
   const {openURL} = useDevice();
 
   /* Event Handlers */
@@ -60,20 +62,18 @@ const StraboFieldProjects = () => {
         ListHeaderComponent={
           <>
             <SectionDivider dividerText={'Load a Project'}/>
+            {!isEmpty(user.name) && !isConnectionAvailable && (
+              <ConnectionRequiredMessage actionText={'download a project'}/>
+            )}
             <MainMenuPanelListItem onPress={onStartNewProject} title={'New'}/>
             <FlatListItemSeparator/>
-            {!isEmpty(user.name) && isOnline.isConnected && (
+            {!isEmpty(user.name) && isConnectionAvailable && (
               <>
                 <MainMenuPanelListItem onPress={onLoadProjectsFromServer} title={'Download'}/>
                 <FlatListItemSeparator/>
               </>
             )}
             <MainMenuPanelListItem onPress={onLoadProjectsFromDevice} title={'Open'}/>
-            {!isEmpty(user.name) && !isOnline.isConnected && (
-              <Text style={{...overlayStyles.statusMessageText, fontWeight: 'bold'}}>
-                Please connect to the Internet.
-              </Text>
-            )}
             <FlatListItemSeparator/>
             <MainMenuPanelListItem onPress={onLoadProjectsFromDownloadsFolder} title={'Import'}/>
             {Platform.OS === 'android' && (

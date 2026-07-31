@@ -4,6 +4,7 @@ import {FlatList, Platform, Text, View} from 'react-native';
 import {Icon, Input, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {CUSTOM_MAP_TYPES} from './customMaps.constants';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
@@ -23,7 +24,6 @@ import {formStyles} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
-import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
@@ -294,16 +294,18 @@ const CustomMapDetails = () => {
           && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
             || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
-          <ActionButton
-            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title)
-              || isEmpty(editableCustomMapData.id) || editableCustomMapData.source === 'map_warper')}
-            onPress={saveMap}
-            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-          />
-          <DeleteButton
-            onPress={confirmDeleteMap}
-            title={'Delete Map'}
-          />
+          <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View>
+              {!isEmpty(customMapToEdit) && <DeleteButton onPress={confirmDeleteMap}/>}
+            </View>
+            <ActionButton
+              disabled={editableCustomMapData
+                && (isEmpty(editableCustomMapData.title) || isEmpty(editableCustomMapData.id)
+                  || editableCustomMapData.source === 'map_warper')}
+              onPress={saveMap}
+              title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            />
+          </View>
         </View>
       </View>
 

@@ -15,14 +15,16 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
-const ProjectList = ({doRefresh, onProjectPress, source}) => {
+const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const userData = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
   const {getAllDeviceProjects, getAllServerProjects} = useProject();
 
   /* Local State */
@@ -96,13 +98,13 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
-        disabled={!isOnline.isConnected && source !== 'device'}
+        disabled={!isConnectionAvailable && source !== 'device'}
         disabledStyle={{backgroundColor: 'lightgrey'}}
         onPress={() => onProjectPress(item)}
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>
-            {source === 'server' ? item.name : item.fileName}
+            {source === 'server' ? item.name : (item.displayName || item.fileName)}
           </ListItem.Title>
           {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
@@ -117,8 +119,15 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
 
   const renderProjectsList = () => {
     if (!isEmpty(userData)) {
+      const allProjects = projectsArr.projects || [];
+      const filteredProjects = source === 'device'
+        ? allProjects.filter(p => backupType === 'auto' ? p.isAutoBackup : !p.isAutoBackup)
+        : allProjects.filter(p => !p.isCollaborativeProject);
       return (
         <View style={{flex: 1}}>
+          {source === 'server' && !isConnectionAvailable && (
+            <ConnectionRequiredMessage actionText={'download a project'}/>
+          )}
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={
@@ -130,7 +139,7 @@ const ProjectList = ({doRefresh, onProjectPress, source}) => {
                 {isError && renderErrorMessage()}
               </View>
             }
-            data={projectsArr.projects}
+            data={filteredProjects}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderProjectItem(item)}/>
         </View>

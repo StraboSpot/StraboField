@@ -6,7 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
-import useAutoBackup from '../../services/files/useAutoBackup';
+import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -17,8 +17,9 @@ import {
   setIsScaleBarMetric,
   startedIntervalDrag,
 } from '../maps/maps.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {
@@ -32,7 +33,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const autoBackupFrequency = useSelector(state => state.home.autoBackupFrequency);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -47,7 +47,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const {getTargetDatasetFromId} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
-  const {performAutoBackup} = useAutoBackup();
+  useAutoSave();
 
   /* Local State */
 
@@ -57,6 +57,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
+  /* Derived Variables */
+
+  const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
+
   /* Side Effects */
 
   useEffect(() => {
@@ -64,15 +68,15 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
 
+  // Switching to an image basemap or strat section leaves the current map, so cancel any in-progress
+  // editing or drawing (those changes belong to the map you were on).
+  useEffect(() => {
+    if (isEditingOrDrawing) onCancel();
+  }, [currentImageBasemap, stratSection]);
+
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
   }, [isDragIntervalMode]);
-
-  useEffect(() => {
-    if (!autoBackupFrequency) return;
-    const interval = setInterval(performAutoBackup, autoBackupFrequency);
-    return () => clearInterval(interval);
-  }, [autoBackupFrequency]);
 
   /* Internal Functions */
 
@@ -211,6 +215,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
+        // Commit the deferred timestamp bump for spots actually moved during the drag, so only a
+        // real reorder dirties the dataset/project. Nothing moved → nothing to bump.
+        const changedSpotIds = store.getState().map.intervalDragChangedSpotIds;
+        if (changedSpotIds?.length > 0) dispatch(updatedModifiedTimestampsBySpotsIds(changedSpotIds));
         dispatch(savedIntervalDragReordering());
         setMapMode(MAP_MODES.VIEW);
         break;
@@ -256,7 +264,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const setMapModeToEdit = () => {
-    lockOrientation();
+    if (!SMALL_SCREEN) lockOrientation();
     setMapMode(MAP_MODES.EDIT);
   };
 

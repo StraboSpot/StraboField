@@ -12,7 +12,6 @@ import {AddFold, FoldGeometryChoices} from './fold-geometry';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -151,7 +150,8 @@ const AddThreeDStructureModal = () => {
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
         headerTitle={'Add 3D Structure'}
-        showActionButton={false}
+        onActionPressed={save3DStructure}
+        showActionButton={!choicesViewKey}
         showCancelButton={false}
         showCloseButton
       >
@@ -175,7 +175,6 @@ const AddThreeDStructureModal = () => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={save3DStructure}/>}
       </ModalWrapper>
     );
   };

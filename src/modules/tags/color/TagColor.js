@@ -15,7 +15,7 @@ const TagColor = ({tempColor, onTempColorChange}) => {
 
   return (
     <>
-      <View style={{flexDirection: 'row', alignItems: 'center', padding: 10, paddingBottom: 40}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', padding: 10}}>
         <Text style={[formStyles.fieldLabel, {flex: 0, paddingRight: 10}]}>Color</Text>
         <Icon
           color={tempColor}

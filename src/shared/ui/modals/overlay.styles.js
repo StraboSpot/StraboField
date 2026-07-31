@@ -1,10 +1,7 @@
-import {Dimensions, Platform, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 import * as themes from '../../styles.constants';
 import {LIGHTGREY, MODAL_WIDTH, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../styles.constants';
-
-const platform = Platform.OS === 'ios' ? 'window' : 'screen';
-const {height} = Dimensions.get(platform);
 
 const styles = StyleSheet.create({
   animationContainer: {
@@ -51,15 +48,9 @@ const styles = StyleSheet.create({
     color: themes.PRIMARY_TEXT_COLOR,
   },
   headerText: {
-    color: 'red',
+    color: themes.WARNING_COLOR,
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  importantText: {
-    color: 'red',
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT_500,
     textAlign: 'center',
   },
   inputContainer: {
@@ -72,7 +63,6 @@ const styles = StyleSheet.create({
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 5,
-    height: height * 0.80,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: MODAL_WIDTH,

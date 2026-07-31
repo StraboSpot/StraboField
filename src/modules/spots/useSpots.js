@@ -18,7 +18,7 @@ import {
   sortSpotsByDateCreated,
   sortSpotsByDateLastModified,
 } from './spots.helpers';
-import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, setSelectedSpot} from './spots.slice';
+import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, restoredSpots, setSelectedSpot} from './spots.slice';
 import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
@@ -30,6 +30,7 @@ import {
   deletedSpotIdFromDatasets,
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
+  restoredSpotReferences,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
 } from '../project/projects.slice';
@@ -41,9 +42,11 @@ const useSpots = () => {
 
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const datasets = useSelector(state => state.project.datasets);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const recentViews = useSelector(state => state.spot.recentViews);
+  const reports = useSelector(state => state.project.project?.reports);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
@@ -100,10 +103,53 @@ const useSpots = () => {
     return {spotName: newSpotName, spotNumber: spotNumber};
   };
 
+  // Find Spots that reference any of the given ids in their samples array (e.g. a rich sample's parent Spot),
+  // so an undo can also restore the parent -> sample link that deleteRichSample severs.
+  const getReferencingParentSpots = (deletedSpotIds) => {
+    return Object.values(spots).filter(
+      spot => !deletedSpotIds.includes(spot.properties.id)
+        && spot.properties.samples?.some(sample => deletedSpotIds.includes(sample.id)),
+    );
+  };
+
+  // Collect every rich-sample Spot nested under a Spot (recursively), so a delete + its undo cover them all.
+  const getRichSampleSpots = (spotToDelete) => {
+    const collected = {};
+    const collect = (spot) => {
+      spot.properties?.samples?.forEach((sample) => {
+        const sampleSpot = spots[sample.id];
+        if (sampleSpot && sample.id !== spotToDelete.properties.id && !collected[sample.id]) {
+          collected[sample.id] = sampleSpot;
+          collect(sampleSpot);
+        }
+      });
+    };
+    collect(spotToDelete);
+    return Object.values(collected);
+  };
+
   const getStratSectionSettings = (stratSectionId) => {
     const spot = getSpotWithThisStratSection(stratSectionId);
     return spot && spot.properties && spot.properties.sed
     && spot.properties.sed.strat_section ? spot.properties.sed.strat_section : undefined;
+  };
+
+  const removeSpotAndReferences = (spotId) => {
+    dispatch(deletedSpotIdFromReports(spotId));
+    dispatch(deletedSpotIdFromTags(spotId));
+    dispatch(deletedSpotIdFromDatasets(spotId));
+    dispatch(deletedSpot(spotId));
+  };
+
+  const undoDeleteSpot = (undoSnapshot) => {
+    dispatch(restoredSpotReferences({
+      datasets: undoSnapshot.datasets,
+      reports: undoSnapshot.reports,
+      tags: undoSnapshot.tags,
+    }));
+    dispatch(restoredSpots(undoSnapshot.spots));
+    const spotToReselect = undoSnapshot.spots[undoSnapshot.selectedSpotId];
+    if (spotToReselect) dispatch(setSelectedSpot(spotToReselect));
   };
 
   /* Exported Functions */
@@ -227,6 +273,11 @@ const useSpots = () => {
     newSpot.properties.modified_timestamp = Date.now();
 
     // Set spot name
+    if (newSpot.properties?.isSample) {
+      const initialNamePrefix = preferences.sample_prefix || '';
+      const startingNumber = preferences.starting_sample_number;
+      newSpot.properties.name = initialNamePrefix + (startingNumber < 10 ? '0' + startingNumber : startingNumber);
+    }
     if (!newSpot.properties.name) {
       const {spotName, spotNumber} = getNewSpotNameObj(newSpot);
       newSpot.properties.name = spotName;
@@ -237,7 +288,7 @@ const useSpots = () => {
       if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         updatedPreferences = {
           ...(updatedPreferences || preferences),
-          starting_sample_number: (preferences.starting_sample_number || 1) + 1,
+          starting_sample_number: (Number(preferences.starting_sample_number) || 1) + 1,
         };
       }
       if (updatedPreferences) dispatch(updatedProject({field: 'preferences', value: updatedPreferences}));
@@ -274,13 +325,39 @@ const useSpots = () => {
     return newSpot;
   };
 
-  const deleteSpot = (spotId) => {
+  const deleteSpot = (spotToDelete) => {
+    const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
-    dispatch(deletedSpotIdFromReports(spotId));
-    dispatch(deletedSpotIdFromTags(spotId));
-    dispatch(deletedSpotIdFromDatasets(spotId));
-    dispatch(deletedSpot(spotId));
+    const spotsToDelete = [spotToDelete, ...getRichSampleSpots(spotToDelete)];
+
+    // Undo is native-only: web syncs deletes to the server immediately, so a local-only undo would be misleading.
+    // Capture the pre-delete state BEFORE dispatching so the toast's undo can restore it verbatim.
+    let undoSnapshot;
+    if (Platform.OS !== 'web') {
+      const deletedSpotIds = spotsToDelete.map(spot => spot.properties.id);
+      // Parent Spots aren't deleted, but their samples array is edited elsewhere - restore them to keep the link.
+      const parentSpots = getReferencingParentSpots(deletedSpotIds);
+      undoSnapshot = {
+        datasets: datasets,
+        reports: reports,
+        selectedSpotId: spotId,
+        spots: [...parentSpots, ...spotsToDelete].reduce((acc, spot) => ({...acc, [spot.properties.id]: spot}), {}),
+        tags: tags,
+      };
+    }
+
+    spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
     dispatch(setModalVisible({modal: null}));
+
+    if (undoSnapshot) {
+      toast.show(`Deleted ${spotToDelete.properties.isSample ? 'Sample' : 'Spot'} "${spotToDelete.properties.name}"`, {
+        // animationDuration: 150,
+        data: {onUndo: () => undoDeleteSpot(undoSnapshot)},
+        duration: 8000,
+        placement: 'bottom',
+        type: 'undo',
+      });
+    }
   };
 
   const getActiveImageBasemaps = () => {
@@ -349,15 +426,18 @@ const useSpots = () => {
     });
   };
 
-  // Get Active Spots with Valid Geometry
+  // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
     const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
+      if (spot.properties.isSample) return false;
       const geometries = spot.geometry?.geometries || [spot.geometry] || [];
       let hasValidGeometry = true;
       geometries.forEach((g) => {
         const coordsFlat = g?.coordinates?.flat(Infinity) || [];
         const coordsFlatValid = coordsFlat.filter(c => c !== null && c !== undefined && !Number.isNaN(c));
-        if (!hasValidGeometry || isEmpty(coordsFlat) || !isEqual(coordsFlat, coordsFlatValid)) hasValidGeometry = false;
+        if (!hasValidGeometry || isEmpty(coordsFlat) || !isEqual(coordsFlat, coordsFlatValid)) {
+          hasValidGeometry = false;
+        }
       });
       if (spot.geometry && !hasValidGeometry) {
         alert('Invalid Geometry',
@@ -403,6 +483,8 @@ const useSpots = () => {
     return rootSpot;
   };
 
+  const getSampleSpotIconSource = () => require('../../assets/icons/SampleRound.png');
+
   const getSpotById = (spotId) => {
     if (spots[spotId]) return spots[spotId];
     else Sentry.captureMessage(`Missing Spot ${spotId}`);
@@ -435,16 +517,12 @@ const useSpots = () => {
     }, []);
   };
 
-  const getSpotsWithImages = () => {
-    return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties.images));
-  };
-
   const getSpotsWithKey = (key) => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties[key]));
   };
 
   const getSpotsWithSamples = () => {
-    return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties.samples));
+    return Object.values(spots).filter(spot => !spot.properties?.isSample && !isEmpty(spot.properties.samples));
   };
 
   // Get all active Spots that contain a strat section
@@ -454,15 +532,24 @@ const useSpots = () => {
 
   const getSpotWithThisImageBasemap = (imageBasemapId) => {
     return Object.values(getActiveSpotsObj()).find((spot) => {
-      const spotFound = spot.properties?.images?.find(image => image.id === imageBasemapId);
+      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageBasemapId?.toString());
       return spotFound ? spot : undefined;
     });
+  };
+
+  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
+  const getSpotWithThisSample = (sampleId) => {
+    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
   };
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
   const getSpotWithThisStratSection = (stratSectionId) => {
     return Object.values(getActiveSpotsObj()).find(
       spot => spot?.properties?.sed?.strat_section?.strat_section_id?.toString() === stratSectionId?.toString());
+  };
+
+  const getVisibleSpots = () => {
+    return Object.values(getActiveSpotsObj()).filter(spot => !spot.properties?.isSample);
   };
 
   const handleSpotSelected = (spot) => {
@@ -513,6 +600,7 @@ const useSpots = () => {
     getNewSpotName,
     getRecentSpots,
     getRootSpot,
+    getSampleSpotIconSource,
     getSpotById,
     getSpotByImageId,
     getSpotGeometryIconSource,
@@ -520,12 +608,13 @@ const useSpots = () => {
     getSpotsInMapExtent,
     getSpotsMappedOnGivenImageBasemap,
     getSpotsMappedOnGivenStratSection,
-    getSpotsWithImages,
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,
     getSpotWithThisImageBasemap,
+    getSpotWithThisSample,
     getSpotWithThisStratSection,
+    getVisibleSpots,
     handleSpotSelected,
     isOnGeoMap,
     isOnImageBasemap,

@@ -2,6 +2,7 @@ import {Linking, PixelRatio} from 'react-native';
 
 import 'react-native-get-random-values';
 import isEqual from 'fast-deep-equal';
+import moment from 'moment/moment';
 import {v4 as uuidv4} from 'uuid';
 
 const passwordValidator = require('password-validator');
@@ -172,6 +173,15 @@ export const getNewCopyId = () => Math.floor(10000000000000 + Math.random() * 90
 export const getNewId = () => Math.floor((new Date().getTime() + Math.random()) * 10);
 
 export const getNewUUID = () => uuidv4();
+
+export const getTimeAndDateFromModifiedTimestamp = (field) => {
+  return {
+    time: moment(field).format('HH:mm:ss'),
+    day: moment(field).format('D'),
+    month: moment(field).format('MM'),
+    year: moment(field).format('YYYY'),
+  };
+};
 
 export const hasSpace = filename => filename.includes(' ');
 

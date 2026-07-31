@@ -6,13 +6,13 @@ import {useSelector} from 'react-redux';
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
+import useMapFeatures from '../features/useMapFeatures';
 import {MAP_MODES} from '../maps.constants';
+import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
+import {getUniqFeatures} from './layers.helpers';
 import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from '../symbology/mapSymbology.constants';
 import useMapSymbology from '../symbology/useMapSymbology';
-import useMapFeatures from '../useMapFeatures';
-import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
-import {getUniqFeatures} from './layers.helpers';
 
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */
@@ -37,9 +37,10 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
 
   // Get selected and not selected Spots as features, split into multiple features if multiple orientations
   const featuresNotSelected = useMemo(() => {
-    console.log('Getting Spots Not Selected as Features...');
-    return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
-  }, [spotsNotSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
+      console.log('Getting Spots Not Selected as Features...');
+      return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
+    },
+    [spotsNotSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
@@ -67,15 +68,6 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
 
   return (
     <>
-      {/* Halos Around Point Features Layers */}
-      {/* Use unique features so multiple halos are not stacked on top of each other */}
-      <FeatureHalosLayers
-        featuresNotSelected={featuresNotSelectedUniq}
-        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
-      />
-
-      <SampleLayers features={features}/>
-
       <MapboxGL.Images
         images={symbols}
         onImageMissing={(imageKey) => {
@@ -83,7 +75,7 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
         }}
       />
 
-      {/* Not Selected Features Layer */}
+      {/* Not Selected Feature Layers (polygons, then lines, then point icons) */}
       {isEmpty(featuresReadOnly) ? <FeaturesNotSelectedLayers features={features}/> : (
         <>
           {/* Editable & Read Only Features Layers */}
@@ -94,6 +86,16 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
 
       {/* Selected Features Layer */}
       <FeaturesSelectedLayers featuresSelected={isDragIntervalMode ? [] : featuresSelected}/>
+
+      {/* Halos + sample starbursts, pinned just below the point icons (pointLayerNotSelected). Full stack, bottom
+       to top: polygons, lines, selected-point halo, tag/geologic color halo, sample starburst, point icon.
+       Declared after the feature layers so the point layer exists as the pin anchor. Halos use unique features so
+       they are not stacked on top of each other. */}
+      <FeatureHalosLayers
+        featuresNotSelected={featuresNotSelectedUniq}
+        featuresSelected={isDragIntervalMode ? [] : featuresSelectedUniq}
+      />
+      <SampleLayers features={features}/>
     </>
   );
 };

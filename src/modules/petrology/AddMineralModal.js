@@ -11,7 +11,6 @@ import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
@@ -199,7 +198,6 @@ const AddMineralModal = () => {
             bounces={false}
           />
         )}
-        {!choicesViewKey && <ActionButton onPress={saveMineral}/>}
       </>
     );
   };
@@ -216,7 +214,8 @@ const AddMineralModal = () => {
       buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
       closeModal={onCloseModalPressed}
       headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
-      showActionButton={false}
+      onActionPressed={saveMineral}
+      showActionButton={!isShowTemplates && isEmpty(selectedTypeIndex) && !choicesViewKey}
       showCancelButton={false}
       showCloseButton={!areMultipleTemplates}
     >

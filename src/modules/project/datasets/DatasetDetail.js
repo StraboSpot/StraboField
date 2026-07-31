@@ -17,6 +17,7 @@ import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConform
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
@@ -28,9 +29,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
+  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
+
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset} = useProject();
-  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
   const toast = useToast();
 
   /* Local State */
@@ -101,7 +103,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         </Text>
         <Text style={overlayStyles.statusMessageText}>
           This will
-          <Text style={overlayStyles.importantText}> ERASE </Text>
+          <Text style={commonStyles.importantText}> ERASE </Text>
           everything in this dataset including Spots, images, and all other data!
         </Text>
       </DeleteConformationDialogBox>
@@ -118,7 +120,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
           title={'Delete Dataset'}
         />
         {isDisabled(dataset.id) && (
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 30}]}>
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
             *{dataset.name} can not be deleted while still set as the target (starred) dataset.
           </Text>
         )}
@@ -314,6 +316,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       {renderSpotsField()}
       {renderImagesField()}
       <LittleSpacer/>
+      <RunQAQC dataset={dataset}/>
       {renderReadOnlyDatasetButton()}
       <LittleSpacer/>
       {Platform.OS === 'web' && renderDeleteDatasetButton()}

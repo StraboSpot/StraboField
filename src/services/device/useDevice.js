@@ -1,6 +1,7 @@
-import {Linking, PermissionsAndroid, Platform} from 'react-native';
+import {Linking, Platform} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
+import moment from 'moment';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -13,13 +14,12 @@ import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modul
 import {APP_DIRECTORIES} from '../files/directories.constants';
 import useServerRequests from '../network/useServerRequests';
 
-const {PERMISSIONS, RESULTS} = PermissionsAndroid;
 const useDevice = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
 
-  const {checkPermission} = usePermissions();
+  const {hasStoragePermission} = usePermissions();
   const {handleError, safePick} = useSafeDocumentPicker();
   const {getImage, getProfileImageURL} = useServerRequests();
 
@@ -52,15 +52,14 @@ const useDevice = () => {
   const createProjectDirectories = async () => {
     console.log('Creating Project Directories...');
     if (Platform.OS === 'android') {
-      const permissionsGranted = await checkPermission(PERMISSIONS.WRITE_EXTERNAL_STORAGE);
-      if (permissionsGranted === RESULTS.GRANTED) {
+      if (await hasStoragePermission()) {
         await makeDirectory(APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID);
         console.log('Android Downloads/StraboSpot/Backups directory created');
         await makeDirectory(APP_DIRECTORIES.EXPORT_FILES_ANDROID);
         console.log('AndroidExportFiles directory created');
       }
       else {
-        console.log('PERMISSION NOT GRANTED', permissionsGranted);
+        console.log('PERMISSION NOT GRANTED');
       }
     }
     if (Platform.OS === 'ios') {
@@ -443,31 +442,6 @@ const useDevice = () => {
     }
   };
 
-  const requestReadDirectoryPermission = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        {
-          title: 'Need permission to read Downloads Folder',
-          message:
-            'StraboField needs permission to access your Downloads Folder to retrieve backups,',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can read the folder');
-      }
-      else {
-        console.log('Folder read permission denied');
-      }
-    }
-    catch (err) {
-      console.warn(err);
-    }
-  };
-
   const unZipAndCopyImportedData = async (zipFile) => {
     try {
       if (Platform.OS === 'android') {
@@ -519,6 +493,47 @@ const useDevice = () => {
     }
   };
 
+  const AUTO_SAVES_DIR = APP_DIRECTORIES.BACKUP_DIR + 'AutoBackups/';
+
+  const pruneOldProjectSaves = async (maxSaves) => {
+    try {
+      const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
+      if (!dirExists) return;
+      const allItems = await RNFS.readdir(AUTO_SAVES_DIR);
+      const saveFiles = allItems
+        .filter(item => item.endsWith('.json'))
+        .sort((a, b) => {
+          const tsA = a.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          const tsB = b.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          return tsB.localeCompare(tsA);
+        });
+      const toDelete = saveFiles.slice(maxSaves);
+      for (const file of toDelete) {
+        await RNFS.unlink(AUTO_SAVES_DIR + file);
+        console.log('Auto save pruned:', file);
+      }
+    }
+    catch (err) {
+      console.error('Error pruning auto saves:', err);
+    }
+  };
+
+  const saveProjectToDevice = async (snapshot) => {
+    try {
+      await makeDirectory(APP_DIRECTORIES.BACKUP_DIR);
+      await makeDirectory(AUTO_SAVES_DIR);
+      const projectName = snapshot?.projectDb?.project?.description?.project_name || '';
+      const sanitizedName = projectName.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/, '');
+      const filename = moment().format('YYYY-MM-DDTHH-mm-ss') + (sanitizedName ? '_' + sanitizedName : '') + '.json';
+      await writeFileToDevice(AUTO_SAVES_DIR, filename, snapshot);
+      console.log('Auto save written:', filename);
+    }
+    catch (err) {
+      console.error('Error saving project to device:', err);
+      throw Error(err);
+    }
+  };
+
   const writeFileToDevice = async (path, filename, data) => {
     try {
       console.log('Writing file to internal storage ...', path + '/' + filename);
@@ -562,7 +577,8 @@ const useDevice = () => {
     readDirectoryForMapFiles,
     readDirectoryForMapTiles,
     readFile,
-    requestReadDirectoryPermission,
+    pruneOldProjectSaves,
+    saveProjectToDevice,
     unZipAndCopyImportedData,
     writeFileToDevice,
   };

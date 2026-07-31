@@ -2,13 +2,13 @@ import {PixelRatio, Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
 
-import useMapFeaturesCalculated from './useMapFeaturesCalculated';
+import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import {isEmpty} from '../../shared/helpers';
 
 const useMapMeasure = (mapRef) => {
   /* Data Hooks */
 
-  const {getNearestFeatureInBBox} = useMapFeaturesCalculated(mapRef);
+  const {getRandomFeatureInBBox} = useMapFeaturesCalculated(mapRef);
 
   /* Exported Functions */
 
@@ -21,7 +21,7 @@ const useMapMeasure = (mapRef) => {
     // Used to draw a line between points
     const linestring = {'type': 'Feature', 'geometry': {'type': 'LineString', 'coordinates': []}};
 
-    const featureAtPoint = await getNearestFeatureInBBox([screenPointX, screenPointY], ['measureLayerPoints']);
+    const featureAtPoint = await getRandomFeatureInBBox([screenPointX, screenPointY], ['measureLayerPoints']);
     // console.log('Feature at pressed point:', featureAtPoint);
 
     // Remove the linestring from the group so that we can redraw it based on points collection.

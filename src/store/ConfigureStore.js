@@ -51,6 +51,7 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
+  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime'],
   timeout: null,
 };
 
@@ -112,7 +113,7 @@ const mapConfig = {
   timeout: null,
   blacklist: [
     'freehandFeatureCoords',
-    'isMapMoved',
+    'isMapExtentFilterActive',
     'selectedCustomMapToEdit',
     'vertexEndCoords',
     'vertexStartCoords',

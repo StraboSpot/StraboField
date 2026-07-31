@@ -18,8 +18,18 @@ const spotSlice = createSlice({
       state.spots = action.payload;
     },
     addedSpotsFromServer(state, action) {
-      state.spots = Object.assign({}, ...action.payload.map(spot => ({...state.spots, [spot.properties.id]: spot})));
-      console.log('ADDED Spots:', state.spots, 'in Existing Spots:', current(state));
+      // Merge each downloaded spot in by id, overwriting the local copy.
+      action.payload.forEach((spot) => {
+        state.spots[spot.properties.id] = spot;
+      });
+      // If the currently selected spot was among those refreshed (e.g. keeping the server copy on a
+      // conflict), update it too so the open view shows the new server data instead of the stale copy.
+      if (!isEmpty(state.selectedSpot)) {
+        const refreshedSpot = action.payload.find(
+          spot => spot.properties.id === state.selectedSpot.properties.id,
+        );
+        if (refreshedSpot) state.selectedSpot = refreshedSpot;
+      }
     },
     clearedSelectedSpots(state) {
       state.selectedSpot = {};
@@ -116,7 +126,8 @@ const spotSlice = createSlice({
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
-        spotToEdit.properties[field] = value;
+        if (isEmpty(value)) delete spotToEdit.properties[field];
+        else spotToEdit.properties[field] = value;
         spotToEdit.properties.modified_timestamp = Date.now();
         if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
         if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
@@ -133,6 +144,10 @@ const spotSlice = createSlice({
       if (!isEmpty(state.selectedSpot) && Object.keys(spots).includes(state.selectedSpot?.properties?.id)) {
         state.selectedSpot = spots[state.selectedSpot.properties.id];
       }
+    },
+    restoredSpots(state, action) {
+      // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots.
+      state.spots = {...state.spots, ...action.payload};
     },
     setIntersectedSpotsForTagging(state, action) {
       state.intersectedSpotsForTagging = action.payload;
@@ -168,6 +183,7 @@ export const {
   editedSpotProperties,
   resetSpotState,
   restoredIntervalDragSnapshot,
+  restoredSpots,
   setIntersectedSpotsForTagging,
   setSelectedAttributes,
   setSelectedSpot,

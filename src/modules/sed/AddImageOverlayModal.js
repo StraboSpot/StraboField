@@ -9,7 +9,6 @@ import {showFieldInfo, validateImageOverlay} from './sed.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {NumberInputField, SelectInputField, useForm} from '../form';
 import {setStratSection} from '../maps/maps.slice';
@@ -134,10 +133,12 @@ const AddImageOverlayModal = ({
   const renderAddImageOverlayModal = () => {
     return (
       <ModalWrapper
-        buttonTitleRight={!isReadOnly && 'Save'}
         headerTitle={'Add Image Overlay'}
-        onActionPressed={() => isReadOnly ? closeModal() : saveImageOverlay(overlayFormRef?.current?.values)}
-        onCancelPress={() => !isReadOnly && closeModal()}
+        onActionPressed={saveImageOverlay}
+        onCancelPress={closeModal}
+        onDeletePress={deleteImageOverlayConfirm}
+        showActionButton={!isReadOnly}
+        showDeleteButton={!isEmpty(image) && !isReadOnly}
       >
         <Formik
           enableReinitialize={false}
@@ -254,9 +255,6 @@ const AddImageOverlayModal = ({
             </View>
           )}
         </Formik>
-        {!isEmpty(image) && !isReadOnly && (
-          <DeleteButton onPress={deleteImageOverlayConfirm} title={'Remove Image Overlay'}/>
-        )}
       </ModalWrapper>
     );
   };

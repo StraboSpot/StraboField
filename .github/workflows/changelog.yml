@@ -1,0 +1,70 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get previous release tag
+        id: prev_tag
+        run: |
+          CURR=${{ github.ref_name }}
+          # Find the tag immediately preceding this release in version order.
+          # Include CURR in the sorted list so we can grab whatever sits just below it,
+          # whether the previous release was a patch, minor, or major bump.
+          PREV_TAG=$( { git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'; echo "$CURR"; } \
+            | sort -V | uniq | awk -v c="$CURR" '$0==c{print prev; exit} {prev=$0}')
+          echo "Previous release tag: $PREV_TAG"
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog
+        run: |
+          PREV=${{ steps.prev_tag.outputs.prev_tag }}
+          CURR=${{ github.ref_name }}
+
+          # If there is no previous tag (first release), log the full history up to CURR.
+          if [ -n "$PREV" ]; then RANGE="$PREV..$CURR"; else RANGE="$CURR"; fi
+
+          changelog=$(git log $RANGE --pretty=format:"%s" | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)\|^chore: bump version\|^chore: update changelog\|^fix: use\|^fix: fetch\|^fix: force\|^fix: make\|^fix: prefer\|^fix: delete" | awk '
+          /^feat/ { features[++fc] = $0 }
+          /^fix/  { fixes[++bc] = $0 }
+          /^chore/ { chores[++cc] = $0 }
+          /^docs/ { docs[++dc] = $0 }
+          /^refactor/ { refactors[++rc] = $0 }
+          END {
+            print "## '"$CURR"' - '"$(date +%Y-%m-%d)"'\n"
+            if (fc > 0) { print "### ✨ Features"; for (i=1;i<=fc;i++) print "- " features[i]; print "" }
+            if (bc > 0) { print "### 🐛 Bug Fixes"; for (i=1;i<=bc;i++) print "- " fixes[i]; print "" }
+            if (rc > 0) { print "### ♻️ Refactors"; for (i=1;i<=rc;i++) print "- " refactors[i]; print "" }
+            if (dc > 0) { print "### 📝 Docs"; for (i=1;i<=dc;i++) print "- " docs[i]; print "" }
+            if (cc > 0) { print "### 🔧 Chores"; for (i=1;i<=cc;i++) print "- " chores[i]; print "" }
+          }')
+
+          echo "$changelog" > release_notes.md
+          cat release_notes.md
+
+      - name: Delete existing release if present
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete ${{ github.ref_name }} --repo ${{ github.repository }} --yes 2>/dev/null || true
+
+      - name: Publish Official Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false

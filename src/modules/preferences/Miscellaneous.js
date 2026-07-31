@@ -4,9 +4,10 @@ import {ScrollView} from 'react-native';
 import {Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
-import AutoBackup from './AutoBackup';
+import ForceOfflineMode from './ForceOfflineMode';
 import GenerateRandomSpots from './GenerateRandomSpots';
 import Geolocate from './Geolocate';
+import ResetWarnings from './ResetWarnings';
 import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -30,14 +31,15 @@ const Miscellaneous = () => {
   const renderPreferences = () => {
     return (
       <>
-        <AutoBackup/>
         <TestingMode
           isTestingMode={isTestingMode}
           textStyles={{flexWrap: 'wrap', flexShrink: 1}}
         />
+        <ForceOfflineMode textStyles={{flexWrap: 'wrap', flexShrink: 1}}/>
         <CustomEndpoint textStyles={{flexWrap: 'wrap', flexShrink: 1}}/>
         <Geolocate/>
         <GenerateRandomSpots isTestingMode={isTestingMode}/>
+        <ResetWarnings/>
       </>
     );
   };

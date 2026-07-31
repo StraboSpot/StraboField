@@ -83,6 +83,7 @@
       "type": "integer",
       "name": "view_azimuth_trend",
       "label": "View azimuth (trend)",
+      "hint": "Orientation is recorded when Use Photo/OK is pressed, not at shutter click. Hold the device steady and maintain the orientation until pressing the confirmation button.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
       "constraint_message": "Value must be a whole number between 0-360."
@@ -91,6 +92,7 @@
       "type": "integer",
       "name": "view_angle_plunge",
       "label": "View angle (plunge)",
+      "hint": "Orientation is recorded when Use Photo/OK is pressed, not at shutter click. Hold the device steady and maintain the orientation until pressing the confirmation button.",
       "required": "false",
       "constraint": ". >= -90 and . <= 90",
       "constraint_message": "Value must be a whole number between -90 (down) and +90 (up)."

@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import NestingImageCard from './NestingImageCard';
 import useNesting from './useNesting';
 import {isEmpty} from '../../shared/helpers';
+import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -23,7 +24,7 @@ const Nesting = () => {
   const spots = useSelector(state => state.spot.spots);
 
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {handleSpotSelected} = useSpots();
+  const {getSpotWithThisImageBasemap, handleSpotSelected} = useSpots();
 
   /* Local State */
 
@@ -45,8 +46,8 @@ const Nesting = () => {
 
   const updateNest = () => {
     if (!isEmpty(selectedSpot)) {
-      console.log('Updating Nest for Selected Spot ...');
-      console.log('Selected Spot:', selectedSpot);
+      console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
+        selectedSpot, '...');
       const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
       setParentGenerations(parentSpots);
       const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
@@ -74,8 +75,8 @@ const Nesting = () => {
         <Text style={{paddingLeft: 10}}>{generationText}</Text>
         <FlatList
           data={Object.entries(groupedGeneration)}
-          keyExtractor={index => type + index}
-          listKey={type + i}
+          keyExtractor={index => `${type}${index}`}
+          listKey={`${type}${i}`}
           renderItem={({item, index}) => renderGroup(type, i, item, index)}
         />
         {type === 'Parents' && (
@@ -91,7 +92,7 @@ const Nesting = () => {
       return (
         <FlatList
           data={type === 'Parents' ? [...generationData].reverse() : generationData}
-          keyExtractor={(item, index) => type + index}
+          keyExtractor={(item, index) => `${type}${index}`}
           listKey={type}
           renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
         />
@@ -101,13 +102,16 @@ const Nesting = () => {
 
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
     console.log('renderGroup', type, i, group, b);
+    console.log('renderGroup', type, i, imageBasemapKey, group, b);
+    const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImageBasemap(imageBasemapKey);
+    const isGroupNestedInSample = spotWithThisImageBasemap?.properties?.isSample;
     return (
       <View
         style={{
           flex: 1,
           flexDirection: 'row',
-          borderWidth: 1,
-          borderColor: 'black',
+          borderWidth: imageBasemapKey !== 'undefined' && isGroupNestedInSample ? 2.5 : 1,
+          borderColor: isGroupNestedInSample ? SAMPLES_COLOR : BLACK,
           marginLeft: 10,
           marginRight: 10,
           marginTop: 2,
@@ -119,8 +123,8 @@ const Nesting = () => {
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             data={group}
-            keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
-            listKey={type + i + b}
+            keyExtractor={item => `NestedItem${item.properties.id}`}
+            listKey={`${type}${i}${b}`}
             renderItem={({item}) => renderName(item)}
           />
         </View>
@@ -147,6 +151,7 @@ const Nesting = () => {
   const renderName = (spot) => {
     return (
       <SpotsListItem
+        isSample={spot.properties?.isSample}
         onPress={() => handleSpotSelected(spot)}
         spot={spot}
       />
@@ -154,8 +159,14 @@ const Nesting = () => {
   };
 
   const renderSelf = (self) => {
+    const spotWithThisImageBasemap = getSpotWithThisImageBasemap(self.properties?.image_basemap);
+    const isSampleORSampleChild = self.properties?.isSample || spotWithThisImageBasemap?.properties?.isSample;
     return (
-      <View style={{borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'black'}}>
+      <View style={{
+        borderTopWidth: isSampleORSampleChild ? 2.5 : 1,
+        borderBottomWidth: isSampleORSampleChild ? 2.5 : 1,
+        borderColor: isSampleORSampleChild ? SAMPLES_COLOR : BLACK,
+      }}>
         {renderItem(self)}
       </View>
     );
@@ -170,7 +181,7 @@ const Nesting = () => {
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}
         data={[selectedSpot]}
-        keyExtractor={item => 'NestedItem' + item.properties.id.toString()}
+        keyExtractor={item => `NestedItem${item.properties.id}`}
         renderItem={({item}) => renderSelf(item)}
       />
     </View>

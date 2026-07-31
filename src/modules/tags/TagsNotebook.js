@@ -12,7 +12,7 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 import {TagDetailModal, TagsAtSpotList} from '../tags';
 
-const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
+const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -23,9 +23,9 @@ const TagsNotebook = ({isReadOnly, openMainMenuPanel, page}) => {
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
 
   /* Derived Variables */
-
+  const firstDividerText = page.key === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Units'
+    : isSample ? 'Sample Tags' : 'Spot Tags';
   const pageVisible = pagesStack.slice(-1)[0];
-  const firstDividerText = pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS ? 'Spot Tags' : 'Geologic Units';
 
   /* Logic Helpers */
 

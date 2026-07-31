@@ -12,7 +12,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
-import useMapView from '../maps/useMapView';
+import useMapView from '../maps/view/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';

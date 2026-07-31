@@ -2,7 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {useSelector} from 'react-redux';
 
 import {STEREONET_HEADERS} from './maps.constants';
-import {getTimeAndDateFromModifiedTimestamp} from './maps.helpers';
+import {getTimeAndDateFromModifiedTimestamp} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measurements/measurements.constants';
 

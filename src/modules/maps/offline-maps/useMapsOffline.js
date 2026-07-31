@@ -11,6 +11,7 @@ import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
+import {GLYPHS_URL} from '../glyphs/glyphs.constants';
 import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
 import useMapURL from '../useMapURL';
@@ -61,12 +62,18 @@ const useMapsOffline = () => {
     let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
     tileCount = tileCount.length;
 
+    const customMapData = !isEmpty(customMap) ? customMap[0] : undefined;
+
     let map = {
       id: mapId,
       name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
       count: tileCount,
-      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
+      bbox: customMapData?.bbox || '',
       source: !mapId ? source : 'direct from filesystem',
+      // Metadata carried so the map can be listed/categorized in the Map Layers menu regardless of the loaded project.
+      // Note: `source` above must stay 'direct from filesystem' — buildStyleURL branches on it to build the offline tile path.
+      customMapSource: customMapData?.source ?? offlineMaps[mapId]?.customMapSource,
+      overlay: customMapData?.overlay ?? offlineMaps[mapId]?.overlay ?? false,
       mapId: zipUID,
       date: new Date().toLocaleString(),
       isOfflineMapVisible: false,
@@ -78,7 +85,7 @@ const useMapsOffline = () => {
           tileSize: 256,
         },
       },
-      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+      glyphs: GLYPHS_URL,
       layers: [{
         id: mapId,
         type: 'raster',

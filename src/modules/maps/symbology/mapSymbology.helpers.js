@@ -79,15 +79,18 @@ export const getIconImage = () => {
 // Get the rotation of the symbol, either strike, trend or failing both, 0 (Mapbox GL expression)
 export const getIconRotation = () => {
   return [
-    'case',
-    ['has', 'strike', ['get', 'orientation']], ['get', 'strike', ['get', 'orientation']],
+    'case', ['has', 'orientation'],
     ['case',
-      ['has', 'dip_direction', ['get', 'orientation']], ['%', ['-', ['get', 'dip_direction', ['get', 'orientation']], 90], 360],
+      ['has', 'strike', ['get', 'orientation']], ['get', 'strike', ['get', 'orientation']],
       ['case',
-        ['has', 'trend', ['get', 'orientation']], ['get', 'trend', ['get', 'orientation']],
-        0,
+        ['has', 'dip_direction', ['get', 'orientation']], ['%', ['-', ['get', 'dip_direction', ['get', 'orientation']], 90], 360],
+        ['case',
+          ['has', 'trend', ['get', 'orientation']], ['get', 'trend', ['get', 'orientation']],
+          0,
+        ],
       ],
     ],
+    0,
   ];
 };
 
@@ -105,6 +108,19 @@ export const getLabel = (labelTypeOn) => {
         ],
       ],
       '',
+    ];
+  }
+  else if (labelTypeOn === 'dipOrName') {
+    return [
+      'case', ['has', 'orientation'],
+      ['case',
+        ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
+        ['case',
+          ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
+          ['get', 'name'],
+        ],
+      ],
+      ['get', 'name'],
     ];
   }
   else return '';

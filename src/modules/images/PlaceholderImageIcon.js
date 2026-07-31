@@ -7,7 +7,7 @@ import placeholderImage from '../../assets/images/noimage.jpg';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 
 const PlaceholderImageIcon = ({isConnected, isInternetReachable}) => {
-  console.log('PlaceholderImageIcon: isConnected and isInternetReachable', isConnected, isInternetReachable);
+  // console.log('PlaceholderImageIcon: isConnected and isInternetReachable', isConnected, isInternetReachable);
   if (isInternetReachable && isConnected) {
     return (
       <>

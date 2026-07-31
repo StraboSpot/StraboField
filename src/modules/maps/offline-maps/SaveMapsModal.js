@@ -227,24 +227,26 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   const updateCount = async () => {
-    getTileCount(downloadZoom).then((tc) => {
-      if (tc.count) {
-        console.log('downloadZoom from updateCount: ', downloadZoom);
-        console.log('downloadZoom tc: ', tc.count);
-        setTileCount(tc.count);
-        setIsLoadingCircle(false);
-        console.log('return_from_mapview_getTileCount: ', tc.count);
+    const tc = await getTileCount(downloadZoom);
+    if (tc?.count) {
+      console.log('downloadZoom from updateCount: ', downloadZoom);
+      console.log('downloadZoom tc: ', tc.count);
+      setTileCount(tc.count);
+      setIsLoadingCircle(false);
+      console.log('return_from_mapview_getTileCount: ', tc.count);
+    }
+    // No count means the tile-count service failed or returned a message. Show it inline in this modal
+    // rather than closing this modal and opening the global ErrorModal (which iOS drops mid-handoff).
+    else {
+      setShowMainMenu(false);
+      if (tc?.message?.includes('Invalid extent')) {
+        console.error(tc.message);
+        setErrorMessage('\n\nPlease zoom to level 5 or greater to get a more accurate tiles with features.');
       }
-      else if (tc.message) {
-        setShowMainMenu(false);
-        if (tc.message.includes('Invalid extent')) {
-          console.error(tc.message);
-          setErrorMessage('\n\nPlease zoom to level 5 or greater to get a more accurate tiles with features.');
-        }
-        setIsError(true);
-        setIsLoadingCircle(false);
-      }
-    });
+      else if (tc?.message) setErrorMessage(tc.message);
+      setIsError(true);
+      setIsLoadingCircle(false);
+    }
   };
 
   const updatePicker = async zoomValue => setDownloadZoom(zoomValue);

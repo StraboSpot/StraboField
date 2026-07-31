@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -20,7 +21,7 @@ import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
   addedDataset,
   addedDatasets,
-  addedProject,
+  addedProjectFromServer,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
@@ -84,8 +85,10 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
+      console.log('Datasets Response:', JSON.stringify(res));
+
+      // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
-        // If same project set active and target dataset to same as before if they still exist
         const newDatasetIds = datasets.map(d => d.id);
         const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
           console.log('Checking if active dataset still exists:', tempActiveDatasetId);
@@ -132,7 +135,7 @@ const useDownload = () => {
         }
         clearProject();
       }
-      dispatch(addedProject(projectResponse));
+      dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
       }
@@ -167,7 +170,7 @@ const useDownload = () => {
 
       if (!isEmpty(neededImagesIds)) {
         console.log('Downloading Needed Report Images...');
-        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Report Images...'));
+        dispatch(addedStatusMessage('Downloading ' + neededImagesIds.length + ' Needed Memo Images...'));
         // Check path first and if it doesn't exist, then create
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
@@ -176,15 +179,15 @@ const useDownload = () => {
           else imagesFailedCount++;
         }
         dispatch(removedLastStatusMessage());
-        dispatch(addedStatusMessage('Finished Downloading Report Images'));
+        dispatch(addedStatusMessage('Finished Downloading Memo Images'));
         if (imagesFailedCount > 0) {
-          dispatch(addedStatusMessage(imagesFailedCount + ' Report Image' + (imagesFailedCount === 1 ? '' : 's')
+          dispatch(addedStatusMessage(imagesFailedCount + ' Memo Image' + (imagesFailedCount === 1 ? '' : 's')
             + ' Failed To Download'));
         }
       }
     }
     catch (err) {
-      dispatch(addedStatusMessage('Error Downloading Report Images!'));
+      dispatch(addedStatusMessage('Error Downloading Memo Images!'));
       console.warn('Error Downloading Report Images: ' + err);
     }
   };
@@ -270,6 +273,12 @@ const useDownload = () => {
     try {
       let userProfileRes = await getProfile(encodedLoginScoped);
 
+      // The server returns default_manual_measurement as an integer (1/0); coerce to a real boolean so Redux and the
+      // measurement toggles never hold the numeric value.
+      if ('default_manual_measurement' in userProfileRes) {
+        userProfileRes.default_manual_measurement = Boolean(userProfileRes.default_manual_measurement);
+      }
+
       if (Platform.OS === 'web') {
         const userProfileImageBlob = await getProfileImage(encodedLoginScoped);
         if (userProfileImageBlob) {
@@ -307,6 +316,7 @@ const useDownload = () => {
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
+      dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
@@ -323,8 +333,10 @@ const useDownload = () => {
     }
   };
 
-  const initializeDownloadImages = async (dataset) => {
+  const initializeDownloadImages = async (dataset, onProgress) => {
     try {
+      imagesDownloadedCount = 0;
+      imagesFailedCount = 0;
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(clearedStatusMessages());
       dispatch(setIsStatusMessagesModalVisible(true));
@@ -336,11 +348,13 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloading Needed Images...'));
       if (!isEmpty(neededImagesIds)) {
+        onProgress?.(0, neededImagesIds.length);
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         for (const imageId of neededImagesIds) {
           const success = await downloadImageAndSave(imageId);
           if (success) imagesDownloadedCount++;
           else imagesFailedCount++;
+          onProgress?.(imagesDownloadedCount, neededImagesIds.length);
           console.log('New/Modified Images Saved: ' + imagesDownloadedCount + '/'
             + neededImagesIds.length + ' Failed Images: ' + imagesFailedCount + '/' + neededImagesIds.length);
           dispatch(removedLastStatusMessage());

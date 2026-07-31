@@ -39,7 +39,16 @@ const homeStyles = StyleSheet.create({
     top: 10,
   },
   connectionStatusIconContainer: {
-    paddingEnd: 5,
+    alignItems: 'center',
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderRadius: 10,
+    elevation: 3,
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    shadowColor: themes.BLACK,
+    shadowOffset: {height: 2, width: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   container: {
     flex: 1,
@@ -71,6 +80,7 @@ const homeStyles = StyleSheet.create({
     right: '40%',
   },
   drawToolsContainer: {
+    alignItems: 'center',
     flexDirection: 'row',
   },
   homeIconContainer: {
@@ -155,9 +165,16 @@ const homeStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     position: 'absolute',
-    top: 10,
+    top: 3,
     width: '100%',
     zIndex: -1,
+  },
+  statusBarDivider: {
+    alignSelf: 'stretch',
+    backgroundColor: themes.MEDIUMGREY,
+    marginHorizontal: 8,
+    marginVertical: 6,
+    width: StyleSheet.hairlineWidth,
   },
   targetDatasetContainer: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,

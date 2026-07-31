@@ -276,18 +276,22 @@ const TemplatesNotebook = ({
     return (
       <View>
         <ListItem
-          containerStyle={isActive ? commonStyles.listItemInverse : commonStyles.listItem}
+          containerStyle={commonStyles.listItem}
           onPress={() => setAsTemplate(template)}
         >
+          <ListItem.CheckBox
+            checked={isActive}
+            onPress={() => setAsTemplate(template)}
+          />
           <ListItem.Content>
-            <ListItem.Title style={isActive ? commonStyles.listItemTitleInverse : commonStyles.listItemTitle}>
+            <ListItem.Title style={commonStyles.listItemTitle}>
               {template.name}
             </ListItem.Title>
           </ListItem.Content>
           <ClearButton
             onPress={() => editTemplate(template)}
             title={'Edit'}
-            titleProps={{style: isActive ? buttonsStyles.standardButtonTextInverse : buttonsStyles.standardButtonText}}
+            titleProps={{style: buttonsStyles.standardButtonText}}
             type={'save'}
           />
         </ListItem>

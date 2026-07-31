@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
 
+import BackupTemplatesModal from './BackupTemplatesModal';
+import LoadTemplatesModal from './LoadTemplatesModal';
 import NewTemplateSectionList from './NewTemplateSectionList';
 import TemplateDetail from './TemplateDetail';
+import TemplatesOverflowMenuModal from './TemplatesOverflowMenuModal';
 import TemplatesSectionList from './TemplatesSectionList';
 import useTemplates from './useTemplates';
 import {isEmpty} from '../../shared/helpers';
@@ -16,7 +19,10 @@ const Templates = () => {
 
   /* Local State */
 
+  const [isBackupTemplatesModalVisible, setIsBackupTemplatesModalVisible] = useState(false);
+  const [isLoadTemplatesModalVisible, setIsLoadTemplatesModalVisible] = useState(false);
   const [isNewTemplateListVisible, setIsNewTemplateListVisible] = useState(false);
+  const [isOverflowMenuVisible, setIsOverflowMenuVisible] = useState(false);
   const [templateType, setTemplateType] = useState(null);
   const [templateVisible, setTemplateVisible] = useState(null);
 
@@ -50,7 +56,7 @@ const Templates = () => {
         <SidePanelHeader
           backButton={handleBackPressed}
           headerTitle={'Create New Template'}
-          title={'TemplatesNotebook'}
+          title={'Templates'}
         />
         <NewTemplateSectionList handleNewTemplatePressed={handleNewTemplatePressed}/>
       </>
@@ -63,7 +69,7 @@ const Templates = () => {
         <SidePanelHeader
           backButton={handleBackPressed}
           headerTitle={getTemplateTitle(templateType) + ' Template'}
-          title={'TemplatesNotebook'}
+          title={'Templates'}
         />
         <TemplateDetail goBack={handleBackPressed} template={templateVisible} templateType={templateType}/>
       </>
@@ -73,7 +79,7 @@ const Templates = () => {
   const renderTemplatesSectionList = () => {
     return (
       <>
-        <MainMenuPanelHeader/>
+        <MainMenuPanelHeader onOverflowMenuPress={() => setIsOverflowMenuVisible(true)}/>
         <AddButton onPress={handleCreateNewTemplatePressed} title={'Create New Template'}/>
         <TemplatesSectionList handleTemplatePressed={handleTemplatePressed}/>
       </>
@@ -87,6 +93,21 @@ const Templates = () => {
       {isNewTemplateListVisible ? renderNewTemplateSectionList()
         : isEmpty(templateVisible) ? renderTemplatesSectionList()
           : renderTemplateDetail()}
+
+      {/* Menus and Modals */}
+      <TemplatesOverflowMenuModal
+        closeMenu={() => setIsOverflowMenuVisible(false)}
+        isVisible={isOverflowMenuVisible}
+        onAddPress={handleCreateNewTemplatePressed}
+        onBackupPress={() => setIsBackupTemplatesModalVisible(true)}
+        onLoadPress={() => setIsLoadTemplatesModalVisible(true)}
+      />
+      {isBackupTemplatesModalVisible && (
+        <BackupTemplatesModal closeModal={() => setIsBackupTemplatesModalVisible(false)}/>
+      )}
+      {isLoadTemplatesModalVisible && (
+        <LoadTemplatesModal closeModal={() => setIsLoadTemplatesModalVisible(false)}/>
+      )}
     </>
   );
 };

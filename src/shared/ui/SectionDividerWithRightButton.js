@@ -6,10 +6,10 @@ import SectionDivider from './SectionDivider';
 import styles from './ui.styles';
 import {PRIMARY_ACCENT_COLOR} from '../styles.constants';
 
-const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, onPress}) => {
+const SectionDividerWithRightButton = ({buttonTitle, disabled, dividerText, iconName, leftIcon, onPress}) => {
   return (
     <View style={styles.sectionDividerWithButtonContainer}>
-      <SectionDivider dividerText={dividerText}/>
+      <SectionDivider dividerText={dividerText} leftIcon={leftIcon}/>
       {buttonTitle ? (
         <ClearButton
           disabled={disabled}

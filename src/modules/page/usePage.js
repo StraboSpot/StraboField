@@ -1,6 +1,8 @@
 import {useSelector} from 'react-redux';
 
-import {NOTEBOOK_PAGES, PET_PAGES, PRIMARY_PAGES, SECONDARY_PAGES, SED_PAGES} from './page.constants';
+import {
+  NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PET_PAGES, PRIMARY_PAGES, SECONDARY_PAGES, SED_PAGES,
+} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
 import {useTags} from '../tags';
@@ -95,23 +97,26 @@ const usePage = () => {
     return populatedPagesKeys;
   };
 
-  const getRelevantGeneralPages = () => {
+  const getRelevantGeneralPages = (isSample) => {
     return [...PRIMARY_PAGES, ...SECONDARY_PAGES].reduce((acc, page) => {
-      return (!page.testing || (isTestingMode && page?.testing)) ? [...acc, page] : acc;
+      return ((!page.testing || (isTestingMode && page?.testing))
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
     }, []);
   };
 
-  const getRelevantPetPages = () => {
+  const getRelevantPetPages = (isSample) => {
     const petPagesWithSedRocks = [...PET_PAGES.slice(0, 3), SED_PAGES[0], ...PET_PAGES.slice(3, PET_PAGES.length)];
     return petPagesWithSedRocks.reduce((acc, page) => {
-      return (!page.testing || (isTestingMode && page?.testing)) ? [...acc, page] : acc;
+      return ((!page.testing || (isTestingMode && page?.testing))
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
     }, []);
   };
 
-  const getRelevantSedPages = () => {
+  const getRelevantSedPages = (isSample) => {
     const sedPagesWithoutSedRocks = [...SED_PAGES.slice(1, SED_PAGES.length)];
     return sedPagesWithoutSedRocks.reduce((acc, page) => {
       if ((!page.testing || (isTestingMode && page?.testing))
+        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))
         && (page.key !== PAGE_KEYS.STRAT_SECTION
           || (page.key === PAGE_KEYS.STRAT_SECTION
             && selectedSpot.properties?.surface_feature?.surface_feature_type !== 'strat_interval'

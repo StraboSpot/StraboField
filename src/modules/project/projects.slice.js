@@ -3,6 +3,17 @@ import {createSlice} from '@reduxjs/toolkit';
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 
+const normalizeProject = (project) => {
+  if (!project.id) project.id = getNewId();
+  if (!project.description) project.description = {};
+  if (!project.description.project_name) project.description.project_name = 'Unnamed';
+  if (!project.other_features) project.other_features = DEFAULT_GEOLOGIC_TYPES;
+  if (!project.relationship_types) project.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
+  if (!project.templates) project.templates = {};
+  if (!project.useContinuousTagging) project.useContinuousTagging = false;
+  return project;
+};
+
 const initialProjectState = {
   activeDatasetsIds: [],
   addTagToSelectedSpot: false,
@@ -36,6 +47,9 @@ const projectSlice = createSlice({
       state.datasets = {...state.datasets, [action.payload.id]: action.payload};
       state.project.modified_timestamp = Date.now();
     },
+    addedDatasetFromServer(state, action) {
+      state.datasets = {...state.datasets, [action.payload.id]: action.payload};
+    },
     addedDatasets(state, action) {
       state.datasets = action.payload;
     },
@@ -56,17 +70,28 @@ const projectSlice = createSlice({
       state.project.modified_timestamp = timestamp;
     },
     addedProject(state, action) {
-      if (!action.payload.id) action.payload.id = getNewId();
-      if (!action.payload.description) action.payload.description = {};
-      if (!action.payload.description.project_name) action.payload.description.project_name = 'Unnamed';
-      if (!action.payload.other_features) action.payload.other_features = DEFAULT_GEOLOGIC_TYPES;
-      if (!action.payload.relationship_types) action.payload.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
-      if (!action.payload.templates) action.payload.templates = {};
-      if (!action.payload.useContinuousTagging) action.payload.useContinuousTagging = false;
-      state.project = action.payload;
+      state.project = normalizeProject(action.payload);
+    },
+    addedProjectFromServer(state, action) {
+      state.project = normalizeProject(action.payload);
     },
     addedProjectDescription(state, action) {
       state.project = action.payload;
+    },
+    addedSpotToTags(state, action) {
+      const {spotId, tagIds} = action.payload;
+      if (!isEmpty(state.project.tags)) {
+        const updatedTags = state.project.tags.map((tag) => {
+          let updatedTag = JSON.parse(JSON.stringify(tag));
+          if (tagIds.includes(tag.id)) {
+            if (!updatedTag.spots) updatedTag.spots = [];
+            updatedTag.spots.push(spotId);
+          }
+          return updatedTag;
+        });
+        state.project.tags = updatedTags;
+        state.project.modified_timestamp = Date.now();
+      }
     },
     addedTagToSelectedSpot(state, action) {
       state.addTagToSelectedSpot = action.payload;
@@ -149,7 +174,7 @@ const projectSlice = createSlice({
         });
         state.project.tags = updatedTags;
         state.project.modified_timestamp = Date.now();
-        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag.id) || {};
+        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
       }
     },
     deletedTagIdFromReports(state, action) {
@@ -218,6 +243,13 @@ const projectSlice = createSlice({
     },
     resetProjectState() {
       return initialProjectState;
+    },
+    restoredSpotReferences(state, action) {
+      // Undo delete: put the datasets/reports/tags back exactly as they were before the Spot was deleted.
+      const {datasets, reports, tags} = action.payload;
+      state.datasets = datasets;
+      if (reports) state.project.reports = reports;
+      if (tags) state.project.tags = tags;
     },
     setActiveDatasets(state, action) {
       const {bool, dataset} = action.payload;
@@ -324,11 +356,14 @@ const projectSlice = createSlice({
 export const {
   addedCustomFeatureTypes,
   addedDataset,
+  addedDatasetFromServer,
   addedDatasets,
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
   addedProject,
   addedProjectDescription,
+  addedProjectFromServer,
+  addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
   clearedDatasets,
@@ -344,6 +379,7 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   resetProjectState,
+  restoredSpotReferences,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setActiveTemplates,

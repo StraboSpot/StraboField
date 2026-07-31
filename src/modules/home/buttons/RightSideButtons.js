@@ -38,7 +38,7 @@ const RightSideButtons = ({
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
 
   useEffect(() => {
-    if (mapMode === MAP_MODES.INTERVAL_DRAG) lockOrientation();
+    if (mapMode === MAP_MODES.INTERVAL_DRAG || mapMode === MAP_MODES.EDIT) lockOrientation();
     else unlockOrientation();
   }, [mapMode]);
 

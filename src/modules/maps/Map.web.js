@@ -1,20 +1,28 @@
-import React, {forwardRef, useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
+import useMapMouseActions from './interactions/useMapMouseActions.web';
+import useMapMoveEvents from './interactions/useMapMoveEvents';
 import {MapLayers} from './layers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
-import {setIsMapMoved} from './maps.slice';
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
-import useMapMouseActions from './useMapMouseActions.web';
-import useMapMoveEvents from './useMapMoveEvents';
-import useMapView from './useMapView';
+import useMapView from './view/useMapView';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
+
+// Pre-decode symbol images once so they can be added synchronously (before tiles parse) instead of async.
+const symbolImageCache = {};
+Object.entries(symbols).forEach(([id, url]) => {
+  const img = new Image();
+  img.onload = () => (symbolImageCache[id] = img);
+  img.onerror = () => console.error('Error decoding symbol image:', id);
+  img.src = url;
+});
 
 const Map = ({
                allowMapViewMove,
@@ -26,27 +34,26 @@ const Map = ({
                isShowMacrostratOverlay,
                location,
                mapMode,
+               mapRef,
                measureFeatures,
                onMapLoad,
                spotsNotSelected,
                spotsSelected,
-             }, forwardedRef) => {
+               updateSpotsInMapExtent,
+             }) => {
   // console.log('Rendering Map...');
 
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
-  const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
-  const {mapRef} = forwardedRef;
   const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
 
   const [viewState, setViewState] = useState({});
-  const {handleMapMoved} = useMapMoveEvents({setViewState});
+  const {handleMapMoved} = useMapMoveEvents({setViewState, onMapMoveEnd: updateSpotsInMapExtent});
   const {getInitialViewState} = useMapView();
 
   /* Local State */
@@ -59,30 +66,46 @@ const Map = ({
 
   /* Derived State */
 
-  // Preload all symbol images when the map style finishes loading.
-  const handleMapLoad = useCallback(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    Object.entries(symbols).forEach(([id, url]) => {
-      if (!map.hasImage(id)) {
-        map.loadImage(url, (error, image) => {
-          if (error) {
-            console.error('Error loading image:', id, error);
-            return;
-          }
-          if (!map.hasImage(id)) map.addImage(id, image);
-        });
+  // Add a symbol image to the style: sync from the cache, else async (warming the cache). No-op if present.
+  const addSymbolImage = useCallback((map, id) => {
+    if (!map || !symbols[id] || map.hasImage(id)) return;
+    if (symbolImageCache[id]) {
+      map.addImage(id, symbolImageCache[id]);
+      return;
+    }
+    map.loadImage(symbols[id], (error, image) => {
+      if (error) console.error('Error loading image:', id, error);
+      else if (!map.hasImage(id)) {
+        map.addImage(id, image);
+        symbolImageCache[id] = image;
       }
     });
+  }, []);
+
+  // Add all symbol images and register the styleimagemissing backstop. Runs on styledata (not just load)
+  // because switching to a strat section / image basemap swaps the style via setStyle(), which drops the
+  // images without re-firing 'load'. styleimagemissing re-parses tiles for icons that missed the atlas.
+  const ensureSymbolImages = useCallback((map) => {
+    if (!map) return;
+    if (!map._strabofieldImageMissingRegistered) {
+      map._strabofieldImageMissingRegistered = true;
+      map.on('styleimagemissing', e => addSymbolImage(map, e.id));
+    }
+    Object.keys(symbols).forEach(id => addSymbolImage(map, id));
+  }, [addSymbolImage]);
+
+  const handleMapLoad = useCallback(() => {
+    ensureSymbolImages(mapRef.current);
     onMapLoad?.();
-  }, [onMapLoad]);
+  }, [ensureSymbolImages, onMapLoad]);
+
+  const handleStyleData = useCallback(e => ensureSymbolImages(e.target), [ensureSymbolImages]);
 
   /* Side Effects */
 
   useEffect(() => {
       // console.log('UE Map', viewState);
       // console.log('Dimensions', useDimensions);
-      if (!isMapMoved) dispatch(setIsMapMoved(true));
       setViewState(getInitialViewState());
     }, [currentImageBasemap, stratSection],
   );
@@ -114,6 +137,7 @@ const Map = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMoveEnd={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
+      onStyleData={handleStyleData}   // Re-add symbol images after setStyle (strat / image basemap swaps)
       pitchWithRotate={false}
       ref={mapRef}
       scrollZoom={allowMapViewMove && !isDragIntervalMode}
@@ -143,4 +167,4 @@ const Map = ({
   );
 };
 
-export default forwardRef(Map);
+export default Map;

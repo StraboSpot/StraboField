@@ -109,7 +109,7 @@ const useStratSection = () => {
           -targetIntervalHeight, targetInterval.properties.id);
       }
     }
-    deleteSpot(targetInterval.properties.id);
+    deleteSpot(targetInterval);
   };
 
   const getStratSectionSettings = (stratSectionId) => {

@@ -1,3 +1,4 @@
+import {GLYPHS_URL} from './glyphs/glyphs.constants';
 import {STRABO_APIS} from '../../services/network/urls.constants';
 import config from '../../utils/config';
 
@@ -5,9 +6,17 @@ export const LATITUDE = 39.828175;      // Geographic center of US;
 export const LONGITUDE = -98.5795;      // Geographic center of US;
 export const GEO_LAT_LNG_PROJECTION = 'EPSG:4326';
 export const PIXEL_PROJECTION = 'EPSG:3857';
-export const STRAT_SECTION_CENTER = [0.001, 0.0007];
 export const ZOOM = 14;                 // Default zoom for geographic map and image basemaps
 export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
+
+// ms to wait for the map viewport to settle (menu close / project load) before fitting to
+// the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
+export const SPOTS_EXTENT_ZOOM_DELAY = 500;
+
+// Half-width (DIP) of the press box for finding Spots/vertices under the finger; _PRECISE requires
+// a press directly on the feature (e.g. Macrostrat).
+export const PRESS_BOX_PADDING = 10;
+export const PRESS_BOX_PADDING_PRECISE = 1;
 
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 
@@ -48,19 +57,6 @@ export const DEFAULT_MAPS = [
     id: 'usgs.hillshade',
     source: 'strabospot_usgs_hillshade',
   }];
-
-export const CUSTOM_MAP_TYPES = [
-  {
-    title: 'Mapbox Styles',
-    id: 'mapbox.styles',
-    source: 'mapbox_styles',
-  },
-  {
-    title: 'StraboSpot My Maps',
-    id: 'strabospot.mymaps',
-    source: 'strabospot_mymaps',
-  },
-];
 
 export const MAP_PROVIDERS = {
   mapbox_classic: {
@@ -133,7 +129,7 @@ export const BASEMAPS = DEFAULT_MAPS.map((map) => {
       attribution: MAP_PROVIDERS[map.source].attributions,
     },
   };
-  map.glyphs = 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf';
+  map.glyphs = GLYPHS_URL;
   map.layers = [{
     id: map.id,
     type: 'raster',
@@ -144,15 +140,10 @@ export const BASEMAPS = DEFAULT_MAPS.map((map) => {
 });
 // console.log('BASEMAPS', BASEMAPS);
 
-export const CUSTOMBASEMAPS = CUSTOM_MAP_TYPES.map((map) => {
-  return {...map, ...MAP_PROVIDERS[map.source]};
-});
-// console.log('CUSTOMBASEMAPS', BASEMAPS);
-
 export const BACKGROUND = {
   title: 'Background',
   id: 'background',
-  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+  glyphs: GLYPHS_URL,
   sources: {},
   layers: [{
     id: 'background',
@@ -162,11 +153,6 @@ export const BACKGROUND = {
   }],
   version: 8,
 };
-
-export const SPOT_LAYERS = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayerNotSelectedDotted',
-  'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
-  'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
-  'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
 
 export const STEREONET_HEADERS = [
   'No.',
@@ -199,17 +185,6 @@ export const STEREONET_HEADERS = [
   'Method',
 ];
 
-export const GLYPH_CENTER_COORDINATE = [-71.416555631, 42.662938497];
-
-export const GLYPH_TEXT_SHAPE = {
-  'type': 'Feature',
-  'properties': {},
-  'geometry': {
-    'type': 'Point',
-    'coordinates': GLYPH_CENTER_COORDINATE,
-  },
-};
-
 export const LAYER_IDS_NOT_SELECTED = ['polygonLayerNotSelected', 'polygonLayerWithPatternNotSelected',
   'polygonLayerNotSelectedBorder', 'polygonLabelLayerNotSelected', 'lineLayerNotSelected',
   'lineLayerNotSelectedDotted', 'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed',
@@ -219,6 +194,3 @@ export const LAYER_IDS_SELECTED = ['polygonLayerSelected', 'polygonLayerWithPatt
   'polygonLayerSelectedBorder', 'polygonLabelLayerSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
   'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'lineLabelLayerSelected', 'pointLayerSelectedHalo'];
 
-export const SET_IN_CURRENT_VIEW_BUTTONS = ['Point', 'LineString', 'Polygon'];
-
-export const VERTEX_ACTION_BUTTONS = ['Add Vertex', 'Delete Vertex', 'Split Line'];

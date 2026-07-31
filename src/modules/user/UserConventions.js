@@ -1,6 +1,7 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,10 +13,14 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
+import {showFieldInfo} from '../form/form.helpers';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
@@ -24,10 +29,12 @@ const UserProfile = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
+  const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
+  const isConnectionAvailable = useIsConnectionAvailable();
+  const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
   const {hasErrors, validateForm} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
@@ -37,10 +44,14 @@ const UserProfile = () => {
   /* Local State */
 
   const formRef = useRef(null);
+  const hasUnsavedConventionRef = useRef(false);
 
   const [isDownloading, setIsDownloading] = useState(false);
 
   /* Side Effects */
+  useEffect(() => {
+    console.log('Default Manual Measurement', defaultManualMeasurement);
+  }, [defaultManualMeasurement]);
 
   useLayoutEffect(() => {
     return () => doCleanup();
@@ -52,6 +63,13 @@ const UserProfile = () => {
     setIsDownloading(true);
     await downloadUserProfile();
     setIsDownloading(false);
+  };
+
+  // Update Redux immediately so the toggle stays in sync, and flag that a convention changed. The server upload is
+  // deferred to page close (doCleanup) so rapid toggling doesn't fire a request on every change.
+  const onToggleUserConvention = (key, value) => {
+    dispatch(setUserData({[key]: value}));
+    hasUnsavedConventionRef.current = true;
   };
 
   /* Logic Helpers */
@@ -108,10 +126,12 @@ const UserProfile = () => {
 
   const doCleanup = async () => {
     const formCurrent = formRef.current;
-    if (formCurrent?.dirty) await saveForm(formCurrent);
+    // Save on close if the form changed or a convention switch was toggled. The switch value is already in the form's
+    // reinitialized values (initialValues={userData}), so saveForm uploads it along with any form edits.
+    if (formCurrent && (formCurrent.dirty || hasUnsavedConventionRef.current)) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !(isOnline.isInternetReachable && isOnline.isConnected);
+  const getIsDisabled = () => !isConnectionAvailable;
 
   const saveForm = async (formCurrent) => {
     try {
@@ -120,7 +140,7 @@ const UserProfile = () => {
       if (hasErrors(formCurrent)) throw Error('Error in form.');
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
-      if (isOnline.isInternetReachable) {
+      if (isConnectionAvailable) {
         if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
         else {
           await uploadProfile(userValuesToUpdate);
@@ -129,7 +149,7 @@ const UserProfile = () => {
         }
       }
       else {
-        toast.show('Not connected to internet to upload profile changes', {type: 'warning'});
+        toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
         toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
     }
@@ -141,6 +161,31 @@ const UserProfile = () => {
 
   /* Render Functions */
 
+  // Default input mode for new measurements. Kept as a live Redux setting (not a deferred form field) so the change
+  // dispatches immediately and propagates to the MeasurementsModal toggle.
+  const renderMeasurementInputDefault = () => {
+    const label = 'Default to Manual Measurement Entry';
+    const info = 'When on, new measurements open in Manual entry mode. When off, they open in Compass (automatic) '
+      + 'mode. You can still switch modes when taking a measurement.';
+    return (
+      <View style={{alignItems: 'center', flexDirection: 'row', paddingBottom: 10, paddingHorizontal: 10, paddingTop: 5}}>
+        <SwitchWrapper
+          onValueChange={value => onToggleUserConvention('default_manual_measurement', value)}
+          value={defaultManualMeasurement}
+        />
+        <Text style={[commonStyles.listItemTitle, {flex: 1, fontWeight: 'bold', paddingLeft: 5}]}>
+          {label}
+        </Text>
+        <Icon
+          color={PRIMARY_ACCENT_COLOR}
+          name={'information-circle-outline'}
+          onPress={() => showFieldInfo(label, info)}
+          type={'ionicon'}
+        />
+      </View>
+    );
+  };
+
   const renderBulkUpdatesSection = () => {
     return (
       <>
@@ -150,7 +195,7 @@ const UserProfile = () => {
           title={'Convert Strike <-> Dip Direction'}
         />
         <View style={{paddingHorizontal: 10}}>
-          <Text style={[overlayStyles.importantText, {paddingHorizontal: 10}]}>
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 10}]}>
             *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
             updated.
           </Text>
@@ -163,7 +208,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <View pointerEvents={isOnline.isInternetReachable ? 'auto' : 'none'} style={{flex: 1}}>
+      <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
@@ -177,9 +222,10 @@ const UserProfile = () => {
                 validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
               />
-              {renderBulkUpdatesSection()}
-              {isOnline.isInternetReachable ? (
+              {renderMeasurementInputDefault()}
+              {isConnectionAvailable ? (
                 <>
+                  {renderBulkUpdatesSection()}
                   {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
                     <View style={userStyles.saveButtonContainer}>
                       <OutlineButton
@@ -190,11 +236,7 @@ const UserProfile = () => {
                     </View>
                   )}
                 </>
-              ) : (
-                <Text style={commonStyles.noValueText}>
-                  Must be online to save changes to user conventions.
-                </Text>
-              )}
+              ) : <ConnectionRequiredMessage actionText={'make changes to user conventions'}/>}
             </>
           }
         />
