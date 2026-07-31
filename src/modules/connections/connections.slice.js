@@ -8,6 +8,7 @@ const initialConnectionsState = {
   },
   isAutoSaving: false,
   isAutoSyncing: false,
+  isForceOffline: false,
   isLocalSaveNeeded: false,
   isOnline: {},
   isPendingImagesChanges: false,
@@ -111,6 +112,9 @@ const connectionsSlice = createSlice({
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
     },
+    setForceOffline(state, action) {
+      state.isForceOffline = action.payload;
+    },
     setPendingImagesChanges(state, action) {
       state.isPendingImagesChanges = action.payload;
     },
@@ -157,6 +161,7 @@ export const {
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
+  setForceOffline,
   setLastSyncedDatasetTimestamp,
   setLastSyncedDatasetTimestamps,
   setLastSyncedProjectTimestamp,

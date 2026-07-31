@@ -182,23 +182,37 @@ const useImages = () => {
         const selectionLimitNumber = Platform.OS === 'ios' ? 10 : 0;
         launchImageLibrary({selectionLimit: selectionLimitNumber}, async (response) => {
           console.log('RES', response);
-          if (response.didCancel) dispatch(setLoadingStatus({view: 'home', bool: false}));
-          else if (response.errorCode === 'others') {
-            console.error(response.errorMessage('Error Here'));
-            dispatch(setLoadingStatus({view: 'home', bool: false}));
+          try {
+            if (response.didCancel) {
+              dispatch(setLoadingStatus({view: 'home', bool: false}));
+              res(newImages);  // Resolve, or the caller awaits a Promise that never settles
+            }
+            // Every errorCode is a failure, not just 'others', and errorMessage is a string
+            else if (response.errorCode) throw Error(response.errorMessage || response.errorCode);
+            else {
+              let imageAsset = response.assets;
+              await Promise.all(
+                imageAsset.map(async (image) => {
+                  imageCount++;
+                  const resizedImage = await resizeImageForDevice(image);
+                  const savedPhoto = await saveFile(resizedImage);
+                  newImages.push(savedPhoto);
+                  console.log('Saved Photo in getImagesFromCameraRoll:', savedPhoto);
+                }),
+              );
+              res(newImages);
+            }
           }
-          else {
-            let imageAsset = response.assets;
-            await Promise.all(
-              imageAsset.map(async (image) => {
-                imageCount++;
-                const resizedImage = await resizeImageForDevice(image);
-                const savedPhoto = await saveFile(resizedImage);
-                newImages.push(savedPhoto);
-                console.log('Saved Photo in getImagesFromCameraRoll:', savedPhoto);
-              }),
-            );
-            res(newImages);
+          catch (err) {
+            // This callback is async, so a throw escapes the try below, which only guards
+            // launchImageLibrary itself. Uncaught, the Promise never settles and the import hangs.
+            // Reported here rather than rejected because the caller does not catch.
+            console.error('Error Importing Images:', err);
+            dispatch(clearedStatusMessages());
+            dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
+            dispatch(setIsErrorMessagesModalVisible(true));
+            dispatch(setLoadingStatus({view: 'home', bool: false}));
+            res(newImages);  // Keep any images already imported
           }
         });
       }
@@ -234,15 +248,16 @@ const useImages = () => {
       dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
       dispatch(setIsErrorMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+      return newImages;  // Keep any photos already taken before the error
     }
   };
 
+  // Always resolves to an array — callers read its length
   const launchCameraFromNotebook = async () => {
     try {
-      if (await hasCameraPermission()) {
-        newImages = [];
-        return launchCameraLoop();
-      }
+      if (!await hasCameraPermission()) return [];
+      newImages = [];
+      return await launchCameraLoop();
     }
     catch (err) {
       console.error(`Error Taking Picture: ${err}`);
@@ -250,6 +265,7 @@ const useImages = () => {
       dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
       dispatch(setIsErrorMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
+      return [];
     }
   };
 
@@ -319,22 +335,29 @@ const useImages = () => {
       try {
         launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
           console.log('Launch Camera Response:', response);
-          if (response.didCancel) {
-            stopCameraAnglesCapture();
-            resolve('cancelled');
+          try {
+            if (response.didCancel) {
+              stopCameraAnglesCapture();
+              resolve('cancelled');
+            }
+            // react-native-image-picker reports failures as errorCode, not error
+            else if (response.errorCode) throw Error(response.errorMessage || response.errorCode);
+            else {
+              const imageAsset = response.assets[0];
+              const compassReading = getCurrentCameraAngles();
+              stopCameraAnglesCapture();
+              const resizedImage = await resizeImageForDevice(imageAsset);
+              console.log('Resized Image:', resizedImage);
+              const savedFile = await saveFile(resizedImage);
+              resolve({...savedFile, ...compassReading});
+            }
           }
-          else if (response.error) {
+          catch (err) {
+            // This callback is async, so a throw escapes the try below, which only guards launchCamera
+            // itself. Uncaught, the Promise never settles and the camera loop hangs with nothing shown.
             stopCameraAnglesCapture();
-            reject();
-          }
-          else {
-            const imageAsset = response.assets[0];
-            const compassReading = getCurrentCameraAngles();
-            stopCameraAnglesCapture();
-            const resizedImage = await resizeImageForDevice(imageAsset);
-            console.log('Resized Image:', resizedImage);
-            const savedFile = await saveFile(resizedImage);
-            resolve({...savedFile, ...compassReading});
+            dispatch(setLoadingStatus({view: 'home', bool: false}));
+            reject(err);
           }
         });
       }

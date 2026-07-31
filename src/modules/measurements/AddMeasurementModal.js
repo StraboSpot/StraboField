@@ -30,17 +30,19 @@ import compassStyles from '../compass/compass.styles';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
+import {setUserData} from '../user/userProfile.slice';
 
 const AddMeasurementModal = ({onPress}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+  const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -60,7 +62,6 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
-  const [isManualMeasurement, setIsManualMeasurement] = useState(Platform.OS === 'web');
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -73,19 +74,32 @@ const AddMeasurementModal = ({onPress}) => {
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
+  // Compass/Manual input mode is the shared user preference, so this toggle and the one in User Conventions stay in
+  // sync. Fall back to the platform default only while the preference is unset.
+  const isManualMeasurement = defaultManualMeasurement ?? (Platform.OS === 'web');
+  const setIsManualMeasurement = value => dispatch(setUserData({default_manual_measurement: value}));
+
   /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    if (!SMALL_SCREEN && Platform.OS !== 'web') {
-      lockToPortrait();
-      toast.show('Screen orientation LOCKED', {...TOAST_OPTIONS, type: 'lock'});
-    }
     return () => {
       dispatch(setModalValues({}));
       if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
     };
   }, []);
+
+  // Only Compass input needs the screen locked to portrait; Manual entry does not, so don't fire the lock for it
+  useEffect(() => {
+    if (SMALL_SCREEN || Platform.OS === 'web') return;
+    if (isManualMeasurement) {
+      unlockOrientation();
+    }
+    else {
+      lockToPortrait();
+      toast.show('Screen orientation LOCKED', {...TOAST_OPTIONS, type: 'lock'});
+    }
+  }, [isManualMeasurement]);
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);

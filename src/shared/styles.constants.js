@@ -18,6 +18,7 @@ export const WHITE = '#ffffff';
 export const WHITE_FADED_90 = '#ffffffE6'; // 90% opacity
 export const BLACK = 'black';
 export const GOLD = '#FFD700';
+export const ORANGE = 'orange'; // (#ffa500)
 //export const REACT_NATIVE_ELEMENTS_BLUE = '#2089dc';
 
 export const PRIMARY_BACKGROUND_COLOR = LIGHTGREY;

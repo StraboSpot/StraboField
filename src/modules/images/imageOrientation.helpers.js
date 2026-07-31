@@ -23,6 +23,39 @@ const base64ToBytes = (b64) => {
   return bytes;
 };
 
+// Returns the JPEG's true {height, width} from its SOF (Start Of Frame) header, or null if they
+// aren't in the part of the header read. These are the stored dimensions, which is what callers
+// want here because resizeImageForDevice bakes EXIF rotation into the pixels of every image the
+// app saves, leaving nothing for a viewer to swap.
+export const readJpegSize = async (uri) => {
+  try {
+    const path = uri.replace('file://', '');
+    const b64full = await RNFS.readFile(path, 'base64');
+    const d = base64ToBytes(b64full.slice(0, 90000));
+    if (d[0] !== 0xff || d[1] !== 0xd8) return null; // not a JPEG
+
+    let offset = 2;
+    while (offset + 9 < d.length) {
+      if (d[offset] !== 0xff) {
+        offset++;
+        continue;
+      }
+      const marker = d[offset + 1];
+      // SOF0-SOF15 carry the frame size; DHT (c4), JPG (c8) and DAC (cc) sit in the range but don't
+      if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+        return {height: (d[offset + 5] << 8) | d[offset + 6], width: (d[offset + 7] << 8) | d[offset + 8]};
+      }
+      if (marker === 0xda) break; // start of scan — no header left
+      offset += 2 + ((d[offset + 2] << 8) | d[offset + 3]);
+    }
+    return null;
+  }
+  catch (err) {
+    console.warn('Could not read JPEG size:', err.message);
+    return null;
+  }
+};
+
 // Returns the EXIF orientation int (1-8), or null if the file has no orientation tag,
 // isn't a readable JPEG, or can't be read.
 export const readExifOrientation = async (uri) => {

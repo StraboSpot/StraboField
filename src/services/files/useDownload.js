@@ -393,6 +393,12 @@ const useDownload = () => {
     try {
       let userProfileRes = await getProfile(encodedLoginScoped);
 
+      // The server returns default_manual_measurement as an integer (1/0); coerce to a real boolean so Redux and the
+      // measurement toggles never hold the numeric value.
+      if ('default_manual_measurement' in userProfileRes) {
+        userProfileRes.default_manual_measurement = Boolean(userProfileRes.default_manual_measurement);
+      }
+
       if (Platform.OS === 'web') {
         const userProfileImageBlob = await getProfileImage(encodedLoginScoped);
         if (userProfileImageBlob) {

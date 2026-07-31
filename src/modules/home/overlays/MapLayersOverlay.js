@@ -15,7 +15,7 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
-import {BASEMAPS} from '../../maps/maps.constants';
+import {BASEMAPS, DEFAULT_MAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
 import {getCustomMapsWithValidSources, getCustomOverlaysWithValidSources} from '../home.helpers';
@@ -63,8 +63,13 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   /* Logic Helpers */
 
+  const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
+
   const determineWhatCustomMapListToRender = () => {
-    if (isInternetReachable && isConnected) return [renderCustomMapsList(), renderCustomOverlaysList()];
+    // Saved (offline) basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
+    if (isInternetReachable && isConnected) {
+      return [renderCustomMapsList(), renderOfflineCustomMapsList(), renderCustomOverlaysList()];
+    }
     else if (!isInternetReachable && isConnected) {
       return [
         renderCustomMapsList(),
@@ -255,7 +260,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
             },
           ]}>
             {customMap.title || customMap.name || truncateText(customMap?.id, 16)} -
-            ({customMap.source || customMap.sources['raster-tiles'].type})
+            ({customMap.customMapSource || customMap.source || customMap.sources['raster-tiles'].type})
           </ListItem.Title>
           {/*{!isInternetReachable && !isConnected*/}
           {/*  && <ListItem.Subtitle style={{paddingTop: 5}}>({customMap.count} tiles!!!)</ListItem.Subtitle>}*/}
@@ -268,8 +273,9 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const renderOfflineCustomMapsList = () => {
     const sectionTitle = 'Offline Custom Basemaps';
-    const offlineCustomMapsToDisplay = getCustomMapsWithValidSources(customMaps).filter(
-      customMap => offlineMaps[customMap.id]);
+    // Read straight from the device-wide offline store so downloaded maps show regardless of the loaded project.
+    const offlineCustomMapsToDisplay = Object.values(offlineMaps).filter(
+      offlineMap => !isDefaultMap(offlineMap) && !offlineMap.overlay);
 
     return (
       <View key={'OfflineCustomMapsList'}>
@@ -287,6 +293,9 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const renderOfflineCustomOverlaysList = () => {
     const sectionTitle = 'Offline Custom Overlays';
+    // Overlays render only from their online tile URL (CustomOverlayLayer/buildTileURL) and their switch is driven by
+    // the loaded project's customMaps, so offline overlays stay project-scoped here — unlike basemaps, which use local
+    // file tiles and are listed device-wide above.
     const offlineCustomOverlaysToDisplay = getCustomOverlaysWithValidSources(customMaps).filter(
       customOverlay => offlineMaps[customOverlay.id]);
 

@@ -15,7 +15,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import {SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {TAG_TYPES} from '../project/project.constants';

@@ -15,8 +15,8 @@ import {
   updateCustomMap,
 } from '../maps.slice';
 import useMap from '../useMap';
-import useMapCoords from '../useMapCoords';
 import useMapURL from '../useMapURL';
+import useMapCoords from '../view/useMapCoords';
 
 const useCustomMap = () => {
   /* Data Hooks */

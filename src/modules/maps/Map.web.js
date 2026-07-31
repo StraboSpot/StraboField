@@ -4,14 +4,14 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
+import useMapMouseActions from './interactions/useMapMouseActions.web';
+import useMapMoveEvents from './interactions/useMapMoveEvents';
 import {MapLayers} from './layers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
-import useMapMouseActions from './useMapMouseActions.web';
-import useMapMoveEvents from './useMapMoveEvents';
-import useMapView from './useMapView';
+import useMapView from './view/useMapView';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
 

@@ -31,6 +31,12 @@ Guidance for Claude Code when working in this repository.
 
 <!-- Append-only. Each entry: symptom → cause → fix. Newest at top. -->
 
+- **Sketch-on-image: compressed basemap / stray pinch marks / dead Android zoom** → `@StraboSpot/react-native-sketch-canvas`
+  exports the full canvas (aspect mismatch with the image basemap's stored width/height) and its `PanResponder` draws in
+  screen-space translation-only coords, ignores multi-touch, and blocks native gestures on Android → `Sketch.js` sizes the
+  canvas to the image aspect + saves with `cropToImageSize: true`; the rest is `patches/@StraboSpot+react-native-sketch-canvas+0.8.0.patch`
+  (transform-aware `locationX/locationY`, a `touches.length > 1` draw guard, and `onShouldBlockNativeResponder → false`).
+  JS-only — no native rebuild. **Rename the patch on any version bump** or patch-package skips it.
 - **iPad form modals slide off-screen** → rn-vui Overlay's KeyboardAvoidingView pushes them → set `doesRenderAsView` +
   Form `renderInline`.
 - **Second modal never appears on iOS** → a Modal presented while another dismisses gets dropped → chain via
@@ -172,7 +178,11 @@ suffixes; `.web.js` for web overrides.
 ## Deployment Checklist
 
 **Android** — 1) `keystore.properties` in `/android/` + `.jks` in `/android/app/`; 2) `npm run bundle:android`; 3)
-`npm run deploy:android`; 4) upload `.aab` from `android/app/build/outputs/bundle/release/`.
+`npm run deploy:android`; 4) verify the AAB dropped the 16 KB-flagged SQLite lib —
+`unzip -l android/app/build/outputs/bundle/release/app-release.aab | grep -i libsqliteJni` should print **nothing**
+(it ships a prebuilt NDK r20 `.so`; excluded in `android/app/build.gradle` via `configurations.all`, since async-storage
+uses the framework SQLite driver — bumping NDK/androidx.sqlite does *not* fix it); 5) upload `.aab` from
+`android/app/build/outputs/bundle/release/`.
 
 **iOS** — 1) `bundle exec pod install`; 2) `npm run bundle:ios`; 3) Xcode signing → archive/upload, or
 `npm run deploy-beta`.

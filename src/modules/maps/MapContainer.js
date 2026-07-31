@@ -5,28 +5,24 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useCustomMap from './custom-maps/useCustomMap';
+import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
+import SetInCurrentViewOverlay from './editing/SetInCurrentViewOverlay';
+import useMapEditor from './editing/useMapEditor';
+import VertexActionsOverlay from './editing/VertexActionsOverlay';
+import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
+import useMapPressEvents from './interactions/useMapPressEvents';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
 import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
-import SelectSpotsAtPressModal from './SelectSpotsAtPressModal';
-import SetInCurrentViewOverlay from './SetInCurrentViewOverlay';
 import useMap from './useMap';
-import useMapCoords from './useMapCoords';
-import useMapFeaturesCalculated from './useMapFeaturesCalculated';
-import useMapFeaturesDraw from './useMapFeaturesDraw';
-import useMapLocation from './useMapLocation';
-import useMapPressEvents from './useMapPressEvents';
-import useMapView from './useMapView';
-import VertexActionsOverlay from './VertexActionsOverlay';
+import useMapCoords from './view/useMapCoords';
+import useMapLocation from './view/useMapLocation';
+import useMapView from './view/useMapView';
 import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-} from '../home/home.slice';
+import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
@@ -91,7 +87,7 @@ const MapContainer = forwardRef(({
     spotsSelected,
     startEditing,
     switchToEditing,
-  } = useMapFeaturesDraw({
+  } = useMapEditor({
     mapMode: mapMode,
     mapRef: mapRef,
     onEndDrawPressed: onEndDrawPressed,
@@ -243,8 +239,8 @@ const MapContainer = forwardRef(({
           dispatch(setIsErrorMessagesModalVisible(true));
         });
       }
-      // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
-      // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
+        // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
+        // file:// glyphs path — that go stale when the app's container path changes across installs/updates,
       // making the style fail to load so Spot layers never attach. Rebuild from current runtime. Issue #919.
       else setBasemap(currentBasemap.id).catch(console.error);
     }

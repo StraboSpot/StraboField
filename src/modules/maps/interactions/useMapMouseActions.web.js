@@ -3,12 +3,12 @@ import {useEffect, useRef, useState} from 'react';
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/helpers';
-import {useSpots} from '../spots';
-import {MAP_MODES} from './maps.constants';
-import {clearedIntervalDragState, setIntervalDragTargetSlot, setVertexEndCoords} from './maps.slice';
-import useStratSectionCalculations from './strat-section/useStratSectionCalculations';
-import useMap from './useMap';
+import {isEmpty} from '../../../shared/helpers';
+import {useSpots} from '../../spots';
+import {MAP_MODES} from '../maps.constants';
+import {clearedIntervalDragState, setIntervalDragTargetSlot, setVertexEndCoords} from '../maps.slice';
+import useStratSectionCalculations from '../strat-section/useStratSectionCalculations';
+import useMap from '../useMap';
 
 const SNAP_HIT_BUFFER = 12; // pixels
 

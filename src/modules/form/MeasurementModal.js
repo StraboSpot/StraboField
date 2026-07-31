@@ -25,12 +25,13 @@ const MeasurementModal = ({
   /* Data Hooks */
 
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+  const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
 
   /* Local State */
 
-  const [isManualMeasurement, setIsManualMeasurement] = useState(Platform.OS !== 'ios');
+  const [isManualMeasurement, setIsManualMeasurement] = useState(defaultManualMeasurement ?? (Platform.OS !== 'ios'));
   const [sliderValue, setSliderValue] = useState(6);
 
   /* Logic Helpers */

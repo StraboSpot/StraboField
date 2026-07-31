@@ -2,8 +2,8 @@ import {useRef} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setZoom} from './maps.slice';
-import useMapView from './useMapView';
+import {setZoom} from '../maps.slice';
+import useMapView from '../view/useMapView';
 
 // Recompute the Spots in the map extent this long after the map stops moving, so a continuous
 // pan/zoom gesture triggers a single recompute once the camera settles instead of one per frame.

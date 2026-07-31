@@ -12,7 +12,7 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
