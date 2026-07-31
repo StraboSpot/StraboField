@@ -18,6 +18,7 @@ const initialProjectState = {
   activeDatasetsIds: [],
   addTagToSelectedSpot: false,
   backupFileName: '',
+  changedImageIds: [],
   datasets: {},
   deviceBackUpDirectoryExists: false,
   downloadsDirectory: false, //Android Only
@@ -39,6 +40,11 @@ const projectSlice = createSlice({
   name: 'project',
   initialState: initialProjectState,
   reducers: {
+    // Images replaced locally but keeping their id; the server reports those as present, so they
+    // have to be forced into the next upload.
+    addedChangedImageId(state, action) {
+      if (!state.changedImageIds.includes(action.payload)) state.changedImageIds.push(action.payload);
+    },
     addedCustomFeatureTypes(state, action) {
       state.project.other_features = action.payload;
       state.project.modified_timestamp = Date.now();
@@ -241,6 +247,9 @@ const projectSlice = createSlice({
       state.datasets = updatedDatasets;
       state.project.modified_timestamp = timestamp;
     },
+    removedChangedImageIds(state, action) {
+      state.changedImageIds = state.changedImageIds.filter(id => !action.payload.includes(id));
+    },
     resetProjectState() {
       return initialProjectState;
     },
@@ -354,6 +363,7 @@ const projectSlice = createSlice({
 });
 
 export const {
+  addedChangedImageId,
   addedCustomFeatureTypes,
   addedDataset,
   addedDatasetFromServer,
@@ -378,6 +388,7 @@ export const {
   doesBackupDirectoryExist,
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
+  removedChangedImageIds,
   resetProjectState,
   restoredSpotReferences,
   setActiveDatasets,

@@ -4,10 +4,15 @@ import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import {SketchCanvas} from '@StraboSpot/react-native-sketch-canvas';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
+import {useToast} from 'react-native-toast-notifications';
 
 import styles from './sketch.styles';
+import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
+import ActionButton from '../../shared/ui/buttons/ActionButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
 import {getLocalImageURI} from '../images/imageURIs.helpers';
@@ -20,16 +25,19 @@ const STROKE_COLORS = [
   '#FF00FF', '#FFFFFF', '#C0C0C0', '#808080', '#FFA500', '#A52A2A', '#800000', '#008000', '#808000',
 ];
 
-const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
+const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisible}) => {
   /* Data Hooks */
 
-  const {saveFile} = useImages();
+  const {saveFile, updateImage} = useImages();
+  const toast = useToast();
   const {height, width} = useWindowSize();
 
   /* Local State */
 
   const sketchRef = useRef(null);
   const [color, setColor] = useState(STROKE_COLORS[0]);
+  const [isSaveSketchModalVisible, setIsSaveSketchModalVisible] = useState(false);
+  const [sketchPath, setSketchPath] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(MIN_STROKE_WIDTH);
 
   /* Derived Variables */
@@ -109,38 +117,26 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
 
   /* Event Handlers */
 
+  const handleSaveSketchChoice = async (saveChoice) => {
+    setIsSaveSketchModalVisible(false);
+    await saveChoice(sketchPath);
+  };
+
   const nextStrokeWidth = () => {
     setStrokeWidth(prev => (prev >= MAX_STROKE_WIDTH ? MIN_STROKE_WIDTH : prev + 1));
   };
 
+  // Sketching over an existing image can either replace that image or be kept as a separate one
   const saveSketch = async (success, path) => {
-    try {
-      console.log(success, 'Path:', path);
-      if (success) {
-        const savedSketch = await saveFile({...image, 'path': path});
-        saveImages([savedSketch]);
-        alert(
-          'Sketch Saved!',
-          'Sketch saved.',
-          [{
-            text: 'OK', onPress: () => setIsSketchModalVisible(false),
-          }],
-        );
-      }
-      else throw Error;
+    console.log(success, 'Path:', path);
+    if (!success) {
+      console.error('Error Saving Sketch');
+      showSketchError();
     }
-    catch (err) {
-      console.error('Error Saving Sketch', err);
-      alert('Error Saving Sketch!',
-        null,
-        [{
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        }, {
-          text: 'OK', onPress: () => setIsSketchModalVisible(false),
-        }],
-      );
+    else if (isEmpty(image)) await saveAsNewSketch(path);
+    else {
+      setSketchPath(path);
+      setIsSaveSketchModalVisible(true);
     }
   };
 
@@ -151,12 +147,80 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
       true, true, true);
   };
 
+  /* Logic Helpers */
+
+  // saveFile returns only id and dimensions, so title and type are carried over by hand. Sketching
+  // over a photo leaves it a photo; only an untyped image becomes a sketch.
+  const saveAsNewSketch = async (path) => {
+    try {
+      const savedFile = await saveFile({...image, 'path': path});
+      const savedSketch = {
+        ...savedFile,
+        image_type: image.image_type || 'sketch',
+        ...(!isEmpty(image.title) && {title: image.title}),
+      };
+      saveImages([savedSketch]);
+      showSketchSaved();
+    }
+    catch (err) {
+      console.error('Error Saving Sketch', err);
+      showSketchError();
+    }
+  };
+
+  // Leaves the sketch open so it can be saved again rather than losing it
+  const showSketchError = () => toast.show('Error Saving Sketch', {type: 'danger'});
+
+  const showSketchSaved = () => {
+    toast.show('Sketch Saved!', {type: 'success', duration: 1500});
+    setIsSketchModalVisible(false);
+  };
+
+  const updateSketch = async (path) => {
+    try {
+      const updatedImage = await updateImage({...image, image_type: image.image_type || 'sketch'}, path);
+      saveUpdatedImage(updatedImage);
+      showSketchSaved();
+    }
+    catch (err) {
+      console.error('Error Updating Sketch', err);
+      showSketchError();
+    }
+  };
+
   /* Render Functions */
 
   const renderColor = ({item}) => (
     <TouchableOpacity onPress={() => setColor(item)} style={{marginHorizontal: 2.5}}>
       <View style={[{backgroundColor: item}, styles.strokeColorButton, color === item && {borderWidth: 2}]}/>
     </TouchableOpacity>
+  );
+
+  // Rendered as a view rather than a modal since it is already inside the fullscreen sketch modal
+  const renderSaveSketchModal = () => (
+    <ModalWrapper
+      closeModal={() => setIsSaveSketchModalVisible(false)}
+      doesRenderAsView
+      headerTitle={'Save Sketch'}
+      overlayStyleOverride={{maxHeight: '35%'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton
+    >
+      <View style={overlayStyles.overlayContent}>
+        <Text style={overlayStyles.contentText}>
+          Save this sketch as a copy or update the existing image?
+        </Text>
+        <ActionButton
+          onPress={() => handleSaveSketchChoice(saveAsNewSketch)}
+          title={'  Save as Copy  '}
+        />
+        <OutlineButton
+          onPress={() => handleSaveSketchChoice(updateSketch)}
+          title={'Update Existing'}
+        />
+      </View>
+    </ModalWrapper>
   );
 
   /* View */
@@ -230,6 +294,9 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           />
         </View>
       </View>
+
+      {/* Modal */}
+      {isSaveSketchModalVisible && renderSaveSketchModal()}
     </View>
   );
 };

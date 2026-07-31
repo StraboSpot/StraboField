@@ -122,7 +122,7 @@ const ImageModal = ({
             placeholderStyle={commonStyles.imagePlaceholder}
             resizeMode={'contain'}
             source={Platform.OS === 'web' ? {uri: getResizedImageURI(image.id, width, height)}
-              : {uri: getLocalImageURI(image.id)}}
+              : {uri: getLocalImageURI(image.id, image.modified_timestamp)}}
             style={Platform.OS === 'web' ? {width: width - 100, height: height - 100}
               : {width: width, height: height - 100 - (SMALL_SCREEN ? SMALL_SCREEN_STATUS_BAR_OFFSET : 0)}}
           />
