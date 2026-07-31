@@ -6,13 +6,10 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
 import {useToast} from 'react-native-toast-notifications';
 
+import SaveSketchModal from './SaveSketchModal';
 import styles from './sketch.styles';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
-import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import overlayStyles from '../../shared/ui/modals/overlay.styles';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
 import {getLocalImageURI} from '../images/imageURIs.helpers';
@@ -36,7 +33,6 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
 
   const sketchRef = useRef(null);
   const [color, setColor] = useState(STROKE_COLORS[0]);
-  const [isOverwriteWarningVisible, setIsOverwriteWarningVisible] = useState(false);
   const [isSaveSketchModalVisible, setIsSaveSketchModalVisible] = useState(false);
   const [sketchPath, setSketchPath] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(MIN_STROKE_WIDTH);
@@ -118,13 +114,8 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
 
   /* Event Handlers */
 
-  const closeSaveSketchModal = () => {
-    setIsOverwriteWarningVisible(false);
-    setIsSaveSketchModalVisible(false);
-  };
-
   const handleSaveSketchChoice = async (saveChoice) => {
-    closeSaveSketchModal();
+    setIsSaveSketchModalVisible(false);
     await saveChoice(sketchPath);
   };
 
@@ -132,7 +123,8 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
     setStrokeWidth(prev => (prev >= MAX_STROKE_WIDTH ? MIN_STROKE_WIDTH : prev + 1));
   };
 
-  // Sketching over an existing image can either replace that image or be kept as a separate one
+  // A sketch drawn on a blank canvas is just saved. One drawn over an existing image can either
+  // replace that image or be kept alongside it, so it holds the exported file and asks first.
   const saveSketch = async (success, path) => {
     console.log(success, 'Path:', path);
     if (!success) {
@@ -182,6 +174,7 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
     setIsSketchModalVisible(false);
   };
 
+  // Replaces the image's file in place, keeping its id so nothing referring to it has to be re-pointed
   const updateSketch = async (path) => {
     try {
       const updatedImage = await updateImage({...image, image_type: image.image_type || 'sketch'}, path);
@@ -200,56 +193,6 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
     <TouchableOpacity onPress={() => setColor(item)} style={{marginHorizontal: 2.5}}>
       <View style={[{backgroundColor: item}, styles.strokeColorButton, color === item && {borderWidth: 2}]}/>
     </TouchableOpacity>
-  );
-
-  // Updating replaces the image file in place, so it takes a second, deliberate tap to confirm. Shown
-  // in place of the choices rather than in its own modal, since a modal opened while another dismisses
-  // is dropped on iOS.
-  const renderOverwriteWarning = () => (
-    <View style={overlayStyles.overlayContent}>
-      <Text style={[overlayStyles.contentText, styles.warningText]}>
-        Updating will overwrite the existing image. This cannot be undone.
-      </Text>
-      <ActionButton
-        onPress={() => handleSaveSketchChoice(updateSketch)}
-        title={'  Update Existing  '}
-      />
-      <OutlineButton
-        onPress={() => setIsOverwriteWarningVisible(false)}
-        title={'      Cancel      '}
-      />
-    </View>
-  );
-
-  const renderSaveSketchChoices = () => (
-    <View style={overlayStyles.overlayContent}>
-      <Text style={overlayStyles.contentText}>
-        Save this sketch as a copy or update the existing image?
-      </Text>
-      <ActionButton
-        onPress={() => handleSaveSketchChoice(saveAsNewSketch)}
-        title={'  Save as Copy  '}
-      />
-      <OutlineButton
-        onPress={() => setIsOverwriteWarningVisible(true)}
-        title={'Update Existing'}
-      />
-    </View>
-  );
-
-  // Rendered as a view rather than a modal since it is already inside the fullscreen sketch modal
-  const renderSaveSketchModal = () => (
-    <ModalWrapper
-      closeModal={closeSaveSketchModal}
-      doesRenderAsView
-      headerTitle={isOverwriteWarningVisible ? 'Warning!' : 'Save Sketch'}
-      overlayStyleOverride={{maxHeight: '35%'}}
-      showActionButton={false}
-      showCancelButton={false}
-      showCloseButton
-    >
-      {isOverwriteWarningVisible ? renderOverwriteWarning() : renderSaveSketchChoices()}
-    </ModalWrapper>
   );
 
   /* View */
@@ -325,7 +268,13 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
       </View>
 
       {/* Modal */}
-      {isSaveSketchModalVisible && renderSaveSketchModal()}
+      {isSaveSketchModalVisible && (
+        <SaveSketchModal
+          closeModal={() => setIsSaveSketchModalVisible(false)}
+          onPressSaveAsCopy={() => handleSaveSketchChoice(saveAsNewSketch)}
+          onPressUpdate={() => handleSaveSketchChoice(updateSketch)}
+        />
+      )}
     </View>
   );
 };
