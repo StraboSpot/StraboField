@@ -39,6 +39,7 @@ const ImagesPage = ({isReadOnly}) => {
             <ImagesInSpot isReadOnly={isReadOnly} saveImages={saveImagesToSpot}/>
           </>
         }
+        ListHeaderComponentStyle={{width: '100%'}}
         contentContainerStyle={{alignItems: 'center', paddingBottom: 40}}
         keyboardShouldPersistTaps='handled'
       />

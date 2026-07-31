@@ -17,7 +17,7 @@ import {
   setIsScaleBarMetric,
   startedIntervalDrag,
 } from '../maps/maps.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';

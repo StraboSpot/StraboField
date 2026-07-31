@@ -2,8 +2,8 @@ import {useRef} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {ZOOM_STRAT_SECTION} from './maps.constants';
-import useMapView from './useMapView';
+import {ZOOM_STRAT_SECTION} from '../maps.constants';
+import useMapView from '../view/useMapView';
 
 // Recompute the Spots in the map extent this long after the map stops moving, so successive
 // move-end events coalesce into a single recompute once the camera settles.

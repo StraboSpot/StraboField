@@ -11,7 +11,7 @@ import {setFreehandFeatureCoords} from '../maps/maps.slice';
 
 let freehandFeatureCoords = [];
 
-// True while a stroke is drawing; useMapFeaturesDraw reads it to defer the preview's map re-render until lift,
+// True while a stroke is drawing; useMapDraw reads it to defer the preview's map re-render until lift,
 // since any re-render mid-gesture truncates the stroke. Module flag, not state, for that same reason.
 let isDrawing = false;
 

@@ -12,6 +12,7 @@ const imageStyles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   cardContainer: {
     borderBottomColor: themes.LIST_BORDER_COLOR,

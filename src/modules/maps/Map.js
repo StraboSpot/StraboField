@@ -4,12 +4,12 @@ import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
 import MapControlsContainer from './controls/MapControlsContainer';
+import VertexDrag from './editing/VertexDrag';
+import useMapMoveEvents from './interactions/useMapMoveEvents';
 import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
 import SnapLineLayer from './strat-section/SnapLineLayer';
-import useMapMoveEvents from './useMapMoveEvents';
-import VertexDrag from './VertexDrag';
 import homeStyles from '../home/home.style';
 import FreehandSketch from '../sketch/FreehandSketch';
 

@@ -62,12 +62,18 @@ const useMapsOffline = () => {
     let tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
     tileCount = tileCount.length;
 
+    const customMapData = !isEmpty(customMap) ? customMap[0] : undefined;
+
     let map = {
       id: mapId,
       name: offlineMaps[mapId]?.name ? offlineMaps[mapId].name : getMapNameFromId(mapId),
       count: tileCount,
-      bbox: !isEmpty(customMap) ? customMap[0]?.bbox : '',
+      bbox: customMapData?.bbox || '',
       source: !mapId ? source : 'direct from filesystem',
+      // Metadata carried so the map can be listed/categorized in the Map Layers menu regardless of the loaded project.
+      // Note: `source` above must stay 'direct from filesystem' — buildStyleURL branches on it to build the offline tile path.
+      customMapSource: customMapData?.source ?? offlineMaps[mapId]?.customMapSource,
+      overlay: customMapData?.overlay ?? offlineMaps[mapId]?.overlay ?? false,
       mapId: zipUID,
       date: new Date().toLocaleString(),
       isOfflineMapVisible: false,

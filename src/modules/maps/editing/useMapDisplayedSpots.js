@@ -2,9 +2,9 @@ import {useState} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import useMapCoords from './useMapCoords';
-import useMapFeatures from './useMapFeatures';
-import {isEmpty, isEqual} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../../shared/helpers';
+import useMapFeatures from '../features/useMapFeatures';
+import useMapCoords from '../view/useMapCoords';
 
 // Owns the selected/not-selected Spots rendered on the map. The two setters partition Spots into those
 // buckets; the WhileEditing variant keeps the in-progress edit separate from the rest.

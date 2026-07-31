@@ -1,0 +1,69 @@
+diff --git a/node_modules/@StraboSpot/react-native-sketch-canvas/src/SketchCanvas.js b/node_modules/@StraboSpot/react-native-sketch-canvas/src/SketchCanvas.js
+index 1234567..abcdefg 100644
+--- a/node_modules/@StraboSpot/react-native-sketch-canvas/src/SketchCanvas.js
++++ b/node_modules/@StraboSpot/react-native-sketch-canvas/src/SketchCanvas.js
+@@ -163,7 +163,8 @@
+       onPanResponderGrant: (evt, gestureState) => {
+         if (!this.props.touchEnabled) return
+         const e = evt.nativeEvent
+-        this._offset = { x: e.pageX - e.locationX, y: e.pageY - e.locationY }
++        // Ignore multi-touch (e.g. pinch-to-zoom) so navigation gestures don't leave stray marks.
++        if (e.touches && e.touches.length > 1) return
+         this._path = {
+           id: parseInt(Math.random() * 100000000), color: this.props.strokeColor,
+           width: this.props.strokeWidth, data: []
+@@ -178,26 +179,33 @@
+             this._path.width * this._screenScale
+           ]
+         )
++        // Use the view-local locationX/locationY (which account for any parent scale/translate) so
++        // strokes land under the finger even when the canvas is zoomed or panned.
++        const x = parseFloat(e.locationX.toFixed(2)), y = parseFloat(e.locationY.toFixed(2))
+         UIManager.dispatchViewManagerCommand(
+           this._handle,
+           UIManager.RNSketchCanvas.Commands.addPoint,
+-          [
+-            parseFloat((gestureState.x0 - this._offset.x).toFixed(2) * this._screenScale),
+-            parseFloat((gestureState.y0 - this._offset.y).toFixed(2) * this._screenScale)
+-          ]
++          [x * this._screenScale, y * this._screenScale]
+         )
+-        const x = parseFloat((gestureState.x0 - this._offset.x).toFixed(2)), y = parseFloat((gestureState.y0 - this._offset.y).toFixed(2))
+         this._path.data.push(`${x},${y}`)
+         this.props.onStrokeStart(x, y)
+       },
+       onPanResponderMove: (evt, gestureState) => {
+         if (!this.props.touchEnabled) return
++        const e = evt.nativeEvent
++        // A second finger arrived mid-stroke (pinch/pan): abandon the stroke so it leaves no mark.
++        if (e.touches && e.touches.length > 1) {
++          if (this._path) {
++            this.deletePath(this._path.id)
++            this._path = null
++          }
++          return
++        }
+         if (this._path) {
++          const x = parseFloat(e.locationX.toFixed(2)), y = parseFloat(e.locationY.toFixed(2))
+           UIManager.dispatchViewManagerCommand(this._handle, UIManager.RNSketchCanvas.Commands.addPoint, [
+-            parseFloat((gestureState.moveX - this._offset.x).toFixed(2) * this._screenScale),
+-            parseFloat((gestureState.moveY - this._offset.y).toFixed(2) * this._screenScale)
++            x * this._screenScale, y * this._screenScale
+           ])
+-          const x = parseFloat((gestureState.moveX - this._offset.x).toFixed(2)), y = parseFloat((gestureState.moveY - this._offset.y).toFixed(2))
+           this._path.data.push(`${x},${y}`)
+           this.props.onStrokeChanged(x, y)
+         }
+@@ -211,8 +219,11 @@
+         UIManager.dispatchViewManagerCommand(this._handle, UIManager.RNSketchCanvas.Commands.endPath, [])
+       },
+ 
++      // Android-only: returning true blocks native gesture handlers (react-native-gesture-handler's
++      // pinch/pan) from ever activating, which kills two-finger zoom/pan over the canvas. Return false
++      // so those handlers can run; single-finger drawing is unaffected (nothing else claims one finger).
+       onShouldBlockNativeResponder: (evt, gestureState) => {
+-        return true;
++        return false;
+       },
+     });
+   }

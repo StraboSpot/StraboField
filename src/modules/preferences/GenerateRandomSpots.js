@@ -11,7 +11,7 @@ import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import formStyles from '../form/form.styles';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 
 const GenerateRandomSpots = () => {
   /* Data Hooks */

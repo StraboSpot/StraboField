@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapSymbology.constants';
 import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
-import {MEDIUMGREY} from '../../../shared/styles.constants';
+import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
 import {useTags} from '../../tags';
 import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
@@ -94,40 +94,40 @@ const useMapSymbology = () => {
     },
     pointSelected: {
       circleRadius: 35,
-      circleColor: 'orange',
+      circleColor: ORANGE,
       circleOpacity: 0.4,
     },
     lineSelected: {
-      lineColor: 'orange',
+      lineColor: ORANGE,
       lineWidth: lineWidthExpression,
     },
     lineSelectedDotted: {
-      lineColor: 'orange',
+      lineColor: ORANGE,
       lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotted,
     },
     lineSelectedDashed: {
-      lineColor: 'orange',
+      lineColor: ORANGE,
       lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dashed,
     },
     lineSelectedDotDashed: {
-      lineColor: 'orange',
+      lineColor: ORANGE,
       lineWidth: lineWidthExpression,
       lineDasharray: LINE_PATTERNS.dotDashed,
     },
     polygonSelected: {
-      fillColor: 'orange',
+      fillColor: ORANGE,
       fillOpacity: 0.7,
     },
     polygonWithPatternSelected: {
-      fillColor: 'orange',
+      fillColor: ORANGE,
       fillPattern: ['get', 'fillPattern', ['get', 'symbology']],
       fillOpacity: 0.7,
     },
     pointDraw: {
       circleRadius: 5,
-      circleColor: 'orange',
+      circleColor: ORANGE,
       circleStrokeColor: 'white',
       circleStrokeWidth: 2,
     },
@@ -137,17 +137,17 @@ const useMapSymbology = () => {
       circleColor: 'black',
     },
     lineDraw: {
-      lineColor: 'orange',
+      lineColor: ORANGE,
       lineWidth: 3,
       lineDasharray: [2, 2],
     },
     polygonDraw: {
-      fillColor: 'orange',
+      fillColor: ORANGE,
       fillOpacity: 0.4,
     },
     pointEdit: {
       circleRadius: 10,
-      circleColor: 'orange',
+      circleColor: ORANGE,
       circleStrokeColor: 'white',
       circleStrokeWidth: 2,
     },

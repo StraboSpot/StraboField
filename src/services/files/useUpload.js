@@ -180,7 +180,13 @@ const useUpload = () => {
 
   const uploadProfile = async (userValues) => {
     try {
-      await updateProfile(userValues);
+      // The server echoes default_manual_measurement back as an integer (1/0); normalize to a real boolean so the
+      // JSON payload sends true/false rather than the numeric value that came down on the last download.
+      const userValuesToUpload = 'default_manual_measurement' in userValues
+        ? {...userValues, default_manual_measurement: Boolean(userValues.default_manual_measurement)}
+        : userValues;
+      console.log('Uploading Profile...', userValuesToUpload);
+      await updateProfile(userValuesToUpload);
     }
     catch (err) {
       console.error('Error uploading profile:', err);

@@ -1,8 +1,8 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setMapSymbols} from './maps.slice';
-import {isEmpty, isEqualUnordered} from '../../shared/helpers';
-import {useSpots} from '../spots';
+import {isEmpty, isEqualUnordered} from '../../../shared/helpers';
+import {useSpots} from '../../spots';
+import {setMapSymbols} from '../maps.slice';
 
 const useMapFeatures = () => {
   /* Data Hooks */

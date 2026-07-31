@@ -15,7 +15,7 @@ import {
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
-import useMapView from '../useMapView';
+import useMapView from '../view/useMapView';
 
 const MapLayers = ({
                      basemap,
