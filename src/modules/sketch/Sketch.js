@@ -36,6 +36,7 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
 
   const sketchRef = useRef(null);
   const [color, setColor] = useState(STROKE_COLORS[0]);
+  const [isOverwriteWarningVisible, setIsOverwriteWarningVisible] = useState(false);
   const [isSaveSketchModalVisible, setIsSaveSketchModalVisible] = useState(false);
   const [sketchPath, setSketchPath] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(MIN_STROKE_WIDTH);
@@ -117,8 +118,13 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
 
   /* Event Handlers */
 
-  const handleSaveSketchChoice = async (saveChoice) => {
+  const closeSaveSketchModal = () => {
+    setIsOverwriteWarningVisible(false);
     setIsSaveSketchModalVisible(false);
+  };
+
+  const handleSaveSketchChoice = async (saveChoice) => {
+    closeSaveSketchModal();
     await saveChoice(sketchPath);
   };
 
@@ -196,30 +202,53 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
     </TouchableOpacity>
   );
 
+  // Updating replaces the image file in place, so it takes a second, deliberate tap to confirm. Shown
+  // in place of the choices rather than in its own modal, since a modal opened while another dismisses
+  // is dropped on iOS.
+  const renderOverwriteWarning = () => (
+    <View style={overlayStyles.overlayContent}>
+      <Text style={[overlayStyles.contentText, styles.warningText]}>
+        Updating will overwrite the existing image. This cannot be undone.
+      </Text>
+      <ActionButton
+        onPress={() => handleSaveSketchChoice(updateSketch)}
+        title={'  Update Existing  '}
+      />
+      <OutlineButton
+        onPress={() => setIsOverwriteWarningVisible(false)}
+        title={'      Cancel      '}
+      />
+    </View>
+  );
+
+  const renderSaveSketchChoices = () => (
+    <View style={overlayStyles.overlayContent}>
+      <Text style={overlayStyles.contentText}>
+        Save this sketch as a copy or update the existing image?
+      </Text>
+      <ActionButton
+        onPress={() => handleSaveSketchChoice(saveAsNewSketch)}
+        title={'  Save as Copy  '}
+      />
+      <OutlineButton
+        onPress={() => setIsOverwriteWarningVisible(true)}
+        title={'Update Existing'}
+      />
+    </View>
+  );
+
   // Rendered as a view rather than a modal since it is already inside the fullscreen sketch modal
   const renderSaveSketchModal = () => (
     <ModalWrapper
-      closeModal={() => setIsSaveSketchModalVisible(false)}
+      closeModal={closeSaveSketchModal}
       doesRenderAsView
-      headerTitle={'Save Sketch'}
+      headerTitle={isOverwriteWarningVisible ? 'Warning!' : 'Save Sketch'}
       overlayStyleOverride={{maxHeight: '35%'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
-      <View style={overlayStyles.overlayContent}>
-        <Text style={overlayStyles.contentText}>
-          Save this sketch as a copy or update the existing image?
-        </Text>
-        <ActionButton
-          onPress={() => handleSaveSketchChoice(saveAsNewSketch)}
-          title={'  Save as Copy  '}
-        />
-        <OutlineButton
-          onPress={() => handleSaveSketchChoice(updateSketch)}
-          title={'Update Existing'}
-        />
-      </View>
+      {isOverwriteWarningVisible ? renderOverwriteWarning() : renderSaveSketchChoices()}
     </ModalWrapper>
   );
 
