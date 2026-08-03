@@ -9,6 +9,7 @@ import linearOrientation from './measurement/linear-orientation.json';
 import planarOrientation from './measurement/planar-orientation.json';
 import tabularZoneOrientation from './measurement/tabular-zone-orientation.json';
 import namingConventions from './naming-conventions.json';
+import outcropSummary from './outcrop-summary.json';
 import rockTypeAlterationOreDeprecated from './pet/deprecated/rock-type-alteration-ore.json';
 import rockTypeIgneousDeprecated from './pet/deprecated/rock-type-igneous.json';
 import rockTypeMetamorphicDeprecated from './pet/deprecated/rock-type-metamorphic.json';
@@ -89,6 +90,7 @@ const forms = {
     earthquakes: earthquake,
     geography: geography,
     images: imageProperties,
+    outcrop_summaries: outcropSummary,
     project_description: projectDescription,
     reports: report,
     samples: sample,

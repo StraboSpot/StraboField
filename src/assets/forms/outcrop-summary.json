@@ -1,0 +1,212 @@
+{
+  "survey": [
+    {
+      "type": "start",
+      "name": "start"
+    },
+    {
+      "type": "end",
+      "name": "end"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_og2iw66",
+      "label": "Outcrop Certainty",
+      "required": "false"
+    },
+    {
+      "type": "select_one ti5pw19",
+      "name": "attachedness",
+      "label": "Attachedness",
+      "required": "false"
+    },
+    {
+      "type": "select_one rs0qo34",
+      "name": "lithology",
+      "label": "Lithology",
+      "required": "false"
+    },
+    {
+      "type": "select_one ii0sh27",
+      "name": "geometry",
+      "label": "Geometry",
+      "required": "false"
+    },
+    {
+      "type": "select_one ws5gk47",
+      "name": "kinematics",
+      "label": "Kinematics",
+      "required": "false"
+    },
+    {
+      "type": "end_group"
+    },
+    {
+      "type": "select_multiple hy0et38",
+      "name": "critical_outcrop",
+      "label": "Critical Outcrop",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "why",
+      "label": "Why",
+      "required": "false",
+      "relevant": "${critical_outcrop} != ''"
+    },
+    {
+      "type": "text",
+      "name": "evidence",
+      "label": "Evidence",
+      "required": "false",
+      "relevant": "${critical_outcrop} != ''"
+    }
+  ],
+  "choices": [
+    {
+      "list_name": "ti5pw19",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "anchor",
+      "label": "Anchor"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "clarifier",
+      "label": "Clarifier"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "exemplar",
+      "label": "Exemplar"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "confuser",
+      "label": "Confuser"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "other",
+      "label": "Other"
+    }
+  ]
+}

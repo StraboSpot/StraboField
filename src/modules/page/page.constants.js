@@ -23,6 +23,8 @@ import NotesOverview from '../notes/NotesOverview';
 import ShortcutNotesModal from '../notes/ShortcutNotesModal';
 import OtherFeaturesOverview from '../other-features/OtherFeaturesOverview';
 import OtherFeaturesPage from '../other-features/OtherFeaturesPage';
+import AddOutcropSummaryModal from '../outcrop-summary/AddOutcropSummaryModal';
+import OutcropSummaryPage from '../outcrop-summary/OutcropSummaryPage';
 import AddMineralModal from '../petrology/AddMineralModal';
 import AddReactionTextureModal from '../petrology/AddReactionTextureModal';
 import AddRockModal from '../petrology/AddRockModal';
@@ -187,6 +189,17 @@ export const SECONDARY_PAGES = [
     modal_component: AddEarthquakeModal,
     overview_component: BasicOverviewList,
     action_label: 'Add an Earthquake Feature',
+  }, {
+    key: PAGE_KEYS.OUTCROP_SUMMARIES,
+    label: 'Outcrop Summaries',
+    label_singular: 'Outcrop Summary',
+    icon_src: require('../../assets/icons/OutcropSummary.png'),
+    icon_pressed_src: require('../../assets/icons/OutcropSummary_pressed.png'),
+    page_component: OutcropSummaryPage,
+    modal_component: AddOutcropSummaryModal,
+    overview_component: BasicOverviewList,
+    action_label: 'Add an Outcrop Summary',
+    testing: true,
   }, {
     key: PAGE_KEYS.QAQC,
     label: 'QAQC',
@@ -456,4 +469,4 @@ export const MODALS = [...NOTEBOOK_MODELS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
 
 export const SAMPLES_OVERVIEW_SECTIONS = [PAGE_KEYS.SAMPLES, PAGE_KEYS.IMAGES, PAGE_KEYS.GEOLOGIC_UNITS];
 
-export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.SAMPLES, PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.STRAT_SECTION, PAGE_KEYS.INTERVAL, PAGE_KEYS.INTERPRETATIONS];
+export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.SAMPLES, PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.OUTCROP_SUMMARIES, PAGE_KEYS.STRAT_SECTION, PAGE_KEYS.INTERVAL, PAGE_KEYS.INTERPRETATIONS];
