@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 
 import {CheckBox, Icon, ListItem} from '@rn-vui/base';
 import MultiSelect from 'react-native-multiple-select';
 
-import {getFittingColumnWidths, getRowsOfColumns, getStretchedColumnWidths} from './columns.helpers';
+import useColumnLayout from './useColumnLayout';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {
@@ -13,7 +13,6 @@ import {
   PRIMARY_TEXT_COLOR,
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
-  SMALL_SCREEN_WIDTH,
   WARNING_COLOR,
 } from '../../shared/styles.constants';
 import {formStyles} from '../form';
@@ -34,10 +33,10 @@ const SelectInputField = ({
                             single,
                             value,
                           }) => {
-  /* Local State */
+  /* Data Hooks */
 
-  const [choiceWidths, setChoiceWidths] = useState({});
-  const [choicesWidth, setChoicesWidth] = useState(0);
+  // Only the horizontal layouts render these rows; the other layouts stack the choices or list them in a dropdown
+  const {isMeasured, isSpread, onContainerLayout, onItemLayout, rows: choiceRows} = useColumnLayout(choices);
 
   /* Derived Variables */
 
@@ -45,27 +44,7 @@ const SelectInputField = ({
   const isHorizontal = appearance === 'horizontal' || isCompact;
   const placeholderText = name === 'spot_id_for_pet_copy' ? '-- None --' : `-- Select ${label} --`;
 
-  // Horizontal choices that fit on a single row keep their natural width and are spread across it. Choices
-  // that need more than one row go into columns, sized to the widest choice in each, so the rows line up.
-  // Either way they only fill the container if it's narrow enough that filling it doesn't stretch them out.
-  const measuredWidths = choices.map(choice => choiceWidths[choice.value]);
-  const isMeasured = measuredWidths.every(width => width !== undefined);
-  const fittedWidths = isMeasured ? getFittingColumnWidths(measuredWidths, choicesWidth) : [];
-  const isFittingOneRow = fittedWidths.length === choices.length;
-  const isNarrowContainer = choicesWidth < SMALL_SCREEN_WIDTH;
-  const isSpread = isFittingOneRow && isNarrowContainer;
-  const columnWidths = isFittingOneRow || !isNarrowContainer ? fittedWidths
-    : getStretchedColumnWidths(fittedWidths, choicesWidth);
-  // Lay the rows out rather than letting them wrap, so they break where the columns say they do
-  const choiceRows = isMeasured ? getRowsOfColumns(choices, columnWidths.length) : [choices];
-
   /* Event Handlers */
-
-  // Measure each choice once, while it's still at its natural width, before any column width is applied
-  const handleChoiceLayout = (item, e) => {
-    const {width} = e.nativeEvent.layout;
-    if (!isMeasured) setChoiceWidths(prevWidths => ({...prevWidths, [item.value]: width}));
-  };
 
   const handleChoicePressed = (item) => {
     if (single) fieldValueChanged([item.value]);
@@ -84,6 +63,12 @@ const SelectInputField = ({
     else setFieldValue(name, isEmpty(itemValue) ? undefined : itemValue);
   };
 
+  // Radio buttons for a single choice field, checkboxes for a multiple choice one
+  const getChoiceIconName = (isSelected) => {
+    if (single) return isSelected ? 'radiobox-marked' : 'radiobox-blank';
+    return isSelected ? 'checkbox-marked' : 'checkbox-blank-outline';
+  };
+
   const getChoiceLabel = (itemValue) => {
     if (typeof itemValue === 'object' && Array.isArray(itemValue) && itemValue.length > 1) return 'Multiple Selected';
     else if (typeof itemValue === 'object' && Array.isArray(itemValue) && itemValue.length === 1) {
@@ -93,51 +78,39 @@ const SelectInputField = ({
     return choiceFound ? choiceFound.label : '';
   };
 
+  const isChoiceSelected = item => single ? value === item.value : !!value?.includes(item.value);
+
   /* Render Functions */
 
-  const renderChoiceItem = (item) => {
-    const checkboxSelected = (
-      <Icon color={PRIMARY_ACCENT_COLOR} name={'checkbox-marked'} type={'material-community'}/>
-    );
-    const checkboxUnselected = (
-      <Icon color={DARKGREY} name={'checkbox-blank-outline'} type={'material-community'}/>
-    );
-    const radioSelected = (
-      <Icon color={PRIMARY_ACCENT_COLOR} name={'radiobox-marked'} type={'material-community'}/>
-    );
-    const radioUnselected = <Icon color={DARKGREY} name={'radiobox-blank'} type={'material-community'}/>;
+  const renderChoiceIcon = (isSelected) => {
     return (
-      <React.Fragment key={item.value}>
-        {isHorizontal ? (
-          <CheckBox
-            checked={single ? value === item.value : !!value?.includes(item.value)}
-            checkedIcon={single ? radioSelected : checkboxSelected}
-            containerStyle={formStyles.horizontalChoiceContainer}
-            disabled={item.disabled}
-            onPress={() => handleChoicePressed(item)}
-            textStyle={[commonStyles.listItemTitle, formStyles.horizontalChoiceTitle]}
-            title={item.label}
-            uncheckedIcon={single ? radioUnselected : checkboxUnselected}
-          />
-        ) : (
-          <ListItem
-            containerStyle={commonStyles.listItemFormField}
-            disabled={item.disabled}
-            onPress={() => handleChoicePressed(item)}
-          >
-            <ListItem.Content>
-              <ListItem.Title style={commonStyles.listItemTitle}>{item.label}</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.CheckBox
-              checked={single ? value === item.value : !!value?.includes(item.value)}
-              checkedIcon={single ? radioSelected : checkboxSelected}
-              disabled={item.disabled}
-              onPress={() => handleChoicePressed(item)}
-              uncheckedIcon={single ? radioUnselected : checkboxUnselected}
-            />
-          </ListItem>
-        )}
-      </React.Fragment>
+      <Icon
+        color={isSelected ? PRIMARY_ACCENT_COLOR : DARKGREY}
+        name={getChoiceIconName(isSelected)}
+        type={'material-community'}
+      />
+    );
+  };
+
+  const renderChoiceItem = (item) => {
+    return (
+      <ListItem
+        containerStyle={commonStyles.listItemFormField}
+        disabled={item.disabled}
+        key={item.value}
+        onPress={() => handleChoicePressed(item)}
+      >
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>{item.label}</ListItem.Title>
+        </ListItem.Content>
+        <ListItem.CheckBox
+          checked={isChoiceSelected(item)}
+          checkedIcon={renderChoiceIcon(true)}
+          disabled={item.disabled}
+          onPress={() => handleChoicePressed(item)}
+          uncheckedIcon={renderChoiceIcon(false)}
+        />
+      </ListItem>
     );
   };
 
@@ -148,13 +121,9 @@ const SelectInputField = ({
         style={[formStyles.horizontalChoicesRow, !isMeasured && formStyles.horizontalChoicesUnmeasured,
           isSpread && formStyles.horizontalChoicesSpread]}
       >
-        {row.map((item, columnIndex) => (
-          <View
-            key={item.value}
-            onLayout={e => handleChoiceLayout(item, e)}
-            style={{width: isFittingOneRow ? undefined : columnWidths[columnIndex]}}
-          >
-            {isCompact ? renderCompactChoiceItem(item) : renderChoiceItem(item)}
+        {row.map(({item, width}) => (
+          <View key={item.value} onLayout={e => onItemLayout(item, e)} style={{width}}>
+            {isCompact ? renderCompactChoiceItem(item) : renderHorizontalChoiceItem(item)}
           </View>
         ))}
       </View>
@@ -178,7 +147,7 @@ const SelectInputField = ({
   const renderChoicesList = () => {
     if (isHorizontal) {
       return (
-        <View onLayout={e => setChoicesWidth(e.nativeEvent.layout.width)} style={formStyles.horizontalChoices}>
+        <View onLayout={onContainerLayout} style={formStyles.horizontalChoices}>
           {choiceRows.map(renderChoiceRow)}
         </View>
       );
@@ -188,9 +157,6 @@ const SelectInputField = ({
 
   // Choice label stacked above its radio/checkbox rather than beside it
   const renderCompactChoiceItem = (item) => {
-    const isChecked = single ? value === item.value : !!value?.includes(item.value);
-    const iconName = single ? (isChecked ? 'radiobox-marked' : 'radiobox-blank')
-      : (isChecked ? 'checkbox-marked' : 'checkbox-blank-outline');
     return (
       <TouchableOpacity
         disabled={item.disabled}
@@ -198,11 +164,7 @@ const SelectInputField = ({
         style={formStyles.horizontalChoiceCompact}
       >
         <Text style={commonStyles.listItemTitle}>{item.label}</Text>
-        <Icon
-          color={isChecked ? PRIMARY_ACCENT_COLOR : DARKGREY}
-          name={iconName}
-          type={'material-community'}
-        />
+        {renderChoiceIcon(isChoiceSelected(item))}
       </TouchableOpacity>
     );
   };
@@ -220,6 +182,22 @@ const SelectInputField = ({
           />
         )}
       </View>
+    );
+  };
+
+  // Choice label beside its radio/checkbox
+  const renderHorizontalChoiceItem = (item) => {
+    return (
+      <CheckBox
+        checked={isChoiceSelected(item)}
+        checkedIcon={renderChoiceIcon(true)}
+        containerStyle={formStyles.horizontalChoiceContainer}
+        disabled={item.disabled}
+        onPress={() => handleChoicePressed(item)}
+        textStyle={[commonStyles.listItemTitle, formStyles.horizontalChoiceTitle]}
+        title={item.label}
+        uncheckedIcon={renderChoiceIcon(false)}
+      />
     );
   };
 
