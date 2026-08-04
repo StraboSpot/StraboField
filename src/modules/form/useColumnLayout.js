@@ -33,10 +33,12 @@ const useColumnLayout = (items) => {
 
   const onContainerLayout = e => setContainerWidth(e.nativeEvent.layout.width);
 
-  // Measure each item once, while it's still at its natural width, before any column width is applied
+  // Measure each item once, while it's still at its natural width, before any column width is applied.
+  // Round up: a column is sized to the widest item it holds, and at a fractional width pixel rounding
+  // leaves that item a sliver narrower than it measured at, which truncates its label.
   const onItemLayout = (item, e) => {
     const {width} = e.nativeEvent.layout;
-    if (!isMeasured) setItemWidths(prevWidths => ({...prevWidths, [item.value]: width}));
+    if (!isMeasured) setItemWidths(prevWidths => ({...prevWidths, [item.value]: Math.ceil(width)}));
   };
 
   return {

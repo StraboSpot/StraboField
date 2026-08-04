@@ -155,7 +155,8 @@ const SelectInputField = ({
     return choices.map(item => renderChoiceItem(item));
   };
 
-  // Choice label stacked above its radio/checkbox rather than beside it
+  // Choice label stacked above its radio/checkbox rather than beside it. Held to one line so that a
+  // label containing spaces wraps the choices onto another row rather than breaking at its own spaces.
   const renderCompactChoiceItem = (item) => {
     return (
       <TouchableOpacity
@@ -163,7 +164,7 @@ const SelectInputField = ({
         onPress={() => handleChoicePressed(item)}
         style={formStyles.horizontalChoiceCompact}
       >
-        <Text style={commonStyles.listItemTitle}>{item.label}</Text>
+        <Text numberOfLines={1} style={commonStyles.listItemTitle}>{item.label}</Text>
         {renderChoiceIcon(isChoiceSelected(item))}
       </TouchableOpacity>
     );
