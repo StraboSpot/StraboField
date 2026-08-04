@@ -134,5 +134,37 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     paddingTop: 2.5,
   },
+  // Stacks the label above the radio/checkbox rather than beside it
+  horizontalChoiceCompact: {
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 2.5,
+  },
+  // Trims the CheckBox's default side margins (10 each) so more choices fit on a row
+  horizontalChoiceContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderWidth: 0,
+    marginHorizontal: 0,
+    marginVertical: 2.5,
+    padding: 1,
+  },
+  // The CheckBox title defaults to bold and its own grey, so match the label of the other choice layouts
+  horizontalChoiceTitle: {
+    fontWeight: 'normal',
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  horizontalChoices: {
+    width: '100%',  // ListItem.Content aligns children to flex-start, so shrinks them to their content width
+  },
+  horizontalChoicesRow: {
+    flexDirection: 'row',
+  },
+  horizontalChoicesSpread: {
+    justifyContent: 'space-between',
+  },
+  horizontalChoicesUnmeasured: {
+    flexWrap: 'wrap',  // Only until the choices have been measured and laid out in columns
+  },
 });
 export default styles;

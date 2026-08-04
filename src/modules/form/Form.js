@@ -173,6 +173,7 @@ const Form = ({
 
     return (
       <Field
+        appearance={field.appearance}
         as={SelectInputField}
         choices={fieldChoicesCopy}
         errors={errors}

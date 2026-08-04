@@ -62,7 +62,10 @@ export const MODAL_BACKDROP = 'rgba(0, 0, 0, 0.5)';
 export const MAIN_MENU_WIDTH = 300;
 export const NOTEBOOK_WIDTH = 400;
 
-export const SMALL_SCREEN = width < 600;
+export const MAX_CONTENT_WIDTH = 400;   // Width past which content is no longer stretched to fill its container
+
+export const SMALL_SCREEN_WIDTH = 600;
+export const SMALL_SCREEN = width < SMALL_SCREEN_WIDTH;
 export const MEDIUM_SCREEN = (width >= 600 && width < 840) || (height >= 480 && height < 900);
 export const LARGE_SCREEN = width > 840 || height > 900;
 

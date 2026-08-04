@@ -18,25 +18,29 @@
       "type": "select_one ti5pw19",
       "name": "attachedness",
       "label": "Attachedness",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal-compact"
     },
     {
       "type": "select_one rs0qo34",
       "name": "lithology",
       "label": "Lithology",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal-compact"
     },
     {
       "type": "select_one ii0sh27",
       "name": "geometry",
       "label": "Geometry",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal-compact"
     },
     {
       "type": "select_one ws5gk47",
       "name": "kinematics",
       "label": "Kinematics",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal-compact"
     },
     {
       "type": "end_group"
@@ -45,13 +49,15 @@
       "type": "select_multiple hy0et38",
       "name": "critical_outcrop",
       "label": "Critical Outcrop",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal"
     },
     {
       "type": "text",
       "name": "why",
       "label": "Why",
       "required": "false",
+      "appearance": "multiline",
       "relevant": "${critical_outcrop} != ''"
     },
     {
@@ -59,6 +65,7 @@
       "name": "evidence",
       "label": "Evidence",
       "required": "false",
+      "appearance": "multiline",
       "relevant": "${critical_outcrop} != ''"
     }
   ],
