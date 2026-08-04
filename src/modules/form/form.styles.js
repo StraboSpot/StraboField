@@ -166,5 +166,10 @@ const styles = StyleSheet.create({
   horizontalChoicesUnmeasured: {
     flexWrap: 'wrap',  // Only until the choices have been measured and laid out in columns
   },
+  noteTextItalic: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+  },
 });
 export default styles;

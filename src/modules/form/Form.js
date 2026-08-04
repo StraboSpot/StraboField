@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
-import {FlatList, Platform} from 'react-native';
+import {FlatList, Platform, Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
 import {showFieldInfo} from './form.helpers';
+import styles from './form.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -115,7 +116,7 @@ const Form = ({
         {fieldType === 'begin_group' && renderGroupHeading(field)}
         {(fieldType === 'text' || fieldType === 'integer' || fieldType === 'decimal' || fieldType === 'select_one'
           || fieldType === 'select_multiple' || fieldType === 'date' || fieldType === 'time'
-          || fieldType === 'acknowledge') && (
+          || fieldType === 'acknowledge' || fieldType === 'note') && (
           <>
             {surveyFragment && (fieldType === 'select_one' || fieldType === 'select_multiple')
               && renderSelectInput(field, true)}
@@ -128,6 +129,7 @@ const Form = ({
                 {fieldType === 'date' && renderDateInput(field)}
                 {fieldType === 'time' && renderDateInput(field, true)}
                 {fieldType === 'acknowledge' && renderAcknowledgeInput(field)}
+                {fieldType === 'note' && renderNote(field)}
               </ListItem.Content>
             </ListItem>
           </>
@@ -143,6 +145,8 @@ const Form = ({
   ));
 
   const renderGroupHeading = field => <SectionDivider dividerText={field.label}/>;
+
+  const renderNote = field => <Text style={styles.noteTextItalic}>{field.label}</Text>;
 
   const renderNumberInput = (field) => {
     return (

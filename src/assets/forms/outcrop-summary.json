@@ -15,6 +15,12 @@
       "required": "false"
     },
     {
+      "type": "note",
+      "name": "outcrop_certainty_note",
+      "label": "An assessment of attributes that provide context to the overall quality of the data collected at a particular outcrop.  Ranges from 5 (most certain) to 1 (least certain). NR stands for Not Reported.",
+      "required": "false"
+    },
+    {
       "type": "select_one ti5pw19",
       "name": "attachedness",
       "label": "Attachedness",
@@ -53,6 +59,12 @@
       "type": "begin_group",
       "name": "group_er04g37",
       "label": "Critical Outcrop",
+      "required": "false"
+    },
+    {
+      "type": "note",
+      "name": "critical_outcrop_note",
+      "label": "An outcrop of particular importance in the project that should be further studied, discussed, or revisited and is likely relevant for any geologist working in the area.",
       "required": "false"
     },
     {
