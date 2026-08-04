@@ -44,6 +44,12 @@ const styles = StyleSheet.create({
     color: themes.WARNING_COLOR,
     textAlign: 'center',
   },
+  fieldInfoText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    lineHeight: 20,
+    padding: 10,
+  },
   fieldLabel: {
     alignSelf: 'center',
     color: themes.PRIMARY_TEXT_COLOR,

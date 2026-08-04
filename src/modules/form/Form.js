@@ -1,11 +1,11 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
-import {showFieldInfo} from './form.helpers';
+import FieldInfoModal from './FieldInfoModal';
 import styles from './form.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -29,6 +29,10 @@ const Form = ({
 
   const {getChoices, getSurvey, isRelevant} = useForm();
 
+  /* Local State */
+
+  const [fieldInfo, setFieldInfo] = useState(null);
+
   /* Derived Variables */
 
   const survey = surveyFragment || getSurvey(formName);
@@ -48,6 +52,10 @@ const Form = ({
       }
     });
   }, []);
+
+  /* Event Handlers */
+
+  const handleShowFieldInfo = (label, info) => setFieldInfo({label, info});
 
   /* Logic Helpers */
 
@@ -87,7 +95,7 @@ const Form = ({
         key={field.name}
         label={field.label}
         name={field.name}
-        onShowFieldInfo={showFieldInfo}
+        onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
         setFieldValue={setFieldValueAndClearIrrelevant}
       />
@@ -157,7 +165,7 @@ const Form = ({
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
+        onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
       />
     );
@@ -186,7 +194,7 @@ const Form = ({
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
+        onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
         setFieldValue={setFieldValueAndClearIrrelevant}
         showExpandedChoices={isExpanded}
@@ -206,7 +214,7 @@ const Form = ({
         label={field.label}
         name={subkey ? subkey + '[0].' + field.name : field.name}
         onMyChange={onMyChange}
-        onShowFieldInfo={showFieldInfo}
+        onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
       />
     );
@@ -217,15 +225,20 @@ const Form = ({
   // Render fields inline (no internal FlatList) on web, or when the caller already provides a single
   // scroll container. Nesting this FlatList inside another scroll view breaks iOS keyboard-focus
   // scrolling — the focused input's nearest scroll ancestor differs from the one adjusting insets.
-  if (Platform.OS === 'web' || renderInline) return renderFields();
-
   return (
-    <FlatList
-      data={relevantFields}
-      keyExtractor={(item, index) => index.toString()}
-      listKey={JSON.stringify(survey)}
-      renderItem={({item}) => renderField(item)}
-    />
+    <>
+      {Platform.OS === 'web' || renderInline ? renderFields() : (
+        <FlatList
+          data={relevantFields}
+          keyExtractor={(item, index) => index.toString()}
+          listKey={JSON.stringify(survey)}
+          renderItem={({item}) => renderField(item)}
+        />
+      )}
+
+      {/* Modal */}
+      <FieldInfoModal fieldInfo={fieldInfo} onClose={() => setFieldInfo(null)}/>
+    </>
   );
 };
 
