@@ -1,6 +1,6 @@
-import faultRock from './fabrics/fault-rock.json';
-import igneousRock from './fabrics/igneous-rock.json';
-import metamorphicRock from './fabrics/metamorphic-rock.json';
+import igneousFabric from './fabrics/igneous.json';
+import metamorphicFabric from './fabrics/metamorphic.json';
+import structuralFabric from './fabrics/structural.json';
 import geography from './geography.json';
 import geologicUnit from './geologic_unit.json';
 import earthquake from './geomorph/earthquake.json';
@@ -82,9 +82,9 @@ const forms = {
     tensor: tensor,
   },
   fabrics: {
-    fault_rock: faultRock,
-    igneous_rock: igneousRock,
-    metamorphic_rock: metamorphicRock,
+    fault_rock: structuralFabric,
+    igneous_rock: igneousFabric,
+    metamorphic_rock: metamorphicFabric,
   },
   general: {
     earthquakes: earthquake,
