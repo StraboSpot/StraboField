@@ -18,6 +18,7 @@
       "type": "select_one ti5pw19",
       "name": "attachedness",
       "label": "Attachedness",
+      "hint": "How clearly is the outcrop attached to the underlying bedrock?\n\n5: Expansive outcrop with clear exposure of bedrock connection.\n1: Isolated outcrop or boulder surrounded by soil.",
       "required": "false",
       "appearance": "horizontal-compact"
     },
@@ -25,6 +26,7 @@
       "type": "select_one rs0qo34",
       "name": "lithology",
       "label": "Lithology",
+      "hint": "How certain is the rock type identification?\n\n5: Completely certain. The rock type or unit is unambiguous (Example: type locality).\n1: Uncertain, the rock type is unclear or has multiple possibilities (Example: four similar sandstones in one field area).",
       "required": "false",
       "appearance": "horizontal-compact"
     },
@@ -32,6 +34,7 @@
       "type": "select_one ii0sh27",
       "name": "geometry",
       "label": "Geometry",
+      "hint": "How certain is the identification of planar or linear features at this outcrop?\n\n5: Clear markers, consistent orientations within the outcrop.\n1: Obscure or overprinted markers, inconsistent or variable orientations.",
       "required": "false",
       "appearance": "horizontal-compact"
     },
@@ -39,6 +42,7 @@
       "type": "select_one ws5gk47",
       "name": "kinematics",
       "label": "Kinematics",
+      "hint": "How certain is the interpreted sense of movement at this outcrop?\n\n5: Clear kinematic indicators with consistent sense of motion.\n1: Poorly preserved or contradictory kinematic indicators.",
       "required": "false",
       "appearance": "horizontal-compact"
     },
@@ -46,9 +50,16 @@
       "type": "end_group"
     },
     {
+      "type": "begin_group",
+      "name": "group_er04g37",
+      "label": "Critical Outcrop",
+      "required": "false"
+    },
+    {
       "type": "select_multiple hy0et38",
       "name": "critical_outcrop",
-      "label": "Critical Outcrop",
+      "label": "Critical Outcrop Type",
+      "hint": "Anchor\nOutcrop chosen for extended study due to scientific relevance or logistical advantage.\n    Example:  A well exposed outcrop along a road contains enough garnets to perform geochronologic analysis and kinematic indicators for structural analysis.\n\nExemplar\nOutcrop displays the best local example of a unit, geometry, or process that is essential for understanding the field area.\n    Example: An outcrop that clearly shows overprinting relationships between a D1 and D2 fabric present throughout field area.\n\nClarifier\nOutcrop resolves ambiguity, either clarifying something previously unclear, distinguishing between competing interpretations, or provides clear evidence for or against a model.\n    Example:  A faulted outcrop has clear offset markers confirming dextral motion, where other outcrops had unclear kinematics.\n\nConfuser\nOutcrop is difficult to interpret and/or is inconsistent with the working conceptual model.\n    Example:  An outcrop has a mineral that is difficult to identify so further petrologic analysis or consultation from colleagues may be required to understand.",
       "required": "false",
       "appearance": "horizontal"
     },
@@ -67,6 +78,9 @@
       "required": "false",
       "appearance": "multiline",
       "relevant": "${critical_outcrop} != ''"
+    },
+    {
+      "type": "end_group"
     }
   ],
   "choices": [
