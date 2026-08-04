@@ -4,7 +4,6 @@ import {Icon, ListItem} from '@rn-vui/base';
 
 import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import usePetrology from '../petrology/usePetrology';
@@ -20,7 +19,7 @@ const BasicListItem = ({
                        }) => {
   /* Data Hooks */
 
-  const {getLabel, getLabels} = useForm();
+  const {getLabel} = useForm();
   const {getMineralTitle, getPetRockTitle, getReactionTextureTitle} = usePetrology();
   const {getBeddingTitle, getSedRockTitle, getStratSectionTitle} = useSed();
 
@@ -55,9 +54,6 @@ const BasicListItem = ({
           + getLabel(item?.layer_type, [PAGE_KEYS.TEPHRA, 'interval_basic']);
       case PAGE_KEYS.EARTHQUAKES:
         return getLabel(item?.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
-      case PAGE_KEYS.OUTCROP_SUMMARIES:
-        return isEmpty(item?.critical_outcrop) ? 'Outcrop Summary ' + (index + 1)
-          : getLabels(item.critical_outcrop, ['general', PAGE_KEYS.OUTCROP_SUMMARIES]);
       default:
         return 'Unknown';
     }

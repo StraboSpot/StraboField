@@ -23,7 +23,6 @@ import NotesOverview from '../notes/NotesOverview';
 import ShortcutNotesModal from '../notes/ShortcutNotesModal';
 import OtherFeaturesOverview from '../other-features/OtherFeaturesOverview';
 import OtherFeaturesPage from '../other-features/OtherFeaturesPage';
-import AddOutcropSummaryModal from '../outcrop-summary/AddOutcropSummaryModal';
 import OutcropSummaryPage from '../outcrop-summary/OutcropSummaryPage';
 import AddMineralModal from '../petrology/AddMineralModal';
 import AddReactionTextureModal from '../petrology/AddReactionTextureModal';
@@ -191,14 +190,10 @@ export const SECONDARY_PAGES = [
     action_label: 'Add an Earthquake Feature',
   }, {
     key: PAGE_KEYS.OUTCROP_SUMMARIES,
-    label: 'Outcrop Summaries',
-    label_singular: 'Outcrop Summary',
+    label: 'Outcrop Summary',
     icon_src: require('../../assets/icons/OutcropSummary.png'),
     icon_pressed_src: require('../../assets/icons/OutcropSummary_pressed.png'),
     page_component: OutcropSummaryPage,
-    modal_component: AddOutcropSummaryModal,
-    overview_component: BasicOverviewList,
-    action_label: 'Add an Outcrop Summary',
     testing: true,
   }, {
     key: PAGE_KEYS.QAQC,

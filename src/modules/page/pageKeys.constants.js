@@ -45,7 +45,6 @@ export const MODAL_KEYS = {
     GEOLOGIC_UNITS: 'geologic_unit',
     MEASUREMENTS: 'orientation_data',
     MINERALS: 'minerals',
-    OUTCROP_SUMMARIES: 'outcrop_summaries',
     REACTIONS: 'reactions',
     REPORTS: 'reports',
     ROCK_TYPE_ALTERATION_ORE: 'alteration_or',

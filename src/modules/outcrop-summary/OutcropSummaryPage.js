@@ -1,92 +1,142 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import React, {useLayoutEffect, useRef} from 'react';
+import {Platform, View} from 'react-native';
 
+import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/helpers';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {setModalVisible} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
+import {FormFlatList} from '../../shared/ui';
+import alert from '../../shared/ui/alert';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import {Form, useForm} from '../form';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {editedSpotProperties} from '../spots/spots.slice';
+
+const pageKey = PAGE_KEYS.OUTCROP_SUMMARIES;
+const formName = ['general', pageKey];
 
 const OutcropSummaryPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {showErrors, validateForm} = useForm();
+  const toast = useToast();
 
   /* Local State */
 
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState({});
+  const formRef = useRef(null);
 
   /* Derived Variables */
 
-  const attributes = spot && spot.properties && spot.properties[page.key] || [];
+  // Outcrop summaries are stored as an array but only one per Spot is shown for now
+  const outcropSummaries = spot.properties?.[pageKey] || [];
+  const initialValues = outcropSummaries[0] || {};
 
   /* Side Effects */
 
-  useEffect(() => {
-    console.log('UE OutcropSummaryPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (!isEmpty(selectedAttributes)) {
-      setSelectedAttribute(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
+  useLayoutEffect(() => {
+    console.log('ULE OutcropSummaryPage []');
+    return () => confirmLeavePage();
+  }, []);
 
   /* Logic Helpers */
 
-  const addAttribute = () => {
-    dispatch(setModalVisible({modal: page.key}));
+  const cancelFormAndGo = () => {
+    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
-  const editAttribute = (attribute) => {
-    setIsDetailView(true);
-    setSelectedAttribute(attribute);
-    dispatch(setModalVisible({modal: null}));
+  const confirmLeavePage = () => {
+    if (formRef.current && formRef.current.dirty) {
+      const formCurrent = formRef.current;
+      alert('Unsaved Changes',
+        'Would you like to save your data before continuing?',
+        [{
+          text: 'No',
+          style: 'cancel',
+        }, {
+          text: 'Yes',
+          onPress: () => saveFormAndGo(formCurrent),
+        }],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const saveForm = async (currentForm) => {
+    try {
+      await currentForm.submitForm();
+      const editedOutcropSummaryData = showErrors(currentForm);
+      const spotId = spot.properties.id;
+      // An empty form saves an empty array, which removes the property from the Spot
+      const editedOutcropSummaries = isEmpty(editedOutcropSummaryData) ? []
+        : [{...editedOutcropSummaryData, id: outcropSummaries[0]?.id || getNewUUID()}];
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: pageKey, value: editedOutcropSummaries, spotId: spotId}));
+      await currentForm.resetForm();
+      if (Platform.OS !== 'web') toast.show('Outcrop Summary Saved', {type: 'success'});
+    }
+    catch (err) {
+      console.log('Error submitting form', err);
+      return Promise.reject();
+    }
+  };
+
+  const saveFormAndGo = async (currentForm = formRef.current) => {
+    try {
+      await saveForm(currentForm);
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    catch (e) {
+      console.log('Error saving form data to Spot');
+    }
   };
 
   /* Render Functions */
 
-  const renderAttributeDetail = () => {
+  const renderCancelSaveButtons = () => {
     return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
-        isReadOnly={isReadOnly}
-        page={page}
-        selectedFeature={selectedAttribute}
-      />
-    );
-  };
-
-  const renderAttributesMain = () => {
-    return (
-      <View style={{flex: 1, justifyContent: 'flex-start'}}>
-        <PageHeader onPressAdd={addAttribute} pageTitle={page.label} showAddButton={!isReadOnly}/>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText onPress={!isReadOnly && addAttribute} text={'No ' + page.label}/>}
-          data={attributes}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({item, index}) => (
-            <BasicListItem
-              editItem={itemToEdit => editAttribute(itemToEdit)}
-              index={index}
-              item={item}
-              page={page}
-            />
-          )}
+      <View>
+        <SaveAndCancelButtons
+          cancel={() => cancelFormAndGo()}
+          save={() => saveFormAndGo()}
         />
       </View>
     );
   };
 
+  const renderOutcropSummaryForm = () => {
+    return (
+      <Formik
+        enableReinitialize={true}
+        initialStatus={{formName: formName}}
+        initialValues={initialValues}
+        innerRef={formRef}
+        onReset={() => console.log('Resetting form...')}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
+      >
+        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+      </Formik>
+    );
+  };
+
   /* View */
 
-  return isDetailView ? renderAttributeDetail() : renderAttributesMain();
+  return (
+    <View style={{flex: 1}}>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={page.label}/>
+      {!isReadOnly && renderCancelSaveButtons()}
+      <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+        {renderOutcropSummaryForm()}
+      </FormFlatList>
+    </View>
+  );
 };
 
 export default OutcropSummaryPage;
