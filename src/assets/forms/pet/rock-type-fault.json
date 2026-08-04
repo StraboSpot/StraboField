@@ -20,7 +20,7 @@
       "name": "fault_rock",
       "label": "Fault and Shear Zone Rock Type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

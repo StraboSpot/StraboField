@@ -14,7 +14,7 @@
       "label": "Metamorphic Rock Type",
       "hint": "Specific metamorphic rock type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "select_one yj3tk91",
@@ -37,7 +37,7 @@
       "label": "Interpreted Protolith",
       "hint": "Interpreted metamorphic protolith",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -51,7 +51,7 @@
       "name": "facies",
       "label": "Facies",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -65,7 +65,7 @@
       "name": "zone",
       "label": "Zone",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
