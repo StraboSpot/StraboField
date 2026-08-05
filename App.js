@@ -10,6 +10,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 
 import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
 import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
+import ProfileSyncListener from './src/modules/user/ProfileSyncListener';
 import Routes from './src/routes/Routes';
 import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
 import {RELEASE_NAME} from './src/shared/app.constants';
@@ -89,6 +90,7 @@ const App = () => {
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
+              <ProfileSyncListener/>
               <MacrostratAuthRedirectHandler/>
               <NavigationContainer linking={linking}>
                 <Routes/>

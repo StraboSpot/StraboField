@@ -18,6 +18,7 @@ import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
@@ -133,7 +134,7 @@ const UserProfile = () => {
     if (formCurrent && (formCurrent.dirty || hasUnsavedConventionRef.current)) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !isConnectionAvailable;
+  const getIsDisabled = () => false;
 
   const saveForm = async (formCurrent) => {
     try {
@@ -146,11 +147,14 @@ const UserProfile = () => {
         if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
         else {
           await uploadProfile(userValuesToUpdate);
+          dispatch(clearProfileUploadNeeded());
           toast.show('Profile uploaded successfully!', {type: 'success'});
           toast.show('Changes Saved!', {type: 'success'});
         }
       }
       else {
+        // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
+        if (!isEmpty(userData.encoded_login)) dispatch(setProfileUploadNeeded());
         toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
         toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
@@ -237,7 +241,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
+      <View style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
@@ -253,20 +257,18 @@ const UserProfile = () => {
               />
               {renderMeasurementInputDefault()}
               {renderUtmDisplay()}
-              {isConnectionAvailable ? (
-                <>
-                  {renderBulkUpdatesSection()}
-                  {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
-                    <View style={userStyles.saveButtonContainer}>
-                      <OutlineButton
-                        loading={isDownloading}
-                        onPress={onDownloadUserProfile}
-                        title={'Download User Conventions'}
-                      />
-                    </View>
-                  )}
-                </>
-              ) : <ConnectionRequiredMessage actionText={'make changes to user conventions'}/>}
+              {renderBulkUpdatesSection()}
+              {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
+                isConnectionAvailable ? (
+                  <View style={userStyles.saveButtonContainer}>
+                    <OutlineButton
+                      loading={isDownloading}
+                      onPress={onDownloadUserProfile}
+                      title={'Download User Conventions'}
+                    />
+                  </View>
+                ) : <ConnectionRequiredMessage actionText={'download user conventions'}/>
+              )}
             </>
           }
         />
