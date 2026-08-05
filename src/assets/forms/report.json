@@ -12,13 +12,15 @@
       "type": "select_one bm0fb04",
       "name": "report_type",
       "label": "Memo Type",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal"
     },
     {
       "type": "select_one xd4uv60",
       "name": "report_privacy",
       "label": "Intended Audience",
-      "required": "false"
+      "required": "false",
+      "appearance": "horizontal"
     },
     {
       "type": "text",

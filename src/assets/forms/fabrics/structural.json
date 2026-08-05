@@ -19,7 +19,7 @@
       "name": "structural_fabric",
       "label": "Planar fabric",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -88,7 +88,7 @@
       "name": "cleavage_char",
       "label": "Characterize cleavage",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${structural_fabric}, 'cleavage')"
     },
     {
@@ -160,7 +160,7 @@
       "name": "spatial_config",
       "label": "Spatial configuration",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -175,7 +175,7 @@
       "name": "linear_structural_fabrics",
       "label": "Linear fabrics",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -302,7 +302,7 @@
       "name": "kinematic_fab",
       "label": "Kinematic indicators",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

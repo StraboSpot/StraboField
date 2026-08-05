@@ -42,7 +42,7 @@
       "label": "Layering contact",
       "required": "false",
       "relevant": "selected(${def_mag_fol}, 'comp_layer')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

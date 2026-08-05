@@ -20,7 +20,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
-import {showFieldInfo} from '../form/form.helpers';
+import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
@@ -46,6 +46,7 @@ const UserProfile = () => {
   const formRef = useRef(null);
   const hasUnsavedConventionRef = useRef(false);
 
+  const [fieldInfo, setFieldInfo] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   /* Side Effects */
@@ -179,7 +180,7 @@ const UserProfile = () => {
         <Icon
           color={PRIMARY_ACCENT_COLOR}
           name={'information-circle-outline'}
-          onPress={() => showFieldInfo(label, info)}
+          onPress={() => setFieldInfo({label, info})}
           type={'ionicon'}
         />
       </View>
@@ -241,6 +242,9 @@ const UserProfile = () => {
           }
         />
       </View>
+
+      {/* Modal */}
+      <FieldInfoModal fieldInfo={fieldInfo} onClose={() => setFieldInfo(null)}/>
     </>
   );
 };
