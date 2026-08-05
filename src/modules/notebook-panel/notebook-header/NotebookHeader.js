@@ -15,6 +15,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {getUtmDisplayString} from '../../maps/maps.helpers';
 import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
@@ -38,6 +39,7 @@ const NotebookHeader = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -84,6 +86,8 @@ const NotebookHeader = ({
 
   /* Logic Helpers */
 
+  const getCoordText = (lat, lng) => isUtmDisplay ? getUtmDisplayString([lng, lat]) : getLatLngText(lat, lng);
+
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
       // Creates DMS string for Point coordinates
@@ -98,17 +102,17 @@ const NotebookHeader = ({
             if (rootSpot && rootSpot.geometry && rootSpot.geometry.type === 'Point') {
               lng = rootSpot.geometry.coordinates[0];
               lat = rootSpot.geometry.coordinates[1];
-              return getLatLngText(lat, lng) + '\n' + pixelDetails;
+              return getCoordText(lat, lng) + '\n' + pixelDetails;
             }
           }
           else {
             lng = spot.properties.lng;
             lat = spot.properties.lat;
-            return getLatLngText(lat, lng) + '\n' + pixelDetails;
+            return getCoordText(lat, lng) + '\n' + pixelDetails;
           }
           return pixelDetails;
         }
-        else return getLatLngText(lat, lng);
+        else return getCoordText(lat, lng);
       }
       else if ((spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
         && spot.properties.trace && spot.properties.trace.trace_feature && spot.properties.trace.trace_type) {

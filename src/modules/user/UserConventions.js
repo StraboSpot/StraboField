@@ -30,6 +30,7 @@ const UserProfile = () => {
 
   const dispatch = useDispatch();
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
+  const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
@@ -187,6 +188,33 @@ const UserProfile = () => {
     );
   };
 
+  // Coordinate display format. Spots are always stored as WGS84 lat/lng regardless of this setting - it only
+  // changes how coordinates are shown and entered.
+  const renderUtmDisplay = () => {
+    const label = 'Display Coordinates as UTM';
+    const info = 'When on, the Geography page and map readouts show UTM zone, easting and northing instead of '
+      + 'latitude and longitude. Spots are always saved as WGS84 latitude/longitude, so you can switch back and '
+      + 'forth at any time without changing your data. The zone is taken from the coordinate itself and includes '
+      + 'the hemisphere (e.g. 13N).';
+    return (
+      <View style={{alignItems: 'center', flexDirection: 'row', paddingBottom: 10, paddingHorizontal: 10, paddingTop: 5}}>
+        <SwitchWrapper
+          onValueChange={value => onToggleUserConvention('is_utm_display', value)}
+          value={isUtmDisplay}
+        />
+        <Text style={[commonStyles.listItemTitle, {flex: 1, fontWeight: 'bold', paddingLeft: 5}]}>
+          {label}
+        </Text>
+        <Icon
+          color={PRIMARY_ACCENT_COLOR}
+          name={'information-circle-outline'}
+          onPress={() => setFieldInfo({label, info})}
+          type={'ionicon'}
+        />
+      </View>
+    );
+  };
+
   const renderBulkUpdatesSection = () => {
     return (
       <>
@@ -224,6 +252,7 @@ const UserProfile = () => {
                 validateOnChange={true}
               />
               {renderMeasurementInputDefault()}
+              {renderUtmDisplay()}
               {isConnectionAvailable ? (
                 <>
                   {renderBulkUpdatesSection()}

@@ -8,10 +8,13 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import GeoFieldInputs from './GeoFieldInputs';
 import {GEOGRAPHY_FORM_NAME} from './geography.constants';
+import UtmFieldInputs from './UtmFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
+import {UTM_MAX_LATITUDE, UTM_MIN_LATITUDE} from '../maps/maps.constants';
+import {convertLatLngToUtm, convertUtmToLatLng, parseUtmZone} from '../maps/maps.helpers';
 import useMapView from '../maps/view/useMapView';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
@@ -22,6 +25,7 @@ const Geography = ({isReadOnly}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
@@ -38,6 +42,21 @@ const Geography = ({isReadOnly}) => {
     dispatch(setNotebookPageVisibleToPrev());
   };
 
+  // Geometry from the UTM inputs, or undefined if they are incomplete or unchanged. Re-deriving the point when the
+  // user did not touch the inputs would nudge the stored WGS84 coordinate by a fraction of a meter on every save.
+  const getEditedUtmGeometry = ({easting, northing, utm_zone: zone}) => {
+    const parsedZone = parseUtmZone(zone);
+    if (isEmpty(easting) || isEmpty(northing) || !parsedZone) return undefined;
+    // Compare against the canonical zone label so '13 n' is not mistaken for an edit of '13N'
+    const canonicalZone = `${parsedZone.zoneNumber}${parsedZone.isNorthernHemisphere ? 'N' : 'S'}`;
+    if (turf.getType(spot) === 'Point') {
+      const currentUtm = convertLatLngToUtm(turf.getCoord(spot));
+      if (currentUtm.easting === Number(easting) && currentUtm.northing === Number(northing)
+        && currentUtm.zone === canonicalZone) return undefined;
+    }
+    return turf.point(convertUtmToLatLng(easting, northing, zone)).geometry;
+  };
+
   const saveForm = async () => {
     try {
       await geomFormRef.current.submitForm();
@@ -47,7 +66,9 @@ const Geography = ({isReadOnly}) => {
       console.log('Saving form data to Spot ...');
       let geometry = spot.geometry;
       if (isOnGeoMap(spot)) {
-        if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
+        const editedUtmGeometry = isUtmDisplay ? getEditedUtmGeometry(editedGeomFormData) : undefined;
+        if (editedUtmGeometry) geometry = editedUtmGeometry;
+        else if (!isEmpty(editedGeomFormData.longitude) && !isEmpty(editedGeomFormData.latitude)) {
           const point = turf.point([editedGeomFormData.longitude, editedGeomFormData.latitude]);
           geometry = point.geometry;
         }
@@ -106,7 +127,9 @@ const Geography = ({isReadOnly}) => {
     return (
       <>
         {!isEmpty(initialGeomValues.latitude) && !isEmpty(initialGeomValues.longitude)
-          ? <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
+          ? (isUtmDisplay
+            ? <UtmFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>
+            : <GeoFieldInputs formRef={formRef} geomFormRef={geomFormRef} isReadOnly={isReadOnly}/>)
           : renderGeoFieldText(initialGeomValues)
         }
       </>
@@ -153,6 +176,32 @@ const Geography = ({isReadOnly}) => {
         values.longitude = parseFloat(values.longitude);
         if (values.longitude < -180 || values.longitude > 180) errors.longitude = 'Longitude must be between -180 and 180';
       }
+      if (isUtmDisplay) {
+        if (!isEmpty(values.utm_zone) && !parseUtmZone(values.utm_zone)) {
+          errors.utm_zone = 'Zone must be 1-60 followed by N or S (e.g. 13N)';
+        }
+        if (values.easting) {
+          values.easting = parseFloat(values.easting);
+          if (values.easting < 100000 || values.easting > 999999) {
+            errors.easting = 'Easting must be between 100,000 and 999,999';
+          }
+        }
+        if (values.northing) {
+          values.northing = parseFloat(values.northing);
+          if (values.northing < 0 || values.northing > 10000000) {
+            errors.northing = 'Northing must be between 0 and 10,000,000';
+          }
+        }
+        // An easting/northing inside the numeric bounds above can still convert to a latitude beyond the range UTM
+        // is defined for, which would drop the Spot near a pole. Check the converted point rather than the inputs.
+        if (isEmpty(errors) && !isEmpty(values.utm_zone) && values.easting && values.northing) {
+          const utmLatLng = convertUtmToLatLng(values.easting, values.northing, values.utm_zone);
+          if (utmLatLng && (utmLatLng[1] < UTM_MIN_LATITUDE || utmLatLng[1] > UTM_MAX_LATITUDE)) {
+            errors.northing = `Coordinate is outside the UTM limits of ${Math.abs(UTM_MIN_LATITUDE)}°S `
+              + `to ${UTM_MAX_LATITUDE}°N`;
+          }
+        }
+      }
       if (values.x_pixels && typeof (values.x_pixels) === 'string') {
         values.x_pixels = parseFloat(values.x_pixels);
       }
@@ -181,6 +230,14 @@ const Geography = ({isReadOnly}) => {
       }
       if (!isEmpty(spot.properties.lng)) initialGeomValues.longitude = spot.properties.lng;
       if (!isEmpty(spot.properties.lat)) initialGeomValues.latitude = spot.properties.lat;
+    }
+
+    if (isUtmDisplay && !isEmpty(initialGeomValues.longitude) && !isEmpty(initialGeomValues.latitude)) {
+      const {easting, northing, zone} = convertLatLngToUtm(
+        [initialGeomValues.longitude, initialGeomValues.latitude]);
+      initialGeomValues.easting = easting;
+      initialGeomValues.northing = northing;
+      initialGeomValues.utm_zone = zone;
     }
 
     return (
@@ -221,24 +278,33 @@ const Geography = ({isReadOnly}) => {
             <View style={formStyles.fieldLabelContainer}>
               <Text style={formStyles.fieldLabel}>Real-World Coordinates</Text>
             </View>
+            {isUtmDisplay && (
+              <Field
+                component={TextInputField}
+                editable={false}
+                key={'utm_zone'}
+                label={'UTM Zone'}
+                name={'utm_zone'}
+              />
+            )}
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, flexDirection: 'row', overflow: 'hidden'}}>
                 <View style={{flex: 1, paddingRight: 5}}>
                   <Field
                     component={NumberInputField}
                     editable={false}
-                    key={'longitude'}
-                    label={'Longitude'}
-                    name={'longitude'}
+                    key={isUtmDisplay ? 'easting' : 'longitude'}
+                    label={isUtmDisplay ? 'Easting (m)' : 'Longitude'}
+                    name={isUtmDisplay ? 'easting' : 'longitude'}
                   />
                 </View>
                 <View style={{flex: 1}}>
                   <Field
                     component={NumberInputField}
                     editable={false}
-                    key={'latitude'}
-                    label={'Latitude'}
-                    name={'latitude'}
+                    key={isUtmDisplay ? 'northing' : 'latitude'}
+                    label={isUtmDisplay ? 'Northing (m)' : 'Latitude'}
+                    name={isUtmDisplay ? 'northing' : 'latitude'}
                   />
                 </View>
               </View>
