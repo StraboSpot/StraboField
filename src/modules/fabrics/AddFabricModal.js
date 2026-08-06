@@ -6,9 +6,9 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {DEFAULT_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_TYPES} from './fabric.constants';
-import FaultRockFabric from './FaultRockFabric';
-import IgneousRockFabric from './IgneousRockFabric';
-import MetamRockFabric from './MetamRockFabric';
+import IgneousFabric from './IgneousFabric';
+import MetamorphicFabric from './MetamorphicFabric';
+import StructuralFabric from './StructuralFabric';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -107,7 +107,7 @@ const AddFabricModal = () => {
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         {types[selectedTypeIndex] === 'fault_rock' && (
-          <FaultRockFabric
+          <StructuralFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}
@@ -116,7 +116,7 @@ const AddFabricModal = () => {
           />
         )}
         {types[selectedTypeIndex] === 'igneous_rock' && (
-          <IgneousRockFabric
+          <IgneousFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}
@@ -125,7 +125,7 @@ const AddFabricModal = () => {
           />
         )}
         {types[selectedTypeIndex] === 'metamorphic_rock' && (
-          <MetamRockFabric
+          <MetamorphicFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}

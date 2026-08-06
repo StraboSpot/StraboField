@@ -66,7 +66,7 @@
       "name": "facing",
       "label": "Feature Facing",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "${feature_type} = 'stratigraphic'"
     },
     {

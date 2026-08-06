@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Pressable, ScrollView, View} from 'react-native';
+import {Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -64,6 +64,7 @@ const MorePagesMenu = ({
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>
               {page.label}
             </ListItem.Title>
+            {!!page.testing && <Text style={footerStyles.morePagesListItemTesting}>Testing</Text>}
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
             <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>

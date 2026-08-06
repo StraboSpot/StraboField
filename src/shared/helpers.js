@@ -183,6 +183,16 @@ export const getTimeAndDateFromModifiedTimestamp = (field) => {
   };
 };
 
+// Appends the lowest free suffix when a title is taken: "Outcrop" -> "Outcrop (2)" -> "Outcrop (3)".
+// A copy of a copy counts from the same base, so never "Outcrop (2) (2)".
+export const getUniqueTitle = (title, existingTitles) => {
+  if (!existingTitles.includes(title)) return title;
+  const baseTitle = title.toString().replace(/ \(\d+\)$/, '');
+  let copyNumber = 2;
+  while (existingTitles.includes(baseTitle + ' (' + copyNumber + ')')) copyNumber++;
+  return baseTitle + ' (' + copyNumber + ')';
+};
+
 export const hasSpace = filename => filename.includes(' ');
 
 export const hexToRgb = (hex) => {
