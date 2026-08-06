@@ -6,7 +6,7 @@ import {Form, MainButtons} from '../form';
 const {firstKeys, lastKeys} = ADD_FABRIC_KEYS.igneous_rock;
 const mainButtonsKeys = ADD_FABRIC_FIELDS.igneous_rock;
 
-const IgneousRockFabric = ({formName, formProps, setChoicesViewKey, survey}) => {
+const IgneousFabric = ({formName, formProps, setChoicesViewKey, survey}) => {
   /* Derived Variables */
 
   const firstKeysFields = firstKeys.map(k => survey.find(f => f.name === k));
@@ -28,4 +28,4 @@ const IgneousRockFabric = ({formName, formProps, setChoicesViewKey, survey}) => 
   );
 };
 
-export default IgneousRockFabric;
+export default IgneousFabric;

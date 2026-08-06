@@ -11,6 +11,7 @@ const IGSNLogo = ({item, onIGSNButtonPressed}) => {
     <View>
       {/*{item.isOnMySesar && (*/}
       <Pressable
+        disabled={item.isOnMySesar}
         onPress={onIGSNButtonPressed}
         pressRetentionOffset={{top: 2, left: 2, right: 2, bottom: 2}}
         style={{

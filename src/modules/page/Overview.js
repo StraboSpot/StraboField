@@ -188,8 +188,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const saveUpdatedImage = (updatedImage) => {
     const images = spot?.properties?.images || [];
-    const imagesFiltered = images.filter(i => i.id !== updatedImage.id);
-    const updatedImages = [...imagesFiltered, updatedImage];
+    const updatedImages = images.map(i => i.id === updatedImage.id ? updatedImage : i);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
@@ -386,6 +385,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         <SketchModal
           image={sketchImage}
           saveImages={saveImagesToSpot}
+          saveUpdatedImage={saveUpdatedImage}
           setIsSketchModalVisible={setIsSketchModalVisible}
         />
       )}

@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/helpers';
+import {getUniqueTitle, isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
 import {updatedProject} from '../project/projects.slice';
@@ -59,13 +59,21 @@ const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
     await deleteImageFile(imageId);
   };
 
+  // Report images skip editedSpotImages, so titles are made unique here instead
   const saveImagesToReport = (newImages) => {
-    setUpdatedImages(prevState => ([...prevState, ...newImages]));
+    setUpdatedImages((prevState) => {
+      const takenTitles = prevState.map(image => image.title).filter(title => !isEmpty(title));
+      return [...prevState, ...newImages.map((image) => {
+        if (isEmpty(image.title)) return image;
+        const title = getUniqueTitle(image.title, takenTitles);
+        takenTitles.push(title);
+        return {...image, title: title};
+      })];
+    });
   };
 
   const saveUpdatedImage = (updatedImage) => {
-    const imagesFiltered = updatedImages.filter(i => i.id !== updatedImage.id);
-    setUpdatedImages([...imagesFiltered, updatedImage]);
+    setUpdatedImages(prevState => prevState.map(i => i.id === updatedImage.id ? updatedImage : i));
   };
 
   /* View */
@@ -95,6 +103,7 @@ const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
         <SketchModal
           image={sketchImage}
           saveImages={saveImagesToReport}
+          saveUpdatedImage={saveUpdatedImage}
           setIsSketchModalVisible={setIsSketchModalVisible}
         />
       )}

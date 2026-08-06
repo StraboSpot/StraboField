@@ -11,6 +11,7 @@ const initialUserState = {
   encoded_login: null,
   image: null,
   isAuthenticated: false,
+  is_utm_display: false,
   mapboxToken: null,
   macrostrat: {
     // token: __DEV__ ? rockedToken : null,

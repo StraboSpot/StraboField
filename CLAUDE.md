@@ -126,7 +126,7 @@ protected). Write meaningful `feat(...)`/`fix(...)` commit subjects — they bec
 backend via REST. Entry points: `index.js` (mobile), `index.web.js` (web). Web bundles via `webpack.config.js`; mobile
 via `metro.config.js`.
 
-- **Feature modules** — **41 self-contained feature modules** under `/src/modules/`, each with UI components, a
+- **Feature modules** — **42 self-contained feature modules** under `/src/modules/`, each with UI components, a
   `.slice.js` Redux slice, `use[Feature].js` hooks, constants, and `.web.js` platform overrides. Core: `spots/` (the
   central data model), `maps/`, `compass/`, `project/`, `form/` (dynamic form engine), `notebook-panel/`.
 - **State** — Redux Toolkit, 10 slices (`spots`, `projects` (largest), `maps`, `offlineMaps`, `userProfile`, `compass`,

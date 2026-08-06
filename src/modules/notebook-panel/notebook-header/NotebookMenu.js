@@ -16,7 +16,6 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
-import IGSNModal from '../../samples/igsn/IGSNModal';
 import useSamples from '../../samples/useSamples';
 import {useSpots} from '../../spots';
 import {setInitialSesarState} from '../../user/userProfile.slice';
@@ -30,7 +29,6 @@ const NotebookMenu = ({
                         isReadOnly,
                         isSample,
                         parentSpot,
-                        selectedSample,
                         zoomToSpots,
                       }) => {
   /* Data Hooks */
@@ -40,7 +38,6 @@ const NotebookMenu = ({
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
-  const pageVisible = useSelector(state => state.notebook.visibleNotebookPagesStack?.slice(-1)[0]);
   const {sesarToken} = useSelector(state => state.user.sesar);
 
   const navigation = useNavigation();
@@ -53,13 +50,11 @@ const NotebookMenu = ({
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
 
   /* Derived Variables */
 
   const type = isSample ? 'Sample' : 'Spot';
-  const sampleIGSN = selectedSample?.Sample_IGSN ?? spot.properties?.samples?.[0]?.Sample_IGSN;
   const actions = [
     ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
     {key: 'zoom', title: `Zoom to this ${type}`},
@@ -68,7 +63,6 @@ const NotebookMenu = ({
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
-    ...(spot.properties?.isSample && pageVisible === PAGE_KEYS.OVERVIEW ? [{key: 'igsn', title: sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}] : []),
     ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
@@ -92,10 +86,6 @@ const NotebookMenu = ({
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
-    else if (key === 'igsn') {
-      if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-      else setIsIGSNModalVisible(true);
-    }
     else if (key === 'rockd') {
       closeNotebookMenu();
       setIsRockdModalVisible(true);
@@ -193,12 +183,6 @@ const NotebookMenu = ({
       <RockdModal
         closeModal={() => setIsRockdModalVisible(false)}
         isVisible={isRockdModalVisible}
-      />
-      <IGSNModal
-        isVisible={isIGSNModalVisible}
-        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-        onModalCancel={() => setIsIGSNModalVisible(false)}
-        sampleValues={!isEmpty(selectedSample) ? selectedSample : spot.properties?.samples?.[0]}
       />
     </>
   );

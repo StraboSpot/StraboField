@@ -6,6 +6,8 @@ export const LATITUDE = 39.828175;      // Geographic center of US;
 export const LONGITUDE = -98.5795;      // Geographic center of US;
 export const GEO_LAT_LNG_PROJECTION = 'EPSG:4326';
 export const PIXEL_PROJECTION = 'EPSG:3857';
+export const UTM_MAX_LATITUDE = 84;     // UTM is only defined from 80 degrees S to 84 degrees N;
+export const UTM_MIN_LATITUDE = -80;    // outside that the polar stereographic (UPS) grid is used instead
 export const ZOOM = 14;                 // Default zoom for geographic map and image basemaps
 export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
 

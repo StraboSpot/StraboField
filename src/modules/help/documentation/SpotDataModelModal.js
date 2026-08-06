@@ -118,7 +118,8 @@ const SpotDataModelModal = ({close}) => {
             else if (formKey === 'lithologies' || formKey === 'composition' || formKey === 'stratification' || formKey === 'texture') {
               return {...acc1, lithologies: {...acc1.lithologies, id: 'uuid', ...survey}};
             }
-            else if (categoryKey === 'pet' || categoryKey === 'sed' || formKey === 'earthquakes') {
+            else if (categoryKey === 'pet' || categoryKey === 'sed' || formKey === 'earthquakes'
+              || formKey === 'outcrop_summaries') {
               return {...acc1, ...{[formKey]: {id: 'uuid', ...survey}}};
             }
             else if (categoryKey === 'tephra') {

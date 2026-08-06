@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {overlayStyles} from '../../../modules/home/overlays';
+import {MAX_CONTENT_WIDTH} from '../../styles.constants';
 import ActionButton from '../buttons/ActionButton';
 import DeleteButton from '../buttons/DeleteButton';
 import OutlineButton from '../buttons/OutlineButton';
@@ -18,12 +19,12 @@ const ModalSaveAndCancelButtons = ({
                                      showCancelButton = true,
                                      showDeleteButton = false,
                                    }) => {
-  // When the action button is the only button shown, stretch it to 80% of the bar (capped at 400)
+  // When the action button is the only button shown, stretch it to 90% of the bar (capped at MAX_CONTENT_WIDTH)
   // so it stays centered and doesn't run into iOS's curved bottom edge on full-width modals.
   if (showActionButton && !showCancelButton && !showDeleteButton) {
     return (
       <View style={{alignItems: 'center'}}>
-        <View style={{maxWidth: 400, width: '90%'}}>
+        <View style={{maxWidth: MAX_CONTENT_WIDTH, width: '90%'}}>
           <ActionButton
             disabled={disabled}
             isLoading={isLoading}

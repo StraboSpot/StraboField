@@ -24,6 +24,7 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {persistor} from '../../store/ConfigureStore';
+import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
 import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
@@ -88,7 +89,7 @@ const UserProfile = () => {
     if (formCurrent?.dirty) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !isConnectionAvailable;
+  const getIsDisabled = () => false;
 
   const openProfileImageModal = () => {
     setShouldUpdateImage(false);
@@ -147,10 +148,15 @@ const UserProfile = () => {
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
         await uploadProfile(userValuesToUpdate);
+        dispatch(clearProfileUploadNeeded());
         toast.show('Profile uploaded successfully!', {type: 'success'});
         toast.show('Changes Saved!', {type: 'success'});
       }
-      else toast.show(`Not connected to ${connectionTargetText}. Changes Saved Locally Only`, {type: 'warning'});
+      else {
+        // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
+        dispatch(setProfileUploadNeeded());
+        toast.show(`Not connected to ${connectionTargetText}. Changes Saved Locally Only`, {type: 'warning'});
+      }
     }
     catch (err) {
       console.error('Error uploading profile', err);
@@ -225,7 +231,7 @@ const UserProfile = () => {
   return (
     <>
       {!isEmpty(userData.email) && !isEmpty(userData.encoded_login) && (
-        <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
+        <View style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={
               <>

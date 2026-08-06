@@ -19,14 +19,14 @@
       "name": "planar_fabric",
       "label": "Planar fabric",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "select_one mj2eg99",
       "name": "cleavage",
       "label": "Characterize the cleavage type",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${planar_fabric}, 'cleavage')"
     },
     {
@@ -82,7 +82,7 @@
       "name": "spatial_var",
       "label": "Spatial variability",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -98,7 +98,7 @@
       "name": "linear_fab",
       "label": "Linear fabric",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -150,7 +150,7 @@
       "name": "kinematic_fab",
       "label": "Kinematic indicators",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -174,7 +174,7 @@
       "name": "other_met_fab",
       "label": "Other metamorphic fabrics",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -234,14 +234,14 @@
       "name": "additional_fab",
       "label": "Additional fabrics",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "select_multiple lg33p50",
       "name": "structural_fab",
       "label": "Structural fabrics",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${additional_fab}, 'structural')"
     },
     {
@@ -297,7 +297,7 @@
       "name": "mullion_type",
       "label": "Type of mullion",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${structural_fab}, 'mullions')"
     },
     {
@@ -313,7 +313,7 @@
       "name": "boudin_type",
       "label": "Type of boudin",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${structural_fab}, 'boudinage')"
     },
     {
@@ -329,7 +329,7 @@
       "name": "relict_sed_fab",
       "label": "Relict sedimentary type",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${additional_fab}, 'relict_sed')"
     },
     {

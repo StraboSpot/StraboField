@@ -4,10 +4,12 @@ import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import {SketchCanvas} from '@StraboSpot/react-native-sketch-canvas';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
+import {useToast} from 'react-native-toast-notifications';
 
+import SaveSketchModal from './SaveSketchModal';
 import styles from './sketch.styles';
+import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import {useImages} from '../images';
 import {getLocalImageURI} from '../images/imageURIs.helpers';
@@ -20,16 +22,19 @@ const STROKE_COLORS = [
   '#FF00FF', '#FFFFFF', '#C0C0C0', '#808080', '#FFA500', '#A52A2A', '#800000', '#008000', '#808000',
 ];
 
-const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
+const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisible}) => {
   /* Data Hooks */
 
-  const {saveFile} = useImages();
+  const {saveFile, updateImage} = useImages();
+  const toast = useToast();
   const {height, width} = useWindowSize();
 
   /* Local State */
 
   const sketchRef = useRef(null);
   const [color, setColor] = useState(STROKE_COLORS[0]);
+  const [isSaveSketchModalVisible, setIsSaveSketchModalVisible] = useState(false);
+  const [sketchPath, setSketchPath] = useState(null);
   const [strokeWidth, setStrokeWidth] = useState(MIN_STROKE_WIDTH);
 
   /* Derived Variables */
@@ -109,38 +114,27 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
 
   /* Event Handlers */
 
+  const handleSaveSketchChoice = async (saveChoice) => {
+    setIsSaveSketchModalVisible(false);
+    await saveChoice(sketchPath);
+  };
+
   const nextStrokeWidth = () => {
     setStrokeWidth(prev => (prev >= MAX_STROKE_WIDTH ? MIN_STROKE_WIDTH : prev + 1));
   };
 
+  // A sketch drawn on a blank canvas is just saved. One drawn over an existing image can either
+  // replace that image or be kept alongside it, so it holds the exported file and asks first.
   const saveSketch = async (success, path) => {
-    try {
-      console.log(success, 'Path:', path);
-      if (success) {
-        const savedSketch = await saveFile({...image, 'path': path});
-        saveImages([savedSketch]);
-        alert(
-          'Sketch Saved!',
-          'Sketch saved.',
-          [{
-            text: 'OK', onPress: () => setIsSketchModalVisible(false),
-          }],
-        );
-      }
-      else throw Error;
+    console.log(success, 'Path:', path);
+    if (!success) {
+      console.error('Error Saving Sketch');
+      showSketchError();
     }
-    catch (err) {
-      console.error('Error Saving Sketch', err);
-      alert('Error Saving Sketch!',
-        null,
-        [{
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        }, {
-          text: 'OK', onPress: () => setIsSketchModalVisible(false),
-        }],
-      );
+    else if (isEmpty(image)) await saveAsNewSketch(path);
+    else {
+      setSketchPath(path);
+      setIsSaveSketchModalVisible(true);
     }
   };
 
@@ -149,6 +143,48 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
   const onPressSave = () => {
     sketchRef.current?.save('jpg', false, 'RNSketchCanvas', String(Math.ceil(Math.random() * 100000000)),
       true, true, true);
+  };
+
+  /* Logic Helpers */
+
+  // saveFile returns only id and dimensions, so title and type are carried over by hand. Sketching
+  // over a photo leaves it a photo; only an untyped image becomes a sketch.
+  const saveAsNewSketch = async (path) => {
+    try {
+      const savedFile = await saveFile({...image, 'path': path});
+      const savedSketch = {
+        ...savedFile,
+        image_type: image.image_type || 'sketch',
+        ...(!isEmpty(image.title) && {title: image.title}),
+      };
+      saveImages([savedSketch]);
+      showSketchSaved();
+    }
+    catch (err) {
+      console.error('Error Saving Sketch', err);
+      showSketchError();
+    }
+  };
+
+  // Leaves the sketch open so it can be saved again rather than losing it
+  const showSketchError = () => toast.show('Error Saving Sketch', {type: 'danger'});
+
+  const showSketchSaved = () => {
+    toast.show('Sketch Saved!', {type: 'success', duration: 1500});
+    setIsSketchModalVisible(false);
+  };
+
+  // Replaces the image's file in place, keeping its id so nothing referring to it has to be re-pointed
+  const updateSketch = async (path) => {
+    try {
+      const updatedImage = await updateImage({...image, image_type: image.image_type || 'sketch'}, path);
+      saveUpdatedImage(updatedImage);
+      showSketchSaved();
+    }
+    catch (err) {
+      console.error('Error Updating Sketch', err);
+      showSketchError();
+    }
   };
 
   /* Render Functions */
@@ -230,6 +266,15 @@ const Sketch = ({image = {}, saveImages, setIsSketchModalVisible}) => {
           />
         </View>
       </View>
+
+      {/* Modal */}
+      {isSaveSketchModalVisible && (
+        <SaveSketchModal
+          closeModal={() => setIsSaveSketchModalVisible(false)}
+          onPressSaveAsCopy={() => handleSaveSketchChoice(saveAsNewSketch)}
+          onPressUpdate={() => handleSaveSketchChoice(updateSketch)}
+        />
+      )}
     </View>
   );
 };
