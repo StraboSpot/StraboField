@@ -28,7 +28,7 @@
       "hint": "Specific plutonic rock type",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'plutonic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -72,7 +72,7 @@
       "label": "Texture",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'plutonic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -94,7 +94,7 @@
       "label": "Modification",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'plutonic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -128,7 +128,7 @@
       "hint": "Specific volcanic rock type",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'volcanic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -143,7 +143,7 @@
       "label": "Occurence",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'volcanic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -158,7 +158,7 @@
       "label": "Texture",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'volcanic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -209,7 +209,7 @@
       "label": "Modification",
       "required": "false",
       "relevant": "selected(${igneous_rock_class}, 'volcanic')",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

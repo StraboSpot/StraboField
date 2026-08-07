@@ -19,11 +19,12 @@ const useImageThumbnails = ({images = []} = {}) => {
 
   /* Side Effects */
 
-  const imageIdsKey = useMemo(() => images.map(i => i.id).join(','), [images]);
+  // Keyed on the images' versions as well as their ids, so replacing an image's file re-thumbnails it
+  const imagesKey = useMemo(() => images.map(i => i.id + ':' + (i.modified_timestamp || '')).join(','), [images]);
 
   useEffect(() => {
     if (!isEmpty(images)) loadImageThumbnailURIs().catch(err => console.error(err));
-  }, [imageIdsKey]);
+  }, [imagesKey]);
 
   /* Internal Functions */
 
@@ -38,7 +39,9 @@ const useImageThumbnails = ({images = []} = {}) => {
           const imageUri = getLocalImageURI(image.id);
           const exists = await doesDeviceDirExist(imageUri);
           if (exists) {
-            const resizedImage = await resizeImageForThumbnail(imageUri);
+            // Versioned, since on iOS the resizer decodes through RCTImageLoader's cache
+            const resizedImage = await resizeImageForThumbnail(
+              getLocalImageURI(image.id, image.modified_timestamp));
             thumbnailURIs = {...thumbnailURIs, [image.id]: resizedImage.uri};
           }
           else thumbnailURIs = {...thumbnailURIs, [image.id]: undefined};

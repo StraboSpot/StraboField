@@ -21,7 +21,11 @@ import {
   setLoadingStatus,
 } from '../home/home.slice';
 import {setCurrentImageBasemap} from '../maps/maps.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {
+  addedChangedImageId,
+  removedChangedImageIds,
+  updatedModifiedTimestampsBySpotsIds,
+} from '../project/projects.slice';
 import {clearedSelectedSpots, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 
 let imageCount = 0;
@@ -46,6 +50,8 @@ const useImages = () => {
   /* Exported Functions */
 
   const deleteImageFile = async (imageId) => {
+    // Nothing left to re-upload once the file is gone; updateImage re-adds the id straight afterwards
+    dispatch(removedChangedImageIds([imageId]));
     if (Platform.OS !== 'web') {
       const localImageFile = getLocalImageURI(imageId);
       const fileExists = await doesDeviceDirExist(localImageFile);
@@ -269,7 +275,9 @@ const useImages = () => {
     }
   };
 
-  const saveFile = async (imageData) => {
+  // An overrideId saves under that id instead of a new one. The destination must be free — copyFile
+  // does not overwrite on iOS.
+  const saveFile = async (imageData, overrideId) => {
     console.log('New image data:', imageData);
     let imgHeight = imageData.height;
     let imgWidth = imageData.width;
@@ -279,7 +287,7 @@ const useImages = () => {
       imgHeight = newImageDimensions.height;
       imgWidth = newImageDimensions.width;
     }
-    let imageId = getNewId();
+    let imageId = overrideId || getNewId();
     let imageURI = getLocalImageURI(imageId);
     try {
       const exists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES);
@@ -318,9 +326,8 @@ const useImages = () => {
     imageCopy.annotated = annotation;
     if (annotation && !imageCopy.title) imageCopy.title = title;
     if (selectedSpot && selectedSpot.properties && selectedSpot.properties.images) {
-      const updatedImages = selectedSpot.properties.images.filter(image2 => imageCopy.id !== image2.id);
+      const updatedImages = selectedSpot.properties.images.map(i => i.id === imageCopy.id ? imageCopy : i);
       console.log(updatedImages);
-      updatedImages.push(imageCopy);
       dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
       dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
     }
@@ -368,6 +375,21 @@ const useImages = () => {
     });
   };
 
+  // Replaces an image's file but keeps its id, so nothing referring to the image has to be re-pointed;
+  // the new modified_timestamp is what gets past the URI-keyed caches (see getLocalImageURI). The id is
+  // queued as changed because the server reports an id it already has as present. Staged under a temp
+  // id first, so a copy that fails partway leaves the original file intact.
+  const updateImage = async (image, path) => {
+    const stagedId = getNewId();
+    const {height, width} = await saveFile({...image, 'path': path}, stagedId);
+    await deleteImageFile(image.id);
+    await moveFile(APP_DIRECTORIES.IMAGES + stagedId + '.jpg', APP_DIRECTORIES.IMAGES + image.id + '.jpg');
+    const updatedImage = {...image, height: height, width: width, modified_timestamp: Date.now()};
+    dispatch(addedChangedImageId(image.id));
+    if (currentImageBasemap?.id === image.id) dispatch(setCurrentImageBasemap(updatedImage));
+    return updatedImage;
+  };
+
   return {
     deleteImageFile,
     deleteImageFromSpot,
@@ -383,6 +405,7 @@ const useImages = () => {
     saveImageFromDownloadsDir,
     setAnnotation,
     takePicture,
+    updateImage,
   };
 };
 

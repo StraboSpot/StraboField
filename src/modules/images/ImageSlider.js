@@ -38,7 +38,7 @@ const ImageSlider = ({route, navigation}) => {
     const sortedSpotsWithImages = route.params.sortedSpotsWithImages;
     return sortedSpotsWithImages.reduce((acc, spot) => {
       const imagesInSpot = spot.properties.images?.reduce((acc1, image) => {
-        return [...acc1, {imageId: image.id, spotId: spot.properties.id}];
+        return [...acc1, {image: image, spotId: spot.properties.id}];
       }, []);
       return [...acc, ...imagesInSpot];
     }, []);
@@ -59,12 +59,12 @@ const ImageSlider = ({route, navigation}) => {
     dispatch(setSelectedSpot(spot));
   };
 
-  const setSource = async (imageId) => {
+  const setSource = async (image) => {
     try {
-      if (Platform.OS === 'web') setImageURI(getResizedImageURI(imageId, width, height));
+      if (Platform.OS === 'web') setImageURI(getResizedImageURI(image.id, width, height));
       else {
-        const res = await doesImageExistOnDevice(imageId);
-        if (res) setImageURI(getLocalImageURI(imageId));
+        const res = await doesImageExistOnDevice(image.id);
+        if (res) setImageURI(getLocalImageURI(image.id, image.modified_timestamp));
         else {
           setImageURI(undefined);
           setIsImageLoading(false);
@@ -80,17 +80,15 @@ const ImageSlider = ({route, navigation}) => {
   const updateImage = (i) => {
     setIsImageLoading(true);
     setImageIndex(i);
-    const imageId = imagesObj[i].imageId;
-    setSource(imageId);
+    setSource(imagesObj[i].image);
   };
 
   /* View */
 
   if (isEmpty(imageIndex)) {
-    const startImageId = route.params.selectedImage.id;
-    const startIndex = imagesObj.map(i => i.imageId).indexOf(startImageId);
+    const startIndex = imagesObj.map(i => i.image.id).indexOf(route.params.selectedImage.id);
     setImageIndex(startIndex);
-    setSource(startImageId);
+    setSource(route.params.selectedImage);
     return null;
   }
 

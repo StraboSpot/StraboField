@@ -27,7 +27,7 @@
       "name": "igneous_or_metamorphic",
       "label": "Igneous or Metamorphic",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "begin_group",

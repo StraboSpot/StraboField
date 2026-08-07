@@ -1,6 +1,4 @@
 import {isEmpty} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/minerals.constants';
 
 export const convertXLSFormLogicToJS = (logic) => {
   logic = logic.replace(/not/g, '!');
@@ -25,13 +23,4 @@ export const isRequired = (field, values) => {
     const F = new Function('values', 'return ' + requiredLogicJS); // eslint-disable-line no-new-func
     return F(values);
   }
-};
-
-export const showFieldInfo = (label, info) => {
-  if (label === 'Mineral Name Abbreviation') {
-    info += '\n\n';
-    const arr = Object.entries(LABELS_WITH_ABBREVIATIONS).map(([key, value]) => key + ': ' + value);
-    info += arr.join('\n');
-  }
-  alert(label, info);
 };

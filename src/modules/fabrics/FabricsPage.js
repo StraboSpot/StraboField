@@ -74,7 +74,7 @@ const FabricsPage = ({isReadOnly, page}) => {
       const data = key !== 'deprecated'
         ? spot?.properties?.[FABRICS_GROUP_KEY]?.filter(fabric => fabric.type === key) || []
         : spot?.properties?._3d_structures?.filter(struct => struct.type === DEPRECATED_FABRIC_TYPE) || [];
-      return [...acc, {title, key, data: data.reverse()}];
+      return key === 'deprecated' && isEmpty(data) ? acc : [...acc, {title, key, data: data.reverse()}];
     }, []);
 
     return (

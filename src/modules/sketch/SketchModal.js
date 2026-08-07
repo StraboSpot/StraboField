@@ -3,7 +3,7 @@ import React from 'react';
 import Sketch from './Sketch';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const SketchModal = ({image, saveImages, setIsSketchModalVisible}) => {
+const SketchModal = ({image, saveImages, saveUpdatedImage, setIsSketchModalVisible}) => {
   return (
     <ModalWrapper
       closeModal={() => setIsSketchModalVisible(false)}
@@ -14,7 +14,12 @@ const SketchModal = ({image, saveImages, setIsSketchModalVisible}) => {
       showCancelButton={false}
       showCloseButton
     >
-      <Sketch image={image} saveImages={saveImages} setIsSketchModalVisible={setIsSketchModalVisible}/>
+      <Sketch
+        image={image}
+        saveImages={saveImages}
+        saveUpdatedImage={saveUpdatedImage}
+        setIsSketchModalVisible={setIsSketchModalVisible}
+      />
     </ModalWrapper>
   );
 };

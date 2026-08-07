@@ -2,36 +2,51 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {useBatteryLevel, usePowerState} from 'react-native-device-info';
+import {usePowerState} from 'react-native-device-info';
 
 import statusBarStyles from './statusBar.styles';
 import {BATTERY_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 
 const BatteryInfo = () => {
-  const batteryLevel = useBatteryLevel();
-  const {batteryState} = usePowerState();
-  console.log('powerState', batteryState);
+  // const batteryLevel = useBatteryLevel();
+  const {batteryState, batteryLevel} = usePowerState();
+
 
   const batteryPercentage = (batteryLevel * 100).toFixed(0);
 
   const getBatteryStatusColor = () => {
-    if (batteryLevel >= 0.65) return 'green';
+    if (batteryLevel >= 0.65 || batteryState === 'charging') return 'green';
     else if (batteryLevel >= 0.35) return 'goldenrod';
     else return 'red';
   };
 
   const getBatteryImage = () => {
-    if (batteryState === 'charging') return BATTERY_ICON_NAMES.CHARGING;
-    if (batteryLevel >= 0.95) return BATTERY_ICON_NAMES.FULL;
-    else if (batteryLevel >= 0.85) return BATTERY_ICON_NAMES.NINTY;
-    else if (batteryLevel >= 0.75) return BATTERY_ICON_NAMES.EIGHTY;
-    else if (batteryLevel >= 0.65) return BATTERY_ICON_NAMES.SEVENTY;
-    else if (batteryLevel >= 0.55) return BATTERY_ICON_NAMES.SIXTY;
-    else if (batteryLevel >= 0.45) return BATTERY_ICON_NAMES.FIFTY;
-    else if (batteryLevel >= 0.35) return BATTERY_ICON_NAMES.FORTY;
-    else if (batteryLevel >= 0.25) return BATTERY_ICON_NAMES.THIRTY;
-    else if (batteryLevel >= 0.15) return BATTERY_ICON_NAMES.TWENTY;
-    else return BATTERY_ICON_NAMES.TEN;
+    console.log('powerState', batteryState);
+    console.log('batteryLevel', batteryLevel);
+    if (batteryState === 'charging') {
+      if (batteryLevel >= 0.95) return BATTERY_ICON_NAMES.CHARGING_STATE.FULL;
+      else if (batteryLevel >= 0.85) return BATTERY_ICON_NAMES.CHARGING_STATE.NINTY;
+      else if (batteryLevel >= 0.75) return BATTERY_ICON_NAMES.CHARGING_STATE.EIGHTY;
+      else if (batteryLevel >= 0.65) return BATTERY_ICON_NAMES.CHARGING_STATE.SEVENTY;
+      else if (batteryLevel >= 0.55) return BATTERY_ICON_NAMES.CHARGING_STATE.SIXTY;
+      else if (batteryLevel >= 0.45) return BATTERY_ICON_NAMES.CHARGING_STATE.FIFTY;
+      else if (batteryLevel >= 0.35) return BATTERY_ICON_NAMES.CHARGING_STATE.FORTY;
+      else if (batteryLevel >= 0.25) return BATTERY_ICON_NAMES.CHARGING_STATE.THIRTY;
+      else if (batteryLevel >= 0.15) return BATTERY_ICON_NAMES.CHARGING_STATE.TWENTY;
+      else return BATTERY_ICON_NAMES.CHARGING_STATE.TEN;
+    }
+    else {
+      if (batteryLevel >= 0.95) return BATTERY_ICON_NAMES.DISCHARGING_STATE.FULL;
+      else if (batteryLevel >= 0.85) return BATTERY_ICON_NAMES.DISCHARGING_STATE.NINTY;
+      else if (batteryLevel >= 0.75) return BATTERY_ICON_NAMES.DISCHARGING_STATE.EIGHTY;
+      else if (batteryLevel >= 0.65) return BATTERY_ICON_NAMES.DISCHARGING_STATE.SEVENTY;
+      else if (batteryLevel >= 0.55) return BATTERY_ICON_NAMES.DISCHARGING_STATE.SIXTY;
+      else if (batteryLevel >= 0.45) return BATTERY_ICON_NAMES.DISCHARGING_STATE.FIFTY;
+      else if (batteryLevel >= 0.35) return BATTERY_ICON_NAMES.DISCHARGING_STATE.FORTY;
+      else if (batteryLevel >= 0.25) return BATTERY_ICON_NAMES.DISCHARGING_STATE.THIRTY;
+      else if (batteryLevel >= 0.15) return BATTERY_ICON_NAMES.DISCHARGING_STATE.TWENTY;
+      else return BATTERY_ICON_NAMES.DISCHARGING_STATE.TEN;
+    }
   };
 
   if (batteryPercentage !== '0') {

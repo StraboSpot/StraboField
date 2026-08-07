@@ -357,7 +357,7 @@ const AddMeasurementModal = ({onPress}) => {
               </>
 
             )}
-            {isManualMeasurement ? (
+            {isManualMeasurement || Platform.OS === 'web' ? (
               <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
             ) : (
               <>

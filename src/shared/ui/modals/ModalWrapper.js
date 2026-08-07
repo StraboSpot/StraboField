@@ -37,6 +37,7 @@ const ModalWrapper = ({
                         headerImage,
                         headerTitle,
                         isChildrenFilled = false,
+                        isContentSized = false,
                         isHideHeader = false,
                         isLoading,
                         imageStyle,
@@ -212,7 +213,9 @@ const ModalWrapper = ({
     );
   }
 
-  if (SMALL_SCREEN) {
+  // Small screens go fullscreen unless the caller asked for a content-sized modal (e.g. a short
+  // message), which stays centered and only as tall as its content at every screen size.
+  if (SMALL_SCREEN && !isContentSized) {
     return (
       <Modal
         animationType={'fade'}

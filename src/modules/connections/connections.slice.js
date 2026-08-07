@@ -13,6 +13,7 @@ const initialConnectionsState = {
   isOnline: {},
   isPendingImagesChanges: false,
   isProjectSyncNeeded: false,
+  isProfileUploadNeeded: false,
   isTransferringImages: false,
   backupFrequency: {
     save: 60,
@@ -100,6 +101,9 @@ const connectionsSlice = createSlice({
         id => String(id) !== String(action.payload),
       );
     },
+    clearProfileUploadNeeded(state) {
+      state.isProfileUploadNeeded = false;
+    },
     setBackupFrequency(state, action) {
       state.backupFrequency = action.payload;
     },
@@ -120,6 +124,9 @@ const connectionsSlice = createSlice({
     },
     setLocalSaveNeeded(state) {
       state.isLocalSaveNeeded = true;
+    },
+    setProfileUploadNeeded(state) {
+      state.isProfileUploadNeeded = true;
     },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
@@ -151,6 +158,7 @@ export const {
   clearAllPendingDatasetIds,
   clearConflictedDatasetId,
   clearLocalSaveNeeded,
+  clearProfileUploadNeeded,
   clearProjectSyncNeeded,
   removePendingDatasetId,
   resetSyncState,
@@ -170,6 +178,7 @@ export const {
   setNextAutoSaveTime,
   setNextAutoSyncTime,
   setOnlineStatus,
+  setProfileUploadNeeded,
   setPendingImagesChanges,
   setProjectSyncNeeded,
   setTransferringImages,

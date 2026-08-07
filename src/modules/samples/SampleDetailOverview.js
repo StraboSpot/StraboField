@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Pressable, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import IGSNModal from './igsn/IGSNModal';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
@@ -19,9 +20,16 @@ const SampleDetailOverview = () => {
 
   const {getLabel, getSurvey} = useForm();
 
+  /* Local State */
+
+  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+
   /* Derived Variables */
 
-  let sampleDetail = JSON.parse(JSON.stringify(spot.properties?.samples?.[0] ?? {}));
+  const sampleValues = spot.properties?.samples?.[0];
+  const sampleIGSN = sampleValues?.Sample_IGSN;
+
+  let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
 
   const formName = ['general', 'samples'];
@@ -39,6 +47,11 @@ const SampleDetailOverview = () => {
   const onViewDetailPressed = () => {
     dispatch(setSelectedAttributes(spot.properties?.samples?.length > 0 ? [spot.properties.samples[0]] : []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
+  };
+
+  const onViewIGSNPressed = () => {
+    if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    else setIsIGSNModalVisible(true);
   };
 
   /* Logic Helpers */
@@ -78,7 +91,18 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
+        <Pressable onPress={onViewIGSNPressed}>
+          <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
+            {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
+          </Text>
+        </Pressable>
       </View>
+      <IGSNModal
+        isVisible={isIGSNModalVisible}
+        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        sampleValues={sampleValues}
+      />
     </View>
   );
 };
