@@ -74,6 +74,7 @@ const homeConfig = {
     'isOfflineMapModalVisible',
     'isProgressModalVisible',
     'isProjectLoadSelectionModalVisible',
+    'isSessionExpiredModalVisible',
     'isStatusMessagesModalVisible',
     'isUploadModalVisible',
     'isUploadProgressModalVisible',

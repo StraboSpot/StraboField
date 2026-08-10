@@ -1,15 +1,30 @@
 import * as Sentry from '@sentry/react-native';
 
 import {STRABO_APIS} from './urls.constants';
+import {setIsSessionExpiredModalVisible} from '../../modules/home/home.slice';
 import alert from '../../shared/ui/alert';
+import {store} from '../../store/ConfigureStore';
 
 const baseUrl = STRABO_APIS.DB;
 
 /* Internal Functions */
 
-const handleError = async (response) => {
+const handleError = async (response, login) => {
   console.log('RESPONSE', response);
   if (response.status === 401) {
+    // A 401 means the stored Basic-Auth credentials are no longer valid (e.g. the user changed their
+    // password on the website). Show the re-auth modal over the current screen instead of logging out —
+    // that keeps the user on their map with their unsynced data intact rather than jarringly navigating
+    // them back to the sign-in screen. Only trigger when the failing request actually carried the
+    // credentials we still have stored: that excludes the sign-in endpoint (a bad-password 401) and
+    // stragglers left in flight with an old token when the user has already re-authenticated (their token
+    // no longer matches the freshly-stored one), so re-authenticating stays final and the modal does not
+    // pop back up.
+    const {encoded_login: currentLogin, isAuthenticated} = store.getState().user;
+    const usedCurrentCreds = Boolean(currentLogin) && login === currentLogin;
+    if (isAuthenticated && usedCurrentCreds && !response.url?.includes('userAuthenticate')) {
+      store.dispatch(setIsSessionExpiredModalVisible(true));
+    }
     const msg401 = 'This server could not verify that you are authorized to access the document requested. Either '
       + 'you supplied the wrong credentials (e.g., bad password), or your browser doesn\'t understand how to supply '
       + 'the credentials required.';
@@ -40,11 +55,11 @@ const handleError = async (response) => {
   }
 };
 
-const handleResponse = (response) => {
+const handleResponse = (response, login) => {
   if (response.ok && response.status === 204) return response.text() || 'no  content';
   // else if (response.ok) return response.json();
   else if (response.ok) return response;
-  else return handleError(response);
+  else return handleError(response, login);
 };
 
 const post = async (urlPart, login, data) => {
@@ -54,7 +69,7 @@ const post = async (urlPart, login, data) => {
       body: JSON.stringify(data),
       headers: {'Authorization': 'Basic ' + login, 'Content-Type': 'application/json'},
     });
-    return handleResponse(response);
+    return handleResponse(response, login);
   }
   catch (err) {
     console.error('Error Posting', err);
@@ -74,7 +89,7 @@ export const deleteDataset = async (datasetId, encodedLogin) => {
         headers: {'Authorization': 'Basic ' + encodedLogin, 'Content-Type': 'application/json'},
       },
     );
-    return handleResponse(response);
+    return handleResponse(response, encodedLogin);
   }
   catch (err) {
     console.error('Error deleting dataset', err);

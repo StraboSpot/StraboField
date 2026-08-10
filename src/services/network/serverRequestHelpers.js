@@ -3,7 +3,9 @@ import {Platform} from 'react-native';
 import * as Sentry from '@sentry/react-native';
 
 import {userAgent} from './userAgent';
+import {setIsSessionExpiredModalVisible} from '../../modules/home/home.slice';
 import {isEmpty} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 
 const DEFAULT_TIMEOUT = 60000;
 
@@ -36,7 +38,7 @@ const buildHeaders = (auth, customHeaders = {}) => ({
 export const deleteRequest = async (url, auth) => {
   try {
     const response = await timeoutPromise(fetch(url, {method: 'DELETE', headers: buildHeaders(auth)}));
-    return handleResponse(response);
+    return handleResponse(response, auth);
   }
   catch (err) {
     console.error(`Error DELETE: ${url}`, err);
@@ -59,7 +61,7 @@ export const deleteRequest = async (url, auth) => {
 export const getRequest = async (url, auth, options = {}) => {
   try {
     const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
-    return isEmpty(options) ? handleResponse(response) : response;
+    return isEmpty(options) ? handleResponse(response, auth) : response;
   }
   catch (err) {
     console.error(`Error GET: ${url}`, err);
@@ -67,7 +69,7 @@ export const getRequest = async (url, auth, options = {}) => {
   }
 };
 
-export const handleError = async (response) => {
+export const handleError = async (response, auth) => {
   const {status, headers} = response;
 
   if (status === 400) return response.json();

@@ -7,6 +7,7 @@ import LoadingSpinner from '../../shared/ui/Loading';
 import {ErrorModal, StatusModal} from '../../shared/ui/modals';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
+import ReauthModal from '../sign-in/ReauthModal';
 
 const OverlaysContainer = forwardRef(({
                                         closeMainMenuPanel,
@@ -32,6 +33,7 @@ const OverlaysContainer = forwardRef(({
       )}
       <ErrorModal/>
       <StatusModal/>
+      <ReauthModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
       {modalVisible && (

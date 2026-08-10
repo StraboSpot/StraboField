@@ -19,6 +19,7 @@ const initialHomeState = {
   isErrorMessagesModalVisible: false,
   isProgressModalVisible: false,
   isProjectLoadSelectionModalVisible: false,
+  isSessionExpiredModalVisible: false,
   isOfflineMapModalVisible: false,
   isImageModalVisible: false,
   isMainMenuPanelVisible: false,
@@ -82,6 +83,9 @@ const homeSlice = createSlice({
     setIsProjectLoadSelectionModalVisible(state, action) {
       state.isProjectLoadSelectionModalVisible = action.payload;
     },
+    setIsSessionExpiredModalVisible(state, action) {
+      state.isSessionExpiredModalVisible = action.payload;
+    },
     setIsStatusMessagesModalVisible(state, action) {
       state.isStatusMessagesModalVisible = action.payload;
     },
@@ -127,6 +131,7 @@ export const {
   setIsOfflineMapsModalVisible,
   setIsProgressModalVisible,
   setIsProjectLoadSelectionModalVisible,
+  setIsSessionExpiredModalVisible,
   setIsStatusMessagesModalVisible,
   setIsUploadModalVisible,
   setIsWarningHidden,
