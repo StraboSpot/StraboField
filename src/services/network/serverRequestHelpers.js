@@ -116,10 +116,10 @@ export const handleError = async (response, auth) => {
   }
 };
 
-export const handleResponse = (response) => {
+export const handleResponse = (response, auth) => {
   if (response.ok && response.status === 204) return response.text() || 'no content';
   if (response.ok) return response.json();
-  return handleError(response);
+  return handleError(response, auth);
 };
 
 export const postFormDataRequest = async (url, formData, auth) => {
@@ -129,7 +129,7 @@ export const postFormDataRequest = async (url, formData, auth) => {
       headers: buildHeaders(auth),
       body: formData,
     }));
-    return handleResponse(response);
+    return handleResponse(response, auth);
   }
   catch (err) {
     console.error(`Error POST (FormData): ${url}`, err);
@@ -145,7 +145,7 @@ export const postRequest = async (url, body, auth, customHeaders = {}, timeout =
       headers: buildHeaders(auth, isEmpty(customHeaders) ? {'Content-Type': 'application/json'} : customHeaders),
       body: isEmpty(customHeaders) ? JSON.stringify(body) : body,
     }), timeout);
-    return isEmpty(customHeaders) ? handleResponse(response) : response;
+    return isEmpty(customHeaders) ? handleResponse(response, auth) : response;
   }
   catch (err) {
     console.error(`Error POST: ${url}`, err);
