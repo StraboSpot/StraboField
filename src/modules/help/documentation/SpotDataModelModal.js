@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
 
-import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
 
 import forms from '../../../assets/forms';
 import {isEmpty} from '../../../shared/helpers';
-import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import CopyToClipboardButton from '../../../shared/ui/buttons/CopyToClipboardButton';
+import {JSON_MODAL_STYLE} from '../../../shared/ui/modals/modal.styles';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 // Since hideRoot is true, level 0 is actually the first visible level
@@ -180,16 +180,14 @@ const SpotDataModelModal = ({close}) => {
     <ModalWrapper
       closeModal={close}
       headerTitle={'Spot Data Model Object'}
-      overlayStyleOverride={{width: '40%'}}
+      isChildrenFilled
+      overlayStyleOverride={JSON_MODAL_STYLE}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
     >
-      <ScrollView>
-        <ClearButton
-          onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}
-          title={'Copy JSON to Clipboard'}
-        />
+      <CopyToClipboardButton getText={() => JSON.stringify(spotDataModel)}/>
+      <ScrollView style={{flex: 1}}>
         <JSONTree data={spotDataModel} hideRoot shouldExpandNode={shouldExpandNode}/>
       </ScrollView>
     </ModalWrapper>

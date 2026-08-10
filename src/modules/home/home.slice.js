@@ -11,6 +11,7 @@ const initialHomeState = {
     modal: false,
     home: false,
   },
+  messageModal: {isVisible: false, message: '', title: ''},
   modalValues: {},
   modalVisible: null,
   hiddenWarnings: {},
@@ -48,6 +49,16 @@ const homeSlice = createSlice({
     },
     clearedStatusMessages(state) {
       state.statusMessages = [];
+    },
+    // Only hide. The modal stays mounted through its fade-out, and clearing the text here blanks the header and
+    // body for the ~270ms the animation runs. openedMessageModal always sets all three fields, so leaving the old
+    // text in place can't leak to the next caller.
+    closedMessageModal(state) {
+      state.messageModal.isVisible = false;
+    },
+    openedMessageModal(state, action) {
+      const {message, title} = action.payload;
+      state.messageModal = {isVisible: true, message, title};
     },
     removedLastStatusMessage(state) {
       state.statusMessages = state.statusMessages.slice(0, -1);
@@ -121,6 +132,8 @@ const homeSlice = createSlice({
 export const {
   addedStatusMessage,
   clearedStatusMessages,
+  closedMessageModal,
+  openedMessageModal,
   removedLastStatusMessage,
   resetHiddenWarnings,
   resetHomeState,

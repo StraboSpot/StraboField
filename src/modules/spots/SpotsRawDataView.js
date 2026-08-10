@@ -1,12 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {ScrollView} from 'react-native';
 
-import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ClearButton from '../../shared/ui/buttons/ClearButton';
+import CopyToClipboardButton from '../../shared/ui/buttons/CopyToClipboardButton';
+import {JSON_MODAL_STYLE} from '../../shared/ui/modals/modal.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
@@ -16,36 +15,12 @@ const SpotsRawDataView = () => {
   const dispatch = useDispatch();
   const project = useSelector(state => state.project.project);
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
-  const toast = useToast();
 
-  /* Local State */
+  /* Derived Variables */
 
-  const [dataJson, setDataJson] = useState({});
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('Selected Spots', selectedSpots);
-    buildObject();
-  }, [selectedSpots]);
-
-  /* Event Handlers */
-
-  const onClipboardPress = () => {
-    Clipboard.setString(JSON.stringify(selectedSpots));
-    toast.show('Copied to clipboard');
-  };
+  const dataJson = {Project: {project}, Spots: {selectedSpots}};
 
   /* Logic Helpers */
-
-  const buildObject = () => {
-    const filteredDataJson = {
-      Project: {project},
-      Spots: {selectedSpots},
-    };
-    console.log(filteredDataJson);
-    setDataJson(filteredDataJson);
-  };
 
   const closeModal = () => {
     dispatch(setModalVisible({modal: null}));
@@ -57,15 +32,12 @@ const SpotsRawDataView = () => {
     <ModalWrapper
       closeModal={closeModal}
       isChildrenFilled
-      overlayStyleOverride={{width: '90%', maxHeight: '80%'}}
+      overlayStyleOverride={JSON_MODAL_STYLE}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
     >
-      <ClearButton
-        onPress={onClipboardPress}
-        title={'Copy JSON to Clipboard'}
-      />
+      <CopyToClipboardButton getText={() => JSON.stringify(selectedSpots)}/>
       <ScrollView style={{flex: 1}}>
         <JSONTree
           data={dataJson}
