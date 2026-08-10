@@ -2,15 +2,17 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {usePowerState} from 'react-native-device-info';
+import {useBatteryLevel, usePowerState} from 'react-native-device-info';
 
 import statusBarStyles from './statusBar.styles';
 import {BATTERY_ICON_NAMES, ICON_TYPE} from './statusBarIcon.constants';
 
 const BatteryInfo = () => {
-  // const batteryLevel = useBatteryLevel();
-  const {batteryState, batteryLevel} = usePowerState();
-
+  // usePowerState only re-emits on plug/unplug and Low Power Mode changes, so the level it
+  // returns goes stale as the battery discharges. useBatteryLevel subscribes to the level-change
+  // event, so it stays current while the app is open.
+  const batteryLevel = useBatteryLevel();
+  const {batteryState} = usePowerState();
 
   const batteryPercentage = (batteryLevel * 100).toFixed(0);
 
@@ -21,8 +23,6 @@ const BatteryInfo = () => {
   };
 
   const getBatteryImage = () => {
-    console.log('powerState', batteryState);
-    console.log('batteryLevel', batteryLevel);
     if (batteryState === 'charging') {
       if (batteryLevel >= 0.95) return BATTERY_ICON_NAMES.CHARGING_STATE.FULL;
       else if (batteryLevel >= 0.85) return BATTERY_ICON_NAMES.CHARGING_STATE.NINTY;
