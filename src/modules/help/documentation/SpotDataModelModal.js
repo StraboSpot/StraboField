@@ -1,18 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
-
-import JSONTree from 'react-native-json-tree';
 
 import forms from '../../../assets/forms';
 import {isEmpty} from '../../../shared/helpers';
-import CopyToClipboardButton from '../../../shared/ui/buttons/CopyToClipboardButton';
-import {JSON_MODAL_STYLE} from '../../../shared/ui/modals/modal.styles';
-import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-
-// hideRoot hides the root, so the first visible level is 1
-// Level 1: type, geometry, properties
-// Level 2: the contents of properties, listed but not opened (what we want to show)
-const shouldExpandNode = (keyName, data, level) => level <= 1;
+import JsonTreeModal from '../../../shared/ui/modals/JsonTreeModal';
 
 const SpotDataModelModal = ({close}) => {
   /* Local State */
@@ -176,22 +166,7 @@ const SpotDataModelModal = ({close}) => {
 
   /* View */
 
-  return (
-    <ModalWrapper
-      closeModal={close}
-      headerTitle={'Spot Data Model Object'}
-      isChildrenFilled
-      overlayStyleOverride={JSON_MODAL_STYLE}
-      showActionButton={false}
-      showCancelButton={false}
-      showCloseButton={true}
-    >
-      <CopyToClipboardButton getText={() => JSON.stringify(spotDataModel)}/>
-      <ScrollView style={{flex: 1}}>
-        <JSONTree data={spotDataModel} hideRoot shouldExpandNode={shouldExpandNode}/>
-      </ScrollView>
-    </ModalWrapper>
-  );
+  return <JsonTreeModal closeModal={close} data={spotDataModel} headerTitle={'Spot Data Model Object'}/>;
 };
 
 export default SpotDataModelModal;
