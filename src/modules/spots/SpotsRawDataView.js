@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import JSONTree from 'react-native-json-tree';
-import Toast from 'react-native-toast-notifications';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -16,10 +16,9 @@ const SpotsRawDataView = () => {
   const dispatch = useDispatch();
   const project = useSelector(state => state.project.project);
   const selectedSpots = useSelector(state => state.spot.intersectedSpotsForTagging);
+  const toast = useToast();
 
   /* Local State */
-
-  const toast = useRef(null);
 
   const [dataJson, setDataJson] = useState({});
 
@@ -34,7 +33,7 @@ const SpotsRawDataView = () => {
 
   const onClipboardPress = () => {
     Clipboard.setString(JSON.stringify(selectedSpots));
-    toast.current.show('Copied to clipboard', {data: {title: 'noWifi', message: 'hello'}});
+    toast.show('Copied to clipboard');
   };
 
   /* Logic Helpers */
@@ -57,23 +56,22 @@ const SpotsRawDataView = () => {
   return (
     <ModalWrapper
       closeModal={closeModal}
-      isFullScreen
-      overlayStylesOverride={{width: '90%', height: '80%'}}
+      isChildrenFilled
+      overlayStyleOverride={{width: '90%', maxHeight: '80%'}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
     >
-      <ScrollView>
-        <ClearButton
-          onPress={onClipboardPress}
-          title={'Copy JSON to Clipboard'}
-        />
+      <ClearButton
+        onPress={onClipboardPress}
+        title={'Copy JSON to Clipboard'}
+      />
+      <ScrollView style={{flex: 1}}>
         <JSONTree
           data={dataJson}
           hideRoot
         />
       </ScrollView>
-      <Toast ref={toast}/>
     </ModalWrapper>
   );
 };
