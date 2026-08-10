@@ -9,6 +9,11 @@ import {JSON_MODAL_STYLE} from '../../shared/ui/modals/modal.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalVisible} from '../home/home.slice';
 
+// hideRoot hides the root, so the first visible level is 1
+// Level 1: Project, Spots
+// Level 2: the project's fields and the selected Spots, listed but not opened
+const shouldExpandNode = (keyName, data, level) => level <= 1;
+
 const SpotsRawDataView = () => {
   /* Data Hooks */
 
@@ -18,7 +23,7 @@ const SpotsRawDataView = () => {
 
   /* Derived Variables */
 
-  const dataJson = {Project: {project}, Spots: {selectedSpots}};
+  const dataJson = {Project: project, Spots: selectedSpots};
 
   /* Logic Helpers */
 
@@ -42,6 +47,7 @@ const SpotsRawDataView = () => {
         <JSONTree
           data={dataJson}
           hideRoot
+          shouldExpandNode={shouldExpandNode}
         />
       </ScrollView>
     </ModalWrapper>

@@ -9,9 +9,9 @@ import CopyToClipboardButton from '../../../shared/ui/buttons/CopyToClipboardBut
 import {JSON_MODAL_STYLE} from '../../../shared/ui/modals/modal.styles';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
-// Since hideRoot is true, level 0 is actually the first visible level
-// Level 0: type, geometry, properties
-// Level 1: contents of properties (what we want to show)
+// hideRoot hides the root, so the first visible level is 1
+// Level 1: type, geometry, properties
+// Level 2: the contents of properties, listed but not opened (what we want to show)
 const shouldExpandNode = (keyName, data, level) => level <= 1;
 
 const SpotDataModelModal = ({close}) => {
