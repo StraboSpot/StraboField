@@ -75,6 +75,19 @@ export const handleError = async (response, auth) => {
   if (status === 400) return response.json();
 
   if (status === 401) {
+    // A 401 means the stored Basic-Auth credentials are no longer valid (e.g. the user changed their
+    // password on the website). Show the re-auth modal over the current screen instead of logging out —
+    // that keeps the user on their map with their unsynced data intact rather than jarringly navigating
+    // them back to the sign-in screen. Only trigger when the failing request actually carried the
+    // credentials we still have stored: that excludes unauthenticated fetches, the sign-in endpoint
+    // itself (a bad-password 401), and — crucially — stragglers left in flight with an old token when the
+    // user has already re-authenticated (their token no longer matches the freshly-stored one), so
+    // re-authenticating stays final and the modal does not pop back up.
+    const {encoded_login: currentLogin, isAuthenticated} = store.getState().user;
+    const usedCurrentCreds = !isEmpty(currentLogin) && auth?.token === currentLogin;
+    if (isAuthenticated && usedCurrentCreds && !response.url?.includes('userAuthenticate')) {
+      store.dispatch(setIsSessionExpiredModalVisible(true));
+    }
     return Promise.reject(
       'This server could not verify that you are authorized to access the document requested. '
       + 'Either you supplied the wrong credentials (e.g., bad password), or your browser doesn\'t '
