@@ -173,17 +173,13 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'addToReport':
         dispatch(setIntersectedSpotsForTagging([]));
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('report');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'stereonet':
         mapComponentRef.current?.clearSelectedSpots();
@@ -193,8 +189,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
       case 'selectSpots':
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('selectSpots');
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'mapMeasurement':
         setDraw(MAP_MODES.DRAW.MEASURE).catch(console.error);
