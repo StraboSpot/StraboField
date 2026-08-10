@@ -193,7 +193,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
       case 'selectSpots':
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('selectSpots');
-        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
+        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
+        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
         break;
       case 'mapMeasurement':
         setDraw(MAP_MODES.DRAW.MEASURE).catch(console.error);
