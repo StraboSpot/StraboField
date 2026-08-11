@@ -82,7 +82,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
-          <ListItem.Subtitle>({getMapTypeName(item.source)})</ListItem.Subtitle>
+          <ListItem.Subtitle style={commonStyles.listItemSubtitle}>{getMapTypeName(item.source)}</ListItem.Subtitle>
         </ListItem.Content>
         {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
           <Icon
