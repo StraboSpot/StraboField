@@ -1,5 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
 
+import {normalizeCustomMapId} from './customMaps.helpers';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
@@ -14,6 +15,7 @@ import {
   setCurrentBasemap,
   updateCustomMap,
 } from '../maps.slice';
+import useMapsOffline from '../offline-maps/useMapsOffline';
 import useMap from '../useMap';
 import useMapURL from '../useMapURL';
 import useMapCoords from '../view/useMapCoords';
@@ -29,20 +31,20 @@ const useCustomMap = () => {
 
   const {setBasemap} = useMap();
   const {getMyMapsBboxCoords} = useMapCoords();
-  const {buildTileURL} = useMapURL();
+  const {renameOfflineMapTiles} = useMapsOffline();
+  const {buildStyleURL, buildTileURL} = useMapURL();
   const {testCustomMapUrl, getMyMapsBbox} = useServerRequests();
 
   /* Internal Functions */
 
   const getProviderInfo = (source) => {
-    let providerInfo = {...MAP_PROVIDERS[source]};
-    if (customDatabaseEndpoint.isSelected) {
+    const providerInfo = {...MAP_PROVIDERS[source]};
+    // Only My Maps are served by a custom database endpoint; Mapbox styles must keep pointing at api.mapbox.com.
+    if (customDatabaseEndpoint.isSelected && source === 'strabospot_mymaps') {
       const serverUrl = customDatabaseEndpoint.endpoint;
       const lastOccur = serverUrl.lastIndexOf('/');
       providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
-      return providerInfo;
     }
-    console.log(providerInfo);
     return providerInfo;
   };
 
@@ -54,8 +56,7 @@ const useCustomMap = () => {
   /* Exported Functions */
 
   const deleteMap = async (mapId) => {
-    console.log('Deleting Map Here');
-    console.log('map: ', mapId);
+    console.log('Deleting Custom Map:', mapId);
     const projectCopy = {...project};
     const customMapsCopy = {...customMaps};
     delete customMapsCopy[mapId];
@@ -74,55 +75,75 @@ const useCustomMap = () => {
 
   const getMyMapsBBox = async (mapId) => {
     if (customDatabaseEndpoint.isSelected) {
-      console.log(customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId));
+      console.log('My Maps Bbox Endpoint:', customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId));
       const bboxEndpoint = customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId);
       const response = await getMyMapsBbox(bboxEndpoint);
-      console.log(response);
+      console.log('My Maps Bbox Response:', response);
     }
     const response = await getMyMapsBbox(STRABO_APIS.MY_MAPS_BBOX + mapId);
-    console.log(response);
+    console.log('My Maps Bbox Response:', response);
   };
 
-  const saveCustomMap = async (map) => {
-    let mapId = map.id.trim();
-    let customMap;
+  // `previousId` is passed when editing an existing map's id — e.g. a shared Mapbox style re-created under the
+  // current user's own account, which gets a new id that their token can actually read.
+  const saveCustomMap = async (map, previousId) => {
+    const mapId = normalizeCustomMapId(map.id, map.source);
+    const isIdChanged = !!previousId && previousId !== mapId;
     const providerInfo = getProviderInfo(map.source);
-    let bbox = '';
-    // Pull out mapbox styles map id
-    if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
-      mapId = map.id.split('/').slice(3).join('/');
-    }
-    customMap = {...map, ...providerInfo, id: mapId, source: map.source};
+    // A changed id points at a different source map, so drop the stored extent rather than carrying it over — an
+    // empty bbox is also what makes getMyMapsBboxCoords go and fetch the new one.
+    const customMap = {...map, ...providerInfo, id: mapId, source: map.source, ...(isIdChanged && {bbox: ''})};
     const tileUrl = buildTileURL(customMap);
     let testTileUrl = tileUrl.replace(/({z}\/{x}\/{y})/, '0/0/0');
+    // Test against customMap.id, not map.id: normalizeCustomMapId trimmed it, and validating a different string
+    // than the one being saved would let an id pasted with stray whitespace through.
     if (map.source === 'strabospot_mymaps') {
       if (!isEmpty(customDatabaseEndpoint.endpoint) && customDatabaseEndpoint.isSelected) {
         const customEndpointTest = customDatabaseEndpoint.endpoint.replace('/db', '/strabo_mymaps_check/');
-        testTileUrl = customEndpointTest + map.id;
+        testTileUrl = customEndpointTest + customMap.id;
       }
-      else testTileUrl = STRABO_APIS.MY_MAPS_CHECK + map.id;
-
+      else testTileUrl = STRABO_APIS.MY_MAPS_CHECK + customMap.id;
     }
     console.log('Custom Map:', customMap, 'Test Tile URL:', testTileUrl);
 
     const testUrlResponse = await testCustomMapUrl(testTileUrl);
-    console.log('RES', testUrlResponse);
+    console.log('Custom Map URL Test Response:', testUrlResponse);
     if (testUrlResponse) {
-      bbox = await getMyMapsBboxCoords(map);
-      if (map.overlay && map.id === currentBasemap.id) {
-        console.log(('Setting Basemap to Mapbox Topo...'));
+      const bbox = await getMyMapsBboxCoords(customMap);
+      const savedCustomMap = bbox ? {...customMap, bbox: bbox} : customMap;
+      // The map is the current basemap under whichever id it was saved as, so an id being edited has to match on
+      // either one. currentBasemap is null until a map has been shown.
+      const isCurrentBasemap = currentBasemap?.id === savedCustomMap.id
+        || (isIdChanged && currentBasemap?.id === previousId);
+      if (map.overlay && isCurrentBasemap) {
+        console.log('Setting Basemap to Mapbox Topo...');
         await setBasemap(null);
       }
       if (project.other_maps) {
         const otherMapsInProject = project.other_maps;
-        const otherMapsInProjectFiltered = otherMapsInProject.filter(m => m.id !== customMap.id);
-        // if (customMap.source !== 'mapbox_styles') delete customMap.key;
+        const otherMapsInProjectFiltered = otherMapsInProject.filter(
+          m => m.id !== savedCustomMap.id && m.id !== previousId);
         dispatch(updatedProject(
-          {field: 'other_maps', value: [...otherMapsInProjectFiltered, customMap]}));
+          {field: 'other_maps', value: [...otherMapsInProjectFiltered, savedCustomMap]}));
       }
-      else dispatch(updatedProject({field: 'other_maps', value: [map]}));
-      dispatch(addedCustomMap(bbox ? {...customMap, bbox: bbox} : customMap));
-      return customMap;
+      else dispatch(updatedProject({field: 'other_maps', value: [savedCustomMap]}));
+      // Drop the old key first — addedCustomMap merges, so it would otherwise leave the map listed under both ids.
+      if (isIdChanged) {
+        console.log('Custom Map id changed:', previousId, '->', savedCustomMap.id);
+        const customMapsCopy = {...customMaps};
+        delete customMapsCopy[previousId];
+        dispatch(deletedCustomMap(customMapsCopy));
+      }
+      dispatch(addedCustomMap(savedCustomMap));
+      if (isIdChanged) {
+        await renameOfflineMapTiles(previousId, savedCustomMap);
+        // Re-point the basemap directly: setBasemap looks the map up in this render's customMaps, which predates
+        // the dispatch above and so would not find the new id. Skipped for an overlay, which just cleared the basemap.
+        if (isCurrentBasemap && !savedCustomMap.overlay) {
+          dispatch(setCurrentBasemap({...savedCustomMap, ...buildStyleURL(savedCustomMap)}));
+        }
+      }
+      return savedCustomMap;
     }
     else throw (`${customMap.id} is not a valid ID for this map.  Please check the id and try again.`);
   };
@@ -138,7 +159,7 @@ const useCustomMap = () => {
   const updateMap = (map) => {
     const customMapsCopy = {...customMaps};
     customMapsCopy[map.id] = map;
-    console.log(customMapsCopy);
+    console.log('Updated Custom Maps:', customMapsCopy);
     dispatch(updateCustomMap(map));
     dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
   };

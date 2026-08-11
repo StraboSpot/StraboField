@@ -16,6 +16,7 @@ import {
   setStatusMessageModalTitle,
 } from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
+import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
@@ -70,7 +71,6 @@ const useDownload = () => {
 
   const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
     if (datasets.length >= 1) {
-      // console.log('Starting Dataset Spots Download!');
 
       // Synchronous download
       await datasets.reduce(async (previousPromise, dataset) => {
@@ -117,7 +117,7 @@ const useDownload = () => {
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
     }
     catch (e) {
-      console.log('Error getting datasets...' + e);
+      console.error('Error getting datasets:', e);
       throw Error;
     }
   };
@@ -134,6 +134,10 @@ const useDownload = () => {
           if (targetDatasetId) tempTargetDatasetId = targetDatasetId;
         }
         clearProject();
+      }
+      // Strip before anything downstream reads it — loadCustomMaps spreads the whole map object through.
+      if (!isEmpty(projectResponse.other_maps)) {
+        projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
       dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
@@ -161,10 +165,10 @@ const useDownload = () => {
         await Promise.all(report.images?.map(async (image) => {
           const doesExist = await doesImageExistOnDevice(image.id);
           if (!doesExist) {
-            console.log('Need to download report image:', image.id);
+            console.log(image.id + ': Need to download report image.');
             neededImagesIds.push(image.id);
           }
-          else console.log('Image', image.id, 'already exists on device. Not downloading.');
+          else console.log(image.id + ': Already exists on device. Not downloading.');
         }));
       }));
 
@@ -194,11 +198,9 @@ const useDownload = () => {
 
   const downloadSpots = async (dataset, encodedLoginScoped) => {
     try {
-      // console.log(dataset.name, ':', 'Downloading Spots...');
       const featureCollection = await getDatasetSpots(dataset.id, encodedLoginScoped);
-      // console.log(dataset.name, ':', 'Finished Downloading Spots.');
       if (isEmpty(featureCollection) || !featureCollection.features) {
-        // console.log(dataset.name, ': No Spots in dataset.');
+        console.log(dataset.name + ': No Spots in dataset.');
       }
       else {
         const spotsDownloaded = featureCollection.features;
@@ -209,7 +211,6 @@ const useDownload = () => {
         spotsToSave.push(...spotsDownloaded);
         const spotIds = Object.values(spotsDownloaded).map(spot => spot.properties.id);
         datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], spotIds: spotIds};
-        // console.log(dataset.name, ':', 'Got Spots', spotsDownloaded);
       }
     }
     catch (err) {
@@ -221,14 +222,15 @@ const useDownload = () => {
 
   const findNeededImages = async (spotsDownloaded, dataset) => {
     try {
-      // console.log(dataset.name, ':', 'Gathering Needed Images...');
       const spotImages = await gatherNeededImages(spotsDownloaded, dataset);
       if (spotImages?.imageIds.length > 0) {
-        // console.log(dataset.name, ':', 'Images needed', spotImages.neededImagesIds.length, 'of', spotImages?.imageIds.length);
+        // neededImagesIds is only returned on native — web doesn't cache images locally.
+        console.log(dataset.name + ': Images needed', spotImages.neededImagesIds?.length || 0, 'of',
+          spotImages.imageIds.length);
         return spotImages;
       }
       else {
-        console.log(dataset.name, ':', 'No Images in dataset.');
+        console.log(dataset.name + ': No Images in dataset.');
         return undefined;
       }
     }
@@ -239,11 +241,7 @@ const useDownload = () => {
 
   const loadCustomMaps = (maps) => {
     maps.map(async (map) => {
-      let mapId = map.id;
-      // Pull out mapbox styles map id
-      if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
-        mapId = map.id.split('/').slice(3).join('/');
-      }
+      const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
       if (map.source === 'strabospot_mymaps') {
         if (!isEmpty(endpoint) && isSelected) {
@@ -259,10 +257,9 @@ const useDownload = () => {
         ...map,
         ...providerInfo,
         id: mapId,
-        key: map.accessToken || map.key,
         source: map.source,
       };
-      console.log(customMap);
+      console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
     });
   };
