@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, FlatList, View} from 'react-native';
+import {Dimensions, FlatList, Platform, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -20,6 +20,8 @@ import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
 import {getCustomMapsWithValidSources, getCustomOverlaysWithValidSources} from '../home.helpers';
 
+// Web has no local tile store, so offline maps are never listed and every basemap comes from its online tile URL.
+const isWeb = Platform.OS === 'web';
 const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
 
 const MapLayersOverlay = ({onTouchOutside, visible}) => {
@@ -54,10 +56,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   /* Event Handlers */
 
   const onSetBasemap = async (customMap) => {
-    if ((isInternetReachable && isConnected) || (!isInternetReachable && isConnected)) {
-      if (!customMap.url) await setOfflineMapTiles(customMap);
-      else await setBasemap(customMap.id);
-    }
+    if (isWeb || (isConnected && customMap.url)) await setBasemap(customMap.id);
     else await setOfflineMapTiles(customMap);
   };
 
@@ -66,7 +65,9 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
 
   const determineWhatCustomMapListToRender = () => {
-    // Saved (offline) basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
+    if (isWeb) return [renderCustomMapsList(), renderCustomOverlaysList()];
+
+    // Offline basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
     if (isInternetReachable && isConnected) {
       return [renderCustomMapsList(), renderOfflineCustomMapsList(), renderCustomOverlaysList()];
     }
@@ -192,7 +193,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
         },
       ]}
       key={map.id + 'DefaultMapItem'}
-      onPress={() => isInternetReachable ? setMap(map) : setOfflineMapTiles(map)}
+      onPress={() => (isWeb || isInternetReachable) ? setMap(map) : setOfflineMapTiles(map)}
     >
       <ListItem.Content>
         <ListItem.Title style={[

@@ -7,13 +7,10 @@ const useMapsOffline = () => {
   const renameOfflineMapTiles = () => {
   };
 
-  const setOfflineMapTiles = () => {
-  };
-
   const switchToOfflineMap = () => {
   };
 
-  return {getMapCenterTile, renameOfflineMapTiles, setOfflineMapTiles, switchToOfflineMap};
+  return {getMapCenterTile, renameOfflineMapTiles, switchToOfflineMap};
 };
 
 export default useMapsOffline;
