@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {APP_DIRECTORIES} from './directories.constants';
 import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
+import {stripMapboxTokenFromCustomMaps} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {
@@ -52,7 +53,7 @@ const useImport = () => {
     dispatch(addedStatusMessage('Checking for maps to import...'));
     if (!isEmpty(otherMapsDb)) {
       dispatch(removedLastStatusMessage());
-      dispatch(addedCustomMapsFromBackup(otherMapsDb));
+      dispatch(addedCustomMapsFromBackup(stripMapboxTokenFromCustomMaps(otherMapsDb)));
       dispatch(addedStatusMessage('Added custom maps.'));
     }
     else {
@@ -92,7 +93,7 @@ const useImport = () => {
       if (existsWithCapital || existsWithLowercase) {
         const imageFiles = await readDirectory(APP_DIRECTORIES.BACKUP_DIR
           + fileName + imagesFolderName);
-        console.log(imageFiles);
+        console.log('Image Files in Backup:', imageFiles);
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         if (!isEmpty(imageFiles)) {
           imageFiles.map(async (image) => {
@@ -225,13 +226,13 @@ const useImport = () => {
   const moveFiles = async (dataFile) => {
     try {
       let fileEntries = [];
-      console.log(dataFile.mapNamesDb);
+      console.log('Offline Maps in Backup:', dataFile.mapNamesDb);
       await Promise.all(
         Object.values(dataFile.mapNamesDb).map(async (map) => {
           const checkSuccess = await doesDeviceDirectoryExist(
             APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/');
           if (checkSuccess) {
-            console.log('dir exists');
+            console.log(map.id + ': Tiles directory exists.');
             const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
             const mapId = files.find(id => id === map.id);
             const zipID = files.find(zipId => zipId === map.mapId);
@@ -239,7 +240,7 @@ const useImport = () => {
             if (id) fileEntries = await readDirectory(APP_DIRECTORIES.TILE_TEMP + id + '/tiles');
             else {
               mapFailures++;
-              console.log('Map file not found', mapFailures);
+              console.log(map.id + ': Map file not found. Failures:', mapFailures);
             }
             await moveTile(fileEntries, id, map);
           }
@@ -271,7 +272,7 @@ const useImport = () => {
   const unzipFile = async (filePath) => {
     try {
       const checkDirSuccess = await doesDeviceDirectoryExist(APP_DIRECTORIES.TILE_TEMP);
-      console.log(checkDirSuccess);
+      console.log('Tile Temp Directory Exists:', checkDirSuccess);
       if (checkDirSuccess) {
         if (isOldBackup) {
           const fileExtension = filePath.substring(filePath.lastIndexOf('.') + 1);

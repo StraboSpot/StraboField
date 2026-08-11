@@ -8,8 +8,7 @@ Guidance for Claude Code when working in this repository.
   unclear, stop and name it. (Skip this for trivial edits — use judgment.)
 - **Simplest thing that works.** No speculative abstractions, config, or error handling for impossible cases. If it's
   200 lines and could be 50, rewrite it.
-- **Surgical diffs.** Touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code; match
-  existing style. Flag unrelated dead code — don't delete it. Every changed line should trace to the request.
+- **Match existing style.** New code should read like the code around it.
 - **Verify, don't hope.** For bugs/features, prefer writing a test that reproduces/defines success, then making it pass.
   State a brief plan for multi-step work.
 

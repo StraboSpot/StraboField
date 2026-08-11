@@ -5,6 +5,7 @@ import {Icon, Input, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CUSTOM_MAP_TYPES} from './customMaps.constants';
+import {normalizeCustomMapId} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
@@ -33,7 +34,6 @@ const CustomMapDetails = () => {
 
   const dispatch = useDispatch();
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  const MBAccessToken = useSelector(state => state.user.mapboxToken);
 
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
 
@@ -56,7 +56,6 @@ const CustomMapDetails = () => {
         overlay: false,
         id: '',
         source: '',
-        key: MBAccessToken,
       });
     }
   }, [customMapToEdit]);
@@ -95,15 +94,20 @@ const CustomMapDetails = () => {
       setIsLoadingModalVisible(true);
       setIsLoading(true);
       if (!isEmpty(customMapToEdit)) {
+        const isIdChanged = normalizeCustomMapId(editableCustomMapData.id, editableCustomMapData.source)
+          !== customMapToEdit.id;
         setTitle('Updating Custom Map');
         setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
-        updateMap(editableCustomMapData);
+        // A new id has to go through saveCustomMap so it gets validated and the map (and its cached tiles) move to
+        // the new key. Everything else stays on updateMap, which needs no network.
+        if (isIdChanged) await saveCustomMap(editableCustomMapData, customMapToEdit.id);
+        else updateMap(editableCustomMapData);
       }
       else {
         setTitle('Saving Custom Map');
         setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
         const customMap = await saveCustomMap(editableCustomMapData);
-        console.log(customMap);
+        console.log('Saved Custom Map:', customMap);
       }
       setMessage('Success!');
       setIsLoading(false);
@@ -171,7 +175,7 @@ const CustomMapDetails = () => {
         </View>
         {!isEmpty(customMapToEdit) && <View style={customMapStyles.mapTypeInfoContainer}>
           <Text style={customMapStyles.mapTypeInfoText}>Map available from:</Text>
-          <Text style={customMapStyles.mapTypeInfoText}>{customMapToEdit?.url[0]}</Text>
+          <Text style={customMapStyles.mapTypeInfoText}>{customMapToEdit?.url?.[0]}</Text>
         </View>}
       </>
     );
@@ -204,7 +208,6 @@ const CustomMapDetails = () => {
         <View style={{padding: 10}}>
           <Text style={customMapStyles.mapOverviewText}>Type: {customMapToEdit.title}</Text>
           {/*<Text style={customMapStyles.mapOverviewText}>Source: {customMapToEdit?.url[0]}</Text>*/}
-          <Text style={customMapStyles.mapOverviewText}>Id: {customMapToEdit.id}</Text>
         </View>
       </View>
     );
@@ -290,9 +293,8 @@ const CustomMapDetails = () => {
         {renderTitle()}
         {renderOverlaySection()}
         {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {isEmpty(customMapToEdit)
-          && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
-            || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        {(editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+          || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
         <View style={customMapStyles.bottomButtonsContainer}>
           <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
             <View>
