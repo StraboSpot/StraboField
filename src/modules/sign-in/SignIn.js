@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {KeyboardAvoidingView, Platform, Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Linking, Platform, Pressable, Text, TextInput, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -38,6 +38,8 @@ const SignIn = ({navigation}) => {
   const isSignInAvailable = isEndpointSelected || isOnline.isInternetReachable;
 
   /* Event Handlers */
+
+  const handleForgotPassword = () => Linking.openURL('https://strabospot.org/forgotpassword');
 
   const handleGuestSignIn = async () => {
     await guestSignIn();
@@ -85,6 +87,23 @@ const SignIn = ({navigation}) => {
           style={signInStyles.input}
           value={password || ''}
         />
+        <Pressable
+          onPress={handleForgotPassword}
+          style={({pressed}) => ({
+            opacity: pressed ? 0.5 : 1,
+          })}
+        >
+          <Text style={
+            {
+              color: themes.PRIMARY_ACCENT_COLOR,
+              fontSize: themes.MEDIUM_TEXT_SIZE,
+              fontWeight: 'bold',
+              // textAlign: 'right',
+            }
+          }>
+            Forgot Password
+          </Text>
+        </Pressable>
       </>
     );
   };
