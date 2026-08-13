@@ -43,7 +43,7 @@ const UploadModal = ({closeModal, isVisible}) => {
   /* Local State */
 
   const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [imageUploadStatus, setImageUploadStatus] = useState({});
   const [modalTitle, setModalTitle] = useState('Upload Project');
   const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
@@ -95,7 +95,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       if (imageStatus.imagesNotFound) {
         setUploadState('error');
         setModalTitle('Uploaded With Errors!');
-        setErrorMesssage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
+        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
       }
       else {
         setUploadState('complete');
@@ -104,7 +104,7 @@ const UploadModal = ({closeModal, isVisible}) => {
     }
     catch (err) {
       console.error('Error uploading', err);
-      setErrorMesssage(err.toString());
+      setErrorMessage(err.toString());
       setUploadState('error');
     }
   };
@@ -120,8 +120,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       if (imageStatus.imagesNotFound) {
         setUploadState('error');
         setModalTitle('Uploaded With Errors!');
-        setErrorMesssage(
-          `There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
+        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
       }
       else {
         setUploadState('complete');
@@ -270,10 +269,8 @@ const UploadModal = ({closeModal, isVisible}) => {
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
       showCancelButton={uploadState === 'not started'}
     >
-      {uploadState === 'not started'
-        ? renderInitialUploadView()
-        : uploadState !== 'error'
-          ? renderUploadProgress()
+      {uploadState === 'not started' ? renderInitialUploadView()
+        : uploadState !== 'error' ? renderUploadProgress()
           : renderErrorView()}
     </ModalWrapper>
   );
