@@ -9,7 +9,7 @@ import {normalizeCustomMapId} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/helpers';
+import {isEmpty, openUrl} from '../../../shared/helpers';
 import {BLUE, DARKGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
@@ -66,6 +66,16 @@ const CustomMapDetails = () => {
     setIsLoadingModalVisible(false);
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
+  };
+
+  const handleUrlPress = async (url) => {
+    try {
+      await openUrl(url);
+    }
+    catch (err) {
+      console.error('Error opening custom map url', url, err);
+      alert('Unable to Open Link', `Could not open ${url} in a browser.`);
+    }
   };
 
   /* Logic Helpers */
@@ -141,17 +151,18 @@ const CustomMapDetails = () => {
   };
 
   const renderMapDetails = () => {
+    const mapUrl = customMapToEdit?.url?.[0];
     return (
       <>
         <SectionDivider dividerText={'Map Details'}/>
         <View>
           {editableCustomMapData?.source === 'mapbox_styles' && (
             <Input
-              containerStyle={{paddingHorizontal: 0}}
+              containerStyle={{paddingHorizontal: 10}}
               errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.id) && 'Style URL is required'}
               errorStyle={customMapStyles.requiredMessage}
               inputContainerStyle={{borderBottomWidth: 0}}
-              inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+              inputStyle={formStyles.fieldValue}
               keyboardType={urlKeyboardType}
               onChangeText={text => setEditableCustomMapData(e => ({...e, id: text}))}
               placeholder={'Style URL'}
@@ -161,11 +172,11 @@ const CustomMapDetails = () => {
           )}
           {editableCustomMapData?.source === 'strabospot_mymaps' && (
             <Input
-              containerStyle={{paddingHorizontal: 0}}
+              containerStyle={{paddingHorizontal: 10}}
               errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.id) && 'Map ID is required'}
               errorStyle={customMapStyles.requiredMessage}
               inputContainerStyle={{borderBottomWidth: 0}}
-              inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+              inputStyle={formStyles.fieldValue}
               onChangeText={text => setEditableCustomMapData(e => ({...e, id: text}))}
               placeholder={'Strabo My Maps ID'}
               placeholderTextColor={MEDIUMGREY}
@@ -173,9 +184,14 @@ const CustomMapDetails = () => {
             />
           )}
         </View>
-        {!isEmpty(customMapToEdit) && <View style={customMapStyles.mapTypeInfoContainer}>
+        {!isEmpty(mapUrl) && <View style={customMapStyles.mapTypeInfoContainer}>
           <Text style={customMapStyles.mapTypeInfoText}>Map available from:</Text>
-          <Text style={customMapStyles.mapTypeInfoText}>{customMapToEdit?.url?.[0]}</Text>
+          <Text
+            onPress={() => handleUrlPress(mapUrl)}
+            style={[customMapStyles.mapTypeInfoText, customMapStyles.mapUrlLink]}
+          >
+            {mapUrl}
+          </Text>
         </View>}
       </>
     );
