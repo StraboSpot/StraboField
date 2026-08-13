@@ -20,6 +20,12 @@ import {PROJECT_SAVE_STATUS} from '../connections/connections.constants';
 import {setLoadingStatus as setHomeLoadingStatus} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
+// Generous on purpose: firing early would report a failure while the save is still genuinely in flight.
+const SERVER_SAVE_TIMEOUT_MS = 60000;
+// Deliberately non-committal — on a timeout the save may still land, so don't claim it failed.
+const SERVER_SAVE_TIMEOUT_MESSAGE = 'Timed out waiting for the save to be confirmed.'
+  + ' Check your project to be sure the changes were saved.';
+
 const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
   /* Data Hooks */
@@ -64,6 +70,18 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
     setLoadingStatus_(isSaved ? TAG_BACKUP_STATUS.COMPLETE : TAG_BACKUP_STATUS.ERROR);
     dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
   }, [projectSaveStatus]);
+
+  // Bounds the wait above, which resolves only when the server reports back. The modal closes both its exits while
+  // the import is in progress, so a status that never arrives would leave it with no way out.
+  useEffect(() => {
+    if (!shouldWaitForServerSave || loadingStatus !== TAG_BACKUP_STATUS.IN_PROGRESS) return;
+    const timeoutId = setTimeout(() => {
+      setStatusMessage(message => `${message} ${SERVER_SAVE_TIMEOUT_MESSAGE}`);
+      setLoadingStatus_(TAG_BACKUP_STATUS.ERROR);
+      dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+    }, SERVER_SAVE_TIMEOUT_MS);
+    return () => clearTimeout(timeoutId);
+  }, [loadingStatus, shouldWaitForServerSave]);
 
   /* Event Handlers */
 
@@ -193,6 +211,7 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
       actionTitle={loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? 'Done' : 'Select File'}
       closeModal={closeModal}
       headerTitle={modalTitle}
+      isLoading={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? closeModal : handleLoad}
       onCancelPress={closeModal}
       showActionButton={loadingStatus !== TAG_BACKUP_STATUS.IN_PROGRESS}

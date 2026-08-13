@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import KeepAwake from 'react-native-keep-awake';
@@ -42,6 +42,10 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   /* Local State */
 
+  // A ref, not state: dismissing the modal mid-upload resets the state below while the upload keeps running, so
+  // only a ref still knows an upload is in flight and can stop a second one from starting.
+  const isUploadInFlightRef = useRef(false);
+
   const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [imageUploadStatus, setImageUploadStatus] = useState({});
@@ -78,7 +82,11 @@ const UploadModal = ({closeModal, isVisible}) => {
   /* Logic Helpers */
 
   const initiateUpload = async () => {
+    if (isUploadInFlightRef.current) {
+      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
+    }
     try {
+      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       isImageTransferring && dispatch(setIsImageTransferring(false));
       dispatch(updatedProjectTransferProgress(0));
@@ -107,10 +115,19 @@ const UploadModal = ({closeModal, isVisible}) => {
       setErrorMessage(err.toString());
       setUploadState('error');
     }
+    finally {
+      isUploadInFlightRef.current = false;
+      // Release the wake lock on every path, including when the user backs out and the upload finishes unseen.
+      Platform.OS !== 'web' && KeepAwake.deactivate();
+    }
   };
 
   const uploadImagesOnly = async () => {
+    if (isUploadInFlightRef.current) {
+      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
+    }
     try {
+      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       Platform.OS !== 'web' && KeepAwake.activate();
       setModalTitle('Uploading');
@@ -130,7 +147,13 @@ const UploadModal = ({closeModal, isVisible}) => {
     catch (err) {
       console.error('Error uploading', err);
       alert('Upload Failed!', err.toString());
-      closeModal();
+      // Reset through handleClosePress: closing alone would leave uploadState at 'uploading', which hides both
+      // the close button and the back button if the modal is reopened.
+      handleClosePress();
+    }
+    finally {
+      isUploadInFlightRef.current = false;
+      Platform.OS !== 'web' && KeepAwake.deactivate();
     }
   };
 
@@ -260,14 +283,16 @@ const UploadModal = ({closeModal, isVisible}) => {
   return (
     <ModalWrapper
       actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
-      closeModal={closeModal}
+      closeModal={handleClosePress}
       headerTitle={modalTitle}
+      isLoading={uploadState === 'uploading'}
       isVisible={isVisible}
       onActionPressed={handleActionPressed}
       onCancelPress={handleClosePress}
       overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
       showCancelButton={uploadState === 'not started'}
+      showCloseButton
     >
       {uploadState === 'not started' ? renderInitialUploadView()
         : uploadState !== 'error' ? renderUploadProgress()

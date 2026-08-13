@@ -16,7 +16,6 @@ import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
-import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
 import {setLoadingStatus} from '../../home/home.slice';
@@ -102,7 +101,6 @@ const IGSNModal = forwardRef(({
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
   const [igsnResult, setIgsnResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [mappedSesarValues, setMappedSesarValues] = useState([]);
@@ -186,10 +184,7 @@ const IGSNModal = forwardRef(({
   /* Logic Helpers */
 
   const doShowActionButton = isUploaded
-    || (!isEmpty(sesar.sesarToken?.access)
-      && !isLoading
-      && !isUploading
-      && modalPage !== 'picker');
+    || (!isEmpty(sesar.sesarToken?.access) && !isUploading && modalPage !== 'picker');
 
   const isActionDisabled = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
 
@@ -233,7 +228,6 @@ const IGSNModal = forwardRef(({
   const registerSample = async () => {
     try {
       setIsUploading(true);
-      // setIsLoading(true);
       setStatusMessage('');
       setSesarStepLabel(formValues?.isOnMySesar ? 'Updating sample with SESAR' : 'Sending sample to SESAR');
       setStepStatuses({sesar: 'loading', upload: 'idle'});
@@ -247,7 +241,6 @@ const IGSNModal = forwardRef(({
         setStepStatuses({sesar: 'error', upload: 'idle'});
         setModalPage('error');
         setErrorMessages(res.error);
-        // setIsLoading(false);
         setIsUploading(false);
         return;
       }
@@ -255,7 +248,6 @@ const IGSNModal = forwardRef(({
       setStatusMessage(formValues.isOnMySesar ? 'Sample updated with SESAR!' : 'Sample registered with SESAR!');
       setAssignedIgsn(res.igsn || '');
       setStepStatuses({sesar: 'done', upload: 'loading'});
-      // setIsLoading(false);
 
       // Save sample + IGSN to Redux
       if (spot.properties.isSample) {
@@ -303,7 +295,6 @@ const IGSNModal = forwardRef(({
         const failedKey = Object.keys(prev).find(k => prev[k] === 'loading') || 'upload';
         return {...prev, [failedKey]: 'error'};
       });
-      // setIsLoading(false);
       setIsUploading(false);
       setErrorMessages(err ? [err.toString()] : ['Something went wrong.']);
       setModalPage('error');
@@ -360,9 +351,9 @@ const IGSNModal = forwardRef(({
                   containerStyle={{width: '50%'}}
                   icon={
                     <Icon
-                      color='#00aced'
-                      name='pencil-outline'
-                      type='ionicon'
+                      color={'#00aced'}
+                      name={'pencil-outline'}
+                      type={'ionicon'}
                     />
                   }
                   onPress={() => setIsPickerVisible(true)}
@@ -419,7 +410,7 @@ const IGSNModal = forwardRef(({
       closeModal={handleClose}
       disabled={isActionDisabled}
       headerTitle={isUploading ? 'Uploading Project' : 'Upload Complete!'}
-      isLoading={isLoading}
+      isLoading={isUploading}
       isVisible={isVisible}
       onActionPressed={isUploaded ? handleClose : registerSample}
       onCancelPress={handleClose}
@@ -443,7 +434,6 @@ const IGSNModal = forwardRef(({
           <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>
         )}
       </View>
-      <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
       <PickerOverlay
         closePicker={() => setIsPickerVisible(false)}
         data={[...sesar.userCodes.map(c => c?.sesar_code || c), undefined]}

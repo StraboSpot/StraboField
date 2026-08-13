@@ -62,6 +62,7 @@ const BackupTemplatesModal = ({closeModal}) => {
       closeModal={closeModal}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
+      isLoading={backingUpStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? closeModal : handleBackup}
       onCancelPress={closeModal}
       showActionButton={backingUpStatus === '' || backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE || backingUpStatus === TEMPLATE_BACKUP_STATUS.ERROR}

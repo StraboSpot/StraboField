@@ -30,10 +30,19 @@ const GenerateRandomSpots = () => {
     const numRandomSpotsInt = parseInt(numRandomSpots, 10);
     if (numRandomSpotsInt) {
       setNumRandomSpots(numRandomSpotsInt);
-      setLoading(true);
-      await generateRandomsSpotsAroundCurrentLocation(numRandomSpotsInt);
-      setLoading(false);
-      toast.show(`${numRandomSpotsInt} Random Spots Generated`, {});
+      try {
+        setLoading(true);
+        await generateRandomsSpotsAroundCurrentLocation(numRandomSpotsInt);
+        toast.show(`${numRandomSpotsInt} Random Spots Generated`, {});
+      }
+      catch (err) {
+        console.error('Error generating random Spots', err);
+        alert('Error Generating Random Spots', err.toString());
+      }
+      finally {
+        // The modal hides its close button while loading, so a failure that left this set would strand the user.
+        setLoading(false);
+      }
     }
     else alert('Error Generating Random Spots', 'The number of Spots must be an integer.');
   };

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import moment from 'moment';
@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SaveAndExportModalContent from './SaveAndExportModalContent';
 import useExport from '../../../services/files/useExport';
+import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
 import {setSelectedProject} from '../projects.slice';
@@ -20,6 +21,10 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
 
   /* Local State */
 
+  // A ref, not state: closing resets backingUpStatus while the save or export keeps running, so only a ref still
+  // knows one is in flight and can stop a second from starting.
+  const isExportInFlightRef = useRef(false);
+
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupOptions, setBackupOptions] = useState({images: true, offlineTiles: true, customMaps: true});
 
@@ -33,10 +38,17 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   /* Event Handlers */
 
   const handleActionPressed = async () => {
-    if (backingUpStatus === 'complete' || backingUpStatus === 'error') handleClosePress();
-    else {
+    if (backingUpStatus === 'complete' || backingUpStatus === 'error') return handleClosePress();
+    if (isExportInFlightRef.current) {
+      return alert('Already In Progress', 'Please wait for the current save or export to finish.');
+    }
+    try {
+      isExportInFlightRef.current = true;
       if (backupAction === 'save') await initiateBackup();
       else if (backupAction === 'export') await exportProject(backupOptions);
+    }
+    finally {
+      isExportInFlightRef.current = false;
     }
   };
 
@@ -95,7 +107,9 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
     }
     catch (err) {
       console.error('Error backing up file', err);
-      setModalTitle(('Error!'));
+      setModalTitle('Error!');
+      // Without this the status stays 'inProgress', which hides the action, cancel and close buttons alike.
+      setBackingUpStatus('error');
     }
   };
 
@@ -106,6 +120,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
       actionTitle={getButtonTitle()}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
+      isLoading={backingUpStatus === 'inProgress'}
       isVisible={isVisible}
       onActionPressed={backingUpStatus === 'complete' ? handleClosePress : handleActionPressed}
       onCancelPress={handleClosePress}

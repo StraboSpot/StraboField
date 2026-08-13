@@ -74,7 +74,7 @@ const StatusModal = () => {
       actionTitle={'Ok'}
       closeModal={closeModal}
       headerTitle={isShowingDatasetPreferences ? 'Dataset Preferences' : 'Status'}
-      isLoading={isModalLoading}
+      isLoading={isModalLoading && !isShowingDatasetPreferences}
       isVisible={isStatusMessagesModalVisible}
       onActionPressed={closeModal}
       onCancelPress={closeModal}

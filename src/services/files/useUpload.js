@@ -124,7 +124,6 @@ const useUpload = () => {
         const imageStatus = await initializeImageUpload();
         projectUploadStatus = {...projectUploadStatus, images: imageStatus};
         dispatch(setIsImageTransferring(false));
-        KeepAwake.deactivate();
       }
       return projectUploadStatus;
     }
@@ -132,6 +131,10 @@ const useUpload = () => {
       dispatch(addedStatusMessage(`\nUpload Failed!\n\n ${err}`));
       console.error('Upload Failed!', err);
       throw Error(err);
+    }
+    finally {
+      // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.
+      if (Platform.OS !== 'web') KeepAwake.deactivate();
     }
   };
 

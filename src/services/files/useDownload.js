@@ -42,6 +42,10 @@ let imagesFailedCount = 0;
 let spotsToSave = [];
 let tempActiveDatasetsIds, tempTargetDatasetId;
 
+// Every caller shares the accumulators above, so a second download would reset the arrays the first is still
+// filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
+let isDownloadInFlight = false;
+
 const useDownload = () => {
   /* Data Hooks */
 
@@ -297,15 +301,18 @@ const useDownload = () => {
   };
 
   const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
-    resetDownloadState();
-    if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
-    const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
-    dispatch(setStatusMessageModalTitle(projectName));
-    dispatch(clearedStatusMessages());
-    dispatch(setIsStatusMessagesModalVisible(true));
-    dispatch(setLoadingStatus({view: 'modal', bool: true}));
-    dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
+    if (isDownloadInFlight) return console.warn('A download is already running. Ignoring the duplicate request.');
+    isDownloadInFlight = true;
+    // Setup lives inside the try so the finally always reaches it; outside, a throw would strand the flag for good.
     try {
+      resetDownloadState();
+      if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+      const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
+      dispatch(setStatusMessageModalTitle(projectName));
+      dispatch(clearedStatusMessages());
+      dispatch(setIsStatusMessagesModalVisible(true));
+      dispatch(setLoadingStatus({view: 'modal', bool: true}));
+      dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
       await downloadProject(selectedProject, encodedLoginScoped);
       await downloadDatasets(selectedProject, encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
@@ -315,7 +322,6 @@ const useDownload = () => {
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
     catch (err) {
       console.error('Error Initializing Download.', err);
@@ -325,8 +331,12 @@ const useDownload = () => {
         dispatch(setIsErrorMessagesModalVisible(true));
       }
       else dispatch(addedStatusMessage('Download Failed!', err));
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
       throw Error;
+    }
+    finally {
+      isDownloadInFlight = false;
+      // The status modal blocks both its exits while this is set, so it must clear on every path or it traps.
+      dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
   };
 
@@ -370,7 +380,6 @@ const useDownload = () => {
             + neededImagesIds.length));
           dispatch(addedStatusMessage('\nAll needed images have been downloaded for this dataset'));
         }
-        dispatch(setLoadingStatus({view: 'modal', bool: false}));
       }
     }
     catch (err) {
@@ -378,6 +387,9 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Error Downloading Images!'));
       dispatch(addedStatusMessage('Complete!'));
       console.warn('Error Downloading Images: ' + err);
+    }
+    finally {
+      // A dataset needing no images used to skip this, leaving the status modal open with no way out.
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
   };

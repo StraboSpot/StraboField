@@ -62,6 +62,7 @@ const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
       closeModal={closeModal}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
+      isLoading={backingUpStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={backingUpStatus === TAG_BACKUP_STATUS.COMPLETE ? closeModal : handleBackup}
       onCancelPress={closeModal}
       showActionButton={backingUpStatus === '' || backingUpStatus === TAG_BACKUP_STATUS.COMPLETE || backingUpStatus === TAG_BACKUP_STATUS.ERROR}
