@@ -205,7 +205,6 @@ const LoadTemplatesModal = ({closeModal}) => {
       <View style={{padding: 20, alignItems: 'center'}}>
         <LottieAnimations
           doesLoop={loadingStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
-          show
           type={loadingStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS ? 'loadingFile'
             : loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? 'complete' : 'error'}
         />

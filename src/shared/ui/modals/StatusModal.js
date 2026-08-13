@@ -87,7 +87,6 @@ const StatusModal = () => {
         <View>
           <LottieAnimations
             doesLoop={isModalLoading}
-            show={isModalLoading || isError}
             type={isModalLoading ? 'loadingFile' : isError ? 'error' : 'complete'}
           />
           <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>

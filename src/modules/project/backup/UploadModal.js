@@ -139,13 +139,12 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   const renderErrorView = () => {
     return (
-      <View style={{padding: 10}}>
+      <View style={{padding: 20}}>
         <LottieAnimations
           doesLoop={false}
-          show={uploadState === 'error'}
           type={'error'}
         />
-        <Text style={{textAlign: 'center'}}>{errorMessage}</Text>
+        <Text style={{marginTop: 24, textAlign: 'center'}}>{errorMessage}</Text>
       </View>
     );
   };

@@ -173,7 +173,6 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
       <View style={{padding: 20, alignItems: 'center'}}>
         <LottieAnimations
           doesLoop={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
-          show
           type={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS ? 'loadingFile'
             : loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? 'complete' : 'error'}
         />

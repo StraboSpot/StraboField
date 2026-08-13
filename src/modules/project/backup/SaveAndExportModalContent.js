@@ -81,7 +81,6 @@ const SaveAndExportModalContent = ({
     <View style={{padding: 20, alignItems: 'center'}}>
       <LottieAnimations
         doesLoop={backingUpStatus === 'inProgress'}
-        show
         type={backingUpStatus === 'inProgress' ? 'loadingFile'
           : backingUpStatus === 'complete' ? 'complete' : 'error'}
       />
