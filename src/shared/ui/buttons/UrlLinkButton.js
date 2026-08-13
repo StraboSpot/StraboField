@@ -1,11 +1,11 @@
 import React from 'react';
-import {Linking} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import OutlineButton from '../../shared/ui/buttons/OutlineButton';
+import OutlineButton from './OutlineButton';
+import {openUrl} from '../../helpers';
+import {PRIMARY_ACCENT_COLOR} from '../../styles.constants';
+import alert from '../alert';
 
 const UrlLinkButton = ({color, icon, title, url}) => {
 
@@ -13,13 +13,11 @@ const UrlLinkButton = ({color, icon, title, url}) => {
 
   const openLink = async () => {
     try {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) await Linking.openURL(url);
-      else alert('Uh Oh!', `Can not open the url ${url}`);
+      await openUrl(url);
     }
     catch (err) {
-      console.error('Can\t open URL', err);
-      alert(' Unable to open URL!');
+      console.error('Can\'t open URL', err);
+      alert('Uh Oh!', `Can not open the url ${url}`);
     }
   };
 
