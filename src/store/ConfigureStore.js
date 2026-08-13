@@ -51,7 +51,7 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime'],
+  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime', 'projectSaveStatus'],
   timeout: null,
 };
 

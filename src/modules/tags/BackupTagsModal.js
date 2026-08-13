@@ -26,7 +26,7 @@ const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
 
-  const actionLabel = Platform.OS === 'iOS' ? 'Backup' : 'Export';
+  const actionLabel = Platform.OS === 'ios' ? 'Backup' : 'Export';
   const [modalTitle, setModalTitle] = useState(actionLabel + ' ' + title);
 
   /* Event Handlers */

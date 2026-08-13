@@ -5,12 +5,12 @@ import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
+import {getTagsToBackup, getTemplatesToBackup} from './files.helpers';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
 import {
   stripMapboxTokenFromCustomMaps,
   stripMapboxTokenFromProject,
 } from '../../modules/maps/custom-maps/customMaps.helpers';
-import {PAGE_KEYS} from '../../modules/page/pageKeys.constants';
 import {setBackupFileName} from '../../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
@@ -216,12 +216,7 @@ const useExport = () => {
   /* Exported Functions */
 
   const backupTags = async (backupFileName, isGeologicUnits) => {
-
-    const tagsToBackup = (projectDb.project.tags || []).reduce((acc, tag) => {
-      const {spots, features, ...rest} = tag;
-      return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
-      || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
-    }, []);
+    const tagsToBackup = getTagsToBackup(projectDb.project?.tags, isGeologicUnits);
 
     console.log(isGeologicUnits ? 'Geologic Units' : 'Tags', 'to backup:', tagsToBackup);
 
@@ -254,15 +249,7 @@ const useExport = () => {
   };
 
   const backupTemplates = async (backupFileName) => {
-    const rawTemplates = projectDb.project.templates || {};
-    const templatesToBackup = Object.entries(rawTemplates).reduce((acc, [key, value]) => {
-      if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
-      if (key === 'measurementTemplates') return {...acc, measurementTemplates: value};
-      if (value && typeof value === 'object' && Array.isArray(value.templates)) {
-        return {...acc, [key]: {templates: value.templates}};
-      }
-      return acc;
-    }, {});
+    const templatesToBackup = getTemplatesToBackup(projectDb.project?.templates);
 
     console.log('Templates to backup:', templatesToBackup);
 

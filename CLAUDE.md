@@ -40,6 +40,19 @@ Guidance for Claude Code when working in this repository.
   Form `renderInline`.
 - **Second modal never appears on iOS** → a Modal presented while another dismisses gets dropped → chain via
   ModalWrapper's `onDismiss`.
+- **Toasts shown from inside a modal are hidden or dimmed** → they mount and animate, they're just painted
+  underneath. How far depends on placement: a center-placed toast (the `ToastWrapper` default) sits behind the modal
+  body and is fully hidden, while a bottom-placed one falls outside a large-screen web modal's centered box and
+  shows through the 50%-opacity backdrop. A `SMALL_SCREEN` modal is fullscreen, so it covers everything. On
+  web, every react-native-web `View` carries `position: relative; z-index: 0`, so each one is a stacking context and
+  the ToastProvider's `z-index: 999999` can't escape the app root — meanwhile RNW's `Modal` portals into a `<div>`
+  appended to `document.body`, landing as a later sibling. On native it's not a layering problem at all: an RN
+  `Modal` is its own window (UIViewController / Dialog), so nothing in the main tree can ever paint above it, and
+  only `doesRenderAsView` modals let toasts through. → **Report results in place instead.** Web save outcomes are
+  published to Redux as `connections.projectSaveStatus` for exactly this reason — see `updateProjectListener` in
+  `listenerMiddleware.web.js` and the import modals that consume it. Never mount a second ToastProvider inside a
+  modal: `GlobalToast` is a module-level `let` overwritten by the last provider to mount, with no unmount cleanup,
+  so it breaks `Toast.show` app-wide afterwards.
 
 ## Development Commands
 
