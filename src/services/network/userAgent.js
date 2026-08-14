@@ -13,8 +13,14 @@ import {toTitleCase} from '../../shared/helpers';
 
 const app = `(${getApplicationName()}/${getReadableVersion()})`;
 
-const device = Platform.OS === 'android'
-  ? ` (${toTitleCase(getManufacturerSync())} ${getModel()}; Android ${getSystemVersion()})`
-  : ` (${getDeviceId()}; iOS ${getSystemVersion()})`;
+// Web never sends this header (see buildHeaders in serverRequestHelpers.js), but describe the platform honestly
+// anyway so nothing reading the string mistakes a web client for an iOS one.
+const getDevice = () => {
+  if (Platform.OS === 'android') {
+    return ` (${toTitleCase(getManufacturerSync())} ${getModel()}; Android ${getSystemVersion()})`;
+  }
+  if (Platform.OS === 'ios') return ` (${getDeviceId()}; iOS ${getSystemVersion()})`;
+  return ' (Web)';
+};
 
-export const userAgent = app + device;
+export const userAgent = app + getDevice();
