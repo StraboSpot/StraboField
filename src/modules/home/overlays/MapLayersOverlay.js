@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, FlatList, Platform, View} from 'react-native';
+import {Dimensions, Platform, SectionList} from 'react-native';
 
-import {Icon, ListItem} from '@rn-vui/base';
+import {ButtonGroup, Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
@@ -14,6 +14,7 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import {getMapTypeName} from '../../maps/custom-maps/customMaps.helpers';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
 import {BASEMAPS, DEFAULT_MAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
@@ -39,6 +40,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   /* Local State */
 
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [dialogTitle, setDialogTitle] = useState('Map Layers');
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
@@ -64,22 +66,70 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
 
-  const determineWhatCustomMapListToRender = () => {
-    if (isWeb) return [renderCustomMapsList(), renderCustomOverlaysList()];
+  // Filters custom maps/overlays to the maps served by the active endpoint (custom endpoints live on a 192.* host).
+  const matchesEndpoint = customMap => customEndpoint.isSelected
+    ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.');
+
+  // Builds the connectivity-aware section list. Each section carries its own row renderer, and section data is tagged
+  // with a unique _key prefix so ids that repeat across sections (e.g. a downloaded custom basemap) stay unique in the
+  // single SectionList.
+  const getSections = () => {
+    const sections = [];
+
+    let defaultTitle = 'Default Basemaps';
+    let defaultData = BASEMAPS;
+    if (!isInternetReachable && !isConnected) {
+      defaultData = Object.values(offlineMaps).reduce((acc, offlineMap) => {
+        return offlineMap.id === 'mapbox.outdoors' || offlineMap.id === 'mapbox.satellite' || offlineMap.id === 'osm'
+        || offlineMap.id === 'macrostrat' || offlineMap.id === 'usgs.hillshade'
+          ? [...acc, offlineMap]
+          : acc;
+      }, []);
+      defaultTitle = 'Offline Default Basemaps';
+    }
+    sections.push({data: defaultData, renderRow: renderDefaultMapItem, title: defaultTitle, type: 'basemap'});
+
+    const customBasemaps = {
+      data: getCustomMapsWithValidSources(customMaps).filter(matchesEndpoint),
+      renderRow: renderCustomMapItem,
+      title: 'Custom Basemaps',
+      type: 'basemap',
+    };
+    const offlineCustomBasemaps = {
+      // Read straight from the device-wide offline store so downloaded maps show regardless of the loaded project.
+      data: Object.values(offlineMaps).filter(offlineMap => !isDefaultMap(offlineMap) && !offlineMap.overlay),
+      renderRow: renderOfflineCustomMapItem,
+      title: 'Offline Custom Basemaps',
+      type: 'basemap',
+    };
+    const customOverlays = {
+      data: getCustomOverlaysWithValidSources(customMaps).filter(matchesEndpoint),
+      renderRow: renderMapOverlayItem,
+      title: 'Custom Overlays',
+      type: 'overlay',
+    };
+    const offlineCustomOverlays = {
+      // Overlays render only from their online tile URL (CustomOverlayLayer/buildTileURL) and their switch is driven by
+      // the loaded project's customMaps, so offline overlays stay project-scoped here — unlike basemaps, which use local
+      // file tiles and are listed device-wide above.
+      data: getCustomOverlaysWithValidSources(customMaps).filter(customOverlay => offlineMaps[customOverlay.id]),
+      renderRow: renderMapOverlayItem,
+      title: 'Offline Custom Overlays',
+      type: 'overlay',
+    };
 
     // Offline basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
-    if (isInternetReachable && isConnected) {
-      return [renderCustomMapsList(), renderOfflineCustomMapsList(), renderCustomOverlaysList()];
-    }
+    if (isWeb) sections.push(customBasemaps, customOverlays);
+    else if (isInternetReachable && isConnected) sections.push(customBasemaps, offlineCustomBasemaps, customOverlays);
     else if (!isInternetReachable && isConnected) {
-      return [
-        renderCustomMapsList(),
-        renderOfflineCustomMapsList(),
-        renderCustomOverlaysList(),
-        renderOfflineCustomOverlaysList(),
-      ];
+      sections.push(customBasemaps, offlineCustomBasemaps, customOverlays, offlineCustomOverlays);
     }
-    else return [renderOfflineCustomMapsList(), renderOfflineCustomOverlaysList()];
+    else sections.push(offlineCustomBasemaps, offlineCustomOverlays);
+
+    return sections.map(section => ({
+      ...section,
+      data: section.data.map(item => ({...item, _key: `${section.title}-${item.id}`})),
+    }));
   };
 
   const setMap = async (map) => {
@@ -110,76 +160,12 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
               fontWeight: '500',
             },
           ]}>
-            {customMap.title || customMap.name || truncateText(customMap?.id, 16)} -
-            ({customMap.source || customMap.sources['raster-tiles'].type})
-          </ListItem.Title>
+            {customMap.title || customMap.name || truncateText(customMap?.id, 16)}</ListItem.Title>
+          <ListItem.Subtitle style={{paddingTop: 5, fontSize: themes.SMALL_TEXT_SIZE}}>{getMapTypeName(
+            customMap.source)}</ListItem.Subtitle>
         </ListItem.Content>
         {customMap.id === currentBasemap?.id && <Icon color={themes.BLUE} name={'checkmark-outline'} type={'ionicon'}/>}
       </ListItem>
-    );
-  };
-
-  const renderCustomMapsList = () => {
-    const sectionTitle = 'Custom Basemaps';
-    let customMapsToDisplay = getCustomMapsWithValidSources(customMaps).filter(
-      customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
-
-    return (
-      <View key={'CustomMapsList'}>
-        <SectionDivider dividerText={sectionTitle}/>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
-          data={customMapsToDisplay}
-          keyExtractor={item => item.id + 'CustomMap'}
-          renderItem={({item}) => renderCustomMapItem(item)}
-        />
-      </View>
-    );
-  };
-
-  const renderCustomOverlaysList = () => {
-    let sectionTitle = 'Custom Overlays';
-    let customOverlaysToDisplay = getCustomOverlaysWithValidSources(customMaps).filter(
-      customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
-
-    return (
-      <View key={'CustomOverlaysList'}>
-        <SectionDivider dividerText={sectionTitle}/>
-        <FlatList
-          ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
-          data={customOverlaysToDisplay}
-          keyExtractor={item => item.id + 'CustomOverlay'}
-          renderItem={({item}) => renderMapOverlayItem(item)}
-        />
-      </View>
-    );
-  };
-
-  const renderDefaultBasemapsList = () => {
-    let sectionTitle = 'Default Basemaps';
-    let mapsToDisplay = BASEMAPS;
-    if (!isInternetReachable && !isConnected) {
-      mapsToDisplay = Object.values(offlineMaps).reduce((acc, offlineMap) => {
-        return offlineMap.id === 'mapbox.outdoors' || offlineMap.id === 'mapbox.satellite' || offlineMap.id === 'osm'
-        || offlineMap.id === 'macrostrat' || offlineMap.id === 'usgs.hillshade'
-          ? [...acc, offlineMap]
-          : acc;
-      }, []);
-      sectionTitle = 'Offline Default Basemaps';
-    }
-    return (
-      <View key={'DefaultMapsList'}>
-        <SectionDivider dividerText={sectionTitle}/>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
-          data={mapsToDisplay}
-          keyExtractor={item => item.id + 'DefaultMap'}
-          renderItem={({item}) => renderDefaultMapItem(item)}
-          scrollEnabled={false}
-        />
-      </View>
     );
   };
 
@@ -272,54 +258,17 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     );
   };
 
-  const renderOfflineCustomMapsList = () => {
-    const sectionTitle = 'Offline Custom Basemaps';
-    // Read straight from the device-wide offline store so downloaded maps show regardless of the loaded project.
-    const offlineCustomMapsToDisplay = Object.values(offlineMaps).filter(
-      offlineMap => !isDefaultMap(offlineMap) && !offlineMap.overlay);
-
-    return (
-      <View key={'OfflineCustomMapsList'}>
-        <SectionDivider dividerText={sectionTitle}/>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
-          data={offlineCustomMapsToDisplay}
-          keyExtractor={item => item.id + 'OfflineCustomMap'}
-          renderItem={({item}) => renderOfflineCustomMapItem(item)}
-        />
-      </View>
-    );
-  };
-
-  const renderOfflineCustomOverlaysList = () => {
-    const sectionTitle = 'Offline Custom Overlays';
-    // Overlays render only from their online tile URL (CustomOverlayLayer/buildTileURL) and their switch is driven by
-    // the loaded project's customMaps, so offline overlays stay project-scoped here — unlike basemaps, which use local
-    // file tiles and are listed device-wide above.
-    const offlineCustomOverlaysToDisplay = getCustomOverlaysWithValidSources(customMaps).filter(
-      customOverlay => offlineMaps[customOverlay.id]);
-
-    return (
-      <View key={'OfflineCustomOverlaysList'}>
-        <SectionDivider dividerText={sectionTitle}/>
-        <FlatList
-          ListEmptyComponent={<ListEmptyText text={`No ${sectionTitle}`}/>}
-          data={offlineCustomOverlaysToDisplay}
-          keyExtractor={item => item.id + 'OfflineCustomOverlay'}
-          renderItem={({item}) => renderMapOverlayItem(item)}
-        />
-      </View>
-    );
-  };
-
   /* View */
+
+  const activeType = activeTabIndex === 0 ? 'basemap' : 'overlay';
+  const visibleSections = getSections().filter(section => section.type === activeType);
 
   return (
     <ModalWrapper
       closeModal={onTouchOutside}
       fullscreen={SMALL_SCREEN}
       headerTitle={dialogTitle}
+      isChildrenFilled
       isVisible={visible}
       onBackdropPress={onTouchOutside}
       overlayStyleOverride={overlayStyle}
@@ -327,18 +276,28 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
     >
-      <FlatList
-        ListHeaderComponent={
-          <>
-            {renderDefaultBasemapsList()}
-            {determineWhatCustomMapListToRender()}
-          </>
-        }
+      <ButtonGroup
+        buttons={['Basemaps', 'Overlays']}
+        containerStyle={{marginHorizontal: 10, marginTop: 10}}
+        onPress={setActiveTabIndex}
+        selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
+        selectedIndex={activeTabIndex}
+        textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
+      />
+      <SectionList
+        ItemSeparatorComponent={FlatListItemSeparator}
         contentContainerStyle={{
-          paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
+          paddingVertical: SMALL_SCREEN ? 20 : 0,
         }}
-        style={{width: '100%'}}
+        keyExtractor={item => item._key}
+        renderItem={({item, section}) => section.renderRow(item)}
+        renderSectionFooter={({section}) => section.data.length === 0
+          ? <ListEmptyText text={`No ${section.title}`}/> : null}
+        renderSectionHeader={({section}) => <SectionDivider dividerText={section.title}/>}
+        sections={visibleSections}
+        stickySectionHeadersEnabled={false}
+        style={{flex: 1, width: '100%'}}
       />
     </ModalWrapper>
   );
