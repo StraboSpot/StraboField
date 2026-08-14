@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const pkg = require('../package.json');
-const env = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'env.json'), 'utf8'));
+const secrets = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'secrets.json'), 'utf8'));
 
 // Must match RELEASE_NAME in src/shared/app.constants.js, which the app reports on every event. Sentry release
 // names are case-sensitive, so deriving both from package.json keeps uploaded sourcemaps attached to a release
@@ -27,7 +27,7 @@ const androidBuildNumber = () => readBuildNumber('android/app/build.gradle', /ve
 const sentryEnv = {
   ...process.env,
   // env.json is gitignored, so CI has no token in it — fall back to the environment for that case.
-  SENTRY_AUTH_TOKEN: env.sentry_organization_auth_token || process.env.SENTRY_AUTH_TOKEN,
+  SENTRY_AUTH_TOKEN: secrets.sentry_organization_auth_token || process.env.SENTRY_AUTH_TOKEN,
   SENTRY_ORG: 'university-of-kansas',
   SENTRY_PROJECT: 'strabospot-2',
 };

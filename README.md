@@ -30,11 +30,23 @@ This is a [**React Native**](https://reactnative.dev) project, bootstrapped usin
 - Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide
   before proceeding.
 
-- Create a `env.json` file at project root and add:
+- Create a `env.json` file at project root and add the app runtime keys (this file is bundled into the app, so it must
+  contain public keys only — never build-time secrets):
 
       {
-       "mapbox_access_token": 'Your Mapbox public access token'
-       "Error_reporting_DSN": 'Optional Sentry DNS or other error reporting service'
+       "mapbox_access_token": "Your Mapbox public access token",
+       "orcid_client_id": "Your ORCID public client id",
+       "Error_reporting_DSN": "Optional Sentry DSN or other error reporting service"
+      }
+
+- Create a `secrets.json` file at project root for build-time secrets. It is gitignored and read only by build scripts
+  (`scripts/`), never bundled into the app:
+
+      {
+       "sentry_organization_auth_token": "Sentry org auth token (used by npm run setup-sentry / upload-sourcemaps)",
+       "orcid_client_secret": "ORCID client secret",
+       "android_keystore": "Android keystore password",
+       "rockd_access_token": "Rockd access token"
       }
 
 - Create a `dev-test-logins.js` in project root and add:
