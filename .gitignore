@@ -82,6 +82,7 @@ sentry.properties
 !.yarn/versions
 
 # Added by Developers
+/dist
 *.jks
 main.jsbundle.map
 index.android.bundle
