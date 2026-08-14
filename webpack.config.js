@@ -156,7 +156,8 @@ module.exports = (env, argv) => {
     plugins: [
       new HtmlWebpackPlugin({template: path.join(__dirname, 'index.html')}),
       // new webpack.HotModuleReplacementPlugin(),
-      new webpack.DefinePlugin({__DEV__: JSON.stringify(true)}),  // See: <https://github.com/necolas/react-native-web/issues/349>
+      // react-native-web has no __DEV__ global, so define it here or cross-platform code referencing it throws.
+      new webpack.DefinePlugin({__DEV__: JSON.stringify(mode !== 'production')}),
       new webpack.DefinePlugin({process: {env: {}}}),
       new webpack.NormalModuleReplacementPlugin(
         /[\\/]@react-navigation[\\/]stack[\\/]lib[\\/]module[\\/]views[\\/]Screens\.js$/,
