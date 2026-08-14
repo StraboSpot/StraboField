@@ -92,7 +92,10 @@ const useDevice = () => {
     let mapID = map.id;
     console.log(`Deleting Map, ${map.name}, with ID of ${map.id} Here`);
     mapID === 'mapwarper' ? map.name : map.id;
-    map.source === 'mapbox_styles' && mapID.includes('/') ? mapID = mapID.split('/')[1] : mapID;
+    // Mapbox Styles map ids are 'username/styleId', but tiles are cached under the styleId only
+    // (see getTileFolderName). Offline maps carry source 'direct from filesystem', not 'mapbox_styles',
+    // so key off the '/' in the id to strip the account prefix and avoid orphaning the cached tiles.
+    if (mapID.includes('/')) mapID = mapID.split('/').pop();
 
     const cacheFolderExists = await RNFS.exists(APP_DIRECTORIES.TILE_CACHE + mapID);
     const zipFileExists = await RNFS.exists(APP_DIRECTORIES.TILE_ZIP + map.mapId + '.zip');

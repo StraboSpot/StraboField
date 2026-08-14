@@ -118,15 +118,15 @@ const useImport = () => {
     }
   };
 
-  const moveTile = async (tileArray, id, map) => {
+  const moveTile = async (tileArray, id, tileFolder) => {
     await Promise.all(
       tileArray.map(async (tile) => {
         fileCount++;
-        const fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
+        const fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/' + tile);
         if (!fileExists) {
           await moveFile(
             APP_DIRECTORIES.TILE_TEMP + id + '/tiles/' + tile,
-            APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/' + tile);
+            APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/' + tile);
           neededTiles++;
         }
         else {
@@ -229,20 +229,24 @@ const useImport = () => {
       console.log('Offline Maps in Backup:', dataFile.mapNamesDb);
       await Promise.all(
         Object.values(dataFile.mapNamesDb).map(async (map) => {
+          // Mapbox Styles map ids arrive as 'username/styleId', but tiles are cached (and zipped) under the
+          // styleId only (see getTileFolderName), so strip the account prefix before locating/moving them.
+          // Without this the '/' is treated as a subfolder and no matching tiles are found.
+          const tileFolder = map.id.includes('/') ? map.id.split('/').pop() : map.id;
           const checkSuccess = await doesDeviceDirectoryExist(
-            APP_DIRECTORIES.TILE_CACHE + map.id + '/tiles/');
+            APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/');
           if (checkSuccess) {
-            console.log(map.id + ': Tiles directory exists.');
+            console.log(tileFolder + ': Tiles directory exists.');
             const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
-            const mapId = files.find(id => id === map.id);
+            const mapId = files.find(id => id === tileFolder);
             const zipID = files.find(zipId => zipId === map.mapId);
             const id = isOldBackup ? zipID : mapId;
             if (id) fileEntries = await readDirectory(APP_DIRECTORIES.TILE_TEMP + id + '/tiles');
             else {
               mapFailures++;
-              console.log(map.id + ': Map file not found. Failures:', mapFailures);
+              console.log(tileFolder + ': Map file not found. Failures:', mapFailures);
             }
-            await moveTile(fileEntries, id, map);
+            await moveTile(fileEntries, id, map, tileFolder);
           }
         }),
       );

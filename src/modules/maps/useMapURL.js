@@ -22,9 +22,11 @@ const useMapURL = () => {
     let mapID = map.id.trim();
     if (map.source === 'map_warper' || map.source === 'strabospot_mymaps') tileURL = map.url[0] + mapID + '/' + map.tilePath;
     else {
-      tileURL = map.url[0] + (map.source === 'mapbox_styles' && map.url[0].includes('file://') ? mapID.split(
-        '/')[1] : mapID) + map.tilePath + (map.url[0].includes(
-        'https://') ? '?access_token=' + mapboxToken : '');
+      // Offline tiles are cached under the styleId only (see getTileFolderName). Offline maps carry
+      // source 'direct from filesystem' rather than 'mapbox_styles', so key off a local file:// url plus a
+      // '/' in the id to strip the 'username/' prefix. Online (https) Mapbox styles keep the full id.
+      const tileId = map.url[0].includes('file://') && mapID.includes('/') ? mapID.split('/').pop() : mapID;
+      tileURL = map.url[0] + tileId + map.tilePath + (map.url[0].includes('https://') ? '?access_token=' + mapboxToken : '');
     }
     const styleURL = {
       source: map.source,
