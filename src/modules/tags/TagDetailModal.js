@@ -15,8 +15,6 @@ import {useTags} from '../tags';
 import TagColor from './color/TagColor';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 
-let initialValues;
-
 const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */
 
@@ -37,16 +35,18 @@ const TagDetailModal = ({closeModal}) => {
   /* Derived Variables */
 
   const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
-  const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT;
+  // The modal key alone can't identify a geologic unit: the Add Sample modal hosts its own geologic units
+  // section, so it opens this modal under the 'samples' key. The list that opens this modal always stamps the
+  // type on selectedTag, so check that first and fall back to the geologic unit modal keys.
+  const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT
+    || modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+    || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
 
+  let initialValues = {};
   let formName = TAG_FORM_NAMES.TAGS;
   if (modalVisible) {
-    let tagType = TAG_TYPES.CONCEPT;
-    if (modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-      tagType = TAG_TYPES.GEOLOGIC_UNIT;
-      formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
-    }
-    initialValues = {type: tagType};
+    if (isGeologicUnit) formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
+    initialValues = {type: isGeologicUnit ? TAG_TYPES.GEOLOGIC_UNIT : TAG_TYPES.CONCEPT};
   }
   else if (!isEmpty(selectedTag)) {
     formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
