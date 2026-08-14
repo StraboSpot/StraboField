@@ -17128,6 +17128,7 @@ __metadata:
     "@rn-vui/themed": "npm:5.1.10"
     "@rnmapbox/maps": "npm:10.3.1"
     "@sentry/cli": "npm:3.4.2"
+    "@sentry/react": "npm:10.51.0"
     "@sentry/react-native": "npm:8.11.1"
     "@turf/turf": "npm:7.3.5"
     "@types/jest": "npm:^30.0.0"

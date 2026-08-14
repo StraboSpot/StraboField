@@ -120,7 +120,9 @@ module.exports = (env, argv) => {
       clean: true, // drop stale bundles from previous builds instead of leaving them alongside the new ones
     },
     mode,
-    devtool: false, // disables source maps
+    // hidden-source-map emits maps for the Sentry upload without a sourceMappingURL comment, so browsers never
+    // request them. web-deploy then runs upload-sourcemaps-web, which deletes them so they are never deployed.
+    devtool: mode === 'production' ? 'hidden-source-map' : false,
     ignoreWarnings: [
       {
         message: /Critical dependency: the request of a dependency is an expression/,
@@ -140,6 +142,7 @@ module.exports = (env, argv) => {
           'src/web/stubs/react-native-image-resizer.web.js'),
         '@react-native-documents/picker': path.resolve(__dirname,
           'src/web/stubs/react-native-documents-picker.web.js'),
+        '@sentry/react-native': path.resolve(__dirname, 'src/web/stubs/sentry.web.js'),
         'react-native-fs': path.resolve(__dirname,
           'src/web/stubs/react-native-fs.web.js'),
         '@react-native-async-storage/async-storage': path.resolve(__dirname,

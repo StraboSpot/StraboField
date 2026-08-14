@@ -22,17 +22,24 @@ import config from './src/utils/config';
 
 let didInit = false;
 
-if (Platform.OS !== 'web') {
+// Web resolves @sentry/react-native to src/web/stubs/sentry.web.js, which is @sentry/react. It shares these
+// options but none of the native ones below, and has no build number to report as dist.
+const sentryOptions = {
+  dsn: config.get('Error_reporting_DSN'),
+  debug: false,
+  environment: __DEV__ ? 'development' : 'production',
+  release: RELEASE_NAME,
+  tracesSampleRate: 0,
+};
+
+if (Platform.OS === 'web') Sentry.init(sentryOptions);
+else {
   Sentry.init({
-    dsn: config.get('Error_reporting_DSN'),
-    enableNative: Platform.OS !== 'web',
+    ...sentryOptions,
+    enableNative: true,
     enableAppHangTracking: false,
-    debug: false,
-    release: RELEASE_NAME,
     dist: DeviceInfo.getBuildNumber(), // must match the --dist that scripts/sentry-commands.js uploads with
     autoSessionTracking: true,
-    environment: __DEV__ ? 'development' : 'production',
-    tracesSampleRate: 0,
     enableAutoPerformanceTracing: false,
     enableAutoSessionTracking: false,
     // _experiments: {
@@ -45,7 +52,6 @@ if (Platform.OS !== 'web') {
     ],
   });
 }
-else console.log('SENTRY NOT RUNNING');
 
 NetInfo.configure({
   // reachabilityUrl: 'https://clients3.google.com/generate_204',

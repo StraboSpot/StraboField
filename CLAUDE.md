@@ -173,7 +173,7 @@ suffixes; `.web.js` for web overrides.
 - Formik 2.4.9 - Form management
 - Turf.js 7.x, RNFS, Sentry
 
-**Node version:** >=22.11.0. **Package manager:** Yarn 4.13.0
+**Node version:** >=22.11.0. **Package manager:** Yarn 4.18.0
 
 ## Deployment Checklist
 

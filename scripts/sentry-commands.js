@@ -26,25 +26,58 @@ const androidBuildNumber = () => readBuildNumber('android/app/build.gradle', /ve
 
 const sentryEnv = {
   ...process.env,
-  SENTRY_AUTH_TOKEN: env.sentry_organization_auth_token,
+  // env.json is gitignored, so CI has no token in it — fall back to the environment for that case.
+  SENTRY_AUTH_TOKEN: env.sentry_organization_auth_token || process.env.SENTRY_AUTH_TOKEN,
   SENTRY_ORG: 'university-of-kansas',
   SENTRY_PROJECT: 'strabospot-2',
 };
 
 const run = cmd => execSync(cmd, {stdio: 'inherit', env: sentryEnv});
 
-// The url-prefix has to match the frame URLs the app reports (app:///main.jsbundle), or Sentry finds the artifacts
-// but cannot tie them to the stack trace. --wait fails the command on a processing error rather than exiting 0.
-const uploadSourcemaps = ({bundle, dist, sourcemap}) => {
+const distDirectory = path.join(__dirname, '..', 'dist');
+
+// Creating a release that already exists is the normal case on a second upload for the same version, so a failure
+// here is not worth stopping for — the real errors surface from the upload itself. sentry-cli prints its own reason.
+const withRelease = (upload) => {
   try {
     run(`sentry-cli releases new ${release}`);
   }
   catch {
-    console.log('Release may already exist');
+    console.log(`Could not create release ${release}; continuing in case it already exists`);
   }
-  run(`sentry-cli sourcemaps upload --release ${release} --dist ${dist} --url-prefix app:/// `
-    + `--strip-common-prefix --wait --bundle ${bundle} --bundle-sourcemap ${sourcemap}`);
+  upload();
   run(`sentry-cli releases finalize ${release}`);
+};
+
+// The url-prefix has to match the frame URLs the app reports (app:///main.jsbundle), or Sentry finds the artifacts
+// but cannot tie them to the stack trace. --wait fails the command on a processing error rather than exiting 0.
+const uploadSourcemaps = ({bundle, dist, sourcemap}) => withRelease(() =>
+  run(`sentry-cli sourcemaps upload --release ${release} --dist ${dist} --url-prefix app:/// `
+    + `--strip-common-prefix --wait --bundle ${bundle} --bundle-sourcemap ${sourcemap}`));
+
+// Web ships several chunks rather than one bundle, so the whole dist directory is uploaded. sourcemaps inject
+// stamps matching debug ids into the JS and the maps, which is how Sentry pairs them — it must run before the
+// files are deployed. The maps are deleted even when the upload is skipped or fails, so a hidden-source-map build
+// can never publish the source; recovering from a failure means rebuilding, which is the safer way round.
+const uploadWebSourcemaps = () => {
+  if (!fs.existsSync(distDirectory)) throw new Error('No dist directory — run the web build before uploading');
+  try {
+    // web-deploy runs this, and not every machine that builds web has a Sentry token, so a missing one is not fatal.
+    if (!sentryEnv.SENTRY_AUTH_TOKEN) {
+      console.log('No sentry_organization_auth_token in env.json — skipping the sourcemap upload.'
+        + ' Web errors will still be reported, but their stack traces will not be readable.');
+      return;
+    }
+    withRelease(() => {
+      run(`sentry-cli sourcemaps inject ${distDirectory}`);
+      run(`sentry-cli sourcemaps upload --release ${release} --wait ${distDirectory}`);
+    });
+  }
+  finally {
+    const maps = fs.readdirSync(distDirectory).filter(file => file.endsWith('.map'));
+    maps.forEach(file => fs.unlinkSync(path.join(distDirectory, file)));
+    console.log(`Deleted ${maps.length} sourcemap(s) from dist so they are not deployed`);
+  }
 };
 
 const command = process.argv[2];
@@ -69,6 +102,9 @@ switch (command) {
       dist: androidBuildNumber(),
       sourcemap: 'android/index.android.bundle.map',
     });
+    break;
+  case 'upload:web':
+    uploadWebSourcemaps();
     break;
   default:
     console.error('Unknown command:', command);
