@@ -88,10 +88,11 @@ const cssLoaderConfiguration = {
   use: ['style-loader', 'css-loader'],
 };
 
-// Added when updated @react-navigation/native to 7.0.1 to make it work on web
-// but this wasn't in any update instructions
-// ToDo Check if we can get rid of this
-const addedForReactNavigation = {
+// @react-navigation 7 ships lib/module as strict ESM ("type": "module"), where webpack requires fully specified
+// imports and will not try resolve.extensions. Its platform-split modules are deliberately imported without an
+// extension (../GestureHandler, ./useLinking, ../MaskedView) so the platform resolver can pick .web.js or .native.js,
+// which strict ESM cannot do. Removing this rule fails the build with 6 "Did you mean 'GestureHandler.js'?" errors.
+const relaxEsmImportsForReactNavigation = {
   test: /\.m?js/,
   resolve: {
     fullySpecified: false,
@@ -116,6 +117,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/',
       filename: '[name].bundle.js',
+      clean: true, // drop stale bundles from previous builds instead of leaving them alongside the new ones
     },
     mode,
     devtool: false, // disables source maps
@@ -132,7 +134,7 @@ module.exports = (env, argv) => {
       alias: {
         'react-native$': 'react-native-web',
         'react-native-screens': path.resolve(__dirname, 'src/web/stubs/react-native-screens.web.js'),
-        'react-native-web': path.resolve('node_modules/react-native-web'),
+        'react-native-web': path.resolve(__dirname, 'node_modules/react-native-web'),
         '../Utilities/Platform': 'react-native-web/dist/exports/Platform',
         '@bam.tech/react-native-image-resizer': path.resolve(__dirname,
           'src/web/stubs/react-native-image-resizer.web.js'),
@@ -148,17 +150,18 @@ module.exports = (env, argv) => {
     },
     module: {
       rules: [esmLibModuleTypeOverride, babelLoaderConfiguration, imageLoaderConfiguration,
-        ttfLoaderConfiguration, cssLoaderConfiguration, addedForReactNavigation],
+        ttfLoaderConfiguration, cssLoaderConfiguration, relaxEsmImportsForReactNavigation],
     },
     devServer: {
       allowedHosts: 'all',
     },
     plugins: [
       new HtmlWebpackPlugin({template: path.join(__dirname, 'index.html')}),
-      // new webpack.HotModuleReplacementPlugin(),
-      // react-native-web has no __DEV__ global, so define it here or cross-platform code referencing it throws.
-      new webpack.DefinePlugin({__DEV__: JSON.stringify(mode !== 'production')}),
-      new webpack.DefinePlugin({process: {env: {}}}),
+      new webpack.DefinePlugin({
+        // react-native-web has no __DEV__ global, so define it here or cross-platform code referencing it throws.
+        __DEV__: JSON.stringify(mode !== 'production'),
+        process: {env: {}},
+      }),
       new webpack.NormalModuleReplacementPlugin(
         /[\\/]@react-navigation[\\/]stack[\\/]lib[\\/]module[\\/]views[\\/]Screens\.js$/,
         path.resolve(__dirname, 'src/web/stubs/react-navigation-stack-screens.web.js'),
@@ -166,8 +169,6 @@ module.exports = (env, argv) => {
     ],
     performance: {
       hints: false,
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
     },
     optimization: {
       minimize: mode === 'production',
