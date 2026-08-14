@@ -4,6 +4,7 @@ import {Platform, StatusBar} from 'react-native';
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
+import DeviceInfo from 'react-native-device-info';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -29,7 +30,7 @@ if (Platform.OS !== 'web') {
     enableAppHangTracking: false,
     debug: false,
     release: RELEASE_NAME,
-    dist: RELEASE_NAME,
+    dist: DeviceInfo.getBuildNumber(), // must match the --dist that scripts/sentry-commands.js uploads with
     autoSessionTracking: true,
     environment: __DEV__ ? 'development' : 'production',
     tracesSampleRate: 0,
