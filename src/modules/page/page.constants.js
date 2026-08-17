@@ -413,7 +413,7 @@ export const PAGES_IN_MENU_ORDER = PAGES_SECTIONS.flatMap(section => section.pag
 // to the menu without becoming findable here, plus the Overview and subpages the menu never lists.
 export const NOTEBOOK_PAGES = [OVERVIEW_PAGE, ...SUBPAGES, ...PAGES_IN_MENU_ORDER];
 
-const NOTEBOOK_MODELS = NOTEBOOK_PAGES.reduce((acc, p) => p.modal_component ? [...acc, p] : acc, []);
+const NOTEBOOK_MODALS = NOTEBOOK_PAGES.reduce((acc, p) => p.modal_component ? [...acc, p] : acc, []);
 
 /* Modals */
 
@@ -501,7 +501,7 @@ const OTHER_MODALS = [
   },
 ];
 
-export const MODALS = [...NOTEBOOK_MODELS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
+export const MODALS = [...NOTEBOOK_MODALS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
 
 /* Sample Rules */
 
