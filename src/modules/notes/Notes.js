@@ -136,7 +136,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   const renderCancelSaveButtons = () => {
     return (
       <View>
-        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
       </View>
     );

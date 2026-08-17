@@ -5,7 +5,7 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {NOTEBOOK_PAGES, PRIMARY_PAGES, SAMPLES_OVERVIEW_SECTIONS} from './page.constants';
+import {PAGES_IN_MENU_ORDER, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
@@ -58,14 +58,15 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   /* Derived Variables */
 
-  const defaultSamplesPages = NOTEBOOK_PAGES.reduce((acc1, p) => {
-    return SAMPLES_OVERVIEW_SECTIONS.includes(p.key) ? [p, ...acc1] : acc1;
-  }, []);
-  const defaultPages = spot.properties?.isSample ? defaultSamplesPages : PRIMARY_PAGES;
-  const visiblePagesKeys = [...new Set([...defaultPages.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
-  const sections = visiblePagesKeys.reduce((acc, key) => {
-    const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (page.overview_component) {
+  const defaultPagesKeys = spot.properties?.isSample ? SAMPLE_OVERVIEW_DEFAULT_PAGES : PRIMARY_PAGES.map(p => p.key);
+  const visiblePagesKeys = [...new Set([...defaultPagesKeys, ...getPopulatedPagesKeys(spot)])];
+  // List the sections in the same order as the notebook's More Pages menu, except on a sample, where
+  // Samples leads
+  const orderedPages = spot.properties?.isSample ? [...PAGES_IN_MENU_ORDER.filter(p => p.key === PAGE_KEYS.SAMPLES),
+      ...PAGES_IN_MENU_ORDER.filter(p => p.key !== PAGE_KEYS.SAMPLES)]
+    : PAGES_IN_MENU_ORDER;
+  const sections = orderedPages.reduce((acc, page) => {
+    if (visiblePagesKeys.includes(page.key) && page.overview_component) {
       const sectionOverview = {title: page, data: [page]};
       return [...acc, sectionOverview];
     }
@@ -257,7 +258,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
           paddingHorizontal: 10,
           paddingVertical: 10,
         }}>
-          <Image resizeMode='contain' source={RockdLogo} style={{height: 30, width: 30}}/>
+          <Image resizeMode={'contain'} source={RockdLogo} style={{height: 30, width: 30}}/>
           <Text
             style={{fontSize: SMALL_TEXT_SIZE, fontWeight: TEXT_WEIGHT_500}}
           >

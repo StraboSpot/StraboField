@@ -13,7 +13,7 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {Form, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {SECONDARY_PAGES} from '../page/page.constants';
+import {SUPPLEMENTAL_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -41,7 +41,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
   if (isEmpty(initialValues) && !isEmpty(coord)) {
     initialValues = {latitude: coord[1].toString(), longitude: coord[0].toString()};
   }
-  const page = SECONDARY_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
+  const page = SUPPLEMENTAL_PAGES.find(p => p.key === PAGE_KEYS.SITE_SAFETY);
 
   /* Side Effects */
 
@@ -132,7 +132,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={'Site Safety'}/>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={page.label}/>
       {!isReadOnly && renderCancelSaveButtons()}
       <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
         <SectionDivider dividerText={page.label}/>

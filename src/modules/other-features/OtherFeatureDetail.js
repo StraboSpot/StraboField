@@ -22,6 +22,7 @@ const OtherFeatureDetail = ({
                               featureTypes,
                               hideFeatureDetail,
                               isReadOnly,
+                              page,
                               selectedFeature,
                             }) => {
   /* Data Hooks */
@@ -281,7 +282,7 @@ const OtherFeatureDetail = ({
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={'Other Feature Detail'}/>
+      <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={page.label_singular + ' Detail'}/>
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={cancelForm}

@@ -13,7 +13,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {formStyles} from '../form';
 import PageHeader from '../page/PageHeader';
 
-const ExternalData = ({isReadOnly}) => {
+const ExternalData = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -69,7 +69,7 @@ const ExternalData = ({isReadOnly}) => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'External Data'}/>
+      <PageHeader pageTitle={page.label}/>
       <SectionDivider dividerText={'Links To Web Resources'}/>
       <View style={{flex: 1}}>
         {!isReadOnly && (

@@ -9,7 +9,7 @@ import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesPage = ({isReadOnly}) => {
+const ImagesPage = ({isReadOnly, page}) => {
   console.log('Rendering ImagesPage...');
 
   /* Data Hooks */
@@ -31,7 +31,7 @@ const ImagesPage = ({isReadOnly}) => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'Images'}/>
+      <PageHeader pageTitle={page.label}/>
       <FlatList
         ListHeaderComponent={
           <>

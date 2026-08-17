@@ -21,7 +21,7 @@ import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
-const Geography = ({isReadOnly}) => {
+const Geography = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -373,7 +373,7 @@ const Geography = ({isReadOnly}) => {
       <FlatList
         ListHeaderComponent={
           <>
-            <PageHeader hideBackButton={!isReadOnly} pageTitle={'Geography'}/>
+            <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
             {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
             {renderGeometryForm()}
             {renderFormFields()}
