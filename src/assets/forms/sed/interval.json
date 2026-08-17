@@ -19,6 +19,7 @@
       "name": "interval_thickness",
       "label": "Interval Thickness",
       "required": false,
+      "constraint": ". > 0",
       "calculation": ""
     },
     {
