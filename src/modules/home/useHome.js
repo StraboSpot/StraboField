@@ -11,6 +11,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
   cancelledIntervalDrag,
+  clearedStratSection,
   savedIntervalDragReordering,
   setFreehandFeatureCoords,
   setIsScaleBarMetric,
@@ -145,7 +146,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         break;
       case 'closeStratSection':
         const spotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
-        handleSpotSelected(spotWithThisStratSection);
+        // If the strat section has been deleted there is no spot to select, so clear it directly to close the view
+        if (spotWithThisStratSection) handleSpotSelected(spotWithThisStratSection);
+        else dispatch(clearedStratSection());
         break;
       // Map Actions
       case 'zoom':
