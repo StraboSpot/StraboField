@@ -124,6 +124,9 @@ and diffs against the immediately preceding version tag in `sort -V` order — s
 `master` **before** you tag. Notes publish to the GitHub Release page only (no `CHANGELOG.md` is committed; `master` is
 protected). Write meaningful `feat(...)`/`fix(...)` commit subjects — they become the changelog verbatim.
 
+**For the full step-by-step checklists — including the hotfix path (patching a version directly on `master` without an
+rc merge) — see [RELEASE.md](RELEASE.md)**, or print them with `npm run start-rc` / `npm run start-hotfix`.
+
 ## Architecture
 
 **React Native app (iOS/Android/web)** for offline-first geologic field data collection, syncing to a Neo4j graph
