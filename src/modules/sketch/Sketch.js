@@ -86,7 +86,9 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
   };
 
   // Two-finger gestures only, so a single finger is always free to draw. (The canvas itself ignores
-  // multi-touch, so these never leave marks — see the patch to the sketch-canvas PanResponder.)
+  // multi-touch, so these never leave marks — see the patch to the sketch-canvas PanResponder.) On Android
+  // these only run because the canvas below is passed shouldBlockNativeResponder={false}; the default blocks
+  // native handlers, which is what a canvas over a map needs.
   const pinchGesture = Gesture.Pinch()
     .onUpdate((e) => {
       scale.value = Math.max(1, Math.min(5, savedScale.value * e.scale));
@@ -247,6 +249,7 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
                 }}
                 onSketchSaved={saveSketch}
                 ref={sketchRef}
+                shouldBlockNativeResponder={false}
                 strokeColor={color}
                 strokeWidth={strokeWidth}
                 style={{backgroundColor: 'transparent', flex: 1}}
