@@ -74,9 +74,10 @@ const AddMeasurementModal = ({onPress}) => {
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
-  // Compass/Manual input mode is the shared user preference, so this toggle and the one in User Conventions stay in
-  // sync. Fall back to the platform default only while the preference is unset.
-  const isManualMeasurement = defaultManualMeasurement ?? (Platform.OS === 'web');
+  // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
+  // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
+  // sync, defaulting to Compass while it is unset.
+  const isManualMeasurement = Platform.OS === 'web' || (defaultManualMeasurement ?? false);
   const setIsManualMeasurement = value => dispatch(setUserData({default_manual_measurement: value}));
 
   /* Side Effects */
@@ -357,7 +358,7 @@ const AddMeasurementModal = ({onPress}) => {
               </>
 
             )}
-            {isManualMeasurement || Platform.OS === 'web' ? (
+            {isManualMeasurement ? (
               <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
             ) : (
               <>
