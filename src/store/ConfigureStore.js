@@ -37,10 +37,12 @@ export const persistConfig = {
   storage: AsyncStorage,
   blacklist: [
     'compass',
+    'connections',
     'home',
     'mainMenu',
     'map',
     'notebook',
+    'project',
     'spot',
   ],
   migrate: createMigrate(migrations, {debug: false}),
@@ -125,11 +127,7 @@ const mapConfig = {
 const projectConfig = {
   key: 'project',
   storage: AsyncStorage,
-  blacklist: [
-    'datasets',
-    'project',
-    'isImageTransferring',
-  ],
+  blacklist: ['isImageTransferring'],
   timeout: null,
 };
 
