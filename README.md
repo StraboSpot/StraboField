@@ -20,10 +20,36 @@ cross-cutting relations) and provide flexible options for access, editing, and s
 
 The application will work on mobile devices with or without connection to Wi-Fi or Cellular networks. When an Internet
 connection is available, users both can upload collected information and backup their device. It is available for all
-devices on the Google Play and Apple App stores.
+devices on the Google Play and Apple App stores, and a web version of the app runs in the browser at
+[strabospot.org](https://strabospot.org).
 
-This is a [**React Native**](https://reactnative.dev) project, bootstrapped using
+## Features
+
+- **Spots** — capture point, line, and polygon observations, GPS-referenced from your device, drawn directly on a map,
+  or placed on field images you capture.
+- **Nested Spots & Tags** — group observations spatially with nested spots, and link them conceptually across areas
+  with tags (geologic units, metamorphic grade, fold generations, and more).
+- **Controlled vocabulary** — data entered through a shared vocabulary developed by the professional geologic
+  community, covering Structural Geology and Tectonics, with Petrology and Sedimentary Geology support expanding.
+- **Custom & offline maps** — bring in custom basemaps from StraboSpot My Maps or Mapbox Studio, and
+  download any basemap for full offline use in the field.
+- **Image basemaps & strat sections** — work over georeferenced field images and build stratigraphic column views.
+- **Offline-first** — collect data with or without a network connection; upload and back up to your StraboSpot account
+  when you're online, or export everything locally.
+- **Cross-platform** — one app on iOS, Android, and the web.
+
+## Tech Stack
+
+This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and web), bootstrapped using
 [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+
+- **React Native 0.84** + **React 19**
+- **Redux Toolkit** + **Redux Persist** for offline-first state management
+- **React Navigation 7**
+- **Mapbox** — [`@rnmapbox/maps`](https://github.com/rnmapbox/maps) on native, `mapbox-gl` on web
+- **Turf.js** for geospatial operations, **RNFS** for the filesystem, **Sentry** for error reporting
+- **Neo4j** graph database backend, accessed via REST
+- **Node** >= 22.11.0, **Yarn** 4.18.0 (package manager)
 
 ## Step 1: Getting Started
 
@@ -46,7 +72,6 @@ This is a [**React Native**](https://reactnative.dev) project, bootstrapped usin
        "sentry_organization_auth_token": "Sentry org auth token (used by npm run setup-sentry / upload-sourcemaps)",
        "orcid_client_secret": "ORCID client secret",
        "android_keystore": "Android keystore password",
-       "rockd_access_token": "Rockd access token"
       }
 
 - Create a `dev-test-logins.js` in project root and add:
@@ -116,13 +141,56 @@ Add your Android signing information.
 
 - Add your Java Keystore file (.jks) to `/android/app`
 
-Run app
+Install and run a release build on a connected device or emulator:
 
     npm run android-release
 
+To build for the **Google Play Store**, bundle the JS (this also strips duplicate resources — required before every
+Play Store deploy) and produce the release `.aab`:
+
+    npm run bundle:android
+    npm run deploy:android
+
+The resulting bundle is written to `android/app/build/outputs/bundle/release/`.
+
+#### iOS
+
+Install the CocoaPods dependencies first if you haven't (`bundle exec pod install`).
+
+Install and run a release build on a connected device or simulator:
+
+    npm run ios-release
+
+To build for the **Apple App Store**, bundle the JS, then archive and upload from Xcode:
+
+    npm run bundle:ios
+
+Alternatively, ship a beta to TestFlight via Fastlane:
+
+    npm run deploy-beta
+
 #### Web
 
+Build the production bundle (output in `/dist/`) and upload sourcemaps to Sentry:
+
     npm run web-deploy
+
+Then deploy the contents of `/dist/`.
+
+#### Versioning & release process
+
+Bump the app version across `package.json`, Android, and iOS in one step (via Fastlane):
+
+    npm run bump-patch    # or bump-minor / bump-major
+
+Upload Sentry sourcemaps for a release with:
+
+    npm run upload-sourcemaps
+
+Official releases follow an **RC → master** flow (cut an `rc-{version}` branch, stabilize, merge to `master`, then tag
+`v{version}` on master to publish the release and auto-generated changelog). Print the checklists with
+`npm run start-rc` (standard) or `npm run start-hotfix` (patch directly on master). See
+[RELEASE.md](RELEASE.md) for the full step-by-step process.
 
 ## Troubleshooting
 
