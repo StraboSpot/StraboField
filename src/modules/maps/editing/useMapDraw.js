@@ -56,14 +56,14 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
     // Preview the thinned freehand line/polygon (with vertices) after finger-lift, so the user sees it before
     // save - or clear it and say why, when the stroke is too small to end up visible.
     if (mapMode !== MAP_MODES.DRAW.FREEHANDLINE && mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON) return;
+    // A new stroke may already be under way; any re-render below would truncate it, and that stroke's own lift
+    // will re-run this effect anyway. The async branch re-checks after its await, which is a later moment.
+    if (getIsFreehandDrawing()) return;
     if (!freehandFeatureCoords || freehandFeatureCoords.length <= 2) {
       setDrawFeatures([]);
       return;
     }
     if (getIsGeometryTooSmall(freehandFeatureCoords, getFreehandGeometryType())) {
-      // A new stroke may already be under way; re-rendering the map now would truncate it, and that stroke's own
-      // lift will re-run this effect anyway.
-      if (getIsFreehandDrawing()) return;
       setDrawFeatures([]);
       toast.show(TOO_SMALL_MESSAGE);
       return;
