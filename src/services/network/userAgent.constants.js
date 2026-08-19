@@ -13,7 +13,7 @@ import {toTitleCase} from '../../shared/helpers';
 
 const app = `(${getApplicationName()}/${getReadableVersion()})`;
 
-// Web never sends this header (see buildHeaders in serverRequestHelpers.js), but describe the platform honestly
+// Web never sends this header (see buildHeaders in serverRequests.helpers.js), but describe the platform honestly
 // anyway so nothing reading the string mistakes a web client for an iOS one.
 const getDevice = () => {
   if (Platform.OS === 'android') {

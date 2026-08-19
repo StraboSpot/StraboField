@@ -2,7 +2,7 @@ import {Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
 
-import {userAgent} from './userAgent';
+import {userAgent} from './userAgent.constants';
 import {setIsSessionExpiredModalVisible} from '../../modules/home/home.slice';
 import {isEmpty} from '../../shared/helpers';
 import {store} from '../../store/ConfigureStore';
@@ -32,27 +32,9 @@ const buildHeaders = (auth, customHeaders = {}) => ({
   ...customHeaders,
 });
 
-// Content-type is the authoritative signal; fall back to sniffing the body, since error pages are often served
-// with a wrong or missing type. A leading '<' is HTML or XML - either way it is markup, not the data asked for.
-const isMarkupBody = (response, text) => response.headers.get('content-type')?.includes('html')
-  || text.trimStart().startsWith('<');
-
-/* Exported Functions */
-
-export const deleteRequest = async (url, auth) => {
-  try {
-    const response = await timeoutPromise(fetch(url, {method: 'DELETE', headers: buildHeaders(auth)}));
-    return handleResponse(response, auth);
-  }
-  catch (err) {
-    console.error(`Error DELETE: ${url}`, err);
-    throw err;
-  }
-};
-
 // What the user is told when a response body cannot be parsed. Status comes first: a 5xx or a timeout serves an
 // HTML error page too, and blaming the address would send them looking for a problem that is not theirs.
-export const describeUnreadableBody = (response, text) => {
+const describeUnreadableBody = (response, text) => {
   if (response.status === 408 || response.status === 504) return 'The server took too long to respond.';
   if (response.status >= 500) return 'The server is unavailable right now. Please try again shortly.';
   if (isMarkupBody(response, text)) {
@@ -61,28 +43,7 @@ export const describeUnreadableBody = (response, text) => {
   return 'The server returned a response that could not be read.';
 };
 
-/* -- 20260330 JMA
- export const getRequest = async (url, auth, options = {}) => {
- const {responseType, ...headerOptions} = options;
- try {
- const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
- return isEmpty(options) ? handleResponse(response) : response;
- */
-
-// `options` (e.g. {responseType: 'blob'}) only flags whether to hand back the raw response. It must not reach
-// buildHeaders, which would spread it into the request and send `responsetype: blob` as a header, tripping CORS.
-export const getRequest = async (url, auth, options = {}) => {
-  try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
-    return isEmpty(options) ? handleResponse(response, auth) : response;
-  }
-  catch (err) {
-    console.error(`Error GET: ${url}`, err);
-    throw err;
-  }
-};
-
-export const handleError = async (response, auth) => {
+const handleError = async (response, auth) => {
   const {status} = response;
 
   if (status === 401) {
@@ -129,6 +90,58 @@ export const handleError = async (response, auth) => {
   return Promise.reject(errorMessage || 'Unknown Error');
 };
 
+// Content-type is the authoritative signal; fall back to sniffing the body, since error pages are often served
+// with a wrong or missing type. A leading '<' is HTML or XML - either way it is markup, not the data asked for.
+const isMarkupBody = (response, text) => response.headers.get('content-type')?.includes('html')
+  || text.trimStart().startsWith('<');
+
+// Read the body once and parse it without throwing. A response body can only be read once, so the text comes back
+// alongside the result for callers that need to inspect what arrived instead of JSON.
+const readJsonBody = async (response) => {
+  const text = await response.text();
+  try {
+    return {isJson: true, json: JSON.parse(text), text};
+  }
+  catch (err) {
+    console.error(`Non-JSON response from ${response.url}`, err, text.slice(0, 300));
+    return {isJson: false, text};
+  }
+};
+
+/* Exported Functions */
+
+export const deleteRequest = async (url, auth) => {
+  try {
+    const response = await timeoutPromise(fetch(url, {method: 'DELETE', headers: buildHeaders(auth)}));
+    return handleResponse(response, auth);
+  }
+  catch (err) {
+    console.error(`Error DELETE: ${url}`, err);
+    throw err;
+  }
+};
+
+/* -- 20260330 JMA
+ export const getRequest = async (url, auth, options = {}) => {
+ const {responseType, ...headerOptions} = options;
+ try {
+ const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth, headerOptions)}));
+ return isEmpty(options) ? handleResponse(response) : response;
+ */
+
+// `options` (e.g. {responseType: 'blob'}) only flags whether to hand back the raw response. It must not reach
+// buildHeaders, which would spread it into the request and send `responsetype: blob` as a header, tripping CORS.
+export const getRequest = async (url, auth, options = {}) => {
+  try {
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
+    return isEmpty(options) ? handleResponse(response, auth) : response;
+  }
+  catch (err) {
+    console.error(`Error GET: ${url}`, err);
+    throw err;
+  }
+};
+
 export const handleResponse = async (response, auth) => {
   if (!response.ok) return handleError(response, auth);
   // text() is a Promise so the fallback never fires; making it work would flip empty 204s from falsy to truthy.
@@ -169,19 +182,6 @@ export const postRequest = async (url, body, auth, customHeaders = {}, timeout =
   catch (err) {
     console.error(`Error POST: ${url}`, err);
     throw err;
-  }
-};
-
-// Read the body once and parse it without throwing. A response body can only be read once, so the text comes back
-// alongside the result for callers that need to inspect what arrived instead of JSON.
-export const readJsonBody = async (response) => {
-  const text = await response.text();
-  try {
-    return {isJson: true, json: JSON.parse(text), text};
-  }
-  catch (err) {
-    console.error(`Non-JSON response from ${response.url}`, err, text.slice(0, 300));
-    return {isJson: false, text};
   }
 };
 
