@@ -61,7 +61,7 @@ const ExternalData = ({isReadOnly, page}) => {
     catch (err) {
       setError(true);
       setTimeout(() => setError(false), 3000);
-      console.error('Not Valid URL Yet');
+      console.error('Error saving URL', err);
     }
   };
 
