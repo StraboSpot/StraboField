@@ -29,7 +29,9 @@ const StatusModal = () => {
 
   /* Derived Variables */
 
-  const isError = statusMessages.some(msg => msg.startsWith('Error:'));
+  // Match the actual failure headlines the flows emit ('Error ...', 'Download/Upload Failed!') without tripping on
+  // benign progress lines like 'Failed Images: 0/5'.
+  const isError = statusMessages.some(msg => /^(Error|Failed)|Failed!/i.test(msg));
   const isLoadingProject = mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS;
 
   /* Side Effects */
