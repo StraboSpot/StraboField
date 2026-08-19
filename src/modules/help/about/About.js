@@ -110,6 +110,7 @@ const About = () => {
         onActionPressed={() => setIsReleaseNotesVisible(false)}
         overlayStyleOverride={styles.releaseNotesOverlay}
         showCancelButton={false}
+        showCloseButton
       >
         <View style={styles.releaseNotesContainer}>
           {versionGroups.map(group => (
@@ -130,7 +131,8 @@ const About = () => {
                         {highlight.commit && (
                           <TouchableOpacity
                             hitSlop={{bottom: 8, left: 8, right: 8, top: 8}}
-                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {})}
+                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {
+                            })}
                             style={styles.commitLink}
                           >
                             <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
