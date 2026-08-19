@@ -134,7 +134,7 @@ const OtherFeatureDetail = ({
       }
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
     }
   };
 

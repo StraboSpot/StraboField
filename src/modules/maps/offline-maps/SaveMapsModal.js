@@ -138,7 +138,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     }
     catch (err) {
       console.error('Server error in downloadZipUrl', err);
-      throw Error(err);
+      throw err;
     }
   };
 
@@ -149,8 +149,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
       const scaleN = calculateScaleRatio(lat, z);
       return '   (1:' + scaleN.toLocaleString() + ')';
     }
-    catch (e) {
-      console.log('Error finding scale', e);
+    catch (err) {
+      console.error('Error finding scale', err);
       return '';
     }
   };

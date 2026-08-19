@@ -114,7 +114,7 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
         importedTags = JSON.parse(fileContent);
       }
       catch (err) {
-        console.log('Selected file is not valid JSON:', err);
+        console.error('Selected file is not valid JSON:', err);
         return failValidation('The selected file isn\'t valid JSON.');
       }
 

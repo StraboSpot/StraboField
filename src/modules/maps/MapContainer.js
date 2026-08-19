@@ -232,10 +232,10 @@ const MapContainer = forwardRef(({
       if (!currentBasemap) setBasemap().catch(console.error);
       // Custom basemaps: rebuild (URL may need rebuilding) and surface a fallback if it fails.
       else if (customBasemap[currentBasemap.id]) {
-        setBasemap(currentBasemap.id).catch((error) => {
-          console.log('Error Setting Basemap', error);
+        setBasemap(currentBasemap.id).catch((err) => {
+          console.error('Error Setting Basemap', err);
           dispatch(openedMessageModal({
-            message: `Setting basemap to Mapbox Topo.\n\n${error}`,
+            message: `Setting basemap to Mapbox Topo.\n\n${err}`,
             title: 'Error Setting Custom Basemap!',
           }));
         });
@@ -249,7 +249,7 @@ const MapContainer = forwardRef(({
       Object.values(customBasemap).forEach((map) => {
         if (offlineMaps[map.id]?.id !== map.id) setCustomMapSwitchValue(false, map);
       });
-      switchToOfflineMap().catch(error => console.log('Error Setting Offline Basemap', error));
+      switchToOfflineMap().catch(err => console.error('Error Setting Offline Basemap', err));
     }
     clearVertexes();
   }, [userEmail, isOnline]);

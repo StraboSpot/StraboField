@@ -170,12 +170,12 @@ const useDevice = () => {
       let checkDirSuccess = await RNFS.exists(directory);
       if (!checkDirSuccess) checkDirSuccess = await createAppDirectory(directory);
       if (checkDirSuccess) console.log('Directory exists:', directory);
-      else throw Error;
+      else throw Error('Unable to create directory ' + directory);
       return checkDirSuccess;
     }
     catch (err) {
       console.error('Error in doesDeviceDirectoryExist()', err);
-      throw Error(err);
+      throw err;
     }
   };
 
@@ -196,7 +196,7 @@ const useDevice = () => {
   const downloadAndSaveMap = async (downloadOptions) => {
     const res = await RNFS.downloadFile(downloadOptions).promise;
     if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
-    else throw Error;
+    else throw Error('Error downloading file. Status code: ' + res.statusCode);
   };
 
   const downloadAndSaveProfileImage = async (encodedLogin) => {
@@ -292,9 +292,9 @@ const useDevice = () => {
           console.log(localCopy.localUri);
           return {localUri: localCopy.localUri, name: name};
         }
-        else throw Error;
+        else throw Error('Unable to save a local copy of ' + name);
       }
-      else throw Error;
+      else throw Error('No name or URI for the picked file.');
     }
     catch (err) {
       console.error('Error getting external project data', err);
@@ -361,7 +361,7 @@ const useDevice = () => {
       const initialUrl = await Linking.canOpenURL(url);
       console.log(initialUrl);
       if (initialUrl) Linking.openURL(url).catch(err => console.error('ERROR', err));
-      else console.log('Could not open:', url);
+      else console.error('Could not open:', url);
     }
     catch (err) {
       console.error('Error opening url', url, ':', err);
@@ -432,14 +432,14 @@ const useDevice = () => {
     try {
       return await RNFS.readFile(source);
     }
-    catch (e) {
-      console.error('Error reading file as utf8', e);
+    catch (err) {
+      console.error('Error reading file as utf8', err);
       try {
         return await RNFS.readFile(source, 'ascii');
       }
-      catch (e2) {
-        console.error('Error reading file as ascii:', e2);
-        const errorMessage = e2.message || 'Unable to read data file.';
+      catch (err2) {
+        console.error('Error reading file as ascii:', err2);
+        const errorMessage = err2.message || 'Unable to read data file.';
         throw Error(errorMessage);
       }
     }

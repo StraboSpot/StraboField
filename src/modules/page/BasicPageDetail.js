@@ -229,8 +229,8 @@ const BasicPageDetail = ({
         }
       }
       catch (err) {
-        console.log('Error saving', pageKey, err);
-        throw Error;
+        console.error('Error saving', pageKey, err);
+        throw err;
       }
     };
 

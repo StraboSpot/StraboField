@@ -36,8 +36,8 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       closeModal();
       return Promise.resolve();
     }
-    catch (e) {
-      console.log('Error submitting form', e);
+    catch (err) {
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };

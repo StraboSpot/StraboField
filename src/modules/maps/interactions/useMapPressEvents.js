@@ -192,7 +192,7 @@ const useMapPressEvents = ({
           else console.log('Only the edited Spot at press and no vertex in box. No action taken.');
         }
       }
-      else console.log('Error. Unknown map mode:', mapMode);
+      else console.error('Error. Unknown map mode:', mapMode);
     }
   };
 
@@ -253,7 +253,7 @@ const useMapPressEvents = ({
         }
       }
       catch (err) {
-        console.log('getPointInView failed for slot', i, err);
+        console.error('getPointInView failed for slot', i, err);
         screenY = screenPointY;
       }
       slotMap.push({

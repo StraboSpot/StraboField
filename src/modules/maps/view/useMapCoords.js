@@ -23,8 +23,8 @@ const useMapCoords = () => {
   const getCentroidOfSelectedSpot = () => turf.getCoord(turf.centroid(selectedSpot));
 
   const getMyMapsBboxCoords = async (map) => {
+    let myMapsBboxUrl = STRABO_APIS.MY_MAPS_BBOX;
     try {
-      let myMapsBboxUrl = STRABO_APIS.MY_MAPS_BBOX;
       if (isOnline.isConnected && !map.bbox && map.source === 'strabospot_mymaps') {
         if (isSelected) {
           console.log(endpoint.replace('/db', '/geotiff/bbox/'));
@@ -34,8 +34,9 @@ const useMapCoords = () => {
         if (!isEmpty(myMapsBbox)) return myMapsBbox.data.bbox;
       }
     }
-    catch (error) {
-      console.error(error);
+    catch (err) {
+      console.error(`Error getting the bounding box for map ${map?.id} (${map?.source}) from ${myMapsBboxUrl}`,
+        err);
       dispatch(openedMessageModal({message: 'Cannot retrieve the bounding box for this map.', title: 'Error!'}));
     }
   };

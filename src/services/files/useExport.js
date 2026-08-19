@@ -204,7 +204,7 @@ const useExport = () => {
     }
     catch (err) {
       imageBackupFailures++;
-      console.log(image_id + ': ERROR Copying Image.', err.toString(), 'Failures:', imageBackupFailures);
+      console.error(image_id + ': ERROR Copying Image.', err.toString(), 'Failures:', imageBackupFailures);
     }
   };
 

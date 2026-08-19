@@ -34,7 +34,7 @@ const useMeasurements = () => {
       else if (measurementToDelete.id === measurement.id && measurement.associated_orientation) {
         alert('Unable to Delete', 'Please delete the associated features before deleting the primary feature.');
         aborted = true;
-        throw Error;
+        throw Error('Unable to delete a feature that has associated features.');
       }
       else if (measurement.associated_orientation) {
         measurement.associated_orientation.forEach((associatedMeasurement, j) => {
@@ -128,7 +128,6 @@ const useMeasurements = () => {
 
   const deleteMeasurements = (measurementsToDelete) => {
     console.log('Deleting measurements...', measurementsToDelete);
-    deleteFeatureTags(measurementsToDelete);
     let flattenedMeasurementsToDelete = measurementsToDelete.reduce((acc, meas) => {
       if (meas.associated_orientation) {
         const assocOrientations = meas.associated_orientation.reduce((acc1, aO) => [...acc1, aO], []);
@@ -141,6 +140,9 @@ const useMeasurements = () => {
     flattenedMeasurementsToDelete.forEach((measurementToDelete) => {
       updatedOrientationData = removeMeasurementFromObj(updatedOrientationData, measurementToDelete);
     });
+    // Only after the loop, which throws and deletes nothing if a feature has associated features - otherwise the
+    // tags would be dropped while the measurements they point at are still there.
+    deleteFeatureTags(measurementsToDelete);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'orientation_data', value: updatedOrientationData}));
     dispatch(setSelectedAttributes([]));

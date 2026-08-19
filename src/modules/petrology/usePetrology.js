@@ -103,8 +103,8 @@ const usePetrology = () => {
       // await formCurrent.resetForm();
     }
     catch (err) {
-      console.log('Error saving', key, err);
-      throw Error;
+      console.error('Error saving', key, err);
+      throw err;
     }
   };
 

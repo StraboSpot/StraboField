@@ -72,7 +72,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     if (dataset && dataset.id) {
       destroyDataset(dataset.id)
         .then(closeDetailView())
-        .catch(err => console.log('Error deleting dataset', err));
+        .catch(err => console.error('Error deleting dataset', err));
     }
     else console.error('Target dataset or id is undefined!');
   };

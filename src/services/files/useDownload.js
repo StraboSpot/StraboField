@@ -119,9 +119,9 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
     }
-    catch (e) {
-      console.error('Error getting datasets:', e);
-      throw e;
+    catch (err) {
+      console.error('Error getting datasets:', err);
+      throw err;
     }
   };
 

@@ -167,8 +167,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
       }
       return Promise.resolve();
     }
-    catch (e) {
-      console.log('Error submitting form', e);
+    catch (err) {
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -177,7 +177,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     saveForm().then(() => {
       setIsTraceSurfaceFeatureEdit(false);
     }, () => {
-      console.log('Error saving form data to Spot');
+      console.error('Error saving form data to Spot');
     });
   };
 

@@ -56,7 +56,7 @@ const useSignIn = () => {
         if (setPassword) setPassword('');
       }
       dispatch(logout());
-      throw Error;
+      throw err;
     }
   };
 

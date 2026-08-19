@@ -125,8 +125,8 @@ const useReportModal = ({openSpotInNotebook}) => {
       updatedReports.push({...editedReport});
       dispatch(updatedProject({field: 'reports', value: updatedReports}));
     }
-    catch (e) {
-      console.log('Error saving report data', e);
+    catch (err) {
+      console.error('Error saving report data', err);
     }
   };
 

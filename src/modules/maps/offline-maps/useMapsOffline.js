@@ -155,11 +155,11 @@ const useMapsOffline = () => {
       // Set a timeout to reject the promise if the condition isn't met in a certain time
       setTimeout(() => {
         clearInterval(interval);
-        reject(new Error('Condition not met in time'));
-      }, 90000); // Timeout after 10 seconds
-    }).catch((error) => {
-      console.error('Error:', error);
-      return Promise.reject(error);
+        reject(new Error(`Timed out after 90 seconds waiting for zip ${zipId} to be ready`));
+      }, 90000);
+    }).catch((err) => {
+      console.error(`Error checking the status of zip ${zipId}`, err);
+      return Promise.reject(err);
     });
   };
 
@@ -289,7 +289,7 @@ const useMapsOffline = () => {
       else dispatch(clearedMapsFromRedux());/**/
     }
     catch (err) {
-      console.log('Error getting saved maps from device', err);
+      console.error('Error getting saved maps from device', err);
     }
   };
 

@@ -100,8 +100,8 @@ const TagDetailModal = ({closeModal}) => {
       saveTag(updatedTag);
       console.log('Finished saving tag data');
     }
-    catch (e) {
-      console.log('Error saving tag data', e);
+    catch (err) {
+      console.error('Error saving tag data', err);
     }
   };
 

@@ -84,7 +84,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
       if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -94,8 +94,8 @@ const SiteSafetyPage = ({isReadOnly}) => {
       await saveForm(currentForm);
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 

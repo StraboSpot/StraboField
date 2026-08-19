@@ -128,7 +128,7 @@ const useProject = () => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(clearedStatusMessages());
-      console.log('Error Deleting Dataset.');
+      console.error('Error Deleting Dataset.');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Deleting Dataset.'));
     }
@@ -254,7 +254,7 @@ const useProject = () => {
       if (!isEmpty(user.name) && val) return 'SWITCHED';  //TODO do we really need this return
     }
     catch (err) {
-      console.log('Error setting switch value.');
+      console.error('Error setting switch value.');
     }
     dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };

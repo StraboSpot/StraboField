@@ -54,8 +54,8 @@ const useExternalData = () => {
   };
 
   const readCSV = async (dataFile) => {
+    let CSVFile = {};
     try {
-      let CSVFile = {};
       dispatch(setLoadingStatus({view: 'home', bool: true}));
 
       if (Platform.OS !== 'web') {
@@ -97,9 +97,8 @@ const useExternalData = () => {
       }
     }
     catch (err) {
-      console.log('ERR', err);
+      console.error(`Error reading .CSV file "${CSVFile?.name || 'unknown'}"`, err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      console.error('Error reading .CSV file', err);
     }
   };
 

@@ -125,8 +125,8 @@ const Compass = ({
       }
       else dispatch(setCompassMeasurements({...compassData, manual: true}));
     }
-    catch (e) {
-      console.log('Error grabbing compass measurement', e);
+    catch (err) {
+      console.error('Error grabbing compass measurement', err);
     }
   };
 

@@ -112,7 +112,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
       if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
   };
@@ -123,8 +123,8 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
       if (zoomToCurrentLocation) await zoomToCurrentLocation();
       else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 

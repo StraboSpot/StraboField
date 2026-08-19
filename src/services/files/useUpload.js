@@ -175,7 +175,7 @@ const useUpload = () => {
     catch (err) {
       console.error('Error Uploading Image:', err);
       dispatch(setIsImageTransferring(false));
-      throw Error;
+      throw err;
     }
   };
 

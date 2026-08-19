@@ -81,8 +81,8 @@ const AddImageButtons = ({saveImages}) => {
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
     }
-    catch (error) {
-      console.error(error);
+    catch (err) {
+      console.error(err);
       alert('Error', 'Unable load image.');
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }

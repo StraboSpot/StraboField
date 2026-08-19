@@ -160,9 +160,9 @@ const useImages = () => {
             alert('Missing Image!', 'Unable to find image file on this device.');
           }
         })
-        .catch((e) => {
+        .catch((err) => {
           dispatch(setLoadingStatus({view: 'home', bool: false}));
-          console.error('Image not found', e);
+          console.error('Image not found', err);
         });
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
@@ -290,7 +290,7 @@ const useImages = () => {
     }
     catch (err) {
       imageCount++;
-      console.log('Error on', imageId, ':', err);
+      console.error('Error on', imageId, ':', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       throw Error(err);
     }
@@ -355,9 +355,9 @@ const useImages = () => {
           }
         });
       }
-      catch (e) {
+      catch (err) {
         dispatch(setLoadingStatus({view: 'home', bool: false}));
-        reject(e);
+        reject(err);
       }
     });
   };

@@ -292,7 +292,7 @@ const AddMeasurementModal = ({onPress}) => {
       SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
     }
   };
 

@@ -53,7 +53,7 @@ const useUploadImages = () => {
       dispatch(updatedProjectTransferProgress(0));
     }
     catch (err) {
-      console.log('Error Uploading Image', imageId, err);
+      console.error('Error Uploading Image', imageId, err);
       throw Error('Error Uploading Image', imageId, err);
     }
   };

@@ -59,7 +59,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
       await saveTemplate(formRef.current, templateKey, template, templateName);
       goBack();
     }
-    catch (error) {
+    catch (err) {
     }
   };
 

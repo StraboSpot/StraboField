@@ -32,7 +32,7 @@ const useAutoLogIn = () => {
       // No modal here: rethrowing sends Routes.web to AuthenticationErrorSplashScreen, which replaces the whole
       // tree, so anything opened now would flash for a frame and vanish. That splash is the report the user sees.
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      throw Error;
+      throw err;
     }
   };
 
@@ -60,7 +60,7 @@ const useAutoLogIn = () => {
         await loadProjectWeb(projectId, newEncodedLogin);
       }
       catch (err) {
-        throw Error(err);
+        throw err;
       }
     }
     else throw Error('Credentials not found.');
