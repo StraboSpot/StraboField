@@ -24,14 +24,35 @@ const buildAuthHeader = (auth) => {
  });
  */
 
-/*
- User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.
- */
+// User-Agent is a forbidden header in the browser Fetch API - the browser sets it and blocks any override - so
+// only send it off the web.
 const buildHeaders = (auth, customHeaders = {}) => ({
   ...(Platform.OS !== 'web' && {'User-Agent': userAgent}),
   ...buildAuthHeader(auth),
   ...customHeaders,
 });
+
+const describeUnreadableBody = (response, text) => (isMarkupBody(response, text)
+  ? 'The server returned a web page instead of data. The address may be wrong or the request was redirected.'
+  : 'The server returned a response that could not be read.');
+
+// Content-type is the authoritative signal; fall back to sniffing the body, since error pages are often served
+// with a wrong or missing type. A leading '<' is HTML or XML - either way it is markup, not the data asked for.
+const isMarkupBody = (response, text) => response.headers.get('content-type')?.includes('html')
+  || text.trimStart().startsWith('<');
+
+// Read the body once and parse it without throwing. A response body can only be read once, so the text comes back
+// alongside the result for callers that need to inspect what arrived instead of JSON.
+const readJsonBody = async (response) => {
+  const text = await response.text();
+  try {
+    return {isJson: true, json: JSON.parse(text), text};
+  }
+  catch (err) {
+    console.error(`Non-JSON response from ${response.url}`, err, text.slice(0, 300));
+    return {isJson: false, text};
+  }
+};
 
 /* Exported Functions */
 
@@ -54,10 +75,8 @@ export const deleteRequest = async (url, auth) => {
  return isEmpty(options) ? handleResponse(response) : response;
  */
 
-/*
- `options` (e.g. {responseType: 'blob'}) was being passed as the `customHeaders` argument to buildHeaders(),
- which spread it into the HTTP headers. This sent `responsetype: blob` as an actual HTTP header, triggering a CORS
- */
+// `options` (e.g. {responseType: 'blob'}) only flags whether to hand back the raw response. It must not reach
+// buildHeaders, which would spread it into the request and send `responsetype: blob` as a header, tripping CORS.
 export const getRequest = async (url, auth, options = {}) => {
   try {
     const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
@@ -70,9 +89,7 @@ export const getRequest = async (url, auth, options = {}) => {
 };
 
 export const handleError = async (response, auth) => {
-  const {status, headers} = response;
-
-  if (status === 400) return response.json();
+  const {status} = response;
 
   if (status === 401) {
     // A 401 means the stored Basic-Auth credentials are no longer valid (e.g. the user changed their
@@ -95,31 +112,35 @@ export const handleError = async (response, auth) => {
     );
   }
 
+  const {isJson, json, text} = await readJsonBody(response);
+
+  // A 400 carries the failure detail as its body, which the caller reads rather than treating as an error.
+  if (status === 400) return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
+
   if (status === 404) {
-    if (headers.get('content-type')?.includes('text/html')) {
-      return Promise.reject('The requested URL was not found on this server.');
-    }
-    const responseJSON = await response.json();
-    const errorMessage = responseJSON.error || responseJSON.Error;
+    if (isMarkupBody(response, text)) return Promise.reject('The requested URL was not found on this server.');
+    const errorMessage = json?.error || json?.Error;
     if (errorMessage) return Promise.reject(errorMessage);
   }
 
-  try {
-    const errorMessage = JSON.parse(await response.text());
-    Sentry.captureMessage(`ERROR in useServerRequests: ${errorMessage.Error}`);
-    return Promise.reject(errorMessage?.Error || 'Unknown Error');
+  if (!isJson) {
+    Sentry.captureMessage(`ERROR in useServerRequests: unreadable ${status} body from ${response.url}`);
+    return Promise.reject(describeUnreadableBody(response, text));
   }
-  catch (err) {
-    console.error(err);
-    Sentry.captureMessage(`ERROR in useServerRequests: ${JSON.stringify(response)}`);
-    return Promise.reject('Unable to parse response. ' + err);
-  }
+  Sentry.captureMessage(`ERROR in useServerRequests: ${json.Error}`);
+  return Promise.reject(json.Error || 'Unknown Error');
 };
 
-export const handleResponse = (response, auth) => {
-  if (response.ok && response.status === 204) return response.text() || 'no content';
-  if (response.ok) return response.json();
-  return handleError(response, auth);
+export const handleResponse = async (response, auth) => {
+  if (!response.ok) return handleError(response, auth);
+  // text() is a Promise so the fallback never fires; making it work would flip empty 204s from falsy to truthy.
+  if (response.status === 204) return response.text() || 'no content';
+
+  // Parse the text rather than calling response.json(): a 2xx carrying a non-JSON body - typically an HTML error
+  // or sign-in page served in place of data - otherwise surfaces as "Unexpected character: <", naming neither the
+  // request nor the cause.
+  const {isJson, json, text} = await readJsonBody(response);
+  return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
 };
 
 export const postFormDataRequest = async (url, formData, auth) => {
