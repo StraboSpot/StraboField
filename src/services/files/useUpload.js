@@ -13,7 +13,7 @@ import {
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toError} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 import useServerRequests from '../network/useServerRequests';
@@ -69,7 +69,7 @@ const useUpload = () => {
     }
     catch (err) {
       console.error(dataset.name + ': Error Uploading Dataset Properties...', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -108,7 +108,7 @@ const useUpload = () => {
         alert('Fixed Spot in Another Dataset Error',
           'Spot removed from ' + dataset.name + '. Please try uploading again.');
       }
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -130,7 +130,7 @@ const useUpload = () => {
     catch (err) {
       dispatch(addedStatusMessage(`\nUpload Failed!\n\n ${err}`));
       console.error('Upload Failed!', err);
-      throw Error(err);
+      throw toError(err);
     }
     finally {
       // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.

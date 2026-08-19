@@ -102,7 +102,6 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
       dispatch(openedMessageModal({message: err.toString(), title: 'Error!'}));
       setIsImportComplete(false);
       setIsLoading(false);
-      throw Error();
     }
   };
 

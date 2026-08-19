@@ -11,6 +11,7 @@ import useSafeDocumentPicker from './useSafeDocumentPicker';
 import {setLoadingStatus} from '../../modules/home/home.slice';
 import {deletedOfflineMap} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modules/project/projects.slice';
+import {toError} from '../../shared/helpers';
 import {APP_DIRECTORIES} from '../files/directories.constants';
 import useServerRequests from '../network/useServerRequests';
 
@@ -34,7 +35,7 @@ const useDevice = () => {
       })
       .catch((err) => {
         console.error('Error creating directory', directory, 'ERROR:', err);
-        throw Error(err);
+        throw toError(err);
       });
   };
 
@@ -45,7 +46,7 @@ const useDevice = () => {
       await RNFS.copyFile(source, target);
     }
     catch (err) {
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -492,7 +493,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error unzipping imported file', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -533,7 +534,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error saving project to device:', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -545,7 +546,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error Writing File!', err.message);
-      throw Error(err);
+      throw toError(err);
     }
   };
 

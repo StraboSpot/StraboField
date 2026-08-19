@@ -11,7 +11,7 @@ import useCompassCore from '../../services/device/useCompassCore';
 import useDevice from '../../services/device/useDevice';
 import usePermissions from '../../services/device/usePermissions';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewId, isEmpty, toError} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import {openedMessageModal, setLoadingStatus} from '../home/home.slice';
@@ -292,7 +292,7 @@ const useImages = () => {
       imageCount++;
       console.error('Error on', imageId, ':', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      throw Error(err);
+      throw toError(err);
     }
   };
 

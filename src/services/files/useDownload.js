@@ -29,7 +29,7 @@ import {
 import useProject from '../../modules/project/useProject';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toError} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
@@ -295,7 +295,8 @@ const useDownload = () => {
       Sentry.setUser({'username': userProfileRes.name, 'email': userProfileRes.email});
     }
     catch (err) {
-      throw Error(err);
+      // Not a no-op: the server layer rejects with plain strings and useSignIn reads err.message off this.
+      throw toError(err);
     }
   };
 
