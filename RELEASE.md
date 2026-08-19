@@ -8,7 +8,8 @@ StraboSpot2 has two release paths:
 ## How versioning & releases are wired
 
 - **Version bump:** `npm run bump-patch` (or `bump-minor` / `bump-major`) runs `npm version <level> --no-git-tag-version` (updates `package.json`) then `bundle exec fastlane bump`, which runs `inc_ver_ios` (iOS build number) and `inc_ver_and` (Android `versionCode` + `versionName` from `package.json`).
-- **Draft / prerelease:** pushing to any `rc-*` branch triggers [`.github/workflows/rc-draft.yml`](.github/workflows/rc-draft.yml), which creates/updates a **draft prerelease**.
+- **Draft / prerelease:** pushing to any `rc-*` branch triggers [`.github/workflows/rc-draft.yml`](.github/workflows/rc-draft.yml), which creates/updates a **draft prerelease**. It slices the log at the highest **cut marker** (`v{version}-rc`) or published release tag reachable from `HEAD` — not at a `package.json` bump — so merging `master` (the 2.29.x hotfix line) into the rc branch no longer scrambles the boundary. Commits after the last cut marker are collected under the **next** version, and 2.29.x hotfix commits that rode in on a master merge are dropped (they are reachable from their own `v*` tags).
+- **Cut markers:** `npm run cut-rc` tags the current `package.json` version as `v{version}-rc` and pushes it. Run it when you **finalize a patch/beta on the rc branch** — it freezes that version's draft so subsequent commits start a fresh draft for the next version. Without a marker, the long-lived `rc-2.30.x` branch has nothing telling it where `.4` ends and `.5` begins.
 - **Official release:** pushing a `v*` **tag** triggers [`.github/workflows/changelog.yml`](.github/workflows/changelog.yml), which builds the changelog from `git log <prev v-tag>..<new tag>` (previous tag chosen in `sort -V` order) and publishes a non-prerelease GitHub Release.
 - **Store release notes:** `npm run release-notes` (`scripts/release-notes.js`) generates **draft** user-facing "What's New" copy from the commit range and writes the files fastlane reads — `fastlane/metadata/en-US/release_notes.txt` (App Store / `deliver`) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play / `supply`, kept under 400 chars). It gathers + templates only; **review/rewrite the draft for a general audience before uploading** (ask Claude to "polish the store notes"). It auto-detects the previous release tag, ignoring malformed ones; override with `node scripts/release-notes.js <from-tag>`. Note: the Fastfile does not yet wire `deliver`/`supply`, so these files are currently copy-pasted into each console.
 
@@ -29,10 +30,11 @@ Print this checklist anytime with `npm run start-rc`.
 2. **Bump the version:** `npm run bump-patch` (or `bump-minor` / `bump-major`).
 3. **Commit & push** to the rc branch → triggers the **draft release**.
 4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft.
-5. **Merge** `rc-{version}` → `master` and push.
-6. **Generate store notes:** `npm run release-notes`, then review/polish the drafts in `fastlane/metadata/`.
-7. **Tag on master:** `git tag v{version}`.
-8. **Push the tag:** `git push origin v{version}` → publishes the official release + changelog.
+5. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
+6. **Merge** `rc-{version}` → `master` and push.
+7. **Generate store notes:** `npm run release-notes`, then review/polish the drafts in `fastlane/metadata/`.
+8. **Tag on master:** `git tag v{version}`.
+9. **Push the tag:** `git push origin v{version}` → publishes the official release + changelog.
 
 ---
 
