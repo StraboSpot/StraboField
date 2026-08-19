@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/react-native';
 
+import {describeUnreadableBody, readJsonBody} from './serverRequestHelpers';
 import {STRABO_APIS} from './urls.constants';
 import {setIsSessionExpiredModalVisible} from '../../modules/home/home.slice';
 import alert from '../../shared/ui/alert';
@@ -30,33 +31,31 @@ const handleError = async (response, login) => {
       + 'the credentials required.';
     return Promise.reject(msg401);
   }
-  else if (response.status === 404) {
-    const responseJSON = await response.json();
-    const errorMessage = responseJSON.error || responseJSON.Error;
-    if (errorMessage) return Promise.reject(errorMessage);
-    return Promise.reject('The requested URL was not found on this server.');
+
+  // Read the body once, without throwing: an error page served in place of JSON used to reach the caller as
+  // "JSON Parse error: Unexpected character: <", naming neither the request nor the cause.
+  const {isJson, json, text} = await readJsonBody(response);
+
+  if (response.status === 404) {
+    const errorMessage = json?.error || json?.Error;
+    return Promise.reject(errorMessage || 'The requested URL was not found on this server.');
   }
-  else if (response.status === 400) {
-    const res = await response.json();
-    console.log(res);
-    return res;
+  // A 400 carries the failure detail as its body, which the caller reads rather than treating as an error.
+  if (response.status === 400) return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
+
+  if (!isJson) {
+    Sentry.captureMessage(`ERROR in useServerRequests: unreadable ${response.status} body from ${response.url}`);
+    return Promise.reject(describeUnreadableBody(response, text));
   }
-  else {
-    try {
-      const errorMessage = JSON.parse(await response.text());
-      Sentry.captureMessage(`ERROR in useServerRequests: ${errorMessage.Error}`);
-      return Promise.reject(errorMessage?.Error || 'Unknown Error');
-    }
-    catch (err) {
-      console.log(err);
-      Sentry.captureMessage(`ERROR in useServerRequests: ${JSON.stringify(response)}`);
-      return Promise.reject('Unable to parse response. ' + err);
-    }
-  }
+  const errorMessage = json.Error || json.error;
+  Sentry.captureMessage(errorMessage ? `ERROR in useServerRequests: ${errorMessage}`
+    : `ERROR in useServerRequests: unexpected ${response.status} body from ${response.url}`);
+  return Promise.reject(errorMessage || 'Unknown Error');
 };
 
 const handleResponse = (response, login) => {
-  if (response.ok && response.status === 204) return response.text() || 'no  content';
+  // text() is a Promise so the fallback never fires; making it work would flip empty 204s from falsy to truthy.
+  if (response.ok && response.status === 204) return response.text() || 'no content';
   // else if (response.ok) return response.json();
   else if (response.ok) return response;
   else return handleError(response, login);
