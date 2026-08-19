@@ -70,7 +70,6 @@ const homeConfig = {
   blacklist: [
     'imageProgress',
     'isBackupModalVisible',
-    'isErrorMessagesModalVisible',
     'isImageModalVisible',
     'isMainMenuPanelVisible',
     'isOfflineMapModalVisible',

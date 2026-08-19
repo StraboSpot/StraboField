@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import Dialog from './Dialog';
 import LoadingSpinner from '../../shared/ui/Loading';
-import {ErrorModal, MessageModal, StatusModal} from '../../shared/ui/modals';
+import {MessageModal, StatusModal} from '../../shared/ui/modals';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
 import ReauthModal from '../sign-in/ReauthModal';
@@ -36,7 +36,6 @@ const OverlaysContainer = forwardRef(({
           openMainMenuPanel={openMainMenuPanel}
         />
       )}
-      <ErrorModal/>
       <MessageModal/>
       <StatusModal/>
       <ReauthModal/>

@@ -13,8 +13,7 @@ import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import Loading from '../../../shared/ui/Loading';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {
-  addedStatusMessage,
-  setIsErrorMessagesModalVisible,
+  openedMessageModal,
   setIsProjectLoadSelectionModalVisible,
   setStatusMessageModalTitle,
 } from '../../home/home.slice';
@@ -100,8 +99,7 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     }
     catch (err) {
       console.error('Error Writing Project Data', err);
-      dispatch(setIsErrorMessagesModalVisible(true));
-      dispatch(addedStatusMessage(err.toString()));
+      dispatch(openedMessageModal({message: err.toString(), title: 'Error!'}));
       setIsImportComplete(false);
       setIsLoading(false);
       throw Error();

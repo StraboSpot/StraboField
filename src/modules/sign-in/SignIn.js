@@ -11,7 +11,7 @@ import {SECONDARY_BACKGROUND_COLOR, WHITE} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
-import {ErrorModal} from '../../shared/ui/modals';
+import {MessageModal} from '../../shared/ui/modals';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import SplashScreen from '../splash-screen/SplashScreen';
 
@@ -25,8 +25,6 @@ const SignIn = ({navigation}) => {
 
   /* Local State */
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState(__DEV__ ? PASSWORD_TEST : '');
   const [username, setUsername] = useState(__DEV__ ? USERNAME_TEST : '');
@@ -51,7 +49,7 @@ const SignIn = ({navigation}) => {
   const handleSignIn = async () => {
     try {
       setLoading(true);
-      await signIn(username, password, setUsername, setPassword, setErrorMessage, setIsErrorModalVisible);
+      await signIn(username, password, setUsername, setPassword);
       setLoading(false);
     }
     catch (err) {
@@ -78,8 +76,7 @@ const SignIn = ({navigation}) => {
         <TextInput
           autoCapitalize={'none'}
           onChangeText={val => setPassword(val)}
-          onSubmitEditing={() => signIn(username, password, setUsername, setPassword, setErrorMessage,
-            setIsErrorModalVisible)}
+          onSubmitEditing={() => signIn(username, password, setUsername, setPassword)}
           placeholder={'Password'}
           placeholderTextColor={themes.MEDIUMGREY}
           returnKeyType={'go'}
@@ -139,18 +136,6 @@ const SignIn = ({navigation}) => {
     );
   };
 
-  const renderErrorModal = () => {
-    return (
-      <ErrorModal
-        headerTitle={'Error Signing In!'}
-        isVisible={isErrorModalVisible}
-        onActionPressed={() => setIsErrorModalVisible(false)}
-      >
-        <Text style={signInStyles.errorText}>{errorMessage.toString()}</Text>
-      </ErrorModal>
-    );
-  };
-
   /* View */
 
   return (
@@ -169,7 +154,7 @@ const SignIn = ({navigation}) => {
               textStyles={{color: WHITE, fontSize: 14, textAlign: 'center'}}
             />
           </View>
-          {renderErrorModal()}
+          <MessageModal/>
         </View>
       </KeyboardAvoidingView>
     </SplashScreen>

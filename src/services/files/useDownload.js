@@ -9,7 +9,6 @@ import {
   addedStatusMessage,
   clearedStatusMessages,
   removedLastStatusMessage,
-  setIsErrorMessagesModalVisible,
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
@@ -122,7 +121,7 @@ const useDownload = () => {
     }
     catch (e) {
       console.error('Error getting datasets:', e);
-      throw Error;
+      throw e;
     }
   };
 
@@ -158,7 +157,7 @@ const useDownload = () => {
       console.error('Error Downloading Project Properties.', err);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Downloading Project Properties. ' + err));
-      throw Error;
+      throw err;
     }
   };
 
@@ -220,7 +219,7 @@ const useDownload = () => {
     catch (err) {
       console.error(dataset.name, ':', 'Error Downloading Spots.', err);
       dispatch(addedStatusMessage('Error Downloading Spots.' + err));
-      throw Error;
+      throw err;
     }
   };
 
@@ -325,13 +324,8 @@ const useDownload = () => {
     }
     catch (err) {
       console.error('Error Initializing Download.', err);
-      if (Platform.OS === 'web') {
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Error loading project!', err));
-        dispatch(setIsErrorMessagesModalVisible(true));
-      }
-      else dispatch(addedStatusMessage('Download Failed!', err));
-      throw Error;
+      dispatch(addedStatusMessage(`Download Failed!\n\n${err}`));
+      throw err;
     }
     finally {
       isDownloadInFlight = false;

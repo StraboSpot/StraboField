@@ -27,10 +27,12 @@ const MessageModal = () => {
       actionTitle={'Ok'}
       closeModal={closeModal}
       headerTitle={title}
+      isContentSized
       isVisible={isVisible}
       onActionPressed={closeModal}
       overlayStyleOverride={{maxHeight: 300, paddingHorizontal: 0}}
       showCancelButton={false}
+      showCloseButton
     >
       <View style={{alignSelf: 'stretch', flexGrow: 0, paddingHorizontal: 10}}>
         <ScrollView style={{flexGrow: 0}}>

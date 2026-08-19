@@ -5,12 +5,7 @@ import {useDispatch} from 'react-redux';
 
 import useSignIn from './useSignIn';
 import useDownload from '../../services/files/useDownload';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {setLoadingStatus} from '../home/home.slice';
 import {setSelectedProject} from '../project/projects.slice';
 
 const useAutoLogIn = () => {
@@ -34,9 +29,8 @@ const useAutoLogIn = () => {
     }
     catch (err) {
       console.error('Error loading project', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error loading project!'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      // No modal here: rethrowing sends Routes.web to AuthenticationErrorSplashScreen, which replaces the whole
+      // tree, so anything opened now would flash for a frame and vanish. That splash is the report the user sees.
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       throw Error;
     }

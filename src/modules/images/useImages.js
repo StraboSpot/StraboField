@@ -14,12 +14,7 @@ import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {openedMessageModal, setLoadingStatus} from '../home/home.slice';
 import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {
   addedChangedImageId,
@@ -62,10 +57,10 @@ const useImages = () => {
   const deleteImageFromSpot = async (imageId, spotWithImage) => {
     const spotsOnImage = Object.values(spots).filter(spot => spot.properties.image_basemap === imageId);
     if (spotsOnImage && spotsOnImage.length >= 1) {
-      dispatch(clearedStatusMessages());
-      dispatch(
-        addedStatusMessage('Image Basemap contains Spots! \n\nDelete the spots, before trying to delete the image'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({
+        message: 'Delete the spots before trying to delete the image.',
+        title: 'Image Basemap Contains Spots!',
+      }));
       return false;
     }
     else if (spotWithImage) {
@@ -79,9 +74,7 @@ const useImages = () => {
       return true;
     }
     else {
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error deleting image ${imageId}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `Image ${imageId} could not be deleted.`, title: 'Error Deleting Image!'}));
     }
   };
 
@@ -214,9 +207,7 @@ const useImages = () => {
             // launchImageLibrary itself. Uncaught, the Promise never settles and the import hangs.
             // Reported here rather than rejected because the caller does not catch.
             console.error('Error Importing Images:', err);
-            dispatch(clearedStatusMessages());
-            dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-            dispatch(setIsErrorMessagesModalVisible(true));
+            dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
             dispatch(setLoadingStatus({view: 'home', bool: false}));
             res(newImages);  // Keep any images already imported
           }
@@ -250,9 +241,7 @@ const useImages = () => {
     }
     catch (err) {
       console.error(`Error Taking Picture: ${err}`);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       return newImages;  // Keep any photos already taken before the error
     }
@@ -267,9 +256,7 @@ const useImages = () => {
     }
     catch (err) {
       console.error(`Error Taking Picture: ${err}`);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       return [];
     }

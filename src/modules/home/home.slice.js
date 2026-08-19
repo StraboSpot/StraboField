@@ -17,7 +17,6 @@ const initialHomeState = {
   hiddenWarnings: {},
   isBackupModalVisible: false,
   isStatusMessagesModalVisible: false,
-  isErrorMessagesModalVisible: false,
   isProgressModalVisible: false,
   isProjectLoadSelectionModalVisible: false,
   isSessionExpiredModalVisible: false,
@@ -75,9 +74,6 @@ const homeSlice = createSlice({
     setIsWarningHidden(state, action) {
       const {key, isHidden} = action.payload;
       state.hiddenWarnings[key] = isHidden;
-    },
-    setIsErrorMessagesModalVisible(state, action) {
-      state.isErrorMessagesModalVisible = action.payload;
     },
     setGeolocationTimeout(state, action) {
       state.geolocationTimeout = action.payload;
@@ -138,7 +134,6 @@ export const {
   resetHiddenWarnings,
   resetHomeState,
   setIsBackupModalVisible,
-  setIsErrorMessagesModalVisible,
   setGeolocationTimeout,
   setIsMainMenuPanelVisible,
   setIsOfflineMapsModalVisible,

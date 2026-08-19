@@ -5,7 +5,7 @@ import {getBBoxPaddedInPixels, getBoundsPadded, getCoordQuad} from './view.helpe
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {openedMessageModal} from '../../home/home.slice';
 import {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} from '../maps.helpers';
 
 const useMapCoords = () => {
@@ -36,9 +36,7 @@ const useMapCoords = () => {
     }
     catch (error) {
       console.error(error);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Cannot retrieve map\'s bounding box'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: 'Cannot retrieve the bounding box for this map.', title: 'Error!'}));
     }
   };
 

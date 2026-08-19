@@ -17,7 +17,7 @@ import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency} from '../../connections/connections.slice';
 import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import SelectInputField from '../../form/SelectInputField';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
 import {setSelectedProject} from '../projects.slice';
 
@@ -62,11 +62,7 @@ const BackupProject = () => {
       setIsSaveAndExportModalVisible(true);
       setBackupAction(backupActionToSet);
     }
-    else {
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There are no active datasets selected.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
+    else dispatch(openedMessageModal({message: 'There are no active datasets selected.', title: 'Error!'}));
   };
 
   const exportProject = () => checkForActiveDatasets('export');

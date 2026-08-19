@@ -235,8 +235,8 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
       setIsLoadingCircle(false);
       console.log('return_from_mapview_getTileCount: ', tc.count);
     }
-    // No count means the tile-count service failed or returned a message. Show it inline in this modal
-    // rather than closing this modal and opening the global ErrorModal (which iOS drops mid-handoff).
+      // No count means the tile-count service failed or returned a message. Show it inline in this modal
+    // rather than closing this modal and opening the global MessageModal (which iOS drops mid-handoff).
     else {
       setShowMainMenu(false);
       if (tc?.message?.includes('Invalid extent')) {
@@ -311,13 +311,13 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
             {showLoadingMenu && (
               <View style={overlayStyles.overlayContent}>
                 <Text style={overlayStyles.statusMessageText}>{statusMessages}</Text>
-                {statusMessages.includes('Installing tiles...') && !statusMessages.includes(
-                  'Downloading Tiles...') && (
-                  <View>
-                    <Text style={overlayStyles.contentText}>Installing: {tilesToInstall}</Text>
-                    <Text style={overlayStyles.contentText}>Already Installed: {installedTiles}</Text>
-                  </View>
-                )}
+                {statusMessages.includes('Installing tiles...')
+                  && !statusMessages.includes('Downloading Tiles...') && (
+                    <View>
+                      <Text style={overlayStyles.contentText}>Installing: {tilesToInstall}</Text>
+                      <Text style={overlayStyles.contentText}>Already Installed: {installedTiles}</Text>
+                    </View>
+                  )}
               </View>
             )}
             {isError && (
