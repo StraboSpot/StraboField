@@ -16,7 +16,7 @@ import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
-import {setStratSection} from '../maps/maps.slice';
+import {clearedStratSection, setStratSection} from '../maps/maps.slice';
 import useStratSectionCalculations from '../maps/strat-section/useStratSectionCalculations';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -173,9 +173,12 @@ const useSed = () => {
 
   const deleteStratSection = (spot) => {
     let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
+    const deletedStratSectionId = editedSedData.strat_section?.strat_section_id;
     delete editedSedData.strat_section;
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    // If the deleted strat section is the one currently displayed, close its view
+    if (stratSection?.strat_section_id === deletedStratSectionId) dispatch(clearedStratSection());
   };
 
   /* Exported Functions */

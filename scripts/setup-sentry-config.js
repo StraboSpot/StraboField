@@ -1,31 +1,31 @@
 #!/usr/bin/env node
 
 /**
- * This script generates sentry.properties files from env.json
+ * This script generates sentry.properties files from secrets.json
  * Run this before any sentry-cli commands to ensure auth token is current
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Read env.json
-const envPath = path.join(__dirname, '..', 'env.json');
-let env;
+// Read secrets.json
+const secretsPath = path.join(__dirname, '..', 'secrets.json');
+let secrets;
 
 try {
-  env = JSON.parse(fs.readFileSync(envPath, 'utf8'));
+  secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf8'));
 }
 catch (error) {
-  console.error('Error reading env.json:', error.message);
-  console.error('Please create env.json with your Sentry auth token');
+  console.error('Error reading secrets.json:', error.message);
+  console.error('Please create secrets.json with your Sentry auth token');
   process.exit(1);
 }
 
-// Get auth token from env.json
-const authToken = env.sentry_organization_auth_token;
+// Get auth token from secrets.json
+const authToken = secrets.sentry_organization_auth_token;
 
 if (!authToken) {
-  console.error('Error: sentry_organization_auth_token not found in env.json');
+  console.error('Error: sentry_organization_auth_token not found in secrets.json');
   process.exit(1);
 }
 
@@ -46,4 +46,4 @@ const androidPath = path.join(__dirname, '..', 'android', 'sentry.properties');
 fs.writeFileSync(androidPath, sentryPropertiesContent);
 console.log('✓ Generated android/sentry.properties');
 
-console.log('✓ Sentry configuration files updated from env.json');
+console.log('✓ Sentry configuration files updated from secrets.json');
