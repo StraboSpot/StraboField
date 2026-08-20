@@ -113,9 +113,6 @@ const projectSlice = createSlice({
       state.activeDatasetsIds = [];
       state.targetDatasetId = undefined;
     },
-    clearedProject(state) {
-      state.project = {};
-    },
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;
@@ -368,7 +365,6 @@ export const {
   addedTagToSelectedSpot,
   addedTemplates,
   clearedDatasets,
-  clearedProject,
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,

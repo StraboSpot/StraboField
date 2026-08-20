@@ -31,7 +31,7 @@ const LoadTemplatesModal = ({closeModal}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const matchedTemplates = useSelector(state => state.project.project?.templates) || {};
+  const currentTemplates = useSelector(state => state.project.project?.templates) || {};
   const projectSaveStatus = useSelector(state => state.connections.projectSaveStatus);
 
   const {safePick} = useSafeDocumentPicker();
@@ -122,7 +122,7 @@ const LoadTemplatesModal = ({closeModal}) => {
         return failValidation(`The selected file isn't a ${title} backup.`);
       }
 
-      const {mergedTemplates, newCount, mergedCount} = mergeTemplates(matchedTemplates, importedTemplates);
+      const {mergedTemplates, newCount, mergedCount} = mergeTemplates(currentTemplates, importedTemplates);
       // A JSON object with no template-shaped keys merges to nothing — a wrong pick, not an empty import
       if (newCount === 0 && mergedCount === 0) return failValidation(`The selected file has no ${title} in it.`);
 

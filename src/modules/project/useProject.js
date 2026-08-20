@@ -49,7 +49,7 @@ const useProject = () => {
   const createProject = async (descriptionData) => {
     const newDate = new Date().toISOString();
     const id = getNewId();
-    const currentProject = {
+    const newProject = {
       id: id,
       description: descriptionData,
       date: newDate,
@@ -59,7 +59,7 @@ const useProject = () => {
       templates: {},
       useContinuousTagging: false,
     };
-    dispatch(addedProjectDescription(currentProject));
+    dispatch(addedProjectDescription(newProject));
     const defaultDataset = createDataset();
     dispatch(addedDataset(defaultDataset));
   };

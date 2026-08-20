@@ -14,7 +14,7 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const currentProject = useSelector(state => state.project.project);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const {initializeBackup, zipAndExportProjectFolder} = useExport();
 
@@ -27,8 +27,8 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupOptions, setBackupOptions] = useState({images: true, offlineTiles: true, customMaps: true});
 
-  const defaultFileName = selectedFilename || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
-    + currentProject.description.project_name).replace(/\s/g, '');
+  const defaultFileName = selectedFilename
+    || (moment(new Date()).format('YYYY-MM-DD_hmma') + '_' + projectName).replace(/\s/g, '');
 
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);

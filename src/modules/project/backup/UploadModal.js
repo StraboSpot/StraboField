@@ -9,7 +9,6 @@ import uploadModalStyles from './uploadModal.styles';
 import useUpload from '../../../services/files/useUpload';
 import useUploadImages from '../../../services/files/useUploadImages';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
@@ -25,9 +24,9 @@ const UploadModal = ({closeModal, isVisible}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
   const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
@@ -211,9 +210,7 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   const renderInitialUploadView = () => (
     <View>
-      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
-        {!isEmpty(currentProject) && currentProject.description?.project_name}
-      </Text>
+      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>{projectName}</Text>
       {endpoint.isSelected ? <Text style={commonStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
         : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
       <Spacer/>
