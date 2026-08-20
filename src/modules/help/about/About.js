@@ -24,21 +24,14 @@ const isVersionAtMost = (a, b) => {
 const About = () => {
   const [isReleaseNotesVisible, setIsReleaseNotesVisible] = useState(false);
 
-  // Only show notes for versions at or below the running build (guards against the bundled file
-  // getting ahead of the app during an rc). In dev builds, also show the not-yet-shipped entries
-  // (flagged "unreleased") so we can preview the next version's highlights. Grouped by minor series.
-  const versionGroups = RELEASE_NOTES
+  // Only show notes for releases at or below the running build (guards against the bundled file
+  // getting ahead of the app during an rc). In dev builds, also show the not-yet-shipped release
+  // (flagged "unreleased") so we can preview the next version's highlights.
+  const releases = RELEASE_NOTES
     .filter(entry => __DEV__ || isVersionAtMost(entry.version, VERSION_NUMBER))
-    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}))
-    .reduce((groups, entry) => {
-      const series = `${entry.version.split('.').slice(0, 2).join('.')}.x`;
-      const group = groups.find(g => g.series === series);
-      if (group) group.versions.push(entry);
-      else groups.push({series, versions: [entry]});
-      return groups;
-    }, []);
+    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}));
 
-  const hasReleaseNotes = versionGroups.length > 0;
+  const hasReleaseNotes = releases.length > 0;
 
   // Give each bullet's lead-in (the text before the first colon) a medium weight so it stands out
   // without competing with the version headers. Bullets with no colon render as plain text.
@@ -113,26 +106,25 @@ const About = () => {
         showCloseButton
       >
         <View style={styles.releaseNotesContainer}>
-          {versionGroups.map(group => (
-            <View key={group.series}>
-              <Text style={styles.releaseSeriesHeading}>{group.series} New Features</Text>
-              {group.versions.map(entry => (
-                <View key={entry.version} style={styles.releaseVersionSection}>
-                  <Text style={styles.releaseVersionHeading}>
-                    {entry.version}
-                    {entry.isUnreleased && <Text style={styles.releaseUnreleasedTag}>{'  · unreleased'}</Text>}
-                  </Text>
-                  {entry.highlights.length === 0
-                    ? <Text style={styles.releaseNoteEmpty}>No user-facing highlights</Text>
-                    : entry.highlights.map((highlight, index) => (
+          {releases.map(release => (
+            <View key={release.version} style={styles.releaseVersionSection}>
+              <Text style={styles.releaseSeriesHeading}>
+                {release.version} New Features
+                {release.isUnreleased && <Text style={styles.releaseUnreleasedTag}>{'  · unreleased'}</Text>}
+              </Text>
+              {release.groups.length === 0
+                ? <Text style={styles.releaseNoteEmpty}>No user-facing highlights</Text>
+                : release.groups.map(group => (
+                  <View key={group.title} style={styles.releaseGroup}>
+                    <Text style={styles.releaseGroupHeading}>{group.title}</Text>
+                    {group.items.map((highlight, index) => (
                       <View key={index} style={styles.releaseNoteRow}>
                         <Text style={styles.releaseNoteBullet}>{'•'}</Text>
                         <Text style={styles.releaseNoteText}>{renderHighlight(highlight.text)}</Text>
                         {highlight.commit && (
                           <TouchableOpacity
                             hitSlop={{bottom: 8, left: 8, right: 8, top: 8}}
-                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {
-                            })}
+                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {})}
                             style={styles.commitLink}
                           >
                             <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
@@ -140,8 +132,8 @@ const About = () => {
                         )}
                       </View>
                     ))}
-                </View>
-              ))}
+                  </View>
+                ))}
             </View>
           ))}
         </View>

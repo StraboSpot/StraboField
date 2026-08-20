@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 
-import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE, MEDIUMGREY, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
+import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE, MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE}
+  from '../../../shared/styles.constants';
 
 const styles = StyleSheet.create({
   bold: {
@@ -31,6 +32,17 @@ const styles = StyleSheet.create({
     fontSize: MEDIUM_TEXT_SIZE,
     lineHeight: 22,
     marginBottom: 24,
+  },
+  releaseGroup: {
+    marginBottom: 14,
+  },
+  releaseGroupHeading: {
+    color: PRIMARY_ACCENT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+    textTransform: 'uppercase',
   },
   releaseNoteBullet: {
     fontSize: MEDIUM_TEXT_SIZE,
@@ -75,11 +87,6 @@ const styles = StyleSheet.create({
     color: PRIMARY_ACCENT_COLOR,
     fontStyle: 'italic',
     fontWeight: '400',
-  },
-  releaseVersionHeading: {
-    fontSize: MEDIUM_TEXT_SIZE,
-    fontWeight: '700',
-    marginBottom: 6,
   },
   releaseVersionSection: {
     marginBottom: 16,
