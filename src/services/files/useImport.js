@@ -11,7 +11,6 @@ import {
   addedDatasets,
   addedProject,
   setActiveDatasets,
-  setSelectedProject,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
@@ -197,7 +196,6 @@ const useImport = () => {
       const loadedProject = await loadProjectData(JSON.parse(fileContent));
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Project loaded.'));
-      dispatch(setSelectedProject({project: '', source: ''}));
       dispatch(addedStatusMessage('Complete!'));
       return {project: loadedProject};
     }
@@ -217,7 +215,6 @@ const useImport = () => {
       dispatch(addedStatusMessage('Importing image files...'));
       await copyImages(selectedProject);
       await checkForMaps(dataFile, selectedProject, isExternal);
-      dispatch(setSelectedProject({project: '', source: ''}));
       dispatch(addedStatusMessage('Complete!'));
       return {project: loadedProject};
     }

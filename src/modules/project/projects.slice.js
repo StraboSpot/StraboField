@@ -28,10 +28,6 @@ const initialProjectState = {
   project: {},
   projectTransferProgress: 0,
   readOnlyDatasetsIds: [],
-  selectedProject: {
-    project: '',
-    source: '',
-  },
   selectedTag: {},
   targetDatasetId: undefined,
 };
@@ -297,11 +293,6 @@ const projectSlice = createSlice({
       }
       else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
     },
-    setSelectedProject(state, action) {
-      const {project, source} = action.payload;
-      state.selectedProject.project = project;
-      state.selectedProject.source = source;
-    },
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
@@ -398,7 +389,6 @@ export const {
   setIsImageTransferring,
   setMultipleFeaturesTaggingEnabled,
   setReadOnlyDatasetsIds,
-  setSelectedProject,
   setSelectedTag,
   setTargetDataset,
   setTestingMode,

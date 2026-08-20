@@ -19,7 +19,6 @@ import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import SelectInputField from '../../form/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
-import {setSelectedProject} from '../projects.slice';
 
 const BackupProject = () => {
   console.log('Rendering BackupProject...');
@@ -50,10 +49,7 @@ const BackupProject = () => {
 
   /* Event Handlers */
 
-  const onUpload = () => {
-    dispatch(setSelectedProject({source: '', project: ''}));
-    setIsUploadModalVisible(true);
-  };
+  const onUpload = () => setIsUploadModalVisible(true);
 
   /* Logic Helpers */
 

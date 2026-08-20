@@ -9,7 +9,6 @@ import useExport from '../../../services/files/useExport';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
-import {setSelectedProject} from '../projects.slice';
 
 const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilename}) => {
   /* Data Hooks */
@@ -101,7 +100,6 @@ const SaveAndExportModal = ({backupAction, closeModal, isVisible, selectedFilena
       setBackingUpStatus('inProgress');
       setModalTitle('Saving Project');
       await initializeBackup(backupFileName, backupOptions);
-      dispatch(setSelectedProject({source: '', project: {fileName: backupFileName}}));
       setBackingUpStatus('complete');
       setModalTitle('Project Saved!');
     }

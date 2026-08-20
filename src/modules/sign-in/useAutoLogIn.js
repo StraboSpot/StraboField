@@ -6,7 +6,6 @@ import {useDispatch} from 'react-redux';
 import useSignIn from './useSignIn';
 import useDownload from '../../services/files/useDownload';
 import {setLoadingStatus} from '../home/home.slice';
-import {setSelectedProject} from '../project/projects.slice';
 
 const useAutoLogIn = () => {
   /* Data Hooks */
@@ -55,7 +54,6 @@ const useAutoLogIn = () => {
         const password = credentials.split('*****')[1];
         console.log('Got Credentials:', credentialsEncoded, '\nGot Project Id:', projectId);
         await signIn(email, password);
-        dispatch(setSelectedProject({project: {id: projectId}, source: ''}));
         const newEncodedLogin = Base64.encode(email + ':' + password);
         await loadProjectWeb(projectId, newEncodedLogin);
       }
