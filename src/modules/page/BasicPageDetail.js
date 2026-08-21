@@ -43,7 +43,7 @@ const BasicPageDetail = ({
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
   const {onSampleFormChange} = useSamples();
   const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
@@ -200,8 +200,8 @@ const BasicPageDetail = ({
 
   const saveFeature = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      const editedFeatureData = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      const {errors, values: editedFeatureData} = await submitAndShowErrors(formRef.current || formCurrent,
+        isEmpty(formRef.current));
       console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
@@ -217,6 +217,8 @@ const BasicPageDetail = ({
         }
         await checkSampleName(editedFeatureData.sample_id_name);
       }
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
     }
     catch (err) {
       console.error('Error saving', pageKey, err);
@@ -231,17 +233,19 @@ const BasicPageDetail = ({
         await updateIGSNAndShowModal(formCurrent);
         return;
       }
+      let errors;
       if (groupKey === 'pet') {
-        await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
       }
       else if (groupKey === 'sed' && pageKey === 'bedding') {
-        await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
       }
       else if (groupKey === 'sed') {
-        await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
       }
-      else await saveFeature(formCurrent);
-      if (Platform.OS !== 'web') toast.show('Changes Saved', {type: 'success'});
+      else errors = await saveFeature(formCurrent);
+      // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
+      if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Changes Saved', {type: 'success'});
       closeDetailView();
       console.log('Done');
     }
@@ -252,8 +256,7 @@ const BasicPageDetail = ({
   };
 
   const saveTemplateForm = async (formCurrent) => {
-    await formCurrent.submitForm();
-    const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isEmpty(formRef.current));
     saveTemplate(formValues);
   };
 
@@ -281,20 +284,19 @@ const BasicPageDetail = ({
         >
           {formProps => (
             <>
-              <Form {...{
-                ...formProps,
-                formName: formName,
-                isReadOnly: isReadOnly,
-                onMyChange: page.key === PAGE_KEYS.MINERALS
+              <Form
+                {...formProps}
+                formName={formName}
+                getIsDisabled={getIsDisabled}
+                isReadOnly={isReadOnly}
+                onMyChange={page.key === PAGE_KEYS.MINERALS
                   ? ((name, value) => onMineralChange(formRef.current, name, value))
                   : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
                     ? ((name, value) => onSedFormChange(formRef.current, name, value))
                     : page.key === PAGE_KEYS.SAMPLES
                       ? ((name, value) => onSampleFormChange(formRef.current, name, value))
-                      : undefined
-                ,
-                getIsDisabled: getIsDisabled,
-              }}/>
+                      : undefined}
+              />
             </>
           )}
         </Formik>

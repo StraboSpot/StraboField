@@ -38,7 +38,7 @@ const UserProfile = () => {
   const isConnectionAvailable = useIsConnectionAvailable();
   const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
-  const {hasErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
   const toast = useToast();
   const {uploadProfile} = useUpload();
@@ -138,9 +138,10 @@ const UserProfile = () => {
 
   const saveForm = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      let newValues = JSON.parse(JSON.stringify(formCurrent.values));
-      if (hasErrors(formCurrent)) throw Error('Error in form.');
+      // Only ever called from doCleanup as the page closes, so keep the valid fields and roll back just the
+      // bad ones rather than discarding the whole edit on a page the user is already leaving.
+      const {values: formValues} = await submitAndShowErrors(formCurrent, true);
+      const newValues = JSON.parse(JSON.stringify(formValues));
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
@@ -246,15 +247,17 @@ const UserProfile = () => {
           ListHeaderComponent={
             <>
               <Formik
-                component={formProps => Form(
-                  {formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
                 enableReinitialize={true}  // Update values if preferences change while form open
                 initialValues={userData}
                 innerRef={formRef}
                 onSubmit={values => console.log('Submitting form...', values)}
                 validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
                 validateOnChange={true}
-              />
+              >
+                {formProps => (
+                  <Form {...formProps} formName={USER_CONVENTIONS_FORM_NAME} getIsDisabled={getIsDisabled}/>
+                )}
+              </Formik>
               {renderMeasurementInputDefault()}
               {renderUtmDisplay()}
               {renderBulkUpdatesSection()}

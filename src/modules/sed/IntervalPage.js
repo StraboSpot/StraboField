@@ -93,7 +93,7 @@ const IntervalPage = ({isReadOnly, page}) => {
         validate={values => validateForm({formName: formName, values: values})}
         validateOnChange={false}
       >
-        {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
+        {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
       </Formik>
     </View>
   );

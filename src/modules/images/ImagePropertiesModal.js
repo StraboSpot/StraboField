@@ -13,7 +13,7 @@ import {formStyles, Form, useForm} from '../form';
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
   /* Data Hooks */
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {height: windowHeight} = useWindowDimensions();
 
   /* Local State */
@@ -26,8 +26,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
 
   const saveFormAndGo = async () => {
     try {
-      await formRef.current.submitForm();
-      let formValues = showErrors(formRef.current);
+      let {values: formValues} = await submitAndShowErrors(formRef.current);
       if (isAnnotated) formValues = {...formValues, annotated: isAnnotated};
       else if (formValues.annotated) delete formValues.annotated;
       setImageToView(formValues);
@@ -51,8 +50,14 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       onSubmit={() => console.log('Submitting form...')}
       validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
     >
-      {formProps => <Form formName={IMAGE_PROPERTIES_FORM_NAME} isReadOnly={isReadOnly}
-                          renderInline={isInline} {...formProps}/>}
+      {formProps => (
+        <Form
+          {...formProps}
+          formName={IMAGE_PROPERTIES_FORM_NAME}
+          isReadOnly={isReadOnly}
+          renderInline={isInline}
+        />
+      )}
     </Formik>
   );
 

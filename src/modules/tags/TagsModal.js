@@ -141,18 +141,19 @@ const TagsModal = ({
             {() => (
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                      tagType => ({label: getTagLabel(tagType), value: tagType}))}
-                    component={formProps => (
-                      SelectInputField(
-                        {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+                  <Field key={'searchText'} name={'searchText'}>
+                    {({field, form}) => (
+                      <SelectInputField
+                        {...field}
+                        choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                          tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                        errors={form.errors}
+                        label={'Tag Type'}
+                        setFieldValue={form.setFieldValue}
+                        single={true}
+                      />
                     )}
-                    key={'searchText'}
-                    label={'Tag Type'}
-                    name={'searchText'}
-                    single={true}
-                  />
+                  </Field>
                 </ListItem.Content>
               </ListItem>
             )}

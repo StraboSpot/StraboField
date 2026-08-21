@@ -23,7 +23,7 @@ const AddLine = ({formName, formProps, isManualMeasurement, isPlanarLinear, setC
   return (
     <>
       {!isManualMeasurement && !isPlanarLinear && (
-        <Form {...{formName: formName, surveyFragment: firstKeysFields, ...updatedFormProps}}/>
+        <Form {...updatedFormProps} formName={formName} surveyFragment={firstKeysFields}/>
       )}
       <MainButtons
         formName={formName}
@@ -33,12 +33,12 @@ const AddLine = ({formName, formProps, isManualMeasurement, isPlanarLinear, setC
         subkey={isPlanarLinear && 'associated_orientation'}
       />
       <LittleSpacer/>
-      <Form {...{
-        formName: formName,
-        surveyFragment: lastKeysFields,
-        subkey: isPlanarLinear && 'associated_orientation',
-        ...updatedFormProps,
-      }}/>
+      <Form
+        {...updatedFormProps}
+        formName={formName}
+        subkey={isPlanarLinear && 'associated_orientation'}
+        surveyFragment={lastKeysFields}
+      />
     </>
   );
 };

@@ -25,7 +25,7 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -70,8 +70,7 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
 
   const saveForm = async (currentForm) => {
     try {
-      await currentForm.submitForm();
-      const editedOutcropSummaryData = showErrors(currentForm);
+      const {values: editedOutcropSummaryData} = await submitAndShowErrors(currentForm);
       const spotId = spot.properties.id;
       // An empty form saves an empty array, which removes the property from the Spot
       const editedOutcropSummaries = isEmpty(editedOutcropSummaryData) ? []
@@ -121,7 +120,7 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+        {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
       </Formik>
     );
   };

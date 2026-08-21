@@ -13,7 +13,7 @@ const usePetrology = () => {
 
   const dispatch = useDispatch();
 
-  const {getLabel, getLabels, getSurvey, showErrors} = useForm();
+  const {getLabel, getLabels, getSurvey, submitAndShowErrors} = useForm();
 
   /* Exported Functions */
 
@@ -83,8 +83,7 @@ const usePetrology = () => {
 
   const savePetFeature = async (key, spot, formCurrent, isLeavingPage) => {
     try {
-      await formCurrent.submitForm();
-      const editedFeatureData = showErrors(formCurrent, isLeavingPage);
+      const {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
       console.log('Saving', key, 'data to Spot ...');
       const spotId = spot.properties.id;
       if (editedFeatureData.rock_type && (key === PAGE_KEYS.ROCK_TYPE_IGNEOUS
@@ -101,6 +100,8 @@ const usePetrology = () => {
         dispatch(editedSpotProperties({field: 'pet', value: editedPetData, spotId: spotId}));
       }
       // await formCurrent.resetForm();
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
     }
     catch (err) {
       console.error('Error saving', key, err);

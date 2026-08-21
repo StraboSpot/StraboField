@@ -40,11 +40,12 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
         onCancelPress={() => setChoicesViewKey(null)}
       >
         <Text style={{textAlign: 'center'}}>This is a placeholder for the subform</Text>
-        <Form {...{
-          formName: REPORT_FORM_NAME,
-          surveyFragment: relevantFields, ...formProps,
-          onMyChange: onMyChange,
-        }}/>
+        <Form
+          {...formProps}
+          formName={REPORT_FORM_NAME}
+          onMyChange={onMyChange}
+          surveyFragment={relevantFields}
+        />
       </ModalWrapper>
     );
   };
@@ -61,7 +62,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
     >
       {formProps => (
         <View style={{flex: 1}}>
-          <Form {...{formName: REPORT_FORM_NAME, surveyFragment: mainFormKeysFields, ...formProps}}/>
+          <Form {...formProps} formName={REPORT_FORM_NAME} surveyFragment={mainFormKeysFields}/>
           {choicesViewKey && renderSubform(formProps)}
         </View>
       )}

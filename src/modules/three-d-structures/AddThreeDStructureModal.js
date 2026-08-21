@@ -28,7 +28,7 @@ const AddThreeDStructureModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors, validateForm} = useForm();
 
   /* Local State */
 
@@ -76,8 +76,7 @@ const AddThreeDStructureModal = () => {
 
   const save3DStructure = async () => {
     try {
-      await formRef.current.submitForm();
-      const edited3DStructureData = showErrors(formRef.current);
+      const {values: edited3DStructureData} = await submitAndShowErrors(formRef.current);
       console.log('Saving 3D Structure data to Spot ...');
       let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
         : [];
@@ -189,7 +188,7 @@ const AddThreeDStructureModal = () => {
         relevantFields = [survey.find(f => f.name === choicesViewKey)];
       }
       return (
-        <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
+        <Form {...formProps} formName={[groupKey, formRef.current?.values?.type]} surveyFragment={relevantFields}/>
       );
     }
   };

@@ -148,7 +148,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
                   save={() => saveStratSection(formProps)}
                 />
               )}
-              <Form {...{...formProps, formName: stratSectionFormName, isReadOnly: isReadOnly}}/>
+              <Form {...formProps} formName={stratSectionFormName} isReadOnly={isReadOnly}/>
             </>
           )}
         </Formik>

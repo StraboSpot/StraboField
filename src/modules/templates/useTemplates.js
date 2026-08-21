@@ -12,7 +12,7 @@ const useTemplates = () => {
   const dispatch = useDispatch();
   const templates = useSelector(state => state.project.project?.templates);
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
 
   /* Exported Functions */
 
@@ -51,8 +51,7 @@ const useTemplates = () => {
       throw Error('Template name is empty.');
     }
     else {
-      await formCurrent.submitForm();
-      const values = showErrors(formCurrent);
+      const {values: values} = await submitAndShowErrors(formCurrent);
       const templatesForKey = templateKey === 'measurementTemplates' ? templates[templateKey]
         : templates[templateKey]?.templates;
       let existingTemplatesCopy = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];

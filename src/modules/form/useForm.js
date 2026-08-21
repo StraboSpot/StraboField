@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import {convertXLSFormLogicToJS, isRequired} from './form.helpers';
+import {getConstraintError, getLogicFunction, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
@@ -93,14 +93,8 @@ const useForm = () => {
 
   // Determine if the field should be shown or not by looking at the relevant key-value pair
   const isRelevant = (field, values) => {
-    //console.log('values', values);
     if (isEmpty(field.relevant)) return true;
-    const relevantLogicJS = convertXLSFormLogicToJS(field.relevant);
-    // console.log(field.name, 'relevant:', relevantLogicJS);
-
-    // eslint-disable-next-line no-new-func -- required for dynamic evaluation of XLSForm logic strings
-    const F = new Function('values', 'return ' + relevantLogicJS);
-    return F(values);
+    return getLogicFunction(field.relevant)(values);
   };
 
   // Remove errors from data, if any, and show alert. Throw error if not leaving page.
@@ -110,15 +104,40 @@ const useForm = () => {
     const formName = form.status?.formName || [];
     if (hasErrors(form)) {
       const errorMessages = Object.entries(errors).map(([key, value]) => {
+        // A subkey'd field is keyed by its path, e.g. associated_orientation[0].plunge. Label it by both halves,
+        // and skip the reversion below, which only reaches top-level fields.
+        if (key.includes('[0].')) {
+          const [subkey, fieldName] = key.split('[0].');
+          return getLabel(subkey, formName) + ' ' + getLabel(fieldName, formName) + ': ' + value;
+        }
         if (form.initialValues[key]) formValues[key] = form.initialValues[key];
         else delete formValues[key];
         return getLabel(key, formName) + ': ' + value;
       });
-      alert('Error Saving', 'Errors found in following fields. Unable to save these changes.'
-        + ' Please fix the following errors.\n\n' + errorMessages.join('\n'));
+      // The two paths have different outcomes, so say which one happened: leaving the page keeps the rest of the
+      // form and only rolls the bad fields back, while staying on it throws below and saves nothing at all.
+      if (isLeavingPage) {
+        alert('Some Changes Not Saved', 'These fields have errors and were reset to their previous values.'
+          + ' Your other changes were saved.\n\n' + errorMessages.join('\n'));
+      }
+      else {
+        alert('Error Saving', 'Errors found in the following fields. Your changes were not saved.'
+          + ' Please fix them and try again.\n\n' + errorMessages.join('\n'));
+      }
       if (!isLeavingPage) throw Error('Found validation errors.');  // If we don't want user to leave the page throw Error
     }
     return formValues;
+  };
+
+  // Submit a form and report its errors the way showErrors does, returning both the errors and the values to save.
+  // Ask Formik for the errors rather than reading form.errors, which innerRef only refreshes on commit — straight
+  // after awaiting submitForm they are still the previous render's, which let a value typed and saved without
+  // leaving the field validate against errors from before it was typed. Callers need them because the
+  // isLeavingPage path alerts without throwing and saves the valid fields, so only they know if the save was whole.
+  const submitAndShowErrors = async (form, isLeavingPage) => {
+    await form.submitForm();
+    const errors = await form.validateForm();
+    return {errors: errors, values: showErrors({...form, errors: errors}, isLeavingPage)};
   };
 
   const validateForm = ({formName, values}) => {
@@ -143,50 +162,8 @@ const useForm = () => {
         if (key === 'end_date' && Date.parse(values.start_date) > Date.parse(values.end_date)) {
           errors[key] = fieldModel.constraint_message;
         }
-        if (fieldModel.constraint) {
-          // Max constraint
-          // Look for <= in constraint, followed by a space and then any number of digits (- preceding the digits is optional)
-          let regexMax = /<=\s(-?\d*)/i;
-          let parsedMaxConstraint = fieldModel.constraint.match(regexMax);
-          if (parsedMaxConstraint) {
-            let max = parseFloat(parsedMaxConstraint[1]);
-            if (!isEmpty(max) && !(values[key] <= max)) {
-              errors[key] = fieldModel.constraint_message || 'Value over max of ' + max;
-            }
-          }
-          else {
-            // Look for < in constraint
-            regexMax = /<\s(-?\d*)/i;
-            parsedMaxConstraint = fieldModel.constraint.match(regexMax);
-            if (parsedMaxConstraint) {
-              let max = parseFloat(parsedMaxConstraint[1]);
-              if (!isEmpty(max) && !(values[key] < max)) {
-                errors[key] = fieldModel.constraint_message || 'Value over max of ' + max;
-              }
-            }
-          }
-          // Min constraint
-          // Look for <= in constraint, followed by a space and then any number of digits (- preceding the digits is optional)
-          let regexMin = />=\s(-?\d*)/i;
-          let parsedMinConstraint = fieldModel.constraint.match(regexMin);
-          if (parsedMinConstraint) {
-            let min = parseFloat(parsedMinConstraint[1]);
-            if (!isEmpty(min) && !(values[key] >= min)) {
-              errors[key] = fieldModel.constraint_message || 'Value below min of ' + min;
-            }
-          }
-          else {
-            // Look for < in constraint
-            regexMin = />\s(-?\d*)/i;
-            parsedMinConstraint = fieldModel.constraint.match(regexMin);
-            if (parsedMinConstraint) {
-              let min = parseFloat(parsedMinConstraint[1]);
-              if (!isEmpty(min) && !(values[key] > min)) {
-                errors[key] = fieldModel.constraint_message || 'Value below min of ' + min;
-              }
-            }
-          }
-        }
+        const constraintError = getConstraintError(fieldModel, values[key]);
+        if (constraintError) errors[key] = constraintError;
       }
     });
     console.log('values after validation:', values, 'Errors:', errors);
@@ -204,6 +181,7 @@ const useForm = () => {
     hasErrors,
     isRelevant,
     showErrors,
+    submitAndShowErrors,
     validateForm,
   };
 };

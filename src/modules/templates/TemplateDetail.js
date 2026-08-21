@@ -131,7 +131,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
           validate={values => validateForm({formName: formName, values: values})}
           validateOnChange={true}
         >
-          {formProps => <Form {...{...formProps, formName: formName, renderInline: true}}/>}
+          {formProps => <Form {...formProps} formName={formName} renderInline={true}/>}
         </Formik>
         {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
       </FormFlatList>

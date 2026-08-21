@@ -54,7 +54,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
         mainKeys={SAMPLE_TYPE_KEY}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form formName={SAMPLE_FORM_NAME} surveyFragment={firstKeysFields} {...formProps}/>
+      <Form {...formProps} formName={SAMPLE_FORM_NAME} surveyFragment={firstKeysFields}/>
       <FormSlider
         choices={choices}
         fieldKey={SAMPLE_INPLACENESS_KEY}
@@ -75,7 +75,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
   );
 
   const renderSubform = formProps => (
-    <Form formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)} {...formProps}/>
+    <Form {...formProps} formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)}/>
   );
 
   /* View */

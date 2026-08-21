@@ -36,7 +36,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {deleteImageFromSpot} = useImages();
   const {getPopulatedPagesKeys} = usePage();
   const {getSpotByImageId} = useSpots();
@@ -152,8 +152,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const saveForm = async () => {
     try {
-      await formRef.current.submitForm();
-      const formValues = showErrors(formRef.current);
+      const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving form data to Spot ...');
       if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString') {
         const traceValues = {...formValues, 'trace_feature': true};
@@ -313,14 +312,15 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         <FlatList
           ListHeaderComponent={
             <Formik
-              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
               enableReinitialize={true}
               initialStatus={{formName: formName}}
               initialValues={initialValues}
               innerRef={formRef}
               onSubmit={onSubmitForm}
               validate={values => validateForm({formName: formName, values: values})}
-            />
+            >
+              {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
+            </Formik>
           }
         />
       </View>

@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
 import {FormFlatList} from '../../shared/ui';
 
 const formName = ['settings', 'project_settings'];
@@ -25,9 +26,13 @@ const ProjectPrivacy = () => {
 
   /* Event Handlers */
 
+  // This form writes on every change, so an invalid value must not reach the project. Ask Formik to validate
+  // rather than reading form.errors, which lags a render behind, and skip the write while anything is invalid.
+  // The field shows its own error inline, so nothing needs alerting — and alerting per keystroke would be unusable.
   const onMyChange = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
-    await formRef.current.submitForm();
+    const errors = await formRef.current.validateForm();
+    if (!isEmpty(errors)) return;
     const updatedValues = {...formRef.current.values, [name]: value};
     console.log('Saving privacy preferences to Project ...', updatedValues);
     dispatch(updatedProject({field: 'preferences', value: updatedValues}));
@@ -46,13 +51,15 @@ const ProjectPrivacy = () => {
         validate={values => validateForm({formName: formName, values: values})}
         validateOnChange={false}
       >
-        {formProps => <Form {...{
-          ...formProps,
-          formName: formName,
-          onMyChange: onMyChange,
-          renderInline: true,
-          setFieldValue: onMyChange,
-        }}/>}
+        {formProps => (
+          <Form
+            {...formProps}
+            formName={formName}
+            onMyChange={onMyChange}
+            renderInline={true}
+            setFieldValue={onMyChange}
+          />
+        )}
       </Formik>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>

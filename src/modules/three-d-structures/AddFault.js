@@ -27,7 +27,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
@@ -47,7 +47,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
         mainKeys={ADD_FAULT_SECOND_BUTTON_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       {isFaultMeasurementsModalVisible && (
         <MeasurementModal
           formName={formName}

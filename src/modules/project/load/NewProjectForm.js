@@ -25,7 +25,7 @@ const NewProjectForm = ({openMainMenuPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {initializeNewProject} = useProject();
 
   /* Local State */
@@ -36,8 +36,7 @@ const NewProjectForm = ({openMainMenuPanel}) => {
 
   const saveForm = async () => {
     try {
-      await formRef.current.submitForm();
-      const formValues = showErrors(formRef.current);
+      const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving form...');
       await initializeNewProject(formValues);
       console.log('New Project created', formValues.project_name);
@@ -59,14 +58,15 @@ const NewProjectForm = ({openMainMenuPanel}) => {
     console.log('Rendering form:', PROJECT_DESCRIPTION_FORM_NAME.join('.'), 'with values:', initialValues);
     return (
       <Formik
-        component={formProps => Form({...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME})}
         enableReinitialize={false}
         initialStatus={{formName: PROJECT_DESCRIPTION_FORM_NAME}}
         initialValues={initialValues}
         innerRef={formRef}
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
-      />
+      >
+        {formProps => <Form {...formProps} formName={PROJECT_DESCRIPTION_FORM_NAME}/>}
+      </Formik>
     );
   };
 

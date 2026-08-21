@@ -43,7 +43,7 @@ const UserProfile = () => {
   const connectionTargetText = useConnectionTargetText();
   const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
   const {downloadUserProfile} = useDownload();
-  const {hasErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {hasCameraPermission} = usePermissions();
   const {deleteProfileImage} = useServerRequests();
   const toast = useToast();
@@ -141,9 +141,10 @@ const UserProfile = () => {
 
   const saveForm = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      let newValues = JSON.parse(JSON.stringify(formCurrent.values));
-      if (hasErrors(formCurrent)) throw Error('Error in form.');
+      // Only ever called from doCleanup as the page closes, so keep the valid fields and roll back just the
+      // bad ones rather than discarding the whole edit on a page the user is already leaving.
+      const {values: formValues} = await submitAndShowErrors(formCurrent, true);
+      const newValues = JSON.parse(JSON.stringify(formValues));
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
@@ -245,14 +246,15 @@ const UserProfile = () => {
                   <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
                 </View>
                 <Formik
-                  component={formProps => Form({formName: formName, getIsDisabled: getIsDisabled, ...formProps})}
                   enableReinitialize={true}  // Update values if preferences change while form open
                   initialValues={userData}
                   innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
                   validate={values => validateForm({formName: formName, values: values})}
                   validateOnChange={true}
-                />
+                >
+                  {formProps => <Form {...formProps} formName={formName} getIsDisabled={getIsDisabled}/>}
+                </Formik>
                 {isConnectionAvailable ? (
                   <View style={userStyles.saveButtonContainer}>
                     {Platform.OS !== 'web' && (

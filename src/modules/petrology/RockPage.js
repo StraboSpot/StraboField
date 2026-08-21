@@ -171,16 +171,18 @@ const RockPage = ({isReadOnly, page}) => {
       >
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
-              component={formProps => (
-                SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+            <Field key={'spot_id_for_pet_copy'} name={'spot_id_for_pet_copy'}>
+              {({field, form}) => (
+                <SelectInputField
+                  {...field}
+                  choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                  errors={form.errors}
+                  label={label}
+                  setFieldValue={form.setFieldValue}
+                  single={true}
+                />
               )}
-              key={'spot_id_for_pet_copy'}
-              label={label}
-              name={'spot_id_for_pet_copy'}
-              single={true}
-            />
+            </Field>
           </ListItem.Content>
         </ListItem>
       </Formik>

@@ -27,7 +27,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -75,8 +75,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
 
   const saveForm = async (currentForm) => {
     try {
-      await currentForm.submitForm();
-      const editedSiteSafetyFormData = showErrors(currentForm);
+      const {values: editedSiteSafetyFormData} = await submitAndShowErrors(currentForm);
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
@@ -123,7 +122,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: formName, values: values})}
       >
-        {formProps => <Form {...{...formProps, formName: formName, isReadOnly: isReadOnly}}/>}
+        {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
       </Formik>
     );
   };

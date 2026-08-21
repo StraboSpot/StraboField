@@ -78,20 +78,23 @@ const ProjectDescription = () => {
   return (
     <FormFlatList>
       <Formik
-        component={formProps => Form({
-          ...formProps,
-          formName: PROJECT_DESCRIPTION_FORM_NAME,
-          onMyChange: onMyChange,
-          renderInline: true,
-          setFieldValue: onMyChange,
-        })}
         enableReinitialize={true}
         initialValues={projectDescription}
         innerRef={descriptionFormRef}
         onSubmit={values => console.log('Submitting form...', values)}
         validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
         validateOnChange={true}
-      />
+      >
+        {formProps => (
+          <Form
+            {...formProps}
+            formName={PROJECT_DESCRIPTION_FORM_NAME}
+            onMyChange={onMyChange}
+            renderInline={true}
+            setFieldValue={onMyChange}
+          />
+        )}
+      </Formik>
     </FormFlatList>
   );
 };

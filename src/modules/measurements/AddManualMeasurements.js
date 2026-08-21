@@ -63,23 +63,23 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
 
   return (
     <>
-      <Form {...{...formProps, formName: PLANAR_FORM_NAME, surveyFragment: [labelField]}}/>
+      <Form {...formProps} formName={PLANAR_FORM_NAME} surveyFragment={[labelField]}/>
       <>
         {(measurementType === MEASUREMENT_KEYS.PLANAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
-          <Form {...{
-            ...formProps,
-            formName: PLANAR_FORM_NAME,
-            surveyFragment: planarKeysFields,
-            onMyChange: onMyChange,
-          }}/>
+          <Form
+            {...formProps}
+            formName={PLANAR_FORM_NAME}
+            onMyChange={onMyChange}
+            surveyFragment={planarKeysFields}
+          />
         )}
         {(measurementType === MEASUREMENT_KEYS.LINEAR || measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR) && (
-          <Form {...{
-            ...formProps,
-            formName: LINEAR_FORM_NAME,
-            surveyFragment: linearKeysFields,
-            subkey: measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR && 'associated_orientation',
-          }}/>
+          <Form
+            {...formProps}
+            formName={LINEAR_FORM_NAME}
+            subkey={measurementType === MEASUREMENT_KEYS.PLANAR_LINEAR && 'associated_orientation'}
+            surveyFragment={linearKeysFields}
+          />
         )}
         <View style={compassStyles.sliderContainer}>
           <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>

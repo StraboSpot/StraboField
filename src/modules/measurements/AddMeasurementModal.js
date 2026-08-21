@@ -49,7 +49,7 @@ const AddMeasurementModal = ({onPress}) => {
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
@@ -200,17 +200,8 @@ const AddMeasurementModal = ({onPress}) => {
       }
     }
     try {
-      await formRef.current.submitForm();
-      let editedMeasurementData = showErrors(formRef.current);
-      // If plane with associated line validate associated line data
-      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
-        validateForm({
-          formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
-          values: editedMeasurementData.associated_orientation[0],
-        });
-      }
-      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
-        : spot;
+      let {values: editedMeasurementData} = await submitAndShowErrors(formRef.current);
+      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
 
@@ -313,6 +304,22 @@ const AddMeasurementModal = ({onPress}) => {
       });
     }
     saveMeasurement().catch(console.error);
+  };
+
+  // An associated orientation is nested under associated_orientation[0] and its fields are named with that path,
+  // so validating the planar survey against the top-level values misses it entirely. Validate it against the
+  // linear survey and key its errors to that same path, so they show inline and block the save — without this an
+  // out-of-range trend/plunge/rake or a missing required other_feature saves silently.
+  const validateMeasurement = (formName, values) => {
+    const errors = validateForm({formName: formName, values: values});
+    const associatedValues = values.associated_orientation?.[0];
+    if (isEmpty(associatedValues)) return errors;
+    const associatedErrors = validateForm({
+      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
+      values: associatedValues,
+    });
+    return Object.entries(associatedErrors).reduce(
+      (acc, [key, message]) => ({...acc, ['associated_orientation[0].' + key]: message}), errors);
   };
 
   /* Render Functions */
@@ -437,7 +444,7 @@ const AddMeasurementModal = ({onPress}) => {
                   initialValues={initialValues}
                   innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
+                  validate={values => validateMeasurement(formName, values)}
                   validateOnChange={false}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
@@ -458,7 +465,7 @@ const AddMeasurementModal = ({onPress}) => {
     if (choicesViewKey === 'feature_type') {
       relevantFields = survey.filter(f => f.name === choicesViewKey || f.name === 'other_feature');
     }
-    return <Form {...{formName: formProps.status.formName, surveyFragment: relevantFields, ...formProps}}/>;
+    return <Form {...formProps} formName={formProps.status.formName} surveyFragment={relevantFields}/>;
   };
 
   const renderSubformAssoc = (formProps) => {
@@ -472,12 +479,11 @@ const AddMeasurementModal = ({onPress}) => {
       relevantFields = assocSurvey.filter(f => f.name === assocChoicesViewKey || f.name === 'other_feature');
     }
     return (
-      <Form {...{
-        formName: assocFormProps.status.formName,
-        ...formProps,
-        subkey: 'associated_orientation',
-        surveyFragment: relevantFields,
-      }}
+      <Form
+        {...formProps}
+        formName={assocFormProps.status.formName}
+        subkey={'associated_orientation'}
+        surveyFragment={relevantFields}
       />
     );
   };

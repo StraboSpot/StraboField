@@ -27,7 +27,7 @@ const AddImageOverlayModal = ({
   const spot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -106,8 +106,7 @@ const AddImageOverlayModal = ({
   };
 
   const saveImageOverlay = async () => {
-    await overlayFormRef.current.submitForm();
-    const editedImageOverlayData = showErrors(overlayFormRef.current);
+    const {values: editedImageOverlayData} = await submitAndShowErrors(overlayFormRef.current);
     // console.log('Image Overlay Data', editedImageOverlayData);
     if (!isEmpty(editedImageOverlayData) && editedImageOverlayData.id) {
       let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
@@ -155,20 +154,18 @@ const AddImageOverlayModal = ({
             <View>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    choices={getImageChoices()}
-                    component={formProps =>
-                      SelectInputField({
-                        setFieldValue: formProps.form.setFieldValue,
-                        ...formProps.field,
-                        ...formProps,
-                      })
-                    }
-                    key={'id'}
-                    label={'Image to Use as Overlay'}
-                    name={'id'}
-                    single={true}
-                  />
+                  <Field key={'id'} name={'id'}>
+                    {({field, form}) => (
+                      <SelectInputField
+                        {...field}
+                        choices={getImageChoices()}
+                        errors={form.errors}
+                        label={'Image to Use as Overlay'}
+                        setFieldValue={form.setFieldValue}
+                        single={true}
+                      />
+                    )}
+                  </Field>
                 </ListItem.Content>
               </ListItem>
               {outerFormProps.values?.id && (

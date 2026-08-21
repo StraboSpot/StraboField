@@ -234,7 +234,7 @@ const AddRockModal = ({modalKey}) => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [groupKey, rockKey], surveyFragment: relevantFields, ...formProps}}/>
+      <Form {...formProps} formName={[groupKey, rockKey]} surveyFragment={relevantFields}/>
     );
   };
 

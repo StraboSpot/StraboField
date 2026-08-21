@@ -73,20 +73,28 @@ const BackupProject = () => {
         initialValues={{backupFrequency: backupFrequency?.save}}
         innerRef={preFormRef}
         onSubmit={values => console.log('Submit: ', values, ' |')}
-        validate={values => dispatch(setBackupFrequency({save: values.backupFrequency}))}
+        // Persists the choice as it changes rather than validating. Keep the block body: dispatch returns the
+        // action object, and Formik takes whatever validate returns as the form's errors.
+        validate={(values) => {
+          dispatch(setBackupFrequency({save: values.backupFrequency}));
+        }}
       >
         {() => (
           <View style={{paddingHorizontal: 10}}>
             <View style={{paddingVertical: 5}}>
-              <Field
-                choices={choices}
-                component={formProps => SelectInputField(
-                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
-                label={'Auto-Save to Device Frequency'}
-                multiSelectStyle={{paddingVertical: 5}}
-                name={'backupFrequency'}
-                single
-              />
+              <Field name={'backupFrequency'}>
+                {({field, form}) => (
+                  <SelectInputField
+                    {...field}
+                    choices={choices}
+                    errors={form.errors}
+                    label={'Auto-Save to Device Frequency'}
+                    multiSelectStyle={{paddingVertical: 5}}
+                    setFieldValue={form.setFieldValue}
+                    single
+                  />
+                )}
+              </Field>
             </View>
           </View>
         )}

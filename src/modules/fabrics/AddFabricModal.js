@@ -24,7 +24,7 @@ const AddFabricModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors, validateForm} = useForm();
 
   /* Local State */
 
@@ -78,8 +78,7 @@ const AddFabricModal = () => {
 
   const saveFabric = async () => {
     try {
-      await formRef.current.submitForm();
-      const editedFabricData = showErrors(formRef.current);
+      const {values: editedFabricData} = await submitAndShowErrors(formRef.current);
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
       editedFabricsData.push({...editedFabricData, id: getNewId()});
@@ -175,7 +174,11 @@ const AddFabricModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [FABRICS_GROUP_KEY, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
+      <Form
+        {...formProps}
+        formName={[FABRICS_GROUP_KEY, formRef.current?.values?.type]}
+        surveyFragment={relevantFields}
+      />
     );
   };
 

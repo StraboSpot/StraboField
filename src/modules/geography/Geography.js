@@ -28,7 +28,7 @@ const Geography = ({isReadOnly, page}) => {
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {isOnGeoMap} = useMapView();
 
   /* Local State */
@@ -59,10 +59,8 @@ const Geography = ({isReadOnly, page}) => {
 
   const saveForm = async () => {
     try {
-      await geomFormRef.current.submitForm();
-      const editedGeomFormData = showErrors(geomFormRef.current);
-      await formRef.current.submitForm();
-      let geographyProperties = showErrors(formRef.current);
+      const {values: editedGeomFormData} = await submitAndShowErrors(geomFormRef.current);
+      let {values: geographyProperties} = await submitAndShowErrors(formRef.current);
       console.log('Saving form data to Spot ...');
       let geometry = spot.geometry;
       if (isOnGeoMap(spot)) {
@@ -111,14 +109,15 @@ const Geography = ({isReadOnly, page}) => {
     return (
       <View style={{flex: 1}}>
         <Formik
-          component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
           enableReinitialize={true}
           initialStatus={{formName: formName}}
           initialValues={spot.properties}
           innerRef={formRef}
           onSubmit={() => console.log('Submitting form...')}
           validate={values => validateForm({formName: formName, values: values})}
-        />
+        >
+          {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
+        </Formik>
       </View>
     );
   };

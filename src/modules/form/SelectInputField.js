@@ -20,7 +20,10 @@ import {formStyles} from '../form';
 const SelectInputField = ({
                             appearance,
                             choices,
-                            errors,
+                            // Formik's `as` prop passes the field flattened and without the form bag, so unlike
+                            // TextInputField and its siblings this can't read form.errors — every caller passes
+                            // them in. Defaulted so a caller that forgets shows no error rather than throwing.
+                            errors = {},
                             isReadOnly,
                             label,
                             multiSelectStyle,
@@ -208,7 +211,7 @@ const SelectInputField = ({
       <>
         {renderFieldLabel()}
         {renderChoicesList()}
-        {errors && errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
+        {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
       </>
     );
   };
@@ -254,8 +257,7 @@ const SelectInputField = ({
             uniqueKey={'value'}
           />
         </View>
-        {errors && errors[name]
-          && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
+        {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
       </>
     );
   };

@@ -31,7 +31,7 @@ const OtherFeatureDetail = ({
   const projectFeatures = useSelector(state => state.project.project?.other_features);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {deleteFeatureTags} = useTags();
 
   /* Local State */
@@ -109,8 +109,7 @@ const OtherFeatureDetail = ({
 
   const saveForm = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isEmpty(formRef.current));
       let featureToEdit;
       let otherFeatures = spot.properties.other_features;
       if (otherFeatures && otherFeatures.length > 0) {
@@ -227,16 +226,18 @@ const OtherFeatureDetail = ({
               </ListItem>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
-                    component={formProps => (
-                      SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+                  <Field key={'type'} name={'type'}>
+                    {({field, form}) => (
+                      <SelectInputField
+                        {...field}
+                        choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                        errors={form.errors}
+                        label={'Feature Type'}
+                        setFieldValue={form.setFieldValue}
+                        single={true}
+                      />
                     )}
-                    key={'type'}
-                    label={'Feature Type'}
-                    name={'type'}
-                    single={true}
-                  />
+                  </Field>
                 </ListItem.Content>
               </ListItem>
               {formRef.current && formRef.current.values.type === 'other' && (

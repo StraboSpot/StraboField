@@ -29,7 +29,7 @@ const useSed = () => {
   const dispatch = useDispatch();
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLabel, getLabels, showErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {validateSedData} = useSedValidation();
   const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
   const {moveSpotsUpOrDownByPixels, recalculateIntervalGeometry} = useStratSectionCalculations();
@@ -251,7 +251,7 @@ const useSed = () => {
   };
 
   const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage) => {
-    await saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds');
+    return saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds');
   };
 
   const saveSedFeature = async (key, spot, formCurrent, isLeavingPage, subKey) => {
@@ -261,8 +261,7 @@ const useSed = () => {
     else if (Object.values(INTERPRETATIONS_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.INTERPRETATIONS;
 
     try {
-      await formCurrent.submitForm();
-      let editedFeatureData = showErrors(formCurrent, isLeavingPage);
+      let {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
       let editedSpot = JSON.parse(JSON.stringify(spot));
       let editedSedData = editedSpot.properties.sed ? JSON.parse(JSON.stringify(editedSpot.properties.sed)) : {};
       if (subKey) {
@@ -316,6 +315,8 @@ const useSed = () => {
       if (stratSection?.strat_section_id && stratSection.strat_section_id === stratSectionSettings?.strat_section_id) {
         dispatch(setStratSection(stratSectionSettings));
       }
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
     }
     catch (err) {
       // console.error('Error saving', pageKey, err);

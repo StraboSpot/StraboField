@@ -36,7 +36,7 @@ const AddEarthquakeModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, isRelevant, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors, validateForm} = useForm();
 
   /* Local State */
 
@@ -66,8 +66,7 @@ const AddEarthquakeModal = () => {
 
   const saveEarthquake = async () => {
     try {
-      await formRef.current.submitForm();
-      const editedEarthquakeData = showErrors(formRef.current);
+      const {values: editedEarthquakeData} = await submitAndShowErrors(formRef.current);
       console.log('Saving earthquake data to Spot ...');
       let editedEarthquakesData = spot.properties.earthquakes
         ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
@@ -136,7 +135,7 @@ const AddEarthquakeModal = () => {
           survey={survey}
         />
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: LAST_KEYSFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={LAST_KEYSFields}/>
         {isFaultOrientationModalVisible && (
           <MeasurementModal
             formName={formName}
@@ -196,7 +195,7 @@ const AddEarthquakeModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [groupKey, pageKey], surveyFragment: relevantFields, ...formProps}}/>
+      <Form {...formProps} formName={[groupKey, pageKey]} surveyFragment={relevantFields}/>
     );
   };
 

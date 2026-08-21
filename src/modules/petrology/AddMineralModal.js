@@ -137,12 +137,12 @@ const AddMineralModal = () => {
   const renderForm = (formProps) => {
     return (
       <>
-        <Form {...{
-          formName: formName,
-          onMyChange: (name, value) => onMineralChange(formProps, name, value),
-          surveyFragment: firstKeysFields,
-          ...formProps,
-        }}/>
+        <Form
+          {...formProps}
+          formName={formName}
+          onMyChange={(name, value) => onMineralChange(formProps, name, value)}
+          surveyFragment={firstKeysFields}
+        />
         <LittleSpacer/>
         <ChoiceButtons
           choiceFieldKey={igOrMetKey}
@@ -169,7 +169,7 @@ const AddMineralModal = () => {
           />
         )}
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       </>
     );
   };
@@ -204,7 +204,7 @@ const AddMineralModal = () => {
 
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
+    return <Form {...formProps} formName={formName} surveyFragment={relevantFields}/>;
   };
 
   /* View */

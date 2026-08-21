@@ -26,7 +26,7 @@ const AddIntervalModal = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLabel, getSurvey, showErrors, validateForm} = useForm();
+  const {getLabel, getSurvey, submitAndShowErrors, validateForm} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
@@ -153,8 +153,7 @@ const AddIntervalModal = () => {
 
   const saveInterval = async () => {
     try {
-      await formRef.current.submitForm();
-      const intervalData = showErrors(formRef.current);
+      const {values: intervalData} = await submitAndShowErrors(formRef.current);
       if (doUnitsFieldsMatch(intervalData)) {
         let newInterval = createInterval(stratSection.strat_section_id, intervalData);
         if (preFormRef.current?.values?.intervalName) {
@@ -215,7 +214,7 @@ const AddIntervalModal = () => {
         validate={values => validateForm({formName: formName, values: values})}
         validateOnChange={true}
       >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
+        {formProps => <Form {...formProps} formName={formName}/>}
       </Formik>
     );
   };
@@ -261,30 +260,34 @@ const AddIntervalModal = () => {
           <>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
-                <Field
-                  choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  component={formProps => (
-                    SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+                <Field key={'intervalToInsertAfter'} name={'intervalToInsertAfter'}>
+                  {({field, form}) => (
+                    <SelectInputField
+                      {...field}
+                      choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                      errors={form.errors}
+                      label={isCore ? 'Insert New Interval Below:' : 'Insert New Interval Above:'}
+                      setFieldValue={form.setFieldValue}
+                      single={true}
+                    />
                   )}
-                  key={'intervalToInsertAfter'}
-                  label={isCore ? 'Insert New Interval Below:' : 'Insert New Interval Above:'}
-                  name={'intervalToInsertAfter'}
-                  single={true}
-                />
+                </Field>
               </ListItem.Content>
             </ListItem>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
-                <Field
-                  choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  component={formProps => (
-                    SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
+                <Field key={'intervalToCopyId'} name={'intervalToCopyId'}>
+                  {({field, form}) => (
+                    <SelectInputField
+                      {...field}
+                      choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                      errors={form.errors}
+                      label={'Copy Interval Data From:'}
+                      setFieldValue={form.setFieldValue}
+                      single={true}
+                    />
                   )}
-                  key={'intervalToCopyId'}
-                  label={'Copy Interval Data From:'}
-                  name={'intervalToCopyId'}
-                  single={true}
-                />
+                </Field>
               </ListItem.Content>
             </ListItem>
             <ListItem containerStyle={commonStyles.listItemFormField}>

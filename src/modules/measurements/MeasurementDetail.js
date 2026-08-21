@@ -44,7 +44,7 @@ const MeasurementDetail = ({
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {doMeasurementCalculations} = useCompassCalculations();
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
@@ -269,8 +269,8 @@ const MeasurementDetail = ({
 
   const saveForm = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
+        isEmpty(formRef.current));
       console.log('Saving form data to Spot ...');
       let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
       let editedSelectedMeasurements = [];
@@ -311,7 +311,8 @@ const MeasurementDetail = ({
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
       await formCurrent.resetForm();
-      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
+      // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
+      if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
     }
     catch (err) {
@@ -351,8 +352,7 @@ const MeasurementDetail = ({
   };
 
   const saveTemplateForm = async (formCurrent) => {
-    await formCurrent.submitForm();
-    const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isEmpty(formRef.current));
     await saveTemplate(formValues);
   };
 
@@ -436,12 +436,12 @@ const MeasurementDetail = ({
             validate={values => validateForm({formName: formName, values: values})}
           >
             {formProps => (
-              <Form {...{
-                ...formProps,
-                formName: formName,
-                isReadOnly: isReadOnly,
-                onMyChange: onMyChange,
-              }}/>
+              <Form
+                {...formProps}
+                formName={formName}
+                isReadOnly={isReadOnly}
+                onMyChange={onMyChange}
+              />
             )}
           </Formik>
         </View>

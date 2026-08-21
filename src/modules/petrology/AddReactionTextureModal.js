@@ -113,7 +113,7 @@ const AddReactionTextureModal = () => {
   const renderForm = (formProps) => {
     return (
       <>
-        <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
         <Text style={{paddingLeft: 10, paddingRight: 10, textAlign: 'center'}}>{
           survey.find(f => f.name === 'reactions').hint}
         </Text>
@@ -131,18 +131,18 @@ const AddReactionTextureModal = () => {
         {!isEmpty(formRef.current?.values[basedOnKey]) && formRef.current?.values[basedOnKey].includes('other') && (
           <>
             <LittleSpacer/>
-            <Form {...{formName: formName, surveyFragment: [basedOnOtherField], ...formProps}}/>
+            <Form {...formProps} formName={formName} surveyFragment={[basedOnOtherField]}/>
           </>
         )}
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       </>
     );
   };
 
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
+    return <Form {...formProps} formName={formName} surveyFragment={relevantFields}/>;
   };
 
   /* View */

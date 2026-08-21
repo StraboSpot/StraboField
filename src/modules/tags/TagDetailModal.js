@@ -24,7 +24,7 @@ const TagDetailModal = ({closeModal}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {validateForm, showErrors} = useForm();
+  const {submitAndShowErrors, validateForm} = useForm();
   const {deleteTag, saveTag} = useTags();
 
   /* Local State */
@@ -85,8 +85,7 @@ const TagDetailModal = ({closeModal}) => {
 
   const saveFormAndClose = async () => {
     try {
-      await formRef.current.submitForm();
-      const formValues = showErrors(formRef.current);
+      const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving tag data to Project ...', formValues);
       let updatedTag = formValues;
       if (!updatedTag.id) updatedTag.id = getNewId();
@@ -122,14 +121,15 @@ const TagDetailModal = ({closeModal}) => {
             <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
             <View style={{flex: 1}}>
               <Formik
-                component={formProps => Form({formName: formName, ...formProps})}
                 enableReinitialize={true}
                 initialStatus={{formName: formName}}
                 initialValues={initialValues}
                 innerRef={formRef}
                 onSubmit={() => console.log('Submitting form...')}
                 validate={values => validateForm({formName: formName, values: values})}
-              />
+              >
+                {formProps => <Form {...formProps} formName={formName}/>}
+              </Formik>
             </View>
           </>
         }

@@ -30,7 +30,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
@@ -67,7 +67,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
         survey={survey}
       />
       <LittleSpacer/>
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       {isFoldMeasurementsModalVisible && (
         <MeasurementModal
           formName={formName}

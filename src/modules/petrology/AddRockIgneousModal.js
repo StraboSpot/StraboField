@@ -31,7 +31,7 @@ const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) =
           mainKeys={mainButtonsKeys}
           setChoicesViewKey={setChoicesViewKey}
         />
-        {!isEmpty(lastKeysFields) && <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>}
+        {!isEmpty(lastKeysFields) && <Form {...formProps} surveyFragment={lastKeysFields}/>}
       </>
     );
   };

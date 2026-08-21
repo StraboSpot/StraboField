@@ -17,7 +17,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -113,8 +113,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   const saveReport = async () => {
     try {
       console.log('Saving report ...');
-      await formRef.current.submitForm();
-      let editedReport = showErrors(formRef.current);
+      let {values: editedReport} = await submitAndShowErrors(formRef.current);
       if (!editedReport.id) editedReport.id = getNewUUID();
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
