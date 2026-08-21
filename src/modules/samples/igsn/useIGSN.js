@@ -66,8 +66,8 @@ const useIGSN = () => {
       dispatch(setSesarToken(newTokens));
       return newTokens;
     }
-    catch (error) {
-      console.error('Token refresh failed:', error);
+    catch (err) {
+      console.error('Token refresh failed:', err);
       return null;
     }
   };

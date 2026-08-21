@@ -10,7 +10,7 @@ import {setModalValues, setModalVisible} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
-const ReportsPage = () => {
+const ReportsPage = ({page}) => {
   console.log('Rendering ReportsPage...');
 
   /* Data Hooks */
@@ -38,7 +38,7 @@ const ReportsPage = () => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'Memos'}/>
+      <PageHeader pageTitle={page.label}/>
       {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>}
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
         Memos referencing this Spot:

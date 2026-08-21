@@ -152,8 +152,15 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   };
 
   const deleteMeasurementsCont = (measurementsToDelete) => {
-    deleteMeasurements(measurementsToDelete);
-    onSelectingCancel();
+    try {
+      deleteMeasurements(measurementsToDelete);
+      onSelectingCancel();
+    }
+    catch (err) {
+      // deleteMeasurements alerts the user and deletes nothing when a feature has associated features. Keep the
+      // selection as it is so they can adjust it and try again.
+      console.error('Unable to delete measurements.', err);
+    }
   };
 
   const editMeasurement = (measurements) => {

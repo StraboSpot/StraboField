@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Platform, Text, TouchableOpacity, View} from 'react-native';
 
 import {SketchCanvas} from '@StraboSpot/react-native-sketch-canvas';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -8,6 +8,7 @@ import {useToast} from 'react-native-toast-notifications';
 
 import SaveSketchModal from './SaveSketchModal';
 import styles from './sketch.styles';
+import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
@@ -60,6 +61,13 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
     else canvasHeight = drawableWidth / imageAspect;
   }
 
+  // Passing a directory keeps iOS on the uncached imageWithContentsOfFile: loader; without it the native
+  // module falls back to imageNamed:, which caches by path and shows a stale image after Update Existing
+  // until relaunch. Android's decodeFile wants the whole path as filename, so it keeps that form.
+  const localSourceImage = Platform.OS === 'ios'
+    ? {directory: APP_DIRECTORIES.IMAGES, filename: image.id + '.jpg', mode: 'AspectFit'}
+    : {filename: getLocalImageURI(image.id).replace('file://', ''), mode: 'AspectFit'};
+
   /* Zoom & Pan (two fingers) */
 
   const scale = useSharedValue(1);
@@ -86,7 +94,9 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
   };
 
   // Two-finger gestures only, so a single finger is always free to draw. (The canvas itself ignores
-  // multi-touch, so these never leave marks — see the patch to the sketch-canvas PanResponder.)
+  // multi-touch, so these never leave marks — see the patch to the sketch-canvas PanResponder.) On Android
+  // these only run because the canvas below is passed shouldBlockNativeResponder={false}; the default blocks
+  // native handlers, which is what a canvas over a map needs.
   const pinchGesture = Gesture.Pinch()
     .onUpdate((e) => {
       scale.value = Math.max(1, Math.min(5, savedScale.value * e.scale));
@@ -241,12 +251,11 @@ const Sketch = ({image = {}, saveImages, saveUpdatedImage, setIsSketchModalVisib
               style={[{width: canvasWidth, height: canvasHeight}, animatedStyle]}
             >
               <SketchCanvas
-                localSourceImage={{
-                  filename: getLocalImageURI(image.id).replace('file://', ''),
-                  mode: 'AspectFit',
-                }}
+                key={image.modified_timestamp}
+                localSourceImage={localSourceImage}
                 onSketchSaved={saveSketch}
                 ref={sketchRef}
+                shouldBlockNativeResponder={false}
                 strokeColor={color}
                 strokeWidth={strokeWidth}
                 style={{backgroundColor: 'transparent', flex: 1}}

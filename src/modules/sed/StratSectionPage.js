@@ -82,8 +82,8 @@ const StratSectionPage = ({isReadOnly, page}) => {
       savedValuesRef.current = {...formCurrent.values};
       toast.show('Strat Section Settings saved', {type: 'success'});
     }
-    catch (e) {
-      console.log('Error saving strat section', e);
+    catch (err) {
+      console.error('Error saving strat section', err);
     }
   };
 

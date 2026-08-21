@@ -21,6 +21,15 @@ import {PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
+// At module scope so useState's initializer can call it — a const in the component body isn't defined yet.
+const getMainMenuData = (projectName, encodedLogin) => {
+  if (Platform.OS === 'web') return MAIN_MENU_DATA_WEB;
+  if (!projectName && isEmpty(encodedLogin)) return MAIN_MENU_DATA_NO_PROJECT_NO_USER;
+  if (!projectName) return MAIN_MENU_DATA_NO_PROJECT;
+  if (isEmpty(encodedLogin)) return MAIN_MENU_DATA_NO_USER;
+  return MAIN_MENU_DATA;
+};
+
 const MainMenuPanelList = ({searchText}) => {
   /* Data Hooks */
 
@@ -32,7 +41,7 @@ const MainMenuPanelList = ({searchText}) => {
 
   /* Local State */
 
-  const [menuItems, setMenuItems] = useState(MAIN_MENU_DATA);
+  const [menuItems, setMenuItems] = useState(() => getMainMenuData(projectName, encodedLogin));
 
   /* Side Effects */
 
@@ -47,11 +56,7 @@ const MainMenuPanelList = ({searchText}) => {
   /* Logic Helpers */
 
   const filterMenuItems = () => {
-    let mainMenuData = MAIN_MENU_DATA;
-    if (Platform.OS === 'web') mainMenuData = MAIN_MENU_DATA_WEB;
-    else if (!projectName && isEmpty(encodedLogin)) mainMenuData = MAIN_MENU_DATA_NO_PROJECT_NO_USER;
-    else if (!projectName) mainMenuData = MAIN_MENU_DATA_NO_PROJECT;
-    else if (isEmpty(encodedLogin)) mainMenuData = MAIN_MENU_DATA_NO_USER;
+    let mainMenuData = getMainMenuData(projectName, encodedLogin);
 
     if (isReadOnlyProject) {
       mainMenuData = mainMenuData

@@ -12,6 +12,10 @@ export const getOfflineMapTitle = (map) => {
   return map.name;
 };
 
+// Cached tiles live in a directory named for the map id — for Mapbox styles the style-id portion only, so a style
+// that moves to a different Mapbox account keeps the tiles already on the device.
+export const getTileFolderName = (id, source) => source === 'mapbox_styles' && id.includes('/') ? id.split('/')[1] : id;
+
 // borrowed from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 export const tile2lat = (y, z) => {
   const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);

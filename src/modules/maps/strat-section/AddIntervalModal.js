@@ -195,8 +195,8 @@ const AddIntervalModal = () => {
         }
       }
     }
-    catch (e) {
-      console.log('Error saving interval', e);
+    catch (err) {
+      console.error('Error saving interval', err);
     }
   };
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import KeepAwake from 'react-native-keep-awake';
@@ -9,7 +9,6 @@ import uploadModalStyles from './uploadModal.styles';
 import useUpload from '../../../services/files/useUpload';
 import useUploadImages from '../../../services/files/useUploadImages';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/helpers';
 import {LARGE_TEXT_SIZE} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
@@ -25,9 +24,9 @@ const UploadModal = ({closeModal, isVisible}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const currentProject = useSelector(state => state.project.project);
   const endpoint = useSelector(state => state.connections.databaseEndpoint);
   const isImageTransferring = useSelector(state => state.project.isImageTransferring);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
   const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
@@ -42,8 +41,12 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   /* Local State */
 
+  // A ref, not state: dismissing the modal mid-upload resets the state below while the upload keeps running, so
+  // only a ref still knows an upload is in flight and can stop a second one from starting.
+  const isUploadInFlightRef = useRef(false);
+
   const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
-  const [errorMessage, setErrorMesssage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [imageUploadStatus, setImageUploadStatus] = useState({});
   const [modalTitle, setModalTitle] = useState('Upload Project');
   const [projectUploadSuccess, setProjectUploadStatus] = useState(false);
@@ -78,7 +81,11 @@ const UploadModal = ({closeModal, isVisible}) => {
   /* Logic Helpers */
 
   const initiateUpload = async () => {
+    if (isUploadInFlightRef.current) {
+      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
+    }
     try {
+      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       isImageTransferring && dispatch(setIsImageTransferring(false));
       dispatch(updatedProjectTransferProgress(0));
@@ -95,7 +102,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       if (imageStatus.imagesNotFound) {
         setUploadState('error');
         setModalTitle('Uploaded With Errors!');
-        setErrorMesssage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
+        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
       }
       else {
         setUploadState('complete');
@@ -104,13 +111,22 @@ const UploadModal = ({closeModal, isVisible}) => {
     }
     catch (err) {
       console.error('Error uploading', err);
-      setErrorMesssage(err.toString());
+      setErrorMessage(err.toString());
       setUploadState('error');
+    }
+    finally {
+      isUploadInFlightRef.current = false;
+      // Release the wake lock on every path, including when the user backs out and the upload finishes unseen.
+      Platform.OS !== 'web' && KeepAwake.deactivate();
     }
   };
 
   const uploadImagesOnly = async () => {
+    if (isUploadInFlightRef.current) {
+      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
+    }
     try {
+      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       Platform.OS !== 'web' && KeepAwake.activate();
       setModalTitle('Uploading');
@@ -120,8 +136,7 @@ const UploadModal = ({closeModal, isVisible}) => {
       if (imageStatus.imagesNotFound) {
         setUploadState('error');
         setModalTitle('Uploaded With Errors!');
-        setErrorMesssage(
-          `There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
+        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
       }
       else {
         setUploadState('complete');
@@ -131,7 +146,13 @@ const UploadModal = ({closeModal, isVisible}) => {
     catch (err) {
       console.error('Error uploading', err);
       alert('Upload Failed!', err.toString());
-      closeModal();
+      // Reset through handleClosePress: closing alone would leave uploadState at 'uploading', which hides both
+      // the close button and the back button if the modal is reopened.
+      handleClosePress();
+    }
+    finally {
+      isUploadInFlightRef.current = false;
+      Platform.OS !== 'web' && KeepAwake.deactivate();
     }
   };
 
@@ -139,13 +160,12 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   const renderErrorView = () => {
     return (
-      <View style={{padding: 10}}>
+      <View style={{padding: 20}}>
         <LottieAnimations
           doesLoop={false}
-          show={uploadState === 'error'}
           type={'error'}
         />
-        <Text style={{textAlign: 'center'}}>{errorMessage}</Text>
+        <Text style={{marginTop: 24, textAlign: 'center'}}>{errorMessage}</Text>
       </View>
     );
   };
@@ -190,9 +210,7 @@ const UploadModal = ({closeModal, isVisible}) => {
 
   const renderInitialUploadView = () => (
     <View>
-      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>
-        {!isEmpty(currentProject) && currentProject.description?.project_name}
-      </Text>
+      <Text style={[overlayStyles.contentText, {paddingTop: 20, fontSize: LARGE_TEXT_SIZE}]}>{projectName}</Text>
       {endpoint.isSelected ? <Text style={commonStyles.importantText}>Uploading to: {endpoint.endpoint}</Text>
         : <Text style={overlayStyles.contentText}>Uploading to: StraboSpot Server</Text>}
       <Spacer/>
@@ -262,19 +280,19 @@ const UploadModal = ({closeModal, isVisible}) => {
   return (
     <ModalWrapper
       actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
-      closeModal={closeModal}
+      closeModal={handleClosePress}
       headerTitle={modalTitle}
+      isLoading={uploadState === 'uploading'}
       isVisible={isVisible}
       onActionPressed={handleActionPressed}
       onCancelPress={handleClosePress}
       overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
       showCancelButton={uploadState === 'not started'}
+      showCloseButton
     >
-      {uploadState === 'not started'
-        ? renderInitialUploadView()
-        : uploadState !== 'error'
-          ? renderUploadProgress()
+      {uploadState === 'not started' ? renderInitialUploadView()
+        : uploadState !== 'error' ? renderUploadProgress()
           : renderErrorView()}
     </ModalWrapper>
   );

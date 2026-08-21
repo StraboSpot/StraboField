@@ -333,7 +333,7 @@ const useMapEditVertex = ({
       }
     }
     catch {
-      console.log('Problem moving the vertex');
+      console.error('Problem moving the vertex');
     }
   };
 

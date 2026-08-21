@@ -54,6 +54,7 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
     <ModalWrapper
       actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
       headerTitle={'Delete Locally Saved Project'}
+      isLoading={deleteProjectStatus === DELETE_STATUS.IN_PROGRESS}
       isVisible={isDeleteProjectModalVisible}
       onActionPressed={handleConfirmPress}
       onCancelPress={closeModal}

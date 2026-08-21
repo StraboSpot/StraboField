@@ -6,13 +6,14 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
 import {addedStatusMessage} from '../../modules/home/home.slice';
+import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {
   addedProjectFromServer,
   deletedSpotIdFromDataset,
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toError} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 import useServerRequests from '../network/useServerRequests';
@@ -57,7 +58,7 @@ const useUpload = () => {
         datasetCopy.images && delete datasetCopy.images;
         const resJSON = await updateDataset(datasetCopy);
         if (resJSON.modified_on_server && !resJSON.isReadOnly) {
-          console.log('Dataset that was uploaded:', resJSON);
+          console.log(dataset.name + ': Dataset that was uploaded:', resJSON);
           await addDatasetToProject(project.id, dataset.id);
           setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
           await uploadSpots(dataset);
@@ -70,7 +71,7 @@ const useUpload = () => {
     }
     catch (err) {
       console.error(dataset.name + ': Error Uploading Dataset Properties...', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -105,12 +106,11 @@ const useUpload = () => {
       const errMsg = typeof err === 'string' ? err : (err?.message ?? String(err));
       if (errMsg.startsWith('Spot(s) already exist in another dataset')) {
         const spotId = parseInt(errMsg.split(')')[1].split('(')[1].split(')')[0], 10);
-        // console.log('dupes', spotId);
         dispatch(deletedSpotIdFromDataset({datasetId: dataset.id, spotId: spotId}));
         alert('Fixed Spot in Another Dataset Error',
           'Spot removed from ' + dataset.name + '. Please try uploading again.');
       }
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -126,14 +126,17 @@ const useUpload = () => {
         const imageStatus = await initializeImageUpload();
         projectUploadStatus = {...projectUploadStatus, images: imageStatus};
         dispatch(setIsImageTransferring(false));
-        KeepAwake.deactivate();
       }
       return projectUploadStatus;
     }
     catch (err) {
       dispatch(addedStatusMessage(`\nUpload Failed!\n\n ${err}`));
       console.error('Upload Failed!', err);
-      throw Error(err);
+      throw toError(err);
+    }
+    finally {
+      // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.
+      if (Platform.OS !== 'web') KeepAwake.deactivate();
     }
   };
 
@@ -172,9 +175,9 @@ const useUpload = () => {
       return res;
     }
     catch (err) {
-      console.log('Error Uploading Image', err);
+      console.error('Error Uploading Image:', err);
       dispatch(setIsImageTransferring(false));
-      throw Error;
+      throw err;
     }
   };
 
@@ -198,7 +201,8 @@ const useUpload = () => {
   const uploadProject = async () => {
     // Read live from the store: an async caller (e.g. trySync) can close over a stale `project`
     // snapshot, which would make uploadedTimestamp mismatch the live store and never clear the flag.
-    const liveProject = store.getState().project.project;
+    // Strip on the way out too: a project loaded before custom maps stopped storing the token still carries it.
+    const liveProject = stripMapboxTokenFromProject(store.getState().project.project);
     console.log(`Uploading ${liveProject.description.project_name} Properties...`);
     setUploadStatusMessage(`Uploading ${liveProject.description.project_name} Properties...`);
     console.log('Uploading Project JSON', JSON.stringify(liveProject));

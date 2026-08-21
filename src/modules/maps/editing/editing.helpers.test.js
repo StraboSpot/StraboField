@@ -6,6 +6,8 @@ import {
   deleteVertexFromGeometry,
   extendLineAtEndpoint,
   getFeatureWithNewVertex,
+  getScreenExtent,
+  getScreenPolygonWidth,
   splitLineAtVertex,
   thinCoordsByDistance,
   thinCoordsByPixels,
@@ -157,6 +159,70 @@ describe('extendLineAtEndpoint', () => {
     const polygon = turf.polygon([[[0, 0], [10, 0], [10, 10], [0, 0]]]);
 
     expect(extendLineAtEndpoint(polygon, [0])).toBeNull();
+  });
+});
+
+describe('getScreenExtent', () => {
+  it('returns the larger of the two bounding-box dimensions', () => {
+    expect(getScreenExtent([[0, 0], [300, 0], [300, 40]])).toBe(300);
+  });
+
+  it('stays small for an accidental tap-drag, so it falls under any sane threshold', () => {
+    expect(getScreenExtent([[0, 0], [3, 2], [5, 4]])).toBe(5);
+  });
+
+  it('reports the long dimension of a deliberate straight line, not its flat one', () => {
+    expect(getScreenExtent([[0, 0], [150, 1], [300, 0]])).toBe(300);
+  });
+
+  it('reports the long dimension when the line is tall rather than wide', () => {
+    expect(getScreenExtent([[0, 0], [1, 150], [0, 300]])).toBe(300);
+  });
+
+  it('returns 0 for too few points to form a stroke', () => {
+    expect(getScreenExtent([[0, 0]])).toBe(0);
+    expect(getScreenExtent(undefined)).toBe(0);
+  });
+});
+
+describe('getScreenPolygonWidth', () => {
+  it('returns half the side for a square, so a 20px square measures 10', () => {
+    expect(getScreenPolygonWidth([[0, 0], [20, 0], [20, 20], [0, 20]])).toBe(10);
+  });
+
+  it('is near zero for a stroke retraced 2px away, though it encloses 600px2 of area', () => {
+    const out = Array.from({length: 61}, (_, i) => [i * 5, 0]);
+    const back = Array.from({length: 61}, (_, i) => [(60 - i) * 5, 2]);
+    expect(getScreenPolygonWidth([...out, ...back])).toBeCloseTo(2, 0);
+  });
+
+  it('stays low across several passes over the same line', () => {
+    const stroke = [];
+    for (let pass = 0; pass < 4; pass++) {
+      for (let i = 0; i <= 60; i++) stroke.push([(pass % 2 ? 60 - i : i) * 5, pass * 6]);
+    }
+    expect(getScreenPolygonWidth(stroke)).toBeLessThan(6);
+  });
+
+  it('keeps a deliberately thin strip well above a sliver', () => {
+    expect(getScreenPolygonWidth([[0, 0], [200, 0], [200, 15], [0, 15]])).toBeGreaterThan(13);
+  });
+
+  it('handles a closed ring, which is what turf.polygon hands the tap-to-place path', () => {
+    expect(getScreenPolygonWidth([[0, 0], [20, 0], [20, 20], [0, 20], [0, 0]])).toBe(10);
+  });
+
+  it('is the same regardless of winding direction', () => {
+    expect(getScreenPolygonWidth([[0, 10], [10, 10], [10, 0], [0, 0]])).toBe(5);
+  });
+
+  it('returns 0 for fewer than 3 points', () => {
+    expect(getScreenPolygonWidth([[0, 0], [10, 10]])).toBe(0);
+    expect(getScreenPolygonWidth([])).toBe(0);
+  });
+
+  it('returns 0 rather than dividing by zero when every point is identical', () => {
+    expect(getScreenPolygonWidth([[5, 5], [5, 5], [5, 5]])).toBe(0);
   });
 });
 

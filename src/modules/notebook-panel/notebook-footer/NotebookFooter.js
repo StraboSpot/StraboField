@@ -21,7 +21,7 @@ const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
+  const {getAllRelevantPages} = usePage();
   const {createRichSample} = useSamples();
 
   /* Local State */
@@ -30,8 +30,7 @@ const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
 
   /* Derived Variables */
 
-  const pagesToShow = [...getRelevantGeneralPages(isRichSample), ...getRelevantPetPages(isRichSample),
-    ...getRelevantSedPages(isRichSample)];
+  const pagesToShow = getAllRelevantPages(isRichSample);
   const notebookPagesValidOn = notebookPagesOn.filter(i => pagesToShow.find(p => p.key === i));
   const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
 

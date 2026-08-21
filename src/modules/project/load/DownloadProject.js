@@ -52,24 +52,29 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const downloadProject = async (inProjectToDownload) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
-    const downloadedDatasets = await initializeDownload(inProjectToDownload, undefined);
-    if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
-      dispatch(setIsStatusMessagesModalVisible(false));
-      dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
-      const emailFound = Object.values(downloadedDatasets).some(dataset => dataset.owner_email === email);
-      if (emailFound) {
-        console.log('Email found in datasets');
-        setIsDatasetNameModalVisible(false);
-        dispatch(setSidePanelVisible({bool: false}));
+    try {
+      const downloadedDatasets = await initializeDownload(inProjectToDownload);
+      if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
+        dispatch(setIsStatusMessagesModalVisible(false));
+        dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+        const emailFound = Object.values(downloadedDatasets).some(dataset => dataset.owner_email === email);
+        if (emailFound) {
+          console.log('Email found in datasets');
+          setIsDatasetNameModalVisible(false);
+          dispatch(setSidePanelVisible({bool: false}));
+        }
+        else {
+          setTimeout(() => {
+            setIsDatasetNameModalVisible(true);
+          }, 400);
+        }
       }
-      else {
-        setTimeout(() => {
-          setIsDatasetNameModalVisible(true);
-        }, 400);
-      }
+      else closeMainMenuPanel();
     }
-    else {
-      closeMainMenuPanel();
+    catch (err) {
+      // initializeDownload already reported the failure into the status modal, and it rethrows because the web
+      // auto-login path needs that. Leave the main menu panel open so the project can be picked again.
+      console.error('Error downloading project.', err);
     }
   };
 

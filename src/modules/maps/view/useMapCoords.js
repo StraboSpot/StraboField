@@ -5,7 +5,7 @@ import {getBBoxPaddedInPixels, getBoundsPadded, getCoordQuad} from './view.helpe
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {openedMessageModal} from '../../home/home.slice';
 import {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} from '../maps.helpers';
 
 const useMapCoords = () => {
@@ -23,8 +23,8 @@ const useMapCoords = () => {
   const getCentroidOfSelectedSpot = () => turf.getCoord(turf.centroid(selectedSpot));
 
   const getMyMapsBboxCoords = async (map) => {
+    let myMapsBboxUrl = STRABO_APIS.MY_MAPS_BBOX;
     try {
-      let myMapsBboxUrl = STRABO_APIS.MY_MAPS_BBOX;
       if (isOnline.isConnected && !map.bbox && map.source === 'strabospot_mymaps') {
         if (isSelected) {
           console.log(endpoint.replace('/db', '/geotiff/bbox/'));
@@ -34,11 +34,10 @@ const useMapCoords = () => {
         if (!isEmpty(myMapsBbox)) return myMapsBbox.data.bbox;
       }
     }
-    catch (error) {
-      console.error(error);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Cannot retrieve map\'s bounding box'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+    catch (err) {
+      console.error(`Error getting the bounding box for map ${map?.id} (${map?.source}) from ${myMapsBboxUrl}`,
+        err);
+      dispatch(openedMessageModal({message: 'Cannot retrieve the bounding box for this map.', title: 'Error!'}));
     }
   };
 

@@ -46,7 +46,7 @@ const useProject = () => {
   const createProject = async (descriptionData) => {
     const newDate = new Date().toISOString();
     const id = getNewId();
-    const currentProject = {
+    const newProject = {
       id: id,
       description: descriptionData,
       date: newDate,
@@ -56,7 +56,7 @@ const useProject = () => {
       templates: {},
       useContinuousTagging: false,
     };
-    dispatch(addedProjectDescription(currentProject));
+    dispatch(addedProjectDescription(newProject));
     const defaultDataset = createDataset();
     dispatch(addedDataset(defaultDataset));
   };
@@ -133,7 +133,7 @@ const useProject = () => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(clearedStatusMessages());
-      console.log('Error Deleting Dataset.');
+      console.error('Error Deleting Dataset.');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Deleting Dataset.'));
     }
@@ -235,7 +235,7 @@ const useProject = () => {
       if (!isEmpty(user.name) && val) return 'SWITCHED';  //TODO do we really need this return
     }
     catch (err) {
-      console.log('Error setting switch value.');
+      console.error('Error setting switch value.');
     }
     dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };

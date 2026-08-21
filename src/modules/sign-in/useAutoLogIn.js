@@ -5,13 +5,7 @@ import {useDispatch} from 'react-redux';
 
 import useSignIn from './useSignIn';
 import useDownload from '../../services/files/useDownload';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
-import {setSelectedProject} from '../project/projects.slice';
+import {setLoadingStatus} from '../home/home.slice';
 
 const useAutoLogIn = () => {
   /* Data Hooks */
@@ -34,11 +28,10 @@ const useAutoLogIn = () => {
     }
     catch (err) {
       console.error('Error loading project', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error loading project!'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      // No modal here: rethrowing sends Routes.web to AuthenticationErrorSplashScreen, which replaces the whole
+      // tree, so anything opened now would flash for a frame and vanish. That splash is the report the user sees.
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      throw Error;
+      throw err;
     }
   };
 
@@ -61,12 +54,11 @@ const useAutoLogIn = () => {
         const password = credentials.split('*****')[1];
         console.log('Got Credentials:', credentialsEncoded, '\nGot Project Id:', projectId);
         await signIn(email, password);
-        dispatch(setSelectedProject({project: {id: projectId}, source: ''}));
         const newEncodedLogin = Base64.encode(email + ':' + password);
         await loadProjectWeb(projectId, newEncodedLogin);
       }
       catch (err) {
-        throw Error(err);
+        throw err;
       }
     }
     else throw Error('Credentials not found.');

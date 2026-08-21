@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
@@ -10,6 +10,7 @@ import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
+import {FormFlatList} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
@@ -65,7 +66,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     if (dataset && dataset.id) {
       destroyDataset(dataset.id)
         .then(closeDetailView())
-        .catch(err => console.log('Error deleting dataset', err));
+        .catch(err => console.error('Error deleting dataset', err));
     }
     else console.error('Target dataset or id is undefined!');
   };
@@ -282,19 +283,18 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         headerTitle={'Dataset Detail'}
         title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
       />
-      <FlatList
-        ListHeaderComponent={
-          <>
-            {renderNameField()}
-            {renderMetadataForm()}
-            {renderSpotsField()}
-            {renderImagesField()}
-            <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
-            <RunQAQC dataset={dataset}/>
-            {Platform.OS === 'web' && renderDeleteDatasetButton()}
-          </>
-        }
-      />
+
+      <FormFlatList>
+        {renderNameField()}
+        {renderMetadataForm()}
+        {renderSpotsField()}
+        {renderImagesField()}
+        <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
+        <RunQAQC dataset={dataset}/>
+        {Platform.OS === 'web' && renderDeleteDatasetButton()}
+      </FormFlatList>
+
+      {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}
     </>
   );

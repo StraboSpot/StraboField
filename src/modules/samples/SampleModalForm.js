@@ -93,7 +93,10 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
       onSubmit={values => console.log('Submitting form...', values)}
     >
       {formProps => (
-        <View style={{flex: 1}}>
+        // No flex here: this sits in the modal's scrolling body alongside the images and geologic units
+        // sections, so it must size to its content. `flex: 1` collapses it to the leftover space and its
+        // fields overflow onto the sections below.
+        <View>
           {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
         </View>
       )}

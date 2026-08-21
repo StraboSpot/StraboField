@@ -12,6 +12,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
   cancelledIntervalDrag,
+  clearedStratSection,
   savedIntervalDragReordering,
   setFreehandFeatureCoords,
   setIsScaleBarMetric,
@@ -191,7 +192,9 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         break;
       case 'closeStratSection':
         const spotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
-        handleSpotSelected(spotWithThisStratSection);
+        // If the strat section has been deleted there is no spot to select, so clear it directly to close the view
+        if (spotWithThisStratSection) handleSpotSelected(spotWithThisStratSection);
+        else dispatch(clearedStratSection());
         break;
       // Map Actions
       case 'zoom':
@@ -206,17 +209,13 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'addToReport':
         dispatch(setIntersectedSpotsForTagging([]));
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('report');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'stereonet':
         mapComponentRef.current?.clearSelectedSpots();

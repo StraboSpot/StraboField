@@ -95,8 +95,8 @@ android {
         applicationId "com.strabospot2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1062
-        versionName "2.30.5"
+        versionCode 1066
+        versionName "2.31.0"
     }
     signingConfigs {
         debug {
@@ -158,12 +158,14 @@ dependencies {
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 
-// Apply Sentry Gradle plugin
-// Temporarily commented out due to compatibility issues with current setup
-// This can be re-enabled once Sentry configuration is updated
-// apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
+// Sentry: auto-upload JS source maps on release builds. Self-contained (no Sentry Android Gradle
+// Plugin required); reads android/sentry.properties for auth/org/project and honors the same
+// SENTRY_DISABLE_AUTO_UPLOAD flag as the iOS build phase.
+apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 
-// Configure Sentry
+// The sentry { } block below needs the Sentry Android Gradle Plugin (io.sentry.android.gradle) on the
+// buildscript classpath, which is NOT added here — leaving it commented. It covers native symbol /
+// ProGuard mapping upload, which is separate from the JS source maps enabled above.
 // sentry {
 //     autoUploadProguardMapping = enableProguardInReleaseBuilds
 //     uploadNativeSymbols = true

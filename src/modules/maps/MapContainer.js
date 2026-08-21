@@ -22,7 +22,7 @@ import useMapLocation from './view/useMapLocation';
 import useMapView from './view/useMapView';
 import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
@@ -232,11 +232,12 @@ const MapContainer = forwardRef(({
       if (!currentBasemap) setBasemap().catch(console.error);
       // Custom basemaps: rebuild (URL may need rebuilding) and surface a fallback if it fails.
       else if (customBasemap[currentBasemap.id]) {
-        setBasemap(currentBasemap.id).catch((error) => {
-          console.log('Error Setting Basemap', error);
-          dispatch(clearedStatusMessages());
-          dispatch(addedStatusMessage('Error setting custom basemap.\n Setting basemap Mapbox Topo.' + error));
-          dispatch(setIsErrorMessagesModalVisible(true));
+        setBasemap(currentBasemap.id).catch((err) => {
+          console.error('Error Setting Basemap', err);
+          dispatch(openedMessageModal({
+            message: `Setting basemap to Mapbox Topo.\n\n${err}`,
+            title: 'Error Setting Custom Basemap!',
+          }));
         });
       }
         // Standard basemaps: the persisted object carries baked-in derived fields — notably an absolute
@@ -248,7 +249,7 @@ const MapContainer = forwardRef(({
       Object.values(customBasemap).forEach((map) => {
         if (offlineMaps[map.id]?.id !== map.id) setCustomMapSwitchValue(false, map);
       });
-      switchToOfflineMap().catch(error => console.log('Error Setting Offline Basemap', error));
+      switchToOfflineMap().catch(err => console.error('Error Setting Offline Basemap', err));
     }
     clearVertexes();
   }, [userEmail, isOnline]);
@@ -358,8 +359,8 @@ const MapContainer = forwardRef(({
     }
     catch (err) {
       // Return an error-shaped result so SaveMapsModal can show it inline. Do NOT close the offline
-      // modal and open the global ErrorModal here: dismissing one native Modal while presenting another
-      // in the same commit makes iOS drop the ErrorModal presentation and freezes the app.
+      // modal and open the global MessageModal here: dismissing one native Modal while presenting another
+      // in the same commit makes iOS drop the MessageModal presentation and freezes the app.
       console.error(err);
       return {
         message: 'Error fetching data from tile count service. '
@@ -452,9 +453,7 @@ const MapContainer = forwardRef(({
   const zoomToCustomMap = (bbox, duration) => {
     if (!bbox) {
       console.error('Error: not able to get Custom Map bbox coords...');
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Not able to zoom to custom map while offline.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: 'Not able to zoom to custom map while offline.', title: 'Error!'}));
       return;
     }
     if (Platform.OS !== 'web' && !cameraRef.current) return;

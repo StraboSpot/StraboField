@@ -8,8 +8,8 @@ const useCompassSound = () => {
       SoundPlayer.playAsset(require('../../assets/sounds/compass_button_click.mp3'));
       console.log('Successfully finished playing compass sound.');
     }
-    catch (e) {
-      console.log('Compass sound failed', e);
+    catch (err) {
+      console.error('Compass sound failed', err);
     }
   };
 

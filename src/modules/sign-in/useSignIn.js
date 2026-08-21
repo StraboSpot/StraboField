@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDownload from '../../services/files/useDownload';
 import {isEmpty} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
-import {setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/home.slice';
+import {openedMessageModal, setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/home.slice';
 import {login, logout} from '../user/userProfile.slice';
 
 const useSignIn = () => {
@@ -30,7 +30,7 @@ const useSignIn = () => {
     setTimeout(() => isEmpty(currentProjectId) && dispatch(setIsProjectLoadSelectionModalVisible(true)), 500);
   };
 
-  const signIn = async (email, password, setUsername, setPassword, setErrorMessage, setIsErrorModalVisible) => {
+  const signIn = async (email, password, setUsername, setPassword) => {
     console.log(`Authenticating ${email} and getting user profile...`);
     try {
       const newEncodedLogin = Base64.encode(email + ':' + password);
@@ -52,12 +52,11 @@ const useSignIn = () => {
       if (Platform.OS !== 'web') {
         dispatch(setLoadingStatus({view: 'home', bool: false}));
         const errMsg = err.message || 'Credentials entered are incorrect. Please try again.';
-        if (setErrorMessage) setErrorMessage(errMsg);
-        if (setIsErrorModalVisible) setIsErrorModalVisible(true);
+        dispatch(openedMessageModal({message: errMsg, title: 'Error Signing In!'}));
         if (setPassword) setPassword('');
       }
       dispatch(logout());
-      throw Error;
+      throw err;
     }
   };
 

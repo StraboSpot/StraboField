@@ -34,7 +34,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getPopulatedPagesKeys, getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
+  const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {isReadOnlySpot} = useProject();
   const {
     getActiveSpotsObj,
@@ -67,10 +67,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
-      || getRelevantGeneralPages().map(p => p.key).includes(pageVisible)
-      || getRelevantPetPages().map(p => p.key).includes(pageVisible)
-      || getRelevantSedPages().map(p => p.key).includes(pageVisible)
-      || SUBPAGES.map(p => p.key).includes(pageVisible);
+      || getAllRelevantPages().some(p => p.key === pageVisible)
+      || SUBPAGES.some(p => p.key === pageVisible);
     if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   }, [pageVisible, spot]);
 

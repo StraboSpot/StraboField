@@ -3,6 +3,10 @@ import {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {clearLocalSaveNeeded, setAutoSaving, setNextAutoSaveTime} from '../../modules/connections/connections.slice';
+import {
+  stripMapboxTokenFromCustomMaps,
+  stripMapboxTokenFromProject,
+} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 
@@ -32,14 +36,15 @@ const useAutoSave = () => {
       const snapshot = {
         mapNamesDb: {},
         mapTilesDb: {},
-        otherMapsDb: otherMapsDb,
-        projectDb: projectDb,
+        otherMapsDb: stripMapboxTokenFromCustomMaps(otherMapsDb),
+        projectDb: {...projectDb, project: stripMapboxTokenFromProject(projectDb.project)},
         spotsDb: spotsDb,
       };
       await saveProjectToDevice(snapshot);
       await pruneOldProjectSaves(MAX_SAVES);
       dispatch(clearLocalSaveNeeded());
-      console.log('Auto save complete.', snapshot);
+      console.log('Auto save complete. Spots:', Object.keys(spotsDb).length,
+        'Custom maps:', Object.keys(otherMapsDb).length);
     }
     catch (err) {
       console.error('Auto save failed:', err);
@@ -55,7 +60,7 @@ const useAutoSave = () => {
   runSaveRef.current = runSave;
 
   useEffect(() => {
-    console.log('UE Auto Save', SAVE_INTERVAL_MS);
+    console.log('Auto Save interval set (ms):', SAVE_INTERVAL_MS);
     dispatch(setNextAutoSaveTime(SAVE_INTERVAL_MS ? Date.now() + SAVE_INTERVAL_MS : null));
   }, [saveFrequency]);
 

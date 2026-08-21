@@ -37,10 +37,12 @@ export const persistConfig = {
   storage: AsyncStorage,
   blacklist: [
     'compass',
+    'connections',
     'home',
     'mainMenu',
     'map',
     'notebook',
+    'project',
     'spot',
   ],
   migrate: createMigrate(migrations, {debug: false}),
@@ -51,7 +53,7 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime'],
+  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime', 'projectSaveStatus'],
   timeout: null,
 };
 
@@ -68,16 +70,17 @@ const homeConfig = {
   blacklist: [
     'imageProgress',
     'isBackupModalVisible',
-    'isErrorMessagesModalVisible',
     'isImageModalVisible',
     'isMainMenuPanelVisible',
     'isOfflineMapModalVisible',
     'isProgressModalVisible',
     'isProjectLoadSelectionModalVisible',
+    'isSessionExpiredModalVisible',
     'isStatusMessagesModalVisible',
     'isUploadModalVisible',
     'isUploadProgressModalVisible',
     'loading',
+    'messageModal',
     'modalValues',
     'modalVisible',
     'statusMessageModalTitle',
@@ -123,11 +126,7 @@ const mapConfig = {
 const projectConfig = {
   key: 'project',
   storage: AsyncStorage,
-  blacklist: [
-    'datasets',
-    'project',
-    'isImageTransferring',
-  ],
+  blacklist: ['isImageTransferring'],
   timeout: null,
 };
 

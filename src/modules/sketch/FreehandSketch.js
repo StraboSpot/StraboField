@@ -13,6 +13,9 @@ let freehandFeatureCoords = [];
 
 // True while a stroke is drawing; useMapDraw reads it to defer the preview's map re-render until lift,
 // since any re-render mid-gesture truncates the stroke. Module flag, not state, for that same reason.
+// A stroke over the map dies two ways: that re-render, and the map claiming the gesture. The second is why
+// this canvas must keep the default shouldBlockNativeResponder - do not add a GestureDetector here the way
+// Sketch.js does, or Mapbox's pan handler will seize one-finger strokes on Android.
 let isDrawing = false;
 
 export const getIsFreehandDrawing = () => isDrawing;

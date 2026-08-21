@@ -5,6 +5,7 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
+import {FormFlatList} from '../../../shared/ui';
 import {Form, useForm} from '../../form';
 import {updatedProject} from '../projects.slice';
 
@@ -36,8 +37,9 @@ const ProjectPrivacy = () => {
 
   /* View */
 
+  // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
-    <>
+    <FormFlatList>
       <Formik
         enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
         initialValues={preferences}
@@ -50,6 +52,7 @@ const ProjectPrivacy = () => {
           ...formProps,
           formName: formName,
           onMyChange: onMyChange,
+          renderInline: true,
           setFieldValue: onMyChange,
           isReadOnly: owner_straboUserId !== straboUserId,
         }}/>}
@@ -67,7 +70,7 @@ const ProjectPrivacy = () => {
             + 'shared as a collaborative project. See the next section.'}
         </Text>
       </View>
-    </>
+    </FormFlatList>
   );
 };
 

@@ -18,13 +18,12 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const dispatch = useDispatch();
   const isAutoSaving = useSelector(state => state.connections.isAutoSaving);
   const isLocalSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
-  const project = useSelector(state => state.project.project);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
   const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
 
   /* Derived Variables */
 
   const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
-  const projectName = project?.description?.project_name || 'Current Project';
 
   /* View */
 

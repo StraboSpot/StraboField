@@ -12,6 +12,7 @@ const imageStyles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
   },
   cardContainer: {

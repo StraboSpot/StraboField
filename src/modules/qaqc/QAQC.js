@@ -8,7 +8,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import PageHeader from '../page/PageHeader';
 
-const QAQC = () => {
+const QAQC = ({page}) => {
   /* Data Hooks */
 
   const existingQAQC = useSelector(state => state.spot.selectedSpot?.properties?.qaqc);
@@ -24,7 +24,7 @@ const QAQC = () => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'QAQC'}/>
+      <PageHeader pageTitle={page.label}/>
       {isEmpty(initialQAQC) ? (
         <Text style={[commonStyles.standardDescriptionText, {padding: 10}]}>
           Run QAQC by opening the Home Menu -{'>'} Datasets and then Dataset Detail for the dataset on which to

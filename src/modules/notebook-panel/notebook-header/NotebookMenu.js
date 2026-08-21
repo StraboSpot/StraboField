@@ -71,7 +71,7 @@ const NotebookMenu = ({
 
   const onPress = (key) => {
     if (key === 'copy') {
-      copySpot().catch(err => console.log('Error copying Spot!', err));
+      copySpot().catch(err => console.error('Error copying Spot!', err));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     else if (key === 'zoom') {

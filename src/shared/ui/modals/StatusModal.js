@@ -25,12 +25,18 @@ const StatusModal = () => {
 
   /* Local State */
 
-  const [isShowingDatasetPreferences, setIsShowingDatasetPreferences] = useState(false);
+  const [isDatasetPreferencesSelected, setIsDatasetPreferencesSelected] = useState(false);
 
   /* Derived Variables */
 
-  const isError = statusMessages.some(msg => msg.startsWith('Error:'));
+  // Match the actual failure headlines the flows emit ('Error ...', 'Download/Upload Failed!') without tripping on
+  // benign progress lines like 'Failed Images: 0/5'.
+  const isError = statusMessages.some(msg => /^(Error|Failed)|Failed!/i.test(msg));
   const isLoadingProject = mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS;
+  // Web is entered with the project already chosen, so the download's status lines are never the point there — the
+  // dataset preferences are. Deriving this instead of storing it keeps the status view out of a web project load
+  // entirely, including the frame it used to flash while the modal animated closed.
+  const isShowingDatasetPreferences = isDatasetPreferencesSelected || (Platform.OS === 'web' && isLoadingProject);
 
   /* Side Effects */
 
@@ -38,15 +44,14 @@ const StatusModal = () => {
     if (isProjectLoadSelectionModalVisible && !isEmpty(currentProjectId)) {
       dispatch(setIsProjectLoadSelectionModalVisible(false));
     }
-    if (Platform.OS === 'web' && isLoadingProject) setIsShowingDatasetPreferences(true);
-    else setIsShowingDatasetPreferences(false);
+    setIsDatasetPreferencesSelected(false);
   }, [isStatusMessagesModalVisible, isLoadingProject, dispatch, isProjectLoadSelectionModalVisible]);
 
   /* Logic Helpers */
 
   const closeModal = () => {
     // Reset dataset preferences view before closing
-    setIsShowingDatasetPreferences(false);
+    setIsDatasetPreferencesSelected(false);
 
     // Close the modal first
     dispatch(setIsStatusMessagesModalVisible(false));
@@ -74,7 +79,7 @@ const StatusModal = () => {
       actionTitle={'Ok'}
       closeModal={closeModal}
       headerTitle={isShowingDatasetPreferences ? 'Dataset Preferences' : 'Status'}
-      isLoading={isModalLoading}
+      isLoading={isModalLoading && !isShowingDatasetPreferences}
       isVisible={isStatusMessagesModalVisible}
       onActionPressed={closeModal}
       onCancelPress={closeModal}
@@ -87,14 +92,13 @@ const StatusModal = () => {
         <View>
           <LottieAnimations
             doesLoop={isModalLoading}
-            show={isModalLoading || isError}
             type={isModalLoading ? 'loadingFile' : isError ? 'error' : 'complete'}
           />
           <Text style={overlayStyles.statusMessageText}>{statusMessages.join('\n')}</Text>
         </View>
       )}
       {!isModalLoading && !isError && isLoadingProject && !isShowingDatasetPreferences && (
-        <OutlineButton onPress={() => setIsShowingDatasetPreferences(true)} title={'Show Datasets'}/>
+        <OutlineButton onPress={() => setIsDatasetPreferencesSelected(true)} title={'Show Datasets'}/>
       )}
       {isShowingDatasetPreferences && isLoadingProject && <DatasetPreferences/>}
     </ModalWrapper>

@@ -10,9 +10,6 @@ import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../ho
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-let CSVData = '';
-let csvObject = {};
-
 const useExternalData = () => {
   /* Data Hooks */
 
@@ -25,12 +22,38 @@ const useExternalData = () => {
   /* Internal Functions */
 
   const createCSVObject = (CSVFile, data) => {
-    csvObject.name = CSVFile.name.substring(0, CSVFile.name.lastIndexOf('.'));
-    csvObject.size = CSVFile.size;
-    csvObject.id = getNewUUID();
-    csvObject.data = csvToArray(data);
+    const csvObject = {
+      name: CSVFile.name.substring(0, CSVFile.name.lastIndexOf('.')),
+      size: CSVFile.size,
+      id: getNewUUID(),
+      data: csvToArray(data),
+    };
     console.log('CSV Object', csvObject);
     return csvObject;
+  };
+
+  const readFileAsText = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = event => resolve(event.target.result);
+      fileReader.onerror = () => reject(fileReader.error);
+      fileReader.readAsText(file);
+    });
+  };
+
+  const saveCSV = (csvObject) => {
+    try {
+      let editedData = spot.properties.data ? JSON.parse(JSON.stringify(spot.properties.data)) : {};
+      if (!editedData.tables) editedData.tables = [];
+      editedData.tables.push(csvObject);
+      console.log(editedData);
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: 'data', value: editedData}));
+    }
+    catch (err) {
+      console.error('Error saving .CSV file', err);
+      toast.show('Error saving .CSV file', {type: 'warning', placement: 'top'});
+    }
   };
 
   /* Exported Functions */
@@ -54,8 +77,9 @@ const useExternalData = () => {
   };
 
   const readCSV = async (dataFile) => {
+    let CSVFile = {};
+    let CSVData = '';
     try {
-      let CSVFile = {};
       dispatch(setLoadingStatus({view: 'home', bool: true}));
 
       if (Platform.OS !== 'web') {
@@ -69,24 +93,9 @@ const useExternalData = () => {
         console.log({uri: CSVFile.uri, type: CSVFile.type, name: CSVFile.name, size: CSVFile.size});
         CSVData = await readFile(CSVFile.uri);
       }
-      else {
-        if (dataFile) {
-          CSVFile = dataFile;
-          const getCSVData = () => {
-            return new Promise((resolve) => {
-              const fileReader = new FileReader();
-
-              fileReader.onload = async (event) => {
-                const result = event.target.result;
-                resolve(result);
-              };
-
-              fileReader.readAsText(dataFile);
-            });
-          };
-          CSVData = await getCSVData(dataFile);
-          // console.log('CSV DATA from WEB', CSVData);
-        }
+      else if (dataFile) {
+        CSVFile = dataFile;
+        CSVData = await readFileAsText(dataFile);
       }
 
       if (CSVData) {
@@ -97,27 +106,8 @@ const useExternalData = () => {
       }
     }
     catch (err) {
-      console.log('ERR', err);
+      console.error(`Error reading .CSV file "${CSVFile?.name || 'unknown'}"`, err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      console.error('Error reading .CSV file', err);
-    }
-  };
-
-  const saveCSV = () => {
-    try {
-      let savedTables;
-      let editedData = spot.properties.data ? JSON.parse(JSON.stringify(spot.properties.data)) : {};
-      if (spot.properties.data?.tables) savedTables = spot.properties.data.tables;
-      console.log(savedTables);
-      if (!editedData.tables) editedData.tables = [];
-      editedData.tables.push(csvObject);
-      console.log(editedData);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      dispatch(editedSpotProperties({field: 'data', value: editedData}));
-    }
-    catch (err) {
-      console.error('Error saving .CSV file');
-      toast.show('Error saving .CSV file', {type: 'warning', placement: 'top'});
     }
   };
 
@@ -149,14 +139,13 @@ const useExternalData = () => {
         alert('URL is already in list.');
       }
     }
-    else throw Error();
+    else throw Error(`"${fullURL}" is not a valid URL.`);
   };
 
   return {
     deleteCSV,
     deleteURL,
     readCSV,
-    saveCSV,
     saveEdits,
     saveURL,
   };

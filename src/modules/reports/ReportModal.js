@@ -4,7 +4,6 @@ import {FlatList, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {ReportComments, ReportForm, ReportImages, ReportMetadata, ReportSpots, ReportTags, useReportModal} from '.';
-import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
@@ -42,7 +41,8 @@ const ReportModal = ({openSpotInNotebook}) => {
 
   /* Derived Variables */
 
-  const isNewReport = isEmpty(initialValues);
+  // A new memo can arrive with values already set (the Spot it was created from), so only a saved memo has an id
+  const isNewReport = !initialValues.id;
   const isReadOnly = isReadOnlyProject || (initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
 
   /* Event Handlers */

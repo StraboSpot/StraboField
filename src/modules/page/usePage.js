@@ -1,8 +1,6 @@
 import {useSelector} from 'react-redux';
 
-import {
-  NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PET_PAGES, PRIMARY_PAGES, SECONDARY_PAGES, SED_PAGES,
-} from './page.constants';
+import {NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PAGES_SECTIONS, PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
 import {useTags} from '../tags';
@@ -16,7 +14,15 @@ const usePage = () => {
 
   const {getTagsAtSpot} = useTags();
 
+  /* Derived Variables */
+
+  const isStratIntervalSpot = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
+  const isSpotInStratSection = isStratIntervalSpot || !!selectedSpot?.properties?.strat_section_id;
+
   /* Exported Functions */
+
+  // Every page relevant to the selected Spot, in the order the More Pages menu lists them
+  const getAllRelevantPages = isSample => getRelevantPagesSections(isSample).flatMap(section => section.pages);
 
   // Return the keys for the Spot pages that are populated with data
   const getPopulatedPagesKeys = (spot) => {
@@ -97,40 +103,11 @@ const usePage = () => {
     return populatedPagesKeys;
   };
 
-  const getRelevantGeneralPages = (isSample) => {
-    return [...PRIMARY_PAGES, ...SECONDARY_PAGES].reduce((acc, page) => {
-      return ((!page.testing || (isTestingMode && page?.testing))
-        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
-    }, []);
-  };
-
-  const getRelevantPetPages = (isSample) => {
-    const petPagesWithSedRocks = [...PET_PAGES.slice(0, 3), SED_PAGES[0], ...PET_PAGES.slice(3, PET_PAGES.length)];
-    return petPagesWithSedRocks.reduce((acc, page) => {
-      return ((!page.testing || (isTestingMode && page?.testing))
-        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))) ? [...acc, page] : acc;
-    }, []);
-  };
-
-  const getRelevantSedPages = (isSample) => {
-    const sedPagesWithoutSedRocks = [...SED_PAGES.slice(1, SED_PAGES.length)];
-    return sedPagesWithoutSedRocks.reduce((acc, page) => {
-      if ((!page.testing || (isTestingMode && page?.testing))
-        && (!isSample || (isSample && !PAGES_HIDDEN_IN_SAMPLE.includes(page.key)))
-        && (page.key !== PAGE_KEYS.STRAT_SECTION
-          || (page.key === PAGE_KEYS.STRAT_SECTION
-            && selectedSpot.properties?.surface_feature?.surface_feature_type !== 'strat_interval'
-            && !selectedSpot.properties?.strat_section_id))
-        && (page.key !== PAGE_KEYS.INTERVAL
-          || (page.key === PAGE_KEYS.INTERVAL
-            && selectedSpot.properties?.surface_feature?.surface_feature_type === 'strat_interval'))
-        && (page.key !== PAGE_KEYS.INTERPRETATIONS
-          || (page.key === PAGE_KEYS.INTERPRETATIONS
-            && (selectedSpot.properties?.surface_feature?.surface_feature_type === 'strat_interval'
-              || selectedSpot.properties?.strat_section_id)))) {
-        return [...acc, page];
-      }
-      return acc;
+  // The sections of the notebook's More Pages menu, each with the pages relevant to the selected Spot
+  const getRelevantPagesSections = (isSample) => {
+    return PAGES_SECTIONS.reduce((acc, section) => {
+      const pages = getRelevantPages(section.pages, isSample);
+      return isEmpty(pages) ? acc : [...acc, {title: section.title, pages: pages}];
     }, []);
   };
 
@@ -139,11 +116,27 @@ const usePage = () => {
     return page && page.icon_src ? page.icon_src : require('../../assets/icons/QuestionMark_pressed.png');
   };
 
+  /* Logic Helpers */
+
+  // PAGES_SECTIONS is the same for every Spot, so the Spot-specific rules live here: Interval belongs
+  // to the interval itself, while Strat Section is offered only to a Spot not already in one.
+  const getRelevantPages = (pages, isSample) => {
+    return pages.reduce((acc, page) => {
+      if ((!page.testing || isTestingMode)
+        && (!isSample || !PAGES_HIDDEN_IN_SAMPLE.includes(page.key))
+        && (page.key !== PAGE_KEYS.INTERVAL || isStratIntervalSpot)
+        && (page.key !== PAGE_KEYS.INTERPRETATIONS || isSpotInStratSection)
+        && (page.key !== PAGE_KEYS.STRAT_SECTION || !isSpotInStratSection)) {
+        return [...acc, page];
+      }
+      return acc;
+    }, []);
+  };
+
   return {
+    getAllRelevantPages,
     getPopulatedPagesKeys,
-    getRelevantGeneralPages,
-    getRelevantPetPages,
-    getRelevantSedPages,
+    getRelevantPagesSections,
     getSpotDataIconSource,
   };
 };
