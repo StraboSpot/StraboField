@@ -414,6 +414,21 @@
     },
     {
       "list_name": "so29n97",
+      "name": "glass",
+      "label": "glass"
+    },
+    {
+      "list_name": "so29n97",
+      "name": "crystals",
+      "label": "crystals"
+    },
+    {
+      "list_name": "so29n97",
+      "name": "lithic_fragmen",
+      "label": "lithic fragments"
+    },
+    {
+      "list_name": "so29n97",
       "name": "volcanic_mudst",
       "label": "volcanic mudstone"
     },
@@ -456,6 +471,21 @@
       "list_name": "so29n97",
       "name": "ignimbrite",
       "label": "ignimbrite"
+    },
+    {
+      "list_name": "so29n97",
+      "name": "discrete",
+      "label": "discrete"
+    },
+    {
+      "list_name": "so29n97",
+      "name": "disseminated",
+      "label": "disseminated"
+    },
+    {
+      "list_name": "so29n97",
+      "name": "cryptotephra",
+      "label": "cryptotephra"
     },
     {
       "list_name": "so29n97",
