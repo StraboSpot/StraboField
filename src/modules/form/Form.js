@@ -20,8 +20,8 @@ const Form = ({
                 isReadOnly,
                 onMyChange,
                 // Called for number fields in place of onMyChange, which every other field type gets too. A form
-                // that only needs its numeric fields intercepted passes this instead, so its select fields stay on
-                // the default path and go on clearing what a choice makes irrelevant
+                // that only needs its numeric fields intercepted passes this instead, so its other fields keep
+                // whatever the default path writes for them
                 onNumberChange,
                 renderInline,
                 setFieldValue,
@@ -62,18 +62,20 @@ const Form = ({
 
   /* Event Handlers */
 
+  // A caller's onMyChange takes over writing the chosen value, so the clearing that SelectInputField's own write
+  // would have done has to happen here instead. Without it a form wired through onMyChange keeps the fields its
+  // new choice makes irrelevant and saves them with the feature
+  const handleSelectChange = (name, value) => {
+    clearFieldsMadeIrrelevant(getFieldName(name), value);
+    onMyChange(name, value);
+  };
+
   const handleShowFieldInfo = (label, info) => setFieldInfo({label, info});
 
   /* Logic Helpers */
 
-  // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
-  const getFieldName = path => subkey ? path.split('[0].')[1] : path;
-
-  const getFieldPath = name => subkey ? subkey + '[0].' + name : name;
-
-  // Wrap setFieldValue to also clear fields that become irrelevant after a change
-  const setFieldValueAndClearIrrelevant = (path, value, shouldValidate) => {
-    const fieldName = getFieldName(path);
+  // Clear the fields that setting the named field to the given value makes irrelevant
+  const clearFieldsMadeIrrelevant = (fieldName, value) => {
     let newValues = {...formValues, [fieldName]: value};
 
     // Iteratively clear fields that now have values but are no longer relevant
@@ -94,7 +96,16 @@ const Form = ({
         setFieldValue(getFieldPath(field.name), undefined, false);
       }
     });
+  };
 
+  // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
+  const getFieldName = path => subkey ? path.split('[0].')[1] : path;
+
+  const getFieldPath = name => subkey ? subkey + '[0].' + name : name;
+
+  // Wrap setFieldValue to also clear fields that become irrelevant after a change
+  const setFieldValueAndClearIrrelevant = (path, value, shouldValidate) => {
+    clearFieldsMadeIrrelevant(getFieldName(path), value);
     setFieldValue(path, value, shouldValidate);
   };
 
@@ -206,7 +217,7 @@ const Form = ({
         key={getFieldPath(field.name)}
         label={field.label}
         name={getFieldPath(field.name)}
-        onMyChange={onMyChange}
+        onMyChange={onMyChange && handleSelectChange}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
         setFieldValue={setFieldValueAndClearIrrelevant}

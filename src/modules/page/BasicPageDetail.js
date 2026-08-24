@@ -21,7 +21,6 @@ import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
-import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
 import {useSpots} from '../spots';
@@ -48,7 +47,6 @@ const BasicPageDetail = ({
 
   const {submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
-  const {onSampleFormChange} = useSamples();
   const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();
@@ -302,9 +300,7 @@ const BasicPageDetail = ({
                   ? ((name, value) => onMineralChange(formRef.current, name, value))
                   : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
                     ? ((name, value) => onSedFormChange(formRef.current, name, value))
-                    : page.key === PAGE_KEYS.SAMPLES
-                      ? ((name, value) => onSampleFormChange(formRef.current, name, value))
-                      : undefined}
+                    : undefined}
                 onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
                     {orientationFields: orientationFields}))
                   : undefined}
