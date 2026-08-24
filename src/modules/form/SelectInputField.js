@@ -46,6 +46,17 @@ const SelectInputField = ({
   const isCompact = appearance === 'horizontal-compact';
   const isHorizontal = appearance === 'horizontal' || isCompact;
   const placeholderText = name === 'spot_id_for_pet_copy' ? '-- None --' : `-- Select ${label} --`;
+  const selectedValues = isEmpty(value) ? [] : Array.isArray(value) ? value : [value];
+  // A saved value these choices don't contain still counts toward the field but renders no row to untick and no
+  // tag to remove, so there is no way to clear it. It happens where two forms edit the same field from lists
+  // that have drifted apart, and to anything written against an older version of a list. Give it a row of its
+  // own, labeled the way useForm labels an unknown key; deselecting it takes the row away with it
+  const unlistedChoices = selectedValues.filter(v => !choices.some(choice => choice.value === v)).map(v => ({
+    disabled: choices[0]?.disabled ?? isReadOnly,
+    label: String(v).replace(/_/g, ' '),
+    value: v,
+  }));
+  const allChoices = isEmpty(unlistedChoices) ? choices : [...choices, ...unlistedChoices];
 
   /* Event Handlers */
 
@@ -77,7 +88,7 @@ const SelectInputField = ({
     else if (typeof itemValue === 'object' && Array.isArray(itemValue) && itemValue.length === 1) {
       itemValue = itemValue[0];
     }
-    const choiceFound = choices.find(choice => choice.value === itemValue);
+    const choiceFound = allChoices.find(choice => choice.value === itemValue);
     return choiceFound ? choiceFound.label : '';
   };
 
@@ -152,10 +163,11 @@ const SelectInputField = ({
       return (
         <View onLayout={onContainerLayout} style={formStyles.horizontalChoices}>
           {choiceRows.map(renderChoiceRow)}
+          {!isEmpty(unlistedChoices) && renderUnlistedRow()}
         </View>
       );
     }
-    return choices.map(item => renderChoiceItem(item));
+    return allChoices.map(item => renderChoiceItem(item));
   };
 
   // Choice label stacked above its radio/checkbox rather than beside it. Held to one line so that a
@@ -234,7 +246,7 @@ const SelectInputField = ({
             hideSubmitButton={true}
             hideTags={false}
             itemTextColor={PRIMARY_TEXT_COLOR}
-            items={choices}
+            items={allChoices}
             onSelectedItemsChange={fieldValueChanged}
             searchIcon={false}
             searchInputPlaceholderText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
@@ -259,6 +271,20 @@ const SelectInputField = ({
         </View>
         {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
       </>
+    );
+  };
+
+  // Kept out of the measured columns above, which are laid out from the choices the field offers. These are
+  // not among them, so they sit in a row of their own below
+  const renderUnlistedRow = () => {
+    return (
+      <View style={formStyles.horizontalChoicesRow}>
+        {unlistedChoices.map(item => (
+          <View key={item.value}>
+            {isCompact ? renderCompactChoiceItem(item) : renderHorizontalChoiceItem(item)}
+          </View>
+        ))}
+      </View>
     );
   };
 
