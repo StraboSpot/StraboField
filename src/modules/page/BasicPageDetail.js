@@ -14,7 +14,9 @@ import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import {onOrientationChange} from '../compass/compass.helpers';
 import {Form, useForm} from '../form';
+import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -25,6 +27,7 @@ import useSed from '../sed/useSed';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
+import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
 import {messages} from './ui/Messages';
 
 const BasicPageDetail = ({
@@ -54,17 +57,13 @@ const BasicPageDetail = ({
   /* Local State */
 
   const formRef = useRef(null);
-
-  const [initialValues, setInitialValues] = useState(selectedFeature);
   const [igsnFormValues, setIgsnFormValues] = useState(null);
+  const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
-  useEffect(() => {
-    setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
-  }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
   /* Derived Variables */
 
   const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
@@ -75,12 +74,20 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
+  // Pages whose form fills one orientation field in from another name the pairs it uses
+  const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
+    : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
+      : undefined;
   const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
   && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
     ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
     : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
   /* Side Effects */
+
+  useEffect(() => {
+    setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
+  }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
 
   useLayoutEffect(() => {
     console.log('ULE BasicPageDetail []');
@@ -98,6 +105,8 @@ const BasicPageDetail = ({
     setInitialValues(selectedFeature);
     if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
   }, [selectedFeature]);
+
+  /* Event Handlers */
 
   const onSampleSaved = async (formCurrent) => {
     console.log('Saving Sample To SESAR', formRef.current?.values);
@@ -296,6 +305,9 @@ const BasicPageDetail = ({
                     : page.key === PAGE_KEYS.SAMPLES
                       ? ((name, value) => onSampleFormChange(formRef.current, name, value))
                       : undefined}
+                onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
+                    {orientationFields: orientationFields}))
+                  : undefined}
               />
             </>
           )}
@@ -309,6 +321,8 @@ const BasicPageDetail = ({
       </View>
     );
   };
+
+  /* View */
 
   return (
     <>

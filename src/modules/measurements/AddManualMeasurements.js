@@ -12,14 +12,13 @@ import {
 } from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import SliderBar from '../../shared/ui/SliderBar';
+import {onOrientationChange} from '../compass/compass.helpers';
 import compassStyles from '../compass/compass.styles';
-import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 
 const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
   /* Data Hooks */
 
-  const {doMeasurementCalculations} = useCompassCalculations();
   const {getSurvey} = useForm();
 
   /* Local State */
@@ -48,16 +47,8 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
 
   /* Event Handlers */
 
-  const onMyChange = (name, value) => {
-    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
-      const valueAsFloat = parseFloat(value);
-      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
-        doMeasurementCalculations(name, valueAsFloat, formRefCurrent, formRefCurrent.values, formRefCurrent.values);
-      }
-      else formRefCurrent.setFieldValue(name, undefined);
-    }
-    else formRefCurrent.setFieldValue(name, value);
-  };
+  // Entering a strike fills in the dip direction and the reverse
+  const onNumberChange = (name, value) => onOrientationChange(formRefCurrent, name, value);
 
   /* View */
 
@@ -69,7 +60,7 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
           <Form
             {...formProps}
             formName={PLANAR_FORM_NAME}
-            onMyChange={onMyChange}
+            onNumberChange={onNumberChange}
             surveyFragment={planarKeysFields}
           />
         )}

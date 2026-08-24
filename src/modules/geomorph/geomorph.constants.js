@@ -1,3 +1,4 @@
+import {getOrientationFields} from '../compass/compass.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 const CONFIDENCE_IN_FEATURE_KEY = 'confidence_in_feature';
@@ -13,6 +14,8 @@ const FAULT_ORIENTATION_KEYS = {
     quality: 'meas_quality',
   },
 };
+
+const EARTHQUAKE_ORIENTATION_FIELDS = getOrientationFields(FAULT_ORIENTATION_KEYS);
 
 const LAST_KEYS = ['diameter', 'height_of_material', 'max_vert_movement', 'dir_of_slope_mov',
   'displacement_amt', 'depth', 'max_drop_in_elevation', 'length_exposed_downslope', 'slip_preferred', 'slip_min',
@@ -37,6 +40,7 @@ export {
   CONFIDENCE_IN_FEATURE_KEY,
   EARTHQUAKE_FORM_NAME,
   EARTHQUAKE_GROUP_KEY,
+  EARTHQUAKE_ORIENTATION_FIELDS,
   EARTHQUAKE_PAGE_KEY,
   FAULT_ORIENTATION_KEYS,
   LAST_KEYS,

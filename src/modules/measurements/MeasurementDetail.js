@@ -20,8 +20,8 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
+import {onOrientationChange} from '../compass/compass.helpers';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
-import useCompassCalculations from '../compass/useCompassCalculations';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
@@ -43,7 +43,6 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {doMeasurementCalculations} = useCompassCalculations();
   const {submitAndShowErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
@@ -133,16 +132,9 @@ const MeasurementDetail = ({
     else addAssociatedMeasurement();
   };
 
-  const onMyChange = (name, value) => {
-    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
-      const valueAsFloat = parseFloat(value, 10);
-      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
-        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
-      }
-      else formRef.current.setFieldValue(name, undefined);
-    }
-    else formRef.current.setFieldValue(name, value);
-  };
+  // Entering a strike fills in the dip direction and the reverse, and a rake the trend and plunge
+  const onNumberChange = (name, value) => onOrientationChange(formRef.current, name, value,
+    {selectedAttitude: selectedAttitude, selectedMeasurement: selectedMeasurement});
 
   // Confirm switch between Planar and Tabular Zone
   const onSwitchPlanarTabular = (i) => {
@@ -440,7 +432,7 @@ const MeasurementDetail = ({
                 {...formProps}
                 formName={formName}
                 isReadOnly={isReadOnly}
-                onMyChange={onMyChange}
+                onNumberChange={onNumberChange}
               />
             )}
           </Formik>

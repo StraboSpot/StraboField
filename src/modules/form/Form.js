@@ -19,6 +19,10 @@ const Form = ({
                 formName,
                 isReadOnly,
                 onMyChange,
+                // Called for number fields in place of onMyChange, which every other field type gets too. A form
+                // that only needs its numeric fields intercepted passes this instead, so its select fields stay on
+                // the default path and go on clearing what a choice makes irrelevant
+                onNumberChange,
                 renderInline,
                 setFieldValue,
                 subkey,
@@ -173,7 +177,7 @@ const Form = ({
         key={getFieldPath(field.name)}
         label={field.label}
         name={getFieldPath(field.name)}
-        onMyChange={onMyChange}
+        onMyChange={onNumberChange || onMyChange}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
       />

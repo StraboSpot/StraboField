@@ -6,6 +6,7 @@ import {Field, Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
+import {onOrientationChange} from './compass.helpers';
 import compassStyles from './compass.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -32,6 +33,11 @@ const ManualMeasurement = ({
 
   const manualFormRef = useRef(null);
 
+  /* Event Handlers */
+
+  // Entering a strike fills in the dip direction and the reverse, as it does for a planar measurement
+  const onNumberChange = (name, value) => onOrientationChange(manualFormRef.current, name, value);
+
   /* View */
 
   return (
@@ -54,6 +60,7 @@ const ManualMeasurement = ({
                     key={'strike'}
                     label={'Strike'}
                     name={'strike'}
+                    onMyChange={onNumberChange}
                   />
                 </ListItem.Content>
               </ListItem>
@@ -65,6 +72,7 @@ const ManualMeasurement = ({
                     key={'dip_direction'}
                     label={'Azimuthal Dip Direction'}
                     name={'dip_direction'}
+                    onMyChange={onNumberChange}
                   />
                 </ListItem.Content>
               </ListItem>

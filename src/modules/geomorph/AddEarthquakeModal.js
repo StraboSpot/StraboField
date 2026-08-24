@@ -8,6 +8,7 @@ import {
   CONFIDENCE_IN_FEATURE_KEY,
   EARTHQUAKE_FORM_NAME,
   EARTHQUAKE_GROUP_KEY,
+  EARTHQUAKE_ORIENTATION_FIELDS,
   EARTHQUAKE_PAGE_KEY,
   FAULT_ORIENTATION_KEYS,
   LAST_KEYS,
@@ -19,6 +20,7 @@ import {getNewUUID} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import {onOrientationChange} from '../compass/compass.helpers';
 import {Form, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
@@ -59,6 +61,12 @@ const AddEarthquakeModal = () => {
     console.log('UE AddEarthquakeModal []');
     return () => dispatch(setModalValues({}));
   }, []);
+
+  /* Event Handlers */
+
+  // Entering a strike fills in the azimuth dip direction and the reverse
+  const onNumberChange = (name, value) => onOrientationChange(formRef.current, name, value,
+    {orientationFields: EARTHQUAKE_ORIENTATION_FIELDS});
 
   /* Logic Helpers */
 
@@ -195,7 +203,12 @@ const AddEarthquakeModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...formProps} formName={[groupKey, pageKey]} surveyFragment={relevantFields}/>
+      <Form
+        {...formProps}
+        formName={[groupKey, pageKey]}
+        onNumberChange={onNumberChange}
+        surveyFragment={relevantFields}
+      />
     );
   };
 
