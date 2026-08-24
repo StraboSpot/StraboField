@@ -310,7 +310,7 @@
       "required": "false",
       "constraint": ". >= 0",
       "constraint_message": "Value must be greater than or equal to 0 (active).",
-      "relevant": "${feature_type} = 'foliation' and ${feature_type} = 'fault'"
+      "relevant": "${feature_type} = 'foliation' or ${feature_type} = 'fault'"
     },
     {
       "type": "text",
@@ -326,7 +326,7 @@
       "required": "false",
       "constraint": ". > 0",
       "constraint_message": "Value must be greater than 0.",
-      "relevant": "${feature_type} = 'foliation' and ${feature_type} = 'fault'"
+      "relevant": "${feature_type} = 'foliation' or ${feature_type} = 'fault'"
     },
     {
       "type": "text",
@@ -340,7 +340,7 @@
       "name": "geo_age",
       "label": "Geologic Age of Structure",
       "required": "false",
-      "relevant": "${feature_type} = 'foliation' and ${feature_type} = 'fault'"
+      "relevant": "${feature_type} = 'foliation' or ${feature_type} = 'fault'"
     }
   ],
   "choices": [
