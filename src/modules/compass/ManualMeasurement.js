@@ -8,6 +8,7 @@ import {useSelector} from 'react-redux';
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
 import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
@@ -16,10 +17,12 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ManualMeasurement = ({
                              addAttributeMeasurement,
+                             initialValues,
                              measurementTypes,
                              setAttributeMeasurements,
                              setSliderValue,
                              sliderValue,
+                             validate,
                            }) => {
   /* Data Hooks */
 
@@ -34,9 +37,11 @@ const ManualMeasurement = ({
   return (
     <Formik
       enableReinitialize={true}
-      initialValues={{}}
+      initialValues={initialValues}
       innerRef={manualFormRef}
       onSubmit={values => console.log('Submitting form...', values)}
+      validate={validate}
+      validateOnMount={true}
     >
       {formProps => (
         <View>
@@ -117,7 +122,11 @@ const ManualMeasurement = ({
                     value={sliderValue}
                   />
                 </View>
-                <ActionButton onPress={() => addAttributeMeasurement(formProps.values)} title={'Add to Attribute'}/>
+                <ActionButton
+                  disabled={!isEmpty(formProps.errors)}
+                  onPress={() => addAttributeMeasurement(formProps.values)}
+                  title={'Add to Attribute'}
+                />
               </>
             )}
         </View>

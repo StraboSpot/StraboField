@@ -4,6 +4,7 @@ import {Platform, ScrollView, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import {useForm} from '.';
+import {getConstraintError} from './form.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -33,6 +34,19 @@ const MeasurementModal = ({
 
   const [isManualMeasurement, setIsManualMeasurement] = useState(defaultManualMeasurement ?? (Platform.OS !== 'ios'));
   const [sliderValue, setSliderValue] = useState(6);
+
+  /* Derived Variables */
+
+  // The group pairs each compass key with the attribute field it writes to. Quality is in it but is a slider here
+  // rather than one of the manual fields, so it takes no seed value and has nothing to validate.
+  const manualFieldEntries = Object.entries(measurementsGroup).filter(
+    ([compassFieldKey]) => compassFieldKey !== 'quality');
+
+  // Reopening the modal shows the measurement already on the attribute, keyed the way the manual fields are named
+  const manualMeasurementValues = manualFieldEntries.reduce((acc, [compassFieldKey, groupFieldKey]) => {
+    if (isEmpty(formProps.values[groupFieldKey])) return acc;
+    return {...acc, [compassFieldKey]: formProps.values[groupFieldKey]};
+  }, {});
 
   /* Logic Helpers */
 
@@ -70,6 +84,18 @@ const MeasurementModal = ({
     }
   };
 
+  // The manual fields are named by compass key while the constraints live on the attribute's own fields, so check
+  // each value against the field it will be written to and report the error back under the name shown here
+  const validateMeasurement = (values) => {
+    const survey = getSurvey(formName);
+    return manualFieldEntries.reduce((acc, [compassFieldKey, groupFieldKey]) => {
+      const fieldModel = survey.find(f => f.name === groupFieldKey);
+      if (!fieldModel || isEmpty(values[compassFieldKey])) return acc;
+      const constraintError = getConstraintError(fieldModel, values[compassFieldKey]);
+      return constraintError ? {...acc, [compassFieldKey]: constraintError} : acc;
+    }, {});
+  };
+
   /* View */
 
   return (
@@ -90,10 +116,12 @@ const MeasurementModal = ({
         {isManualMeasurement ? (
           <ManualMeasurement
             addAttributeMeasurement={addAttributeMeasurement}
+            initialValues={manualMeasurementValues}
             measurementTypes={compassMeasurementTypes}
             setAttributeMeasurements={setMeasurements}
             setSliderValue={setSliderValue}
             sliderValue={sliderValue}
+            validate={validateMeasurement}
           />
         ) : (
           <>
