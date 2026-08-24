@@ -100,7 +100,8 @@ const UserProfile = () => {
                 spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
               }
               else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
-                const strike = (m.dipDirection - 90) % 360;
+                // Wrapped through 360 so a dip direction under 90 gives a strike in range rather than a negative
+                const strike = (m.dip_direction - 90 + 360) % 360;
                 console.log('Dip direction', m.dip_direction, '-> Strike', strike);
                 m.strike = strike;
                 spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
