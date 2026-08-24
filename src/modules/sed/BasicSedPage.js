@@ -10,6 +10,7 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import TruncatedText from '../../shared/ui/TruncatedText';
+import {useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -24,6 +25,8 @@ const BasicSedPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {getSurvey} = useForm();
 
   /* Local State */
 
@@ -74,6 +77,11 @@ const BasicSedPage = ({isReadOnly, page}) => {
         : page.key === PAGE_KEYS.INTERPRETATIONS ? INTERPRETATIONS_SUBPAGES
           : undefined;
     if (subpages) {
+      const subpageKeys = Object.values(subpages);
+      const subpageKey = subpageKeys[selectedTypeIndex];
+      // Every tab edits the same attribute, so a choice made on one can leave a field on another behind. The
+      // tab being shown does its own clearing; these are the fields it cannot see
+      const siblingSurvey = subpageKeys.filter(k => k !== subpageKey).flatMap(k => getSurvey(['sed', k]));
       return (
         <>
           <BasicPageDetail
@@ -91,8 +99,9 @@ const BasicSedPage = ({isReadOnly, page}) => {
             closeDetailView={() => setIsDetailView(false)}
             groupKey={'sed'}
             isReadOnly={isReadOnly}
-            page={{...page, key: Object.values(subpages)[selectedTypeIndex]}}
+            page={{...page, key: subpageKey}}
             selectedFeature={selectedAttribute}
+            siblingSurvey={siblingSurvey}
           />
         </>
       );

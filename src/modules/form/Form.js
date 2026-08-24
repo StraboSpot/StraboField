@@ -25,6 +25,9 @@ const Form = ({
                 onNumberChange,
                 renderInline,
                 setFieldValue,
+                // The fields of the sibling surveys a tabbed page edits the same object through. Clearing needs
+                // them; rendering must not have them, or a tab would draw its siblings' fields
+                siblingSurvey,
                 subkey,
                 surveyFragment,
                 values,
@@ -43,6 +46,13 @@ const Form = ({
   // all read that object rather than the values around it
   const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
   const survey = surveyFragment || getSurvey(formName);
+  // A choice on one tab can make a field on another irrelevant, so clearing sees every tab's fields. This
+  // survey's own definition wins where both define a field: the composition tab shows volcaniclastic_type
+  // whatever the lithology is, the lithology tab only for a volcaniclastic one, and each has to go on meaning
+  // what it says while you are editing it
+  const unseenSiblingFields = (siblingSurvey || []).filter(
+    siblingField => !survey.some(field => field.name === siblingField.name));
+  const clearingSurvey = [...survey, ...unseenSiblingFields];
   const relevantFields = survey.filter(item => isRelevant(item, formValues));
 
   /* Side Effects */
@@ -82,7 +92,7 @@ const Form = ({
     let changed = true;
     while (changed) {
       changed = false;
-      survey.forEach((field) => {
+      clearingSurvey.forEach((field) => {
         if (field.name !== fieldName && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
           newValues = {...newValues, [field.name]: undefined};
           changed = true;
@@ -91,7 +101,7 @@ const Form = ({
     }
 
     // Apply clears for fields that became irrelevant
-    survey.forEach((field) => {
+    clearingSurvey.forEach((field) => {
       if (field.name !== fieldName && formValues[field.name] !== undefined && newValues[field.name] === undefined) {
         setFieldValue(getFieldPath(field.name), undefined, false);
       }

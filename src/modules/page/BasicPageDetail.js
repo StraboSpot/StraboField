@@ -38,6 +38,7 @@ const BasicPageDetail = ({
                            page,
                            saveTemplate,
                            selectedFeature,
+                           siblingSurvey,
                          }) => {
   /* Data Hooks */
 
@@ -304,6 +305,7 @@ const BasicPageDetail = ({
                 onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
                     {orientationFields: orientationFields}))
                   : undefined}
+                siblingSurvey={siblingSurvey}
               />
             </>
           )}
