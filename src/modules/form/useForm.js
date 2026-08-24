@@ -130,12 +130,16 @@ const useForm = () => {
   };
 
   // Submit a form and report its errors the way showErrors does, returning both the errors and the values to save.
-  // Ask Formik for the errors rather than reading form.errors, which innerRef only refreshes on commit — straight
-  // after awaiting submitForm they are still the previous render's, which let a value typed and saved without
-  // leaving the field validate against errors from before it was typed. Callers need them because the
-  // isLeavingPage path alerts without throwing and saves the valid fields, so only they know if the save was whole.
-  const submitAndShowErrors = async (form, isLeavingPage) => {
-    await form.submitForm();
+  // Formik rebinds innerRef on every commit, so the bag a save starts with is stale in two ways. Its errors are the
+  // previous render's, which let a value typed and saved without leaving the field validate against errors from
+  // before it was typed, so ask Formik for them directly. Its values are missing anything written in the same tick
+  // as the save, as the compass does with its reading, so take a ref where the caller has one and re-read it after
+  // submitting. Callers need the errors back because the isLeavingPage path alerts without throwing and saves the
+  // valid fields, so only they can tell a whole save from a partial one.
+  const submitAndShowErrors = async (formOrRef, isLeavingPage) => {
+    const getForm = () => formOrRef.current || formOrRef;
+    await getForm().submitForm();
+    const form = getForm();
     const errors = await form.validateForm();
     return {errors: errors, values: showErrors({...form, errors: errors}, isLeavingPage)};
   };

@@ -122,26 +122,23 @@ const AddMeasurementModal = ({onPress}) => {
       id: getNewUUID(),
       type: typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR : typeObj.key,
     };
-    // Set the initial form values if not multiple templates
-    if (gotRelevantTemplates.length <= 1 || (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR
-      && getPlanarTemplates(gotRelevantTemplates).length <= 1
-      || getLinearTemplates(gotRelevantTemplates).length <= 1)) {
-      if (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-        if (getPlanarTemplates(gotRelevantTemplates).length === 1) {
-          initialValuesTemp = {...initialValuesTemp, ...getPlanarTemplates(gotRelevantTemplates)[0].values};
-        }
-        if (getLinearTemplates(gotRelevantTemplates).length === 1) {
-          if (!initialValuesTemp.associated_orientation) initialValuesTemp.associated_orientation = [];
-          initialValuesTemp.associated_orientation[0] = {
-            ...getLinearTemplates(gotRelevantTemplates)[0].values,
-            id: getNewUUID(),
-            type: MEASUREMENT_KEYS.LINEAR,
-          };
-        }
+    // A single template of a kind fills the form in so it can still be edited. Several of a kind each become
+    // their own measurement on save, so there is no one set of values to show and nothing is filled in.
+    if (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR) {
+      const planarTemplates = getPlanarTemplates(gotRelevantTemplates);
+      const linearTemplates = getLinearTemplates(gotRelevantTemplates);
+      if (planarTemplates.length === 1) initialValuesTemp = {...initialValuesTemp, ...planarTemplates[0].values};
+      if (linearTemplates.length === 1) {
+        if (!initialValuesTemp.associated_orientation) initialValuesTemp.associated_orientation = [];
+        initialValuesTemp.associated_orientation[0] = {
+          ...linearTemplates[0].values,
+          id: getNewUUID(),
+          type: MEASUREMENT_KEYS.LINEAR,
+        };
       }
-      else if (gotRelevantTemplates.length === 1) {
-        initialValuesTemp = {...initialValuesTemp, ...gotRelevantTemplates[0].values};
-      }
+    }
+    else if (gotRelevantTemplates.length === 1) {
+      initialValuesTemp = {...initialValuesTemp, ...gotRelevantTemplates[0].values};
     }
     setInitialValues(initialValuesTemp);
     setMeasurementTypeForForm(initialValuesTemp.type);
@@ -192,15 +189,15 @@ const AddMeasurementModal = ({onPress}) => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
       : measurementTypeForForm;
-    // If plane with associated line copy label from plane data to line data
+    // If plane with associated line label the line with its own label, falling back to the plane's
     if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      if (formRef.current.values.associated_orientation?.[0]?.label || formRef.current.values.label) {
-        formRef.current.setFieldValue('associated_orientation[0].label',
-          formRef.current.values.associated_orientation?.[0]?.label);
-      }
+      const {associated_orientation: associatedOrientation, label} = formRef.current.values;
+      const lineLabel = associatedOrientation?.[0]?.label || label;
+      if (lineLabel) formRef.current.setFieldValue('associated_orientation[0].label', lineLabel);
     }
     try {
-      let {values: editedMeasurementData} = await submitAndShowErrors(formRef.current);
+      // The ref, not the bag: the compass writes its reading and saves in the same tick
+      let {values: editedMeasurementData} = await submitAndShowErrors(formRef);
       const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
@@ -241,18 +238,17 @@ const AddMeasurementModal = ({onPress}) => {
           }
           // If an associated measurement from the Quick Entry Modal with multiple templates
           else {
+            const enteredLine = editedMeasurementData.associated_orientation?.[0];
             if (planarTabularTemplates.length === 0) planarTabularTemplates = [editedMeasurementData];
-            if (linearTemplates.length === 0) linearTemplates = editedMeasurementData.associated_orientation;
+            // Without linear templates the one entered line is associated to every planar measurement
+            if (linearTemplates.length === 0) linearTemplates = enteredLine ? [enteredLine] : [];
             planarTabularTemplates.forEach((t) => {
-              const associatedMeasurements = linearTemplates.map(
-                lT => ({...lT.values, ...editedMeasurementData.associated_orientation[0], id: getNewUUID()}));
-              editedMeasurementsData.push(
-                {
-                  ...t.values,
-                  ...editedMeasurementData,
-                  id: getNewUUID(),
-                  associated_orientation: associatedMeasurements,
-                });
+              const associatedLines = linearTemplates.map(lT => ({...lT.values, ...enteredLine, id: getNewUUID()}));
+              const measurement = {...t.values, ...editedMeasurementData, id: getNewUUID()};
+              // A planar template can carry a line of its own, so clear it when there is none to attach
+              if (isEmpty(associatedLines)) delete measurement.associated_orientation;
+              else measurement.associated_orientation = associatedLines;
+              editedMeasurementsData.push(measurement);
             });
           }
         }
