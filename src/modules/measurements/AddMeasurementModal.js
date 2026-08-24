@@ -328,8 +328,6 @@ const AddMeasurementModal = ({onPress}) => {
     const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
     const assocSurvey = getSurvey(assocFormName);
     const assocChoices = getChoices(assocFormName);
-    let assocFormProps = JSON.parse(JSON.stringify(formProps));
-    assocFormProps.values = {};
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
       : measurementTypeForForm;
@@ -469,10 +467,7 @@ const AddMeasurementModal = ({onPress}) => {
   };
 
   const renderSubformAssoc = (formProps) => {
-    let assocFormProps = JSON.parse(JSON.stringify(formProps));
-    assocFormProps.values = {};
     const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
-    assocFormProps.status = {formName: assocFormName};
     const assocSurvey = getSurvey(assocFormName);
     let relevantFields = getRelevantFields(assocSurvey, assocChoicesViewKey);
     if (assocChoicesViewKey === 'feature_type') {
@@ -481,7 +476,7 @@ const AddMeasurementModal = ({onPress}) => {
     return (
       <Form
         {...formProps}
-        formName={assocFormProps.status.formName}
+        formName={assocFormName}
         subkey={'associated_orientation'}
         surveyFragment={relevantFields}
       />

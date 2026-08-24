@@ -36,18 +36,21 @@ const Form = ({
   /* Derived Variables */
 
   const survey = surveyFragment || getSurvey(formName);
-  const relevantFields = Object.values(survey.filter(item => isRelevant(item, values)));
+  // A subkey'd form edits one nested object, e.g. associated_orientation[0], so relevance, defaults and clearing
+  // all read that object rather than the values around it
+  const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
+  const relevantFields = survey.filter(item => isRelevant(item, formValues));
 
   /* Side Effects */
 
   useEffect(() => {
     // Set default values
-    survey.filter(item => isRelevant(item, values)).forEach((field) => {
+    relevantFields.forEach((field) => {
       const [fieldType, choicesListName] = field.type.split(' ');
       if (fieldType === 'select_one' || fieldType === 'select_multiple') {
         const choiceValues = getChoices(formName).filter(c => c.list_name === choicesListName).map(c => c.name);
-        if (isEmpty(values[field.name]) && field.default && choiceValues.includes(field.default)) {
-          setFieldValue(field.name, field.default, false);
+        if (isEmpty(formValues[field.name]) && field.default && choiceValues.includes(field.default)) {
+          setFieldValue(getFieldPath(field.name), field.default, false);
         }
       }
     });
@@ -59,16 +62,22 @@ const Form = ({
 
   /* Logic Helpers */
 
+  // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
+  const getFieldName = path => subkey ? path.split('[0].')[1] : path;
+
+  const getFieldPath = name => subkey ? subkey + '[0].' + name : name;
+
   // Wrap setFieldValue to also clear fields that become irrelevant after a change
-  const setFieldValueAndClearIrrelevant = (name, value, shouldValidate) => {
-    let newValues = {...values, [name]: value};
+  const setFieldValueAndClearIrrelevant = (path, value, shouldValidate) => {
+    const fieldName = getFieldName(path);
+    let newValues = {...formValues, [fieldName]: value};
 
     // Iteratively clear fields that now have values but are no longer relevant
     let changed = true;
     while (changed) {
       changed = false;
       survey.forEach((field) => {
-        if (field.name !== name && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
+        if (field.name !== fieldName && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
           newValues = {...newValues, [field.name]: undefined};
           changed = true;
         }
@@ -77,12 +86,12 @@ const Form = ({
 
     // Apply clears for fields that became irrelevant
     survey.forEach((field) => {
-      if (field.name !== name && values[field.name] !== undefined && newValues[field.name] === undefined) {
-        setFieldValue(field.name, undefined, false);
+      if (field.name !== fieldName && formValues[field.name] !== undefined && newValues[field.name] === undefined) {
+        setFieldValue(getFieldPath(field.name), undefined, false);
       }
     });
 
-    setFieldValue(name, value, shouldValidate);
+    setFieldValue(path, value, shouldValidate);
   };
 
   /* Render Functions */
@@ -161,9 +170,9 @@ const Form = ({
       <Field
         component={NumberInputField}
         editable={!isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        key={getFieldPath(field.name)}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
+        name={getFieldPath(field.name)}
         onMyChange={onMyChange}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
@@ -190,9 +199,9 @@ const Form = ({
         choices={fieldChoicesCopy}
         errors={errors}
         isReadOnly={isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        key={getFieldPath(field.name)}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
+        name={getFieldPath(field.name)}
         onMyChange={onMyChange}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
@@ -210,9 +219,9 @@ const Form = ({
         // autoFocus={field.name === 'name'}
         component={TextInputField}
         editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        key={getFieldPath(field.name)}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
+        name={getFieldPath(field.name)}
         onMyChange={onMyChange}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}

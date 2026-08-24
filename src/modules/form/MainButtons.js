@@ -12,21 +12,29 @@ const MainButtons = ({
                        formProps,
                        mainKeys,
                        setChoicesViewKey,
+                       subkey,
                      }) => {
   /* Data Hooks */
 
   const {getLabel, getLabels} = useForm();
 
+  /* Derived Variables */
+
+  // A subkey'd form edits one nested object, e.g. associated_orientation[0], so the button shows that object's
+  // selection rather than the one on the values around it
+  const formValues = (subkey ? formProps?.values?.[subkey]?.[0] : formProps?.values) || {};
+  const isSingle = mainKeys.length === 1;
+
   /* Render Functions */
 
   const renderMainButtonsText = fieldKey => (
     <View style={{flex: 1, alignItems: 'center'}}>
-      <Text style={formProps?.values?.[fieldKey] ? formStyles.formButtonSelectedTitle : formStyles.formButtonTitle}>
+      <Text style={formValues[fieldKey] ? formStyles.formButtonSelectedTitle : formStyles.formButtonTitle}>
         {getLabel(fieldKey, formName)}
       </Text>
-      {formProps?.values?.[fieldKey] && (
+      {!!formValues[fieldKey] && (
         <Text style={[formStyles.formButtonSelectedTitle, {fontWeight: 'bold'}]}>
-          {truncateText(getLabels(formProps.values[fieldKey], formName, fieldKey), 23)}
+          {truncateText(getLabels(formValues[fieldKey], formName, fieldKey), 23)}
         </Text>
       )}
     </View>
@@ -35,23 +43,19 @@ const MainButtons = ({
   /* View */
 
   return (
-    <View
-      style={mainKeys.length === 1 ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonsContainer}>
-      {mainKeys.map((k) => {
-        const isSingle = mainKeys.length === 1;
-        return (
-          <Button
-            buttonStyle={[formStyles.formButtonLarge, {
-              backgroundColor: formProps?.values[k] ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
-            }]}
-            containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
-            key={k}
-            onPress={() => setChoicesViewKey(k)}
-            title={renderMainButtonsText(k)}
-            type={'outline'}
-          />
-        );
-      })}
+    <View style={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonsContainer}>
+      {mainKeys.map(k => (
+        <Button
+          buttonStyle={[formStyles.formButtonLarge, {
+            backgroundColor: formValues[k] ? PRIMARY_ACCENT_COLOR : SECONDARY_BACKGROUND_COLOR,
+          }]}
+          containerStyle={isSingle ? formStyles.fullWidthButtonContainer : formStyles.halfWidthButtonContainer}
+          key={k}
+          onPress={() => setChoicesViewKey(k)}
+          title={renderMainButtonsText(k)}
+          type={'outline'}
+        />
+      ))}
     </View>
   );
 };
