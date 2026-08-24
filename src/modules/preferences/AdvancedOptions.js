@@ -12,7 +12,7 @@ import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
-const Miscellaneous = () => {
+const AdvancedOptions = () => {
   /* Data Hooks */
 
   const {endpoint} = useSelector(state => state.connections.databaseEndpoint);
@@ -63,4 +63,4 @@ const Miscellaneous = () => {
   );
 };
 
-export default Miscellaneous;
+export default AdvancedOptions;
