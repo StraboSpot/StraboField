@@ -35,10 +35,10 @@ const Form = ({
 
   /* Derived Variables */
 
-  const survey = surveyFragment || getSurvey(formName);
   // A subkey'd form edits one nested object, e.g. associated_orientation[0], so relevance, defaults and clearing
   // all read that object rather than the values around it
   const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
+  const survey = surveyFragment || getSurvey(formName);
   const relevantFields = survey.filter(item => isRelevant(item, formValues));
 
   /* Side Effects */

@@ -7,10 +7,10 @@ import {Form, MainButtons} from '../form';
 const AddLine = ({formName, formProps, isManualMeasurement, isPlanarLinear, setChoicesViewKey, survey}) => {
   /* Derived Variables */
 
-  const subkey = isPlanarLinear ? 'associated_orientation' : undefined;
   // Relevant fields for quick-entry modal
   const firstKeysFields = ADD_LINE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
   const lastKeysFields = ADD_LINE_LAST_KEYS.map(k => survey.find(f => f.name === k));
+  const subkey = isPlanarLinear ? 'associated_orientation' : undefined;
 
   /* View */
 
