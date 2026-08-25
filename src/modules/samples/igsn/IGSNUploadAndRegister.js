@@ -15,6 +15,8 @@ import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
 import {setLoadingStatus} from '../../home/home.slice';
+import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage} from '../../main-menu-panel/mainMenuPanel.slice';
 import {
   setInitialSesarState,
   setSelectedUserCode,
@@ -22,12 +24,13 @@ import {
   setSesarUserCodes,
 } from '../../user/userProfile.slice';
 
-const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeature}) => {
+const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, openLoginPage, selectedFeature}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
-  const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+  // const {userCodes, selectedUserCode, sesarToken} = useSelector(state => state.user?.sesar || {});
+  const {encoded_login, sesar} = useSelector(state => state.user || {});
   const {isSample} = useSelector(state => state.spot.selectedSpot.properties) || {};
 
   const {authenticateWithSesar, getAndSaveSesarCode} = useIGSN();
@@ -39,13 +42,13 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
 
   /* Derived Variables */
 
-  let tokens = sesarToken;
+  let tokens = sesar?.sesarToken;
 
   /* Side Effects */
 
   useEffect(() => {
     console.log('In 1st UE in IGSNUploadAndRegister page');
-    isIGSNChecked && !isEmpty(sesarToken?.access) && getSesarTokenAndCodes()
+    isIGSNChecked && !isEmpty(tokens?.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
   }, [isIGSNChecked]);
 
@@ -75,6 +78,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
         console.log('SESAR TOKEN', tokens);
         dispatch(setSesarToken(tokens));
       }
+      if (!tokens) throw Error('No SESAR token returned — ORCID sign-in may have failed.');
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
@@ -90,7 +94,7 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
         }
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
-      else if (tokens.errors.permissions) {
+      else if (tokens.errors?.permissions) {
         throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
       }
     }
@@ -105,6 +109,23 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
   };
 
   const orcidAuthentication = async () => {
+    if (!encoded_login) {
+      alert(
+        'Please sign in to your StraboSpot account before connecting to MySESAR.',
+        'Press OK to open the StraboSpot login page.',
+        [{
+          text: 'OK', onPress: () => {
+            dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.PROFILE}));
+            openLoginPage();
+          },
+        },
+          {
+            text: 'Cancel',
+          },
+        ],
+      );
+      return;
+    }
     await getOrcidToken();
   };
 
@@ -134,18 +155,18 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
                 iconRight
                 onPress={openPicker}
                 raised
-                title={selectedUserCode || 'Select User Code'}
+                title={sesar?.selectedUserCode || 'Select User Code'}
                 titleStyle={{color: BLACK, fontSize: MEDIUM_TEXT_SIZE}}
                 type={'outline'}
               />
             </View>
             <PickerOverlay
               closePicker={closePicker}
-              data={[...userCodes.map(c => c?.sesar_code || c), undefined]}
+              data={[...sesar?.userCodes.map(c => c?.sesar_code || c), undefined]}
               dividerText={'Select User Code'}
               isPickerVisible={isPickerVisible}
               onSelect={onUserCodeSelect}
-              value={selectedUserCode}
+              value={sesar?.selectedUserCode}
             />
           </>
         )}
@@ -180,9 +201,9 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       {selectedFeature?.isOnMySesar && renderSesarUploadDisclosure()}
       {isIGSNChecked && (
         <View>
-          {isEmpty(sesarToken?.access) && renderOrcidSignInButton()}
-          {!isEmpty(sesarToken?.access) && renderIGSNUserCodePicker()}
-          {!isSample && !isEmpty(sesarToken?.access)
+          {isEmpty(tokens?.access) && renderOrcidSignInButton()}
+          {!isEmpty(tokens?.access) && renderIGSNUserCodePicker()}
+          {!isSample && !isEmpty(tokens?.access)
             && <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>}
         </View>
       )}

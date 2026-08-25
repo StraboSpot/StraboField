@@ -74,6 +74,7 @@ const IGSNModal = forwardRef(({
                                 onModalCancel,
                                 onSampleSaved,
                                 sampleValues,
+                                openLoginPage,
                               }, formRef) => {
   /* Data Hooks */
 
@@ -166,13 +167,13 @@ const IGSNModal = forwardRef(({
 
   const handleOpenURL = async ({url}) => {
     console.log('App resumed with URL:', url);
-    if (url) {
-      const code = url.split('/')[3];
-      await getSesarTokenAndCodes(code);
-    }
-    else {
+    if (!url) {
       console.log('No code found in URL.');
+      return;
     }
+    const code = url.split('/')[3];
+    if (!code) alert('ORCID sign-in did not return a token. Please try again.');
+    else await getSesarTokenAndCodes(code);
   };
 
   const onReset = () => {
@@ -196,6 +197,7 @@ const IGSNModal = forwardRef(({
         console.log('SESAR TOKEN', tokens);
         dispatch(setSesarToken(tokens));
       }
+      if (!tokens) throw Error('No SESAR token returned — ORCID sign-in may have failed.');
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
@@ -210,7 +212,7 @@ const IGSNModal = forwardRef(({
         dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
-      else if (tokens.errors.permissions) {
+      else if (tokens.errors?.permissions) {
         throw Error(tokens.errors.permissions + ' Please check your ORCID login credentials');
       }
     }
@@ -323,6 +325,7 @@ const IGSNModal = forwardRef(({
   const renderLoginView = () => (
     <IGSNUploadAndRegister
       isIGSNChecked={true}
+      openLoginPage={openLoginPage}
       selectedFeature={formValues}
     />
   );
