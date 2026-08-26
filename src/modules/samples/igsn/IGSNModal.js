@@ -82,6 +82,16 @@ const IGSNModal = forwardRef(({
   };
   /* Logic Helpers */
 
+  // SESAR requires sample_type and material to register/update a sample. Detect from the raw form
+  // values — the mapped display value is unreliable (getLabel returns 'Unknown' for an empty type).
+  const missingRequiredFields = {
+    material: isEmpty(formValues?.material_type),
+    sample_type: isEmpty(formValues?.sample_type),
+  };
+
+  const isActionDisabled = (!formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode))
+    || missingRequiredFields.sample_type || missingRequiredFields.material;
+
   const registerSample = async () => {
     try {
       const currentFormValues = sampleValues || formRef.current?.values || {};
@@ -129,7 +139,9 @@ const IGSNModal = forwardRef(({
         alignItems: 'flex-start',
         justifyContent: 'center',
       }}>
-        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+        {!isUploaded && isActionDisabled
+          ? renderRequiredFieldsWarning()
+          : <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>}
         {!isUploaded && isVisible && mappedSesarValues.map((item) => {
           if (item.sesarKey === 'user_code' && formValues?.isOnMySesar) return null;
           if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
@@ -148,6 +160,31 @@ const IGSNModal = forwardRef(({
         })
         }
       </View>
+    );
+  };
+
+  const renderRequiredFieldsWarning = () => {
+    const missingLabels = [
+      missingRequiredFields.sample_type && 'Sample Type',
+      missingRequiredFields.material && 'Material',
+    ].filter(Boolean);
+    const isMissingUserCode = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
+    if (isEmpty(missingLabels) && !isMissingUserCode) return null;
+    return (
+      <>
+        {!isEmpty(missingLabels) && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            {missingLabels.join(' and ')} {missingLabels.length > 1 ? 'are' : 'is'} required to register a sample with
+            SESAR. Please set {missingLabels.length > 1 ? 'these fields' : 'this field'} before registering.
+          </Text>
+        )}
+        {isMissingUserCode && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            A SESAR user code is required to register a sample. Please select a user code in your MYSESAR account
+            settings before registering.
+          </Text>
+        )}
+      </>
     );
   };
 
@@ -177,6 +214,7 @@ const IGSNModal = forwardRef(({
   return (
     <ModalWrapper
       actionTitle={errorView ? 'Close' : (!isUploaded ? 'Register' : 'OK')}
+      disabled={isActionDisabled}
       isLoading={isLoading}
       isVisible={isVisible}
       onActionPressed={errorView ? handleModalClose : (!isUploaded ? registerSample : handleConfirmOnPress)}

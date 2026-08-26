@@ -28,6 +28,13 @@ const IGSNModalStyles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 10,
   },
+  requiredLabel: {
+    color: themes.WARNING_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+    margin: 20,
+    textAlign: 'center',
+  },
   sesarAuthText: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -36,8 +43,8 @@ const IGSNModalStyles = StyleSheet.create({
   },
   sesarImage: {
     borderWidth: 2,
-    height: 120,
-    width: 340,
+    height: 100,
+    width: 275,
   },
   sesarImageContainer: {
     alignContent: 'center',
