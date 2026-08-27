@@ -1,5 +1,5 @@
-import React, {useEffect, useRef} from 'react';
-import {Animated, Easing, Platform, Pressable, Text, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, Easing, ImageBackground, Platform, Pressable, Text, View} from 'react-native';
 
 import {COMPASS_TOGGLE_BUTTONS, DIAL_TICKS} from './compass.constants';
 import compassStyles from './compass.styles';
@@ -33,6 +33,12 @@ const getCardinal = (deg) => {
 };
 
 const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
+  /* Local State */
+
+  // Temporary A/B toggle: the redesigned dial vs. the classic static face used before commit
+  // a90dd586. Lets users compare readings while we track down the "readings are not right" reports.
+  const [useLegacyCompass, setUseLegacyCompass] = useState(false);
+
   /* Derived Variables */
 
   const heading = compassData?.trueHeading ?? compassData?.magHeading ?? 0;
@@ -106,10 +112,9 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
     );
   };
 
-  /* View */
-
-  return (
-    <View style={compassStyles.compassImageContainer}>
+  // Redesigned dial: the whole face counter-rotates with heading and the symbols ride the dial.
+  const renderNewFace = () => (
+    <>
       <Text style={compassStyles.headingText}>
         {String(Math.round(heading) % 360).padStart(3, '0')}° {getCardinal(heading)}
       </Text>
@@ -124,6 +129,29 @@ const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) =
         </View>
       </Pressable>
       <Text style={compassStyles.tapHint}>Tap to Measure</Text>
+    </>
+  );
+
+  // Classic face (pre-a90dd586): static compass image, symbols rotated by their raw azimuth only.
+  const renderLegacyFace = () => (
+    <Pressable onPress={() => grabMeasurements(true)}>
+      <ImageBackground
+        source={require('../../assets/images/compass/compass.png')}
+        style={compassStyles.compassImage}
+      >
+        {renderCompassSymbols()}
+      </ImageBackground>
+    </Pressable>
+  );
+
+  /* View */
+
+  return (
+    <View style={compassStyles.compassImageContainer}>
+      {useLegacyCompass ? renderLegacyFace() : renderNewFace()}
+      <Text onPress={() => setUseLegacyCompass(prev => !prev)} style={compassStyles.compassModeToggle}>
+        {useLegacyCompass ? 'Switch to new compass' : 'Switch to classic compass'}
+      </Text>
     </View>
   );
 };

@@ -39,6 +39,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  compassImage: {
+    alignItems: 'center',
+    height: 175,
+    justifyContent: 'center',
+    width: 175,
+  },
   compassImageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -47,6 +53,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
     textAlign: 'center',
+  },
+  compassModeToggle: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    fontSize: 13,
+    marginTop: 12,
+    textDecorationLine: 'underline',
   },
   dial: {
     alignItems: 'center',
