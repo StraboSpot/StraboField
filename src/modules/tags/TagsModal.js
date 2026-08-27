@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,7 +13,7 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
-import {SelectInputField} from '../form';
+import {FormikWrapper, SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
@@ -132,12 +132,7 @@ const TagsModal = ({
     return (
       <>
         {!isEmpty(tags) && pageKey !== PAGE_KEYS.GEOLOGIC_UNITS && (
-          <Formik
-            initialValues={{}}
-            innerRef={formRef}
-            onSubmit={values => console.log('Submitting form...', values)}
-            validate={fieldValues => setSearchText(fieldValues.searchText)}
-          >
+          <FormikWrapper initialValues={{}} innerRef={formRef}>
             {() => (
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
@@ -149,7 +144,10 @@ const TagsModal = ({
                           tagType => ({label: getTagLabel(tagType), value: tagType}))}
                         errors={form.errors}
                         label={'Tag Type'}
-                        setFieldValue={form.setFieldValue}
+                        setFieldValue={(name, value) => {
+                          form.setFieldValue(name, value);
+                          setSearchText(value);
+                        }}
                         single={true}
                       />
                     )}
@@ -157,7 +155,7 @@ const TagsModal = ({
                 </ListItem.Content>
               </ListItem>
             )}
-          </Formik>
+          </FormikWrapper>
         )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}

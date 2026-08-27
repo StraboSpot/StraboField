@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AddRockAlterationOreModal from './AddRockAlterationOreModal';
@@ -15,7 +14,7 @@ import usePetrology from './usePetrology';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useSed from '../sed/useSed';
@@ -75,6 +74,7 @@ const AddRockModal = ({modalKey}) => {
       setInitialValues(initialValuesTemp);
     }
     const formName = [groupKey, rockKeyUpdated];
+    formRef.current?.setStatus({formName: formName});
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
     setChoicesViewKey(null);
@@ -100,6 +100,7 @@ const AddRockModal = ({modalKey}) => {
       const type = types[i];
       dispatch(setModalValues({id: getNewId(), igneous_rock_class: type}));
       const formNameSwitched = ['pet', type];
+      formRef.current?.setStatus({formName: formNameSwitched});
       setSurvey(getSurvey(formNameSwitched));
       setChoices(getChoices(formNameSwitched));
     }
@@ -107,17 +108,24 @@ const AddRockModal = ({modalKey}) => {
 
   /* Logic Helpers */
 
+  // Saving alerts and throws when the form has errors, and a sedimentary rock is checked against its interval on
+  // top of that, so stop there rather than rolling the id over and closing on a save that did not happen
   const saveRock = async () => {
-    if (areMultipleTemplates) {
-      if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
-      else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+    try {
+      if (areMultipleTemplates) {
+        if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+        else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+      }
+      else {
+        if (groupKey === 'pet') await savePetFeature(pageKey, spot, formRef.current);
+        else if (groupKey === 'sed') await saveSedFeature(pageKey, spot, formRef.current);
+        dispatch(setModalValues({...formRef.current.values, id: getNewId()}));
+      }
+      if (SMALL_SCREEN) onCloseModalPressed();
     }
-    else {
-      if (groupKey === 'pet') await savePetFeature(pageKey, spot, formRef.current);
-      else if (groupKey === 'sed') await saveSedFeature(pageKey, spot, formRef.current);
-      dispatch(setModalValues({...formRef.current.values, id: getNewId()}));
+    catch (err) {
+      console.error('Error saving rock', err);
     }
-    if (SMALL_SCREEN) onCloseModalPressed();
   };
 
   /* Render Functions */
@@ -129,18 +137,18 @@ const AddRockModal = ({modalKey}) => {
           <FlatList
             ListHeaderComponent={
               <View style={{flex: 1}}>
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
+                  formName={[groupKey, rockKey]}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
                 >
                   {formProps => (
                     <View style={{flex: 1}}>
                       {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                     </View>
                   )}
-                </Formik>
+                </FormikWrapper>
               </View>
             }
             bounces={false}

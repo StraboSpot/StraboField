@@ -2,12 +2,12 @@ import React, {useRef} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {DateInputField, NumberInputField} from '../form';
+import {DateInputField, FormikWrapper, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
@@ -70,11 +70,10 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderMetadataForm = () => {
     return (
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
         initialValues={spot.properties}
         innerRef={metadataFormRef}
-        onSubmit={values => console.log('Submitting form...', values)}
       >
         {() => (
           <>
@@ -115,7 +114,7 @@ const Metadata = ({isReadOnly, page}) => {
             </ListItem>
           </>
         )}
-      </Formik>
+      </FormikWrapper>
     );
   };
 

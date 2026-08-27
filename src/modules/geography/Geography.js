@@ -1,9 +1,9 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import * as turf from '@turf/turf';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import GeoFieldInputs from './GeoFieldInputs';
@@ -12,7 +12,7 @@ import UtmFieldInputs from './UtmFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {Form, formStyles, NumberInputField, TextInputField, useForm} from '../form';
+import {Form, FormikWrapper, formStyles, NumberInputField, TextInputField, useForm} from '../form';
 import {UTM_MAX_LATITUDE, UTM_MIN_LATITUDE} from '../maps/maps.constants';
 import {convertLatLngToUtm, convertUtmToLatLng, parseUtmZone} from '../maps/maps.helpers';
 import useMapView from '../maps/view/useMapView';
@@ -28,13 +28,15 @@ const Geography = ({isReadOnly, page}) => {
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {isOnGeoMap} = useMapView();
 
   /* Local State */
 
   const formRef = useRef(null);
   const geomFormRef = useRef(null);
+
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Logic Helpers */
 
@@ -57,9 +59,17 @@ const Geography = ({isReadOnly, page}) => {
     return turf.point(convertUtmToLatLng(easting, northing, zone)).geometry;
   };
 
+  // The geometry fields are typed as text, so read the numbers out of them here rather than having validation
+  // write them back into the form as it is typed in. turf needs numbers to build a point from them.
+  const getParsedGeomValues = (values) => {
+    return ['easting', 'latitude', 'longitude', 'northing', 'x_pixels', 'y_pixels'].reduce(
+      (acc, key) => (isEmpty(values[key]) ? acc : {...acc, [key]: parseFloat(values[key])}), {...values});
+  };
+
   const saveForm = async () => {
     try {
-      const {values: editedGeomFormData} = await submitAndShowErrors(geomFormRef.current);
+      const {values: geomFormValues} = await submitAndShowErrors(geomFormRef.current);
+      const editedGeomFormData = getParsedGeomValues(geomFormValues);
       let {values: geographyProperties} = await submitAndShowErrors(formRef.current);
       console.log('Saving form data to Spot ...');
       let geometry = spot.geometry;
@@ -108,16 +118,14 @@ const Geography = ({isReadOnly, page}) => {
     console.log('Rendering Form:', formName[0] + '.' + formName[1], 'with', spot.properties);
     return (
       <View style={{flex: 1}}>
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
-          initialStatus={{formName: formName}}
+          formName={formName}
           initialValues={spot.properties}
           innerRef={formRef}
-          onSubmit={() => console.log('Submitting form...')}
-          validate={values => validateForm({formName: formName, values: values})}
         >
           {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
-        </Formik>
+        </FormikWrapper>
       </View>
     );
   };
@@ -163,51 +171,37 @@ const Geography = ({isReadOnly, page}) => {
       else return '[multiple geometries]';
     };
 
-    // Validate the geometry
+    // Validate the geometry. The fields are left as they were typed - getParsedGeomValues reads the numbers out of
+    // them for the save - so that validating a change does not rewrite the field being typed in.
     const validateGeometry = (values) => {
-      console.log('Values before geometry validation:', values);
+      const {easting, latitude, longitude, northing} = getParsedGeomValues(values);
       let errors = {};
-      if (values.latitude) {
-        values.latitude = parseFloat(values.latitude);
-        if (values.latitude < -90 || values.latitude > 90) errors.latitude = 'Latitude must be between -90 and 90';
+      if (values.latitude && (latitude < -90 || latitude > 90)) {
+        errors.latitude = 'Latitude must be between -90 and 90';
       }
-      if (values.longitude) {
-        values.longitude = parseFloat(values.longitude);
-        if (values.longitude < -180 || values.longitude > 180) errors.longitude = 'Longitude must be between -180 and 180';
+      if (values.longitude && (longitude < -180 || longitude > 180)) {
+        errors.longitude = 'Longitude must be between -180 and 180';
       }
       if (isUtmDisplay) {
         if (!isEmpty(values.utm_zone) && !parseUtmZone(values.utm_zone)) {
           errors.utm_zone = 'Zone must be 1-60 followed by N or S (e.g. 13N)';
         }
-        if (values.easting) {
-          values.easting = parseFloat(values.easting);
-          if (values.easting < 100000 || values.easting > 999999) {
-            errors.easting = 'Easting must be between 100,000 and 999,999';
-          }
+        if (values.easting && (easting < 100000 || easting > 999999)) {
+          errors.easting = 'Easting must be between 100,000 and 999,999';
         }
-        if (values.northing) {
-          values.northing = parseFloat(values.northing);
-          if (values.northing < 0 || values.northing > 10000000) {
-            errors.northing = 'Northing must be between 0 and 10,000,000';
-          }
+        if (values.northing && (northing < 0 || northing > 10000000)) {
+          errors.northing = 'Northing must be between 0 and 10,000,000';
         }
         // An easting/northing inside the numeric bounds above can still convert to a latitude beyond the range UTM
         // is defined for, which would drop the Spot near a pole. Check the converted point rather than the inputs.
         if (isEmpty(errors) && !isEmpty(values.utm_zone) && values.easting && values.northing) {
-          const utmLatLng = convertUtmToLatLng(values.easting, values.northing, values.utm_zone);
+          const utmLatLng = convertUtmToLatLng(easting, northing, values.utm_zone);
           if (utmLatLng && (utmLatLng[1] < UTM_MIN_LATITUDE || utmLatLng[1] > UTM_MAX_LATITUDE)) {
             errors.northing = `Coordinate is outside the UTM limits of ${Math.abs(UTM_MIN_LATITUDE)}°S `
               + `to ${UTM_MAX_LATITUDE}°N`;
           }
         }
       }
-      if (values.x_pixels && typeof (values.x_pixels) === 'string') {
-        values.x_pixels = parseFloat(values.x_pixels);
-      }
-      if (values.y_pixels && typeof (values.y_pixels) === 'string') {
-        values.y_pixels = parseFloat(values.y_pixels);
-      }
-      console.log('Values after geometry validation:', values);
       return errors;
     };
 
@@ -240,11 +234,11 @@ const Geography = ({isReadOnly, page}) => {
     }
 
     return (
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
         initialValues={initialGeomValues}
         innerRef={geomFormRef}
-        onSubmit={() => console.log('Submitting form...')}
+        setIsFormInvalid={setIsFormInvalid}
         validate={validateGeometry}
       >
         {() => (
@@ -263,7 +257,7 @@ const Geography = ({isReadOnly, page}) => {
             {isOnGeoMap(spot) ? renderGeoCoords(initialGeomValues) : renderPixelCoords(initialGeomValues)}
           </View>
         )}
-      </Formik>
+      </FormikWrapper>
     );
   };
 
@@ -373,7 +367,7 @@ const Geography = ({isReadOnly, page}) => {
         ListHeaderComponent={
           <>
             <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
-            {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
+            {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} getIsDisabled={isFormInvalid} save={saveFormAndGo}/>}
             {renderGeometryForm()}
             {renderFormFields()}
           </>

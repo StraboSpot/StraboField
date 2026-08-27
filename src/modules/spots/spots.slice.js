@@ -105,8 +105,11 @@ const spotSlice = createSlice({
       }
     },
     editedSpotImages(state, action) {
-      let tempImages = [];
-      if (state.selectedSpot.properties.images) tempImages = state.selectedSpot.properties.images;
+      // An image saved again under an id the Spot already has replaces the one there rather than joining it.
+      // Two of an id is a duplicate the server refuses the whole Spot for, leaving it unable to save at all.
+      const updatedIds = action.payload.map(image => image.id);
+      let tempImages = (state.selectedSpot.properties.images || []).filter(
+        image => !updatedIds.includes(image.id));
       // Updated as titles are assigned, so images added together cannot collide either
       const takenTitles = tempImages.map(image => image.title).filter(title => !isEmpty(title));
       const updatedSpotObj = action.payload.map((image) => {

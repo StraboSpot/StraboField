@@ -1,13 +1,13 @@
 import React, {useLayoutEffect, useRef} from 'react';
 
-import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {PROJECT_DESCRIPTION_FORM_NAME} from './project.constants';
 import {updatedProject} from './projects.slice';
 import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 
 let timeout;
 
@@ -18,10 +18,12 @@ const ProjectDescription = () => {
   const project = useSelector(state => state.project.project);
 
   const {getLabel, hasErrors, validateForm} = useForm();
+  const toast = useToast();
 
   /* Local State */
 
   const descriptionFormRef = useRef(null);
+  const hasSavedRef = useRef(false);
 
   /* Derived Variables */
 
@@ -34,7 +36,11 @@ const ProjectDescription = () => {
   /* Side Effects */
 
   useLayoutEffect(() => {
-    return () => doCleanup();
+    // The pending save would fire against a form that no longer exists, and doCleanup saves what it was waiting on
+    return () => {
+      clearTimeout(timeout);
+      doCleanup();
+    };
   }, []);
 
   /* Event Handlers */
@@ -46,22 +52,29 @@ const ProjectDescription = () => {
     // Wait 2000 milliseconds (2 seconds) from last change before saving
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(async () => {
-      const updatedValues = {...descriptionFormRef.current.values, [name]: value};
-      if (!hasErrors(descriptionFormRef.current)) await saveForm(descriptionFormRef.current, updatedValues);
+      if (!hasErrors(descriptionFormRef.current)) await saveForm(descriptionFormRef.current);
     }, 2000);
   };
 
   /* Logic Helpers */
 
-  const doCleanup = () => {
+  // Every change is written as it is made, so confirm the visit once on the way out rather than field by field
+  const doCleanup = async () => {
     if (hasErrors(descriptionFormRef.current)) showErrors(descriptionFormRef.current);
-    else if (descriptionFormRef.current?.dirty) saveForm(descriptionFormRef.current);
+    else if (descriptionFormRef.current?.dirty) await saveForm(descriptionFormRef.current);
+    if (hasSavedRef.current) toast.show('Project Description Saved', {type: 'success'});
   };
 
+  // Save what validating cleans up - the magnetic declination as a number, not as the text it was typed in as
   const saveForm = async (descriptionCurrent) => {
     await descriptionCurrent.submitForm();
-    console.log('Saving project daily-notes to Project ...', descriptionCurrent.values);
-    dispatch(updatedProject({field: 'description', value: descriptionCurrent.values}));
+    const {values: updatedValues} = validateForm({
+      formName: PROJECT_DESCRIPTION_FORM_NAME,
+      values: descriptionCurrent.values,
+    });
+    console.log('Saving project description to Project ...', updatedValues);
+    dispatch(updatedProject({field: 'description', value: updatedValues}));
+    hasSavedRef.current = true;
   };
 
   const showErrors = (descriptionCurrent) => {
@@ -77,13 +90,11 @@ const ProjectDescription = () => {
   // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
     <FormFlatList>
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
+        formName={PROJECT_DESCRIPTION_FORM_NAME}
         initialValues={projectDescription}
         innerRef={descriptionFormRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
-        validateOnChange={true}
       >
         {formProps => (
           <Form
@@ -94,7 +105,7 @@ const ProjectDescription = () => {
             setFieldValue={onMyChange}
           />
         )}
-      </Formik>
+      </FormikWrapper>
     </FormFlatList>
   );
 };

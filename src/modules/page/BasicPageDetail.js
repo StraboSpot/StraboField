@@ -1,13 +1,12 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
+import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
 import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
@@ -15,13 +14,14 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {onOrientationChange} from '../compass/compass.helpers';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
+import {getRequiredLithologyKeys} from '../sed/sed.helpers';
 import useSed from '../sed/useSed';
 import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -36,6 +36,7 @@ const BasicPageDetail = ({
                            groupKey = 'general',
                            isReadOnly,
                            page,
+                           registerGetValues,
                            saveTemplate,
                            selectedFeature,
                            siblingSurvey,
@@ -46,7 +47,7 @@ const BasicPageDetail = ({
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {showErrors, submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
   const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
   const {checkSampleName} = useSpots();
@@ -56,9 +57,14 @@ const BasicPageDetail = ({
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already dealt with, by a save or by a caller taking them to write itself. Leaving straight
+  // afterwards must not ask about them again, and the page can unmount in the same render pass as the save, so
+  // the form ref may still be holding what it looked like beforehand.
+  const savedValuesRef = useRef(null);
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
@@ -96,7 +102,10 @@ const BasicPageDetail = ({
   useEffect(() => {
     console.log('UE BasicPageDetail []');
     setInitialValues(selectedFeature);
-    return () => dispatch(setSelectedAttributes([]));
+    return () => {
+      if (registerGetValues) registerGetValues.current = null;
+      dispatch(setSelectedAttributes([]));
+    };
   }, []);
 
   useEffect(() => {
@@ -130,7 +139,7 @@ const BasicPageDetail = ({
     const description = isIGSNChecked
       ? 'Would you like to save your data before continuing? \n\n This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
       : 'Would you like to save your data before continuing?';
-    if (!isTemplate && formRef.current && formRef.current.dirty) {
+    if (!isTemplate && formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         description,
@@ -139,7 +148,7 @@ const BasicPageDetail = ({
           style: 'cancel',
         }, {
           text: 'Yes',
-          onPress: () => saveForm(formCurrent),
+          onPress: () => saveForm(formCurrent, true),
         }],
         {cancelable: false},
       );
@@ -192,6 +201,14 @@ const BasicPageDetail = ({
     return formName;
   };
 
+  // A lithology in an interval mapped on a strat section has to answer fields its survey marks optional, which a
+  // survey rule cannot express because it turns on the Spot rather than the form. The lithology is one record
+  // across its tabs, so all of them hold Save until it is complete, while each tab marks the fields it shows.
+  const getRequiredFields = (values) => {
+    if (groupKey !== 'sed' || !Object.values(LITHOLOGY_SUBPAGES).includes(pageKey)) return [];
+    return getRequiredLithologyKeys(values, spot);
+  };
+
   const getIsDisabled = (fieldName) => {
     if (isReadOnly) return true;
     else {
@@ -202,14 +219,21 @@ const BasicPageDetail = ({
     }
   };
 
+  // Fields a feature requires beyond its survey are checked with it, so they hold Save the same way
+  const validateFeature = (formName, values) => {
+    const {errors} = validateForm({formName: formName, values: values});
+    return getRequiredFields(values).reduce(
+      (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), errors);
+  };
+
   const saveButtonOnPress = () => {
     isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
   };
 
-  const saveFeature = async (formCurrent) => {
+  const saveFeature = async (formCurrent, isLeavingPage) => {
     try {
       const {errors, values: editedFeatureData} = await submitAndShowErrors(formRef.current || formCurrent,
-        isEmpty(formRef.current));
+        isLeavingPage);
       console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
@@ -234,7 +258,26 @@ const BasicPageDetail = ({
     }
   };
 
-  const saveForm = async (formCurrent) => {
+  // The values the open form would save, for a caller that is about to write them somewhere itself. The samples
+  // footer converts a sample to a rich sample while this form is open (NotebookFooter) and puts these values in
+  // the new sample. They are deliberately not written to this Spot on the way: the conversion replaces the
+  // sample here with nothing but its id a moment later, so saving first only adds a write that is immediately
+  // undone - and on web every write is an upload, of a Spot that is already about to change again.
+  // Refuses the same way a save would, alerting and throwing, so a caller cannot carry a bad value forward.
+  const getOpenFeatureValues = async () => {
+    const formCurrent = formRef.current;
+    if (isReadOnly || isTemplate || !formCurrent?.dirty) return undefined;
+    const errors = await formCurrent.validateForm();
+    const values = showErrors({...formCurrent, errors: errors});
+    // Marks these values as dealt with, so leaving the page does not go on to ask about them
+    savedValuesRef.current = {...formCurrent.values};
+    return values;
+  };
+
+  // Whether the page is being left is the caller's to say. Reading it back off the ref guessed, and guessed
+  // wrong whenever the prompt was answered before the form had gone: an edit meant to be kept apart from its
+  // one bad field was refused whole instead.
+  const saveForm = async (formCurrent, isLeavingPage) => {
     try {
       console.log('Saving form...', formCurrent);
       if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
@@ -243,15 +286,16 @@ const BasicPageDetail = ({
       }
       let errors;
       if (groupKey === 'pet') {
-        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
       }
       else if (groupKey === 'sed' && pageKey === 'bedding') {
-        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
       }
       else if (groupKey === 'sed') {
-        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
+        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
       }
-      else errors = await saveFeature(formCurrent);
+      else errors = await saveFeature(formCurrent, isLeavingPage);
+      savedValuesRef.current = {...(formRef.current || formCurrent).values};
       // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
       if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Changes Saved', {type: 'success'});
       closeDetailView();
@@ -264,7 +308,7 @@ const BasicPageDetail = ({
   };
 
   const saveTemplateForm = async (formCurrent) => {
-    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
     saveTemplate(formValues);
   };
 
@@ -275,41 +319,44 @@ const BasicPageDetail = ({
     setIsIGSNModalVisible(true);
   };
 
+  // Expose the values to a parent-owned button that carries this form's edits somewhere (see NotebookFooter)
+  if (registerGetValues) registerGetValues.current = getOpenFeatureValues;
+
   /* Render Functions */
 
   const renderFormFields = () => {
     const formName = getFormName();
     return (
       <View style={{flex: 1}}>
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
-          initialStatus={{formName: formName}}
+          formName={formName}
           initialValues={initialValues}
           innerRef={formRef}
           onReset={() => console.log('Resetting form...')}
           onSubmit={onSubmitForm}
-          validate={values => validateForm({formName: formName, values: values})}
+          setIsFormInvalid={setIsFormInvalid}
+          validate={values => validateFeature(formName, values)}
         >
           {formProps => (
-            <>
-              <Form
-                {...formProps}
-                formName={formName}
-                getIsDisabled={getIsDisabled}
-                isReadOnly={isReadOnly}
-                onMyChange={page.key === PAGE_KEYS.MINERALS
-                  ? ((name, value) => onMineralChange(formRef.current, name, value))
-                  : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
-                    ? ((name, value) => onSedFormChange(formRef.current, name, value))
-                    : undefined}
-                onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
-                    {orientationFields: orientationFields}))
+            <Form
+              {...formProps}
+              formName={formName}
+              getIsDisabled={getIsDisabled}
+              isReadOnly={isReadOnly}
+              onMyChange={page.key === PAGE_KEYS.MINERALS
+                ? ((name, value) => onMineralChange(formRef.current, name, value))
+                : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
+                  ? ((name, value) => onSedFormChange(formRef.current, name, value))
                   : undefined}
-                siblingSurvey={siblingSurvey}
-              />
-            </>
+              onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
+                  {orientationFields: orientationFields}))
+                : undefined}
+              requiredFields={getRequiredFields(formProps.values)}
+              siblingSurvey={siblingSurvey}
+            />
           )}
-        </Formik>
+        </FormikWrapper>
         {!isReadOnly && (
           <DeleteButton
             onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
@@ -347,7 +394,7 @@ const BasicPageDetail = ({
                 )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={isSaveDisabled}
+                  getIsDisabled={isSaveDisabled || isFormInvalid}
                   save={saveButtonOnPress}
                 />
               </>

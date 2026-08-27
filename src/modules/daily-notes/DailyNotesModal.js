@@ -2,14 +2,14 @@ import React, {useRef} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {DateInputField, TextInputField} from '../form';
+import {DateInputField, FormikWrapper, TextInputField} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
@@ -78,12 +78,10 @@ const DailyNotesModal = () => {
         overlayStyleOverride={{height: 'auto'}}
         showDeleteButton={!isEmpty(projectDescription?.daily_setup)}
       >
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
           initialValues={initialValues}
           innerRef={formRef}
-          onSubmit={() => console.log('Submitting form...')}
-          validateOnChange={true}
         >
           {() => (
             <View>
@@ -112,7 +110,7 @@ const DailyNotesModal = () => {
               </ListItem>
             </View>
           )}
-        </Formik>
+        </FormikWrapper>
       </ModalWrapper>
     );
   };

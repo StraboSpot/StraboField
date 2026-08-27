@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -27,7 +26,7 @@ import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';
@@ -62,6 +61,7 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -185,6 +185,19 @@ const AddMeasurementModal = ({onPress}) => {
 
   /* Logic Helpers */
 
+  // A save cleans the values against the survey it was validated with, which reaches only the top level, so the
+  // associated orientation nested under associated_orientation[0] would keep the text its numbers were typed as.
+  // Clean it against the linear survey, the same one validateMeasurement collects its errors from.
+  const cleanAssociatedOrientation = (values) => {
+    const associatedValues = values.associated_orientation?.[0];
+    if (isEmpty(associatedValues)) return values;
+    const {values: cleanedAssociatedValues} = validateForm({
+      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
+      values: associatedValues,
+    });
+    return {...values, associated_orientation: [cleanedAssociatedValues]};
+  };
+
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
@@ -198,6 +211,7 @@ const AddMeasurementModal = ({onPress}) => {
     try {
       // The ref, not the bag: the compass writes its reading and saves in the same tick
       let {values: editedMeasurementData} = await submitAndShowErrors(formRef);
+      editedMeasurementData = cleanAssociatedOrientation(editedMeasurementData);
       const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
@@ -307,10 +321,10 @@ const AddMeasurementModal = ({onPress}) => {
   // linear survey and key its errors to that same path, so they show inline and block the save — without this an
   // out-of-range trend/plunge/rake or a missing required other_feature saves silently.
   const validateMeasurement = (formName, values) => {
-    const errors = validateForm({formName: formName, values: values});
+    const {errors} = validateForm({formName: formName, values: values});
     const associatedValues = values.associated_orientation?.[0];
     if (isEmpty(associatedValues)) return errors;
-    const associatedErrors = validateForm({
+    const {errors: associatedErrors} = validateForm({
       formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
       values: associatedValues,
     });
@@ -421,6 +435,7 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        disabled={isFormInvalid}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
@@ -432,18 +447,17 @@ const AddMeasurementModal = ({onPress}) => {
           {measurementTypeForForm && (
             <FlatList
               ListHeaderComponent={
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
-                  initialStatus={{formName: formName}}
+                  formName={formName}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
+                  setIsFormInvalid={setIsFormInvalid}
                   validate={values => validateMeasurement(formName, values)}
-                  validateOnChange={false}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
-                </Formik>
+                </FormikWrapper>
               }
               bounces={false}
               listKey={'form'}

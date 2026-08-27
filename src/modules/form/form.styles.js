@@ -63,6 +63,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
   },
+  fieldRequired: {
+    color: themes.WARNING_COLOR,
+  },
   fieldValue: {
     borderBottomColor: themes.MEDIUMGREY,
     borderBottomWidth: 0.5,

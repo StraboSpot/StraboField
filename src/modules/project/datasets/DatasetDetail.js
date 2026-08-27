@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -15,7 +15,7 @@ import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import {DateInputField, formStyles, NumberInputField} from '../../form';
+import {DateInputField, FormikWrapper, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
@@ -193,7 +193,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   // Dataset ID & Timestamps
   const renderMetadataForm = () => {
     return (
-      <Formik initialValues={dataset}>
+      <FormikWrapper initialValues={dataset}>
         {() => (
           <>
             <ListItem containerStyle={commonStyles.listItemFormField}>
@@ -233,7 +233,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
             </ListItem>
           </>
         )}
-      </Formik>
+      </FormikWrapper>
     );
   };
 

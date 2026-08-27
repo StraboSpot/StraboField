@@ -2,10 +2,10 @@ import React, {useCallback, useRef} from 'react';
 import {ScrollView} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
-import {TextInputField} from '../form';
+import {FormikWrapper, TextInputField} from '../form';
 
 const QAQCForm = ({formRef, initialQAQCValues, isReadOnly, appearance = 'full', customHeight}) => {
   /* Local State */
@@ -35,11 +35,10 @@ const QAQCForm = ({formRef, initialQAQCValues, isReadOnly, appearance = 'full', 
       ref={scrollViewRef}
       style={{flex: 1}}
     >
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
         initialValues={initialQAQCValues}
         innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
       >
         {() => (
           <ListItem containerStyle={commonStyles.listItemFormField}>
@@ -58,7 +57,7 @@ const QAQCForm = ({formRef, initialQAQCValues, isReadOnly, appearance = 'full', 
             </ListItem.Content>
           </ListItem>
         )}
-      </Formik>
+      </FormikWrapper>
     </ScrollView>
   );
 };

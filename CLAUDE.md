@@ -174,7 +174,12 @@ properties (measurements, images, notes, samples) + modified timestamp, with a p
 
 **Dynamic forms:** XLSForm-style JSON in `/src/assets/forms/` (`survey` + `choices`), 14 categories, with skip logic,
 constraint validation, and a label dictionary. Rendered by `/src/modules/form/`. To add a field: edit the form JSON, add
-a custom component in `form/` if needed, wire validation and slice state.
+a custom component in `form/` if needed, wire validation and slice state. Every form is set up through
+`form/FormikWrapper.js` — the only place `<Formik>` is used — which derives the survey validation from a `formName`
+prop; passing it `setIsFormInvalid` also validates as the user types so Save can be disabled while errors remain.
+`useForm().validateForm` returns `{errors, values}` — the values being what to save (trimmed, numbers converted from
+text, empty and irrelevant fields dropped). It writes nothing back, and no validate anywhere may modify the values it
+is given: forms are validated as they are typed in, so a rewritten value lands under the cursor.
 
 **Maps:** three types — regular basemaps, georeferenced image basemaps, strat sections. State in `maps.slice.js`. Native
 uses `@rnmapbox/maps`; web uses `mapbox-gl` + `react-map-gl`.

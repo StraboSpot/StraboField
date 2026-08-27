@@ -1,17 +1,16 @@
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {SUPPLEMENTAL_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
@@ -27,12 +26,18 @@ const SiteSafetyPage = ({isReadOnly}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const toast = useToast();
 
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
+
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
 
@@ -57,7 +62,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
   };
 
   const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty) {
+    if (formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
@@ -79,6 +84,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
+      savedValuesRef.current = {...currentForm.values};
       await currentForm.resetForm();
       if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
     }
@@ -105,6 +111,7 @@ const SiteSafetyPage = ({isReadOnly}) => {
       <View>
         <SaveAndCancelButtons
           cancel={() => cancelFormAndGo()}
+          getIsDisabled={isFormInvalid}
           save={() => saveFormAndGo()}
         />
       </View>
@@ -113,17 +120,16 @@ const SiteSafetyPage = ({isReadOnly}) => {
 
   const renderSiteSafetyForm = () => {
     return (
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
-        initialStatus={{formName: formName}}
+        formName={formName}
         initialValues={initialValues}
         innerRef={formRef}
         onReset={() => console.log('Resetting form...')}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: formName, values: values})}
+        setIsFormInvalid={setIsFormInvalid}
       >
         {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
-      </Formik>
+      </FormikWrapper>
     );
   };
 

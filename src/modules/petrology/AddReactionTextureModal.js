@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ADD_ROCK_KEYS} from './petrology.constants';
@@ -10,7 +9,7 @@ import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {ChoiceButtons, Form, formStyles, useForm} from '../form';
+import {ChoiceButtons, Form, FormikWrapper, formStyles, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
@@ -70,10 +69,17 @@ const AddReactionTextureModal = () => {
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
-  const saveReactionTexture = () => {
-    savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) closeModal();
+  // Wait on the save and stop if it fails: it alerts and throws when the form has errors, and rolling the id over
+  // or closing the modal would lose what was entered
+  const saveReactionTexture = async () => {
+    try {
+      await savePetFeature(petKey, spot, formRef.current);
+      formRef.current?.setFieldValue('id', getNewId());
+      if (SMALL_SCREEN) closeModal();
+    }
+    catch (err) {
+      console.error('Error saving reaction texture', err);
+    }
   };
 
   /* Render Functions */
@@ -91,17 +97,17 @@ const AddReactionTextureModal = () => {
         <FlatList
           ListHeaderComponent={
             <View style={{flex: 1}}>
-              <Formik
+              <FormikWrapper
+                formName={formName}
                 initialValues={{id: getNewId()}}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
               >
                 {formProps => (
                   <View style={{flex: 1}}>
                     {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                   </View>
                 )}
-              </Formik>
+              </FormikWrapper>
             </View>
           }
           bounces={false}

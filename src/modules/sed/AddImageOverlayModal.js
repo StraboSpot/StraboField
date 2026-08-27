@@ -2,15 +2,15 @@ import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {validateImageOverlay} from './sed.helpers';
+import {getCleanedImageOverlay, validateImageOverlay} from './sed.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {NumberInputField, SelectInputField, useForm} from '../form';
+import {FormikWrapper, NumberInputField, SelectInputField, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
 import {setStratSection} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -34,6 +34,7 @@ const AddImageOverlayModal = ({
   const overlayFormRef = useRef(null);
 
   const [fieldInfo, setFieldInfo] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Event Handlers */
 
@@ -106,7 +107,8 @@ const AddImageOverlayModal = ({
   };
 
   const saveImageOverlay = async () => {
-    const {values: editedImageOverlayData} = await submitAndShowErrors(overlayFormRef.current);
+    const {values: overlayFormValues} = await submitAndShowErrors(overlayFormRef.current);
+    const editedImageOverlayData = getCleanedImageOverlay(overlayFormValues);
     // console.log('Image Overlay Data', editedImageOverlayData);
     if (!isEmpty(editedImageOverlayData) && editedImageOverlayData.id) {
       let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
@@ -135,6 +137,7 @@ const AddImageOverlayModal = ({
   const renderAddImageOverlayModal = () => {
     return (
       <ModalWrapper
+        disabled={isFormInvalid}
         headerTitle={'Add Image Overlay'}
         onActionPressed={saveImageOverlay}
         onCancelPress={closeModal}
@@ -142,13 +145,12 @@ const AddImageOverlayModal = ({
         showActionButton={!isReadOnly}
         showDeleteButton={!isEmpty(image) && !isReadOnly}
       >
-        <Formik
+        <FormikWrapper
           enableReinitialize={false}
           initialValues={image || {}}
           innerRef={overlayFormRef}
-          onSubmit={() => console.log('Submitting form...')}
+          setIsFormInvalid={setIsFormInvalid}
           validate={validateImageOverlay}
-          validateOnChange={false}
         >
           {outerFormProps => (
             <View>
@@ -254,7 +256,7 @@ const AddImageOverlayModal = ({
               )}
             </View>
           )}
-        </Formik>
+        </FormikWrapper>
 
         {/* Modal */}
         <FieldInfoModal fieldInfo={fieldInfo} onClose={() => setFieldInfo(null)}/>

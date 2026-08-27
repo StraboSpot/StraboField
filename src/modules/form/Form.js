@@ -6,6 +6,7 @@ import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
 import FieldInfoModal from './FieldInfoModal';
+import {isRequired} from './form.helpers';
 import styles from './form.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -24,6 +25,9 @@ const Form = ({
                 // whatever the default path writes for them
                 onNumberChange,
                 renderInline,
+                // The fields a feature has to answer beyond what its survey asks for. A sed lithology's depend on the
+                // Spot it belongs to, which a survey rule cannot see, so the page works them out and names them
+                requiredFields = [],
                 setFieldValue,
                 // The fields of the sibling surveys a tabbed page edits the same object through. Clearing needs
                 // them; rendering must not have them, or a tab would draw its siblings' fields
@@ -53,7 +57,11 @@ const Form = ({
   const unseenSiblingFields = (siblingSurvey || []).filter(
     siblingField => !survey.some(field => field.name === siblingField.name));
   const clearingSurvey = [...survey, ...unseenSiblingFields];
-  const relevantFields = survey.filter(item => isRelevant(item, formValues));
+  // Relevance turns on whether the fields it depends on are filled in, and a field the user has emptied still
+  // holds an empty string. Read those as absent, the way saving does, so the fields they drive hide as soon as
+  // their own field is cleared rather than at the next save
+  const filledValues = Object.fromEntries(Object.entries(formValues).filter(([, value]) => !isEmpty(value)));
+  const relevantFields = survey.filter(item => isRelevant(item, filledValues));
 
   /* Side Effects */
 
@@ -107,6 +115,8 @@ const Form = ({
       }
     });
   };
+
+  const isFieldRequired = field => isRequired(field, filledValues) || requiredFields.includes(field.name);
 
   // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
   const getFieldName = path => subkey ? path.split('[0].')[1] : path;
@@ -195,6 +205,7 @@ const Form = ({
       <Field
         component={NumberInputField}
         editable={!isReadOnly}
+        isRequired={isFieldRequired(field)}
         key={getFieldPath(field.name)}
         label={field.label}
         name={getFieldPath(field.name)}
@@ -224,6 +235,7 @@ const Form = ({
         choices={fieldChoicesCopy}
         errors={errors}
         isReadOnly={isReadOnly}
+        isRequired={isFieldRequired(field)}
         key={getFieldPath(field.name)}
         label={field.label}
         name={getFieldPath(field.name)}
@@ -244,6 +256,7 @@ const Form = ({
         // autoFocus={field.name === 'name'}
         component={TextInputField}
         editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
+        isRequired={isFieldRequired(field)}
         key={getFieldPath(field.name)}
         label={field.label}
         name={getFieldPath(field.name)}

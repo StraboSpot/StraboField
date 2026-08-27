@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {SectionList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -19,7 +19,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {SelectInputField, useForm} from '../form';
+import {FormikWrapper, SelectInputField, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -162,13 +162,7 @@ const RockPage = ({isReadOnly, page}) => {
     }));
     const label = 'Copy ' + page.label + ' Data From:';
     return (
-      <Formik
-        initialValues={{}}
-        innerRef={preFormRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={fieldValues => copyPetData(fieldValues.spot_id_for_pet_copy)}
-        validateOnChange={true}
-      >
+      <FormikWrapper initialValues={{}} innerRef={preFormRef}>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
             <Field key={'spot_id_for_pet_copy'} name={'spot_id_for_pet_copy'}>
@@ -178,14 +172,17 @@ const RockPage = ({isReadOnly, page}) => {
                   choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
                   errors={form.errors}
                   label={label}
-                  setFieldValue={form.setFieldValue}
+                  setFieldValue={(name, value) => {
+                    form.setFieldValue(name, value);
+                    copyPetData(value);
+                  }}
                   single={true}
                 />
               )}
             </Field>
           </ListItem.Content>
         </ListItem>
-      </Formik>
+      </FormikWrapper>
     );
   };
 

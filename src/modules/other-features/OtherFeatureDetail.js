@@ -2,16 +2,16 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Text, TextInput, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
+import {FormikWrapper, formStyles, SelectInputField, TextInputField, useForm} from '../form';
 import PageHeader from '../page/PageHeader';
 import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -37,7 +37,12 @@ const OtherFeatureDetail = ({
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
 
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   let [otherType, setOtherType] = useState(undefined);
 
   /* Derived Variables */
@@ -58,7 +63,7 @@ const OtherFeatureDetail = ({
   };
 
   const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty) {
+    if (formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
@@ -69,7 +74,7 @@ const OtherFeatureDetail = ({
           },
           {
             text: 'Yes',
-            onPress: () => saveForm(formCurrent),
+            onPress: () => saveForm(formCurrent, true),
           },
         ],
         {cancelable: false},
@@ -107,9 +112,11 @@ const OtherFeatureDetail = ({
     );
   };
 
-  const saveForm = async (formCurrent) => {
+  // Whether the page is being left is the caller's to say, rather than read back off a ref that may not have
+  // been cleared yet - guessing it wrong refuses an edit whole that was meant to keep all but its bad field
+  const saveForm = async (formCurrent, isLeavingPage) => {
     try {
-      let {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
       let featureToEdit;
       let otherFeatures = spot.properties.other_features;
       if (otherFeatures && otherFeatures.length > 0) {
@@ -128,6 +135,7 @@ const OtherFeatureDetail = ({
         featureToEdit = selectedFeature;
       }
       if (updateFeature(featureToEdit, otherFeatures, formValues)) {
+        savedValuesRef.current = {...formRef.current.values};
         await formRef.current.resetForm();
         hideFeatureDetail();
       }
@@ -195,11 +203,11 @@ const OtherFeatureDetail = ({
 
     return (
       <View style={{flex: 1}}>
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
           initialValues={initialFeatureValues}
           innerRef={formRef}
-          onSubmit={values => console.log('Submitting form...', values)}
+          setIsFormInvalid={setIsFormInvalid}
           validate={validateFeature}
         >
           {() => (
@@ -218,6 +226,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <Field
                     component={TextInputField}
+                    isRequired={true}
                     key={'name'}
                     label={'Name'}
                     name={'name'}
@@ -232,6 +241,7 @@ const OtherFeatureDetail = ({
                         {...field}
                         choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
                         errors={form.errors}
+                        isRequired={true}
                         label={'Feature Type'}
                         setFieldValue={form.setFieldValue}
                         single={true}
@@ -274,7 +284,7 @@ const OtherFeatureDetail = ({
               )}
             </View>
           )}
-        </Formik>
+        </FormikWrapper>
       </View>
     );
   };
@@ -287,6 +297,7 @@ const OtherFeatureDetail = ({
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={cancelForm}
+          getIsDisabled={isFormInvalid}
           save={() => saveForm(formRef.current)}
         />
       )}

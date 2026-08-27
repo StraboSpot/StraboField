@@ -3,7 +3,6 @@ import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -20,7 +19,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper} from '../form';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -35,7 +34,6 @@ const StratSectionPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {validateForm} = useForm();
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
   const toast = useToast();
@@ -131,13 +129,12 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return (
       <View style={{flex: 1}}>
         <SectionDivider dividerText={'Section Settings'}/>
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
+          formName={stratSectionFormName}
           initialValues={stratSection}
           innerRef={stratSectionRef}
           onReset={() => console.log('Resetting form...')}
-          onSubmit={() => console.log('Submitting form...')}
-          validate={values => validateForm({formName: stratSectionFormName, values: values})}
           validateOnChange={false}
         >
           {formProps => (
@@ -151,7 +148,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
               <Form {...formProps} formName={stratSectionFormName} isReadOnly={isReadOnly}/>
             </>
           )}
-        </Formik>
+        </FormikWrapper>
       </View>
     );
   };

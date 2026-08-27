@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -12,7 +11,7 @@ import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
@@ -20,7 +19,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
@@ -38,7 +37,7 @@ const UserProfile = () => {
   const isConnectionAvailable = useIsConnectionAvailable();
   const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
   const toast = useToast();
   const {uploadProfile} = useUpload();
@@ -141,24 +140,34 @@ const UserProfile = () => {
     try {
       // Only ever called from doCleanup as the page closes, so keep the valid fields and roll back just the
       // bad ones rather than discarding the whole edit on a page the user is already leaving.
-      const {values: formValues} = await submitAndShowErrors(formCurrent, true);
+      const {errors, values: formValues} = await submitAndShowErrors(formCurrent, true);
+      // Rolling the bad fields back can leave the form with nothing to save. A toggled convention is already in
+      // state - and so in these values - but its upload is deferred to here, so only stop when there is neither.
+      const hasNothingToSave = isEqual(formValues, formCurrent.initialValues) && !hasUnsavedConventionRef.current;
+      if (!isEmpty(errors) && hasNothingToSave) return;
+      // A save that kept only some of the fields has already been alerted about, so don't announce it as a save
+      const isFullSave = isEmpty(errors);
       const newValues = JSON.parse(JSON.stringify(formValues));
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
-        if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        if (isEmpty(userData.encoded_login)) {
+          if (isFullSave) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        }
         else {
           await uploadProfile(userValuesToUpdate);
           dispatch(clearProfileUploadNeeded());
-          toast.show('Profile uploaded successfully!', {type: 'success'});
-          toast.show('Changes Saved!', {type: 'success'});
+          if (isFullSave) {
+            toast.show('Profile uploaded successfully!', {type: 'success'});
+            toast.show('Changes Saved!', {type: 'success'});
+          }
         }
       }
       else {
         // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
         if (!isEmpty(userData.encoded_login)) dispatch(setProfileUploadNeeded());
         toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
-        toast.show('Changes Saved Locally Only!', {type: 'success'});
+        if (isFullSave) toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
     }
     catch (err) {
@@ -247,18 +256,16 @@ const UserProfile = () => {
         <FlatList
           ListHeaderComponent={
             <>
-              <Formik
+              <FormikWrapper
                 enableReinitialize={true}  // Update values if preferences change while form open
+                formName={USER_CONVENTIONS_FORM_NAME}
                 initialValues={userData}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
-                validateOnChange={true}
               >
                 {formProps => (
                   <Form {...formProps} formName={USER_CONVENTIONS_FORM_NAME} getIsDisabled={getIsDisabled}/>
                 )}
-              </Formik>
+              </FormikWrapper>
               {renderMeasurementInputDefault()}
               {renderUtmDisplay()}
               {renderBulkUpdatesSection()}

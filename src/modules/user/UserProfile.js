@@ -1,7 +1,6 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -18,7 +17,7 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import useUploadImages from '../../services/files/useUploadImages';
 import useServerRequests from '../../services/network/useServerRequests';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
@@ -26,7 +25,7 @@ import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMe
 import {persistor} from '../../store/ConfigureStore';
 import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 
@@ -43,7 +42,7 @@ const UserProfile = () => {
   const connectionTargetText = useConnectionTargetText();
   const {copyFiles, deleteFromDevice, deleteProfileImageFile} = useDevice();
   const {downloadUserProfile} = useDownload();
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {hasCameraPermission} = usePermissions();
   const {deleteProfileImage} = useServerRequests();
   const toast = useToast();
@@ -143,15 +142,21 @@ const UserProfile = () => {
     try {
       // Only ever called from doCleanup as the page closes, so keep the valid fields and roll back just the
       // bad ones rather than discarding the whole edit on a page the user is already leaving.
-      const {values: formValues} = await submitAndShowErrors(formCurrent, true);
+      const {errors, values: formValues} = await submitAndShowErrors(formCurrent, true);
+      // Rolling the bad fields back can leave nothing to save, and then there is nothing to upload or announce
+      if (!isEmpty(errors) && isEqual(formValues, formCurrent.initialValues)) return;
+      // A save that kept only some of the fields has already been alerted about, so don't announce it as a save
+      const isFullSave = isEmpty(errors);
       const newValues = JSON.parse(JSON.stringify(formValues));
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
         await uploadProfile(userValuesToUpdate);
         dispatch(clearProfileUploadNeeded());
-        toast.show('Profile uploaded successfully!', {type: 'success'});
-        toast.show('Changes Saved!', {type: 'success'});
+        if (isFullSave) {
+          toast.show('Profile uploaded successfully!', {type: 'success'});
+          toast.show('Changes Saved!', {type: 'success'});
+        }
       }
       else {
         // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
@@ -245,16 +250,14 @@ const UserProfile = () => {
                 <View style={{alignItems: 'center', padding: 10}}>
                   <Text style={userStyles.avatarLabelEmail}>{userData.email}</Text>
                 </View>
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}  // Update values if preferences change while form open
+                  formName={formName}
                   initialValues={userData}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
-                  validateOnChange={true}
                 >
                   {formProps => <Form {...formProps} formName={formName} getIsDisabled={getIsDisabled}/>}
-                </Formik>
+                </FormikWrapper>
                 {isConnectionAvailable ? (
                   <View style={userStyles.saveButtonContainer}>
                     {Platform.OS !== 'web' && (

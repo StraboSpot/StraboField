@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSection from './useStratSection';
@@ -11,7 +11,7 @@ import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {Form, SelectInputField, TextInputField, useForm} from '../../form';
+import {Form, FormikWrapper, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
@@ -26,7 +26,7 @@ const AddIntervalModal = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLabel, getSurvey, submitAndShowErrors, validateForm} = useForm();
+  const {getLabel, getSurvey, submitAndShowErrors} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
@@ -37,6 +37,7 @@ const AddIntervalModal = () => {
   const preFormRef = useRef(null);
 
   const [intervalToCopy, setIntervalToCopy] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
@@ -190,32 +191,18 @@ const AddIntervalModal = () => {
     }
   };
 
-  const validatePreForm = (values) => {
-    console.log('Values before geometry validation:', values);
-    let errors = {};
-    if (values.intervalToCopyId) {
-      const copyInterval = intervals.find(i => i.properties.id === values.intervalToCopyId);
-      copyIntervalLithology(copyInterval);
-    }
-    else setIntervalToCopy(null);
-    console.log('Values after geometry validation:', values);
-    return errors;
-  };
-
   /* Render Functions */
 
   const renderAddIntervalFormFields = () => {
     return (
-      <Formik
-        initialStatus={{formName: formName}}
+      <FormikWrapper
+        formName={formName}
         initialValues={{}}
         innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        validateOnChange={true}
+        setIsFormInvalid={setIsFormInvalid}
       >
         {formProps => <Form {...formProps} formName={formName}/>}
-      </Formik>
+      </FormikWrapper>
     );
   };
 
@@ -223,6 +210,7 @@ const AddIntervalModal = () => {
     return (
       <ModalWrapper
         closeModal={close}
+        disabled={isFormInvalid}
         headerTitle={'Add Interval'}
         onActionPressed={() => saveInterval(formRef?.current?.values)}
         showActionButton
@@ -249,13 +237,7 @@ const AddIntervalModal = () => {
       {properties: {name: '-- Bottom --', id: 'bottom'}},
     ];
     return (
-      <Formik
-        initialValues={initialIntervalName}
-        innerRef={preFormRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={validatePreForm}
-        validateOnChange={true}
-      >
+      <FormikWrapper initialValues={initialIntervalName} innerRef={preFormRef}>
         {() => (
           <>
             <ListItem containerStyle={commonStyles.listItemFormField}>
@@ -283,7 +265,10 @@ const AddIntervalModal = () => {
                       choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
                       errors={form.errors}
                       label={'Copy Interval Data From:'}
-                      setFieldValue={form.setFieldValue}
+                      setFieldValue={(name, value) => {
+                        form.setFieldValue(name, value);
+                        copyIntervalLithology(intervals.find(i => i.properties.id === value));
+                      }}
                       single={true}
                     />
                   )}
@@ -302,7 +287,7 @@ const AddIntervalModal = () => {
             </ListItem>
           </>
         )}
-      </Formik>
+      </FormikWrapper>
     );
   };
 

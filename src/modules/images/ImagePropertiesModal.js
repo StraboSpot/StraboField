@@ -1,19 +1,17 @@
 import React, {useRef, useState} from 'react';
 import {FlatList, Platform, useWindowDimensions, Text, View} from 'react-native';
 
-import {Formik} from 'formik';
-
 import {imageStyles} from '.';
 import {IMAGE_PROPERTIES_FORM_NAME} from './images.constants';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {formStyles, Form, useForm} from '../form';
+import {formStyles, Form, FormikWrapper, useForm} from '../form';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
   /* Data Hooks */
 
-  const {submitAndShowErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {height: windowHeight} = useWindowDimensions();
 
   /* Local State */
@@ -21,6 +19,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
   const formRef = useRef(null);
 
   const [isAnnotated, setIsAnnotated] = useState(image.annotated);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Logic Helpers */
 
@@ -43,12 +42,11 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
   /* Render Functions */
 
   const renderForm = isInline => (
-    <Formik
-      initialStatus={{formName: IMAGE_PROPERTIES_FORM_NAME}}
+    <FormikWrapper
+      formName={IMAGE_PROPERTIES_FORM_NAME}
       initialValues={image}
       innerRef={formRef}
-      onSubmit={() => console.log('Submitting form...')}
-      validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
+      setIsFormInvalid={setIsFormInvalid}
     >
       {formProps => (
         <Form
@@ -58,7 +56,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
           renderInline={isInline}
         />
       )}
-    </Formik>
+    </FormikWrapper>
   );
 
   const renderBasemapSwitch = () => (
@@ -77,6 +75,7 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
   return (
     <ModalWrapper
       closeModal={closeModal}
+      disabled={isFormInvalid}
       // On large-screen native (iPad) render as a plain view overlay instead of the rn-vui Overlay,
       // whose built-in KeyboardAvoidingView pushes the whole modal up when the keyboard opens (hiding
       // the top/focused field). Without it, the modal stays put and the form's keyboard-aware FlatList

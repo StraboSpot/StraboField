@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BackupStatusModal from './BackupStatusModal';
@@ -16,6 +16,7 @@ import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequire
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency} from '../../connections/connections.slice';
 import useIsConnectionAvailable from '../../connections/useConnectionStatus';
+import {FormikWrapper} from '../../form';
 import SelectInputField from '../../form/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
@@ -69,16 +70,7 @@ const BackupProject = () => {
 
   const renderBackupOptions = () => {
     return (
-      <Formik
-        initialValues={{backupFrequency: backupFrequency?.save}}
-        innerRef={preFormRef}
-        onSubmit={values => console.log('Submit: ', values, ' |')}
-        // Persists the choice as it changes rather than validating. Keep the block body: dispatch returns the
-        // action object, and Formik takes whatever validate returns as the form's errors.
-        validate={(values) => {
-          dispatch(setBackupFrequency({save: values.backupFrequency}));
-        }}
-      >
+      <FormikWrapper initialValues={{backupFrequency: backupFrequency?.save}} innerRef={preFormRef}>
         {() => (
           <View style={{paddingHorizontal: 10}}>
             <View style={{paddingVertical: 5}}>
@@ -90,7 +82,10 @@ const BackupProject = () => {
                     errors={form.errors}
                     label={'Auto-Save to Device Frequency'}
                     multiSelectStyle={{paddingVertical: 5}}
-                    setFieldValue={form.setFieldValue}
+                    setFieldValue={(name, value) => {
+                      form.setFieldValue(name, value);
+                      dispatch(setBackupFrequency({save: value}));
+                    }}
                     single
                   />
                 )}
@@ -98,7 +93,7 @@ const BackupProject = () => {
             </View>
           </View>
         )}
-      </Formik>
+      </FormikWrapper>
 
     );
   };

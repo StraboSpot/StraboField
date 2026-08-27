@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';
@@ -13,7 +12,7 @@ import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
+import {ChoiceButtons, Form, FormikWrapper, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
@@ -38,6 +37,7 @@ const AddMineralModal = () => {
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewId()});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
 
@@ -103,11 +103,18 @@ const AddMineralModal = () => {
     setSelectedTypeIndex(null);
   };
 
-  const saveMineral = () => {
-    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
-    else savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) onCloseModalPressed();
+  // Await the save so a failed one stops here: it alerts and throws when the form has errors, and rolling the id
+  // over or closing the modal would then lose what was entered.
+  const saveMineral = async () => {
+    try {
+      if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
+      else await savePetFeature(petKey, spot, formRef.current);
+      formRef.current?.setFieldValue('id', getNewId());
+      if (SMALL_SCREEN) onCloseModalPressed();
+    }
+    catch (err) {
+      console.error('Error saving mineral', err);
+    }
   };
 
   /* Render Functions */
@@ -181,18 +188,19 @@ const AddMineralModal = () => {
           <FlatList
             ListHeaderComponent={
               <View style={{flex: 1}}>
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
+                  formName={formName}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
+                  setIsFormInvalid={setIsFormInvalid}
                 >
                   {formProps => (
                     <View style={{flex: 1}}>
                       {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                     </View>
                   )}
-                </Formik>
+                </FormikWrapper>
               </View>
             }
             bounces={false}
@@ -213,6 +221,7 @@ const AddMineralModal = () => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
       closeModal={onCloseModalPressed}
+      disabled={isFormInvalid}
       headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
       onActionPressed={saveMineral}
       showActionButton={!isShowTemplates && isEmpty(selectedTypeIndex) && !choicesViewKey}

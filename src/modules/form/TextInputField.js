@@ -13,6 +13,7 @@ const TextInputField = ({
                           autoCapitalize,
                           customHeight,
                           editable = true,
+                          isRequired,
                           label,
                           onFocus,
                           onBlur: onBlurProp,
@@ -54,7 +55,10 @@ const TextInputField = ({
     <>
       {label && (
         <View style={formStyles.fieldLabelContainer}>
-          <Text style={formStyles.fieldLabel}>{label}</Text>
+          <Text style={formStyles.fieldLabel}>
+            {label}
+            {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+          </Text>
           {placeholder && (
             <Icon
               color={themes.PRIMARY_ACCENT_COLOR}

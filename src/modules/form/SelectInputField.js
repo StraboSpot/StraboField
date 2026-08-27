@@ -25,6 +25,7 @@ const SelectInputField = ({
                             // them in. Defaulted so a caller that forgets shows no error rather than throwing.
                             errors = {},
                             isReadOnly,
+                            isRequired,
                             label,
                             multiSelectStyle,
                             name,
@@ -154,6 +155,7 @@ const SelectInputField = ({
           </ListItem.Content>
         </ListItem>
         {renderChoicesList()}
+        {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
       </>
     );
   };
@@ -188,7 +190,10 @@ const SelectInputField = ({
   const renderFieldLabel = () => {
     return (
       <View style={formStyles.fieldLabelContainer}>
-        <Text style={formStyles.fieldLabel}>{label}</Text>
+        <Text style={formStyles.fieldLabel}>
+          {label}
+          {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+        </Text>
         {placeholder && (
           <Icon
             color={PRIMARY_ACCENT_COLOR}

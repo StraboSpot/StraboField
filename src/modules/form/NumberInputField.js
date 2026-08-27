@@ -10,7 +10,7 @@ import {formStyles} from '../form';
 const NumberInputField = ({
                             field: {name, onBlur, onChange, value},
                             form: {errors},
-                            editable = true, label, onMyChange, onShowFieldInfo, placeholder,
+                            editable = true, isRequired, label, onMyChange, onShowFieldInfo, placeholder,
                           }) => {
   /* Logic Helpers */
 
@@ -24,7 +24,10 @@ const NumberInputField = ({
   return (
     <>
       <View style={formStyles.fieldLabelContainer}>
-        <Text style={formStyles.fieldLabel}>{label}</Text>
+        <Text style={formStyles.fieldLabel}>
+          {label}
+          {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+        </Text>
         {placeholder && (
           <Icon
             color={themes.PRIMARY_ACCENT_COLOR}

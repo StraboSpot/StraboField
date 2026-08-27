@@ -4,23 +4,18 @@ import {Text, View} from 'react-native';
 import moment from 'moment';
 import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import {useDispatch} from 'react-redux';
 
 import {formStyles} from '../form';
-import {openedMessageModal} from '../home/home.slice';
 
 const DateInputField = ({
                           field: {name, value},
-                          form: {setFieldValue, values},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
+                          onMyChange,
+                          setFieldValue,
                         }) => {
-  /* Data Hooks */
-
-  const dispatch = useDispatch();
-
   /* Local State */
 
   const [date, setDate] = useState(Date.parse(value) ? new Date(value) : undefined);
@@ -34,25 +29,13 @@ const DateInputField = ({
 
   /* Logic Helpers */
 
+  // Whatever is picked is written, even a date range in the wrong order: the survey's own validation catches that
+  // one, marking both dates and holding the save, the same as on a device
   const changeDate = (selectedDate) => {
     console.log('Change Date', name, selectedDate);
     setDate(selectedDate);
     selectedDate = selectedDate?.toISOString();
-
-    if (selectedDate && name === 'start_date' && values.end_date) {
-      if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate);
-      else {
-        console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
-      }
-    }
-    else if (selectedDate && name === 'end_date' && values.start_date) {
-      if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate);
-      else {
-        console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
-      }
-    }
+    if (onMyChange && typeof onMyChange === 'function') onMyChange(name, selectedDate);
     else setFieldValue(name, selectedDate);
   };
 

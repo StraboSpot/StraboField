@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -21,7 +20,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {onOrientationChange} from '../compass/compass.helpers';
-import {Form, FormSlider, MainButtons, useForm} from '../form';
+import {Form, FormikWrapper, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -38,7 +37,7 @@ const AddEarthquakeModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -46,6 +45,7 @@ const AddEarthquakeModal = () => {
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [isFaultOrientationModalVisible, setIsFaultOrientationModalVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isVectorMeasurementModalVisible, setIsVectorMeasurementModalVisible] = useState(false);
   const [measurementsGroupField, setMeasurementsGroupField] = useState({});
 
@@ -171,6 +171,7 @@ const AddEarthquakeModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
+        disabled={isFormInvalid}
         onActionPressed={saveEarthquake}
         showActionButton={!choicesViewKey}
         showCancelButton={false}
@@ -179,19 +180,18 @@ const AddEarthquakeModal = () => {
         <FlatList
           ListHeaderComponent={
             <View style={{flex: 1}}>
-              <Formik
+              <FormikWrapper
+                formName={formName}
                 initialValues={{}}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={false}
+                setIsFormInvalid={setIsFormInvalid}
               >
                 {formProps => (
                   <View style={{flex: 1}}>
                     {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                   </View>
                 )}
-              </Formik>
+              </FormikWrapper>
             </View>
           }
           bounces={false}

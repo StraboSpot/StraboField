@@ -1,15 +1,13 @@
 import React, {forwardRef, useState} from 'react';
 import {Text, View} from 'react-native';
 
-import {Formik} from 'formik';
-
 import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 
 const ReportForm = forwardRef(({initialValues}, formRef) => {
   /* Data Hooks */
-  const {getRelevantFields, getSurvey, validateForm} = useForm();
+  const {getRelevantFields, getSurvey} = useForm();
 
   /* Local State */
 
@@ -53,11 +51,10 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
   /* View */
 
   return (
-    <Formik
+    <FormikWrapper
+      formName={REPORT_FORM_NAME}
       initialValues={initialValues}
       innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: REPORT_FORM_NAME, values: values})}
       validateOnChange={false}
     >
       {formProps => (
@@ -66,7 +63,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
           {choicesViewKey && renderSubform(formProps)}
         </View>
       )}
-    </Formik>
+    </FormikWrapper>
   );
 });
 

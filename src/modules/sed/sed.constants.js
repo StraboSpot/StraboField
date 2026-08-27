@@ -7,6 +7,9 @@ export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'phosphorite_type',
 ];
 
+// The interval characters whose lithologies have to be filled in
+export const LITHOLOGY_INTERVAL_CHARACTERS = ['bed', 'bed_mixed_lit', 'interbedded', 'package_succe'];
+
 export const LITHOLOGY_SUBPAGES = {
   LITHOLOGY: 'lithology',
   COMPOSITION: 'composition',

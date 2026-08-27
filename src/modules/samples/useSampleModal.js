@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useSamples from './useSamples';
 import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {useForm} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -26,6 +27,7 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const {addSpotToTags} = useTags();
+  const {submitAndShowErrors} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -102,10 +104,13 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
       setIsLoading(true);
       dispatch(setLoadingStatus({bool: true, view: 'home'}));
 
+      // The values the survey validates and cleans, rather than what is sitting in the inputs: numbers converted
+      // from text, text trimmed, and the fields a choice has made irrelevant left out of the sample
+      const {values: sampleValues} = await submitAndShowErrors(formRefCurrent);
       const date = new Date().toISOString();
       const newId = getNewId();
       const newSample = {
-        ...formRefCurrent.values,
+        ...sampleValues,
         collection_date: date,
         collection_time: date,
         id: newId,

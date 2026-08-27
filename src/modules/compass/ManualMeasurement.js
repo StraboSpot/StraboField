@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Field} from 'formik';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
@@ -13,7 +13,7 @@ import {isEmpty} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
-import {NumberInputField} from '../form';
+import {FormikWrapper, NumberInputField} from '../form';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ManualMeasurement = ({
@@ -41,11 +41,10 @@ const ManualMeasurement = ({
   /* View */
 
   return (
-    <Formik
+    <FormikWrapper
       enableReinitialize={true}
       initialValues={initialValues}
       innerRef={manualFormRef}
-      onSubmit={values => console.log('Submitting form...', values)}
       validate={validate}
       validateOnMount={true}
     >
@@ -139,7 +138,7 @@ const ManualMeasurement = ({
             )}
         </View>
       )}
-    </Formik>
+    </FormikWrapper>
   );
 };
 
