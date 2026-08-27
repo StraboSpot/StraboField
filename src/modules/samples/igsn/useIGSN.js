@@ -128,7 +128,11 @@ const useIGSN = () => {
       // {label: 'Classification:', sesarKey: 'classification', value: getRockClassification()}, //required
       {label: 'Description:', sesarKey: 'description', value: sampleValue?.sample_description},
       {label: 'Purpose:', sesarKey: 'purpose', value: sampleValue?.main_sampling_purpose},
-      {label: 'Collection Date (Time):', sesarKey: 'collection_start_date', value: sampleValue?.collection_date},
+      {
+        label: 'Collection Date (Time):',
+        sesarKey: 'collection_start_date',
+        value: sampleValue?.collection_date || selectedSpot.properties.date,
+      },
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
       {label: 'Longitude:', sesarKey: 'longitude', value: longitude},
       {label: 'Latitude:', sesarKey: 'latitude', value: latitude},
