@@ -80,6 +80,10 @@ const useForm = () => {
     return relevantFields;
   };
 
+  // The surveys of a tabbed record's other tabs - the part of the record the tab named here edits without showing
+  const getSiblingSurvey = ([category, name], subpageKeys) => subpageKeys.filter(k => k !== name)
+    .flatMap(k => getSurvey([category, k]));
+
   // Return the survey object given the form category and name
   const getSurvey = ([category, name]) => {
     const survey = forms.default[category] && forms.default[category][name] && forms.default[category][name].survey || [];
@@ -162,11 +166,13 @@ const useForm = () => {
   // choice dropped. Nothing is written back into the values given, so a form can be validated while it is being
   // typed in without half-typed text being rewritten under the cursor - a decimal entered as '0.' would otherwise
   // become 0 before the digits after the point could be typed.
-  const validateForm = ({formName, values}) => {
+  // A survey given in place of a formName checks fields the form on screen does not show, which is how a tabbed
+  // form checks the other tabs of the record it is one tab of.
+  const validateForm = ({formName, survey, values}) => {
     const errors = {};
     const cleanedValues = {...values};
 
-    getSurvey(formName).forEach((fieldModel) => {
+    (survey || getSurvey(formName)).forEach((fieldModel) => {
       const key = fieldModel.name;
       if (cleanedValues[key] && typeof cleanedValues[key] === 'string') cleanedValues[key] = cleanedValues[key].trim();
       if (isEmpty(cleanedValues[key]) || !isRelevant(fieldModel, cleanedValues)) delete cleanedValues[key];
@@ -202,6 +208,7 @@ const useForm = () => {
     getLabel,
     getLabels,
     getRelevantFields,
+    getSiblingSurvey,
     getSurvey,
     hasErrors,
     isRelevant,

@@ -7,11 +7,12 @@ import {isEmpty} from '../../shared/helpers';
 // show under the fields right away rather than only when the form is saved. FormikWrapper renders it.
 // Validating on every change is also why a validate must leave the values it is given alone: rewriting them here
 // would rewrite what is being typed, under the cursor.
-const LiveValidation = ({formProps, setIsFormInvalid, validate}) => {
+const LiveValidation = ({formProps, setInvalidFields, setIsFormInvalid, validate}) => {
   useEffect(() => {
     const errors = validate(formProps.values);
     formProps.setErrors(errors);
     setIsFormInvalid(!isEmpty(errors));
+    if (setInvalidFields) setInvalidFields(Object.keys(errors));
   }, [formProps.values]);
 
   return null;

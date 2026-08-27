@@ -39,6 +39,8 @@ const BasicPageDetail = ({
                            registerGetValues,
                            saveTemplate,
                            selectedFeature,
+                           // Reports the fields in error up to a tabbed page, so it can mark the tab holding one
+                           setInvalidFields,
                            siblingSurvey,
                          }) => {
   /* Data Hooks */
@@ -222,8 +224,12 @@ const BasicPageDetail = ({
   // Fields a feature requires beyond its survey are checked with it, so they hold Save the same way
   const validateFeature = (formName, values) => {
     const {errors} = validateForm({formName: formName, values: values});
+    // Every tab edits the same record, so a field left unanswered on another tab holds Save just as one here
+    // does, and SubpageTabs marks the tab holding it. Errors only - what a save writes is still cleaned by the
+    // survey of the tab being shown, which is also the reading that wins for a field both tabs define.
+    const siblingErrors = siblingSurvey ? validateForm({survey: siblingSurvey, values: values}).errors : {};
     return getRequiredFields(values).reduce(
-      (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), errors);
+      (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), {...siblingErrors, ...errors});
   };
 
   const saveButtonOnPress = () => {
@@ -335,6 +341,7 @@ const BasicPageDetail = ({
           innerRef={formRef}
           onReset={() => console.log('Resetting form...')}
           onSubmit={onSubmitForm}
+          setInvalidFields={setInvalidFields}
           setIsFormInvalid={setIsFormInvalid}
           validate={values => validateFeature(formName, values)}
         >
