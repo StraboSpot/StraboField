@@ -19,8 +19,6 @@ import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
 
-let tempValues = {};
-
 const AddMineralModal = () => {
   /* Data Hooks */
 
@@ -87,6 +85,8 @@ const AddMineralModal = () => {
   };
 
   const onViewTypePress = (i) => {
+    // The form unmounts while a mineral lookup is showing, so hold on to what has been entered
+    if (formRef.current) setInitialValues(formRef.current.values);
     if (selectedTypeIndex === i) setSelectedTypeIndex(null);
     else setSelectedTypeIndex(i);
   };
@@ -94,12 +94,12 @@ const AddMineralModal = () => {
   /* Logic Helpers */
 
   const addMineral = (mineralInfo) => {
-    setInitialValues({
-      ...tempValues,
+    setInitialValues(currentValues => ({
+      ...currentValues,
       id: getNewId(),
       mineral_abbrev: mineralInfo.Abbreviation,
       full_mineral_name: mineralInfo.Label,
-    });
+    }));
     setSelectedTypeIndex(null);
   };
 
@@ -120,7 +120,6 @@ const AddMineralModal = () => {
   /* Render Functions */
 
   const renderAddMineral = () => {
-    tempValues = formRef.current?.values || {};
     return (
       <>
         {!choicesViewKey && !areMultipleTemplates && (
