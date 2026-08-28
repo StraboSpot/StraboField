@@ -24,19 +24,19 @@ const ROOT = path.resolve(__dirname, '..');
 const PLAY_LIMIT = 500; // hard cap enforced by Google Play
 const PLAY_TARGET = 400; // our preferred ceiling
 
-const sh = (cmd) => execSync(cmd, {cwd: ROOT}).toString().trim();
+const sh = cmd => execSync(cmd, {cwd: ROOT}).toString().trim();
 
 // Map a conventional-commit scope to a user-facing category heading.
 const CATEGORY = {
-  map: 'Maps', maps: 'Maps',
-  image: 'Photos', images: 'Photos', sketch: 'Photos',
-  form: 'Forms', forms: 'Forms',
-  notebook: 'Notebook', 'notebook-menu': 'Notebook', 'notebook-panel': 'Notebook',
-  spot: 'Spots', spots: 'Spots', samples: 'Spots',
-  'strat section': 'Strat sections', strat: 'Strat sections',
-  compass: 'Compass',
-  project: 'Projects', projects: 'Projects', backup: 'Backup & sync',
-  connectivity: 'Sync', network: 'Sync',
+  'map': 'Maps', 'maps': 'Maps',
+  'image': 'Photos', 'images': 'Photos', 'sketch': 'Photos',
+  'form': 'Forms', 'forms': 'Forms',
+  'notebook': 'Notebook', 'notebook-menu': 'Notebook', 'notebook-panel': 'Notebook',
+  'spot': 'Spots', 'spots': 'Spots', 'samples': 'Spots',
+  'strat section': 'Strat sections', 'strat': 'Strat sections',
+  'compass': 'Compass',
+  'project': 'Projects', 'projects': 'Projects', 'backup': 'Backup & sync',
+  'connectivity': 'Sync', 'network': 'Sync',
 };
 
 // Commit types that describe user-visible change. Everything else is dropped.
@@ -52,7 +52,7 @@ function readVersionCode() {
   return m ? m[1] : null;
 }
 
-const semver = (t) => t.replace(/^v/, '').split('.').map(Number);
+const semver = t => t.replace(/^v/, '').split('.').map(Number);
 const lt = (a, b) => {
   const [A, B] = [semver(a), semver(b)];
   for (let i = 0; i < 3; i++) {
@@ -66,8 +66,8 @@ const lt = (a, b) => {
 function previousTag(currentVersion) {
   const tags = sh('git tag')
     .split('\n')
-    .filter((t) => /^v\d+\.\d+\.\d+$/.test(t));
-  const below = tags.filter((t) => lt(t, `v${currentVersion}`));
+    .filter(t => /^v\d+\.\d+\.\d+$/.test(t));
+  const below = tags.filter(t => lt(t, `v${currentVersion}`));
   below.sort((a, b) => (lt(a, b) ? -1 : 1));
   return below[below.length - 1] || null;
 }
@@ -151,7 +151,7 @@ function main() {
   write(appFile, appStore);
   write(playFile, play);
 
-  const rel = (p) => path.relative(ROOT, p);
+  const rel = p => path.relative(ROOT, p);
   console.log(`\n📝 DRAFT store notes for v${version} (versionCode ${versionCode})`);
   console.log(`   range: ${fromTag ? `${fromTag}..HEAD` : 'full history'}  (${parsed.length} user-facing commits)\n`);
   console.log(`── App Store Connect ── ${rel(appFile)}`);
