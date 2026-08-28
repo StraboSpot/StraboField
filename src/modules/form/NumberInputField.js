@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
@@ -10,8 +10,29 @@ import {formStyles} from '../form';
 const NumberInputField = ({
                             field: {name, onBlur, onChange, value},
                             form: {errors},
-                            editable = true, isRequired, label, onMyChange, onShowFieldInfo, placeholder,
+                            editable = true, isDecimalAllowed = true, isNegativeAllowed = true, isRequired, label,
+                            onMyChange, onShowFieldInfo, placeholder,
                           }) => {
+  /* Derived Variables */
+
+  // iOS maps the numeric keyboard to a decimal pad, which has no minus sign, so a field that can hold a negative
+  // needs the one keyboard that does - and that one carries letters and punctuation with it. A field whose survey
+  // rules a negative out gets a plain pad instead, digits only where it rules out a decimal point too. Android's
+  // numeric keyboard is already signed, and web has no on-screen keyboard to pick.
+  const keyboardType = Platform.OS !== 'ios' ? 'numeric'
+    : isNegativeAllowed ? 'numbers-and-punctuation'
+      : isDecimalAllowed ? 'decimal-pad' : 'number-pad';
+
+  /* Event Handlers */
+
+  // The punctuation keyboard can type things a number cannot be made of, so drop those as they are typed rather
+  // than drop the whole value at save time, which is what an unparsable number would otherwise come to.
+  const onChangeNumber = (text) => {
+    const numberText = text.replace(/[^\d.-]/g, '');
+    if (onMyChange && typeof onMyChange === 'function') onMyChange(name, numberText);
+    else onChange(name)(numberText);
+  };
+
   /* Logic Helpers */
 
   const getDisplayValue = () => {
@@ -39,9 +60,9 @@ const NumberInputField = ({
       </View>
       <TextInput
         editable={editable}
-        keyboardType={'numeric'}
+        keyboardType={keyboardType}
         onBlur={onBlur(name)}
-        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        onChangeText={onChangeNumber}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
         style={formStyles.fieldValue}

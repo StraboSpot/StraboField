@@ -4,6 +4,20 @@ import {isEmpty} from '../../shared/helpers';
 // fixed by the survey JSON — 548 distinct ones across every form — so this is bounded and never needs clearing.
 const compiledLogic = new Map();
 
+/* Internal Functions */
+
+// The lowest value an XLSForm constraint string allows, and whether that bound is inclusive, or undefined where it
+// sets no minimum. The inclusive form is matched first and the exclusive form only if there is none, since '>='
+// also contains '>'.
+const getConstraintMinimum = (constraint) => {
+  const inclusiveMatch = constraint.match(/>=\s(-?\d*)/i);
+  const exclusiveMatch = inclusiveMatch ? null : constraint.match(/>\s(-?\d*)/i);
+  const match = inclusiveMatch || exclusiveMatch;
+  return match && {isInclusive: !!inclusiveMatch, min: parseFloat(match[1])};
+};
+
+/* Exported Functions */
+
 export const convertXLSFormLogicToJS = (logic) => {
   logic = logic.replace(/not/g, '!');
   logic = logic.replace(/selected\(\${(.*?)}, /g, 'values?.$1?.includes(');
@@ -32,12 +46,12 @@ export const getConstraintError = (field, value) => {
     if (!isEmpty(max) && !isWithinMax) error = field.constraint_message || 'Value over max of ' + max;
   }
 
-  const minInclusive = field.constraint.match(/>=\s(-?\d*)/i);
-  const minExclusive = minInclusive ? null : field.constraint.match(/>\s(-?\d*)/i);
-  if (minInclusive || minExclusive) {
-    const min = parseFloat((minInclusive || minExclusive)[1]);
-    const isWithinMin = minInclusive ? value >= min : value > min;
-    if (!isEmpty(min) && !isWithinMin) error = field.constraint_message || 'Value below min of ' + min;
+  const minimum = getConstraintMinimum(field.constraint);
+  if (minimum) {
+    const isWithinMin = minimum.isInclusive ? value >= minimum.min : value > minimum.min;
+    if (!isEmpty(minimum.min) && !isWithinMin) {
+      error = field.constraint_message || 'Value below min of ' + minimum.min;
+    }
   }
 
   return error;
@@ -54,6 +68,14 @@ export const getLogicFunction = (logic) => {
     compiledLogic.set(logic, evaluate);
   }
   return evaluate;
+};
+
+// Whether a field's survey leaves room for a negative value. Only a constraint can rule one out, by setting a
+// minimum of 0 or more; a field with no constraint has to be assumed to take them. Written as !(min >= 0) rather
+// than min < 0 so that a minimum which did not parse falls the same permissive way.
+export const isNegativeAllowed = (field) => {
+  const minimum = field.constraint && getConstraintMinimum(field.constraint);
+  return !minimum || !(minimum.min >= 0);
 };
 
 export const isRequired = (field, values) => {

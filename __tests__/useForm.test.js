@@ -1,3 +1,4 @@
+import {isNegativeAllowed} from '../src/modules/form/form.helpers';
 import useForm from '../src/modules/form/useForm';
 
 const PLANAR_FORM_NAME = ['measurement', 'planar_orientation'];
@@ -117,5 +118,23 @@ describe('validateForm', () => {
     });
     expect(values.other_feature).toBeUndefined();
     expect(values.feature_type).toBe('fold_hinge');
+  });
+});
+
+describe('isNegativeAllowed', () => {
+  it('rules out a negative for a constraint whose minimum is 0 or more', () => {
+    expect(isNegativeAllowed({constraint: '. > 0'})).toBe(false);
+    expect(isNegativeAllowed({constraint: '. >= 0'})).toBe(false);
+    expect(isNegativeAllowed({constraint: '. >= 0 and . <= 360'})).toBe(false);
+  });
+
+  it('allows a negative where the constraint says one is in range', () => {
+    expect(isNegativeAllowed({constraint: '. >= -90 and . <= 90'})).toBe(true);
+    expect(isNegativeAllowed({constraint: '. >= -180 and . <= 180'})).toBe(true);
+  });
+
+  it('allows a negative when nothing rules one out, since only a minimum can', () => {
+    expect(isNegativeAllowed({})).toBe(true);
+    expect(isNegativeAllowed({constraint: '. <= 100'})).toBe(true);
   });
 });

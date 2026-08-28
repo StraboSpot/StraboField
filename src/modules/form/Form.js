@@ -6,7 +6,7 @@ import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
 import FieldInfoModal from './FieldInfoModal';
-import {isRequired} from './form.helpers';
+import {isNegativeAllowed, isRequired} from './form.helpers';
 import styles from './form.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -46,9 +46,6 @@ const Form = ({
 
   /* Derived Variables */
 
-  // A subkey'd form edits one nested object, e.g. associated_orientation[0], so relevance, defaults and clearing
-  // all read that object rather than the values around it
-  const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
   const survey = surveyFragment || getSurvey(formName);
   // A choice on one tab can make a field on another irrelevant, so clearing sees every tab's fields. This
   // survey's own definition wins where both define a field: the composition tab shows volcaniclastic_type
@@ -57,6 +54,9 @@ const Form = ({
   const unseenSiblingFields = (siblingSurvey || []).filter(
     siblingField => !survey.some(field => field.name === siblingField.name));
   const clearingSurvey = [...survey, ...unseenSiblingFields];
+  // A subkey'd form edits one nested object, e.g. associated_orientation[0], so relevance, defaults and clearing
+  // all read that object rather than the values around it
+  const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
   // Relevance turns on whether the fields it depends on are filled in, and a field the user has emptied still
   // holds an empty string. Read those as absent, the way saving does, so the fields they drive hide as soon as
   // their own field is cleared rather than at the next save
@@ -116,12 +116,12 @@ const Form = ({
     });
   };
 
-  const isFieldRequired = field => isRequired(field, filledValues) || requiredFields.includes(field.name);
-
   // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
   const getFieldName = path => subkey ? path.split('[0].')[1] : path;
 
   const getFieldPath = name => subkey ? subkey + '[0].' + name : name;
+
+  const isFieldRequired = field => isRequired(field, filledValues) || requiredFields.includes(field.name);
 
   // Wrap setFieldValue to also clear fields that become irrelevant after a change
   const setFieldValueAndClearIrrelevant = (path, value, shouldValidate) => {
@@ -205,6 +205,8 @@ const Form = ({
       <Field
         component={NumberInputField}
         editable={!isReadOnly}
+        isDecimalAllowed={field.type !== 'integer'}
+        isNegativeAllowed={isNegativeAllowed(field)}
         isRequired={isFieldRequired(field)}
         key={getFieldPath(field.name)}
         label={field.label}
