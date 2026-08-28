@@ -110,6 +110,15 @@ const IGSNModal = forwardRef(({
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [stepStatuses, setStepStatuses] = useState({sesar: 'idle', upload: 'idle'});
 
+  /* Derived Variables */
+
+  // SESAR requires sample_type and material to register/update a sample. Detect from the raw form
+  // values — the mapped display value is unreliable (getLabel returns 'Unknown' for an empty type).
+  const missingRequiredFields = {
+    material: isEmpty(formValues?.material_type),
+    sample_type: isEmpty(formValues?.sample_type),
+  };
+
   /* Side Effects */
 
   useEffect(() => {
@@ -186,7 +195,8 @@ const IGSNModal = forwardRef(({
   const doShowActionButton = isUploaded
     || (!isEmpty(sesar.sesarToken?.access) && !isUploading && modalPage !== 'picker');
 
-  const isActionDisabled = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
+  const isActionDisabled = (!formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode))
+    || missingRequiredFields.sample_type || missingRequiredFields.material;
 
   const getSesarTokenAndCodes = async (orcidToken) => {
     try {
@@ -329,7 +339,9 @@ const IGSNModal = forwardRef(({
 
   const renderContentView = () => (
     <ScrollView style={IGSNModalStyles.contentContainer}>
-      <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      {!isUploaded && isActionDisabled ? renderRequiredFieldsWarning() : (
+        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      )}
       {isVisible && mappedSesarValues?.map((item) => {
         if (item.sesarKey === 'user_code' && formRef?.current?.values?.isOnMySesar) return null;
         if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
@@ -365,6 +377,31 @@ const IGSNModal = forwardRef(({
       })}
     </ScrollView>
   );
+
+  const renderRequiredFieldsWarning = () => {
+    const missingLabels = [
+      missingRequiredFields.sample_type && 'Sample Type',
+      missingRequiredFields.material && 'Material',
+    ].filter(Boolean);
+    const isMissingUserCode = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
+    if (isEmpty(missingLabels) && !isMissingUserCode) return null;
+    return (
+      <>
+        {!isEmpty(missingLabels) && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            {missingLabels.join(' and ')} {missingLabels.length > 1 ? 'are' : 'is'} required to register a sample with
+            SESAR. Please set {missingLabels.length > 1 ? 'these fields' : 'this field'} before registering.
+          </Text>
+        )}
+        {isMissingUserCode && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            A SESAR user code is required to register a sample. Please select a user code in your MYSESAR account
+            settings before registering.
+          </Text>
+        )}
+      </>
+    );
+  };
 
   const renderStatusView = () => (
     <View
