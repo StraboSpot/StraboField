@@ -460,7 +460,11 @@ function mergeBlankLines(oldLines, newLines) {
   }
   const result = [];
   for (let k = 0; k < newContent.length; k++) {
-    const blanks = lcsMap.has(k)
+    // A line that follows a section header keeps the blank line the header was written with. Its old spacing says
+    // nothing about that gap - the line may have sat mid-section before, with no blank in front of it - and taking
+    // it would close a gap every other section has.
+    const isAfterSectionHeader = k > 0 && PREAMBLE_HEADER_RE.test(newContent[k - 1].text);
+    const blanks = lcsMap.has(k) && !isAfterSectionHeader
       ? oldContent[lcsMap.get(k)].blanksBefore
       : newContent[k].blanksBefore;
     for (let b = 0; b < blanks; b++) result.push('');
@@ -1401,6 +1405,21 @@ for (const file of files) {
   }
 
   if (bodyStart < 0 || returnStart < 0) continue;
+
+  // A comment sitting directly above the return explains the return, so move the boundary back over it and let it
+  // travel with the return. Left inside the parsed body it has no function after it to attach to, so it is handed
+  // to the preamble and re-attached to whichever statement ends up first there — where it describes something
+  // else entirely, and the return it belonged to is left with no explanation. Stop at a blank line, which means
+  // the comment was not attached to the return in the first place, and at a section header, which is regenerated.
+  while (returnStart > bodyStart) {
+    const previousLine = lines[returnStart - 1];
+    const previousTrimmed = previousLine.trim();
+    if (PREAMBLE_HEADER_RE.test(previousLine)) break;
+    if (!previousTrimmed.startsWith('//') && !previousTrimmed.startsWith('/*') && !previousTrimmed.startsWith('*')) {
+      break;
+    }
+    returnStart--;
+  }
 
   // Parse the body into chunks
   let chunks = [];
