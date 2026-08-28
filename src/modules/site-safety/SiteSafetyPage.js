@@ -6,11 +6,10 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty, isEqual} from '../../shared/helpers';
-import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {Form, FormikWrapper, useForm} from '../form';
+import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {SUPPLEMENTAL_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';

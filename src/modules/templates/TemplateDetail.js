@@ -5,9 +5,8 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {FormFlatList} from '../../shared/ui';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {Form, formStyles, FormikWrapper} from '../form';
+import {Form, FormFlatList, formStyles, FormikWrapper} from '../form';
 import useTemplates from './useTemplates';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';

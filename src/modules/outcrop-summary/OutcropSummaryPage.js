@@ -5,10 +5,9 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
-import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {Form, FormikWrapper, useForm} from '../form';
+import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';

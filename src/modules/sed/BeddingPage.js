@@ -4,14 +4,13 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
-import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {Form, FormikWrapper} from '../form';
+import {Form, FormFlatList, FormikWrapper} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicListItem from '../page/BasicListItem';
