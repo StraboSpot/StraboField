@@ -61,11 +61,39 @@ describe('getSiliciclasticGrainSize', () => {
 
 describe('validateImageOverlay', () => {
   it('reports an opacity outside 0 to 1', () => {
-    expect(validateImageOverlay({image_opacity: '1.5'}).image_opacity).toBe('Opacity must be between 0 and 1.');
+    expect(validateImageOverlay({image_opacity: '1.5'}).image_opacity).toBe('Must be between 0 and 1.');
   });
 
   it('finds no errors for an opacity within 0 to 1', () => {
-    expect(validateImageOverlay({image_opacity: '0.5'})).toEqual({});
+    expect(validateImageOverlay({id: 'image1', image_opacity: '0.5'})).toEqual({});
+  });
+
+  it('asks for the image the overlay draws', () => {
+    expect(validateImageOverlay({}).id).toBe('Required');
+  });
+
+  it('accepts a negative origin, which places the image left of or below the axes origin', () => {
+    expect(validateImageOverlay({id: 'image1', image_origin_x: '-100', image_origin_y: '-50'})).toEqual({});
+  });
+
+  it('rejects a width or height that is not greater than 0', () => {
+    expect(validateImageOverlay({id: 'image1', image_width: '-200', image_height: '100'}).image_width)
+      .toBe('Must be greater than 0.');
+    expect(validateImageOverlay({id: 'image1', image_width: '200', image_height: '0'}).image_height)
+      .toBe('Must be greater than 0.');
+  });
+
+  it('rejects a half-typed size rather than letting the pair be dropped without saying so', () => {
+    expect(validateImageOverlay({id: 'image1', image_width: '-', image_height: '100'}).image_width)
+      .toBe('Must be a number.');
+  });
+
+  it('asks for the other size when only one of the pair is filled in, since neither saves alone', () => {
+    expect(validateImageOverlay({id: 'image1', image_width: '', image_height: '300'}).image_width)
+      .toBe('Needed with the height. Use Original Size to clear both.');
+    expect(validateImageOverlay({id: 'image1', image_width: '300', image_height: ''}).image_height)
+      .toBe('Needed with the width. Use Original Size to clear both.');
+    expect(validateImageOverlay({id: 'image1', image_width: '', image_height: ''})).toEqual({});
   });
 
   it('leaves the values it is given untouched', () => {
@@ -83,6 +111,15 @@ describe('getCleanedImageOverlay', () => {
 
   it('keeps an opacity of 0', () => {
     expect(getCleanedImageOverlay({id: 'image1', image_opacity: '0'}).image_opacity).toBe(0);
+  });
+
+  it('keeps a negative origin, which is what moves the image left of or below the axes origin', () => {
+    expect(getCleanedImageOverlay({id: 'image1', image_origin_x: '-100', image_origin_y: '-50'}))
+      .toEqual({id: 'image1', image_origin_x: -100, image_origin_y: -50});
+  });
+
+  it('keeps an origin of 0 rather than reading it as nothing', () => {
+    expect(getCleanedImageOverlay({id: 'image1', image_origin_x: '0'}).image_origin_x).toBe(0);
   });
 
   it('drops a height and width unless both are positive numbers', () => {

@@ -1,4 +1,5 @@
-import {LITHOLOGY_INTERVAL_CHARACTERS} from './sed.constants';
+import {IMAGE_OVERLAY_SIZE_KEYS, LITHOLOGY_INTERVAL_CHARACTERS} from './sed.constants';
+import {isEmpty} from '../../shared/helpers';
 import {isStratInterval} from '../spots/spots.helpers';
 
 export const getBasicLithologyIndex = (lithology) => {
@@ -11,16 +12,16 @@ export const getBasicLithologyIndex = (lithology) => {
 };
 
 // The overlay fields are typed as text, so read the numbers out of them for saving. Everything but the image id is
-// a number: a height or width is kept only as a pair of positive numbers, an opacity keeps a 0, and anything else
-// that is not a number is left out rather than stored as one.
+// a number: a width or height is kept only as a pair of positive numbers, and anything that is not a number at all
+// is left out rather than stored as one. A 0 is a number like any other - it is what an origin on the axis is -
+// and a negative origin is what puts the image left of or below that axis, so neither is treated as nothing.
 export const getCleanedImageOverlay = (values) => {
   const hasImageSize = parseFloat(values.image_height) > 0 && parseFloat(values.image_width) > 0;
   return Object.entries(values).reduce((acc, [key, value]) => {
     const number = parseFloat(value);
     if (key === 'id') return {...acc, id: value};
-    if (key === 'image_height' || key === 'image_width') return hasImageSize ? {...acc, [key]: number} : acc;
-    if (key === 'image_opacity') return isNaN(number) ? acc : {...acc, image_opacity: number};
-    return number ? {...acc, [key]: number} : acc;
+    if (IMAGE_OVERLAY_SIZE_KEYS.includes(key)) return hasImageSize ? {...acc, [key]: number} : acc;
+    return isNaN(number) ? acc : {...acc, [key]: number};
   }, {});
 };
 
@@ -76,7 +77,21 @@ export const onSedFormChange = (formCurrent, name, value) => {
 // Leaves the values it is given alone; getCleanedImageOverlay makes what is saved out of them
 export const validateImageOverlay = (values) => {
   const errors = {};
+  if (isEmpty(values.id)) errors.id = 'Required';
   const opacity = parseFloat(values.image_opacity);
-  if (opacity < 0 || opacity > 1) errors.image_opacity = 'Opacity must be between 0 and 1.';
+  if (opacity < 0 || opacity > 1) errors.image_opacity = 'Must be between 0 and 1.';
+  // An origin may be negative - it places the image on either side of the axes origin - but a size may not. The
+  // two sizes are also saved as a pair, so one without the other would be dropped without anything saying so.
+  IMAGE_OVERLAY_SIZE_KEYS.forEach((key, i) => {
+    const otherKey = IMAGE_OVERLAY_SIZE_KEYS[1 - i];
+    const number = parseFloat(values[key]);
+    if (isEmpty(values[key])) {
+      if (!isEmpty(values[otherKey])) {
+        errors[key] = 'Needed with the ' + otherKey.replace('image_', '') + '. Use Original Size to clear both.';
+      }
+    }
+    else if (isNaN(number)) errors[key] = 'Must be a number.';
+    else if (number <= 0) errors[key] = 'Must be greater than 0.';
+  });
   return errors;
 };
