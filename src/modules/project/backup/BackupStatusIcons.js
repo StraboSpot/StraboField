@@ -7,6 +7,8 @@ import {useSelector} from 'react-redux';
 import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
 import backupStatusStyles from './backupStatus.styles';
 import BackupStatusModal from './BackupStatusModal';
+import UploadModal from './UploadModal';
+import useBackupUpload from './useBackupUpload';
 import * as themes from '../../../shared/styles.constants';
 import homeStyles from '../../home/home.style';
 
@@ -54,6 +56,8 @@ const BackupStatusIcons = () => {
   const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
 
   const saveBounce = useBounceAnimation(isAutoSaving);
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, isUploadPending, startUploadFromStatus}
+    = useBackupUpload();
 
   /* Local State */
 
@@ -63,13 +67,22 @@ const BackupStatusIcons = () => {
 
   const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
 
+  /* Event Handlers */
+
+  const onUploadFromStatus = () => startUploadFromStatus(() => setIsModalVisible(false));
+
   /* View */
 
-  if (!isSaveVisible && !isModalVisible) return null;
+  if (!isSaveVisible && !isModalVisible && !isUploadPending && !isUploadModalVisible) return null;
 
   return (
     <>
-      <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
+      <BackupStatusModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onUpload={onUploadFromStatus}
+      />
+      <UploadModal autoStart={isUploadAutoStart} closeModal={closeUploadModal} isVisible={isUploadModalVisible}/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={backupStatusStyles.backupStatusContainer}>
           {isSaveVisible && (

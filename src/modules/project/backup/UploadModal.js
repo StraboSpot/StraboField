@@ -20,7 +20,7 @@ import {updatedProjectTransferProgress} from '../../connections/connections.slic
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 
-const UploadModal = ({closeModal, isVisible}) => {
+const UploadModal = ({autoStart, closeModal, isVisible}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -44,6 +44,8 @@ const UploadModal = ({closeModal, isVisible}) => {
   // A ref, not state: dismissing the modal mid-upload resets the state below while the upload keeps running, so
   // only a ref still knows an upload is in flight and can stop a second one from starting.
   const isUploadInFlightRef = useRef(false);
+  // Lets the auto-start effect below call the latest initiateUpload without depending on it (it's defined later).
+  const initiateUploadRef = useRef(() => {});
 
   const [datasetUploadSuccess, setDatasetUploadStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -60,6 +62,12 @@ const UploadModal = ({closeModal, isVisible}) => {
     console.log('Current Image', currentImage);
     console.log('Is Image Transferring', isImageTransferring);
   }, [uploadState, currentImage]);
+
+  // When opened via the auto-save status modal's "Upload to Server" button, skip the confirmation screen and start
+  // the upload immediately so the modal shows live upload status.
+  useEffect(() => {
+    if (isVisible && autoStart && uploadState === 'not started') initiateUploadRef.current();
+  }, [isVisible, autoStart]);
 
   /* Event Handlers */
 
@@ -120,6 +128,8 @@ const UploadModal = ({closeModal, isVisible}) => {
       Platform.OS !== 'web' && KeepAwake.deactivate();
     }
   };
+
+  initiateUploadRef.current = initiateUpload;
 
   const uploadImagesOnly = async () => {
     if (isUploadInFlightRef.current) {
