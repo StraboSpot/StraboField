@@ -30,8 +30,11 @@ import UIKit
     }
 
     @objc func startCompass() {
-        motionTrue.deviceMotionUpdateInterval = 0.2
-        motionMagnetic.deviceMotionUpdateInterval = 0.2
+        // 20 Hz sampling. Paired with the 5-sample rolling average below this gives a
+        // ~0.25 s smoothing window (vs ~1 s at the old 0.2 s interval) — a responsive
+        // needle that's still steady enough not to jitter.
+        motionTrue.deviceMotionUpdateInterval = 0.05
+        motionMagnetic.deviceMotionUpdateInterval = 0.05
 
         motionTrue.startDeviceMotionUpdates(using: .xTrueNorthZVertical, to: .main) {
             data, error in

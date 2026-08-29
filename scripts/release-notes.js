@@ -32,7 +32,7 @@ const CATEGORY = {
   image: 'Photos', images: 'Photos', sketch: 'Photos',
   form: 'Forms', forms: 'Forms',
   notebook: 'Notebook', 'notebook-menu': 'Notebook', 'notebook-panel': 'Notebook',
-  spot: 'Spots', spots: 'Spots', samples: 'Spots',
+  spot: 'Spots', spots: 'Spots', samples: 'Spots', igsn: 'Spots',
   'strat section': 'Strat sections', strat: 'Strat sections',
   compass: 'Compass',
   project: 'Projects', projects: 'Projects', backup: 'Backup & sync',

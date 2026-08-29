@@ -71,6 +71,13 @@ const IGSNModalStyles = {
   labelColumn: {
     flex: 1.5, // Controls the width of the left side
   },
+  requiredLabel: {
+    color: themes.WARNING_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+    margin: 20,
+    textAlign: 'center',
+  },
   sesarAuthText: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -80,7 +87,7 @@ const IGSNModalStyles = {
   sesarImage: {
     borderWidth: 2,
     height: 100,
-    width: 300,
+    width: 275,
   },
   sesarImageContainer: {
     alignContent: 'center',
