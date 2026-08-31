@@ -1,18 +1,16 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, TextInput, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, isEqual} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {FormikWrapper, formStyles, SelectInputField, TextInputField, useForm} from '../form';
+import {FormikWrapper, SelectInputField, TextInputField, useForm} from '../form';
 import PageHeader from '../page/PageHeader';
-import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 import {useTags} from '../tags';
@@ -42,11 +40,6 @@ const OtherFeatureDetail = ({
   const savedValuesRef = useRef(null);
 
   const [isFormInvalid, setIsFormInvalid] = useState(false);
-  let [otherType, setOtherType] = useState(undefined);
-
-  /* Derived Variables */
-
-  const customFeatureTypes = projectFeatures.filter(feature => !DEFAULT_GEOLOGIC_TYPES.includes(feature));
 
   /* Side Effects */
 
@@ -148,15 +141,11 @@ const OtherFeatureDetail = ({
     feature.label = formValues.label || formValues.name;
     feature.name = formValues.name;
     if (formValues.type === 'other') {
-      if (validateAndSetNewType(otherType)) {
-        feature.type = otherType;
-        //let index = projectFeatures[projectFeatures.length - 1].id + 1;
-        let name = otherType;
-        let projectFeaturesCopy = JSON.parse(JSON.stringify(projectFeatures));
-        projectFeaturesCopy.push(name);
-        dispatch(addedCustomFeatureTypes(projectFeaturesCopy));
-      }
-      else return false;
+      // Leaving the page rolls a field in error back to what it was, so the new type can still be missing here
+      // even though the form holds Save until it is named
+      if (isEmpty(formValues.otherType)) return false;
+      feature.type = formValues.otherType;
+      dispatch(addedCustomFeatureTypes([...projectFeatures, formValues.otherType]));
     }
     else feature.type = formValues.type;
     feature.description = formValues.description;
@@ -167,29 +156,20 @@ const OtherFeatureDetail = ({
     return true;
   };
 
-  const validateAndSetNewType = (newType) => {
-    let existingCustomFeatureTypes = customFeatureTypes.filter(feature => feature === newType);
-    if (!isEmpty(existingCustomFeatureTypes)) {
-      alert('Alert!',
-        'The type ' + newType + ' is already being used. Choose a different type name.');
-      setOtherType('');
-      return false;
-    }
-    else if (isEmpty(otherType)) {
-      alert('Alert!', 'The new type being defined is empty');
-      return false;
-    }
-    else return true;
-  };
-
   /* Render Functions */
 
   const renderForm = () => {
     // Validate the feature
     const validateFeature = (values) => {
-      let errors = {};
+      const errors = {};
       if (isEmpty(values.name)) errors.name = 'Feature name cannot be empty';
-      if (!values.type || isEmpty(values.type)) errors.type = 'Feature type cannot be empty';
+      if (isEmpty(values.type)) errors.type = 'Feature type cannot be empty';
+      if (values.type === 'other') {
+        if (isEmpty(values.otherType)) errors.otherType = 'New feature type cannot be empty';
+        else if (projectFeatures.includes(values.otherType)) {
+          errors.otherType = 'The type ' + values.otherType + ' is already being used';
+        }
+      }
       return errors;
     };
 
@@ -197,6 +177,7 @@ const OtherFeatureDetail = ({
       label: selectedFeature.label,
       name: selectedFeature.name,
       type: selectedFeature.type,
+      otherType: '',
       description: selectedFeature.description,
     };
 
@@ -209,7 +190,7 @@ const OtherFeatureDetail = ({
           setIsFormInvalid={setIsFormInvalid}
           validate={validateFeature}
         >
-          {() => (
+          {formProps => (
             <View>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
@@ -239,23 +220,16 @@ const OtherFeatureDetail = ({
                   />
                 </ListItem.Content>
               </ListItem>
-              {formRef.current && formRef.current.values.type === 'other' && (
-                <>
-                  <ListItem containerStyle={commonStyles.listItemFormField}>
-                    <ListItem.Content>
-                      <View style={formStyles.fieldLabelContainer}>
-                        <Text style={formStyles.fieldLabel}>{'Other Feature Type'}</Text>
-                      </View>
-                      <TextInput
-                        onChangeText={newType => setOtherType(newType)}
-                        placeholder={'Type of feature ...'}
-                        placeholderTextColor={themes.MEDIUMGREY}
-                        style={formStyles.fieldValue}
-                        value={otherType || ''}
-                      />
-                    </ListItem.Content>
-                  </ListItem>
-                </>
+              {formProps.values.type === 'other' && (
+                <ListItem containerStyle={commonStyles.listItemFormField}>
+                  <ListItem.Content>
+                    <TextInputField
+                      isRequired={true}
+                      label={'Other Feature Type'}
+                      name={'otherType'}
+                    />
+                  </ListItem.Content>
+                </ListItem>
               )}
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
