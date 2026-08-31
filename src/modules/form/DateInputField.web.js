@@ -19,6 +19,8 @@ const DateInputField = ({
   /* Data Hooks */
 
   const [{value}] = useField(name);
+  // Read the errors from the form rather than take useField's meta.error - see TextInputField
+  const {errors, setFieldValue} = useFormikContext();
 
   /* Local State */
 
@@ -84,6 +86,7 @@ const DateInputField = ({
       )}
       {isDisplayOnly ? <Text style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}>{title}</Text>
         : renderDatePickerWeb()}
+      {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>
   );
 };
