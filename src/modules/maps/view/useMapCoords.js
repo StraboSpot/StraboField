@@ -6,6 +6,7 @@ import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
 import {openedMessageModal} from '../../home/home.slice';
+import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 import {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} from '../maps.helpers';
 
 const useMapCoords = () => {
@@ -25,7 +26,7 @@ const useMapCoords = () => {
   const getMyMapsBboxCoords = async (map) => {
     let myMapsBboxUrl = STRABO_APIS.MY_MAPS_BBOX;
     try {
-      if (isOnline.isConnected && !map.bbox && map.source === 'strabospot_mymaps') {
+      if (isOnline.isConnected && !map.bbox && map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
         if (isSelected) {
           console.log(endpoint.replace('/db', '/geotiff/bbox/'));
           myMapsBboxUrl = endpoint.replace('/db', '/geotiff/bbox/');

@@ -4,7 +4,7 @@ import {FlatList, Platform, Text, TextInput, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {CUSTOM_MAP_TYPES} from './customMaps.constants';
+import {CUSTOM_MAP_SOURCES, CUSTOM_MAP_TYPES} from './customMaps.constants';
 import {getMapTypeName, normalizeCustomMapId} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
@@ -150,8 +150,8 @@ const CustomMapDetails = () => {
     if (isEmpty(values.title)) errors.title = 'Title is required';
     if (isEmpty(values.source)) errors.source = 'Map type is required';
     // A Map Warper map is identified by the file uploaded to Strabo MyMaps rather than by anything typed here
-    else if (values.source !== 'map_warper' && isEmpty(values.id)) {
-      errors.id = values.source === 'mapbox_styles' ? 'Style URL is required' : 'Map ID is required';
+    else if (values.source !== CUSTOM_MAP_SOURCES.MAP_WARPER && isEmpty(values.id)) {
+      errors.id = values.source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES ? 'Style URL is required' : 'Map ID is required';
     }
     return errors;
   };
@@ -193,7 +193,7 @@ const CustomMapDetails = () => {
             </ListItem.Content>
           </ListItem>
         )}
-        {formProps.values.source === 'mapbox_styles' && (
+        {formProps.values.source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES && (
           <ListItem containerStyle={commonStyles.listItemFormField}>
             <ListItem.Content>
               <TextInputField
@@ -205,7 +205,7 @@ const CustomMapDetails = () => {
             </ListItem.Content>
           </ListItem>
         )}
-        {formProps.values.source === 'strabospot_mymaps' && (
+        {formProps.values.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && (
           <ListItem containerStyle={commonStyles.listItemFormField}>
             <ListItem.Content>
               <TextInputField
@@ -338,7 +338,7 @@ const CustomMapDetails = () => {
                 </View>
                 <ActionButton
                   // A Map Warper map is uploaded to Strabo MyMaps, never saved from here
-                  disabled={isFormInvalid || formProps.values.source === 'map_warper'}
+                  disabled={isFormInvalid || formProps.values.source === CUSTOM_MAP_SOURCES.MAP_WARPER}
                   onPress={() => saveMap(formProps.values)}
                   title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
                 />

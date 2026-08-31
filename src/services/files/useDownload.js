@@ -15,6 +15,7 @@ import {
   setStatusMessageModalTitle,
 } from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
+import {CUSTOM_MAP_SOURCES} from '../../modules/maps/custom-maps/customMaps.constants';
 import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
@@ -246,7 +247,7 @@ const useDownload = () => {
     maps.map(async (map) => {
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === 'strabospot_mymaps') {
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
         if (!isEmpty(endpoint) && isSelected) {
           let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
           if (await testCustomMapUrl(tileEndpoint + map.id)) {

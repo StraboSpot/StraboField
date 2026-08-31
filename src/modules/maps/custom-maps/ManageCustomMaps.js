@@ -4,7 +4,7 @@ import {FlatList, Text} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {getMapTypeName} from './customMaps.helpers';
+import {getMapTypeName, isLiveCustomMapSource} from './customMaps.helpers';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
@@ -84,7 +84,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
           <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
           <ListItem.Subtitle style={commonStyles.listItemSubtitle}>{getMapTypeName(item.source)}</ListItem.Subtitle>
         </ListItem.Content>
-        {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
+        {isLiveCustomMapSource(item.source) && (
           <Icon
             color={PRIMARY_ACCENT_COLOR}
             disabled={!isInternetReachable && !isConnected}
