@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
   fieldError: {
     color: themes.WARNING_COLOR,
     fontSize: themes.SMALL_TEXT_SIZE,
-    textAlign: 'center',
   },
   fieldInfoText: {
     color: themes.PRIMARY_TEXT_COLOR,
