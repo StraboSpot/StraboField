@@ -11,7 +11,12 @@ import {AvatarWrapper} from '../../../shared/ui/avatars';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import usePage from '../../page/usePage';
-import {addedNotebookPageOn, removedNotebookPageOn, setNotebookPageVisible} from '../notebook.slice';
+import {
+  addedNotebookPageOn,
+  removedNotebookPageOn,
+  setMorePagesSectionsCollapsed,
+  setNotebookPageVisible,
+} from '../notebook.slice';
 
 const MorePagesMenu = ({
                          closeMorePagesMenu,
@@ -22,6 +27,7 @@ const MorePagesMenu = ({
 
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
+  const morePagesSectionsCollapsed = useSelector(state => state.notebook.morePagesSectionsCollapsed);
 
   const {getRelevantPagesSections} = usePage();
 
@@ -30,6 +36,9 @@ const MorePagesMenu = ({
   const sectionsToShow = getRelevantPagesSections(isRichSample);
 
   /* Logic Helpers */
+
+  // The first section has no header, so there is nothing to fold it away with
+  const isSectionShown = (title, sectionIndex) => sectionIndex === 0 || !morePagesSectionsCollapsed.includes(title);
 
   const switchPage = (key) => {
     dispatch(setNotebookPageVisible(key));
@@ -71,6 +80,19 @@ const MorePagesMenu = ({
     );
   };
 
+  const renderSectionHeader = title => (
+    <ListItem.Accordion
+      containerStyle={footerStyles.morePagesSectionHeader}
+      content={
+        <ListItem.Content>
+          <SectionDivider dividerText={title}/>
+        </ListItem.Content>
+      }
+      isExpanded={!morePagesSectionsCollapsed.includes(title)}
+      onPress={() => dispatch(setMorePagesSectionsCollapsed(title))}
+    />
+  );
+
   /* View */
 
   return (
@@ -84,13 +106,14 @@ const MorePagesMenu = ({
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
     >
-      <View style={{flex: 1, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingTop: 10}}>
+      <View style={{flex: 1, paddingVertical: 10}}>
         <ScrollView>
           {/* The first section sits right under the modal header, so it has nothing to divide from */}
           {sectionsToShow.map((section, sectionIndex) => (
             <React.Fragment key={section.title}>
-              {sectionIndex > 0 && <SectionDivider dividerText={section.title}/>}
-              {section.pages.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
+              {sectionIndex > 0 && renderSectionHeader(section.title)}
+              {isSectionShown(section.title, sectionIndex)
+                && section.pages.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
             </React.Fragment>
           ))}
         </ScrollView>
