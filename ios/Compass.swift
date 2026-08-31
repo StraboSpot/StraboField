@@ -91,13 +91,11 @@ import UIKit
             return
         }
 
-        let orientation = UIDevice.current.orientation
-
         let avgTrue = averageMatrix(trueMatrixArray)
         let avgMag = averageMatrix(magneticMatrixArray)
 
-        let trueHeading = headingFromMatrix(avgTrue, orientation: orientation)
-        let magneticHeading = headingFromMatrix(avgMag, orientation: orientation)
+        let trueHeading = headingFromMatrix(avgTrue)
+        let magneticHeading = headingFromMatrix(avgMag)
 
         sendEvent(
             withName: "rotationMatrix",
@@ -151,26 +149,18 @@ import UIKit
         )
     }
 
-    private func headingFromMatrix(_ m: CMRotationMatrix, orientation: UIDeviceOrientation) -> Double
-        {
-        var x: Double = -m.m12
-        var y: Double = -m.m22
+    // Heading = compass azimuth of the device's top edge (its +Y axis), read straight from the
+    // attitude matrix's world frame — the same frame the JS layer uses for strike/dip/trend
+    // (row 2 of the matrix is the device Y axis in ENU: East = -m22, North = m21). Because it's
+    // derived from the world-referenced matrix, it's correct in any hold and needs no
+    // `UIDevice.orientation` correction — the old switch broke when the device was flat/face-up
+    // (reported as portrait) or held upright in landscape. Vertical up/down (Up = m23) doesn't
+    // affect the horizontal azimuth, so only the projection onto the horizon is used.
+    private func headingFromMatrix(_ m: CMRotationMatrix) -> Double {
+        let east = -m.m22
+        let north = m.m21
 
-        switch orientation {
-        case .landscapeLeft:
-            swap(&x, &y)
-            y = -y
-        case .landscapeRight:
-            swap(&x, &y)
-            x = -x
-        case .portraitUpsideDown:
-            x = -x
-            y = -y
-        default:
-            break
-        }
-
-        var headingDegrees = atan2(y, x) * 180.0 / .pi
+        var headingDegrees = atan2(east, north) * 180.0 / .pi
         if headingDegrees < 0 {
             headingDegrees += 360
         }
