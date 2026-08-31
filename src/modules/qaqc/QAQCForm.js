@@ -2,7 +2,6 @@ import React, {useCallback, useRef} from 'react';
 import {ScrollView} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import {FormikWrapper, TextInputField} from '../form';
@@ -40,23 +39,19 @@ const QAQCForm = ({formRef, initialQAQCValues, isReadOnly, appearance = 'full', 
         initialValues={initialQAQCValues}
         innerRef={formRef}
       >
-        {() => (
-          <ListItem containerStyle={commonStyles.listItemFormField}>
-            <ListItem.Content>
-              <Field
-                appearance={appearance}
-                autoFocus={true}
-                component={TextInputField}
-                customHeight={customHeight}
-                editable={!isReadOnly}
-                key={'qaqc'}
-                name={'qaqc'}
-                onBlur={handleInputBlur}
-                onFocus={handleInputFocus}
-              />
-            </ListItem.Content>
-          </ListItem>
-        )}
+        <ListItem containerStyle={commonStyles.listItemFormField}>
+          <ListItem.Content>
+            <TextInputField
+              appearance={appearance}
+              autoFocus={true}
+              customHeight={customHeight}
+              editable={!isReadOnly}
+              name={'qaqc'}
+              onBlurred={handleInputBlur}
+              onFocused={handleInputFocus}
+            />
+          </ListItem.Content>
+        </ListItem>
       </FormikWrapper>
     </ScrollView>
   );

@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {Pressable, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import {COLOR_CHOICES} from './tagColor.constants';
 import {getRGBString, isValidHexColor, rgbToHex} from './tagColor.helpers';
@@ -25,7 +24,7 @@ const TagColorPickerModal = ({closeModal, onColorSelect, tempColor}) => {
 
   /* Event Handlers */
 
-  const handleColorChanged = (field, value) => {
+  const setFieldValueAndMatchingNotation = (field, value) => {
     if (field === 'rgb') {
       formRef.current.setFieldValue('rgb', value);
       const [r, g, b] = value.replaceAll(' ', '').split(',');
@@ -84,7 +83,7 @@ const TagColorPickerModal = ({closeModal, onColorSelect, tempColor}) => {
                 return (
                   <Pressable
                     key={colorChoice}
-                    onPress={() => handleColorChanged('hex', colorChoice)}
+                    onPress={() => setFieldValueAndMatchingNotation('hex', colorChoice)}
                     style={{
                       ...overlayStyles.tagColorPickerColorItem,
                       backgroundColor: colorChoice,
@@ -101,32 +100,26 @@ const TagColorPickerModal = ({closeModal, onColorSelect, tempColor}) => {
           initialValues={{hex: hexColor, rgb: getRGBString(hexColor)}}
           innerRef={formRef}
         >
-          {() => (
-            <View>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    component={TextInputField}
-                    key={'hex'}
-                    label={'Hex'}
-                    name={'hex'}
-                    onMyChange={handleColorChanged}
-                  />
-                </ListItem.Content>
-              </ListItem>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    component={TextInputField}
-                    key={'rgb'}
-                    label={'RGB'}
-                    name={'rgb'}
-                    onMyChange={handleColorChanged}
-                  />
-                </ListItem.Content>
-              </ListItem>
-            </View>
-          )}
+          <View>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <TextInputField
+                  label={'Hex'}
+                  name={'hex'}
+                  setFieldValueOverride={setFieldValueAndMatchingNotation}
+                />
+              </ListItem.Content>
+            </ListItem>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <TextInputField
+                  label={'RGB'}
+                  name={'rgb'}
+                  setFieldValueOverride={setFieldValueAndMatchingNotation}
+                />
+              </ListItem.Content>
+            </ListItem>
+          </View>
         </FormikWrapper>
         <Spacer/>
         <ActionButton

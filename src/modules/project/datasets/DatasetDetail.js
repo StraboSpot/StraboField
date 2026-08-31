@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -194,45 +193,37 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const renderMetadataForm = () => {
     return (
       <FormikWrapper initialValues={dataset}>
-        {() => (
-          <>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={NumberInputField}
-                  editable={false}
-                  key={'id'}
-                  label={'ID'}
-                  name={'id'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'date'}
-                  label={'Date Created'}
-                  name={'date'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  name={'modified_timestamp'}
-                />
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
+        <>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <NumberInputField
+                editable={false}
+                label={'ID'}
+                name={'id'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Created'}
+                name={'date'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Last Modified'}
+                name={'modified_timestamp'}
+              />
+            </ListItem.Content>
+          </ListItem>
+        </>
       </FormikWrapper>
     );
   };

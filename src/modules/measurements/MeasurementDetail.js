@@ -18,7 +18,7 @@ import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
-import {onOrientationChange} from '../compass/compass.helpers';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
@@ -136,7 +136,7 @@ const MeasurementDetail = ({
   };
 
   // Entering a strike fills in the dip direction and the reverse, and a rake the trend and plunge
-  const onNumberChange = (name, value) => onOrientationChange(formRef.current, name, value,
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(formRef.current, name, value,
     {selectedAttitude: selectedAttitude, selectedMeasurement: selectedMeasurement});
 
   // Confirm switch between Planar and Tabular Zone
@@ -439,7 +439,7 @@ const MeasurementDetail = ({
                 {...formProps}
                 formName={formName}
                 isReadOnly={isReadOnly}
-                onNumberChange={onNumberChange}
+                setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
               />
             )}
           </FormikWrapper>

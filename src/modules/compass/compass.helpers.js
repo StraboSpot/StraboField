@@ -50,9 +50,9 @@ const isRakeCalculable = (rake, selectedAttitude, selectedMeasurement) => {
 };
 
 // Entering a strike fills in the dip direction of the same orientation and the reverse, and entering a rake fills
-// in the trend and plunge. A field that takes part in no calculation is set as it would be with no handler at all,
+// in the trend and plunge. A field that takes part in no calculation is set as it would be with no override at all,
 // left as it was typed rather than read as a number, so a decimal field can still be typed into.
-export const onOrientationChange = (formCurrent, name, value, options = {}) => {
+export const setOrientationFieldValue = (formCurrent, name, value, options = {}) => {
   const {orientationFields = DEFAULT_ORIENTATION_FIELDS, selectedAttitude, selectedMeasurement} = options;
   const pairedFields = orientationFields.find(f => f.dip_direction === name || f.strike === name);
   const valueAsFloat = parseFloat(value);

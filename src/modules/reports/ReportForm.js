@@ -21,7 +21,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
 
   /* Event Handlers */
 
-  const onMyChange = async (name, value) => {
+  const setFieldValueAndCloseChoices = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
     setChoicesViewKey(null);
   };
@@ -41,7 +41,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
         <Form
           {...formProps}
           formName={REPORT_FORM_NAME}
-          onMyChange={onMyChange}
+          setFieldValueOverride={setFieldValueAndCloseChoices}
           surveyFragment={relevantFields}
         />
       </ModalWrapper>

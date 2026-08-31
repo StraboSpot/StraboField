@@ -64,7 +64,7 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
   }
 };
 
-export const onSedFormChange = (formCurrent, name, value) => {
+export const setSedFieldValue = (formCurrent, name, value) => {
   if (name === 'siliciclastic_type' && (value === 'claystone' || value === 'mudstone')) {
     formCurrent.setFieldValue('mud_silt_grain_size', 'clay');
   }

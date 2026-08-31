@@ -44,7 +44,7 @@ const ProjectDescription = () => {
 
   /* Event Handlers */
 
-  const onMyChange = async (name, value) => {
+  const setFieldValueAndSaveAfterPause = async (name, value) => {
     await descriptionFormRef.current.setFieldValue(name, value);
     console.log('updated field value');
 
@@ -99,9 +99,8 @@ const ProjectDescription = () => {
           <Form
             {...formProps}
             formName={PROJECT_DESCRIPTION_FORM_NAME}
-            onMyChange={onMyChange}
             renderInline={true}
-            setFieldValue={onMyChange}
+            setFieldValueOverride={setFieldValueAndSaveAfterPause}
           />
         )}
       </FormikWrapper>

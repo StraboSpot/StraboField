@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
@@ -97,21 +96,13 @@ const MineralsPage = ({isReadOnly, page}) => {
       <FormikWrapper initialValues={{}} innerRef={preFormRef}>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field key={'spot_id_for_pet_copy'} name={'spot_id_for_pet_copy'}>
-              {({field, form}) => (
-                <SelectInputField
-                  {...field}
-                  choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  errors={form.errors}
-                  label={'Copy ' + page.label + ' Data From:'}
-                  setFieldValue={(name, value) => {
-                    form.setFieldValue(name, value);
-                    copyMineralData(value);
-                  }}
-                  single={true}
-                />
-              )}
-            </Field>
+            <SelectInputField
+              choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+              isSingleSelect={true}
+              label={'Copy ' + page.label + ' Data From:'}
+              name={'spot_id_for_pet_copy'}
+              onValueChanged={(name, value) => copyMineralData(value)}
+            />
           </ListItem.Content>
         </ListItem>
       </FormikWrapper>

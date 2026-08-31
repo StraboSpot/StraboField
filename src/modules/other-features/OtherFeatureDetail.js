@@ -2,7 +2,6 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Text, TextInput, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
@@ -214,9 +213,7 @@ const OtherFeatureDetail = ({
             <View>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={TextInputField}
-                    key={'label'}
+                  <TextInputField
                     label={'Label'}
                     name={'label'}
                   />
@@ -224,10 +221,8 @@ const OtherFeatureDetail = ({
               </ListItem>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={TextInputField}
+                  <TextInputField
                     isRequired={true}
-                    key={'name'}
                     label={'Name'}
                     name={'name'}
                   />
@@ -235,19 +230,13 @@ const OtherFeatureDetail = ({
               </ListItem>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field key={'type'} name={'type'}>
-                    {({field, form}) => (
-                      <SelectInputField
-                        {...field}
-                        choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
-                        errors={form.errors}
-                        isRequired={true}
-                        label={'Feature Type'}
-                        setFieldValue={form.setFieldValue}
-                        single={true}
-                      />
-                    )}
-                  </Field>
+                  <SelectInputField
+                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                    isRequired={true}
+                    isSingleSelect={true}
+                    label={'Feature Type'}
+                    name={'type'}
+                  />
                 </ListItem.Content>
               </ListItem>
               {formRef.current && formRef.current.values.type === 'other' && (
@@ -270,10 +259,8 @@ const OtherFeatureDetail = ({
               )}
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
+                  <TextInputField
                     appearance={'multiline'}
-                    component={TextInputField}
-                    key={'description'}
                     label={'Feature Description'}
                     name={'description'}
                   />

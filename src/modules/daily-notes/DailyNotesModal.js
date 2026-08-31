@@ -2,7 +2,6 @@ import React, {useRef} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
@@ -83,33 +82,27 @@ const DailyNotesModal = () => {
           initialValues={initialValues}
           innerRef={formRef}
         >
-          {() => (
-            <View>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    component={DateInputField}
-                    isDisplayOnly={true}
-                    isShowTime={true}
-                    key={'date'}
-                    label={'Date'}
-                    name={'date'}
-                  />
-                </ListItem.Content>
-              </ListItem>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    appearance={'multiline'}
-                    component={TextInputField}
-                    key={'notes'}
-                    label={'Notes'}
-                    name={'notes'}
-                  />
-                </ListItem.Content>
-              </ListItem>
-            </View>
-          )}
+          <View>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <DateInputField
+                  isDisplayOnly={true}
+                  isShowTime={true}
+                  label={'Date'}
+                  name={'date'}
+                />
+              </ListItem.Content>
+            </ListItem>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <TextInputField
+                  appearance={'multiline'}
+                  label={'Notes'}
+                  name={'notes'}
+                />
+              </ListItem.Content>
+            </ListItem>
+          </View>
         </FormikWrapper>
       </ModalWrapper>
     );

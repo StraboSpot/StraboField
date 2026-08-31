@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {SectionList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
@@ -165,21 +164,13 @@ const RockPage = ({isReadOnly, page}) => {
       <FormikWrapper initialValues={{}} innerRef={preFormRef}>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field key={'spot_id_for_pet_copy'} name={'spot_id_for_pet_copy'}>
-              {({field, form}) => (
-                <SelectInputField
-                  {...field}
-                  choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  errors={form.errors}
-                  label={label}
-                  setFieldValue={(name, value) => {
-                    form.setFieldValue(name, value);
-                    copyPetData(value);
-                  }}
-                  single={true}
-                />
-              )}
-            </Field>
+            <SelectInputField
+              choices={spotsWithRockTypeSorted.map(s => ({label: s.properties.name, value: s.properties.id}))}
+              isSingleSelect={true}
+              label={label}
+              name={'spot_id_for_pet_copy'}
+              onValueChanged={(name, value) => copyPetData(value)}
+            />
           </ListItem.Content>
         </ListItem>
       </FormikWrapper>

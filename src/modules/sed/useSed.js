@@ -11,7 +11,7 @@ import {
   STRUCTURE_SUBPAGES,
   Y_MULTIPLIER,
 } from './sed.constants';
-import {onSedFormChange} from './sed.helpers';
+import {setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
@@ -365,10 +365,10 @@ const useSed = () => {
     getIntervalTitle,
     getSedRockTitle,
     getStratSectionTitle,
-    onSedFormChange,
     saveSedBedFeature,
     saveSedFeature,
     saveSedFeatureValuesFromTemplates,
+    setSedFieldValue,
     toggleStratSection,
   };
 };

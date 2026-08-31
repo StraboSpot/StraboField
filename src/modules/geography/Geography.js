@@ -3,7 +3,6 @@ import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import * as turf from '@turf/turf';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import GeoFieldInputs from './GeoFieldInputs';
@@ -147,11 +146,9 @@ const Geography = ({isReadOnly, page}) => {
     return (
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
-          <Field
+          <TextInputField
             appearance={'multiline'}
-            component={TextInputField}
             editable={false}
-            key={'coordsString'}
             label={'Coordinates as [Longitude, Latitude]'}
             name={'coordsString'}
           />
@@ -245,10 +242,8 @@ const Geography = ({isReadOnly, page}) => {
           <View>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
-                <Field
-                  component={TextInputField}
+                <TextInputField
                   editable={false}
-                  key={'geomType'}
                   label={'Geometry'}
                   name={'geomType'}
                 />
@@ -272,10 +267,8 @@ const Geography = ({isReadOnly, page}) => {
               <Text style={formStyles.fieldLabel}>Real-World Coordinates</Text>
             </View>
             {isUtmDisplay && (
-              <Field
-                component={TextInputField}
+              <TextInputField
                 editable={false}
-                key={'utm_zone'}
                 label={'UTM Zone'}
                 name={'utm_zone'}
               />
@@ -283,19 +276,15 @@ const Geography = ({isReadOnly, page}) => {
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, flexDirection: 'row', overflow: 'hidden'}}>
                 <View style={{flex: 1, paddingRight: 5}}>
-                  <Field
-                    component={NumberInputField}
+                  <NumberInputField
                     editable={false}
-                    key={isUtmDisplay ? 'easting' : 'longitude'}
                     label={isUtmDisplay ? 'Easting (m)' : 'Longitude'}
                     name={isUtmDisplay ? 'easting' : 'longitude'}
                   />
                 </View>
                 <View style={{flex: 1}}>
-                  <Field
-                    component={NumberInputField}
+                  <NumberInputField
                     editable={false}
-                    key={isUtmDisplay ? 'northing' : 'latitude'}
                     label={isUtmDisplay ? 'Northing (m)' : 'Latitude'}
                     name={isUtmDisplay ? 'northing' : 'latitude'}
                   />
@@ -318,19 +307,15 @@ const Geography = ({isReadOnly, page}) => {
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{flex: 1, flexDirection: 'row', overflow: 'hidden'}}>
               <View style={{flex: 1, paddingRight: 5}}>
-                <Field
-                  component={NumberInputField}
+                <NumberInputField
                   editable={false}
-                  key={'x_pixels'}
                   label={'X Pixels'}
                   name={'x_pixels'}
                 />
               </View>
               <View style={{flex: 1}}>
-                <Field
-                  component={NumberInputField}
+                <NumberInputField
                   editable={false}
-                  key={'y_pixels'}
                   label={'Y Pixels'}
                   name={'y_pixels'}
                 />
@@ -346,11 +331,9 @@ const Geography = ({isReadOnly, page}) => {
     return (
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
-          <Field
+          <TextInputField
             appearance={'multiline'}
-            component={TextInputField}
             editable={false}
-            key={'coordsString'}
             label={'Coordinates as [X Pixels, Y Pixels]'}
             name={'coordsString'}
           />

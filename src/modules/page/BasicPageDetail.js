@@ -12,7 +12,7 @@ import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {onOrientationChange} from '../compass/compass.helpers';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
 import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {overlayStyles} from '../home/overlays';
@@ -49,8 +49,8 @@ const BasicPageDetail = ({
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, submitAndShowErrors, validateForm} = useForm();
-  const {deletePetFeature, onMineralChange, savePetFeature} = usePetrology();
-  const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
+  const {deletePetFeature, savePetFeature, setMineralFieldValue} = usePetrology();
+  const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();
   const toast = useToast();
@@ -350,15 +350,16 @@ const BasicPageDetail = ({
               formName={formName}
               getIsDisabled={getIsDisabled}
               isReadOnly={isReadOnly}
-              onMyChange={page.key === PAGE_KEYS.MINERALS
-                ? ((name, value) => onMineralChange(formRef.current, name, value))
+              requiredFields={getRequiredFields(formProps.values)}
+              setFieldValueOverride={page.key === PAGE_KEYS.MINERALS
+                ? ((name, value) => setMineralFieldValue(formRef.current, name, value))
                 : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
-                  ? ((name, value) => onSedFormChange(formRef.current, name, value))
+                  ? ((name, value) => setSedFieldValue(formRef.current, name, value))
                   : undefined}
-              onNumberChange={orientationFields ? ((name, value) => onOrientationChange(formRef.current, name, value,
+              setNumberFieldValueOverride={orientationFields
+                ? ((name, value) => setOrientationFieldValue(formRef.current, name, value,
                   {orientationFields: orientationFields}))
                 : undefined}
-              requiredFields={getRequiredFields(formProps.values)}
               siblingSurvey={siblingSurvey}
             />
           )}

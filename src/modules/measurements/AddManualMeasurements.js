@@ -12,7 +12,7 @@ import {
 } from './measurements.constants';
 import commonStyles from '../../shared/common.styles';
 import SliderBar from '../../shared/ui/SliderBar';
-import {onOrientationChange} from '../compass/compass.helpers';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
 import compassStyles from '../compass/compass.styles';
 import {Form, useForm} from '../form';
 
@@ -48,7 +48,7 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
   /* Event Handlers */
 
   // Entering a strike fills in the dip direction and the reverse
-  const onNumberChange = (name, value) => onOrientationChange(formRefCurrent, name, value);
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(formRefCurrent, name, value);
 
   /* View */
 
@@ -60,7 +60,7 @@ const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => 
           <Form
             {...formProps}
             formName={PLANAR_FORM_NAME}
-            onNumberChange={onNumberChange}
+            setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
             surveyFragment={planarKeysFields}
           />
         )}

@@ -66,21 +66,6 @@ const usePetrology = () => {
       + (item.based_on && (' - ' + getLabels(item.based_on, formName).toUpperCase()));
   };
 
-  const onMineralChange = async (formCurrent, name, value) => {
-    console.log(name, 'changed to', value);
-    if (name === 'mineral_abbrev') {
-      const foundFullName = getFullMineralNameFromAbbrev(value);
-      if (foundFullName) await formCurrent.setFieldValue('full_mineral_name', foundFullName);
-      await formCurrent.setFieldValue('mineral_abbrev', value);
-    }
-    else if (name === 'full_mineral_name') {
-      const foundAbbrev = getAbbrevFromFullMineralName(value);
-      if (foundAbbrev) await formCurrent.setFieldValue('mineral_abbrev', foundAbbrev);
-      await formCurrent.setFieldValue('full_mineral_name', value);
-    }
-    else await formCurrent.setFieldValue(name, value);
-  };
-
   const savePetFeature = async (key, spot, formCurrent, isLeavingPage) => {
     try {
       const {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
@@ -118,14 +103,29 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
+  const setMineralFieldValue = async (formCurrent, name, value) => {
+    console.log(name, 'changed to', value);
+    if (name === 'mineral_abbrev') {
+      const foundFullName = getFullMineralNameFromAbbrev(value);
+      if (foundFullName) await formCurrent.setFieldValue('full_mineral_name', foundFullName);
+      await formCurrent.setFieldValue('mineral_abbrev', value);
+    }
+    else if (name === 'full_mineral_name') {
+      const foundAbbrev = getAbbrevFromFullMineralName(value);
+      if (foundAbbrev) await formCurrent.setFieldValue('mineral_abbrev', foundAbbrev);
+      await formCurrent.setFieldValue('full_mineral_name', value);
+    }
+    else await formCurrent.setFieldValue(name, value);
+  };
+
   return {
     deletePetFeature,
     getMineralTitle,
     getPetRockTitle,
     getReactionTextureTitle,
-    onMineralChange,
     savePetFeature,
     savePetFeatureValuesFromTemplates,
+    setMineralFieldValue,
   };
 };
 

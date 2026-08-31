@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -40,11 +39,9 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
     <>
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
-          <Field
+          <TextInputField
             autoCapitalize={'characters'}
-            component={TextInputField}
             editable={!isReadOnly}
-            key={'utm_zone'}
             label={'UTM Zone (e.g. 13N)'}
             name={'utm_zone'}
           />
@@ -55,19 +52,15 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{flex: 1, flexDirection: 'row', overflow: 'hidden'}}>
               <View style={{flex: 1, paddingRight: 5}}>
-                <Field
-                  component={NumberInputField}
+                <NumberInputField
                   editable={!isReadOnly}
-                  key={'easting'}
                   label={'Easting (m)'}
                   name={'easting'}
                 />
               </View>
               <View style={{flex: 1}}>
-                <Field
-                  component={NumberInputField}
+                <NumberInputField
                   editable={!isReadOnly}
-                  key={'northing'}
                   label={'Northing (m)'}
                   name={'northing'}
                 />

@@ -19,7 +19,7 @@ import {getNewUUID} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {onOrientationChange} from '../compass/compass.helpers';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
 import {Form, FormikWrapper, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
@@ -65,7 +65,7 @@ const AddEarthquakeModal = () => {
   /* Event Handlers */
 
   // Entering a strike fills in the azimuth dip direction and the reverse
-  const onNumberChange = (name, value) => onOrientationChange(formRef.current, name, value,
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(formRef.current, name, value,
     {orientationFields: EARTHQUAKE_ORIENTATION_FIELDS});
 
   /* Logic Helpers */
@@ -206,7 +206,7 @@ const AddEarthquakeModal = () => {
       <Form
         {...formProps}
         formName={[groupKey, pageKey]}
-        onNumberChange={onNumberChange}
+        setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
         surveyFragment={relevantFields}
       />
     );

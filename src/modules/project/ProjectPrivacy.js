@@ -40,7 +40,7 @@ const ProjectPrivacy = () => {
   // This form writes on every change, so an invalid value must not reach the project. Formik's values lag a render
   // behind the field just changed, so validate the change on top of them, put what it finds under the field, and
   // save what validating cleans up rather than the text as typed. Alerting per keystroke would be unusable.
-  const onMyChange = async (name, value) => {
+  const setFieldValueAndSavePreferences = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
     const {errors, values: updatedValues} = validateForm({
       formName: formName,
@@ -69,9 +69,8 @@ const ProjectPrivacy = () => {
           <Form
             {...formProps}
             formName={formName}
-            onMyChange={onMyChange}
             renderInline={true}
-            setFieldValue={onMyChange}
+            setFieldValueOverride={setFieldValueAndSavePreferences}
           />
         )}
       </FormikWrapper>

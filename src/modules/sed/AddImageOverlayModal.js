@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {IMAGE_OVERLAY_SIZE_KEYS, Y_MULTIPLIER} from './sed.constants';
@@ -56,7 +55,7 @@ const AddImageOverlayModal = ({
   // Width and height are a pair, so whichever one is typed sets the other to keep the image's proportions. A value
   // that is not a positive number yet - a lone minus sign or decimal point on the way to one - has no ratio to
   // scale by, so the other side waits for the keystroke that gives it one rather than being filled in with NaN.
-  const onMyChange = (name, value) => {
+  const setFieldValueAndKeepProportions = (name, value) => {
     const formCurrent = overlayFormRef.current;
     formCurrent.setFieldValue(name, value);
     const originalImage = getOriginalImage(formCurrent?.values?.id);
@@ -174,11 +173,9 @@ const AddImageOverlayModal = ({
         <SectionDivider dividerText={'Appearance'}/>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
               isNegativeAllowed={false}
-              key={'image_opacity'}
               label={'Opacity'}
               name={'image_opacity'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -188,10 +185,8 @@ const AddImageOverlayModal = ({
         </ListItem>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
-              key={'z_index'}
               label={'Draw Order'}
               name={'z_index'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -214,10 +209,8 @@ const AddImageOverlayModal = ({
         />
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
-              key={'image_origin_x'}
               label={'Origin X (pixels)'}
               name={'image_origin_x'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -227,10 +220,8 @@ const AddImageOverlayModal = ({
         </ListItem>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
-              key={'image_origin_y'}
               label={'Origin Y (pixels)'}
               name={'image_origin_y'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -256,31 +247,27 @@ const AddImageOverlayModal = ({
         />
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
               isNegativeAllowed={false}
-              key={'image_width'}
               label={'Width (pixels)'}
               name={'image_width'}
-              onMyChange={onMyChange}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
               placeholder={'Must be greater than 0. The height changes with it to keep the image\'s proportions.'}
+              setFieldValueOverride={setFieldValueAndKeepProportions}
             />
           </ListItem.Content>
         </ListItem>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
-              component={NumberInputField}
+            <NumberInputField
               editable={!isReadOnly}
               isNegativeAllowed={false}
-              key={'image_height'}
               label={'Height (pixels)'}
               name={'image_height'}
-              onMyChange={onMyChange}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
               placeholder={'Must be greater than 0. The width changes with it to keep the image\'s proportions.'}
+              setFieldValueOverride={setFieldValueAndKeepProportions}
             />
           </ListItem.Content>
         </ListItem>
@@ -317,19 +304,13 @@ const AddImageOverlayModal = ({
           <View>
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
-                <Field key={'id'} name={'id'}>
-                  {({field, form}) => (
-                    <SelectInputField
-                      {...field}
-                      choices={getImageChoices()}
-                      errors={form.errors}
-                      isRequired={true}
-                      label={'Image to Use as Overlay'}
-                      setFieldValue={form.setFieldValue}
-                      single={true}
-                    />
-                  )}
-                </Field>
+                <SelectInputField
+                  choices={getImageChoices()}
+                  isRequired={true}
+                  isSingleSelect={true}
+                  label={'Image to Use as Overlay'}
+                  name={'id'}
+                />
               </ListItem.Content>
             </ListItem>
             {outerFormProps.values?.id && (

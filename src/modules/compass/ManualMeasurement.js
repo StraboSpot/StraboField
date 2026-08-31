@@ -2,11 +2,10 @@ import React, {useRef} from 'react';
 import {Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
-import {onOrientationChange} from './compass.helpers';
+import {setOrientationFieldValue} from './compass.helpers';
 import compassStyles from './compass.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -36,7 +35,7 @@ const ManualMeasurement = ({
   /* Event Handlers */
 
   // Entering a strike fills in the dip direction and the reverse, as it does for a planar measurement
-  const onNumberChange = (name, value) => onOrientationChange(manualFormRef.current, name, value);
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(manualFormRef.current, name, value);
 
   /* View */
 
@@ -54,33 +53,27 @@ const ManualMeasurement = ({
             <>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'strike'}
+                  <NumberInputField
                     label={'Strike'}
                     name={'strike'}
-                    onMyChange={onNumberChange}
+                    setFieldValueOverride={setFieldValueAndPairedOrientation}
                   />
                 </ListItem.Content>
               </ListItem>
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'dip_direction'}
+                  <NumberInputField
                     label={'Azimuthal Dip Direction'}
                     name={'dip_direction'}
-                    onMyChange={onNumberChange}
+                    setFieldValueOverride={setFieldValueAndPairedOrientation}
                   />
                 </ListItem.Content>
               </ListItem>
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'dip'}
+                  <NumberInputField
                     label={'Dip'}
                     name={'dip'}
                   />
@@ -93,9 +86,7 @@ const ManualMeasurement = ({
             <>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'trend'}
+                  <NumberInputField
                     label={'Trend'}
                     name={'trend'}
                   />
@@ -104,9 +95,7 @@ const ManualMeasurement = ({
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'plunge'}
+                  <NumberInputField
                     label={'Plunge'}
                     name={'plunge'}
                   />

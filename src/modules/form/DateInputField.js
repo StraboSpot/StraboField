@@ -2,21 +2,26 @@ import React, {useEffect, useState} from 'react';
 import {Appearance, Platform, Text, View} from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {formStyles} from '../form';
 
 const DateInputField = ({
-                          field: {name, value},
-                          form: {errors},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
-                          onMyChange,
-                          setFieldValue,
+                          name,
+                          setFieldValueOverride,  // For a page that does its own work on a change
                         }) => {
+  /* Data Hooks */
+
+  const [{value}] = useField(name);
+  // Read the errors from the form rather than take useField's meta.error - see TextInputField
+  const {errors, setFieldValue} = useFormikContext();
+
   /* Local State */
 
   const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme());
@@ -25,6 +30,7 @@ const DateInputField = ({
 
   /* Derived Variables */
 
+  const setValue = setFieldValueOverride || setFieldValue;
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a') : isShowTime ? moment(value).format(
     'MM/DD/YYYY, h:mm:ss a') : moment(value).format('MM/DD/YYYY') : undefined;
 
@@ -67,8 +73,7 @@ const DateInputField = ({
       // The picker was dismissed without a choice, by tapping outside it
       else return;
     }
-    if (onMyChange && typeof onMyChange === 'function') onMyChange(name, selectedDate);
-    else setFieldValue(name, selectedDate);
+    setValue(name, selectedDate);
   };
 
   /* Render Functions */

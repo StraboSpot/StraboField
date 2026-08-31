@@ -1,7 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Field} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BackupStatusModal from './BackupStatusModal';
@@ -71,30 +70,19 @@ const BackupProject = () => {
   const renderBackupOptions = () => {
     return (
       <FormikWrapper initialValues={{backupFrequency: backupFrequency?.save}} innerRef={preFormRef}>
-        {() => (
-          <View style={{paddingHorizontal: 10}}>
-            <View style={{paddingVertical: 5}}>
-              <Field name={'backupFrequency'}>
-                {({field, form}) => (
-                  <SelectInputField
-                    {...field}
-                    choices={choices}
-                    errors={form.errors}
-                    label={'Auto-Save to Device Frequency'}
-                    multiSelectStyle={{paddingVertical: 5}}
-                    setFieldValue={(name, value) => {
-                      form.setFieldValue(name, value);
-                      dispatch(setBackupFrequency({save: value}));
-                    }}
-                    single
-                  />
-                )}
-              </Field>
-            </View>
+        <View style={{paddingHorizontal: 10}}>
+          <View style={{paddingVertical: 5}}>
+            <SelectInputField
+              choices={choices}
+              dropdownStyle={{paddingVertical: 5}}
+              isSingleSelect
+              label={'Auto-Save to Device Frequency'}
+              name={'backupFrequency'}
+              onValueChanged={(name, value) => dispatch(setBackupFrequency({save: value}))}
+            />
           </View>
-        )}
+        </View>
       </FormikWrapper>
-
     );
   };
 

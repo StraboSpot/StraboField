@@ -27,7 +27,7 @@ const AddMineralModal = () => {
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
-  const {onMineralChange, savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
+  const {savePetFeature, savePetFeatureValuesFromTemplates, setMineralFieldValue} = usePetrology();
 
   /* Local State */
 
@@ -146,7 +146,7 @@ const AddMineralModal = () => {
         <Form
           {...formProps}
           formName={formName}
-          onMyChange={(name, value) => onMineralChange(formProps, name, value)}
+          setFieldValueOverride={(name, value) => setMineralFieldValue(formProps, name, value)}
           surveyFragment={firstKeysFields}
         />
         <LittleSpacer/>

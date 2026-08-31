@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
+import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,20 +9,24 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {formStyles} from '../form';
 
 const DateInputField = ({
-                          field: {name, value},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
-                          onMyChange,
-                          setFieldValue,
+                          name,
+                          setFieldValueOverride,  // For a page that does its own work on a change
                         }) => {
+  /* Data Hooks */
+
+  const [{value}] = useField(name);
+
   /* Local State */
 
   const [date, setDate] = useState(Date.parse(value) ? new Date(value) : undefined);
 
   /* Derived Variables */
 
+  const setValue = setFieldValueOverride || setFieldValue;
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
         : moment(value).format('MM/DD/YYYY')
@@ -35,8 +40,7 @@ const DateInputField = ({
     console.log('Change Date', name, selectedDate);
     setDate(selectedDate);
     selectedDate = selectedDate?.toISOString();
-    if (onMyChange && typeof onMyChange === 'function') onMyChange(name, selectedDate);
-    else setFieldValue(name, selectedDate);
+    setValue(name, selectedDate);
   };
 
   /* Render Functions */

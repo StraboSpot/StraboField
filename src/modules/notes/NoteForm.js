@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -24,17 +23,13 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full',
       initialValues={initialNotesValues}
       innerRef={formRef}
     >
-      {() => (
-        <Field
-          appearance={fieldAppearance}
-          autoFocus={autoFocus}
-          component={TextInputField}
-          customHeight={customHeight}
-          editable={!isReadOnly}
-          key={'note'}
-          name={'note'}
-        />
-      )}
+      <TextInputField
+        appearance={fieldAppearance}
+        autoFocus={autoFocus}
+        customHeight={customHeight}
+        editable={!isReadOnly}
+        name={'note'}
+      />
     </FormikWrapper>
   );
 

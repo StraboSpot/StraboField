@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -133,28 +132,18 @@ const TagsModal = ({
       <>
         {!isEmpty(tags) && pageKey !== PAGE_KEYS.GEOLOGIC_UNITS && (
           <FormikWrapper initialValues={{}} innerRef={formRef}>
-            {() => (
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field key={'searchText'} name={'searchText'}>
-                    {({field, form}) => (
-                      <SelectInputField
-                        {...field}
-                        choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                          tagType => ({label: getTagLabel(tagType), value: tagType}))}
-                        errors={form.errors}
-                        label={'Tag Type'}
-                        setFieldValue={(name, value) => {
-                          form.setFieldValue(name, value);
-                          setSearchText(value);
-                        }}
-                        single={true}
-                      />
-                    )}
-                  </Field>
-                </ListItem.Content>
-              </ListItem>
-            )}
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <SelectInputField
+                  choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                    tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                  isSingleSelect={true}
+                  label={'Tag Type'}
+                  name={'searchText'}
+                  onValueChanged={(name, value) => setSearchText(value)}
+                />
+              </ListItem.Content>
+            </ListItem>
           </FormikWrapper>
         )}
         <FlatList
