@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -11,18 +10,17 @@ import {isEmptyMeasurement} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import {FormFlatList} from '../../shared/ui';
+import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
-import useCompassCalculations from '../compass/useCompassCalculations';
-import {Form, useForm} from '../form';
+import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -43,17 +41,21 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {doMeasurementCalculations} = useCompassCalculations();
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState(null);
 
   /* Derived Variables */
@@ -133,16 +135,9 @@ const MeasurementDetail = ({
     else addAssociatedMeasurement();
   };
 
-  const onMyChange = (name, value) => {
-    if (name === 'rake' || name === 'strike' || name === 'dip_direction') {
-      const valueAsFloat = parseFloat(value, 10);
-      if (!isNaN(valueAsFloat) && typeof valueAsFloat === 'number') {
-        doMeasurementCalculations(name, valueAsFloat, formRef.current, selectedAttitude, selectedMeasurement);
-      }
-      else formRef.current.setFieldValue(name, undefined);
-    }
-    else formRef.current.setFieldValue(name, value);
-  };
+  // Entering a strike fills in the dip direction and the reverse, and a rake the trend and plunge
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(formRef.current, name, value,
+    {selectedAttitude: selectedAttitude, selectedMeasurement: selectedMeasurement});
 
   // Confirm switch between Planar and Tabular Zone
   const onSwitchPlanarTabular = (i) => {
@@ -224,7 +219,7 @@ const MeasurementDetail = ({
   };
 
   const confirmLeavePage = () => {
-    if (!isTemplate && formRef.current && formRef.current.dirty) {
+    if (!isTemplate && formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
@@ -238,7 +233,7 @@ const MeasurementDetail = ({
         }, {
           text: 'Yes',
           onPress: async () => {
-            await saveForm(formCurrent);
+            await saveForm(formCurrent, true);
             dispatch(setSelectedAttributes([]));
           },
         }],
@@ -267,10 +262,13 @@ const MeasurementDetail = ({
     else return 'Measurement Detail';
   };
 
-  const saveForm = async (formCurrent) => {
+  // Whether the page is being left is the caller's to say. Reading it back off the ref guessed, and guessed
+  // wrong whenever the prompt was answered before the form had gone: an edit meant to be kept apart from its
+  // one bad field was refused whole instead.
+  const saveForm = async (formCurrent, isLeavingPage) => {
     try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
+        isLeavingPage);
       console.log('Saving form data to Spot ...');
       let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
       let editedSelectedMeasurements = [];
@@ -310,8 +308,10 @@ const MeasurementDetail = ({
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
+      savedValuesRef.current = {...formCurrent.values};
       await formCurrent.resetForm();
-      if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
+      // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
+      if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
     }
     catch (err) {
@@ -351,8 +351,7 @@ const MeasurementDetail = ({
   };
 
   const saveTemplateForm = async (formCurrent) => {
-    await formCurrent.submitForm();
-    const formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
     await saveTemplate(formValues);
   };
 
@@ -415,6 +414,7 @@ const MeasurementDetail = ({
     return (
       <SaveAndCancelButtons
         cancel={cancelFormAndGo}
+        getIsDisabled={isFormInvalid}
         save={() => isTemplate ? saveTemplateForm(formRef.current) : saveFormAndGo()}
       />
     );
@@ -426,24 +426,23 @@ const MeasurementDetail = ({
     return (
       <View>
         <View style={{flex: 1}}>
-          <Formik
+          <FormikWrapper
             enableReinitialize={true}
-            initialStatus={{formName: formName}}
+            formName={formName}
             initialValues={selectedMeasurement}
             innerRef={formRef}
             onReset={() => console.log('Resetting form...')}
-            onSubmit={values => console.log('Submitting form...', values)}
-            validate={values => validateForm({formName: formName, values: values})}
+            setIsFormInvalid={setIsFormInvalid}
           >
             {formProps => (
-              <Form {...{
-                ...formProps,
-                formName: formName,
-                isReadOnly: isReadOnly,
-                onMyChange: onMyChange,
-              }}/>
+              <Form
+                {...formProps}
+                formName={formName}
+                isReadOnly={isReadOnly}
+                setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
+              />
             )}
-          </Formik>
+          </FormikWrapper>
         </View>
       </View>
     );
@@ -521,7 +520,7 @@ const MeasurementDetail = ({
         onPress={i => onSwitchPlanarTabular(i)}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
         selectedIndex={selectedMeasurement.type === 'planar_orientation' ? 0 : 1}
-        textStyle={{color: PRIMARY_ACCENT_COLOR}}
+        textStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
       />
     );
   };

@@ -7,38 +7,32 @@ import {Form, MainButtons} from '../form';
 const AddLine = ({formName, formProps, isManualMeasurement, isPlanarLinear, setChoicesViewKey, survey}) => {
   /* Derived Variables */
 
-  let updatedFormProps = {...formProps};
-  if (isPlanarLinear) {
-    updatedFormProps = {
-      ...formProps,
-      values: (formProps.values.associated_orientation && formProps.values.associated_orientation[0]) || {},
-    };
-  }
   // Relevant fields for quick-entry modal
   const firstKeysFields = ADD_LINE_FIRST_KEYS.map(k => survey.find(f => f.name === k));
   const lastKeysFields = ADD_LINE_LAST_KEYS.map(k => survey.find(f => f.name === k));
+  const subkey = isPlanarLinear ? 'associated_orientation' : undefined;
 
   /* View */
 
   return (
     <>
       {!isManualMeasurement && !isPlanarLinear && (
-        <Form {...{formName: formName, surveyFragment: firstKeysFields, ...updatedFormProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       )}
       <MainButtons
         formName={formName}
-        formProps={updatedFormProps}
+        formProps={formProps}
         mainKeys={ADD_LINE_MAIN_BUTTONS_KEYS}
         setChoicesViewKey={setChoicesViewKey}
-        subkey={isPlanarLinear && 'associated_orientation'}
+        subkey={subkey}
       />
       <LittleSpacer/>
-      <Form {...{
-        formName: formName,
-        surveyFragment: lastKeysFields,
-        subkey: isPlanarLinear && 'associated_orientation',
-        ...updatedFormProps,
-      }}/>
+      <Form
+        {...formProps}
+        formName={formName}
+        subkey={subkey}
+        surveyFragment={lastKeysFields}
+      />
     </>
   );
 };

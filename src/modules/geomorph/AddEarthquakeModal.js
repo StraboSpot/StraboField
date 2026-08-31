@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
   CONFIDENCE_IN_FEATURE_KEY,
   EARTHQUAKE_FORM_NAME,
   EARTHQUAKE_GROUP_KEY,
+  EARTHQUAKE_ORIENTATION_FIELDS,
   EARTHQUAKE_PAGE_KEY,
   FAULT_ORIENTATION_KEYS,
   LAST_KEYS,
@@ -19,7 +19,8 @@ import {getNewUUID} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, FormSlider, MainButtons, useForm} from '../form';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
+import {Form, FormikWrapper, FormSlider, MainButtons, useForm} from '../form';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -36,7 +37,7 @@ const AddEarthquakeModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, isRelevant, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -44,6 +45,7 @@ const AddEarthquakeModal = () => {
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [isFaultOrientationModalVisible, setIsFaultOrientationModalVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isVectorMeasurementModalVisible, setIsVectorMeasurementModalVisible] = useState(false);
   const [measurementsGroupField, setMeasurementsGroupField] = useState({});
 
@@ -60,14 +62,19 @@ const AddEarthquakeModal = () => {
     return () => dispatch(setModalValues({}));
   }, []);
 
+  /* Event Handlers */
+
+  // Entering a strike fills in the azimuth dip direction and the reverse
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(formRef.current, name, value,
+    {orientationFields: EARTHQUAKE_ORIENTATION_FIELDS});
+
   /* Logic Helpers */
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
   const saveEarthquake = async () => {
     try {
-      await formRef.current.submitForm();
-      const editedEarthquakeData = showErrors(formRef.current);
+      const {values: editedEarthquakeData} = await submitAndShowErrors(formRef.current);
       console.log('Saving earthquake data to Spot ...');
       let editedEarthquakesData = spot.properties.earthquakes
         ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
@@ -136,7 +143,7 @@ const AddEarthquakeModal = () => {
           survey={survey}
         />
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: LAST_KEYSFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={LAST_KEYSFields}/>
         {isFaultOrientationModalVisible && (
           <MeasurementModal
             formName={formName}
@@ -164,6 +171,7 @@ const AddEarthquakeModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
+        disabled={isFormInvalid}
         onActionPressed={saveEarthquake}
         showActionButton={!choicesViewKey}
         showCancelButton={false}
@@ -172,19 +180,18 @@ const AddEarthquakeModal = () => {
         <FlatList
           ListHeaderComponent={
             <View style={{flex: 1}}>
-              <Formik
+              <FormikWrapper
+                formName={formName}
                 initialValues={{}}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={false}
+                setIsFormInvalid={setIsFormInvalid}
               >
                 {formProps => (
                   <View style={{flex: 1}}>
                     {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                   </View>
                 )}
-              </Formik>
+              </FormikWrapper>
             </View>
           }
           bounces={false}
@@ -196,7 +203,12 @@ const AddEarthquakeModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [groupKey, pageKey], surveyFragment: relevantFields, ...formProps}}/>
+      <Form
+        {...formProps}
+        formName={[groupKey, pageKey]}
+        setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
+        surveyFragment={relevantFields}
+      />
     );
   };
 

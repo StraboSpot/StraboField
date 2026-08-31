@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSection from './useStratSection';
@@ -11,7 +10,7 @@ import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {Form, SelectInputField, TextInputField, useForm} from '../../form';
+import {Form, FormikWrapper, SelectInputField, TextInputField, useForm} from '../../form';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
@@ -26,7 +25,7 @@ const AddIntervalModal = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLabel, getSurvey, showErrors, validateForm} = useForm();
+  const {getLabel, getSurvey, submitAndShowErrors} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
@@ -37,6 +36,7 @@ const AddIntervalModal = () => {
   const preFormRef = useRef(null);
 
   const [intervalToCopy, setIntervalToCopy] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
@@ -153,8 +153,7 @@ const AddIntervalModal = () => {
 
   const saveInterval = async () => {
     try {
-      await formRef.current.submitForm();
-      const intervalData = showErrors(formRef.current);
+      const {values: intervalData} = await submitAndShowErrors(formRef.current);
       if (doUnitsFieldsMatch(intervalData)) {
         let newInterval = createInterval(stratSection.strat_section_id, intervalData);
         if (preFormRef.current?.values?.intervalName) {
@@ -191,32 +190,18 @@ const AddIntervalModal = () => {
     }
   };
 
-  const validatePreForm = (values) => {
-    console.log('Values before geometry validation:', values);
-    let errors = {};
-    if (values.intervalToCopyId) {
-      const copyInterval = intervals.find(i => i.properties.id === values.intervalToCopyId);
-      copyIntervalLithology(copyInterval);
-    }
-    else setIntervalToCopy(null);
-    console.log('Values after geometry validation:', values);
-    return errors;
-  };
-
   /* Render Functions */
 
   const renderAddIntervalFormFields = () => {
     return (
-      <Formik
-        initialStatus={{formName: formName}}
+      <FormikWrapper
+        formName={formName}
         initialValues={{}}
         innerRef={formRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={values => validateForm({formName: formName, values: values})}
-        validateOnChange={true}
+        setIsFormInvalid={setIsFormInvalid}
       >
-        {formProps => <Form {...{...formProps, formName: formName}}/>}
-      </Formik>
+        {formProps => <Form {...formProps} formName={formName}/>}
+      </FormikWrapper>
     );
   };
 
@@ -224,6 +209,7 @@ const AddIntervalModal = () => {
     return (
       <ModalWrapper
         closeModal={close}
+        disabled={isFormInvalid}
         headerTitle={'Add Interval'}
         onActionPressed={() => saveInterval(formRef?.current?.values)}
         showActionButton
@@ -250,56 +236,40 @@ const AddIntervalModal = () => {
       {properties: {name: '-- Bottom --', id: 'bottom'}},
     ];
     return (
-      <Formik
-        initialValues={initialIntervalName}
-        innerRef={preFormRef}
-        onSubmit={() => console.log('Submitting form...')}
-        validate={validatePreForm}
-        validateOnChange={true}
-      >
-        {() => (
-          <>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  component={formProps => (
-                    SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-                  )}
-                  key={'intervalToInsertAfter'}
-                  label={isCore ? 'Insert New Interval Below:' : 'Insert New Interval Above:'}
-                  name={'intervalToInsertAfter'}
-                  single={true}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
-                  component={formProps => (
-                    SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-                  )}
-                  key={'intervalToCopyId'}
-                  label={'Copy Interval Data From:'}
-                  name={'intervalToCopyId'}
-                  single={true}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={TextInputField}
-                  key={'intervalName'}
-                  label={'Interval Name'}
-                  name={'intervalName'}
-                />
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </Formik>
+      <FormikWrapper initialValues={initialIntervalName} innerRef={preFormRef}>
+        <>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <SelectInputField
+                choices={intervalsForInsert.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                isSingleSelect={true}
+                label={isCore ? 'Insert New Interval Below:' : 'Insert New Interval Above:'}
+                name={'intervalToInsertAfter'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <SelectInputField
+                choices={orderedIntervals.map(s => ({label: s.properties.name, value: s.properties.id}))}
+                isSingleSelect={true}
+                label={'Copy Interval Data From:'}
+                name={'intervalToCopyId'}
+                onValueChanged={(name, value) => copyIntervalLithology(
+                  intervals.find(i => i.properties.id === value))}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <TextInputField
+                label={'Interval Name'}
+                name={'intervalName'}
+              />
+            </ListItem.Content>
+          </ListItem>
+        </>
+      </FormikWrapper>
     );
   };
 

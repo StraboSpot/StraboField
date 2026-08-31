@@ -7,6 +7,13 @@ export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'phosphorite_type',
 ];
 
+// An image overlay's width and height are only ever saved together, and each is worked out from the other, so
+// they are kept as a pair - width first, so the two are always read the same way round
+export const IMAGE_OVERLAY_SIZE_KEYS = ['image_width', 'image_height'];
+
+// The interval characters whose lithologies have to be filled in
+export const LITHOLOGY_INTERVAL_CHARACTERS = ['bed', 'bed_mixed_lit', 'interbedded', 'package_succe'];
+
 export const LITHOLOGY_SUBPAGES = {
   LITHOLOGY: 'lithology',
   COMPOSITION: 'composition',

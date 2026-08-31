@@ -8,7 +8,7 @@ const drawGeometryTogglesStyles = StyleSheet.create({
     color: PRIMARY_ACCENT_COLOR,
     flexShrink: 1,
     flexWrap: 'wrap',
-    fontSize: 12,
+    fontSize: themes.SMALL_TEXT_SIZE,
     paddingHorizontal: 3,
     textAlign: 'center',
   },

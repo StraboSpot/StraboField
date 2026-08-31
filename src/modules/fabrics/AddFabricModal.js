@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {DEFAULT_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_TYPES} from './fabric.constants';
@@ -10,9 +9,9 @@ import IgneousFabric from './IgneousFabric';
 import MetamorphicFabric from './MetamorphicFabric';
 import StructuralFabric from './StructuralFabric';
 import {getNewId, isEmpty} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -24,7 +23,7 @@ const AddFabricModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -78,8 +77,7 @@ const AddFabricModal = () => {
 
   const saveFabric = async () => {
     try {
-      await formRef.current.submitForm();
-      const editedFabricData = showErrors(formRef.current);
+      const {values: editedFabricData} = await submitAndShowErrors(formRef.current);
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
       editedFabricsData.push({...editedFabricData, id: getNewId()});
@@ -104,7 +102,7 @@ const AddFabricModal = () => {
           onPress={onFabricTypePress}
           selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
           selectedIndex={selectedTypeIndex}
-          textStyle={{color: PRIMARY_TEXT_COLOR}}
+          textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
         />
         {types[selectedTypeIndex] === 'fault_rock' && (
           <StructuralFabric
@@ -151,11 +149,10 @@ const AddFabricModal = () => {
         <FlatList
           ListHeaderComponent={
             <View style={{flex: 1}}>
-              <Formik
+              <FormikWrapper
+                formName={formName}
                 initialValues={{}}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
                 validateOnChange={false}
               >
                 {formProps => (
@@ -163,7 +160,7 @@ const AddFabricModal = () => {
                     {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                   </View>
                 )}
-              </Formik>
+              </FormikWrapper>
             </View>
           }
           bounces={false}
@@ -175,7 +172,11 @@ const AddFabricModal = () => {
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
     return (
-      <Form {...{formName: [FABRICS_GROUP_KEY, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
+      <Form
+        {...formProps}
+        formName={[FABRICS_GROUP_KEY, formRef.current?.values?.type]}
+        surveyFragment={relevantFields}
+      />
     );
   };
 

@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import usePetrology from './usePetrology';
@@ -10,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import {getNewCopyId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {SelectInputField} from '../form';
+import {FormikWrapper, SelectInputField} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -94,27 +93,19 @@ const MineralsPage = ({isReadOnly, page}) => {
 
   const renderCopyDataSelectBox = () => {
     return (
-      <Formik
-        initialValues={{}}
-        innerRef={preFormRef}
-        validate={fieldValues => copyMineralData(fieldValues.spot_id_for_pet_copy)}
-        validateOnChange={true}
-      >
+      <FormikWrapper initialValues={{}} innerRef={preFormRef}>
         <ListItem containerStyle={commonStyles.listItemFormField}>
           <ListItem.Content>
-            <Field
+            <SelectInputField
               choices={spotsWithMinerals.map(s => ({label: s.properties.name, value: s.properties.id}))}
-              component={formProps => (
-                SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-              )}
-              key={'spot_id_for_pet_copy'}
+              isSingleSelect={true}
               label={'Copy ' + page.label + ' Data From:'}
               name={'spot_id_for_pet_copy'}
-              single={true}
+              onValueChanged={(name, value) => copyMineralData(value)}
             />
           </ListItem.Content>
         </ListItem>
-      </Formik>
+      </FormikWrapper>
     );
   };
 

@@ -1,6 +1,8 @@
 export {default as ChoiceButtons} from './ChoiceButtons';
 export {default as DateInputField} from './DateInputField';
 export {default as Form} from './Form';
+export {default as FormFlatList} from './FormFlatList';
+export {default as FormikWrapper} from './FormikWrapper';
 export {default as FormSlider} from './FormSlider';
 export {default as formStyles} from './form.styles';
 export {default as MainButtons} from './MainButtons';

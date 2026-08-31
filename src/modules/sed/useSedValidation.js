@@ -1,4 +1,5 @@
-import {getSiliciclasticGrainSize} from './sed.helpers';
+import {LITHOLOGY_INTERVAL_CHARACTERS} from './sed.constants';
+import {getSiliciclasticGrainSize, getSiliciclasticGrainSizeKey} from './sed.helpers';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
@@ -91,16 +92,18 @@ const useSedValidation = () => {
 
     // Validation checks for Lithologies page
     const validateLithologiesPage = () => {
-      if (isMappedInterval && (sed.character === 'bed' || sed.character === 'bed_mixed_lit'
-        || sed.character === 'interbedded' || sed.character === 'package_succe')) {
+      if (isMappedInterval && LITHOLOGY_INTERVAL_CHARACTERS.includes(sed.character)) {
         if (!isEmpty(sed.lithologies) && sed.lithologies.length > 0) {
           sed.lithologies.forEach((lithology, n) => {
             if (!lithology.primary_lithology) {
               errorMessages.push('Primary Lithology: Required for lithology ' + (n + 1));
             }
             if (lithology.primary_lithology === 'siliciclastic' && !getSiliciclasticGrainSize(lithology)) {
-              errorMessages.push(
-                'Grain Size: Required for lithology ' + (n + 1) + ' if the primary lithology is siliciclastic.');
+              // Name the grain size field the chosen type actually uses, so it can be found on the Texture tab
+              const grainSizeKey = getSiliciclasticGrainSizeKey(lithology.siliciclastic_type);
+              errorMessages.push(grainSizeKey
+                ? getLabel(grainSizeKey, ['sed', 'texture']) + ': Required for lithology ' + (n + 1) + '.'
+                : 'Siliciclastic Type: Required for lithology ' + (n + 1) + ', along with its grain size.');
             }
             if ((lithology.primary_lithology === 'limestone' || lithology.primary_lithology === 'dolostone')
               && !lithology.dunham_classification) {

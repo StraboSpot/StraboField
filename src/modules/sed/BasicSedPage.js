@@ -1,20 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {INTERPRETATIONS_SUBPAGES, LITHOLOGY_SUBPAGES, STRUCTURE_SUBPAGES} from './sed.constants';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import TruncatedText from '../../shared/ui/TruncatedText';
+import {useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import SubpageTabs from '../page/SubpageTabs';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -25,8 +24,11 @@ const BasicSedPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {getSiblingSurvey} = useForm();
+
   /* Local State */
 
+  const [invalidFields, setInvalidFields] = useState([]);
   const [isDetailView, setIsDetailView] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
@@ -74,25 +76,30 @@ const BasicSedPage = ({isReadOnly, page}) => {
         : page.key === PAGE_KEYS.INTERPRETATIONS ? INTERPRETATIONS_SUBPAGES
           : undefined;
     if (subpages) {
+      const subpageKeys = Object.values(subpages);
+      const subpageKey = subpageKeys[selectedTypeIndex];
+      // Every tab edits the same attribute, so a choice made on one can leave a field on another behind, and a
+      // field another asks for is unanswered wherever you are standing. Both are checked against these
+      const siblingSurvey = getSiblingSurvey(['sed', subpageKey], subpageKeys);
       return (
         <>
           <BasicPageDetail
             PageTabsComponent={
-              <ButtonGroup
-                buttonStyle={{padding: 5}}
-                buttons={Object.values(subpages).map(
-                  v => ({element: () => <TruncatedText title={toTitleCase(v.replace(/_/g, ' '))}/>}))}
-                containerStyle={{height: 40, borderRadius: 10}}
+              <SubpageTabs
+                formCategory={'sed'}
+                invalidFields={invalidFields}
                 onPress={i => setSelectedTypeIndex(i)}
-                selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
                 selectedIndex={selectedTypeIndex}
+                subpageKeys={subpageKeys}
               />
             }
             closeDetailView={() => setIsDetailView(false)}
             groupKey={'sed'}
             isReadOnly={isReadOnly}
-            page={{...page, key: Object.values(subpages)[selectedTypeIndex]}}
+            page={{...page, key: subpageKey}}
             selectedFeature={selectedAttribute}
+            setInvalidFields={setInvalidFields}
+            siblingSurvey={siblingSurvey}
           />
         </>
       );

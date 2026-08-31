@@ -2,48 +2,51 @@ import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
+import {useField, useFormikContext} from 'formik';
 
 import * as themes from '../../shared/styles.constants';
 import {formStyles} from '../form';
 
 const TextInputField = ({
-                          field: {name, onBlur, onChange, value},
-                          form: {errors},
                           appearance,
                           autoCapitalize,
                           customHeight,
                           editable = true,
+                          isRequired,
                           label,
-                          onFocus,
-                          onBlur: onBlurProp,
-                          onMyChange,
+                          name,
+                          onBlurred,              // Runs as well as Formik's blur, which marks the field touched
+                          onFocused,
                           onShowFieldInfo,
                           placeholder,
+                          setFieldValueOverride,  // For a page that does its own work on a change
                         }) => {
+  /* Data Hooks */
+
+  const [{onBlur, value}] = useField(name);
+  // A nested field is named by the path it sits at, e.g. associated_orientation[0].plunge, and its error is keyed
+  // by that whole path as one string. Read the errors here rather than take useField's meta.error, which looks the
+  // name up as a path into nested objects and so would never find it.
+  const {errors, setFieldValue} = useFormikContext();
+
   /* Local State */
 
   const [isFocused, setIsFocused] = useState(false);
+
+  /* Derived Variables */
+
+  const setValue = setFieldValueOverride || setFieldValue;
 
   /* Logic Helpers */
 
   const getInputStyle = () => {
     let style;
-    if (appearance === 'multiline') {
-      style = {...formStyles.fieldValue, ...formStyles.fieldValueMultiline};
-    }
-    else if (appearance === 'fill') {
-      style = {...formStyles.fieldValue, ...formStyles.fieldValueFill};
-    }
-    else if (appearance === 'full') {
-      style = {...formStyles.fieldValue, ...formStyles.fieldValueFull};
-    }
-    else {
-      style = formStyles.fieldValue;
-    }
+    if (appearance === 'multiline') style = {...formStyles.fieldValue, ...formStyles.fieldValueMultiline};
+    else if (appearance === 'fill') style = {...formStyles.fieldValue, ...formStyles.fieldValueFill};
+    else if (appearance === 'full') style = {...formStyles.fieldValue, ...formStyles.fieldValueFull};
+    else style = formStyles.fieldValue;
 
-    if (customHeight) {
-      style = {...style, height: customHeight};
-    }
+    if (customHeight) style = {...style, height: customHeight};
 
     return style;
   };
@@ -54,7 +57,10 @@ const TextInputField = ({
     <>
       {label && (
         <View style={formStyles.fieldLabelContainer}>
-          <Text style={formStyles.fieldLabel}>{label}</Text>
+          <Text style={formStyles.fieldLabel}>
+            {label}
+            {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+          </Text>
           {placeholder && (
             <Icon
               color={themes.PRIMARY_ACCENT_COLOR}
@@ -72,12 +78,12 @@ const TextInputField = ({
         onBlur={(e) => {
           setIsFocused(false);
           onBlur(name)(e);
-          onBlurProp && onBlurProp(e);
+          onBlurred && onBlurred(e);
         }}
-        onChangeText={onMyChange && typeof onMyChange === 'function' ? val => onMyChange(name, val) : onChange(name)}
+        onChangeText={text => setValue(name, text)}
         onFocus={(e) => {
           setIsFocused(true);
-          onFocus && onFocus(e);
+          onFocused && onFocused(e);
         }}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}

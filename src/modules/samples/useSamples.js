@@ -84,19 +84,9 @@ const useSamples = () => {
     }
   };
 
-  const onSampleFormChange = (formCurrent, fieldName, fieldValue) => {
-    console.log(fieldName, 'changed to', fieldValue);
-    fieldName === 'collection_date'
-      ? formCurrent.setFieldValue('collection_time', fieldValue)
-      : fieldName === 'collection_time'
-        ? formCurrent.setFieldValue('collection_date', fieldValue)
-        : formCurrent.setFieldValue(fieldName, fieldValue);
-  };
-
   return {
     createRichSample,
     deleteRichSample,
-    onSampleFormChange,
   };
 };
 

@@ -31,7 +31,7 @@
       "name": "end_date",
       "label": "End Date",
       "required": "false",
-      "constraint_message": "End Date cannot be greater then Start Date"
+      "constraint_message": "Start Date must come before End Date"
     },
     {
       "type": "end_group"

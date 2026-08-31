@@ -1,7 +1,6 @@
 import React, {useRef} from 'react';
 import {ScrollView} from 'react-native';
 
-import {Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
 import ForceOfflineMode from './ForceOfflineMode';
@@ -11,8 +10,9 @@ import ResetWarnings from './ResetWarnings';
 import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import {FormikWrapper} from '../form';
 
-const Miscellaneous = () => {
+const AdvancedOptions = () => {
   /* Data Hooks */
 
   const {endpoint} = useSelector(state => state.connections.databaseEndpoint);
@@ -49,18 +49,17 @@ const Miscellaneous = () => {
   return (
     <>
       <SectionDivider dividerText={'Preferences'}/>
-      <Formik
+      <FormikWrapper
         enableReinitialize
         initialValues={initialValues}
         innerRef={formRef}
-        onSubmit={values => console.log('Submitting Form', values)}
       >
         <ScrollView style={{flex: 1}}>
           {renderPreferences()}
         </ScrollView>
-      </Formik>
+      </FormikWrapper>
     </>
   );
 };
 
-export default Miscellaneous;
+export default AdvancedOptions;

@@ -17,7 +17,7 @@ const StructuralFabric = ({choices, formName, formProps, setChoicesViewKey, surv
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <LittleSpacer/>
       <MainButtons
         formName={formName}
@@ -26,7 +26,7 @@ const StructuralFabric = ({choices, formName, formProps, setChoicesViewKey, surv
         setChoicesViewKey={setChoicesViewKey}
       />
       <LittleSpacer/>
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       <LittleSpacer/>
       <FormSlider
         choices={choices}

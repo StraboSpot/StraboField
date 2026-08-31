@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -46,6 +46,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   } = useSpots();
 
   /* Local State */
+
+  // The open sample form's current values, registered by the page that renders it so the footer's 'Add Data to
+  // Sample' can carry the edits on screen into the sample it creates
+  const getSampleValuesRef = useRef(null);
 
   const [selectedSample, setSelectedSample] = useState({});
 
@@ -95,6 +99,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     if (page?.key === PAGE_KEYS.SAMPLES) {
       pageProps = {
         ...pageProps,
+        registerGetValues: getSampleValuesRef,
         selectedSample: selectedSample,
         setSelectedSample: setSelectedSample,
       };
@@ -121,6 +126,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           <NotebookFooter
             isRichSample={spot.properties?.isSample}
             openPage={openPage}
+            registerGetValues={getSampleValuesRef}
             selectedSample={selectedSample}
           />
         </View>

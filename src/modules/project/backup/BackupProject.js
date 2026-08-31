@@ -1,7 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BackupStatusModal from './BackupStatusModal';
@@ -16,6 +15,7 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency} from '../../connections/connections.slice';
+import {FormikWrapper} from '../../form';
 import SelectInputField from '../../form/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
@@ -74,36 +74,27 @@ const BackupProject = () => {
 
   const renderBackupOptions = () => {
     return (
-      <Formik
-        initialValues={{backupFrequency: backupFrequency?.save}}
-        innerRef={preFormRef}
-        onSubmit={values => console.log('Submit: ', values, ' |')}
-        validate={values => dispatch(setBackupFrequency({save: values.backupFrequency}))}
-      >
-        {() => (
-          <View style={{paddingHorizontal: 10}}>
-            <View style={{paddingVertical: 5}}>
-              <Field
-                choices={choices}
-                component={formProps => SelectInputField(
-                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
-                label={'Auto-Save to Device Frequency'}
-                multiSelectStyle={{paddingVertical: 5}}
-                name={'backupFrequency'}
-                single
-              />
-            </View>
-            <Text style={{...uiStyles.sectionDividerText, paddingVertical: 5}}>
-              {Platform.OS === 'ios'
-                ? 'Auto-saves are stored locally in the app\'s directory and can be accessed with the '
-                + '"View/Edit Files on Device" button below.'
-                : 'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed '
-                + 'directly on Android. Use Save or Save & Export to Zip to keep an accessible copy.'}
-            </Text>
+      <FormikWrapper initialValues={{backupFrequency: backupFrequency?.save}} innerRef={preFormRef}>
+        <View style={{paddingHorizontal: 10}}>
+          <View style={{paddingVertical: 5}}>
+            <SelectInputField
+              choices={choices}
+              dropdownStyle={{paddingVertical: 5}}
+              isSingleSelect
+              label={'Auto-Save to Device Frequency'}
+              name={'backupFrequency'}
+              onValueChanged={(name, value) => dispatch(setBackupFrequency({save: value}))}
+            />
           </View>
-        )}
-      </Formik>
-
+          <Text style={{...uiStyles.sectionDividerText, paddingVertical: 5}}>
+            {Platform.OS === 'ios'
+              ? 'Auto-saves are stored locally in the app\'s directory and can be accessed with the '
+              + '"View/Edit Files on Device" button below.'
+              : 'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed '
+              + 'directly on Android. Use Save or Save & Export to Zip to keep an accessible copy.'}
+          </Text>
+        </View>
+      </FormikWrapper>
     );
   };
 

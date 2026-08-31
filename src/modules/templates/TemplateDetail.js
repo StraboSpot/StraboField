@@ -2,13 +2,11 @@ import React, {useRef, useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {FormFlatList} from '../../shared/ui';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {Form, formStyles, useForm} from '../form';
+import {Form, FormFlatList, formStyles, FormikWrapper} from '../form';
 import useTemplates from './useTemplates';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
@@ -21,7 +19,6 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   const dispatch = useDispatch();
 
-  const {validateForm} = useForm();
   const {saveTemplate} = useTemplates();
 
   /* Local State */
@@ -29,6 +26,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
   const formRef = useRef(null);
 
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [templateName, setTemplateName] = useState(template.name);
 
   /* Derived Variables */
@@ -123,16 +121,15 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     return (
       <FormFlatList>
         {renderNameField()}
-        <Formik
+        <FormikWrapper
           enableReinitialize={false}  // Update values if preferences change while form open, like when number incremented
+          formName={formName}
           initialValues={template.values}
           innerRef={formRef}
-          onSubmit={values => console.log('Submitting form...', values)}
-          validate={values => validateForm({formName: formName, values: values})}
-          validateOnChange={true}
+          setIsFormInvalid={setIsFormInvalid}
         >
-          {formProps => <Form {...{...formProps, formName: formName, renderInline: true}}/>}
-        </Formik>
+          {formProps => <Form {...formProps} formName={formName} renderInline={true}/>}
+        </FormikWrapper>
         {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
       </FormFlatList>
     );
@@ -142,7 +139,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   return (
     <>
-      <SaveAndCancelButtons cancel={goBack} save={saveTemplateAndGo}/>
+      <SaveAndCancelButtons cancel={goBack} getIsDisabled={isFormInvalid} save={saveTemplateAndGo}/>
       {renderTemplateFields()}
 
       {/* Child Modal */}

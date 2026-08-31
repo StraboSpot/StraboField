@@ -2,26 +2,25 @@ import React, {useEffect, useState} from 'react';
 import {Appearance, Platform, Text, View} from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
-import {useDispatch} from 'react-redux';
 
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {formStyles} from '../form';
-import {openedMessageModal} from '../home/home.slice';
 
 const DateInputField = ({
-                          field: {name, value},
-                          form: {errors, values},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
-                          onMyChange,
-                          setFieldValue,
+                          name,
+                          setFieldValueOverride,  // For a page that does its own work on a change
                         }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
+  const [{value}] = useField(name);
+  // Read the errors from the form rather than take useField's meta.error - see TextInputField
+  const {errors, setFieldValue} = useFormikContext();
 
   /* Local State */
 
@@ -31,6 +30,7 @@ const DateInputField = ({
 
   /* Derived Variables */
 
+  const setValue = setFieldValueOverride || setFieldValue;
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a') : isShowTime ? moment(value).format(
     'MM/DD/YYYY, h:mm:ss a') : moment(value).format('MM/DD/YYYY') : undefined;
 
@@ -56,37 +56,24 @@ const DateInputField = ({
     Platform.OS === 'ios' ? setDate(selectedDate) : saveDate(event, selectedDate);
   };
 
+  // Whatever is picked is written, even a date range in the wrong order: the survey's own validation catches that
+  // one, marking both dates and holding the save. Refusing the write here instead left each platform with a rule
+  // of its own - iOS wrote the value before its check could stop it, and Android turned it away with a message
+  // modal that never appeared on the page the field is used from.
   const saveDate = async (event, selectedDate) => {
     console.log('Change Date', name, event, selectedDate);
-    if (Platform.OS === 'ios') {
-      selectedDate = selectedDate.toISOString();
-      if (onMyChange && typeof onMyChange === 'function') onMyChange(name, selectedDate);
-    }
+    if (Platform.OS === 'ios') selectedDate = selectedDate.toISOString();
     else {
       setIsDatePickerModalVisible(false);
-      if (event.type === 'neutralButtonPressed') selectedDate = undefined; else if (event.type === 'set') {
+      if (event.type === 'neutralButtonPressed') selectedDate = undefined;
+      else if (event.type === 'set') {
         setDate(selectedDate);
         selectedDate = selectedDate.toISOString();
       }
-      else {
-        // User dismissed the picker without selecting (e.g., by tapping outside)
-        return;
-      }
+      // The picker was dismissed without a choice, by tapping outside it
+      else return;
     }
-
-    // Validate start_date against end_date if both will exist
-    if (selectedDate && name === 'start_date' && values.end_date) {
-      if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate);
-      else dispatch(openedMessageModal({message: 'Start Date must be before End Date.', title: 'Date Error!'}));
-    }
-    // Validate end_date against start_date if both will exist
-    else if (selectedDate && name === 'end_date' && values.start_date) {
-      if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate);
-      else dispatch(openedMessageModal({message: 'Start Date must be before End Date.', title: 'Date Error!'}));
-    }
-    // No validation needed, just set the value
-    else setFieldValue(name, selectedDate);
-    console.log('After setFieldValue, name:', name, 'selectedDate:', selectedDate);
+    setValue(name, selectedDate);
   };
 
   /* Render Functions */

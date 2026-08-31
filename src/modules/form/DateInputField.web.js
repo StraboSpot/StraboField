@@ -1,25 +1,26 @@
 import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
+import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import {useDispatch} from 'react-redux';
 
 import {formStyles} from '../form';
-import {openedMessageModal} from '../home/home.slice';
 
 const DateInputField = ({
-                          field: {name, value},
-                          form: {setFieldValue, values},
                           isDisplayOnly,
                           isShowTime,
                           isShowTimeOnly,
                           label,
+                          name,
+                          setFieldValueOverride,  // For a page that does its own work on a change
                         }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
+  const [{value}] = useField(name);
+  // Read the errors from the form rather than take useField's meta.error - see TextInputField
+  const {errors, setFieldValue} = useFormikContext();
 
   /* Local State */
 
@@ -27,6 +28,7 @@ const DateInputField = ({
 
   /* Derived Variables */
 
+  const setValue = setFieldValueOverride || setFieldValue;
   let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
         : moment(value).format('MM/DD/YYYY')
@@ -34,26 +36,13 @@ const DateInputField = ({
 
   /* Logic Helpers */
 
+  // Whatever is picked is written, even a date range in the wrong order: the survey's own validation catches that
+  // one, marking both dates and holding the save, the same as on a device
   const changeDate = (selectedDate) => {
     console.log('Change Date', name, selectedDate);
     setDate(selectedDate);
     selectedDate = selectedDate?.toISOString();
-
-    if (selectedDate && name === 'start_date' && values.end_date) {
-      if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate);
-      else {
-        console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
-      }
-    }
-    else if (selectedDate && name === 'end_date' && values.start_date) {
-      if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate);
-      else {
-        console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
-      }
-    }
-    else setFieldValue(name, selectedDate);
+    setValue(name, selectedDate);
   };
 
   /* Render Functions */
@@ -97,6 +86,7 @@ const DateInputField = ({
       )}
       {isDisplayOnly ? <Text style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}>{title}</Text>
         : renderDatePickerWeb()}
+      {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>
   );
 };

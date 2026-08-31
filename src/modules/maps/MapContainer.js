@@ -363,8 +363,8 @@ const MapContainer = forwardRef(({
       // in the same commit makes iOS drop the MessageModal presentation and freezes the app.
       console.error(err);
       return {
-        message: 'Error fetching data from tile count service. '
-          + 'Make sure you are pulling from the correct endpoint (Home → Miscellaneous → Custom Database Endpoint).',
+        message: 'Error fetching data from tile count service. Make sure you are pulling from the correct '
+          + 'endpoint (Home Menu -> Advanced Options -> Custom Database Endpoint).',
       };
     }
   };

@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
   },
   fieldError: {
     color: themes.WARNING_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
     textAlign: 'center',
   },
   fieldInfoText: {
@@ -62,6 +63,9 @@ const styles = StyleSheet.create({
   fieldLabelContainer: {
     flexDirection: 'row',
     width: '100%',
+  },
+  fieldRequired: {
+    color: themes.WARNING_COLOR,
   },
   fieldValue: {
     borderBottomColor: themes.MEDIUMGREY,

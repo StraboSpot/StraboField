@@ -2,12 +2,11 @@ import React, {useRef} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {DateInputField, NumberInputField} from '../form';
+import {DateInputField, FormikWrapper, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
@@ -70,52 +69,43 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderMetadataForm = () => {
     return (
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
         initialValues={spot.properties}
         innerRef={metadataFormRef}
-        onSubmit={values => console.log('Submitting form...', values)}
       >
-        {() => (
-          <>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={NumberInputField}
-                  editable={false}
-                  key={'id'}
-                  label={'ID'}
-                  name={'id'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'date'}
-                  label={'Date Created'}
-                  name={'date'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  name={'modified_timestamp'}
-                />
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </Formik>
+        <>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <NumberInputField
+                editable={false}
+                label={'ID'}
+                name={'id'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Created'}
+                name={'date'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Last Modified'}
+                name={'modified_timestamp'}
+              />
+            </ListItem.Content>
+          </ListItem>
+        </>
+      </FormikWrapper>
     );
   };
 

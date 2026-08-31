@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -36,6 +36,10 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
 
   const [initialNotesValues, setInitialNotesValues] = useState({note: initialNote});
   const [isShowTemplates, setIsShowTemplates] = useState(false);
@@ -69,7 +73,8 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   };
 
   const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.NOTE) {
+    if (formRef.current?.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.NOTE
+      && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
@@ -108,6 +113,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
         dispatch(editedSpotProperties({field: 'notes', value: currentForm.values.note, spotId: spotId}));
         await currentForm.resetForm();
       }
+      savedValuesRef.current = {...currentForm.values};
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
     }

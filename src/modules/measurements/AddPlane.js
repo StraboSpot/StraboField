@@ -33,7 +33,7 @@ const AddPlane = ({formName, formProps, isManualMeasurement, setChoicesViewKey, 
   return (
     <>
       {!isManualMeasurement && (
-        <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       )}
       <MainButtons
         formName={formName}
@@ -50,7 +50,7 @@ const AddPlane = ({formName, formProps, isManualMeasurement, setChoicesViewKey, 
         />
       )}
       <LittleSpacer/>
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
     </>
   );
 };

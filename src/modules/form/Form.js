@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import AcknowledgeInput from './AcknowledgeInput';
 import FieldInfoModal from './FieldInfoModal';
+import {isNegativeAllowed, isRequired} from './form.helpers';
 import styles from './form.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -13,14 +13,26 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, NumberInputField, SelectInputField, TextInputField, useForm} from '../form';
 
 const Form = ({
-                fieldCustomHeights,
                 getIsDisabled,
-                errors,
                 formName,
                 isReadOnly,
-                onMyChange,
                 renderInline,
+                // The fields a feature has to answer beyond what its survey asks for. A sed lithology's depend on the
+                // Spot it belongs to, which a survey rule cannot see, so the page works them out and names them
+                requiredFields = [],
+                // Formik's own setter, which arrives with the {...formProps} every caller spreads in. Only the two
+                // writes Form makes on its own behalf reach it - the defaults set on mount and the clearing of a
+                // field made irrelevant - since a page that passed setFieldValueOverride takes the field writes itself
                 setFieldValue,
+                // The page's own setter, handed to every field in place of Formik's - see SelectInputField
+                setFieldValueOverride,
+                // Used for number fields in place of setFieldValueOverride, which every other field type gets too. A
+                // form that only needs its numeric fields intercepted passes this instead, so its other fields keep
+                // whatever the default path writes for them
+                setNumberFieldValueOverride,
+                // The fields of the sibling surveys a tabbed page edits the same object through. Clearing needs
+                // them; rendering must not have them, or a tab would draw its siblings' fields
+                siblingSurvey,
                 subkey,
                 surveyFragment,
                 values,
@@ -36,18 +48,32 @@ const Form = ({
   /* Derived Variables */
 
   const survey = surveyFragment || getSurvey(formName);
-  const relevantFields = Object.values(survey.filter(item => isRelevant(item, values)));
+  // A choice on one tab can make a field on another irrelevant, so clearing sees every tab's fields. This
+  // survey's own definition wins where both define a field: the composition tab shows volcaniclastic_type
+  // whatever the lithology is, the lithology tab only for a volcaniclastic one, and each has to go on meaning
+  // what it says while you are editing it
+  const unseenSiblingFields = (siblingSurvey || []).filter(
+    siblingField => !survey.some(field => field.name === siblingField.name));
+  const clearingSurvey = [...survey, ...unseenSiblingFields];
+  // A subkey'd form edits one nested object, e.g. associated_orientation[0], so relevance, defaults and clearing
+  // all read that object rather than the values around it
+  const formValues = subkey ? values?.[subkey]?.[0] || {} : values;
+  // Relevance turns on whether the fields it depends on are filled in, and a field the user has emptied still
+  // holds an empty string. Read those as absent, the way saving does, so the fields they drive hide as soon as
+  // their own field is cleared rather than at the next save
+  const filledValues = Object.fromEntries(Object.entries(formValues).filter(([, value]) => !isEmpty(value)));
+  const relevantFields = survey.filter(item => isRelevant(item, filledValues));
 
   /* Side Effects */
 
   useEffect(() => {
     // Set default values
-    survey.filter(item => isRelevant(item, values)).forEach((field) => {
+    relevantFields.forEach((field) => {
       const [fieldType, choicesListName] = field.type.split(' ');
       if (fieldType === 'select_one' || fieldType === 'select_multiple') {
         const choiceValues = getChoices(formName).filter(c => c.list_name === choicesListName).map(c => c.name);
-        if (isEmpty(values[field.name]) && field.default && choiceValues.includes(field.default)) {
-          setFieldValue(field.name, field.default, false);
+        if (isEmpty(formValues[field.name]) && field.default && choiceValues.includes(field.default)) {
+          setFieldValue(getFieldPath(field.name), field.default, false);
         }
       }
     });
@@ -59,16 +85,16 @@ const Form = ({
 
   /* Logic Helpers */
 
-  // Wrap setFieldValue to also clear fields that become irrelevant after a change
-  const setFieldValueAndClearIrrelevant = (name, value, shouldValidate) => {
-    let newValues = {...values, [name]: value};
+  // Clear the fields that setting the named field to the given value makes irrelevant
+  const clearFieldsMadeIrrelevant = (fieldName, value) => {
+    let newValues = {...formValues, [fieldName]: value};
 
     // Iteratively clear fields that now have values but are no longer relevant
     let changed = true;
     while (changed) {
       changed = false;
-      survey.forEach((field) => {
-        if (field.name !== name && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
+      clearingSurvey.forEach((field) => {
+        if (field.name !== fieldName && newValues[field.name] !== undefined && !isRelevant(field, newValues)) {
           newValues = {...newValues, [field.name]: undefined};
           changed = true;
         }
@@ -76,43 +102,50 @@ const Form = ({
     }
 
     // Apply clears for fields that became irrelevant
-    survey.forEach((field) => {
-      if (field.name !== name && values[field.name] !== undefined && newValues[field.name] === undefined) {
-        setFieldValue(field.name, undefined, false);
+    clearingSurvey.forEach((field) => {
+      if (field.name !== fieldName && formValues[field.name] !== undefined && newValues[field.name] === undefined) {
+        setFieldValue(getFieldPath(field.name), undefined, false);
       }
     });
-
-    setFieldValue(name, value, shouldValidate);
   };
+
+  // Formik names a subkey'd field by its path; the survey and formValues key it by its bare name
+  const getFieldName = path => subkey ? path.split('[0].')[1] : path;
+
+  const getFieldPath = name => subkey ? subkey + '[0].' + name : name;
+
+  // Every field writes through one of these: it clears the fields the change makes irrelevant, then hands the value
+  // on to the setter the page gave for that field, or to Formik's own where the page gave none
+  const getFieldSetter = pageSetter => (path, value, shouldValidate) => {
+    clearFieldsMadeIrrelevant(getFieldName(path), value);
+    (pageSetter || setFieldValue)(path, value, shouldValidate);
+  };
+
+  const isFieldRequired = field => isRequired(field, filledValues) || requiredFields.includes(field.name);
 
   /* Render Functions */
 
   const renderAcknowledgeInput = (field) => {
     return (
-      <Field
-        as={AcknowledgeInput}
+      <AcknowledgeInput
         disabled={isReadOnly}
-        key={field.name}
         label={field.label}
         name={field.name}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
-        setFieldValue={setFieldValueAndClearIrrelevant}
+        setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
       />
     );
   };
 
   const renderDateInput = (field, isShowTimeOnly = false) => {
     return (
-      <Field
-        component={DateInputField}
+      <DateInputField
         isDisplayOnly={isReadOnly}
         isShowTimeOnly={isShowTimeOnly}
-        key={field.name}
         label={field.label}
         name={field.name}
-        onMyChange={onMyChange}
-        setFieldValue={setFieldValueAndClearIrrelevant}
+        setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
       />
     );
   };
@@ -158,20 +191,21 @@ const Form = ({
 
   const renderNumberInput = (field) => {
     return (
-      <Field
-        component={NumberInputField}
+      <NumberInputField
         editable={!isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        isDecimalAllowed={field.type !== 'integer'}
+        isNegativeAllowed={isNegativeAllowed(field)}
+        isRequired={isFieldRequired(field)}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
+        name={getFieldPath(field.name)}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
+        setFieldValueOverride={getFieldSetter(setNumberFieldValueOverride || setFieldValueOverride)}
       />
     );
   };
 
-  const renderSelectInput = (field, isExpanded) => {
+  const renderSelectInput = (field, shouldShowChoiceList) => {
     const isDisabled = getIsDisabled ? getIsDisabled(field.name) : isReadOnly;
     const [fieldType, choicesListName] = field.type.split(' ');
     const fieldChoices = getChoices(formName).filter(choice => choice.list_name === choicesListName);
@@ -184,38 +218,34 @@ const Form = ({
     });
 
     return (
-      <Field
+      <SelectInputField
         appearance={field.appearance}
-        as={SelectInputField}
         choices={fieldChoicesCopy}
-        errors={errors}
         isReadOnly={isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        isRequired={isFieldRequired(field)}
+        isSingleSelect={fieldType === 'select_one'}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
+        name={getFieldPath(field.name)}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
-        setFieldValue={setFieldValueAndClearIrrelevant}
-        showExpandedChoices={isExpanded}
-        single={fieldType === 'select_one'}
+        setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
+        shouldShowChoiceList={shouldShowChoiceList}
       />
     );
   };
 
   const renderTextInput = (field) => {
     return (
-      <Field
+      <TextInputField
         appearance={field.appearance}
         // autoFocus={field.name === 'name'}
-        component={TextInputField}
         editable={getIsDisabled ? !getIsDisabled(field.name) : !isReadOnly}
-        key={subkey ? subkey + '[0].' + field.name : field.name}
+        isRequired={isFieldRequired(field)}
         label={field.label}
-        name={subkey ? subkey + '[0].' + field.name : field.name}
-        onMyChange={onMyChange}
+        name={getFieldPath(field.name)}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
+        setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
       />
     );
   };

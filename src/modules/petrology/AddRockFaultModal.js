@@ -21,7 +21,7 @@ const AddRockFaultModal = ({formName, formProps, setChoicesViewKey, survey}) => 
         mainKeys={firstKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} surveyFragment={lastKeysFields}/>
     </>
   );
 };

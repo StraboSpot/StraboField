@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -10,12 +9,12 @@ import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
-import {FormFlatList, SwitchWrapper} from '../../../shared/ui';
+import {SwitchWrapper} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import {DateInputField, formStyles, NumberInputField} from '../../form';
+import {DateInputField, FormFlatList, FormikWrapper, formStyles, NumberInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
@@ -193,47 +192,39 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   // Dataset ID & Timestamps
   const renderMetadataForm = () => {
     return (
-      <Formik initialValues={dataset}>
-        {() => (
-          <>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={NumberInputField}
-                  editable={false}
-                  key={'id'}
-                  label={'ID'}
-                  name={'id'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'date'}
-                  label={'Date Created'}
-                  name={'date'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  name={'modified_timestamp'}
-                />
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </Formik>
+      <FormikWrapper initialValues={dataset}>
+        <>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <NumberInputField
+                editable={false}
+                label={'ID'}
+                name={'id'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Created'}
+                name={'date'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Last Modified'}
+                name={'modified_timestamp'}
+              />
+            </ListItem.Content>
+          </ListItem>
+        </>
+      </FormikWrapper>
     );
   };
 

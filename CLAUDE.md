@@ -174,7 +174,27 @@ properties (measurements, images, notes, samples) + modified timestamp, with a p
 
 **Dynamic forms:** XLSForm-style JSON in `/src/assets/forms/` (`survey` + `choices`), 14 categories, with skip logic,
 constraint validation, and a label dictionary. Rendered by `/src/modules/form/`. To add a field: edit the form JSON, add
-a custom component in `form/` if needed, wire validation and slice state.
+a custom component in `form/` if needed, wire validation and slice state. Every form is set up through
+`form/FormikWrapper.js` — the only place `<Formik>` is used — which derives the survey validation from a `formName`
+prop; passing it `setIsFormInvalid` also validates as the user types so Save can be disabled while errors remain.
+The input fields (`TextInputField`, `NumberInputField`, `DateInputField`, `SelectInputField`, `AcknowledgeInput`)
+read their own value, errors and setter from Formik through `useField`, so each is given a `name` and rendered
+directly — Formik's `<Field>` and `<Form>` are not used anywhere. Read the errors off the form bag, never
+`useField`'s `meta.error`: a nested field is named by its path (`associated_orientation[0].plunge`) but its error is
+keyed by that path as one flat string, which `meta.error` resolves as a path into nested objects and so never finds.
+Writes go through the optional `setFieldValueOverride` prop, which falls back to Formik's own setter. A page with
+work to do on a change (clear the fields it makes irrelevant, fill in a field it implies, save after a pause) passes
+its own setter there and takes on writing the value; `Form.js` builds one per field with `getFieldSetter`, folding
+the clearing together with the page's own `setFieldValueOverride`/`setNumberFieldValueOverride`.
+`SelectInputField` additionally takes `onValueChanged`, which is the opposite rather than a second way to do the
+same thing: the imperative name means the page does the write, the past-tense one means it is already done and the
+page only has something of its own to run afterwards. Reach for the override only where the write itself has to
+change — writing a paired field, or clearing around it — and `onValueChanged` otherwise.
+Every setter a page passes is named for the work it adds (`setFieldValueAndKeepProportions`,
+`setFieldValueAndSaveAfterPause`), so no `on*` name in this chain performs a write.
+`useForm().validateForm` returns `{errors, values}` — the values being what to save (trimmed, numbers converted from
+text, empty and irrelevant fields dropped). It writes nothing back, and no validate anywhere may modify the values it
+is given: forms are validated as they are typed in, so a rewritten value lands under the cursor.
 
 **Maps:** three types — regular basemaps, georeferenced image basemaps, strat sections. State in `maps.slice.js`. Native
 uses `@rnmapbox/maps`; web uses `mapbox-gl` + `react-map-gl`.

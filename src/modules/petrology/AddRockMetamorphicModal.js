@@ -183,7 +183,7 @@ const AddRockMetamorphicModal = ({formName, formProps, setChoicesViewKey, survey
         mainKeys={fourthKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} surveyFragment={lastKeysFields}/>
       {isFaciesModalVisible && renderFaciesModal()}
     </>
   );

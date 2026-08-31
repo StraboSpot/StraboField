@@ -25,6 +25,7 @@ import {
   editedSpotImages,
   editedSpotProperties,
 } from '../modules/spots/spots.slice';
+import {isAuthenticationError} from '../services/network/serverRequests.helpers';
 import {
   deleteDataset,
   moveSpotToDataset,
@@ -32,25 +33,56 @@ import {
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
 } from '../services/network/serverRequests.web';
-import {isEmpty} from '../shared/helpers';
+import {isEmpty, toError} from '../shared/helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends
 let pendingDragSpotIds = new Set();
 
-const alertAuthenticationError = () => {
-  Toast.hideAll();
-  window.alert(
-    'Authentication Error! Changes NOT saved. Your connection has timed out. Please log in to StraboSpot again.');
-  window.location.href = 'https://strabospot.org/';
+// A web edit goes straight to the server, so a failed request means the change is not saved anywhere. Only a
+// refused login is worth sending someone back to sign in for - a timeout, a server error or a rejected payload
+// used to do the same, throwing away both the real cause and whatever they were in the middle of.
+const reportSaveError = (err, toastId) => {
+  console.error('Error saving to the server', err);
+  if (isAuthenticationError(err)) {
+    Toast.hideAll();
+    window.alert(
+      'Authentication Error! Changes NOT saved. Your connection has timed out. Please log in to StraboSpot again.');
+    window.location.href = 'https://strabospot.org/';
+    return;
+  }
+  Toast.update(toastId, 'Changes NOT saved. ' + toError(err).message, {type: 'danger', duration: 6000});
+};
+
+// The server keeps one row per id and rejects the whole save when a single command carries the same id twice
+// ("ON CONFLICT DO UPDATE command cannot affect row a second time"), so anything that has ended up with two of
+// something could never be saved again. Send each id once and say in the log what was left out.
+const withoutDuplicateIds = (items, what) => {
+  const seenIds = new Set();
+  return (items || []).filter((item) => {
+    const id = item?.id ?? item?.properties?.id;
+    if (id === undefined || !seenIds.has(id)) {
+      if (id !== undefined) seenIds.add(id);
+      return true;
+    }
+    console.error(`Not sending a second ${what} with the id ${id} - the server can only hold one of it.`);
+    return false;
+  });
 };
 
 // Remove spotIds and images from dataset because those shouldn't go up to the server
 const cleanDatasets = (datasets) => {
-  return datasets.map((dataset) => {
+  return withoutDuplicateIds(datasets, 'dataset').map((dataset) => {
     const {spotIds, images, ...rest} = dataset;
+    if (rest.spots?.features) rest.spots = {...rest.spots, features: cleanSpots(rest.spots.features)};
     return rest;
   });
 };
+
+
+const cleanSpots = spots => withoutDuplicateIds(spots, 'Spot')
+  .map(spot => (spot.properties?.images
+    ? {...spot, properties: {...spot.properties, images: withoutDuplicateIds(spot.properties.images, 'image')}}
+    : spot));
 
 // Delete dataset, update Project on server DB
 const deleteDatasetListener = async (action, listenerApi) => {
@@ -75,7 +107,7 @@ const deleteDatasetListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -99,7 +131,7 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -130,7 +162,7 @@ const updateProjectListener = async (action, listenerApi) => {
   }
   catch (err) {
     listenerApi.dispatch(setProjectSaveStatus(PROJECT_SAVE_STATUS.ERROR));
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -164,7 +196,7 @@ const uploadProjectDatasetDeleteSpotListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -236,7 +268,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -277,7 +309,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
