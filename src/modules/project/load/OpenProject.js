@@ -91,7 +91,7 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
           onPress={i => setSelectedTabIndex(i)}
           selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
           selectedIndex={selectedTabIndex}
-          textStyle={{color: themes.PRIMARY_TEXT_COLOR}}
+          textStyle={{color: themes.PRIMARY_TEXT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
         />
         {selectedTabIndex === 1 && (
           <Text style={[commonStyles.standardDescriptionText, {

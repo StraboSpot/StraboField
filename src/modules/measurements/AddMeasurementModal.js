@@ -19,7 +19,7 @@ import {
 import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
@@ -351,7 +351,7 @@ const AddMeasurementModal = ({onPress}) => {
             onPress={onMeasurementTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
-            textStyle={{color: PRIMARY_TEXT_COLOR}}
+            textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
           />
         )}
         {!isSelectedAttitude && (

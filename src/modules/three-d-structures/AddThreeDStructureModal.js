@@ -10,7 +10,7 @@ import AddTensor from './AddTensor';
 import {AddFold, FoldGeometryChoices} from './fold-geometry';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormikWrapper, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -103,7 +103,7 @@ const AddThreeDStructureModal = () => {
             onPress={on3DStructureTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
-            textStyle={{color: PRIMARY_TEXT_COLOR}}
+            textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
           />
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.FOLD && (
             <AddFold

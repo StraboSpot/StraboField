@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {Form, FormikWrapper, FormSlider, MainButtons, useForm} from '../form';
 import {
   SAMPLE_FIRST_KEYS,
@@ -76,7 +76,7 @@ const SampleModalForm = ({
         onPress={onOrientedButtonPress}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
         selectedIndex={getSelectedOrientedIndex()}
-        textStyle={{color: PRIMARY_TEXT_COLOR}}
+        textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
       />
     </>
   );

@@ -11,7 +11,7 @@ import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
@@ -520,7 +520,7 @@ const MeasurementDetail = ({
         onPress={i => onSwitchPlanarTabular(i)}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
         selectedIndex={selectedMeasurement.type === 'planar_orientation' ? 0 : 1}
-        textStyle={{color: PRIMARY_ACCENT_COLOR}}
+        textStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
       />
     );
   };

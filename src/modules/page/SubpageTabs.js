@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {ButtonGroup} from '@rn-vui/base';
 
 import {toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, WARNING_COLOR} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
 import TruncatedText from '../../shared/ui/TruncatedText';
 import {useForm} from '../form';
 
@@ -23,8 +23,11 @@ const SubpageTabs = ({formCategory, invalidFields = [], onPress, selectedIndex, 
     const hasInvalidField = getSurvey([formCategory, subpageKey]).some(f => invalidFields.includes(f.name));
     return (
       <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}}>
-        <TruncatedText style={{flexShrink: 1}} title={toTitleCase(subpageKey.replace(/_/g, ' '))}/>
-        {hasInvalidField && <Text style={{color: WARNING_COLOR}}> *</Text>}
+        <TruncatedText
+          style={{flexShrink: 1, fontSize: SMALL_TEXT_SIZE}}
+          title={toTitleCase(subpageKey.replace(/_/g, ' '))}
+        />
+        {hasInvalidField && <Text style={{color: WARNING_COLOR, fontSize: SMALL_TEXT_SIZE}}> *</Text>}
       </View>
     );
   };
