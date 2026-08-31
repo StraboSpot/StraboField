@@ -13,6 +13,7 @@ const TextInputField = ({
                           customHeight,
                           editable = true,
                           isRequired,
+                          keyboardType,           // NumberInputField picks its own; a text field is given one
                           label,
                           name,
                           onBlurred,              // Runs as well as Formik's blur, which marks the field touched
@@ -74,6 +75,7 @@ const TextInputField = ({
       <TextInput
         autoCapitalize={autoCapitalize}
         editable={editable}
+        keyboardType={keyboardType}
         multiline={appearance === 'multiline' || appearance === 'full' || appearance === 'fill'}
         onBlur={(e) => {
           setIsFocused(false);

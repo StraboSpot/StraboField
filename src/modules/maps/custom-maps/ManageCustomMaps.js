@@ -105,7 +105,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   return (
     <>
       <AddButton onPress={() => getCustomMapDetails({})} title={'Add New Custom Map'}/>
-      <SectionDivider dividerText={'Current Custom Maps'}/>
+      <SectionDivider dividerText={'Custom Maps'}/>
       {isSelected && <Text style={commonStyles.standardDescriptionText}>Endpoint: {endpoint.replace('/db', '')}</Text>}
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
