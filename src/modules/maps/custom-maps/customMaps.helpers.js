@@ -1,7 +1,18 @@
-import {MAP_TYPE_NAMES} from './customMaps.constants';
+import {CUSTOM_MAP_SOURCES, MAP_TYPE_NAMES} from './customMaps.constants';
 import {isEmpty} from '../../../shared/helpers';
 
+export const getLiveCustomMaps = customMaps => Object.values(customMaps)
+  .filter(map => isLiveCustomMapSource(map.source) && !map.overlay);
+
+export const getLiveCustomOverlays = customMaps => Object.values(customMaps)
+  .filter(map => isLiveCustomMapSource(map.source) && map.overlay);
+
 export const getMapTypeName = source => MAP_TYPE_NAMES[source];
+
+// A map from a provider still offered. Maps saved under the retired ones are still in projects, so their source
+// is recognized elsewhere, but they are not listed among the basemaps and cannot be opened from the custom maps list.
+export const isLiveCustomMapSource = source => source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES
+  || source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS;
 
 // A style pasted as a full mapbox://styles/user/style URL is stored, and compared, as user/style.
 export const normalizeCustomMapId = (id, source) =>
