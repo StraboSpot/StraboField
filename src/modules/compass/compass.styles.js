@@ -11,6 +11,13 @@ const styles = StyleSheet.create({
     color: themes.PRIMARY_ACCENT_COLOR,
     fontSize: 16,
   },
+  // Green wash that flashes over the face on a successful measurement grab (issue #911 visual cue).
+  captureFlash: {
+    backgroundColor: themes.POSITIVE_COLOR,
+    left: 0,
+    position: 'absolute',
+    top: 0,
+  },
   cardinal: {
     color: themes.DARKGREY,
     fontSize: 16,
@@ -39,14 +46,53 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  compassImage: {
+    alignItems: 'center',
+    height: 175,
+    justifyContent: 'center',
+    width: 175,
+  },
   compassImageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 12,
   },
   compassMatrixHeader: {
     fontWeight: 'bold',
     marginBottom: 5,
     textAlign: 'center',
+  },
+  // Single border wrapping the control buttons and the compass face as one card.
+  compassSection: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderColor: themes.MEDIUMGREY,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginHorizontal: 10,
+    marginVertical: 8,
+    overflow: 'hidden',
+  },
+  controlRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingVertical: 4,
+  },
+  // Fixed width so every segmented control starts at the same x and the rows line up in a column.
+  controlRowLabel: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: 14,
+    fontWeight: '600',
+    marginRight: 8,
+    width: 72,
+  },
+  // Opaque and raised above the compass (a later sibling) so the enlarged dial can never paint over
+  // or steal taps from these controls — that overlap is what let a tap on a control grab a measurement.
+  controlsGroup: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    zIndex: 10,
   },
   dial: {
     alignItems: 'center',
@@ -99,6 +145,32 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  segmentButton: {
+    borderRadius: 8,
+    margin: 3,
+  },
+  segmentContainer: {
+    backgroundColor: themes.LIGHTGREY,
+    borderRadius: 10,
+    borderWidth: 0,
+    flex: 1,
+    height: 36,
+    marginHorizontal: 0,
+    marginVertical: 0,
+  },
+  segmentSelected: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR_FADED_40,
+    borderRadius: 8,
+  },
+  segmentText: {
+    color: themes.DARKGREY,
+    fontSize: 14,
+  },
+  segmentTextSelected: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    fontSize: 14,
+    fontWeight: '600',
   },
   sliderContainer: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,

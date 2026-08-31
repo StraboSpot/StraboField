@@ -12,7 +12,7 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import {setNextAutoSaveTime} from '../../connections/connections.slice';
 
-const BackupStatusModal = ({isVisible, onClose}) => {
+const BackupStatusModal = ({isVisible, onClose, onUpload}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -29,11 +29,11 @@ const BackupStatusModal = ({isVisible, onClose}) => {
 
   return (
     <ModalWrapper
-      actionTitle={'OK'}
+      actionTitle={'Upload to Server'}
       closeModal={onClose}
       headerTitle={'Auto Backup Status'}
       isVisible={isVisible}
-      onActionPressed={onClose}
+      onActionPressed={onUpload}
       onBackdropPress={onClose}
       overlayStyleOverride={{height: 'auto'}}
       showCancelButton={false}
@@ -72,6 +72,9 @@ const BackupStatusModal = ({isVisible, onClose}) => {
       {!isSaveVisible && (
         <Text style={commonStyles.noValueText}>No pending auto backups.</Text>
       )}
+      <Text style={[commonStyles.noValueText, {fontSize: SMALL_TEXT_SIZE, paddingHorizontal: 10, paddingTop: 10}]}>
+        {'Auto-saves are stored locally on this device and are not uploaded to the server.'}
+      </Text>
     </ModalWrapper>
   );
 };
