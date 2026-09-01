@@ -5,7 +5,7 @@ import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormikWrapper, useForm} from '../form';
 
-const ReportForm = forwardRef(({initialValues}, formRef) => {
+const ReportForm = forwardRef(({initialValues, setIsFormInvalid}, formRef) => {
   /* Data Hooks */
   const {getRelevantFields, getSurvey} = useForm();
 
@@ -55,7 +55,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
       formName={REPORT_FORM_NAME}
       initialValues={initialValues}
       innerRef={formRef}
-      validateOnChange={false}
+      setIsFormInvalid={setIsFormInvalid}
     >
       {formProps => (
         <View style={{flex: 1}}>
