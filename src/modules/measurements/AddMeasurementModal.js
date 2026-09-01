@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, useWindowDimensions, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {Formik} from 'formik';
@@ -21,13 +21,12 @@ import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measu
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
-import {ENLARGED_COMPASS_MODAL_MAX_HEIGHT, getEnlargedCompassModalWidth} from '../compass/compass.constants';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
-import CompassControls from '../compass/CompassControls';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
@@ -44,13 +43,11 @@ const AddMeasurementModal = ({onPress}) => {
   const dispatch = useDispatch();
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
-  const isCompassEnlarged = useSelector(state => state.compass.isCompassEnlarged);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {height, width} = useWindowDimensions();
   const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -351,29 +348,25 @@ const AddMeasurementModal = ({onPress}) => {
         )}
         {!isShowTemplates && (
           <>
-            {isManualMeasurement ? (
+            {Platform.OS !== 'web' && (
               <>
-                <CompassControls
-                  isManual={isManualMeasurement}
-                  onToggleManual={setIsManualMeasurement}
-                  showManualToggle={Platform.OS !== 'web'}
-                />
-                <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', padding: 5}}>
+                  <Text style={{}}>Compass</Text>
+                  <SwitchWrapper onValueChange={value => setIsManualMeasurement(value)} value={isManualMeasurement}/>
+                  <Text style={{}}>Manual</Text>
+                </View>
               </>
+
+            )}
+            {isManualMeasurement ? (
+              <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
             ) : (
               <>
-                <View style={compassStyles.compassSection}>
-                  <CompassControls
-                    isManual={isManualMeasurement}
-                    onToggleManual={setIsManualMeasurement}
-                    showManualToggle={Platform.OS !== 'web'}
-                  />
-                  <Compass
-                    formValues={formProps.values}
-                    setMeasurements={setMeasurements}
-                    sliderValue={sliderValue}
-                  />
-                </View>
+                <Compass
+                  formValues={formProps.values}
+                  setMeasurements={setMeasurements}
+                  sliderValue={sliderValue}
+                />
                 <View style={compassStyles.sliderContainer}>
                   <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
                   <SliderBar
@@ -429,9 +422,7 @@ const AddMeasurementModal = ({onPress}) => {
         closeModal={onCloseButton}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
-        overlayStyleOverride={isCompassEnlarged && !isManualMeasurement
-          ? {maxHeight: ENLARGED_COMPASS_MODAL_MAX_HEIGHT, width: getEnlargedCompassModalWidth(width, height)}
-          : {height: '80%'}}
+        overlayStyleOverride={{height: '80%'}}
         showActionButton={!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement}
         showCancelButton={false}
         showCloseButton

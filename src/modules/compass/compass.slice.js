@@ -3,8 +3,6 @@ import {createSlice} from '@reduxjs/toolkit';
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 
 const initialCompassState = {
-  isClassicCompass: true,
-  isCompassEnlarged: false,
   measurements: {},
   measurementTypes: [COMPASS_TOGGLE_BUTTONS.PLANAR],
 };
@@ -16,12 +14,6 @@ const compassSlice = createSlice({
   reducers: {
     resetCompassState() {
       return initialCompassState;
-    },
-    setIsClassicCompass(state, action) {
-      state.isClassicCompass = action.payload;
-    },
-    setIsCompassEnlarged(state, action) {
-      state.isCompassEnlarged = action.payload;
     },
     setCompassMeasurements(state, action) {
       state.measurements = action.payload;
@@ -36,8 +28,6 @@ export const {
   resetCompassState,
   setCompassMeasurements,
   setCompassMeasurementTypes,
-  setIsClassicCompass,
-  setIsCompassEnlarged,
 } = compassSlice.actions;
 
 export default compassSlice.reducer;

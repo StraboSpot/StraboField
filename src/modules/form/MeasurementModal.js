@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Platform, ScrollView, Text, useWindowDimensions, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -7,12 +7,12 @@ import {useForm} from '.';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
+import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
+import Spacer from '../../shared/ui/Spacer';
 import Compass from '../compass/Compass';
-import {ENLARGED_COMPASS_MODAL_MAX_HEIGHT, getEnlargedCompassModalWidth} from '../compass/compass.constants';
 import compassStyles from '../compass/compass.styles';
-import CompassControls from '../compass/CompassControls';
 import ManualMeasurement from '../compass/ManualMeasurement';
 
 const MeasurementModal = ({
@@ -26,9 +26,6 @@ const MeasurementModal = ({
 
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
-  const isCompassEnlarged = useSelector(state => state.compass.isCompassEnlarged);
-
-  const {height, width} = useWindowDimensions();
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
 
@@ -79,43 +76,33 @@ const MeasurementModal = ({
     <ModalWrapper
       closeModal={() => setIsMeasurementModalVisible(false)}
       headerTitle={measurementsGroupLabel}
-      overlayStyleOverride={isCompassEnlarged && !isManualMeasurement
-        ? {maxHeight: ENLARGED_COMPASS_MODAL_MAX_HEIGHT, width: getEnlargedCompassModalWidth(width, height)}
-        : undefined}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
       <ScrollView>
+        {Platform.OS === 'ios' && (
+          <OutlineButton
+            onPress={() => setIsManualMeasurement(!isManualMeasurement)}
+            title={isManualMeasurement ? 'Switch to Compass Input' : 'Manually Add Measurement'}
+          />
+        )}
         {isManualMeasurement ? (
-          <>
-            <CompassControls
-              isManual={isManualMeasurement}
-              onToggleManual={setIsManualMeasurement}
-              showManualToggle={Platform.OS === 'ios'}
-            />
-            <ManualMeasurement
-              addAttributeMeasurement={addAttributeMeasurement}
-              measurementTypes={compassMeasurementTypes}
-              setAttributeMeasurements={setMeasurements}
-              setSliderValue={setSliderValue}
-              sliderValue={sliderValue}
-            />
-          </>
+          <ManualMeasurement
+            addAttributeMeasurement={addAttributeMeasurement}
+            measurementTypes={compassMeasurementTypes}
+            setAttributeMeasurements={setMeasurements}
+            setSliderValue={setSliderValue}
+            sliderValue={sliderValue}
+          />
         ) : (
           <>
-            <View style={compassStyles.compassSection}>
-              <CompassControls
-                isManual={isManualMeasurement}
-                onToggleManual={setIsManualMeasurement}
-                showManualToggle={Platform.OS === 'ios'}
-              />
-              <Compass
-                closeCompass={() => setIsMeasurementModalVisible(false)}
-                setAttributeMeasurements={setMeasurements}
-                sliderValue={sliderValue}
-              />
-            </View>
+            <Spacer/>
+            <Compass
+              closeCompass={() => setIsMeasurementModalVisible(false)}
+              setAttributeMeasurements={setMeasurements}
+              sliderValue={sliderValue}
+            />
             <View style={compassStyles.sliderContainer}>
               <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
               <SliderBar
