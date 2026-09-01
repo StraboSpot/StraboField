@@ -65,7 +65,6 @@ const useReportModal = ({openSpotInNotebook}) => {
     const isSpotsObjChanged = !isEqual(reportSpots, checkedSpotsIds);
     const isTagsObjChanged = !isEqual(reportTags, checkedTagsIds);
     if ((formRef.current && formRef.current.dirty) || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
-      const formCurrent = formRef?.current || {};
       alert(
         'Unsaved Changes',
         'Would you like to save your memo before ' + (itemText ? 'navigating to this ' + itemText : 'continuing') + '?',
@@ -77,8 +76,7 @@ const useReportModal = ({openSpotInNotebook}) => {
           {
             text: 'Yes',
             onPress: async () => {
-              await saveReport(formCurrent);
-              go();
+              if (await saveReport()) go();
             },
           },
         ],
@@ -110,6 +108,8 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const handleTagPressedCont = tag => checkReportChanged('Tag', () => goToTag(tag));
 
+  // Reports whether the memo was saved. A save refused for a field in error has already alerted about it, so the
+  // caller stays where it is for that field to be fixed rather than carrying on and losing the edit.
   const saveReport = async () => {
     try {
       console.log('Saving report ...');
@@ -120,12 +120,17 @@ const useReportModal = ({openSpotInNotebook}) => {
       editedReport.images = updatedImages;
       editedReport.spots = checkedSpotsIds;
       editedReport.tags = checkedTagsIds;
-      let updatedReports = reports.filter(r => r.id !== editedReport.id);
-      updatedReports.push({...editedReport});
+      const updatedReports = [...reports];
+      // Saving an edit must leave the memo where it is, so write it back into its own place in the list
+      const i = updatedReports.findIndex(r => r.id === editedReport.id);
+      if (i === -1) updatedReports.push({...editedReport});
+      else updatedReports.splice(i, 1, {...editedReport});
       dispatch(updatedProject({field: 'reports', value: updatedReports}));
+      return true;
     }
     catch (err) {
       console.error('Error saving report data', err);
+      return false;
     }
   };
 
@@ -144,8 +149,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   };
 
   const handleSavePressed = async () => {
-    await saveReport();
-    closeModal();
+    if (await saveReport()) closeModal();
   };
 
   const handleSpotChecked = (spotId) => {
