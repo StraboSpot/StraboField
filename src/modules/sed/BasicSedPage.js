@@ -4,6 +4,7 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {INTERPRETATIONS_SUBPAGES, LITHOLOGY_SUBPAGES, STRUCTURE_SUBPAGES} from './sed.constants';
+import {isLithologyRequiredForInterval} from './sed.helpers';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -24,7 +25,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getSiblingSurvey} = useForm();
+  const {getLabel, getSiblingSurvey} = useForm();
 
   /* Local State */
 
@@ -36,6 +37,12 @@ const BasicSedPage = ({isReadOnly, page}) => {
   /* Derived Variables */
 
   const attributes = spot && spot.properties && spot.properties.sed && spot.properties.sed[page.key] || [];
+  const intervalCharacter = spot?.properties?.sed?.character;
+  // There is no field to mark the requirement on, and the empty list is the only place it is ever live
+  const isLithologyRequired = page.key === PAGE_KEYS.LITHOLOGIES && isLithologyRequiredForInterval(spot);
+  const emptyListText = 'No ' + page.label + (isLithologyRequired
+    ? '.\n\nAt least one is required for ' + getLabel(intervalCharacter, ['sed', 'interval']) + ' intervals.'
+    : '');
 
   /* Side Effects */
 
@@ -124,7 +131,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={
-            <ListEmptyText onPress={!isReadOnly && addAttribute} text={'No ' + page.label}/>
+            <ListEmptyText onPress={!isReadOnly && addAttribute} text={emptyListText}/>
           }
           data={attributes}
           keyExtractor={(item, index) => index.toString()}

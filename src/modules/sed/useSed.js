@@ -11,7 +11,7 @@ import {
   STRUCTURE_SUBPAGES,
   Y_MULTIPLIER,
 } from './sed.constants';
-import {setSedFieldValue} from './sed.helpers';
+import {isLithologyRequiredForInterval, setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
@@ -183,6 +183,7 @@ const useSed = () => {
 
   /* Exported Functions */
 
+  // Reports whether the feature was deleted, so the page it was deleted from only closes on one that was
   const deleteSedFeature = (key, spot, selectedFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
@@ -195,6 +196,7 @@ const useSed = () => {
       // ToDo Check if any spots mapped on this strat section before deleting
       // console.log('Delete not implemented yet.');
       alert('Notice', 'Unable to delete. This feature has not been implemented yet.');
+      return false;
     }
     else if (pageKey === PAGE_KEYS.BEDDING) {
       if (editedSedData[pageKey].beds) {
@@ -204,11 +206,18 @@ const useSed = () => {
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
     else {
-      editedSedData[pageKey] = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
+      const remainingFeatures = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
+      if (pageKey === PAGE_KEYS.LITHOLOGIES && isEmpty(remainingFeatures) && isLithologyRequiredForInterval(spot)) {
+        alert('Cannot Remove', 'At least one lithology is required for '
+          + getLabel(editedSedData.character, ['sed', 'interval']) + ' intervals.');
+        return false;
+      }
+      editedSedData[pageKey] = remainingFeatures;
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    return true;
   };
 
   const getBeddingTitle = (bedding) => {

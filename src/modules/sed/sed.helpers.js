@@ -28,9 +28,9 @@ export const getCleanedImageOverlay = (values) => {
 // The fields a lithology has to answer when the Spot it belongs to is an interval mapped on a strat section. Their
 // surveys mark them optional because a lithology on an ordinary Spot does not need them - it is the interval that
 // makes them required, and a survey rule cannot see the Spot it is being filled in for. The same rules are reported
-// at save time by validateLithologiesPage, together with the ones no single field can carry, so keep the two in step.
+// at save time by validateLithologiesPage, so keep the two in step.
 export const getRequiredLithologyKeys = (lithology, spot) => {
-  if (!isStratInterval(spot) || !LITHOLOGY_INTERVAL_CHARACTERS.includes(spot.properties?.sed?.character)) return [];
+  if (!isLithologyRequiredForInterval(spot)) return [];
   const requiredKeys = ['primary_lithology'];
   // Which grain size a siliciclastic needs is not known until its type is chosen, so ask for the type first
   if (lithology.primary_lithology === 'siliciclastic') {
@@ -63,6 +63,11 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
       return undefined;
   }
 };
+
+// A bed, interbedded, mixed or package interval is described by its lithologies, so it takes at least one. The
+// Lithologies list says so while it is empty, and deleting the last one is refused.
+export const isLithologyRequiredForInterval = spot => isStratInterval(spot)
+  && LITHOLOGY_INTERVAL_CHARACTERS.includes(spot?.properties?.sed?.character);
 
 export const setSedFieldValue = (formCurrent, name, value) => {
   if (name === 'siliciclastic_type' && (value === 'claystone' || value === 'mudstone')) {

@@ -92,30 +92,26 @@ const useSedValidation = () => {
 
     // Validation checks for Lithologies page
     const validateLithologiesPage = () => {
+      // Only ever runs from saving a lithology, which is spliced in before the check, so there is never an empty
+      // list to catch here - the Lithologies page states that requirement itself
       if (isMappedInterval && LITHOLOGY_INTERVAL_CHARACTERS.includes(sed.character)) {
-        if (!isEmpty(sed.lithologies) && sed.lithologies.length > 0) {
-          sed.lithologies.forEach((lithology, n) => {
-            if (!lithology.primary_lithology) {
-              errorMessages.push('Primary Lithology: Required for lithology ' + (n + 1));
-            }
-            if (lithology.primary_lithology === 'siliciclastic' && !getSiliciclasticGrainSize(lithology)) {
-              // Name the grain size field the chosen type actually uses, so it can be found on the Texture tab
-              const grainSizeKey = getSiliciclasticGrainSizeKey(lithology.siliciclastic_type);
-              errorMessages.push(grainSizeKey
-                ? getLabel(grainSizeKey, ['sed', 'texture']) + ': Required for lithology ' + (n + 1) + '.'
-                : 'Siliciclastic Type: Required for lithology ' + (n + 1) + ', along with its grain size.');
-            }
-            if ((lithology.primary_lithology === 'limestone' || lithology.primary_lithology === 'dolostone')
-              && !lithology.dunham_classification) {
-              errorMessages.push('Dunham Classification: Required for lithology ' + (n + 1) + ' if the primary '
-                + 'lithology is limestone or dolostone.');
-            }
-          });
-        }
-        else {
-          errorMessages.push('Lithologies: Required for ' + getLabel(sed.character, ['sed', 'interval'])
-            + ' interval.');
-        }
+        sed.lithologies?.forEach((lithology, n) => {
+          if (!lithology.primary_lithology) {
+            errorMessages.push('Primary Lithology: Required for lithology ' + (n + 1));
+          }
+          if (lithology.primary_lithology === 'siliciclastic' && !getSiliciclasticGrainSize(lithology)) {
+            // Name the grain size field the chosen type actually uses, so it can be found on the Texture tab
+            const grainSizeKey = getSiliciclasticGrainSizeKey(lithology.siliciclastic_type);
+            errorMessages.push(grainSizeKey
+              ? getLabel(grainSizeKey, ['sed', 'texture']) + ': Required for lithology ' + (n + 1) + '.'
+              : 'Siliciclastic Type: Required for lithology ' + (n + 1) + ', along with its grain size.');
+          }
+          if ((lithology.primary_lithology === 'limestone' || lithology.primary_lithology === 'dolostone')
+            && !lithology.dunham_classification) {
+            errorMessages.push('Dunham Classification: Required for lithology ' + (n + 1) + ' if the primary '
+              + 'lithology is limestone or dolostone.');
+          }
+        });
       }
     };
 

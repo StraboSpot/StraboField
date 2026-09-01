@@ -157,15 +157,18 @@ const BasicPageDetail = ({
   };
 
   const deleteFeature = () => {
-    deleteFeatureTags([selectedFeature]);
     if (groupKey === 'pet') deletePetFeature(pageKey, spot, selectedFeature);
-    else if (groupKey === 'sed') deleteSedFeature(pageKey, spot, selectedFeature);
+    else if (groupKey === 'sed') {
+      // A sed delete can be refused - an interval cannot be left without a lithology - and then nothing else happens
+      if (!deleteSedFeature(pageKey, spot, selectedFeature)) return;
+    }
     else {
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       editedPageData = editedPageData.filter(f => f.id !== selectedFeature.id);
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedPageData}));
     }
+    deleteFeatureTags([selectedFeature]);
     dispatch(setSelectedAttributes([]));
     closeDetailView();
   };
