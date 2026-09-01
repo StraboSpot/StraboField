@@ -68,7 +68,6 @@ const BasicPageDetail = ({
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
   /* Derived Variables */
 
@@ -80,6 +79,9 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
+  // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
+  const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
+    && !isInternetReachable;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -90,10 +92,6 @@ const BasicPageDetail = ({
     : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
   /* Side Effects */
-
-  useEffect(() => {
-    setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
-  }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
 
   useLayoutEffect(() => {
     console.log('ULE BasicPageDetail []');
@@ -388,7 +386,7 @@ const BasicPageDetail = ({
             {PageTabsComponent && PageTabsComponent}
             {!isReadOnly && (
               <>
-                {pageKey === PAGE_KEYS.SAMPLES && isSaveDisabled && (
+                {isRegisteredSampleOffline && (
                   <View>
                     <Text style={{
                       color: RED,
@@ -404,7 +402,7 @@ const BasicPageDetail = ({
                 )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={isSaveDisabled || isFormInvalid}
+                  getIsDisabled={isFormInvalid || isRegisteredSampleOffline}
                   save={saveButtonOnPress}
                 />
               </>
