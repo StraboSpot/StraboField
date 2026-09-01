@@ -76,14 +76,14 @@ const UserProfile = () => {
 
   /* Logic Helpers */
 
-  const convertStrikeDipDirection = () => {
+  const calculateMissingStrikesAndDipDirections = () => {
     if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
     else {
       // Filter out Read Only Spots
       const spotsFiltered = Object.values(spots).filter((spot) => {
         if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
       });
-      if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found.  No changes made.', {placement: 'top'});
+      if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found. No changes made.', {placement: 'top'});
 
       else {
         const spotsEdited = [];
@@ -120,9 +120,10 @@ const UserProfile = () => {
           // console.log('Spots to update', spotsEdited);
           dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
           dispatch(editedOrCreatedSpots(spotsEdited));
-          toast.show('Finished conversions. Spots updated', {placement: 'top', type: 'success'});
+          const spotsUpdatedText = spotsEdited.length + (spotsEdited.length === 1 ? ' Spot' : ' Spots');
+          toast.show(`Finished calculating. ${spotsUpdatedText} updated.`, {placement: 'top', type: 'success'});
         }
-        else toast.show('No conversions needed. No Spots updated.', {placement: 'top'});
+        else toast.show('No missing values to calculate. No Spots updated.', {placement: 'top'});
       }
     }
   };
@@ -233,17 +234,16 @@ const UserProfile = () => {
   const renderBulkUpdatesSection = () => {
     return (
       <>
-        <SectionDivider dividerText={'Convert Measurements'}/>
-        <OutlineButton
-          onPress={convertStrikeDipDirection}
-          title={'Convert Strike <-> Dip Direction'}
+        <SectionDivider
+          dividerText={'Update Measurements'}
+          subtitle={'Calculates a missing dip direction from an existing strike, and a missing strike from an '
+            + 'existing dip direction. Applies to every Spot in the project except those in read only datasets. '
+            + 'Updated Spots are marked as modified.'}
         />
-        <View style={{paddingHorizontal: 10}}>
-          <Text style={[commonStyles.importantText, {paddingHorizontal: 10}]}>
-            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
-            updated.
-          </Text>
-        </View>
+        <OutlineButton
+          onPress={calculateMissingStrikesAndDipDirections}
+          title={'Calculate Missing\nStrikes and Dip Directions'}
+        />
       </>
     );
   };
