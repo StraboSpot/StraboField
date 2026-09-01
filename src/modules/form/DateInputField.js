@@ -10,6 +10,7 @@ import {formStyles} from '../form';
 
 const DateInputField = ({
                           isDisplayOnly,
+                          isRequired,
                           isShowTime,
                           isShowTimeOnly,
                           label,
@@ -110,7 +111,10 @@ const DateInputField = ({
 
   return (<>
     {label && (<View style={formStyles.fieldLabelContainer}>
-      <Text style={formStyles.fieldLabel}>{label}</Text>
+      <Text style={formStyles.fieldLabel}>
+        {label}
+        {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+      </Text>
     </View>)}
     {isDisplayOnly ? (<Text style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}>
       {title}

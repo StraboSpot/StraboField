@@ -129,8 +129,9 @@ const Form = ({
     return (
       <AcknowledgeInput
         disabled={isReadOnly}
+        isRequired={isFieldRequired(field)}
         label={field.label}
-        name={field.name}
+        name={getFieldPath(field.name)}
         onShowFieldInfo={handleShowFieldInfo}
         placeholder={field.hint}
         setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
@@ -142,9 +143,10 @@ const Form = ({
     return (
       <DateInputField
         isDisplayOnly={isReadOnly}
+        isRequired={isFieldRequired(field)}
         isShowTimeOnly={isShowTimeOnly}
         label={field.label}
-        name={field.name}
+        name={getFieldPath(field.name)}
         setFieldValueOverride={getFieldSetter(setFieldValueOverride)}
       />
     );

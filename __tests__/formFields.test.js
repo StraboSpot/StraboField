@@ -205,4 +205,24 @@ describe('AcknowledgeInput', () => {
     await act(async () => toggle.props.onValueChange(true));
     expect(setFieldValueOverride).toHaveBeenCalledWith('acknowledged', true);
   });
+
+  it('marks itself required and shows the error keyed to its name', async () => {
+    const formRef = React.createRef();
+    const tree = await render(
+      <FormikWrapper
+        initialValues={{acknowledged: false}}
+        innerRef={formRef}
+        validate={() => ({acknowledged: 'Required'})}
+      >
+        <AcknowledgeInput isRequired={true} label={'Acknowledged'} name={'acknowledged'}/>
+      </FormikWrapper>,
+    );
+
+    expect(renderedText(tree)).toContain(' *');
+
+    await act(async () => {
+      await formRef.current.validateForm();
+    });
+    expect(renderedText(tree)).toContain('Required');
+  });
 });
