@@ -233,7 +233,11 @@ const AddImageOverlayModal = ({
     );
   };
 
-  const renderSizeSection = (originalImage) => {
+  // The two sizes are saved as a pair, so neither is required on its own - leaving both empty draws the image at
+  // its own size - but each becomes required once the other is filled, which is the rule validateImageOverlay
+  // enforces. So each is marked from the other's value rather than always.
+  const renderSizeSection = (values) => {
+    const originalImage = getOriginalImage(values.id);
     const originalSizeText = originalImage && originalImage.width + ' x ' + originalImage.height + ' pixels';
     return (
       <>
@@ -250,6 +254,7 @@ const AddImageOverlayModal = ({
             <NumberInputField
               editable={!isReadOnly}
               isNegativeAllowed={false}
+              isRequired={!isEmpty(values.image_height)}
               label={'Width (pixels)'}
               name={'image_width'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -263,6 +268,7 @@ const AddImageOverlayModal = ({
             <NumberInputField
               editable={!isReadOnly}
               isNegativeAllowed={false}
+              isRequired={!isEmpty(values.image_width)}
               label={'Height (pixels)'}
               name={'image_height'}
               onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
@@ -316,7 +322,7 @@ const AddImageOverlayModal = ({
             {outerFormProps.values?.id && (
               <>
                 {renderPositionSection()}
-                {renderSizeSection(getOriginalImage(outerFormProps.values.id))}
+                {renderSizeSection(outerFormProps.values)}
                 {renderAppearanceSection()}
               </>
             )}
