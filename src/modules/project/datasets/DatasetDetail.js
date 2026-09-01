@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Platform, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
@@ -8,13 +8,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/helpers';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
-import {DateInputField, FormFlatList, FormikWrapper, formStyles, NumberInputField} from '../../form';
+import {DateInputField, FormFlatList, FormikWrapper, formStyles, NumberInputField, TextInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
@@ -36,8 +37,11 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   /* Local State */
 
+  const nameFormRef = useRef(null);
+
   const [datasetName, setDatasetName] = useState(dataset.name);
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
+  const [isNameInvalid, setIsNameInvalid] = useState(false);
 
   /* Derived Variables */
 
@@ -47,7 +51,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Event Handlers */
 
   const handleBackPressed = () => {
-    if (datasetName !== dataset.name) {
+    // Leaving is what saves here, so a name in error is left behind and the dataset keeps the one it had
+    if (datasetName !== dataset.name && !isNameInvalid) {
       saveDataset();
       toast.show('Changes Saved!', 'success');
     }
@@ -57,6 +62,12 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
+
+  // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
+  const setFieldValueAndTrackName = (name, value) => {
+    nameFormRef.current.setFieldValue(name, value);
+    setDatasetName(value);
+  };
 
   /* Logic Helpers */
 
@@ -228,28 +239,36 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
-  // Dataset Name Field
+  // Dataset Name Field. The only dataset field that can be edited, so it has a form of its own - the metadata
+  // below it is display only.
   const renderNameField = () => {
+    const validateName = values => isEmpty(values.name?.trim()) ? {name: 'Dataset name cannot be empty'} : {};
+
     return (
-      <View style={{alignContent: 'flex-start'}}>
-        <ListItem containerStyle={commonStyles.listItemFormField}>
-          <ListItem.Content
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-          >
-            <View style={{flex: 1}}>
-              <View style={formStyles.fieldLabelContainer}>
-                <Text style={formStyles.fieldLabel}>{'Name'}</Text>
+      <FormikWrapper
+        initialValues={{name: dataset.name}}
+        innerRef={nameFormRef}
+        setIsFormInvalid={setIsNameInvalid}
+        validate={validateName}
+      >
+        <View style={{alignContent: 'flex-start'}}>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content
+              style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+            >
+              <View style={{flex: 1}}>
+                <TextInputField
+                  editable={!isReadOnly}
+                  isRequired={true}
+                  label={'Name'}
+                  name={'name'}
+                  setFieldValueOverride={setFieldValueAndTrackName}
+                />
               </View>
-              <TextInput
-                editable={!isReadOnly}
-                onChangeText={text => setDatasetName(text)}
-                style={formStyles.fieldValue}
-                value={datasetName}
-              />
-            </View>
-          </ListItem.Content>
-        </ListItem>
-      </View>
+            </ListItem.Content>
+          </ListItem>
+        </View>
+      </FormikWrapper>
     );
   };
 
@@ -299,7 +318,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
       <SidePanelHeader
         backButton={handleBackPressed}
         headerTitle={'Dataset Detail'}
-        title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
+        title={datasetName !== dataset.name && !isNameInvalid ? 'Datasets (Save Changes)' : 'Datasets'}
       />
 
       <FormFlatList>
