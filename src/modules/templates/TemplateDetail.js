@@ -1,12 +1,13 @@
 import React, {useRef, useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {Form, FormFlatList, formStyles, FormikWrapper} from '../form';
+import {Form, FormFlatList, FormikWrapper, TextInputField} from '../form';
 import useTemplates from './useTemplates';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
@@ -24,9 +25,11 @@ const TemplateDetail = ({goBack, template, templateType}) => {
   /* Local State */
 
   const formRef = useRef(null);
+  const nameFormRef = useRef(null);
 
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
+  const [isNameInvalid, setIsNameInvalid] = useState(false);
   const [templateName, setTemplateName] = useState(template.name);
 
   /* Derived Variables */
@@ -42,6 +45,12 @@ const TemplateDetail = ({goBack, template, templateType}) => {
   /* Event Handlers */
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
+
+  // The delete dialog and the save both sit outside the name's form, so they need the name as it is typed
+  const setFieldValueAndTrackName = (name, value) => {
+    nameFormRef.current.setFieldValue(name, value);
+    setTemplateName(value);
+  };
 
   /* Logic Helpers */
 
@@ -76,27 +85,35 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     );
   };
 
-  // Template Name Field
+  // Template Name Field. Not one of the template's own values, and the notes template renders no survey form
+  // here at all, so it has a form of its own.
   const renderNameField = () => {
+    const validateName = values => isEmpty(values.name?.trim()) ? {name: 'Template name cannot be empty'} : {};
+
     return (
-      <View style={{alignContent: 'flex-start'}}>
-        <ListItem containerStyle={commonStyles.listItemFormField}>
-          <ListItem.Content
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-          >
-            <View style={{flex: 1}}>
-              <View style={formStyles.fieldLabelContainer}>
-                <Text style={formStyles.fieldLabel}>{'Template Name'}</Text>
+      <FormikWrapper
+        initialValues={{name: template.name}}
+        innerRef={nameFormRef}
+        setIsFormInvalid={setIsNameInvalid}
+        validate={validateName}
+      >
+        <View style={{alignContent: 'flex-start'}}>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content
+              style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
+            >
+              <View style={{flex: 1}}>
+                <TextInputField
+                  isRequired={true}
+                  label={'Template Name'}
+                  name={'name'}
+                  setFieldValueOverride={setFieldValueAndTrackName}
+                />
               </View>
-              <TextInput
-                onChangeText={text => setTemplateName(text)}
-                style={formStyles.fieldValue}
-                value={templateName}
-              />
-            </View>
-          </ListItem.Content>
-        </ListItem>
-      </View>
+            </ListItem.Content>
+          </ListItem>
+        </View>
+      </FormikWrapper>
     );
   };
 
@@ -139,7 +156,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   return (
     <>
-      <SaveAndCancelButtons cancel={goBack} getIsDisabled={isFormInvalid} save={saveTemplateAndGo}/>
+      <SaveAndCancelButtons cancel={goBack} getIsDisabled={isFormInvalid || isNameInvalid} save={saveTemplateAndGo}/>
       {renderTemplateFields()}
 
       {/* Child Modal */}

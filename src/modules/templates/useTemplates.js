@@ -2,7 +2,6 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import forms from '../../assets/forms';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
@@ -46,10 +45,9 @@ const useTemplates = () => {
 
   const saveTemplate = async (formCurrent, templateKey, selectedTemplate, name) => {
     let templateObject;
-    if (isEmpty(name)) {
-      alert('Template name empty', 'Provide a template name.');
-      throw Error('Template name is empty.');
-    }
+    // The form holds Save until the name is filled in, so this is a backstop. It throws rather than returns
+    // because the caller leaves the page on a save that comes back.
+    if (isEmpty(name?.trim())) throw Error('Template name is empty.');
     else {
       const {values: values} = await submitAndShowErrors(formCurrent);
       const templatesForKey = templateKey === 'measurementTemplates' ? templates[templateKey]
