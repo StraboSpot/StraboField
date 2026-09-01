@@ -77,6 +77,8 @@ const SiteSafetyPage = ({isReadOnly}) => {
     }
   };
 
+  // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
+  // stays where it is for that to be fixed rather than carrying on.
   const saveForm = async (currentForm) => {
     try {
       const {values: editedSiteSafetyFormData} = await submitAndShowErrors(currentForm);
@@ -86,21 +88,16 @@ const SiteSafetyPage = ({isReadOnly}) => {
       savedValuesRef.current = {...currentForm.values};
       await currentForm.resetForm();
       if (Platform.OS !== 'web') toast.show('Site Safety Saved', {type: 'success'});
+      return true;
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
+      return false;
     }
   };
 
   const saveFormAndGo = async (currentForm = formRef.current) => {
-    try {
-      await saveForm(currentForm);
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    catch (err) {
-      console.error('Error saving form data to Spot');
-    }
+    if (await saveForm(currentForm)) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
   /* Render Functions */

@@ -262,9 +262,10 @@ const MeasurementDetail = ({
     else return 'Measurement Detail';
   };
 
-  // Whether the page is being left is the caller's to say. Reading it back off the ref guessed, and guessed
-  // wrong whenever the prompt was answered before the form had gone: an edit meant to be kept apart from its
-  // one bad field was refused whole instead.
+  // Whether the page is being left is the caller's to say, not this function's to read off the ref - that guessed
+  // wrong whenever the prompt was answered before the form had gone, refusing whole an edit meant to be kept apart
+  // from its one bad field. What comes back says whether the save happened: a refusal has already alerted about
+  // the field it stopped on, so the caller stays where it is for that to be fixed rather than carrying on.
   const saveForm = async (formCurrent, isLeavingPage) => {
     try {
       let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
@@ -289,8 +290,7 @@ const MeasurementDetail = ({
 
       orientationDataCopy.forEach((measurement, i) => {
         if (idsOfMeasurementsToEdit.includes(measurement.id)) {
-          orientationDataCopy[i] = selectedAttributes.length === 1
-            ? {...formValues, modified_timestamp: Date.now()}
+          orientationDataCopy[i] = selectedAttributes.length === 1 ? {...formValues, modified_timestamp: Date.now()}
             : {...measurement, ...formValues};
           editedSelectedMeasurements.push(orientationDataCopy[i]);
         }
@@ -313,10 +313,11 @@ const MeasurementDetail = ({
       // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
       if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
+      return true;
     }
     catch (err) {
       console.error('Error submitting form.', err);
-      return Promise.reject();
+      return false;
     }
   };
 
@@ -324,35 +325,17 @@ const MeasurementDetail = ({
   // flag has to be set before saving rather than after. A refused save never reaches that dispatch, so clear the
   // flag rather than leaving it to fire on whatever changes the selected attributes next.
   const saveFormAndAddAssociatedMeasurement = async () => {
-    try {
-      setIsAddingAssociatedMeasurementAfterSave(true);
-      await saveForm(formRef.current);
-    }
-    catch (err) {
-      console.error('Error saving form data to Spot');
-    }
+    setIsAddingAssociatedMeasurementAfterSave(true);
     const isSaved = await saveForm(formRef.current);
     if (!isSaved) setIsAddingAssociatedMeasurementAfterSave(false);
   };
 
   const saveFormAndGo = async () => {
-    try {
-      await saveForm(formRef.current);
-      closeDetailView();
-    }
-    catch (err) {
-      console.error('Error saving form data to Spot');
-    }
+    if (await saveForm(formRef.current)) closeDetailView();
   };
 
   const saveFormAndSwitchSelectedMeasurement = async (measurement) => {
-    try {
-      await saveForm(formRef.current);
-      switchSelectedMeasurement(measurement);
-    }
-    catch (err) {
-      console.error('Error saving form data to Spot');
-    }
+    if (await saveForm(formRef.current)) switchSelectedMeasurement(measurement);
   };
 
   const saveTemplateForm = async (formCurrent) => {

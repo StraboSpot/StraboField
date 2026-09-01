@@ -45,11 +45,9 @@ const NewProjectForm = ({openMainMenuPanel}) => {
       dispatch(setSidePanelVisible({bool: false}));
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
       if (openMainMenuPanel) openMainMenuPanel();
-      return Promise.resolve();
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
     }
   };
 
