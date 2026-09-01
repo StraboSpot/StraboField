@@ -320,6 +320,9 @@ const MeasurementDetail = ({
     }
   };
 
+  // The effect on the selected attributes is what adds the measurement, and a save is what changes them, so the
+  // flag has to be set before saving rather than after. A refused save never reaches that dispatch, so clear the
+  // flag rather than leaving it to fire on whatever changes the selected attributes next.
   const saveFormAndAddAssociatedMeasurement = async () => {
     try {
       setIsAddingAssociatedMeasurementAfterSave(true);
@@ -328,6 +331,8 @@ const MeasurementDetail = ({
     catch (err) {
       console.error('Error saving form data to Spot');
     }
+    const isSaved = await saveForm(formRef.current);
+    if (!isSaved) setIsAddingAssociatedMeasurementAfterSave(false);
   };
 
   const saveFormAndGo = async () => {
