@@ -1,18 +1,19 @@
-import {unzip} from 'react-native-zip-archive';
+import {subscribe, unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
-import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
+import {
+  addedStatusMessage,
+  clearedStatusMessages,
+  removedLastStatusMessage,
+  resetMapImportProgress,
+  setMapImportProgress,
+} from '../../modules/home/home.slice';
 import {stripMapboxTokenFromCustomMaps} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
-import {
-  addedDatasets,
-  addedProject,
-  setActiveDatasets,
-  setTargetDataset,
-} from '../../modules/project/projects.slice';
+import {addedDatasets, addedProject, setActiveDatasets, setTargetDataset} from '../../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
 import {isEmpty} from '../../shared/helpers';
 import {persistor} from '../../store/ConfigureStore';
@@ -24,6 +25,8 @@ let isOldBackup;
 let mapFailures = 0;
 let neededTiles = 0;
 let notNeededTiles = 0;
+let movedTiles = 0;
+let totalTilesToMove = 0;
 
 const useImport = () => {
   /* Data Hooks */
@@ -48,6 +51,13 @@ const useImport = () => {
 
   const checkForMaps = async (dataFile, selectedProject, isExternal) => {
     let progress;
+    fileCount = 0;
+    neededTiles = 0;
+    notNeededTiles = 0;
+    mapFailures = 0;
+    movedTiles = 0;
+    totalTilesToMove = 0;
+    dispatch(resetMapImportProgress());
     const {mapNamesDb, otherMapsDb} = dataFile;
     dispatch(addedStatusMessage('Checking for maps to import...'));
     if (!isEmpty(otherMapsDb)) {
@@ -74,7 +84,9 @@ const useImport = () => {
       dispatch(addedStatusMessage(`Map tiles imported: ${progress?.fileCount || 0}`));
       dispatch(addedStatusMessage(`Map tiles installed: ${progress?.neededTiles || 0}`));
       dispatch(addedStatusMessage(`Map tiles already installed: ${progress?.notNeededTiles || 0}`));
+      if (progress?.mapFailures) dispatch(addedStatusMessage(`Map tiles skipped: ${progress.mapFailures}`));
       dispatch(addedStatusMessage('Finished moving tiles'));
+      dispatch(resetMapImportProgress());
     }
     else {
       dispatch(removedLastStatusMessage());
@@ -117,27 +129,53 @@ const useImport = () => {
     }
   };
 
-  const moveTile = async (tileArray, id, tileFolder) => {
-    await Promise.all(
-      tileArray.map(async (tile) => {
-        fileCount++;
-        const fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/' + tile);
-        if (!fileExists) {
-          await moveFile(
-            APP_DIRECTORIES.TILE_TEMP + id + '/tiles/' + tile,
-            APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/' + tile);
-          neededTiles++;
-        }
-        else {
-          notNeededTiles++;
-        }
-      }),
-    );
+  // Bound a native filesystem call so a single one that never settles can't freeze the whole import.
+  const withTimeout = (promise, ms, label) => {
+    let timer;
+    const timeout = new Promise((resolve, reject) => {
+      timer = setTimeout(() => reject(new Error(`Timed out after ${ms}ms: ${label}`)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+  };
+
+  const moveTile = async (tile, id, tileFolder) => {
+    const dest = APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/' + tile;
+    try {
+      const fileExists = await withTimeout(doesDeviceDirExist(dest), 15000, 'exists ' + tile);
+      if (!fileExists) {
+        await withTimeout(
+          moveFile(APP_DIRECTORIES.TILE_TEMP + id + '/tiles/' + tile, dest), 15000, 'move ' + tile);
+        neededTiles++;
+      }
+      else {
+        notNeededTiles++;
+      }
+    }
+    catch (err) {
+      // A timed-out or failed tile is skipped rather than allowed to stall the import; it surfaces in the
+      // 'Map tiles imported' vs 'installed' totals shown when the import finishes.
+      mapFailures++;
+      console.warn('Skipped tile:', tile, err?.message);
+    }
+    finally {
+      fileCount++;
+      movedTiles++;
+    }
   };
 
   /* Exported Functions */
 
   const copyZipMapsToProject = async (fileName, isExternal) => {
+    // Reflect the native unzip's progress on the bar. subscribe fires many events per file, so only push
+    // when the whole-number percent changes to keep re-renders down.
+    let lastPct = -1;
+    const unzipSubscription = subscribe(({progress}) => {
+      const pct = Math.round(progress * 100);
+      if (pct !== lastPct) {
+        lastPct = pct;
+        dispatch(setMapImportProgress({progress, label: 'Unzipping map tiles...'}));
+      }
+    });
     try {
       const sourceDir = isExternal ? APP_DIRECTORIES.DOWNLOAD_DIR_ANDROID : APP_DIRECTORIES.BACKUP_DIR;
       const checkDirSuccess = await doesDeviceBackupDirExist(fileName + '/maps');
@@ -166,6 +204,9 @@ const useImport = () => {
     }
     catch (err) {
       console.error('Error Copying Maps for Distribution', err);
+    }
+    finally {
+      unzipSubscription.remove();
     }
   };
 
@@ -222,31 +263,48 @@ const useImport = () => {
 
   const moveFiles = async (dataFile) => {
     try {
-      let fileEntries = [];
       console.log('Offline Maps in Backup:', dataFile.mapNamesDb);
-      await Promise.all(
-        Object.values(dataFile.mapNamesDb).map(async (map) => {
-          // Mapbox Styles map ids arrive as 'username/styleId', but tiles are cached (and zipped) under the
-          // styleId only (see getTileFolderName), so strip the account prefix before locating/moving them.
-          // Without this the '/' is treated as a subfolder and no matching tiles are found.
-          const tileFolder = map.id.includes('/') ? map.id.split('/').pop() : map.id;
-          const checkSuccess = await doesDeviceDirectoryExist(
-            APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/');
-          if (checkSuccess) {
-            console.log(tileFolder + ': Tiles directory exists.');
-            const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
-            const mapId = files.find(id => id === tileFolder);
-            const zipID = files.find(zipId => zipId === map.mapId);
-            const id = isOldBackup ? zipID : mapId;
-            if (id) fileEntries = await readDirectory(APP_DIRECTORIES.TILE_TEMP + id + '/tiles');
-            else {
-              mapFailures++;
-              console.log(tileFolder + ': Map file not found. Failures:', mapFailures);
-            }
-            await moveTile(fileEntries, id, map, tileFolder);
+      // First pass: resolve each map's tiles so we know the total up front, which the ProgressBar needs as its
+      // denominator. Done sequentially (rather than in the move loop) so every map gets its own tile list.
+      const movePlan = [];
+      for (const map of Object.values(dataFile.mapNamesDb)) {
+        // Mapbox Styles map ids arrive as 'username/styleId', but tiles are cached (and zipped) under the
+        // styleId only (see getTileFolderName), so strip the account prefix before locating/moving them.
+        // Without this the '/' is treated as a subfolder and no matching tiles are found.
+        const tileFolder = map.id.includes('/') ? map.id.split('/').pop() : map.id;
+        const checkSuccess = await doesDeviceDirectoryExist(APP_DIRECTORIES.TILE_CACHE + tileFolder + '/tiles/');
+        if (checkSuccess) {
+          console.log(tileFolder + ': Tiles directory exists.');
+          const files = await readDirectory(APP_DIRECTORIES.TILE_TEMP) || [];
+          const mapId = files.find(id => id === tileFolder);
+          const zipID = files.find(zipId => zipId === map.mapId);
+          const id = isOldBackup ? zipID : mapId;
+          if (id) {
+            const tileArray = await readDirectory(APP_DIRECTORIES.TILE_TEMP + id + '/tiles');
+            movePlan.push({tileArray, id, tileFolder});
           }
-        }),
-      );
+          else {
+            mapFailures++;
+            console.log(tileFolder + ': Map file not found. Failures:', mapFailures);
+          }
+        }
+      }
+      // Flatten to one task list and move in bounded batches. A single Promise.all over every tile fires
+      // thousands of native file ops at once, which swamps the filesystem bridge so nothing resolves until the
+      // very end — the bar sits at 0% and looks frozen. Batching keeps native fed and advances the bar steadily.
+      const tileTasks = movePlan.flatMap(
+        ({tileArray, id, tileFolder}) => tileArray.map(tile => ({tile, id, tileFolder})));
+      totalTilesToMove = tileTasks.length;
+      dispatch(setMapImportProgress({progress: 0, label: `Moving map tiles (0/${totalTilesToMove})`}));
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < tileTasks.length; i += BATCH_SIZE) {
+        const batch = tileTasks.slice(i, i + BATCH_SIZE);
+        await Promise.all(batch.map(({tile, id, tileFolder}) => moveTile(tile, id, tileFolder)));
+        dispatch(setMapImportProgress({
+          progress: totalTilesToMove ? movedTiles / totalTilesToMove : 0,
+          label: `Moving map tiles (${movedTiles}/${totalTilesToMove})`,
+        }));
+      }
       console.log('Move Files Promise Complete!!!');
       return {fileCount: fileCount, neededTiles: neededTiles, notNeededTiles: notNeededTiles, mapFailures: mapFailures};
     }
