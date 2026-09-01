@@ -10,29 +10,25 @@ import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
-import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import {DateInputField, FormFlatList, FormikWrapper, formStyles, NumberInputField, TextInputField} from '../../form';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
-import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
+import GovernanceFields from '../governance/GovernanceFields';
+import {updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
 const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
-
   const {initializeDownloadImages} = useDownload();
-  const {destroyDataset} = useProject();
+  const {destroyDataset, isReadOnlyDataset} = useProject();
   const toast = useToast();
 
   /* Local State */
@@ -45,8 +41,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   /* Derived Variables */
 
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-  const isTarget = targetDatasetId === dataset.id;
+  const isReadOnly = isReadOnlyDataset(dataset.id);
 
   /* Event Handlers */
 
@@ -60,8 +55,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   };
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
-
-  const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
 
   // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
   const setFieldValueAndTrackName = (name, value) => {
@@ -87,9 +80,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     else console.error('Target dataset or id is undefined!');
   };
 
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
-  };
+  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
@@ -272,25 +263,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     );
   };
 
-  const renderReadOnlyDatasetButton = () => {
-    return (
-      <View style={{alignContent: 'flex-start'}}>
-        <ListItem containerStyle={commonStyles.listItemFormField}>
-          <ListItem.Content
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-          >
-            <View style={{flex: 1}}>
-              <View style={formStyles.fieldLabelContainer}>
-                <Text style={formStyles.fieldLabel}>{'Read Only'}</Text>
-              </View>
-            </View>
-          </ListItem.Content>
-          <SwitchWrapper disabled={isTarget} onValueChange={onToggleReadOnly} value={isReadOnly}/>
-        </ListItem>
-      </View>
-    );
-  };
-
   // Dataset Spots Field
   const renderSpotsField = () => {
     const spotsCount = dataset.spotIds?.length || 0;
@@ -326,10 +298,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         {renderMetadataForm()}
         {renderSpotsField()}
         {renderImagesField()}
-        <LittleSpacer/>
+        <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
         <RunQAQC dataset={dataset}/>
-        {renderReadOnlyDatasetButton()}
-        <LittleSpacer/>
         {Platform.OS === 'web' && renderDeleteDatasetButton()}
       </FormFlatList>
 

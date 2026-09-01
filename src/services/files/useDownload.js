@@ -40,7 +40,7 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-let tempActiveDatasetsIds, tempTargetDatasetId;
+let prevActiveDatasetsIds, prevTargetDatasetId;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
@@ -67,8 +67,8 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    tempActiveDatasetsIds = undefined;
-    tempTargetDatasetId = undefined;
+    prevActiveDatasetsIds = undefined;
+    prevTargetDatasetId = undefined;
   };
 
   /* Internal Functions */
@@ -91,22 +91,32 @@ const useDownload = () => {
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
 
-      // If same project set active and target dataset to same as before if they still exist
+      // Same project re-downloaded — restore active/target from before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
-        const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
-          console.log('Checking if active dataset still exists:', tempActiveDatasetId);
-          return newDatasetIds.includes(tempActiveDatasetId) ? [...acc, tempActiveDatasetId] : acc;
-        }, []);
-        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
-        else dispatch(setTargetDataset(datasets[0].id));
+        const retainedActiveDatasetIds = prevActiveDatasetsIds.filter(id => newDatasetIds.includes(id));
+        if (retainedActiveDatasetIds.length >= 1) {
+          if (retainedActiveDatasetIds.length === 1) {
+            dispatch(setActiveDatasets({bool: true, dataset: retainedActiveDatasetIds[0]}));
+          }
+          else dispatch(setActiveDatasetsMultiple(retainedActiveDatasetIds));
+          const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
+          if (prevTargetDataset && !prevTargetDataset.isReadOnly) {
+            dispatch(setActiveDatasets({bool: true, dataset: prevTargetDatasetId}));
+            dispatch(setTargetDataset(prevTargetDatasetId));
+          }
+          else {
+            const firstWritableDataset = datasets.find(d => retainedActiveDatasetIds.includes(d.id) && !d.isReadOnly)
+              || datasets.find(d => !d.isReadOnly);
+            if (firstWritableDataset) {
+              dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
+              dispatch(setTargetDataset(firstWritableDataset.id));
+            }
+          }
+        }
+        else setFirstWritableActiveAndTarget(datasets);
       }
-      else if (datasets.length >= 1) {
-        dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setTargetDataset(datasets[0].id));
-      }
+      else if (datasets.length >= 1) setFirstWritableActiveAndTarget(datasets);
       else {
         const targetDataset = createDataset();
         dispatch(addedDataset(targetDataset));
@@ -134,8 +144,8 @@ const useDownload = () => {
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       if (!isEmpty(project)) {
         if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) tempActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) tempTargetDatasetId = targetDatasetId;
+          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
+          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
         }
         clearProject();
       }
@@ -266,6 +276,17 @@ const useDownload = () => {
       console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
     });
+  };
+
+  // Sets the first non-read-only dataset as both the active and target dataset
+  // falls back to datasets[0] for the active dataset if all are read-only
+  const setFirstWritableActiveAndTarget = (datasets) => {
+    const firstWritableDataset = datasets.find(d => !d.isReadOnly);
+    if (firstWritableDataset) {
+      dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
+      dispatch(setTargetDataset(firstWritableDataset.id));
+    }
+    else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
   };
 
   /* Exported Functions */

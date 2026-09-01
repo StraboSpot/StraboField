@@ -6,6 +6,7 @@ import proj4 from 'proj4';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, getNewUUID, isEmpty} from '../../../shared/helpers';
+import useProject from '../../project/useProject';
 import {clearedSelectedSpots, setSelectedSpot} from '../../spots/spots.slice';
 import useMapFeatures from '../features/useMapFeatures';
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from '../maps.constants';
@@ -41,6 +42,7 @@ const useMapEditVertex = ({
   const {isDrawMode} = useMap();
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots} = useMapFeatures();
+  const {isReadOnlySpot} = useProject();
 
   /* Local State */
 
@@ -249,6 +251,9 @@ const useMapEditVertex = ({
     return indexOfCoordinatesToUpdate;
   };
 
+  const isEditableSpot = spot => !spot?.properties?.id || !isReadOnlySpot(spot.properties.id);
+  const getEditableSpots = spotsToFilter => spotsToFilter.filter(isEditableSpot);
+
   const setEditFeatures = (spotToEdit) => {
     // Get the draw features for the Spot (the individual vertex and lines that make up the Spot)
     let explodedFeatures = turf.explode(spotToEdit).features;
@@ -298,13 +303,18 @@ const useMapEditVertex = ({
   };
 
   const setSelectedSpotToEdit = (spotToEdit) => {
-    console.log('setSelectedSpotToEdit spotToEdit', spotToEdit);
+    const editableSpotToEdit = isEditableSpot(spotToEdit) ? spotToEdit : {};
+    console.log('setSelectedSpotToEdit spotToEdit', editableSpotToEdit);
     clearSelectedVertexToEdit();
-    setSpotEditing(spotToEdit);
-    console.log('Set selected Spot to edit:', spotToEdit);
-    setDisplayedSpotsWhileEditing(spotToEdit, spotsEdited, spotsNotEdited);
-    setEditFeatures(spotToEdit);
-    if (turf.getType(spotToEdit) === 'Point') setSelectedVertexToEdit(spotToEdit);
+    setSpotEditing(editableSpotToEdit);
+    console.log('Set selected Spot to edit:', editableSpotToEdit);
+    setDisplayedSpotsWhileEditing(editableSpotToEdit, spotsEdited, spotsNotEdited);
+    if (isEmpty(editableSpotToEdit)) {
+      setDrawFeatures([]);
+      return;
+    }
+    setEditFeatures(editableSpotToEdit);
+    if (turf.getType(editableSpotToEdit) === 'Point') setSelectedVertexToEdit(editableSpotToEdit);
   };
 
   const moveVertex = async () => {
@@ -497,25 +507,27 @@ const useMapEditVertex = ({
   const startEditing = (spotToEdit, vertexToEditTemp, index, setMapModeToEdit) => {
     setMapModeToEdit();
     clearEditing();
-    const mappedSpots = getAllMappedSpots();
-    setSpotEditing(spotToEdit ? spotToEdit : {});
+    const editableMappedSpots = getEditableSpots(getAllMappedSpots());
+    const editableSpotToEdit = isEditableSpot(spotToEdit) ? spotToEdit : {};
+    if (isEmpty(editableSpotToEdit)) dispatch(clearedSelectedSpots());
+    setSpotEditing(editableSpotToEdit);
     setSpotsEdited([]);
-    setSpotsNotEdited(mappedSpots);
-    spotToEdit ? console.log('Set Spot to edit:', spotToEdit) : console.log('No Spot selected to edit.');
+    setSpotsNotEdited(editableMappedSpots);
+    !isEmpty(editableSpotToEdit) ? console.log('Set Spot to edit:', editableSpotToEdit) : console.log('No Spot selected to edit.');
     // #114, editing a spot should immediately identify it as the selected spot and hence update the notebook panel.
-    setDisplayedSpotsWhileEditing(spotToEdit, [], mappedSpots);
-    if (!isEmpty(spotToEdit)) {
-      dispatch(setSelectedSpot(spotToEdit));
-      setEditFeatures(spotToEdit);
+    setDisplayedSpotsWhileEditing(editableSpotToEdit, [], editableMappedSpots);
+    if (!isEmpty(editableSpotToEdit)) {
+      dispatch(setSelectedSpot(editableSpotToEdit));
+      setEditFeatures(editableSpotToEdit);
     }
     // while starting to edit the spot, set the vertex active to move immediately, if available
-    if (vertexToEditTemp) {
-      if (spotToEdit.geometry.type !== 'Point') {
+    if (vertexToEditTemp && !isEmpty(editableSpotToEdit)) {
+      if (editableSpotToEdit.geometry.type !== 'Point') {
         setSelectedVertexToEdit(vertexToEditTemp);
         setVertexIndex(index);
       }
     }
-    if (spotToEdit?.geometry?.type === 'Point') setSelectedVertexToEdit(spotToEdit);
+    if (editableSpotToEdit?.geometry?.type === 'Point') setSelectedVertexToEdit(editableSpotToEdit);
   };
 
   return {

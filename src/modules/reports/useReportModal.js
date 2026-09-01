@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -16,6 +16,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   const dispatch = useDispatch();
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {name: userName, straboUserId} = useSelector(state => state.user);
 
   const {submitAndShowErrors} = useForm();
 
@@ -24,18 +25,25 @@ const useReportModal = ({openSpotInNotebook}) => {
   const formRef = useRef(null);
 
   const reportSpots = report?.spots ? JSON.parse(JSON.stringify(report?.spots)) : [];
-
   const [checkedSpotsIds, setCheckedSpotsIds] = useState(reportSpots);
 
   const reportTags = report?.tags ? JSON.parse(JSON.stringify(report?.tags)) : [];
-
   const [checkedTagsIds, setCheckedTagsIds] = useState(reportTags);
 
   const reportImages = report?.images ? JSON.parse(JSON.stringify(report?.images)) : [];
-
   const [updatedImages, setUpdatedImages] = useState(reportImages);
 
+  const reportComments = report?.comments ? JSON.parse(JSON.stringify(report?.comments)) : [];
+  const [comments, setComments] = useState(reportComments);
+
+  const [isFormDirty, setIsFormDirty] = useState(false);
+
   /* Derived Variables */
+
+  const hasUnsavedChanges = isFormDirty
+    || !isEqual(reportImages, updatedImages)
+    || !isEqual(reportSpots, checkedSpotsIds)
+    || !isEqual(reportTags, checkedTagsIds);
 
   const initialValues = isEmpty(report) ? {} : report;
 
@@ -64,7 +72,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     const isImageObjChanged = !isEqual(reportImages, updatedImages);
     const isSpotsObjChanged = !isEqual(reportSpots, checkedSpotsIds);
     const isTagsObjChanged = !isEqual(reportTags, checkedTagsIds);
-    if ((formRef.current && formRef.current.dirty) || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
+    if (isFormDirty || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
       const formCurrent = formRef?.current || {};
       alert(
         'Unsaved Changes',
@@ -114,9 +122,14 @@ const useReportModal = ({openSpotInNotebook}) => {
     try {
       console.log('Saving report ...');
       let {values: editedReport} = await submitAndShowErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewUUID();
+      if (!editedReport.id) editedReport.id = getNewId();
+      if (!editedReport.straboUserId || !editedReport.created_by) {
+        editedReport.straboUserId = straboUserId;
+        editedReport.created_by = userName;
+      }
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
+      editedReport.comments = comments;
       editedReport.images = updatedImages;
       editedReport.spots = checkedSpotsIds;
       editedReport.tags = checkedTagsIds;
@@ -141,6 +154,23 @@ const useReportModal = ({openSpotInNotebook}) => {
     closeModal();
     const updatedReports = reports.filter(r => r.id !== report.id);
     dispatch(updatedProject({field: 'reports', value: updatedReports}));
+  };
+
+  const handleSaveComment = (text) => {
+    const newComment = {
+      created_timestamp: Date.now(),
+      id: getNewId(),
+      name: userName,
+      straboUserId: straboUserId,
+      text: text,
+    };
+    const newComments = [...comments, newComment];
+    setComments(newComments);
+    if (report?.id) {
+      const updatedReports = reports.map(
+        r => r.id === report.id ? {...r, comments: newComments, updated_timestamp: Date.now()} : r);
+      dispatch(updatedProject({field: 'reports', value: updatedReports}));
+    }
   };
 
   const handleSavePressed = async () => {
@@ -168,15 +198,19 @@ const useReportModal = ({openSpotInNotebook}) => {
     checkedSpotsIds,
     checkedTagsIds,
     checkIsSafeDelete,
+    comments,
     confirmCloseModal,
     deleteReport,
     formRef,
+    handleSaveComment,
     handleSavePressed,
     handleSpotChecked,
     handleSpotPressed,
     handleTagChecked,
     handleTagPressed,
+    hasUnsavedChanges,
     initialValues,
+    setIsFormDirty,
     setUpdatedImages,
     updatedImages,
   };

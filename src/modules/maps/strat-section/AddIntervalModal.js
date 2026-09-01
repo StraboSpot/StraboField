@@ -2,12 +2,13 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSection from './useStratSection';
 import useStratSectionCalculations from './useStratSectionCalculations';
 import commonStyles from '../../../shared/common.styles';
-import {deepObjectExtend} from '../../../shared/helpers';
+import {deepObjectExtend, isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import {Form, FormikWrapper, SelectInputField, TextInputField, useForm} from '../../form';
@@ -24,11 +25,13 @@ const AddIntervalModal = () => {
   const dispatch = useDispatch();
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const stratSection = useSelector(state => state.map.stratSection);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {getLabel, getSurvey, submitAndShowErrors} = useForm();
   const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
+  const toast = useToast();
 
   /* Local State */
 
@@ -39,8 +42,10 @@ const AddIntervalModal = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
+
   const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
   const isCore = isNegativeColumn();
+  const isTargetDatasetMissing = isEmpty(targetDatasetId);
 
   /* Side Effects */
 
@@ -153,6 +158,10 @@ const AddIntervalModal = () => {
 
   const saveInterval = async () => {
     try {
+      if (isTargetDatasetMissing) {
+        toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
+        return;
+      }
       const {values: intervalData} = await submitAndShowErrors(formRef.current);
       if (doUnitsFieldsMatch(intervalData)) {
         let newInterval = createInterval(stratSection.strat_section_id, intervalData);

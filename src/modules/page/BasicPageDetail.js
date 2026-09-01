@@ -46,6 +46,8 @@ const BasicPageDetail = ({
 
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const {isOwner} = useSelector(state => state.project.project);
+  const {sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, submitAndShowErrors, validateForm} = useForm();
@@ -68,7 +70,6 @@ const BasicPageDetail = ({
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
 
   /* Derived Variables */
 
@@ -80,6 +81,16 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
+  const isNonOwnerRegisteredSample = pageKey === PAGE_KEYS.SAMPLES && isOwner === false;
+  // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
+  const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
+    && !isInternetReachable;
+  // Registering a sample with SESAR needs credentials to do it with, and a user code to register it under unless
+  // it is already on SESAR and reachable to be updated in place
+  const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
+    || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
+  // Every reason the save itself is refused, held at the button rather than failing once it is pressed
+  const isSaveDisabled = isNonOwnerRegisteredSample || isRegisteredSampleOffline || isSesarRegistrationBlocked;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -90,10 +101,6 @@ const BasicPageDetail = ({
     : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
   /* Side Effects */
-
-  useEffect(() => {
-    setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
-  }, [selectedFeature.isOnMySesar, selectedFeature.Sample_IGSN, isInternetReachable]);
 
   useLayoutEffect(() => {
     console.log('ULE BasicPageDetail []');
@@ -213,7 +220,8 @@ const BasicPageDetail = ({
     return getRequiredLithologyKeys(values, spot);
   };
 
-  const getIsDisabled = (fieldName) => {
+  // Whether a single field is editable, which is a separate question from whether the form can be saved
+  const getIsFieldDisabled = (fieldName) => {
     if (isReadOnly) return true;
     else {
       return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
@@ -288,6 +296,10 @@ const BasicPageDetail = ({
   const saveForm = async (formCurrent, isLeavingPage) => {
     try {
       console.log('Saving form...', formCurrent);
+      if (isNonOwnerRegisteredSample) {
+        toast.show('Only project owners may update a sample with a registered IGSN', {type: 'warning'});
+        return;
+      }
       if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
         await updateIGSNAndShowModal(formCurrent);
         return;
@@ -351,7 +363,7 @@ const BasicPageDetail = ({
             <Form
               {...formProps}
               formName={formName}
-              getIsDisabled={getIsDisabled}
+              getIsDisabled={getIsFieldDisabled}
               isReadOnly={isReadOnly}
               requiredFields={getRequiredFields(formProps.values)}
               setFieldValueOverride={page.key === PAGE_KEYS.MINERALS
@@ -388,7 +400,7 @@ const BasicPageDetail = ({
             {PageTabsComponent && PageTabsComponent}
             {!isReadOnly && (
               <>
-                {pageKey === PAGE_KEYS.SAMPLES && isSaveDisabled && (
+                {isRegisteredSampleOffline && (
                   <View>
                     <Text style={{
                       color: RED,
@@ -404,9 +416,14 @@ const BasicPageDetail = ({
                 )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={isSaveDisabled || isFormInvalid}
+                  getIsDisabled={isFormInvalid || isSaveDisabled}
                   save={saveButtonOnPress}
                 />
+                {isNonOwnerRegisteredSample && (
+                  <Text style={{color: RED, paddingBottom: 10, paddingHorizontal: 10, textAlign: 'center'}}>
+                    Only project owners may update a sample with a registered IGSN
+                  </Text>
+                )}
               </>
             )}
             {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}

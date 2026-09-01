@@ -30,6 +30,7 @@ const TagsModal = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
@@ -205,7 +206,7 @@ const TagsModal = ({
     return (
       <>
         <View style={{flex: 1}}>
-          <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>
+          {!isReadOnlyProject && <AddButton onPress={addTag} title={`Create New ${toTitleCase(label).slice(0, -1)}`}/>}
           <View style={modalStyles.textContainer}>
             {tags && !isEmpty(tags)
               ? <Text style={modalStyles.textStyle}>Check all {label.toLowerCase()} that apply</Text>

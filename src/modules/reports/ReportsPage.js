@@ -16,6 +16,7 @@ const ReportsPage = ({page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -38,7 +39,7 @@ const ReportsPage = ({page}) => {
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={page.label}/>
-      <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>}
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
         Memos referencing this Spot:
       </Text>

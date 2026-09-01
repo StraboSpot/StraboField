@@ -56,7 +56,7 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
   return (
     <SectionList
       ItemSeparatorComponent={FlatListItemSeparator}
-      ListEmptyComponent={<ListEmptyText text={'No Templates'}/>}
+      ListEmptyComponent={<ListEmptyText text={'No Templates Found'}/>}
       keyExtractor={(item, index) => item + index}
       renderItem={renderTemplateListItem}
       renderSectionHeader={props => <TemplateSectionHeader {...props}/>}

@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {ReportsList} from '.';
 import AddButton from '../../shared/ui/buttons/AddButton';
@@ -14,6 +14,7 @@ const ReportsMenu = ({}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   /* Logic Helpers */
 
@@ -26,7 +27,7 @@ const ReportsMenu = ({}) => {
 
   return (
     <View style={{flex: 1}}>
-      <AddButton onPress={addReport} title={'Create New Memo'}/>
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo'}/>}
       <ReportsList/>
     </View>
   );

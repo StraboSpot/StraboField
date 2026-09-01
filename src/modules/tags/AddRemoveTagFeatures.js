@@ -24,7 +24,7 @@ const AddRemoveTagFeatures = () => {
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
   const {getAllFeaturesFromSpot} = useSpots();
   const {addRemoveSpotFeatureFromTag, getFeatureDisplayComponent} = useTags();
 
@@ -35,7 +35,7 @@ const AddRemoveTagFeatures = () => {
     const spot = spots[spotId];
     const selectedTagCopy = JSON.parse(JSON.stringify(selectedTag));
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
-    const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+    const isReadOnly = isReadOnlySpot(spot.properties.id);
 
     if (!isEmpty(spot) && !isEmpty(spot.properties)) {
       return (

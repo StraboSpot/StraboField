@@ -18,6 +18,7 @@ const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -111,11 +112,11 @@ const TagDetailModal = ({closeModal}) => {
     <ModalWrapper
       disabled={isFormInvalid}
       headerTitle={`${actionLabel} ${toTitleCase(label).slice(0, -1)}`}
-      onActionPressed={saveFormAndClose}
+      onActionPressed={isReadOnlyProject ? undefined : saveFormAndClose}
       onCancelPress={closeModal}
       onDeletePress={confirmDeleteTag}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
-      showDeleteButton={isEmpty(modalVisible) && !isEmpty(selectedTag?.id)}
+      showDeleteButton={isEmpty(modalVisible) && !isEmpty(selectedTag?.id) && !isReadOnlyProject}
     >
       <FlatList
         ListHeaderComponent={

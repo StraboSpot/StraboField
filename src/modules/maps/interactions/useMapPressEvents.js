@@ -36,10 +36,13 @@ const useMapPressEvents = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const datasets = useSelector(state => state.project.datasets || {});
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
@@ -53,6 +56,11 @@ const useMapPressEvents = ({
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
   // What the picker does with the tapped Spot ('select' | 'edit' | 'switch'); holds long-press coords for 'edit'.
   const [spotsAtPressAction, setSpotsAtPressAction] = useState(null);
+
+  /* Derived Variables */
+
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
+  const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset;
 
   /* Internal Functions */
 
@@ -77,7 +85,7 @@ const useMapPressEvents = ({
     console.log('Map long press detected:', e);
     const [screenPointX, screenPointY] = getScreenPoint(e);
 
-    if (mapMode === MAP_MODES.VIEW && !isEmpty(getAllMappedSpots())) {
+    if (mapMode === MAP_MODES.VIEW && !isEditToolsDisabled && !isEmpty(getAllMappedSpots())) {
       const spotsToEdit = await getSpotsAtPress(screenPointX, screenPointY);
       // Several Spots overlap - let the user pick which to edit.
       if (spotsToEdit.length > 1) {

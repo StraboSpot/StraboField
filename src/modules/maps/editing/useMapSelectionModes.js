@@ -17,7 +17,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
 
   const {getLassoedSpots} = useMapFeaturesCalculated(mapRef);
   const {getStereonet} = useStereonet();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isReadOnlySpot} = useProject();
 
   /* Functions */
 
@@ -57,7 +57,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
 
     // Filter out Read Only Spots
     const selectedSpotsFiltered = selectedSpots.filter((spot) => {
-      if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+      if (spot?.properties?.id && !isReadOnlySpot(spot.properties.id)) return spot;
     });
 
     if (selectedSpotsFiltered.length > 0) {

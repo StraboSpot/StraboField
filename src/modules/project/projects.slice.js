@@ -284,12 +284,6 @@ const projectSlice = createSlice({
     setMultipleFeaturesTaggingEnabled(state, action) {
       state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
-    setReadOnlyDatasetsIds(state, action) {
-      if (state.readOnlyDatasetsIds?.includes(action.payload)) {
-        state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(r => r !== action.payload);
-      }
-      else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
-    },
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
@@ -364,7 +358,6 @@ export const {
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
-  clearedDatasets,
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
@@ -384,7 +377,6 @@ export const {
   setBackupFileName,
   setIsImageTransferring,
   setMultipleFeaturesTaggingEnabled,
-  setReadOnlyDatasetsIds,
   setSelectedTag,
   setTargetDataset,
   setTestingMode,

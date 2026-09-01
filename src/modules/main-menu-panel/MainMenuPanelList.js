@@ -10,6 +10,8 @@ import {
   MAIN_MENU_DATA_NO_PROJECT_NO_USER,
   MAIN_MENU_DATA_NO_USER,
   MAIN_MENU_DATA_WEB,
+  MAIN_MENU_ITEMS_TO_HIDE_IF_IS_READ_ONLY_PROJECT,
+  MAIN_MENU_SECTIONS_TO_HIDE_IF_IS_READ_ONLY_PROJECT,
 } from './mainMenu.constants';
 import {MENU_KEYWORDS} from './mainMenuKeywords.constants';
 import {setSectionsCollapsed} from './mainMenuPanel.slice';
@@ -33,6 +35,7 @@ const MainMenuPanelList = ({searchText}) => {
 
   const dispatch = useDispatch();
   const encodedLogin = useSelector(state => state.user.encoded_login);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const sectionsCollapsed = useSelector(state => state.mainMenu.sectionsCollapsed);
 
@@ -44,7 +47,7 @@ const MainMenuPanelList = ({searchText}) => {
 
   useEffect(() => {
     filterMenuItems();
-  }, [searchText, projectName, encodedLogin]);
+  }, [searchText, projectName, encodedLogin, isReadOnlyProject]);
 
   /* Event Handlers */
 
@@ -53,7 +56,16 @@ const MainMenuPanelList = ({searchText}) => {
   /* Logic Helpers */
 
   const filterMenuItems = () => {
-    const mainMenuData = getMainMenuData(projectName, encodedLogin);
+    let mainMenuData = getMainMenuData(projectName, encodedLogin);
+
+    if (isReadOnlyProject) {
+      mainMenuData = mainMenuData
+        .filter(section => !MAIN_MENU_SECTIONS_TO_HIDE_IF_IS_READ_ONLY_PROJECT.includes(section.title))
+        .map(section => ({
+          ...section,
+          data: section.data.filter(item => !MAIN_MENU_ITEMS_TO_HIDE_IF_IS_READ_ONLY_PROJECT.includes(item)),
+        }));
+    }
 
     if (searchText === '') setMenuItems(mainMenuData);
     else {

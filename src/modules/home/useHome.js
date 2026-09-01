@@ -34,18 +34,22 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const datasets = useSelector(state => state.project.datasets || {});
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
   const stratSection = useSelector(state => state.map.stratSection);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   const store = useStore();
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
-  const {getTargetDatasetFromId} = useProject();
+  const {getTargetDatasetFromId, isReadOnlySpot} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
   useAutoSave();
@@ -60,6 +64,14 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   /* Derived Variables */
 
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
+  const imageBasemapSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id) : null;
+  const isReadOnlyBasemap = !!imageBasemapSpot && isReadOnlySpot(imageBasemapSpot.properties?.id);
+  const stratSectionSpot = stratSection ? getSpotWithThisStratSection(stratSection.strat_section_id) : null;
+  const isReadOnlyStratSection = !!stratSectionSpot && isReadOnlySpot(stratSectionSpot.properties?.id);
+  const isCreateToolsDisabled = isEmpty(
+    targetDatasetId) || isReadOnlyProject || isReadOnlyBasemap || isReadOnlyStratSection;
+  const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyBasemap || isReadOnlyStratSection;
   const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
 
   /* Side Effects */
@@ -79,6 +91,25 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
   }, [isDragIntervalMode]);
 
+  useEffect(() => {
+    if (!isEditToolsDisabled || mapMode !== MAP_MODES.EDIT) return;
+    mapComponentRef.current?.cancelEdits();
+    setMapMode(MAP_MODES.VIEW);
+  }, [isEditToolsDisabled, mapComponentRef, mapMode]);
+
+  useEffect(() => {
+    if (!isCreateToolsDisabled || selectingMode) return;
+    if ([MAP_MODES.DRAW.POINT,
+      MAP_MODES.DRAW.LINE,
+      MAP_MODES.DRAW.POLYGON,
+      MAP_MODES.DRAW.FREEHANDPOLYGON,
+      MAP_MODES.DRAW.FREEHANDLINE,
+      MAP_MODES.DRAW.POINTLOCATION].includes(mapMode)) {
+      mapComponentRef.current?.cancelDraw();
+      setMapMode(MAP_MODES.VIEW);
+    }
+  }, [isCreateToolsDisabled, mapMode, selectingMode]);
+
   /* Internal Functions */
 
   const cancelEdits = async () => {
@@ -88,11 +119,13 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   const createPointAtCurrentLocation = async () => {
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) return;
     try {
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       await setPointAtCurrentLocation();
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show(`Point Spot Added at Current\n Location to Dataset ${getTargetDatasetFromId().name.toUpperCase()}`,
+      toast.show(`Point Spot Added at Current\n Location to Dataset ${targetDataset.name.toUpperCase()}`,
         {type: 'success'});
       openNotebookPanel();
     }
@@ -138,7 +171,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         const targetDataset = getTargetDatasetFromId();
         if (!isEmpty(targetDataset) && name === MAP_MODES.DRAW.POINTLOCATION) await createPointAtCurrentLocation();
         else if (!isEmpty(targetDataset)) setDraw(name).catch(console.error);
-        else toast.show('No Current Dataset! \n A current dataset needs to be set before drawing Spots.');
+        else toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
         break;
       case 'cancelEdits':
         await cancelEdits();
@@ -147,7 +180,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         await saveEdits();
         break;
       case 'startEditing':
-        mapComponentRef.current?.startEditingMode();
+        if (!isEditToolsDisabled) mapComponentRef.current?.startEditingMode();
         break;
       case 'toggleUserLocation':
         if (value) zoomToCurrentLocation().catch(console.error);
@@ -284,6 +317,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     dialogs,
     distance,
     endMeasurement,
+    isCreateToolsDisabled,
+    isEditToolsDisabled,
     mapMode,
     onCancel,
     onEndDrawPressed,

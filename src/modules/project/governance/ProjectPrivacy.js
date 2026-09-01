@@ -1,13 +1,13 @@
 import React, {useEffect, useRef} from 'react';
-import {Text, View} from 'react-native';
+import {Linking, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
-import {updatedProject} from './projects.slice';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/helpers';
+import {Form, FormFlatList, FormikWrapper, useForm} from '../../form';
+import {updatedProject} from '../projects.slice';
 
 const formName = ['settings', 'project_settings'];
 
@@ -15,7 +15,9 @@ const ProjectPrivacy = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {owner_straboUserId} = useSelector(state => state.project.project);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
+  const {straboUserId} = useSelector(state => state.user);
 
   const {validateForm} = useForm();
   const toast = useToast();
@@ -69,6 +71,7 @@ const ProjectPrivacy = () => {
           <Form
             {...formProps}
             formName={formName}
+            isReadOnly={owner_straboUserId !== straboUserId}
             renderInline={true}
             setFieldValueOverride={setFieldValueAndSavePreferences}
           />
@@ -76,8 +79,15 @@ const ProjectPrivacy = () => {
       </FormikWrapper>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>
-          *Public datasets are accessible at StraboSpot.org/search. Privacy settings are reversible and update when
-          project is uploaded.
+          {'Public datasets are accessible at '}
+          <Text
+            onPress={() => Linking.openURL('https://strabospot.org/search/')}
+            style={{textDecorationLine: 'underline'}}>
+            {'strabospot.org/search'}
+          </Text>
+          {'. Privacy settings are reversible and update when project is uploaded.\n\n* A public project does not mean '
+            + 'the project is editable by everyone. To make a project ediable to others besides yourself it must be '
+            + 'shared as a collaborative project. See the next section.'}
         </Text>
       </View>
     </FormFlatList>

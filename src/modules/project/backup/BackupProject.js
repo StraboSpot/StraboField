@@ -35,6 +35,8 @@ const BackupProject = () => {
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const backupFrequency = useSelector(state => state.connections.backupFrequency);
+  // const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
+  // const user = useSelector(state => state.user);
 
   const {openURL} = useDevice();
   const {

@@ -16,33 +16,26 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
-  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+  const {targetDatasetId} = useSelector(state => state.project);
 
-  const {makeDatasetCurrent, setSwitchValue} = useProject();
   const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
+  const {toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Derived Variables */
 
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
+  const isReadOnly = dataset.isReadOnly;
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */
 
   const handleDatasetPressed = () => setDatasetToView(dataset);
 
-  const onSwitch = async (val) => {
-    const value = await setSwitchValue(val, dataset);
-    console.log('Value has been switched', value);
-  };
-
-  /* Logic Helpers */
-
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
+  const handleToggleActiveDataset = async (val) => {
+    const value = await toggleActiveDataset(val, dataset);
+    console.log('Active dataset has been switched', value);
   };
 
   /* View */
@@ -55,7 +48,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         onPress={handleDatasetPressed}
         pad={10}
       >
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={onSwitch} value={isActive}/>
+        <SwitchWrapper
+          disabled={false}
+          onValueChange={handleToggleActiveDataset}
+          value={isActive}
+        />
 
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{truncateText(dataset.name, 18)}</ListItem.Title>
@@ -71,10 +68,10 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         <Icon
           color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
             : themes.SECONDARY_BACKGROUND_COLOR}
-          disabled={!isActive}
+          disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => makeDatasetCurrent(dataset.id)}
+          onPress={() => toggleTargetDataset(dataset.id)}
           type={'ionicon'}
         />
 

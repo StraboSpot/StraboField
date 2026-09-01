@@ -51,20 +51,22 @@ const useUpload = () => {
 
   const uploadDataset = async (dataset) => {
     try {
-      setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
-      let datasetCopy = JSON.parse(JSON.stringify(dataset));
-      delete datasetCopy.spotIds;
-      datasetCopy.images && delete datasetCopy.images;
-      const resJSON = await updateDataset(datasetCopy);
-      if (resJSON.modified_on_server) {
-        console.log(dataset.name + ': Dataset that was uploaded:', resJSON);
-        await addDatasetToProject(project.id, dataset.id);
-        setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
-        await uploadSpots(dataset);
-      }
-      else {
-        // Rejected: the server copy is newer, so it was not overwritten.
-        setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server and was not overwritten.`);
+      if (!dataset.isReadOnly) {
+        setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
+        let datasetCopy = JSON.parse(JSON.stringify(dataset));
+        delete datasetCopy.spotIds;
+        datasetCopy.images && delete datasetCopy.images;
+        const resJSON = await updateDataset(datasetCopy);
+        if (resJSON.modified_on_server && !resJSON.isReadOnly) {
+          console.log(dataset.name + ': Dataset that was uploaded:', resJSON);
+          await addDatasetToProject(project.id, dataset.id);
+          setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
+          await uploadSpots(dataset);
+        }
+        else {
+          // Rejected: the server copy is newer, so it was not overwritten.
+          setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server and was not overwritten.`);
+        }
       }
     }
     catch (err) {

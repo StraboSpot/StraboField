@@ -28,10 +28,13 @@ const TagDetail = ({
                    }) => {
   /* Data Hooks */
 
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
+
+  const {isReadOnlySpot} = useProject();
   const {getSpotById, getSpotWithThisSample} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
@@ -77,7 +80,7 @@ const TagDetail = ({
     const spot = getSpotById(feature.parentSpotId);
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
     if (!isEmpty(spot)) {
-      const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+      const isReadOnly = isReadOnlySpot(spot.properties.id);
       return (
         <ListItem
           containerStyle={commonStyles.listItem}
@@ -134,17 +137,17 @@ const TagDetail = ({
       ListHeaderComponent={
         <>
           <SectionDividerWithRightButton
-            buttonTitle={'View/Edit'}
+            buttonTitle={isReadOnlyProject ? undefined : 'View/Edit'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
-            onPress={setIsDetailModalVisible}
+            onPress={isReadOnlyProject ? undefined : setIsDetailModalVisible}
           />
-          {selectedTag && <TagDetailSummaryText onPress={setIsDetailModalVisible}/>}
+          {selectedTag && <TagDetailSummaryText onPress={isReadOnlyProject ? undefined : setIsDetailModalVisible}/>}
 
           {/* Spots with this Tag */}
           <SectionDividerWithRightButton
-            buttonTitle={'Add/Remove'}
+            buttonTitle={isReadOnlyProject ? undefined : 'Add/Remove'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}
-            onPress={addRemoveSpots}
+            onPress={isReadOnlyProject ? undefined : addRemoveSpots}
           />
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
@@ -168,9 +171,9 @@ const TagDetail = ({
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
               <SectionDividerWithRightButton
-                buttonTitle={'Add/Remove'}
+                buttonTitle={isReadOnlyProject ? undefined : 'Add/Remove'}
                 dividerText={'Tagged Features'}
-                onPress={addRemoveFeatures}
+                onPress={isReadOnlyProject ? undefined : addRemoveFeatures}
               />
               {renderTaggedFeaturesList()}
             </>
