@@ -57,6 +57,7 @@ const Compass = ({
         alert('Location Services Required',
           'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
       }
+      throw err; // rethrow so the Android branch can tell success from failure and not start with declination 0
     });
 
     const startSensors = () => {
@@ -65,21 +66,21 @@ const Compass = ({
       subscribeToCalibrationStatus(handleCalibrationStatus);
     };
 
-    // Android converts magnetic -> true north in JS by adding this declination, so a reading emitted
-    // before it's fetched would be recorded as magnetic (off by the local declination). Wait for the
-    // fetch to settle before the sensor stream starts. iOS gets true north straight from CoreMotion's
-    // reference frame and doesn't use this value for measurements, so it subscribes immediately.
-    if (Platform.OS === 'android') declinationReady.finally(startSensors);
+    // Android converts magnetic -> true north in JS by adding this declination. Starting the stream
+    // before the fetch resolves would record magnetic values, and starting it after the fetch FAILS
+    // (declination stuck at 0) would silently record magnetic mislabeled as true. So only start once
+    // declination is known; on failure the user got the alert above and the compass stays unstarted.
+    // iOS gets true north straight from CoreMotion's reference frame and doesn't use this value, so it
+    // subscribes immediately.
+    if (Platform.OS === 'android') declinationReady.then(startSensors).catch(() => {});
     else startSensors();
 
-    AppState.addEventListener('change', handleAppStateChange);
+    const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
       isMounted = false;
       unsubscribeFromSensors();
       unsubscribeFromCalibrationStatus();
-      AppState.addEventListener(
-        'change',
-        () => console.log('APP STATE EVENT REMOVED IN COMPASS')).remove();
+      appStateSubscription.remove();
     };
   }, []);
 

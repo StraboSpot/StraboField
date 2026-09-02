@@ -4,13 +4,11 @@ import {NativeEventEmitter, Platform} from 'react-native';
 import geomagnetism from 'geomagnetism';
 import {useSelector} from 'react-redux';
 
-import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge} from './compassMath.helpers';
+import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod} from './compassMath.helpers';
 import CompassModule from './CompassModule';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
-
-let matrixArray = [];
 
 const useCompassCore = () => {
   /* Data Hooks */
@@ -26,6 +24,7 @@ const useCompassCore = () => {
   const imageCapturedDeclination = useRef(0);
   const imageCaptureSubscription = useRef(null);
   const magneticDeclination = useRef(0);
+  const matrixArray = useRef([]);
   const matrixRawData = useRef(null);
   const rotationMatrixSubscription = useRef(null);
 
@@ -52,11 +51,11 @@ const useCompassCore = () => {
     const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
     matrixRawData.current = matrix;
     let {magneticHeading, trueHeading} = matrixRotationData;
-    if (Platform.OS !== 'ios') trueHeading = (magneticHeading + declination) % 360;
+    if (Platform.OS !== 'ios') trueHeading = mod(magneticHeading + declination, 360);
     const {strike, dip} = getStrikeAndDipFromMatrix(matrix, declination);
     const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, declination);
 
-    const dipDirection = (strike + 90) % 360;
+    const dipDirection = mod(strike + 90, 360);
     setCompassData({
       declination: declination.toFixed(2),
       dip: roundToDecimalPlaces(dip, 0),
@@ -77,7 +76,7 @@ const useCompassCore = () => {
     const ENU_Cam = Platform.OS === 'ios' ? cartesianToSpherical(m32, -m31, -m33)
       : cartesianToSpherical(-m31, -m32, -m33);
     let {plunge, trend} = getTrendAndPlunge(ENU_Cam);
-    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    if (Platform.OS !== 'ios') trend = mod(trend + declination, 360);
     return {plunge, trend};
   };
 
@@ -89,7 +88,7 @@ const useCompassCore = () => {
     const ENU_Pole = Platform.OS === 'ios' ? cartesianToSpherical(-m32, m31, m33)
       : cartesianToSpherical(m31, m32, m33);
     let {strike, dip} = getStrikeAndDip(ENU_Pole);
-    if (Platform.OS !== 'ios') strike = (strike + declination) % 360;
+    if (Platform.OS !== 'ios') strike = mod(strike + declination, 360);
     return {strike, dip};
   };
 
@@ -100,7 +99,7 @@ const useCompassCore = () => {
     const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23)
       : cartesianToSpherical(m21, m22, m23);
     let {plunge, trend} = getTrendAndPlunge(ENU_TP);
-    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    if (Platform.OS !== 'ios') trend = mod(trend + declination, 360);
     return {plunge, trend};
   };
 
@@ -115,10 +114,11 @@ const useCompassCore = () => {
   };
 
   const matrixAverage = async (matrixData) => {
-    matrixArray.push(matrixData);
-    if (matrixArray.length > 5) matrixArray.shift();
+    const buffer = matrixArray.current;
+    buffer.push(matrixData);
+    if (buffer.length > 5) buffer.shift();
 
-    const avg = key => matrixArray.reduce((sum, obj) => sum + obj[key] / matrixArray.length, 0);
+    const avg = key => buffer.reduce((sum, obj) => sum + obj[key] / buffer.length, 0);
     return {
       m11: roundToDecimalPlaces(avg('m11'), 3),
       m12: roundToDecimalPlaces(avg('m12'), 3),
@@ -192,6 +192,7 @@ const useCompassCore = () => {
 
   const subscribeToSensors = () => {
     try {
+      matrixArray.current = []; // drop any samples left over from a previous session
       const CompassEvents = new NativeEventEmitter(CompassModule);
       rotationMatrixSubscription.current = CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
@@ -216,6 +217,7 @@ const useCompassCore = () => {
 
   const unsubscribeFromSensors = () => {
     try {
+      matrixArray.current = [];
       rotationMatrixSubscription.current?.remove();
       Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
       console.log('%cEnded Compass observation and rotationMatrix listener.', 'color: red');
