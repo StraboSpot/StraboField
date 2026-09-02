@@ -14,6 +14,7 @@ StraboSpot2 has two release paths:
 - **Cut markers:** `npm run cut-rc` tags the current `package.json` version as `v{version}-rc` and pushes it. Run it when you **finalize a patch/beta on the rc branch** — it freezes that version's draft so subsequent commits start a fresh draft for the next version. Without a marker, the long-lived `rc-2.30.x` branch has nothing telling it where `.4` ends and `.5` begins.
 - **Official release:** pushing a `v*` **tag** triggers [`.github/workflows/changelog.yml`](.github/workflows/changelog.yml), which builds the changelog from `git log <prev v-tag>..<new tag>` (previous tag chosen in `sort -V` order) and publishes a non-prerelease GitHub Release.
 - **Store release notes:** `npm run release-notes` (`scripts/release-notes.js`) generates the store "What's New" copy from the **curated** [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) — the same source the in-app What's New modal uses, so the stores and the app never disagree (and reverted/internal work can't leak in). It writes `fastlane/metadata/en-US/release_notes.txt` (App Store / `deliver`, grouped, ≤4000 chars) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play / `supply`, condensed to ≤500 chars). It generates for the release entry matching `package.json`; override with `node scripts/release-notes.js <version>`. **Edit `releaseNotes.js`, not the `.txt` files** — the script overwrites them. Note: the Fastfile does not yet wire `deliver`/`supply`, so these files are currently copy-pasted into each console.
+- **TestFlight "What to Test":** the `beta` lane feeds the same `fastlane/metadata/en-US/release_notes.txt` into `upload_to_testflight(changelog:)`, so TestFlight testers see the App Store notes (falls back to a generic line if the file is missing). Run `npm run release-notes` **before** `npm run deploy-beta` so testers get the current version's notes; nothing extra to write.
 
 ### Rules that apply to both paths
 
@@ -33,7 +34,7 @@ Print this checklist anytime with `npm run start-rc`.
 3. **Commit & push** to the rc branch → triggers the **draft release**.
 4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. Each new **test build** of this same version (TestFlight / closed testing) needs a fresh build number — run `npm run bump-build` (build number only). **Do not** `bump-patch` again; that starts a new marketing version.
 5. **Update What's New:** add this release's highlights to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal).
-6. **Generate store notes:** `npm run release-notes` regenerates the App Store + Play files from `releaseNotes.js`; commit `releaseNotes.js` and the `.txt` files. Do **not** hand-edit the `.txt` files — the script overwrites them.
+6. **Generate store notes:** `npm run release-notes` regenerates the App Store + Play files from `releaseNotes.js`; commit `releaseNotes.js` and the `.txt` files. Do **not** hand-edit the `.txt` files — the script overwrites them. Run this **before** any `npm run deploy-beta` — the `beta` lane reads `release_notes.txt` for TestFlight's "What to Test".
 7. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
 8. **Merge** `rc-{version}` → `master` and push.
 9. **Tag on master:** `git tag v{version}`.
@@ -91,6 +92,7 @@ Use this when a fix must ship now and you are **not** merging the rc branch. The
    Then confirm `changelog.yml` ran green and the release notes contain **only** the hotfix commits.
 
 8. **Build & ship the binaries** (the tag only makes release notes; it does not build the app):
+   - Make sure `npm run release-notes` already ran (step 5) — `deploy-beta` reads `release_notes.txt` for TestFlight's "What to Test".
    - iOS → TestFlight: `npm run deploy-beta`.
    - Android → `npm run bundle:android && npm run deploy:android`, then upload the `.aab` from `android/app/build/outputs/bundle/release/`.
    - Web (if affected): `npm run web-deploy`.
