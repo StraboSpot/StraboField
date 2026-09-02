@@ -163,11 +163,12 @@ const spotSlice = createSlice({
       return initialSpotState;
     },
     restoredIntervalDragSnapshot(state, action) {
-      const spots = Object.assign({}, ...action.payload.map(spot => ({[spot.properties.id]: spot})));
-      state.spots = {...state.spots, ...spots};
-      if (!isEmpty(state.selectedSpot) && Object.keys(spots).includes(state.selectedSpot?.properties?.id)) {
-        state.selectedSpot = spots[state.selectedSpot.properties.id];
-      }
+      const spotsRestored = Object.assign({}, ...action.payload.map(spot => ({[spot.properties.id]: spot})));
+      state.spots = {...state.spots, ...spotsRestored};
+      // Only the Spots being restored are keyed here, so finding the selected Spot among them is what says to
+      // refresh it, and the lookup coerces its number id to the string it is keyed under
+      const selectedSpotRestored = spotsRestored[state.selectedSpot?.properties?.id];
+      if (selectedSpotRestored) state.selectedSpot = selectedSpotRestored;
     },
     restoredSpots(state, action) {
       // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots.
