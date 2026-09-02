@@ -4,7 +4,7 @@ import {Toast} from 'react-native-toast-notifications';
 
 import {PROJECT_SAVE_STATUS} from '../modules/connections/connections.constants';
 import {setProjectSaveStatus} from '../modules/connections/connections.slice';
-import {cancelledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
+import {canceledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
 import {
   addedCustomFeatureTypes,
   addedDataset,
@@ -321,7 +321,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
   }
 };
 
-const cancelledIntervalDragListener = () => {
+const canceledIntervalDragListener = () => {
   pendingDragSpotIds = new Set();
 };
 
@@ -339,7 +339,7 @@ listenerMiddleware.startListening({
 
 // Batch-save interval reorder changes when drag mode ends
 listenerMiddleware.startListening({actionCreator: savedIntervalDragReordering, effect: intervalDragModeEndedListener});
-listenerMiddleware.startListening({actionCreator: cancelledIntervalDrag, effect: cancelledIntervalDragListener});
+listenerMiddleware.startListening({actionCreator: canceledIntervalDrag, effect: canceledIntervalDragListener});
 
 // Don't need to do addedSpotsFromDevice until can add from device on web
 // listenerMiddleware.startListening({actionCreator: addedSpotsFromDevice, effect: updatedProjectDatasetSpotListener});

@@ -54,7 +54,7 @@ const mapsSlice = createSlice({
     addedIntervalDragChangedSpotIds(state, action) {
       state.intervalDragChangedSpotIds = [...new Set([...state.intervalDragChangedSpotIds, ...action.payload])];
     },
-    cancelledIntervalDrag(state) {
+    canceledIntervalDrag(state) {
       state.isDragIntervalMode = false;
       state.intervalDragState = null;
       state.intervalDragSnapshot = null;
@@ -194,7 +194,7 @@ export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
   addedIntervalDragChangedSpotIds,
-  cancelledIntervalDrag,
+  canceledIntervalDrag,
   clearedIntervalDragState,
   clearedMaps,
   clearedSpotsInMapExtentIds,

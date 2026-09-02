@@ -11,7 +11,7 @@ import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
-  cancelledIntervalDrag,
+  canceledIntervalDrag,
   clearedStratSection,
   savedIntervalDragReordering,
   setFreehandFeatureCoords,
@@ -123,7 +123,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const clickHandler = async (name, value) => {
     if (name !== 'startIntervalDrag' && name !== 'saveReordering' && name !== 'cancelIntervalDrag') {
       if (isDragIntervalMode) setMapMode(MAP_MODES.VIEW);
-      dispatch(cancelledIntervalDrag());
+      dispatch(canceledIntervalDrag());
     }
     switch (name) {
       // Map Actions
@@ -226,7 +226,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
           dispatch(restoredIntervalDragSnapshot(intervalDragSnapshot));
           if (Platform.OS !== 'web') dispatch(editedOrCreatedSpots(intervalDragSnapshot));
         }
-        dispatch(cancelledIntervalDrag());
+        dispatch(canceledIntervalDrag());
         setMapMode(MAP_MODES.VIEW);
         break;
     }
@@ -269,7 +269,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   // Toggle given dialog between true (visible) and false (hidden)
   const toggleDialog = (dialog) => {
-    dispatch(cancelledIntervalDrag());
+    dispatch(canceledIntervalDrag());
     console.log('Toggle', dialog);
     setDialogs({
       ...dialogs,

@@ -14,7 +14,7 @@ import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
-import {cancelledIntervalDrag} from '../maps/maps.slice';
+import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -61,7 +61,7 @@ const HomeViewSmallScreen = forwardRef(({
   }, []);
 
   const toggleSpotNavigator = () => {
-    dispatch(cancelledIntervalDrag());
+    dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
   };
@@ -108,7 +108,7 @@ const HomeViewSmallScreen = forwardRef(({
         />
       ) : (
         <Tab.Navigator
-          screenListeners={{focus: () => dispatch(cancelledIntervalDrag())}}
+          screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
@@ -155,7 +155,7 @@ const HomeViewSmallScreen = forwardRef(({
                 {stratSection && (
                   <IconButton
                     onPress={() => {
-                      dispatch(cancelledIntervalDrag());
+                      dispatch(canceledIntervalDrag());
                       dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
                     }}
                     source={require('../../assets/icons/AddIntervalButton.png')}

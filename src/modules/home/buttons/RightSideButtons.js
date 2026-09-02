@@ -8,7 +8,7 @@ import {DrawActionButtons, ShortcutButtons} from './';
 import NotebookButton from './NotebookButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
-import {cancelledIntervalDrag} from '../../maps/maps.slice';
+import {canceledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
@@ -50,7 +50,7 @@ const RightSideButtons = ({
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => {
-              dispatch(cancelledIntervalDrag());
+              dispatch(canceledIntervalDrag());
               dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
             }}
             source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
