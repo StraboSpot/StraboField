@@ -18,6 +18,48 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.1',
+    groups: [
+      {
+        title: 'Compass',
+        items: [
+          {
+            text: 'Smoother, more accurate compass: faster needle updates and improved declination handling',
+            commit: '85d7dddb0',
+          },
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'IGSN required fields: registration now warns inline about missing required fields, and falls back to the Spot\'s date when no collection date is set',
+            commit: '88b6528d1',
+          },
+          {
+            text: 'Sample dates: converting a legacy sample keeps the parent Spot\'s created date',
+            commit: '563d0e73c',
+          },
+        ],
+      },
+      {
+        title: 'Maps',
+        items: [
+          {
+            text: 'Import progress: see progress while importing, and large tile imports no longer stall',
+            commit: 'a97d9e98f',
+          },
+        ],
+      },
+      {
+        title: 'Backup & uploads',
+        items: [
+          {text: 'Simpler uploads: a unified upload screen with more consistent behavior', commit: '46a29cc00'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.0',
     groups: [
       {
