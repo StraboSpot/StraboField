@@ -80,11 +80,14 @@ const spotSlice = createSlice({
       const spotsWithTimestamp = action.payload.map(s => (
         {...s, properties: {...s.properties, modified_timestamp: Date.now()}}
       ));
-      const spots = Object.assign({}, ...spotsWithTimestamp.map(spot => ({[spot.properties.id]: spot})));
-      state.spots = {...state.spots, ...spots};
+      const spotsEdited = Object.assign({}, ...spotsWithTimestamp.map(spot => ({[spot.properties.id]: spot})));
+      state.spots = {...state.spots, ...spotsEdited};
       console.log('UPDATED Spots:', state.spots, 'in Existing Spots:', current(state));
-      if (!isEmpty(state.selectedSpot) && Object.keys(spots).includes(state.selectedSpot.properties.id)) {
-        state.selectedSpot = spots[state.selectedSpot.properties.id];
+      // Only the Spots just edited are keyed here, so finding the selected Spot among them is what says to refresh
+      // it, and the lookup coerces its number id to the string it is keyed under
+      const selectedSpotUpdated = spotsEdited[state.selectedSpot?.properties?.id];
+      if (selectedSpotUpdated) {
+        state.selectedSpot = selectedSpotUpdated;
         console.log('UPDATED Selected Spot:', state.selectedSpot);
       }
     },
