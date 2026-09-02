@@ -23,7 +23,8 @@ import {Form, FormikWrapper, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {editedOrCreatedSpots} from '../spots/spots.slice';
+import {calculateMissingOrientations, getSpotOrientations} from '../spots/spots.helpers';
+import {editedOrCreatedSpots, setSelectedAttributes} from '../spots/spots.slice';
 
 const UserProfile = () => {
   /* Data Hooks */
@@ -31,6 +32,8 @@ const UserProfile = () => {
   const dispatch = useDispatch();
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
@@ -87,39 +90,30 @@ const UserProfile = () => {
 
       else {
         const spotsEdited = [];
-        let spotsEditedIds = [];
+        const spotsEditedIds = [];
         spotsFiltered.forEach((s) => {
-          if (s.properties.orientation_data) {
-            let editedMeasurements = JSON.parse(JSON.stringify(s.properties.orientation_data));
-            Object.values(editedMeasurements).forEach((m) => {
-              if (!isEmpty(m.strike) && isEmpty(m.dip_direction)) {
-                const dipDirection = (m.strike + 90) % 360;
-                console.log('Strike', m.strike, '-> Dip Direction', dipDirection);
-                m.dip_direction = dipDirection;
-                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-              }
-              else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
-                // Wrapped through 360 so a dip direction under 90 gives a strike in range rather than a negative
-                const strike = (m.dip_direction - 90 + 360) % 360;
-                console.log('Dip direction', m.dip_direction, '-> Strike', strike);
-                m.strike = strike;
-                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-              }
-            });
-            if (spotsEditedIds.includes(s.properties.id.toString())) {
-              const updatedSpot = JSON.parse(JSON.stringify(s));
-              updatedSpot.properties.orientation_data = editedMeasurements;
-              spotsEdited.push(updatedSpot);
-            }
+          // Don't copy a Spot only to find it holds nothing that could carry a plane
+          if (isEmpty(getSpotOrientations(s))) return;
+          const updatedSpot = JSON.parse(JSON.stringify(s));
+          let isSpotEdited = false;
+          getSpotOrientations(updatedSpot).forEach(({fields, orientation}) => {
+            if (calculateMissingOrientations(orientation, fields)) isSpotEdited = true;
+          });
+          if (isSpotEdited) {
+            spotsEdited.push(updatedSpot);
+            // As stored, not as a string: the dataset holding the Spot is found by matching its own numeric ids
+            spotsEditedIds.push(s.properties.id);
           }
         });
         if (!isEmpty(spotsEdited)) {
           // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
-          //   return spotsEditedIds.includes(s.properties.id.toString()) ? [...acc, s] : acc;
+          //   return spotsEditedIds.includes(s.properties.id) ? [...acc, s] : acc;
           // }, []));
           // console.log('Spots to update', spotsEdited);
           dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
           dispatch(editedOrCreatedSpots(spotsEdited));
+          const selectedAttributesUpdated = getUpdatedSelectedAttributes(spotsEdited);
+          if (selectedAttributesUpdated) dispatch(setSelectedAttributes(selectedAttributesUpdated));
           const spotsUpdatedText = spotsEdited.length + (spotsEdited.length === 1 ? ' Spot' : ' Spots');
           toast.show(`Finished calculating. ${spotsUpdatedText} updated.`, {placement: 'top', type: 'success'});
         }
@@ -136,6 +130,18 @@ const UserProfile = () => {
   };
 
   const getIsDisabled = () => false;
+
+  // A detail page open in the Notebook renders the record it was handed rather than reading the Spot again, so a
+  // calculated value reaches it only by handing that record back. Returns null unless a record being looked at was
+  // itself calculated, since reselecting reinitializes the open form over anything typed into it.
+  const getUpdatedSelectedAttributes = (spotsEdited) => {
+    if (isEmpty(selectedAttributes)) return null;
+    const spotUpdated = spotsEdited.find(spot => spot.properties.id === selectedSpot?.properties?.id);
+    if (isEmpty(spotUpdated)) return null;
+    const records = getSpotOrientations(spotUpdated).map(({orientation}) => orientation);
+    const selectedAttributesUpdated = selectedAttributes.map(a => records.find(r => r.id === a.id) || a);
+    return isEqual(selectedAttributesUpdated, selectedAttributes) ? null : selectedAttributesUpdated;
+  };
 
   const saveForm = async (formCurrent) => {
     try {
@@ -236,9 +242,9 @@ const UserProfile = () => {
       <>
         <SectionDivider
           dividerText={'Update Measurements'}
-          subtitle={'Calculates a missing dip direction from an existing strike, and a missing strike from an '
-            + 'existing dip direction. Applies to every Spot in the project except those in read only datasets. '
-            + 'Updated Spots are marked as modified.'}
+          subtitle={'Uses an existing strike to calculate a missing dip direction, and the reverse, in every '
+            + 'measurement, associated plane, earthquake and 3D structure in the project. Skips read only datasets '
+            + 'and marks updated Spots as modified.'}
         />
         <OutlineButton
           onPress={calculateMissingStrikesAndDipDirections}
