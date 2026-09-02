@@ -1,5 +1,14 @@
-• Compass: New enlarged compass mode with redesigned controls, plus a toggle to switch between the classic and updated compass faces.
-• Backup & Sync: More reliable project uploads and a simpler, more consistent upload screen.
-• Samples: IGSN registration now flags missing required fields with inline warnings, and uses the Spot's date when no collection date is set.
+COMPASS
+• Smoother, more accurate compass: faster needle updates and improved declination handling
+
+SAMPLES & IGSN
+• IGSN required fields: registration now warns inline about missing required fields, and falls back to the Spot's date when no collection date is set
+• Sample dates: converting a legacy sample keeps the parent Spot's created date
+
+MAPS
+• Import progress: see progress while importing, and large tile imports no longer stall
+
+BACKUP & UPLOADS
+• Simpler uploads: a unified upload screen with more consistent behavior
 
 Thanks for using StraboSpot!
