@@ -16,11 +16,11 @@ describe('updatedModifiedTimestampsBySpotsIds', () => {
     expect(datasets[13].modified_timestamp).toBe(1);
   });
 
-  // Spot ids are stored in spotIds as numbers and matched with ===, so a caller handing over a string finds no
-  // dataset to mark and the Spot is left looking uploaded
-  it('needs the Spot id as it is stored rather than as a string', () => {
+  // Spot ids are stored in spotIds as numbers, but callers hand them over both ways
+  it('finds the dataset when the Spot id is given as a string', () => {
     const {datasets} = projectReducer(getState(), updatedModifiedTimestampsBySpotsIds([spotId.toString()]));
-    expect(datasets[12].modified_timestamp).toBe(1);
+    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+    expect(datasets[13].modified_timestamp).toBe(1);
   });
 
   it('marks the project as modified either way', () => {

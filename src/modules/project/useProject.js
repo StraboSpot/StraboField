@@ -13,7 +13,7 @@ import {
 } from './projects.slice';
 import useDevice from '../../services/device/useDevice';
 import useServerRequests from '../../services/network/useServerRequests';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewId, isEmpty, isSameId} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useResetState from '../../store/useResetState';
 import {
@@ -67,8 +67,8 @@ const useProject = () => {
   const getDatasetIdFromSpotId = (spotId) => {
     let datasetIdFound;
     for (const dataset of Object.values(datasets)) {
-      const spotIdFound = dataset.spotIds?.find(id => id === spotId);
-      if (spotIdFound) {
+      const isSpotIdFound = dataset.spotIds?.some(id => isSameId(id, spotId));
+      if (isSpotIdFound) {
         datasetIdFound = dataset.id;
         break;
       }

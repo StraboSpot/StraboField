@@ -33,7 +33,7 @@ import {
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
 } from '../services/network/serverRequests.web';
-import {isEmpty, toError} from '../shared/helpers';
+import {isEmpty, isSameId, toError} from '../shared/helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends
 let pendingDragSpotIds = new Set();
@@ -227,7 +227,10 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   if (action.type.includes('spot/editedOrCreatedSpots')) {
     const spotIds = action.payload.map(s => s.properties.id);
     const spotIdsGroupedByDatasetId = spotIds.reduce((acc, spotId) => {
-      const dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+      const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
+      // A Spot belongs to no dataset for a moment at times (e.g. a just-split line before Save Edits adds it to
+      // the target dataset); it goes up with the dataset it joins, so skip it here
+      if (!dataset) return acc;
       const datasetId = dataset.id;
       if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
       else return {...acc, [datasetId]: [spotId]};
@@ -246,7 +249,12 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     const spot = newState.spot.spots[spotId];
 
     // Get dataset for spot
-    let dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+    let dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
+    // Nothing to send while the Spot belongs to no dataset, as above, and no sibling Spot to send it with here
+    if (!dataset) {
+      Toast.hideAll();
+      return;
+    }
     dataset = {...dataset, spots: turf.featureCollection([spot])};
 
     // Create object to send to server
@@ -288,7 +296,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
   const datasets = Object.values(newState.project.datasets);
 
   const spotIdsGroupedByDatasetId = spotIds.reduce((acc, spotId) => {
-    const dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+    const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     if (!dataset) return acc;
     const datasetId = dataset.id;
     if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
