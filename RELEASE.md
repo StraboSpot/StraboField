@@ -7,7 +7,9 @@ StraboSpot2 has two release paths:
 
 ## How versioning & releases are wired
 
-- **Version bump:** `npm run bump-patch` (or `bump-minor` / `bump-major`) runs `npm version <level> --no-git-tag-version` (updates `package.json`) then `bundle exec fastlane bump`, which runs `inc_ver_ios` (iOS build number) and `inc_ver_and` (Android `versionCode` + `versionName` from `package.json`).
+- **Two numbers, two commands:** the **marketing version** (`2.31.1` — what users see, in `package.json` / iOS `MARKETING_VERSION` / Android `versionName`) and the **build number / `versionCode`** (an internal counter that must be unique for *every* binary you upload, even at the same marketing version).
+  - **Start a new public version:** `npm run bump-patch` (or `bump-minor` / `bump-major`) runs `npm version <level> --no-git-tag-version` (bumps the marketing version in `package.json`) **then** `bundle exec fastlane bump` (`inc_ver_ios` + `inc_ver_and`, which also syncs `versionName` from `package.json`). Moves **both** numbers. Run this **once** per version.
+  - **Another test build, same version:** `npm run bump-build` (just `bundle exec fastlane bump`) bumps **only** the build number / `versionCode` — the marketing version stays put. Use it for every extra TestFlight / closed-testing build while you stabilize an rc. No tag, no changelog, no store-notes change.
 - **Draft / prerelease:** pushing to any `rc-*` branch triggers [`.github/workflows/rc-draft.yml`](.github/workflows/rc-draft.yml), which creates/updates a **draft prerelease**. It slices the log at the highest **cut marker** (`v{version}-rc`) or published release tag reachable from `HEAD` — not at a `package.json` bump — so merging `master` (the 2.29.x hotfix line) into the rc branch no longer scrambles the boundary. Commits after the last cut marker are collected under the **next** version, and 2.29.x hotfix commits that rode in on a master merge are dropped (they are reachable from their own `v*` tags).
 - **Cut markers:** `npm run cut-rc` tags the current `package.json` version as `v{version}-rc` and pushes it. Run it when you **finalize a patch/beta on the rc branch** — it freezes that version's draft so subsequent commits start a fresh draft for the next version. Without a marker, the long-lived `rc-2.30.x` branch has nothing telling it where `.4` ends and `.5` begins.
 - **Official release:** pushing a `v*` **tag** triggers [`.github/workflows/changelog.yml`](.github/workflows/changelog.yml), which builds the changelog from `git log <prev v-tag>..<new tag>` (previous tag chosen in `sort -V` order) and publishes a non-prerelease GitHub Release.
@@ -29,7 +31,7 @@ Print this checklist anytime with `npm run start-rc`.
 1. **Cut the RC branch** from `dev`: `git checkout -b rc-{version} dev`.
 2. **Bump the version:** `npm run bump-patch` (or `bump-minor` / `bump-major`).
 3. **Commit & push** to the rc branch → triggers the **draft release**.
-4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft.
+4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. Each new **test build** of this same version (TestFlight / closed testing) needs a fresh build number — run `npm run bump-build` (build number only). **Do not** `bump-patch` again; that starts a new marketing version.
 5. **Update What's New:** add this release's highlights to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal).
 6. **Generate store notes:** `npm run release-notes` regenerates the App Store + Play files from `releaseNotes.js`; commit `releaseNotes.js` and the `.txt` files. Do **not** hand-edit the `.txt` files — the script overwrites them.
 7. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
@@ -92,6 +94,7 @@ Use this when a fix must ship now and you are **not** merging the rc branch. The
    - iOS → TestFlight: `npm run deploy-beta`.
    - Android → `npm run bundle:android && npm run deploy:android`, then upload the `.aab` from `android/app/build/outputs/bundle/release/`.
    - Web (if affected): `npm run web-deploy`.
+   - Need another build of this **same** hotfix version (e.g. a beta was rejected)? `npm run bump-build` (build number only), then re-ship. Do **not** `bump-patch` — that starts a new marketing version.
 
 9. **Upload Sentry sourcemaps** for the new version so the build symbolicates:
    ```bash
