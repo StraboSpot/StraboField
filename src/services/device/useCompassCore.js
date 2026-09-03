@@ -24,7 +24,6 @@ const useCompassCore = () => {
   const imageCapturedDeclination = useRef(0);
   const imageCaptureSubscription = useRef(null);
   const magneticDeclination = useRef(0);
-  const matrixArray = useRef([]);
   const matrixRawData = useRef(null);
   const rotationMatrixSubscription = useRef(null);
 
@@ -103,34 +102,15 @@ const useCompassCore = () => {
     return {plunge, trend};
   };
 
-  const handleMatrixRotationData = async (matrixData) => {
+  // Both platforms now average the rotation matrix natively (iOS in CoreMotion, Android over a rolling
+  // window in Compass.java), so there's a single smoothing stage and JS just consumes the result.
+  const handleMatrixRotationData = (matrixData) => {
     try {
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
       computeCompassData(matrixData);
     }
     catch (err) {
       console.error('Error Getting Matrix', err);
     }
-  };
-
-  const matrixAverage = async (matrixData) => {
-    const buffer = matrixArray.current;
-    buffer.push(matrixData);
-    if (buffer.length > 5) buffer.shift();
-
-    const avg = key => buffer.reduce((sum, obj) => sum + obj[key] / buffer.length, 0);
-    return {
-      m11: roundToDecimalPlaces(avg('m11'), 3),
-      m12: roundToDecimalPlaces(avg('m12'), 3),
-      m13: roundToDecimalPlaces(avg('m13'), 3),
-      m21: roundToDecimalPlaces(avg('m21'), 3),
-      m22: roundToDecimalPlaces(avg('m22'), 3),
-      m23: roundToDecimalPlaces(avg('m23'), 3),
-      m31: roundToDecimalPlaces(avg('m31'), 3),
-      m32: roundToDecimalPlaces(avg('m32'), 3),
-      m33: roundToDecimalPlaces(avg('m33'), 3),
-      magneticHeading: roundToDecimalPlaces(matrixData.magneticHeading, 0),
-    };
   };
 
   /* Exported Functions */
@@ -178,21 +158,20 @@ const useCompassCore = () => {
     Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
   };
 
+  // Both platforms emit compassCalibrationStatus now: iOS when CoreMotion can't get true north, Android
+  // when the magnetometer reports low/unreliable accuracy.
   const subscribeToCalibrationStatus = (handler) => {
-    if (Platform.OS === 'ios') {
-      try {
-        const CompassEvents = new NativeEventEmitter(CompassModule);
-        calibrationSubscription.current = CompassEvents.addListener('compassCalibrationStatus', handler);
-      }
-      catch (err) {
-        console.error('Error subscribing to calibration status: ' + err);
-      }
+    try {
+      const CompassEvents = new NativeEventEmitter(CompassModule);
+      calibrationSubscription.current = CompassEvents.addListener('compassCalibrationStatus', handler);
+    }
+    catch (err) {
+      console.error('Error subscribing to calibration status: ' + err);
     }
   };
 
   const subscribeToSensors = () => {
     try {
-      matrixArray.current = []; // drop any samples left over from a previous session
       const CompassEvents = new NativeEventEmitter(CompassModule);
       rotationMatrixSubscription.current = CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
@@ -204,20 +183,17 @@ const useCompassCore = () => {
   };
 
   const unsubscribeFromCalibrationStatus = () => {
-    if (Platform.OS === 'ios') {
-      try {
-        calibrationSubscription.current?.remove();
-        console.log('%cEnded compass calibration status listener.', 'color: red');
-      }
-      catch (err) {
-        console.error('Error unsubscribing from calibration status', err);
-      }
+    try {
+      calibrationSubscription.current?.remove();
+      console.log('%cEnded compass calibration status listener.', 'color: red');
+    }
+    catch (err) {
+      console.error('Error unsubscribing from calibration status', err);
     }
   };
 
   const unsubscribeFromSensors = () => {
     try {
-      matrixArray.current = [];
       rotationMatrixSubscription.current?.remove();
       Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
       console.log('%cEnded Compass observation and rotationMatrix listener.', 'color: red');

@@ -111,12 +111,20 @@ const Compass = ({
     }
 
     // Only show the alert once per compass session - check and set flag atomically
-    if (data.needsCalibration && Platform.OS === 'ios') {
+    if (data.needsCalibration) {
       if (hasShownCalibrationAlert.current) return; // Already shown, ignore this event
       hasShownCalibrationAlert.current = true;  // Set flag IMMEDIATELY before calling alert to prevent race conditions
 
-      alert('Compass Calibration Required',
-        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+      // The remedy differs by platform: iOS needs a system setting enabled; Android needs the user to
+      // recalibrate the magnetometer (figure-8 motion) and move away from magnetic interference.
+      if (Platform.OS === 'ios') {
+        alert('Compass Calibration Required',
+          'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+      }
+      else {
+        alert('Compass Needs Calibration',
+          'The magnetometer accuracy is low, so orientation measurements may be inaccurate. Wave the device in a figure-8 motion a few times and move away from metal or magnetic objects.');
+      }
     }
   };
 
