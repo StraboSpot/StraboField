@@ -75,7 +75,7 @@
       "type": "decimal",
       "name": "magnetic_declination",
       "label": "Magnetic Declination",
-      "hint": "Enter declination based on whether magnetic north is east or west of geographic north. If magnetic north is west of geographic north, enter declination as a negative number; if it is east enter declination as a positive number.",
+      "hint": "This is automatically recorded from your location when the compass is opened or a picture is taken, and can be edited here. \n\nEnter declination based on whether magnetic north is east or west of geographic north. If magnetic north is west of geographic north, enter declination as a negative number; if it is east enter declination as a positive number.",
       "required": "false",
       "constraint_message": "Declination must be between -180 to 180.",
       "constraint": ". >= -180 and . <= 180"
