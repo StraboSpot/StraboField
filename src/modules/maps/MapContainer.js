@@ -26,6 +26,7 @@ import {isEmpty} from '../../shared/helpers';
 import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {isStratInterval} from '../spots/spots.helpers';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
 const MapContainer = forwardRef(({
@@ -219,18 +220,14 @@ const MapContainer = forwardRef(({
 
   useEffect(() => {
     if (isDragIntervalMode && stratSection) {
-      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
-        ? selectedSpot
-        : null;
+      const interval = isStratInterval(selectedSpot) ? selectedSpot : null;
       startIntervalDrag(0, 0, interval, 0).catch(console.error);
     }
   }, [isDragIntervalMode]);
 
   useEffect(() => {
     if (!intervalDragState && isDragIntervalMode && stratSection) {
-      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
-        ? selectedSpot
-        : null;
+      const interval = isStratInterval(selectedSpot) ? selectedSpot : null;
       startIntervalDrag(0, 0, interval, 0).catch(console.error);
     }
   }, [intervalDragState]);
