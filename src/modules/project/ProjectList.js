@@ -94,7 +94,9 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
   };
 
   const renderProjectItem = (item) => {
-    const modifiedTimeAndDate = moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
+    const modifiedTimeAndDate = item.modified_timestamp
+      ? moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a')
+      : null;
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
