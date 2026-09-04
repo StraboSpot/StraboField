@@ -203,10 +203,13 @@ const useProject = () => {
   const getTargetDatasetFromId = () => {
     let targetDataset = datasets[targetDatasetId];
     if (isEmpty(targetDataset)) {
-      const datasetToSelect = Object.values(datasets)?.[0];
+      // New Spots are filed into the target, so pass over the read only datasets - one of those would take
+      // Spots that could never be edited. With none writable, fall through and make one
+      const datasetToSelect = Object.values(datasets).find(dataset => !readOnlyDatasetsIds.includes(dataset.id));
       if (!isEmpty(datasetToSelect) && datasetToSelect.id) {
         dispatch(setActiveDatasets({bool: true, dataset: datasetToSelect.id}));
         dispatch(setTargetDataset(datasetToSelect.id));
+        targetDataset = datasetToSelect;
       }
       else if (!__DEV__ && Platform.OS !== 'web') {
         alert('No Target Dataset. Creating a new Default Dataset.');

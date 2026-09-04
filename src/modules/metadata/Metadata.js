@@ -35,8 +35,8 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
-    // A lock at either end blocks the move: isReadOnly is the Spot's own, so it disables every row, while a
-    // read only dataset disables only its own row
+    // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only
+    // dataset only its own. rn-vui keeps disabled off the radio it draws, hence the fade
     const isDatasetReadOnly = readOnlyDatasetsIds.includes(dataset.id);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
@@ -53,6 +53,7 @@ const Metadata = ({isReadOnly, page}) => {
           checked={isChecked}
           checkedIcon={'radiobox-marked'}
           disabled={isReadOnly || isDatasetReadOnly}
+          disabledStyle={{opacity: 0.5}}
           iconType={'material-community'}
           onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}
