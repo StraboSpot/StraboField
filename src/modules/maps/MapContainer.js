@@ -16,6 +16,7 @@ import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
+import useStratSection from './strat-section/useStratSection';
 import useMap from './useMap';
 import useMapCoords from './view/useMapCoords';
 import useMapLocation from './view/useMapLocation';
@@ -126,6 +127,7 @@ const MapContainer = forwardRef(({
     switchToEditing,
   });
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
+  const {activateDatasetsWithIntervals} = useStratSection();
   const {setMapView, zoomToSpotsNow} = useMapView();
   const {getTilesFromHost} = useServerRequests();
 
@@ -207,6 +209,13 @@ const MapContainer = forwardRef(({
     updateMapView().catch(err => console.warn('Error getting center of custom map:', err));
     if (currentBasemap?.source !== 'macrostrat') setIsShowMacrostratOverlay(false);
   }, [currentBasemap, isZoomToCenterOffline]);
+
+  // Whenever a strat section becomes the current map, make sure every dataset holding one of its intervals
+  // is active, otherwise the column draws with gaps. Keyed on the id so editing the section's settings,
+  // which replaces the object, does not run it again.
+  useEffect(() => {
+    if (stratSection) activateDatasetsWithIntervals(stratSection.strat_section_id);
+  }, [stratSection?.strat_section_id]);
 
   useEffect(() => {
     if (isDragIntervalMode && stratSection) {

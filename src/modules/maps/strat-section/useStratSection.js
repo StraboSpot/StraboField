@@ -1,21 +1,46 @@
 import * as turf from '@turf/turf';
-import {useSelector} from 'react-redux';
+import {useToast} from 'react-native-toast-notifications';
+import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
-import {getNewUUID, isEmpty} from '../../../shared/helpers';
+import {getNewUUID, isEmpty, isSameId} from '../../../shared/helpers';
 import {useForm} from '../../form';
+import {setActiveDatasets} from '../../project/projects.slice';
 import {useSpots} from '../../spots';
+import {clearedSpotsInMapExtentIds} from '../maps.slice';
 
 const useStratSection = () => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
+  const datasets = useSelector(state => state.project.datasets) || {};
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSurvey} = useForm();
-  const {deleteSpot, getSpotWithThisStratSection} = useSpots();
+  const {deleteSpot, getSpotsMappedOnGivenStratSection, getSpotWithThisStratSection} = useSpots();
   const {calculateIntervalGeometry, moveSpotsUpOrDownByPixels} = useStratSectionCalculations();
+  const toast = useToast();
 
   /* Exported Functions */
+
+  // Intervals on a strat section can belong to datasets other than the active ones, and an inactive interval
+  // is simply not drawn, so the section opens with gaps in the column or empty altogether. Turn those
+  // datasets on so the section is whole, and tell the user which ones were turned on and why.
+  const activateDatasetsWithIntervals = (stratSectionId) => {
+    const intervals = getSpotsMappedOnGivenStratSection(stratSectionId).filter(
+      spot => spot.properties?.surface_feature?.surface_feature_type === 'strat_interval');
+    const datasetsToActivate = Object.values(datasets).filter(
+      dataset => !activeDatasetsIds.some(id => isSameId(id, dataset.id))
+        && intervals.some(interval => dataset.spotIds?.some(id => isSameId(id, interval.properties.id))));
+    if (isEmpty(datasetsToActivate)) return;
+
+    datasetsToActivate.forEach(dataset => dispatch(setActiveDatasets({bool: true, dataset: dataset.id})));
+    dispatch(clearedSpotsInMapExtentIds());
+    const datasetNames = datasetsToActivate.map(dataset => dataset.name).join(', ');
+    toast.show(`${datasetsToActivate.length === 1 ? 'Dataset' : 'Datasets'} ${datasetNames} turned on`
+      + ' to show all the intervals on this strat section.', {duration: 5000});
+  };
 
   // Create a new strat section interval, separating the fields to their respective objects
   const createInterval = (stratSectionId, data) => {
@@ -149,6 +174,7 @@ const useStratSection = () => {
   };
 
   return {
+    activateDatasetsWithIntervals,
     createInterval,
     deleteInterval,
     getStratSectionSettings,
