@@ -18,7 +18,7 @@ const useStratSection = () => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSurvey} = useForm();
-  const {deleteSpot, getSpotsMappedOnGivenStratSection, getSpotWithThisStratSection} = useSpots();
+  const {deleteSpot, getAllIntervalSpotsOnStratSection, getSpotWithThisStratSection} = useSpots();
   const {calculateIntervalGeometry, moveSpotsUpOrDownByPixels} = useStratSectionCalculations();
   const toast = useToast();
 
@@ -28,8 +28,7 @@ const useStratSection = () => {
   // is simply not drawn, so the section opens with gaps in the column or empty altogether. Turn those
   // datasets on so the section is whole, and tell the user which ones were turned on and why.
   const activateDatasetsWithIntervals = (stratSectionId) => {
-    const intervals = getSpotsMappedOnGivenStratSection(stratSectionId).filter(
-      spot => spot.properties?.surface_feature?.surface_feature_type === 'strat_interval');
+    const intervals = getAllIntervalSpotsOnStratSection(stratSectionId);
     const datasetsToActivate = Object.values(datasets).filter(
       dataset => !activeDatasetsIds.some(id => isSameId(id, dataset.id))
         && intervals.some(interval => dataset.spotIds?.some(id => isSameId(id, interval.properties.id))));

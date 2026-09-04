@@ -18,7 +18,7 @@ const useStratSectionCalculations = () => {
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
+  const {getAllIntervalSpotsOnStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
 
   /* Internal Functions */
 
@@ -84,8 +84,10 @@ const useStratSectionCalculations = () => {
 
   // Get the height (y) of the whole section.
   // For normal sections, returns max Y (top of stack); for core sections, returns min Y (bottom of stack).
+  // Measured over all the intervals, not just the visible ones: this is where a new interval stacks, so
+  // stopping at the highest active one would drop it on top of an interval in an inactive dataset.
   const getSectionHeight = () => {
-    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    const intervals = getAllIntervalSpotsOnStratSection(stratSection.strat_section_id);
     if (stratSection.section_type === 'core') {
       return intervals.reduce((acc, i) => {
         const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();

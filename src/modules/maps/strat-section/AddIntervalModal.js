@@ -26,7 +26,7 @@ const AddIntervalModal = () => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getLabel, getSurvey, submitAndShowErrors} = useForm();
-  const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
+  const {createSpot, getActiveIntervalSpotsOnStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
 
@@ -39,7 +39,7 @@ const AddIntervalModal = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
-  const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+  const intervals = getActiveIntervalSpotsOnStratSection(stratSection.strat_section_id);
   const isCore = isNegativeColumn();
 
   /* Side Effects */

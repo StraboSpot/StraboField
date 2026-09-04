@@ -398,6 +398,13 @@ const useSpots = () => {
     }, []);
   };
 
+  // Get the Interval Spots on a Strat Section that are in the active Datasets, i.e. the ones actually drawn
+  // on the section. Anything measuring the section's own shape wants getAllIntervalSpotsOnStratSection.
+  const getActiveIntervalSpotsOnStratSection = (stratSectionId) => {
+    return Object.values(getActiveSpotsObj()).filter(
+      s => s.properties.strat_section_id === stratSectionId && isStratInterval(s));
+  };
+
   // Get only the Spots in the active Datasets
   const getActiveSpotsObj = () => {
     let activeSpots = {};
@@ -442,19 +449,18 @@ const useSpots = () => {
     return JSON.parse(JSON.stringify(allFeatures)).slice(0, 25);
   };
 
+  // Get every Interval Spot on a Strat Section, active Dataset or not. The section's own shape - where the
+  // next interval stacks, how far the axes run - comes from every interval on it, so measuring it with
+  // getActiveIntervalSpotsOnStratSection would move the column whenever a Dataset is switched off.
+  const getAllIntervalSpotsOnStratSection = (stratSectionId) => {
+    return getSpotsMappedOnGivenStratSection(stratSectionId).filter(isStratInterval);
+  };
+
   // Get parent Spot for image basemap
   const getImageBasemapBySpot = (spot) => {
     const imageBasemapFound = getActiveImageBasemaps().find(
       imageBasemap => imageBasemap.id === spot.properties.image_basemap);
     return imageBasemapFound;
-  };
-
-  // Get Interval Spots on a given Strat Section
-  const getIntervalSpotsThisStratSection = (stratSectionId) => {
-    return Object.values(getActiveSpotsObj()).filter((s) => {
-      return s.properties.strat_section_id === stratSectionId
-        && s.properties.surface_feature?.surface_feature_type === 'strat_interval';
-    });
   };
 
   // Get Active Spots (not Samples) with Valid Geometry
@@ -668,10 +674,11 @@ const useSpots = () => {
     createSpot,
     deleteSpot,
     getActiveImageBasemaps,
+    getActiveIntervalSpotsOnStratSection,
     getActiveSpotsObj,
     getAllFeaturesFromSpot,
+    getAllIntervalSpotsOnStratSection,
     getImageBasemapBySpot,
-    getIntervalSpotsThisStratSection,
     getMappableSpots,
     getNewSpotName,
     getReadOnlyReason,
