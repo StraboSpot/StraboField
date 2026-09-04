@@ -1,10 +1,11 @@
 import React, {useRef} from 'react';
 import {FlatList} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import {MEDIUMGREY} from '../../shared/styles.constants';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, FormikWrapper, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
@@ -15,6 +16,7 @@ const Metadata = ({isReadOnly, page}) => {
 
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 
   /* Local State */
@@ -33,6 +35,9 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
+    // A lock at either end blocks the move: isReadOnly is the Spot's own, so it disables every row, while a
+    // read only dataset disables only its own row
+    const isDatasetReadOnly = readOnlyDatasetsIds.includes(dataset.id);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
@@ -43,10 +48,11 @@ const Metadata = ({isReadOnly, page}) => {
               : '(0 spots)'}
           </ListItem.Subtitle>
         </ListItem.Content>
+        {isDatasetReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} type={'ionicon'}/>}
         <ListItem.CheckBox
           checked={isChecked}
           checkedIcon={'radiobox-marked'}
-          disabled={isReadOnly}
+          disabled={isReadOnly || isDatasetReadOnly}
           iconType={'material-community'}
           onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}
