@@ -9,6 +9,10 @@
  *   - App Store (deliver): fastlane/metadata/en-US/release_notes.txt        (grouped, <= 4000 chars)
  *   - Play (supply):       fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (<= 500 chars)
  *
+ * Also writes WHAT_TO_TEST.md at the repo root — a tester-facing rendering of the same curated
+ * notes, refreshed on every run for paste into TestFlight / Play testing notes. It is gitignored
+ * (a local aid, not a tracked artifact), so any hand-edits are overwritten on the next run.
+ *
  * It generates notes for the release entry whose `version` matches package.json (the build you're
  * shipping). Pass a version to target a different entry.
  *
@@ -91,6 +95,18 @@ function playText(release, version) {
   return out;
 }
 
+// WHAT_TO_TEST.md: a tester-facing rendering of the same curated highlights — a heading per group,
+// a bullet per item — for paste into TestFlight / Play testing notes.
+function whatToTestText(release, version, versionCode) {
+  const header = `# What to Test — StraboField ${version} (build ${versionCode})\n\n` +
+    'New in this build — please exercise each area and report anything off, with your device model and OS version.\n';
+  if (!release.groups.length) return `${header}\n- General stability and reliability improvements.\n`;
+  const blocks = release.groups.map(g =>
+    [`## ${g.title}`, ...g.items.map(i => `- ${i.text}`)].join('\n'),
+  );
+  return `${header}\n${blocks.join('\n\n')}\n`;
+}
+
 function write(file, contents) {
   fs.mkdirSync(path.dirname(file), {recursive: true});
   fs.writeFileSync(file, contents.endsWith('\n') ? contents : `${contents}\n`);
@@ -111,11 +127,14 @@ function main() {
 
   const appStore = appStoreText(release);
   const play = playText(release, release.version);
+  const whatToTest = whatToTestText(release, release.version, versionCode);
 
   const appFile = path.join(ROOT, 'fastlane/metadata/en-US/release_notes.txt');
   const playFile = path.join(ROOT, `fastlane/metadata/android/en-US/changelogs/${versionCode || 'draft'}.txt`);
+  const whatToTestFile = path.join(ROOT, 'WHAT_TO_TEST.md');
   write(appFile, appStore);
   write(playFile, play);
+  write(whatToTestFile, whatToTest);
 
   const rel = (p) => path.relative(ROOT, p);
   console.log(`\n📝 Store notes for v${release.version} (versionCode ${versionCode}) from src/assets/releaseNotes.js\n`);
@@ -124,6 +143,7 @@ function main() {
   if (appStore.length > APP_STORE_LIMIT) console.log(`⚠️  Over the ${APP_STORE_LIMIT}-char App Store cap — trim releaseNotes.js.`);
   console.log(`\n── Google Play ── ${rel(playFile)}   [${play.length}/${PLAY_LIMIT} chars]`);
   console.log(play);
+  console.log(`\n── What to Test (gitignored) ── ${rel(whatToTestFile)}`);
   if (target !== version) console.log(`\nℹ️  Generated for ${target}, but package.json is ${version} — the Play file is still named for versionCode ${versionCode}.`);
   console.log('');
 }
