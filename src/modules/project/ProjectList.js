@@ -94,7 +94,7 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
   };
 
   const renderProjectItem = (item) => {
-    const modifiedTimeAndDate = item.modified_timestamp
+    const timeAndDate = item.modified_timestamp
       ? moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a')
       : null;
     return (
@@ -108,9 +108,9 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
           <ListItem.Title style={commonStyles.listItemTitle}>
             {source === 'server' ? item.name : (item.displayName || item.fileName)}
           </ListItem.Title>
-          {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
+          {timeAndDate && timeAndDate !== 'Invalid date' && (
             <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
-              Updated: {modifiedTimeAndDate}
+              Updated: {timeAndDate}
             </ListItem.Subtitle>
           )}
         </ListItem.Content>

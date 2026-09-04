@@ -167,7 +167,7 @@ const useProject = () => {
       const deviceFiles = await Promise.all(manualBackupFiles.map(async (file, index) => {
         const dataFile = await readDeviceJSONFile(file);
         const projectData = dataFile?.projectDb?.project || dataFile?.projectDb;
-        return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp};
+        return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp || projectData?.date};
       }));
       let id = manualBackupFiles.length;
       const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
