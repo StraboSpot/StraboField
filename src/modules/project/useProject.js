@@ -39,7 +39,7 @@ const useProject = () => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const user = useSelector(state => state.user);
 
-  const {doesDeviceBackupDirExist, readDirectory} = useDevice();
+  const {doesDeviceBackupDirExist, readDeviceJSONFile, readDirectory} = useDevice();
   const {clearProject} = useResetState();
   const {getMyProjects} = useServerRequests();
   const toast = useToast();
@@ -158,15 +158,18 @@ const useProject = () => {
     //   else return res;
     // });
     // return Promise.resolve(deviceProject);
-    let id = 0;
     const exists = await doesDeviceBackupDirExist(undefined);
     if (exists) {
       const res = await readDirectory(directory);
-      const deviceFiles = res
-        .filter(file => file !== 'AutoBackups')
-        .map((file) => {
-          return {id: id++, fileName: file};
-        });
+      const manualBackupFiles = res.filter(file => file !== 'AutoBackups');
+      // Surface each backup's own last modified_timestamp (from its data.json) rather than leaving it undefined,
+      // which would make moment() in ProjectList render the current time instead of when the project was last saved.
+      const deviceFiles = await Promise.all(manualBackupFiles.map(async (file, index) => {
+        const dataFile = await readDeviceJSONFile(file);
+        const projectData = dataFile?.projectDb?.project || dataFile?.projectDb;
+        return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp || projectData?.date};
+      }));
+      let id = manualBackupFiles.length;
       const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
       const autoBackupItems = autoBackupFiles
         .filter(file => file.endsWith('.json') && /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(file))

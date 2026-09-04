@@ -22,7 +22,10 @@ const useSamples = () => {
 
   // Create new Sample Spot
   const createRichSample = (spot, selectedSample, sampleImages = []) => {
-    let d = new Date(Date.now());
+    // A sample already on the parent Spot is a legacy sample being converted, so it was created with that Spot and
+    // keeps the parent's created date. A brand new sample isn't on the parent Spot yet, so it gets today's date.
+    const isConvertingLegacySample = spot.properties[PAGE_KEYS.SAMPLES]?.some(s => s.id === selectedSample.id);
+    let d = isConvertingLegacySample && spot.properties.date ? new Date(spot.properties.date) : new Date(Date.now());
     d.setMilliseconds(0);
     let geometry = spot.geometry;
     if (spot.properties.lng && spot.properties.lat) {

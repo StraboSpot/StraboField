@@ -378,15 +378,25 @@ const useDevice = () => {
   };
 
   const readDeviceJSONFile = async (fileName) => {
+    const filePath = APP_DIRECTORIES.BACKUP_DIR + fileName + '/data.json';
+    let response;
     try {
-      const dataFile = '/data.json';
-      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      console.log(JSON.parse(response));
+      if (!await RNFS.exists(filePath)) {
+        console.warn('No data.json found for backup:', fileName);
+        return undefined;
+      }
+      response = await readFile(filePath);
+    }
+    catch (err) {
+      console.error('Error reading data.json for backup', fileName, ':', err);
+      return undefined;
+    }
+    try {
       return JSON.parse(response);
     }
     catch (err) {
-      console.error('Error reading JSON file', err);
+      console.error('Malformed data.json for backup', fileName, ':', err);
+      return undefined;
     }
   };
 

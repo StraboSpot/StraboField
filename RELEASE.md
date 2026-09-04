@@ -7,11 +7,14 @@ StraboSpot2 has two release paths:
 
 ## How versioning & releases are wired
 
-- **Version bump:** `npm run bump-patch` (or `bump-minor` / `bump-major`) runs `npm version <level> --no-git-tag-version` (updates `package.json`) then `bundle exec fastlane bump`, which runs `inc_ver_ios` (iOS build number) and `inc_ver_and` (Android `versionCode` + `versionName` from `package.json`).
+- **Two numbers, two commands:** the **marketing version** (`2.31.1` — what users see, in `package.json` / iOS `MARKETING_VERSION` / Android `versionName`) and the **build number / `versionCode`** (an internal counter that must be unique for *every* binary you upload, even at the same marketing version).
+  - **Start a new public version:** `npm run bump-patch` (or `bump-minor` / `bump-major`) runs `npm version <level> --no-git-tag-version` (bumps the marketing version in `package.json`) **then** `bundle exec fastlane bump` (`inc_ver_ios` + `inc_ver_and`, which also syncs `versionName` from `package.json`). Moves **both** numbers. Run this **once** per version.
+  - **Another test build, same version:** `npm run bump-build` (just `bundle exec fastlane bump`) bumps **only** the build number / `versionCode` — the marketing version stays put. Use it for every extra TestFlight / closed-testing build while you stabilize an rc. No tag, no changelog, no store-notes change.
 - **Draft / prerelease:** pushing to any `rc-*` branch triggers [`.github/workflows/rc-draft.yml`](.github/workflows/rc-draft.yml), which creates/updates a **draft prerelease**. It slices the log at the highest **cut marker** (`v{version}-rc`) or published release tag reachable from `HEAD` — not at a `package.json` bump — so merging `master` (the 2.29.x hotfix line) into the rc branch no longer scrambles the boundary. Commits after the last cut marker are collected under the **next** version, and 2.29.x hotfix commits that rode in on a master merge are dropped (they are reachable from their own `v*` tags).
 - **Cut markers:** `npm run cut-rc` tags the current `package.json` version as `v{version}-rc` and pushes it. Run it when you **finalize a patch/beta on the rc branch** — it freezes that version's draft so subsequent commits start a fresh draft for the next version. Without a marker, the long-lived `rc-2.30.x` branch has nothing telling it where `.4` ends and `.5` begins.
 - **Official release:** pushing a `v*` **tag** triggers [`.github/workflows/changelog.yml`](.github/workflows/changelog.yml), which builds the changelog from `git log <prev v-tag>..<new tag>` (previous tag chosen in `sort -V` order) and publishes a non-prerelease GitHub Release.
-- **Store release notes:** `npm run release-notes` (`scripts/release-notes.js`) generates **draft** user-facing "What's New" copy from the commit range and writes the files fastlane reads — `fastlane/metadata/en-US/release_notes.txt` (App Store / `deliver`) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play / `supply`, kept under 400 chars). It gathers + templates only; **review/rewrite the draft for a general audience before uploading** (ask Claude to "polish the store notes"). It auto-detects the previous release tag, ignoring malformed ones; override with `node scripts/release-notes.js <from-tag>`. Note: the Fastfile does not yet wire `deliver`/`supply`, so these files are currently copy-pasted into each console.
+- **Store release notes:** `npm run release-notes` (`scripts/release-notes.js`) generates the store "What's New" copy from the **curated** [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) — the same source the in-app What's New modal uses, so the stores and the app never disagree (and reverted/internal work can't leak in). It writes `fastlane/metadata/en-US/release_notes.txt` (App Store / `deliver`, grouped, ≤4000 chars) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play / `supply`, condensed to ≤500 chars). It generates for the release entry matching `package.json`; override with `node scripts/release-notes.js <version>`. **Edit `releaseNotes.js`, not the `.txt` files** — the script overwrites them. Note: the Fastfile does not yet wire `deliver`/`supply`, so these files are currently copy-pasted into each console.
+- **TestFlight "What to Test":** the `beta` lane feeds the same `fastlane/metadata/en-US/release_notes.txt` into `upload_to_testflight(changelog:)`, so TestFlight testers see the App Store notes (falls back to a generic line if the file is missing). Run `npm run release-notes` **before** `npm run deploy-beta` so testers get the current version's notes; nothing extra to write.
 
 ### Rules that apply to both paths
 
@@ -29,12 +32,13 @@ Print this checklist anytime with `npm run start-rc`.
 1. **Cut the RC branch** from `dev`: `git checkout -b rc-{version} dev`.
 2. **Bump the version:** `npm run bump-patch` (or `bump-minor` / `bump-major`).
 3. **Commit & push** to the rc branch → triggers the **draft release**.
-4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft.
-5. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
-6. **Merge** `rc-{version}` → `master` and push.
-7. **Generate store notes:** `npm run release-notes`, then review/polish the drafts in `fastlane/metadata/`.
-8. **Tag on master:** `git tag v{version}`.
-9. **Push the tag:** `git push origin v{version}` → publishes the official release + changelog.
+4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. Each new **test build** of this same version (TestFlight / closed testing) needs a fresh build number — run `npm run bump-build` (build number only). **Do not** `bump-patch` again; that starts a new marketing version.
+5. **Update What's New:** add this release's highlights to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal).
+6. **Generate store notes:** `npm run release-notes` regenerates the App Store + Play files from `releaseNotes.js`; commit `releaseNotes.js` and the `.txt` files. Do **not** hand-edit the `.txt` files — the script overwrites them. Run this **before** any `npm run deploy-beta` — the `beta` lane reads `release_notes.txt` for TestFlight's "What to Test".
+7. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
+8. **Merge** `rc-{version}` → `master` and push.
+9. **Tag on master:** `git tag v{version}`.
+10. **Push the tag:** `git push origin v{version}` → publishes the official release + changelog.
 
 ---
 
@@ -69,16 +73,16 @@ Use this when a fix must ship now and you are **not** merging the rc branch. The
    - ⚠️ **Known stale spot:** iOS `MARKETING_VERSION` has drifted from `package.json` before (was `2.26.3` while the app was `2.29.x`). Confirm it matches the new version; fix it in `project.pbxproj` if fastlane did not.
    - Commit the bump: `chore(release): bump app version to <version> and build to <code>`.
 
-5. **Push master** (not an `rc-*` branch — that would fire the draft workflow):
-   ```bash
-   git push origin master
-   ```
-
-6. **Generate store release notes** (draft, then polish):
+5. **Update What's New & store notes:** add this hotfix's user-facing changes to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal), then generate the store files from it:
    ```bash
    npm run release-notes
    ```
-   Review/rewrite `fastlane/metadata/en-US/release_notes.txt` (App Store) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play, <400 chars) for a general audience before uploading.
+   This writes `fastlane/metadata/en-US/release_notes.txt` (App Store, ≤4000 chars) and `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (Play, ≤500 chars). Edit `releaseNotes.js`, **not** the `.txt` files — the script overwrites them. Commit `releaseNotes.js` and the generated `.txt` files.
+
+6. **Push master** (not an `rc-*` branch — that would fire the draft workflow):
+   ```bash
+   git push origin master
+   ```
 
 7. **Tag on master → publishes the official release:**
    ```bash
@@ -88,9 +92,11 @@ Use this when a fix must ship now and you are **not** merging the rc branch. The
    Then confirm `changelog.yml` ran green and the release notes contain **only** the hotfix commits.
 
 8. **Build & ship the binaries** (the tag only makes release notes; it does not build the app):
+   - Make sure `npm run release-notes` already ran (step 5) — `deploy-beta` reads `release_notes.txt` for TestFlight's "What to Test".
    - iOS → TestFlight: `npm run deploy-beta`.
    - Android → `npm run bundle:android && npm run deploy:android`, then upload the `.aab` from `android/app/build/outputs/bundle/release/`.
    - Web (if affected): `npm run web-deploy`.
+   - Need another build of this **same** hotfix version (e.g. a beta was rejected)? `npm run bump-build` (build number only), then re-ship. Do **not** `bump-patch` — that starts a new marketing version.
 
 9. **Upload Sentry sourcemaps** for the new version so the build symbolicates:
    ```bash

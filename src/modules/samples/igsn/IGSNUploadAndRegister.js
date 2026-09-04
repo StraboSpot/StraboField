@@ -48,9 +48,11 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, openLoginPage,
 
   useEffect(() => {
     console.log('In 1st UE in IGSNUploadAndRegister page');
-    isIGSNChecked && !isEmpty(tokens?.access) && getSesarTokenAndCodes()
+    // Guard on connectivity — otherwise a cached, locally-unexpired token flashes a false "SESAR Authenticated!"
+    // toast offline, since authentication is only re-verified against the server when online.
+    isIGSNChecked && isInternetReachable && !isEmpty(tokens?.access) && getSesarTokenAndCodes()
       .catch(err => console.log(err));
-  }, [isIGSNChecked]);
+  }, [isIGSNChecked, isInternetReachable]);
 
   /* Event Handlers */
 
@@ -176,9 +178,11 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, openLoginPage,
 
   const renderOrcidSignInButton = () => (
     <View style={{alignItems: 'center', justifyContent: 'flex-start', padding: 20}}>
-      <OutlineButton onPress={orcidAuthentication} title={'Sign into MySESAR'}/>
+      <OutlineButton disabled={!isInternetReachable} onPress={orcidAuthentication} title={'Sign into MySESAR'}/>
       <Text style={igsnStyles.mySesarUpdateDisclaimer}>
-        ⚠️ Authenticate your SESAR account to upload a sample.
+        {isInternetReachable
+          ? '⚠️ Authenticate your SESAR account to upload a sample.'
+          : '⚠️ You must be connected to the Internet to authenticate with SESAR.'}
       </Text>
     </View>
   );
