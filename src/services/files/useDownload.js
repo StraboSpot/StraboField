@@ -17,13 +17,13 @@ import {
   addedStatusMessage,
   clearedStatusMessages,
   removedLastStatusMessage,
-  setIsErrorMessagesModalVisible,
   setIsProjectLoadSelectionModalVisible,
   setIsStatusMessagesModalVisible,
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
+import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
@@ -38,7 +38,7 @@ import {
 import useProject from '../../modules/project/useProject';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toError} from '../../shared/helpers';
 import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
@@ -50,6 +50,10 @@ let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
 let tempActiveDatasetsIds, tempTargetDatasetId;
+
+// Every caller shares the accumulators above, so a second download would reset the arrays the first is still
+// filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
+let isDownloadInFlight = false;
 
 const useDownload = () => {
   /* Data Hooks */
@@ -83,7 +87,6 @@ const useDownload = () => {
 
   const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
     if (datasets.length >= 1) {
-      // console.log('Starting Dataset Spots Download!');
 
       // Synchronous download
       await datasets.reduce(async (previousPromise, dataset) => {
@@ -129,9 +132,9 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
     }
-    catch (e) {
-      console.log('Error getting datasets...' + e);
-      throw Error;
+    catch (err) {
+      console.error('Error getting datasets:', err);
+      throw err;
     }
   };
 
@@ -148,6 +151,10 @@ const useDownload = () => {
         }
         clearProject();
       }
+      // Strip before anything downstream reads it — loadCustomMaps spreads the whole map object through.
+      if (!isEmpty(projectResponse.other_maps)) {
+        projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
+      }
       dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
@@ -163,7 +170,7 @@ const useDownload = () => {
       console.error('Error Downloading Project Properties.', err);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Downloading Project Properties. ' + err));
-      throw Error;
+      throw err;
     }
   };
 
@@ -174,10 +181,10 @@ const useDownload = () => {
         await Promise.all(report.images?.map(async (image) => {
           const doesExist = await doesImageExistOnDevice(image.id);
           if (!doesExist) {
-            console.log('Need to download report image:', image.id);
+            console.log(image.id + ': Need to download report image.');
             neededImagesIds.push(image.id);
           }
-          else console.log('Image', image.id, 'already exists on device. Not downloading.');
+          else console.log(image.id + ': Already exists on device. Not downloading.');
         }));
       }));
 
@@ -207,11 +214,9 @@ const useDownload = () => {
 
   const downloadSpots = async (dataset, encodedLoginScoped) => {
     try {
-      // console.log(dataset.name, ':', 'Downloading Spots...');
       const featureCollection = await getDatasetSpots(dataset.id, encodedLoginScoped);
-      // console.log(dataset.name, ':', 'Finished Downloading Spots.');
       if (isEmpty(featureCollection) || !featureCollection.features) {
-        // console.log(dataset.name, ': No Spots in dataset.');
+        console.log(dataset.name + ': No Spots in dataset.');
       }
       else {
         const spotsDownloaded = featureCollection.features;
@@ -222,26 +227,26 @@ const useDownload = () => {
         spotsToSave.push(...spotsDownloaded);
         const spotIds = Object.values(spotsDownloaded).map(spot => spot.properties.id);
         datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], spotIds: spotIds};
-        // console.log(dataset.name, ':', 'Got Spots', spotsDownloaded);
       }
     }
     catch (err) {
       console.error(dataset.name, ':', 'Error Downloading Spots.', err);
       dispatch(addedStatusMessage('Error Downloading Spots.' + err));
-      throw Error;
+      throw err;
     }
   };
 
   const findNeededImages = async (spotsDownloaded, dataset) => {
     try {
-      // console.log(dataset.name, ':', 'Gathering Needed Images...');
       const spotImages = await gatherNeededImages(spotsDownloaded, dataset);
       if (spotImages?.imageIds.length > 0) {
-        // console.log(dataset.name, ':', 'Images needed', spotImages.neededImagesIds.length, 'of', spotImages?.imageIds.length);
+        // neededImagesIds is only returned on native — web doesn't cache images locally.
+        console.log(dataset.name + ': Images needed', spotImages.neededImagesIds?.length || 0, 'of',
+          spotImages.imageIds.length);
         return spotImages;
       }
       else {
-        console.log(dataset.name, ':', 'No Images in dataset.');
+        console.log(dataset.name + ': No Images in dataset.');
         return undefined;
       }
     }
@@ -252,11 +257,7 @@ const useDownload = () => {
 
   const loadCustomMaps = (maps) => {
     maps.map(async (map) => {
-      let mapId = map.id;
-      // Pull out mapbox styles map id
-      if (map.source === 'mapbox_styles' && map.id.includes('mapbox://styles/')) {
-        mapId = map.id.split('/').slice(3).join('/');
-      }
+      const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
       if (map.source === 'strabospot_mymaps') {
         if (!isEmpty(endpoint) && isSelected) {
@@ -272,10 +273,9 @@ const useDownload = () => {
         ...map,
         ...providerInfo,
         id: mapId,
-        key: map.accessToken || map.key,
         source: map.source,
       };
-      console.log(customMap);
+      console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
     });
   };
@@ -415,20 +415,24 @@ const useDownload = () => {
       Sentry.setUser({'username': userProfileRes.name, 'email': userProfileRes.email});
     }
     catch (err) {
-      throw Error(err);
+      // Not a no-op: the server layer rejects with plain strings and useSignIn reads err.message off this.
+      throw toError(err);
     }
   };
 
   const initializeDownload = async (selectedProject, encodedLoginScoped = encodedLogin) => {
-    resetDownloadState();
-    if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
-    const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
-    dispatch(setStatusMessageModalTitle(projectName));
-    dispatch(clearedStatusMessages());
-    dispatch(setIsStatusMessagesModalVisible(true));
-    dispatch(setLoadingStatus({view: 'modal', bool: true}));
-    dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
+    if (isDownloadInFlight) return console.warn('A download is already running. Ignoring the duplicate request.');
+    isDownloadInFlight = true;
+    // Setup lives inside the try so the finally always reaches it; outside, a throw would strand the flag for good.
     try {
+      resetDownloadState();
+      if (setIsProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+      const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
+      dispatch(setStatusMessageModalTitle(projectName));
+      dispatch(clearedStatusMessages());
+      dispatch(setIsStatusMessagesModalVisible(true));
+      dispatch(setLoadingStatus({view: 'modal', bool: true}));
+      dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
       await downloadProject(selectedProject, encodedLoginScoped);
       await downloadDatasets(selectedProject, encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
@@ -443,18 +447,16 @@ const useDownload = () => {
       ));
       dispatch(setLastSyncedProjectTimestamp(store.getState().project.project.modified_timestamp));
       dispatch(addedStatusMessage('Complete!'));
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
     catch (err) {
       console.error('Error Initializing Download.', err);
-      if (Platform.OS === 'web') {
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Error loading project!', err));
-        dispatch(setIsErrorMessagesModalVisible(true));
-      }
-      else dispatch(addedStatusMessage('Download Failed!', err));
+      dispatch(addedStatusMessage(`Download Failed!\n\n${err}`));
+      throw err;
+    }
+    finally {
+      isDownloadInFlight = false;
+      // The status modal blocks both its exits while this is set, so it must clear on every path or it traps.
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      throw Error;
     }
   };
 
@@ -498,7 +500,6 @@ const useDownload = () => {
             + neededImagesIds.length));
           dispatch(addedStatusMessage('\nAll needed images have been downloaded for this dataset'));
         }
-        dispatch(setLoadingStatus({view: 'modal', bool: false}));
       }
     }
     catch (err) {
@@ -506,6 +507,9 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Error Downloading Images!'));
       dispatch(addedStatusMessage('Complete!'));
       console.warn('Error Downloading Images: ' + err);
+    }
+    finally {
+      // A dataset needing no images used to skip this, leaving the status modal open with no way out.
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
     }
   };

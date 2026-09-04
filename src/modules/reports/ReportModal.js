@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
-import {isEmpty} from '../../shared/helpers';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
@@ -31,6 +30,11 @@ const ReportModal = ({openSpotInNotebook}) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
 
+  /* Derived Variables */
+
+  // A new memo can arrive with values already set (the Spot it was created from), so only a saved memo has an id
+  const isNewReport = !initialValues.id;
+
   /* Event Handlers */
 
   const handleDeletePressed = () => {
@@ -43,15 +47,15 @@ const ReportModal = ({openSpotInNotebook}) => {
   return (
     <>
       <ModalWrapper
-        actionTitle={isEmpty(initialValues) ? 'Save' : 'Update'}
+        actionTitle={isNewReport ? 'Save' : 'Update'}
         closeModal={confirmCloseModal}
-        headerTitle={isEmpty(initialValues) ? 'Create New Memo' : 'Update Memo'}
+        headerTitle={isNewReport ? 'Create New Memo' : 'Update Memo'}
         onActionPressed={handleSavePressed}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
         showCancelButton={false}
         showCloseButton
-        showDeleteButton={!isEmpty(initialValues)}
+        showDeleteButton={!isNewReport}
       >
         <FlatList
           ListHeaderComponent={

@@ -27,6 +27,7 @@ const initialConnectionsState = {
   nextAutoSaveTime: null,
   nextAutoSyncTime: null,
   pendingUploadDatasetIds: [],
+  projectSaveStatus: null,
 };
 
 const connectionsSlice = createSlice({
@@ -128,6 +129,9 @@ const connectionsSlice = createSlice({
     setProfileUploadNeeded(state) {
       state.isProfileUploadNeeded = true;
     },
+    setProjectSaveStatus(state, action) {
+      state.projectSaveStatus = action.payload;
+    },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
     },
@@ -179,6 +183,7 @@ export const {
   setNextAutoSyncTime,
   setOnlineStatus,
   setProfileUploadNeeded,
+  setProjectSaveStatus,
   setPendingImagesChanges,
   setProjectSyncNeeded,
   setTransferringImages,

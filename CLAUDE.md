@@ -8,8 +8,7 @@ Guidance for Claude Code when working in this repository.
   unclear, stop and name it. (Skip this for trivial edits — use judgment.)
 - **Simplest thing that works.** No speculative abstractions, config, or error handling for impossible cases. If it's
   200 lines and could be 50, rewrite it.
-- **Surgical diffs.** Touch only what the request requires. Don't refactor, reformat, or "improve" adjacent code; match
-  existing style. Flag unrelated dead code — don't delete it. Every changed line should trace to the request.
+- **Match existing style.** New code should read like the code around it.
 - **Verify, don't hope.** For bugs/features, prefer writing a test that reproduces/defines success, then making it pass.
   State a brief plan for multi-step work.
 
@@ -31,16 +30,33 @@ Guidance for Claude Code when working in this repository.
 
 <!-- Append-only. Each entry: symptom → cause → fix. Newest at top. -->
 
-- **Sketch-on-image: compressed basemap / stray pinch marks / dead Android zoom** → `@StraboSpot/react-native-sketch-canvas`
-  exports the full canvas (aspect mismatch with the image basemap's stored width/height) and its `PanResponder` draws in
-  screen-space translation-only coords, ignores multi-touch, and blocks native gestures on Android → `Sketch.js` sizes the
-  canvas to the image aspect + saves with `cropToImageSize: true`; the rest is `patches/@StraboSpot+react-native-sketch-canvas+0.8.0.patch`
-  (transform-aware `locationX/locationY`, a `touches.length > 1` draw guard, and `onShouldBlockNativeResponder → false`).
+- **Sketch canvas: compressed basemap / stray pinch marks / dead Android zoom / Android strokes dying mid-gesture**
+  → `@StraboSpot/react-native-sketch-canvas` exports the full canvas (aspect mismatch with the image basemap's stored
+  width/height), and its `PanResponder` draws in screen-space translation-only coords, ignores multi-touch, and takes a
+  single hard-coded stance on native gestures. No one stance suits both consumers: `Sketch.js` must let them through
+  for its pinch/pan, while `FreehandSketch` must block them or Mapbox seizes one-finger strokes off the canvas →
+  `Sketch.js` sizes the canvas to the image aspect + saves with `cropToImageSize: true`; the rest is
+  `patches/@StraboSpot+react-native-sketch-canvas+0.8.0.patch` (transform-aware `locationX/locationY`, a
+  `touches.length > 1` draw guard, and `onShouldBlockNativeResponder` behind a `shouldBlockNativeResponder` prop
+  defaulting to true, which `Sketch.js` alone passes false).
   JS-only — no native rebuild. **Rename the patch on any version bump** or patch-package skips it.
 - **iPad form modals slide off-screen** → rn-vui Overlay's KeyboardAvoidingView pushes them → set `doesRenderAsView` +
   Form `renderInline`.
 - **Second modal never appears on iOS** → a Modal presented while another dismisses gets dropped → chain via
   ModalWrapper's `onDismiss`.
+- **Toasts shown from inside a modal are hidden or dimmed** → they mount and animate, they're just painted
+  underneath. How far depends on placement: a center-placed toast (the `ToastWrapper` default) sits behind the modal
+  body and is fully hidden, while a bottom-placed one falls outside a large-screen web modal's centered box and
+  shows through the 50%-opacity backdrop. A `SMALL_SCREEN` modal is fullscreen, so it covers everything. On
+  web, every react-native-web `View` carries `position: relative; z-index: 0`, so each one is a stacking context and
+  the ToastProvider's `z-index: 999999` can't escape the app root — meanwhile RNW's `Modal` portals into a `<div>`
+  appended to `document.body`, landing as a later sibling. On native it's not a layering problem at all: an RN
+  `Modal` is its own window (UIViewController / Dialog), so nothing in the main tree can ever paint above it, and
+  only `doesRenderAsView` modals let toasts through. → **Report results in place instead.** Web save outcomes are
+  published to Redux as `connections.projectSaveStatus` for exactly this reason — see `updateProjectListener` in
+  `listenerMiddleware.web.js` and the import modals that consume it. Never mount a second ToastProvider inside a
+  modal: `GlobalToast` is a module-level `let` overwritten by the last provider to mount, with no unmount cleanup,
+  so it breaks `Toast.show` app-wide afterwards.
 
 ## Development Commands
 
@@ -48,7 +64,7 @@ Guidance for Claude Code when working in this repository.
 # Setup
 yarn                       # install deps
 bundle install && bundle exec pod install   # iOS CocoaPods (first time)
-npm run setup-sentry       # generate Sentry props from env.json
+npm run setup-sentry       # generate Sentry props from secrets.json
 node scripts/install-hooks.js   # install git hooks (CLAUDE.md auto-update)
 
 # Run
@@ -79,7 +95,11 @@ npm run remove:packages    # clean node_modules + iOS Pods
 
 **Required config files** (project root, gitignored):
 
-- `env.json` — `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`
+- `env.json` — app **runtime** keys, bundled into the app so **public keys only**:
+  `{"mapbox_access_token": "...", "orcid_client_id": "...", "Error_reporting_DSN": "..."}`. Anything imported under
+  `src/` gets inlined into the web/Metro bundles, so never put secrets here.
+- `secrets.json` — **build-time** secrets, read only by `scripts/` (never imported under `src/`, so never bundled):
+  `sentry_organization_auth_token`, `orcid_client_secret`, `android_keystore`, `rockd_access_token`.
 - `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
 **Two helper scripts to know:**
@@ -110,15 +130,22 @@ npm run remove:packages    # clean node_modules + iOS Pods
 
 1. **Start RC:** cut `rc-{version}` from `dev` → bump version → push. A GitHub Action auto-creates a **draft release**.
 2. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. No manual changelog.
-3. **Publish:** merge `rc-{version}` → `master` and push → `git tag v{version}` on master →
+3. **Cut it:** when the version is finalized, `npm run cut-rc` tags `v{version}-rc` and **freezes that version's draft** —
+   commits after it collect into the next version's draft. This marker (not the `package.json` version) is what the draft
+   workflow slices on, so merging `master` (the 2.29.x hotfix line) into the rc branch no longer scrambles the boundary.
+4. **Publish:** merge `rc-{version}` → `master` and push → `git tag v{version}` on master →
    `git push origin v{version}`. The Action publishes the official release + changelog.
 
-Common mistakes: tagging on rc instead of master; missing the `v` prefix; hand-writing the changelog.
+Common mistakes: tagging on rc instead of master; missing the `v` prefix; hand-writing the changelog; forgetting
+`npm run cut-rc` when a version is done, so its draft keeps absorbing the next version's commits.
 
 The changelog is generated by `.github/workflows/changelog.yml`, which triggers on the `v*` tag (not the master push)
 and diffs against the immediately preceding version tag in `sort -V` order — so any changelog-affecting fix must be on
 `master` **before** you tag. Notes publish to the GitHub Release page only (no `CHANGELOG.md` is committed; `master` is
 protected). Write meaningful `feat(...)`/`fix(...)` commit subjects — they become the changelog verbatim.
+
+**For the full step-by-step checklists — including the hotfix path (patching a version directly on `master` without an
+rc merge) — see [RELEASE.md](RELEASE.md)**, or print them with `npm run start-rc` / `npm run start-hotfix`.
 
 ## Architecture
 
@@ -173,7 +200,7 @@ suffixes; `.web.js` for web overrides.
 - Formik 2.4.9 - Form management
 - Turf.js 7.x, RNFS, Sentry
 
-**Node version:** >=22.11.0. **Package manager:** Yarn 4.13.0
+**Node version:** >=22.11.0. **Package manager:** Yarn 4.18.0
 
 ## Deployment Checklist
 

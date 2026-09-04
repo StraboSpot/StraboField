@@ -7,7 +7,7 @@ import {useDispatch} from 'react-redux';
 
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {formStyles} from '../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 
 const DateInputField = ({
                           field: {name, value},
@@ -76,19 +76,13 @@ const DateInputField = ({
 
     // Validate start_date against end_date if both will exist
     if (selectedDate && name === 'start_date' && values.end_date) {
-      if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate); else {
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Date Error!\nStart Date must be before End Date.'));
-        dispatch(setIsErrorMessagesModalVisible(true));
-      }
+      if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate);
+      else dispatch(openedMessageModal({message: 'Start Date must be before End Date.', title: 'Date Error!'}));
     }
     // Validate end_date against start_date if both will exist
     else if (selectedDate && name === 'end_date' && values.start_date) {
-      if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate); else {
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Date Error!\nStart Date must be before End Date.'));
-        dispatch(setIsErrorMessagesModalVisible(true));
-      }
+      if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate);
+      else dispatch(openedMessageModal({message: 'Start Date must be before End Date.', title: 'Date Error!'}));
     }
     // No validation needed, just set the value
     else setFieldValue(name, selectedDate);

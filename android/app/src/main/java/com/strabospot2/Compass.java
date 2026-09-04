@@ -103,7 +103,11 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (listenerCount <= 0) return;
-        final float alpha = 0.97f;
+        // Low-pass smoothing of the raw gravity/magnetometer vectors: value = alpha*old + (1-alpha)*new.
+        // At SENSOR_DELAY_GAME (~50 Hz, dt ~= 0.02 s) the smoothing time constant is dt*alpha/(1-alpha).
+        // The old 0.97 gave ~0.65 s of lag (a needle that visibly trails); 0.85 gives ~0.11 s -- responsive
+        // but still enough to filter magnetometer noise. Raise toward 0.9 if the heading looks jittery.
+        final float alpha = 0.85f;
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 mGravity[0] = alpha * mGravity[0] + (1 - alpha) * event.values[0];

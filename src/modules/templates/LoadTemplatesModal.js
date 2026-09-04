@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
@@ -7,18 +7,32 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {TEMPLATE_BACKUP_MESSAGES, TEMPLATE_BACKUP_STATUS} from './templates.constants';
 import useSafeDocumentPicker from '../../services/device/useSafeDocumentPicker';
-import {DARKGREY, MODAL_TEXT_SIZE, PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE} from '../../shared/styles.constants';
+import {
+  DARKGREY,
+  MODAL_TEXT_SIZE,
+  PRIMARY_TEXT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  WARNING_COLOR,
+} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import LottieAnimations from '../../utils/animations/LottieAnimations';
+import {PROJECT_SAVE_STATUS} from '../connections/connections.constants';
 import {setLoadingStatus as setHomeLoadingStatus} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
+
+// Generous on purpose: firing early would report a failure while the save is still genuinely in flight.
+const SERVER_SAVE_TIMEOUT_MS = 60000;
+// Deliberately non-committal — on a timeout the save may still land, so don't claim it failed.
+const SERVER_SAVE_TIMEOUT_MESSAGE = 'Timed out waiting for the save to be confirmed.'
+  + ' Check your project to be sure the changes were saved.';
 
 const LoadTemplatesModal = ({closeModal}) => {
 
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const matchedTemplates = useSelector(state => state.project.project?.templates) || {};
+  const currentTemplates = useSelector(state => state.project.project?.templates) || {};
+  const projectSaveStatus = useSelector(state => state.connections.projectSaveStatus);
 
   const {safePick} = useSafeDocumentPicker();
 
@@ -26,6 +40,7 @@ const LoadTemplatesModal = ({closeModal}) => {
 
   const [loadingStatus, setLoadingStatus_] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
 
   /* Derived Variables */
 
@@ -38,16 +53,46 @@ const LoadTemplatesModal = ({closeModal}) => {
       : loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE
         ? `${title} Imported`
         : 'Import Failed';
+  // Web writes go straight to the server, so the import isn't done until that save comes back
+  const shouldWaitForServerSave = Platform.OS === 'web';
+  // Shown up front and repeated after a rejected file, so both say the same thing
+  const chooseFileText = `Choose a .json file exported from ${title}.`;
+
+  /* Side Effects */
+
+  // Deps are the save status alone: adding loadingStatus would let a stale SAVED finish the next import early.
+  useEffect(() => {
+    if (!shouldWaitForServerSave || loadingStatus !== TEMPLATE_BACKUP_STATUS.IN_PROGRESS) return;
+    const isSaved = projectSaveStatus === PROJECT_SAVE_STATUS.SAVED;
+    if (!isSaved && projectSaveStatus !== PROJECT_SAVE_STATUS.ERROR) return;
+
+    setStatusMessage(message => `${message} ${isSaved ? 'Changes saved.' : 'Changes NOT saved.'}`);
+    setLoadingStatus_(isSaved ? TEMPLATE_BACKUP_STATUS.COMPLETE : TEMPLATE_BACKUP_STATUS.ERROR);
+    dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+  }, [projectSaveStatus]);
+
+  // Bounds the wait above, which resolves only when the server reports back. The modal closes both its exits while
+  // the import is in progress, so a status that never arrives would leave it with no way out.
+  useEffect(() => {
+    if (!shouldWaitForServerSave || loadingStatus !== TEMPLATE_BACKUP_STATUS.IN_PROGRESS) return;
+    const timeoutId = setTimeout(() => {
+      setStatusMessage(message => `${message} ${SERVER_SAVE_TIMEOUT_MESSAGE}`);
+      setLoadingStatus_(TEMPLATE_BACKUP_STATUS.ERROR);
+      dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+    }, SERVER_SAVE_TIMEOUT_MS);
+    return () => clearTimeout(timeoutId);
+  }, [loadingStatus, shouldWaitForServerSave]);
 
   /* Event Handlers */
 
   const handleLoad = async () => {
+    setValidationMessage('');
     try {
       const result = await safePick({type: [types.json]});
       if (!result) return;
 
       const [{name, uri}] = result;
-      if (!name || !uri) throw new Error('Invalid file selected.');
+      if (!name || !uri) return failValidation('Could not read the selected file.');
 
       setLoadingStatus_(TEMPLATE_BACKUP_STATUS.IN_PROGRESS);
       dispatch(setHomeLoadingStatus({view: 'home', bool: true}));
@@ -59,19 +104,33 @@ const LoadTemplatesModal = ({closeModal}) => {
         type: [types.json],
       });
 
-      if (localCopy.status !== 'success') throw new Error('Could not access the selected file.');
+      if (localCopy.status !== 'success') return failValidation('Could not read the selected file.');
 
       const fileContent = await RNFS.readFile(localCopy.localUri, 'utf8');
-      const importedTemplates = JSON.parse(fileContent);
 
-      if (!importedTemplates || typeof importedTemplates !== 'object' || Array.isArray(importedTemplates)) {
-        throw new Error('File does not contain a valid templates object.');
+      // The picker's type filter is only a hint (the browser allows All Files), so anything can land here
+      let importedTemplates;
+      try {
+        importedTemplates = JSON.parse(fileContent);
+      }
+      catch (err) {
+        console.error('Selected file is not valid JSON:', err);
+        return failValidation('The selected file isn\'t valid JSON.');
       }
 
-      const {mergedTemplates, newCount, mergedCount} = mergeTemplates(matchedTemplates, importedTemplates);
+      if (!importedTemplates || typeof importedTemplates !== 'object' || Array.isArray(importedTemplates)) {
+        return failValidation(`The selected file isn't a ${title} backup.`);
+      }
+
+      const {mergedTemplates, newCount, mergedCount} = mergeTemplates(currentTemplates, importedTemplates);
+      // A JSON object with no template-shaped keys merges to nothing — a wrong pick, not an empty import
+      if (newCount === 0 && mergedCount === 0) return failValidation(`The selected file has no ${title} in it.`);
+
       dispatch(updatedProject({field: 'templates', value: mergedTemplates}));
 
-      setStatusMessage(`Added ${newCount} new templates, merged ${mergedCount} existing.`);
+      setStatusMessage(`Added ${newCount} new ${nounForCount(newCount)}, merged ${mergedCount} existing.`);
+      if (shouldWaitForServerSave) return;  // The side effect above reports completion once the server save lands
+
       setLoadingStatus_(TEMPLATE_BACKUP_STATUS.COMPLETE);
       dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
     }
@@ -84,6 +143,16 @@ const LoadTemplatesModal = ({closeModal}) => {
   };
 
   /* Logic Helpers */
+
+  // 'Templates' → 'template' or 'templates' to match the count
+  const nounForCount = count => (count === 1 ? title.slice(0, -1) : title).toLowerCase();
+
+  // A wrong file isn't a failed import — send the user back to the picker with the reason
+  const failValidation = (reason) => {
+    setValidationMessage(`${reason} ${chooseFileText}`);
+    setLoadingStatus_('');
+    dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+  };
 
   const mergeTemplateArray = (existing, imported) => {
     const merged = [...existing];
@@ -137,12 +206,16 @@ const LoadTemplatesModal = ({closeModal}) => {
 
   const renderContent = () => {
     if (loadingStatus === '') {
-      const instructionText = `Select a JSON file from which to ${actionLabel.toLowerCase()} ${title.toLowerCase()}. `
-        + `${title} with matching IDs will be merged — any new properties will be added, but existing properties will not be overwritten. `
-        + `${title} with new IDs will be added.`;
+      const instructionText = `${chooseFileText} ${title} with matching IDs will be merged — new properties are `
+        + `added, existing ones are kept. ${title} with new IDs will be added.`;
       return (
         <View style={{padding: 16}}>
           <Text style={{fontSize: PRIMARY_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}>{instructionText}</Text>
+          {validationMessage !== '' && (
+            <Text style={{fontSize: PRIMARY_TEXT_SIZE, color: WARNING_COLOR, marginTop: 12}}>
+              {validationMessage}
+            </Text>
+          )}
         </View>
       );
     }
@@ -150,17 +223,11 @@ const LoadTemplatesModal = ({closeModal}) => {
       <View style={{padding: 20, alignItems: 'center'}}>
         <LottieAnimations
           doesLoop={loadingStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
-          show
           type={loadingStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS ? 'loadingFile'
             : loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? 'complete' : 'error'}
         />
         {statusMessage !== '' && (
-          <Text style={{
-            marginTop: 12,
-            textAlign: 'center',
-            fontSize: MODAL_TEXT_SIZE,
-            color: DARKGREY,
-          }}>
+          <Text style={{fontSize: MODAL_TEXT_SIZE, color: DARKGREY, marginTop: 12, textAlign: 'center'}}>
             {statusMessage}
           </Text>
         )}
@@ -170,14 +237,16 @@ const LoadTemplatesModal = ({closeModal}) => {
 
   /* View */
 
+  // The action button opens the file picker rather than importing, so it's labeled for what it does
   return (
     <ModalWrapper
-      actionTitle={loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? 'Done' : actionLabel}
+      actionTitle={loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? 'Done' : 'Select File'}
       closeModal={closeModal}
       headerTitle={modalTitle}
+      isLoading={loadingStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? closeModal : handleLoad}
       onCancelPress={closeModal}
-      showActionButton={loadingStatus === '' || loadingStatus === TEMPLATE_BACKUP_STATUS.COMPLETE || loadingStatus === TEMPLATE_BACKUP_STATUS.ERROR}
+      showActionButton={loadingStatus !== TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       showCancelButton={loadingStatus === ''}
       showCloseButton
     >

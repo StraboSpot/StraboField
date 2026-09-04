@@ -9,9 +9,9 @@ import {
   postFormDataRequest,
   postRequest,
   timeoutPromise,
-} from './serverRequestHelpers';
+} from './serverRequests.helpers';
 import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
-import {userAgent} from './userAgent';
+import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import alert from '../../shared/ui/alert';
 
@@ -44,8 +44,12 @@ const useServerRequests = () => {
         {'Content-Type': 'application/x-www-form-urlencoded'});
     }
     catch (err) {
+      // Re-throw a clean, user-facing message so the caller (registerSample) surfaces it on the error view.
+      // Previously this swallowed the error and returned undefined, causing a downstream `undefined.text()` crash.
       console.error('Error Posting to SESAR', err);
-      alert('Error Posting to SESAR', err.toString());
+      throw new Error(err?.message === 'Network timeout'
+        ? 'SESAR did not respond (network timeout). Please check your connection and try again.'
+        : 'Unable to reach SESAR. Please check your Internet connection and try again.');
     }
   };
 

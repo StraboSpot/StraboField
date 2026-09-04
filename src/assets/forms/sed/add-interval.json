@@ -31,7 +31,7 @@
       "read_only": false,
       "required": true,
       "relevant": "",
-      "constraint": "",
+      "constraint": ". > 0",
       "appearance": "",
       "calculation": "",
       "$given_name": ""

@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import BackupStatusModal from './BackupStatusModal';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
+import useBackupUpload from './useBackupUpload';
 import useDevice from '../../../services/device/useDevice';
 import {BLUE, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
@@ -16,11 +17,9 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
-import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import SelectInputField from '../../form/SelectInputField';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
-import {setSelectedProject} from '../projects.slice';
 
 const BackupProject = () => {
   console.log('Rendering BackupProject...');
@@ -38,24 +37,21 @@ const BackupProject = () => {
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
   const backupFrequency = useSelector(state => state.connections.backupFrequency);
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
-  const user = useSelector(state => state.user);
 
-  const isConnectionAvailable = useIsConnectionAvailable();
   const {openURL} = useDevice();
+  const {
+    closeUploadModal,
+    isUploadAutoStart,
+    isUploadAvailable,
+    isUploadModalVisible,
+    openUploadModal,
+  } = useBackupUpload();
 
   /* Local State */
 
   const [backupAction, setBackupAction] = useState(undefined);
   const [isBackupStatusModalVisible, setIsBackupStatusModalVisible] = useState(false);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
-  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
-
-  /* Event Handlers */
-
-  const onUpload = () => {
-    dispatch(setSelectedProject({source: '', project: ''}));
-    setIsUploadModalVisible(true);
-  };
 
   /* Logic Helpers */
 
@@ -64,11 +60,7 @@ const BackupProject = () => {
       setIsSaveAndExportModalVisible(true);
       setBackupAction(backupActionToSet);
     }
-    else {
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There are no active datasets selected.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
+    else dispatch(openedMessageModal({message: 'There are no active datasets selected.', title: 'Error!'}));
   };
 
   const exportProject = () => checkForActiveDatasets('export');
@@ -119,6 +111,13 @@ const BackupProject = () => {
                 />
               )}
             </View>
+            <Text style={{...uiStyles.sectionDividerText, paddingVertical: 5}}>
+              {Platform.OS === 'ios'
+                ? 'Auto-saves are stored locally in the app\'s directory and can be accessed with the '
+                + '"View/Edit Files on Device" button below.'
+                : 'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed '
+                + 'directly on Android. Use Save or Save & Export to Zip to keep an accessible copy.'}
+            </Text>
           </View>
         )}
       </Formik>
@@ -129,7 +128,7 @@ const BackupProject = () => {
   const renderUploadAndBackupButtons = () => {
     return (
       <>
-        {user.encoded_login && isConnectionAvailable ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+        {isUploadAvailable ? <MainMenuPanelListItem onPress={openUploadModal} title={'Upload'}/>
           : <ConnectionRequiredMessage actionText={'upload your project'}/>}
         <FlatListItemSeparator/>
         <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
@@ -182,7 +181,7 @@ const BackupProject = () => {
         closeModal={() => setIsSaveAndExportModalVisible(false)}
         isVisible={isSaveAndExportModalVisible}
       />
-      <UploadModal closeModal={() => setIsUploadModalVisible(false)} isVisible={isUploadModalVisible}/>
+      <UploadModal autoStart={isUploadAutoStart} closeModal={closeUploadModal} isVisible={isUploadModalVisible}/>
     </View>
   );
 };

@@ -39,8 +39,15 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const downloadProject = async (inProjectToDownload) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
-    await initializeDownload(inProjectToDownload);
-    closeMainMenuPanel();
+    try {
+      await initializeDownload(inProjectToDownload);
+      closeMainMenuPanel();
+    }
+    catch (err) {
+      // initializeDownload already reported the failure into the status modal, and it rethrows because the web
+      // auto-login path needs that. Leave the main menu panel open so the project can be picked again.
+      console.error('Error downloading project.', err);
+    }
   };
 
   const getTextOverride = () => {

@@ -11,6 +11,7 @@ import useSafeDocumentPicker from './useSafeDocumentPicker';
 import {setLoadingStatus} from '../../modules/home/home.slice';
 import {deletedOfflineMap} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modules/project/projects.slice';
+import {toError} from '../../shared/helpers';
 import {APP_DIRECTORIES} from '../files/directories.constants';
 import useServerRequests from '../network/useServerRequests';
 
@@ -34,7 +35,7 @@ const useDevice = () => {
       })
       .catch((err) => {
         console.error('Error creating directory', directory, 'ERROR:', err);
-        throw Error(err);
+        throw toError(err);
       });
   };
 
@@ -45,7 +46,7 @@ const useDevice = () => {
       await RNFS.copyFile(source, target);
     }
     catch (err) {
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -92,7 +93,10 @@ const useDevice = () => {
     let mapID = map.id;
     console.log(`Deleting Map, ${map.name}, with ID of ${map.id} Here`);
     mapID === 'mapwarper' ? map.name : map.id;
-    map.source === 'mapbox_styles' && mapID.includes('/') ? mapID = mapID.split('/')[1] : mapID;
+    // Mapbox Styles map ids are 'username/styleId', but tiles are cached under the styleId only
+    // (see getTileFolderName). Offline maps carry source 'direct from filesystem', not 'mapbox_styles',
+    // so key off the '/' in the id to strip the account prefix and avoid orphaning the cached tiles.
+    if (mapID.includes('/')) mapID = mapID.split('/').pop();
 
     const cacheFolderExists = await RNFS.exists(APP_DIRECTORIES.TILE_CACHE + mapID);
     const zipFileExists = await RNFS.exists(APP_DIRECTORIES.TILE_ZIP + map.mapId + '.zip');
@@ -167,12 +171,12 @@ const useDevice = () => {
       let checkDirSuccess = await RNFS.exists(directory);
       if (!checkDirSuccess) checkDirSuccess = await createAppDirectory(directory);
       if (checkDirSuccess) console.log('Directory exists:', directory);
-      else throw Error;
+      else throw Error('Unable to create directory ' + directory);
       return checkDirSuccess;
     }
     catch (err) {
       console.error('Error in doesDeviceDirectoryExist()', err);
-      throw Error(err);
+      throw err;
     }
   };
 
@@ -193,7 +197,7 @@ const useDevice = () => {
   const downloadAndSaveMap = async (downloadOptions) => {
     const res = await RNFS.downloadFile(downloadOptions).promise;
     if (res.statusCode === 200) console.log(`Download Complete to ${downloadOptions.toFile}`);
-    else throw Error;
+    else throw Error('Error downloading file. Status code: ' + res.statusCode);
   };
 
   const downloadAndSaveProfileImage = async (encodedLogin) => {
@@ -289,9 +293,9 @@ const useDevice = () => {
           console.log(localCopy.localUri);
           return {localUri: localCopy.localUri, name: name};
         }
-        else throw Error;
+        else throw Error('Unable to save a local copy of ' + name);
       }
-      else throw Error;
+      else throw Error('No name or URI for the picked file.');
     }
     catch (err) {
       console.error('Error getting external project data', err);
@@ -358,7 +362,7 @@ const useDevice = () => {
       const initialUrl = await Linking.canOpenURL(url);
       console.log(initialUrl);
       if (initialUrl) Linking.openURL(url).catch(err => console.error('ERROR', err));
-      else console.log('Could not open:', url);
+      else console.error('Could not open:', url);
     }
     catch (err) {
       console.error('Error opening url', url, ':', err);
@@ -374,15 +378,25 @@ const useDevice = () => {
   };
 
   const readDeviceJSONFile = async (fileName) => {
+    const filePath = APP_DIRECTORIES.BACKUP_DIR + fileName + '/data.json';
+    let response;
     try {
-      const dataFile = '/data.json';
-      console.log(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      const response = await readFile(APP_DIRECTORIES.BACKUP_DIR + fileName + dataFile);
-      console.log(JSON.parse(response));
+      if (!await RNFS.exists(filePath)) {
+        console.warn('No data.json found for backup:', fileName);
+        return undefined;
+      }
+      response = await readFile(filePath);
+    }
+    catch (err) {
+      console.error('Error reading data.json for backup', fileName, ':', err);
+      return undefined;
+    }
+    try {
       return JSON.parse(response);
     }
     catch (err) {
-      console.error('Error reading JSON file', err);
+      console.error('Malformed data.json for backup', fileName, ':', err);
+      return undefined;
     }
   };
 
@@ -429,14 +443,14 @@ const useDevice = () => {
     try {
       return await RNFS.readFile(source);
     }
-    catch (e) {
-      console.error('Error reading file as utf8', e);
+    catch (err) {
+      console.error('Error reading file as utf8', err);
       try {
         return await RNFS.readFile(source, 'ascii');
       }
-      catch (e2) {
-        console.error('Error reading file as ascii:', e2);
-        const errorMessage = e2.message || 'Unable to read data file.';
+      catch (err2) {
+        console.error('Error reading file as ascii:', err2);
+        const errorMessage = err2.message || 'Unable to read data file.';
         throw Error(errorMessage);
       }
     }
@@ -489,7 +503,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error unzipping imported file', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -530,7 +544,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error saving project to device:', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -542,7 +556,7 @@ const useDevice = () => {
     }
     catch (err) {
       console.error('Error Writing File!', err.message);
-      throw Error(err);
+      throw toError(err);
     }
   };
 

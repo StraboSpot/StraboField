@@ -2,7 +2,7 @@ import React from 'react';
 import {FlatList} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
@@ -11,7 +11,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {deletedSpotIdFromTags} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
@@ -29,7 +28,6 @@ const TagDetail = ({
                    }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 

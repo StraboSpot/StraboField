@@ -200,6 +200,9 @@ const BackupStatusModal = ({isVisible, onClose}) => {
       {!isSaveVisible && !isSyncVisible && !isConflictPending && (
         <Text style={commonStyles.noValueText}>No pending auto backups.</Text>
       )}
+      <Text style={[commonStyles.noValueText, {fontSize: SMALL_TEXT_SIZE, paddingHorizontal: 10, paddingTop: 10}]}>
+        {'Auto-saves are stored locally on this device and are not uploaded to the server.'}
+      </Text>
     </ModalWrapper>
   );
 };

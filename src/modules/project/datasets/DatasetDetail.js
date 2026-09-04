@@ -10,7 +10,7 @@ import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui';
+import {FormFlatList, SwitchWrapper} from '../../../shared/ui';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
@@ -72,7 +72,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     if (dataset && dataset.id) {
       destroyDataset(dataset.id)
         .then(closeDetailView())
-        .catch(err => console.log('Error deleting dataset', err));
+        .catch(err => console.error('Error deleting dataset', err));
     }
     else console.error('Target dataset or id is undefined!');
   };
@@ -311,15 +311,17 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         title={datasetName === dataset.name ? 'Datasets' : 'Datasets (Save Changes)'}
       />
 
-      {renderNameField()}
-      {renderMetadataForm()}
-      {renderSpotsField()}
-      {renderImagesField()}
-      <LittleSpacer/>
-      <RunQAQC dataset={dataset}/>
-      {renderReadOnlyDatasetButton()}
-      <LittleSpacer/>
-      {Platform.OS === 'web' && renderDeleteDatasetButton()}
+      <FormFlatList>
+        {renderNameField()}
+        {renderMetadataForm()}
+        {renderSpotsField()}
+        {renderImagesField()}
+        <LittleSpacer/>
+        <RunQAQC dataset={dataset}/>
+        {renderReadOnlyDatasetButton()}
+        <LittleSpacer/>
+        {Platform.OS === 'web' && renderDeleteDatasetButton()}
+      </FormFlatList>
 
       {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}

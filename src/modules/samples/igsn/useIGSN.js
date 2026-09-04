@@ -66,8 +66,8 @@ const useIGSN = () => {
       dispatch(setSesarToken(newTokens));
       return newTokens;
     }
-    catch (error) {
-      console.error('Token refresh failed:', error);
+    catch (err) {
+      console.error('Token refresh failed:', err);
       return null;
     }
   };
@@ -133,7 +133,11 @@ const useIGSN = () => {
       // {label: 'Classification:', sesarKey: 'classification', value: getRockClassification()}, //required
       {label: 'Description:', sesarKey: 'description', value: sampleValue?.sample_description},
       {label: 'Purpose:', sesarKey: 'purpose', value: sampleValue?.main_sampling_purpose},
-      {label: 'Collection Date (Time):', sesarKey: 'collection_start_date', value: sampleValue?.collection_date},
+      {
+        label: 'Collection Date (Time):',
+        sesarKey: 'collection_start_date',
+        value: sampleValue?.collection_date || selectedSpot.properties.date,
+      },
       // {label: 'Collection Time:', sesarKey: 'collection_time', value: sampleValue?.collection_time},
       {label: 'Collector:', sesarKey: 'collector', value: name},
       {label: 'URL:', sesarKey: 'url', value: 'http://www.strabospot.org'},

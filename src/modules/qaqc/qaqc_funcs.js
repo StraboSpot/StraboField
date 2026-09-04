@@ -1,4 +1,4 @@
-import {getRequest} from '../../services/network/serverRequestHelpers';
+import {getRequest} from '../../services/network/serverRequests.helpers';
 import {QAQC_PATHS} from '../../services/network/urls.constants';
 
 const basicAuth = token => ({type: 'basic', token});

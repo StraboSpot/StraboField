@@ -19,20 +19,29 @@ bundle install
 bundle exec pod install
 
 # Create required configuration files:
-# 1. env.json at project root:
+# 1. env.json at project root (app runtime keys — bundled into the app, public keys only):
 {
   "mapbox_access_token": "Your Mapbox public access token",
+  "orcid_client_id": "Your ORCID public client id",
   "Error_reporting_DSN": "Optional Sentry DSN"
 }
 
-# 2. dev-test-logins.js at project root:
+# 2. secrets.json at project root (build-time secrets — gitignored, read only by scripts/, never bundled):
+{
+  "sentry_organization_auth_token": "Sentry org auth token (used by setup-sentry / upload-sourcemaps)",
+  "orcid_client_secret": "ORCID client secret",
+  "android_keystore": "Android keystore password",
+  "rockd_access_token": "Rockd access token"
+}
+
+# 3. dev-test-logins.js at project root:
 export const USERNAME_TEST = 'your username/email';
 export const PASSWORD_TEST = 'your password';
 
-# 3. Generate Sentry properties files (auto-generated from env.json):
+# 4. Generate Sentry properties files (auto-generated from secrets.json):
 npm run setup-sentry
 
-# 4. Install git hooks (keeps AGENTS.md auto-updated on commit):
+# 5. Install git hooks (keeps AGENTS.md auto-updated on commit):
 node scripts/install-hooks.js
 ```
 
@@ -340,7 +349,8 @@ Always check network state before server operations using `ConnectionStatus`.
 ### Error Tracking
 
 Sentry integration for error reporting:
-- Configure DSN in `env.json`
+- Configure runtime DSN in `env.json` (`Error_reporting_DSN`)
+- Auth token for uploads lives in `secrets.json` (`sentry_organization_auth_token`); `npm run setup-sentry` reads it
 - Errors automatically captured
 - Sourcemaps uploaded via `npm run upload-sourcemaps`
 

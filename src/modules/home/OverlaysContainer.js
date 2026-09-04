@@ -1,12 +1,18 @@
 import React, {forwardRef} from 'react';
+import {Platform} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
 import Dialog from './Dialog';
 import LoadingSpinner from '../../shared/ui/Loading';
-import {ErrorModal, StatusModal} from '../../shared/ui/modals';
+import {MessageModal, StatusModal} from '../../shared/ui/modals';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
+import ReauthModal from '../sign-in/ReauthModal';
+
+// Web auto-logs in to a fixed project and cannot switch projects, so there is nothing to choose. The
+// isProjectLoadSelectionModalVisible flag still runs on web — MapContainer uses it to arm the initial map zoom.
+const isWeb = Platform.OS === 'web';
 
 const OverlaysContainer = forwardRef(({
                                         closeMainMenuPanel,
@@ -23,15 +29,16 @@ const OverlaysContainer = forwardRef(({
 
   return (
     <>
-      {isProjectLoadSelectionModalVisible && (
+      {!isWeb && isProjectLoadSelectionModalVisible && (
         <InitialProjectLoadModal
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}
           openMainMenuPanel={openMainMenuPanel}
         />
       )}
-      <ErrorModal/>
+      <MessageModal/>
       <StatusModal/>
+      <ReauthModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
       {modalVisible && (

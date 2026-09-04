@@ -54,16 +54,18 @@ index 1234567..abcdefg 100644
            this._path.data.push(`${x},${y}`)
            this.props.onStrokeChanged(x, y)
          }
-@@ -211,8 +219,11 @@
+@@ -211,8 +219,13 @@
          UIManager.dispatchViewManagerCommand(this._handle, UIManager.RNSketchCanvas.Commands.endPath, [])
        },
  
-+      // Android-only: returning true blocks native gesture handlers (react-native-gesture-handler's
-+      // pinch/pan) from ever activating, which kills two-finger zoom/pan over the canvas. Return false
-+      // so those handlers can run; single-finger drawing is unaffected (nothing else claims one finger).
++      // Android-only, and consulted once at grant. Defaults to blocking, because a canvas drawn over a native map
++      // (FreehandSketch) must not let the map's pan handler seize a ONE-finger drag mid-stroke: the responder
++      // terminates, no further points arrive, onStrokeEnd never fires, and saving silently produces no Spot.
++      // Consumers hosting their own pinch/pan gestures (Sketch.js) pass shouldBlockNativeResponder={false} so
++      // those handlers can run.
        onShouldBlockNativeResponder: (evt, gestureState) => {
 -        return true;
-+        return false;
++        return this.props.shouldBlockNativeResponder !== false
        },
      });
    }

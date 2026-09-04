@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, Platform} from 'react-native';
+import {FlatList} from 'react-native';
 
 import DrawGeometryToggles from './DrawGeometryToggles';
 import ShortcutsList from './ShortcutsList';
@@ -10,7 +10,7 @@ const AddingNewSpots = () => {
       ListHeaderComponent={
         <>
           <ShortcutsList/>
-          {Platform.OS !== 'web' && <DrawGeometryToggles/>}
+          <DrawGeometryToggles/>
         </>
       }
     />

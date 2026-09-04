@@ -28,10 +28,6 @@ const initialProjectState = {
   project: {},
   projectTransferProgress: 0,
   readOnlyDatasetsIds: [],
-  selectedProject: {
-    project: '',
-    source: '',
-  },
   selectedTag: {},
   targetDatasetId: undefined,
 };
@@ -116,9 +112,6 @@ const projectSlice = createSlice({
       state.datasets = {};
       state.activeDatasetsIds = [];
       state.targetDatasetId = undefined;
-    },
-    clearedProject(state) {
-      state.project = {};
     },
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
@@ -297,11 +290,6 @@ const projectSlice = createSlice({
       }
       else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
     },
-    setSelectedProject(state, action) {
-      const {project, source} = action.payload;
-      state.selectedProject.project = project;
-      state.selectedProject.source = source;
-    },
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
@@ -377,7 +365,6 @@ export const {
   addedTagToSelectedSpot,
   addedTemplates,
   clearedDatasets,
-  clearedProject,
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
@@ -398,7 +385,6 @@ export const {
   setIsImageTransferring,
   setMultipleFeaturesTaggingEnabled,
   setReadOnlyDatasetsIds,
-  setSelectedProject,
   setSelectedTag,
   setTargetDataset,
   setTestingMode,

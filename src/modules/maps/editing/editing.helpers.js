@@ -101,6 +101,33 @@ export const getFeatureWithNewVertex = (e, spotEditingCopy) => {
     : addVertexToPolygon(spotEditingCopy, newVertex);
 };
 
+// Larger dimension of a stroke's screen-pixel bounding box. A line is invisible only when BOTH dimensions are
+// tiny, which is what this maximum being tiny means - testing either dimension alone would reject a deliberate
+// straight line, which is wide in one and flat in the other.
+export const getScreenExtent = (screenCoords) => {
+  if (!screenCoords || screenCoords.length < 2) return 0;
+  const xs = screenCoords.map(coord => coord[0]);
+  const ys = screenCoords.map(coord => coord[1]);
+  return Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+};
+
+// Approximate width of a freehand stroke's ring in screen pixels: twice its shoelace area over its perimeter.
+// Width, not area, is what separates a polygon from a sliver. A stroke that doubles back never retraces exactly,
+// so it still encloses area - 2px of hand wobble over 300px is 600px2 - but its width stays near zero. Neither
+// area nor the bounding box can see that; both read the sliver as large.
+export const getScreenPolygonWidth = (screenCoords) => {
+  if (!screenCoords || screenCoords.length < 3) return 0;
+  let twiceArea = 0;
+  let perimeter = 0;
+  for (let i = 0; i < screenCoords.length; i++) {
+    const [x1, y1] = screenCoords[i];
+    const [x2, y2] = screenCoords[(i + 1) % screenCoords.length];
+    twiceArea += x1 * y2 - x2 * y1;
+    perimeter += Math.hypot(x2 - x1, y2 - y1);
+  }
+  return perimeter === 0 ? 0 : Math.abs(twiceArea) / perimeter;
+};
+
 // Slice a line feature into two at an added vertex point, returning the two cleaned line features
 // (geometry only). The caller assigns identity and properties to each resulting Spot.
 export const splitLineAtVertex = (lineFeature, vertexAdded) => {

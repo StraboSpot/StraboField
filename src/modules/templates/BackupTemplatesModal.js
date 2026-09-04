@@ -15,15 +15,15 @@ const BackupTemplatesModal = ({closeModal}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const currentProject = useSelector(state => state.project.project);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const {backupTemplates} = useExport();
 
   /* Local State */
 
   const [backingUpStatus, setBackingUpStatus] = useState('');
-  const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
-    + currentProject.description.project_name + '_' + TEMPLATE_BACKUP_MESSAGES.TITLE).replace(/\s/g, '');
+  const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_' + projectName + '_'
+    + TEMPLATE_BACKUP_MESSAGES.TITLE).replace(/\s/g, '');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
 
@@ -37,7 +37,9 @@ const BackupTemplatesModal = ({closeModal}) => {
       console.log('FileName', backupFileName);
       setBackingUpStatus(TEMPLATE_BACKUP_STATUS.IN_PROGRESS);
       dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (Platform.OS === 'ios') setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.ZIPPING + TEMPLATE_BACKUP_MESSAGES.TITLE);
+      if (Platform.OS === 'ios') {
+        setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.ZIPPING + TEMPLATE_BACKUP_MESSAGES.TITLE);
+      }
       else setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.EXPORTING + TEMPLATE_BACKUP_MESSAGES.TITLE);
       dispatch(clearedStatusMessages());
       await backupTemplates(backupFileName);
@@ -62,6 +64,7 @@ const BackupTemplatesModal = ({closeModal}) => {
       closeModal={closeModal}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
+      isLoading={backingUpStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? closeModal : handleBackup}
       onCancelPress={closeModal}
       showActionButton={backingUpStatus === '' || backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE || backingUpStatus === TEMPLATE_BACKUP_STATUS.ERROR}

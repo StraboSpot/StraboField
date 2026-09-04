@@ -8,6 +8,8 @@ import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
 import backupStatusStyles from './backupStatus.styles';
 import BackupStatusModal from './BackupStatusModal';
 import SyncConflictModal from './SyncConflictModal';
+import UploadModal from './UploadModal';
+import useBackupUpload from './useBackupUpload';
 import * as themes from '../../../shared/styles.constants';
 import homeStyles from '../../home/home.style';
 
@@ -64,6 +66,8 @@ const BackupStatusIcons = () => {
   const imagesBounce = useBounceAnimation(isTransferringImages);
   const saveBounce = useBounceAnimation(isAutoSaving);
   const syncBounce = useBounceAnimation(isAutoSyncing);
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, isUploadPending: isUploadHostPending, startUploadFromStatus}
+    = useBackupUpload();
 
   /* Local State */
 
@@ -81,14 +85,26 @@ const BackupStatusIcons = () => {
   // Conflicts persist across restart, so surface them regardless of sync frequency.
   const isConflictVisible = conflictedDatasetIds.length > 0;
 
+  /* Event Handlers */
+
+  const onUploadFromStatus = () => startUploadFromStatus(() => setIsModalVisible(false));
+
   /* View */
 
-  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible) return null;
+  // isUploadHostPending keeps the icon host mounted across the transient gap after an upload (see useBackupUpload).
+  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible
+    && !isUploadModalVisible && !isUploadHostPending) return null;
 
   return (
     <>
       <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
       <SyncConflictModal/>
+      <BackupStatusModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onUpload={onUploadFromStatus}
+      />
+      <UploadModal autoStart={isUploadAutoStart} closeModal={closeUploadModal} isVisible={isUploadModalVisible}/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={backupStatusStyles.backupStatusContainer}>
           {isConflictVisible && (
