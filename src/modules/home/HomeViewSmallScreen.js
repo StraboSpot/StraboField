@@ -14,12 +14,13 @@ import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
-import {cancelledIntervalDrag} from '../maps/maps.slice';
+import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
+import useSpots from '../spots/useSpots';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const Tab = createMaterialTopTabNavigator();
@@ -56,6 +57,7 @@ const HomeViewSmallScreen = forwardRef(({
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
   const {height, width} = useWindowSize();
+  const {isCurrentMapReadOnly} = useSpots();
   const {lockToPortrait} = useDeviceOrientation();
 
   useEffect(() => {
@@ -63,7 +65,7 @@ const HomeViewSmallScreen = forwardRef(({
   }, []);
 
   const toggleSpotNavigator = () => {
-    dispatch(cancelledIntervalDrag());
+    dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
   };
@@ -110,7 +112,7 @@ const HomeViewSmallScreen = forwardRef(({
         />
       ) : (
         <Tab.Navigator
-          screenListeners={{focus: () => dispatch(cancelledIntervalDrag())}}
+          screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
@@ -154,10 +156,10 @@ const HomeViewSmallScreen = forwardRef(({
                   />
                 )}
 
-                {stratSection && !isCreateToolsDisabled && (
+                {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
                     onPress={() => {
-                      dispatch(cancelledIntervalDrag());
+                      dispatch(canceledIntervalDrag());
                       dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
                     }}
                     source={require('../../assets/icons/AddIntervalButton.png')}

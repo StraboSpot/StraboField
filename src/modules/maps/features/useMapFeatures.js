@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {isEmpty, isEqualUnordered} from '../../../shared/helpers';
 import {useSpots} from '../../spots';
 import {setMapSymbols} from '../maps.slice';
+import {isLabelOffsetFurtherRight} from '../symbology/mapSymbology.helpers';
 
 const useMapFeatures = () => {
   /* Data Hooks */
@@ -12,6 +13,7 @@ const useMapFeatures = () => {
   const featureTypesOff = useSelector(state => state.map.featureTypesOff) || [];
   const geometryTypesOff = useSelector(state => state.map.geometryTypesOff) || [];
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
+  const labelTypeOn = useSelector(state => state.map.labelTypeOn);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const stratSection = useSelector(state => state.map.stratSection);
 
@@ -65,6 +67,28 @@ const useMapFeatures = () => {
 
     // console.log('Features after filtering by geometry type', filteredFeatures);
     return filteredFeatures;
+  };
+
+  // A Spot with multiple measurements becomes a feature per measurement, all at the same location, so with Spot
+  // names as the labels the Spot's name would be drawn once per feature, stacked on itself. Label only one of them,
+  // the feature whose label sits furthest to the right, so the single name drawn clears the widest symbol at the Spot.
+  const hideRepeatedSpotNameLabels = (features) => {
+    if (labelTypeOn !== 'name') return features;
+
+    const labeledFeatures = {};    // The one feature to label at each Spot, by Spot id
+    features.forEach((feature) => {
+      if (!feature.properties.orientation) return;
+      const labeledFeature = labeledFeatures[feature.properties.id];
+      if (!labeledFeature || (isLabelOffsetFurtherRight(feature.properties.orientation)
+        && !isLabelOffsetFurtherRight(labeledFeature.properties.orientation))) {
+        labeledFeatures[feature.properties.id] = feature;
+      }
+    });
+
+    return features.map(feature => feature.properties.orientation
+    && labeledFeatures[feature.properties.id] !== feature
+      ? {...feature, properties: {...feature.properties, isSpotNameLabelHidden: true}}
+      : feature);
   };
 
   /* Exported Functions */
@@ -124,7 +148,7 @@ const useMapFeatures = () => {
       else mappedFeatures.push(spot);
     });
     console.log('Mapped Features:', mappedFeatures);
-    return filterFeatures(mappedFeatures);
+    return hideRepeatedSpotNameLabels(filterFeatures(mappedFeatures));
   };
 
   // True if the Spot belongs to the map currently being viewed: an image basemap or strat section

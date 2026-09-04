@@ -42,7 +42,7 @@ const useMapEditVertex = ({
   const {isDrawMode} = useMap();
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots} = useMapFeatures();
-  const {isReadOnlySpot} = useProject();
+  const {isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -251,7 +251,7 @@ const useMapEditVertex = ({
     return indexOfCoordinatesToUpdate;
   };
 
-  const isEditableSpot = spot => !spot?.properties?.id || !isReadOnlySpot(spot.properties.id);
+  const isEditableSpot = spot => !spot?.properties?.id || !isSpotInReadOnlyDataset(spot.properties.id);
   const getEditableSpots = spotsToFilter => spotsToFilter.filter(isEditableSpot);
 
   const setEditFeatures = (spotToEdit) => {

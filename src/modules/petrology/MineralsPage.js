@@ -80,6 +80,8 @@ const MineralsPage = ({isReadOnly, page}) => {
   const editMineral = (mineral) => {
     setIsDetailView(true);
     setSelectedMineral(mineral);
+    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
+    dispatch(setSelectedAttributes([mineral]));
     dispatch(setModalVisible({modal: null}));
   };
 

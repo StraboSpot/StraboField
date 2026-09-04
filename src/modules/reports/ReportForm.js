@@ -1,18 +1,11 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, FormikWrapper, useForm} from '../form';
 
-const FormDirtyObserver = ({isDirty, onDirtyChange}) => {
-  useEffect(() => {
-    onDirtyChange(isDirty);
-  }, [isDirty, onDirtyChange]);
-  return null;
-};
-
-const ReportForm = forwardRef(({initialValues, isReadOnly, onDirtyChange}, formRef) => {
+const ReportForm = forwardRef(({initialValues, setIsFormInvalid}, formRef) => {
   /* Data Hooks */
   const {getRelevantFields, getSurvey} = useForm();
 
@@ -62,12 +55,11 @@ const ReportForm = forwardRef(({initialValues, isReadOnly, onDirtyChange}, formR
       formName={REPORT_FORM_NAME}
       initialValues={initialValues}
       innerRef={formRef}
-      validateOnChange={false}
+      setIsFormInvalid={setIsFormInvalid}
     >
       {formProps => (
         <View style={{flex: 1}}>
-          {onDirtyChange && <FormDirtyObserver isDirty={formProps.dirty} onDirtyChange={onDirtyChange}/>}
-          <Form {...formProps} formName={REPORT_FORM_NAME} isReadOnly={isReadOnly} surveyFragment={mainFormKeysFields}/>
+          <Form {...formProps} formName={REPORT_FORM_NAME} surveyFragment={mainFormKeysFields}/>
           {choicesViewKey && renderSubform(formProps)}
         </View>
       )}

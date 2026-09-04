@@ -12,7 +12,6 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import SpotQuery from '../spots/SpotQuery';
 
@@ -27,8 +26,8 @@ const ImageGallery = ({openSpotInNotebook}) => {
   const dispatch = useDispatch();
 
   const navigate = useNavigation();
-  const {isReadOnlySpot} = useProject();
-  const {getActiveSpotsObj} = useSpots();
+
+  const {getActiveSpotsObj, isSpotReadOnly} = useSpots();
 
   /* Local State */
 
@@ -65,11 +64,11 @@ const ImageGallery = ({openSpotInNotebook}) => {
   /* Render Functions */
 
   const renderImagesInSpot = (images, section) => {
-    const isReadOnlyImages = !isEmpty(section.spot) && isReadOnlySpot(section.spot.properties.id);
+    const isReadOnly = isSpotReadOnly(section.spot);
     return (
       <ImagesList
         images={images}
-        isReadOnlyImages={isReadOnlyImages}
+        isReadOnlyImages={isReadOnly}
         isThumbnailOnly
         onOpenImage={handleOpenImage}
         spotWithImage={section.spot}
@@ -136,7 +135,6 @@ const ImageGallery = ({openSpotInNotebook}) => {
       </>
     );
   };
-
 
   /* View */
 

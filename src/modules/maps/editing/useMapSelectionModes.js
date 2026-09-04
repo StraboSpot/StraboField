@@ -3,8 +3,8 @@ import {useDispatch} from 'react-redux';
 import alert from '../../../shared/ui/alert';
 import {setModalVisible} from '../../home/home.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
-import useProject from '../../project/useProject';
 import {setIntersectedSpotsForTagging} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import useStereonet from '../useStereonet';
 
@@ -17,7 +17,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
 
   const {getLassoedSpots} = useMapFeaturesCalculated(mapRef);
   const {getStereonet} = useStereonet();
-  const {isReadOnlySpot} = useProject();
+  const {isSpotReadOnly} = useSpots();
 
   /* Functions */
 
@@ -57,7 +57,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
 
     // Filter out Read Only Spots
     const selectedSpotsFiltered = selectedSpots.filter((spot) => {
-      if (spot?.properties?.id && !isReadOnlySpot(spot.properties.id)) return spot;
+      if (spot?.properties?.id && !isSpotReadOnly(spot)) return spot;
     });
 
     if (selectedSpotsFiltered.length > 0) {

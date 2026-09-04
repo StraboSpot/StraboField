@@ -3,7 +3,7 @@ import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 
 // What a form calls its strike and dip direction when it takes a single orientation, and so has no measurement
 // groups to tell one from another
-const DEFAULT_ORIENTATION_FIELDS = [{dip_direction: 'dip_direction', strike: 'strike'}];
+export const DEFAULT_ORIENTATION_FIELDS = [{dip_direction: 'dip_direction', strike: 'strike'}];
 
 // A form that does name its orientations by group, such as the 3D structures, passes in the field to fill
 export const calcDipDir = (strike, formRefCurrent, dipDirectionKey = 'dip_direction') => {

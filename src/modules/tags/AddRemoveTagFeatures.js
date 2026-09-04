@@ -13,7 +13,6 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
-import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {useTags} from '../tags';
 
@@ -24,8 +23,7 @@ const AddRemoveTagFeatures = () => {
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isReadOnlySpot} = useProject();
-  const {getAllFeaturesFromSpot} = useSpots();
+  const {getAllFeaturesFromSpot, isSpotReadOnly} = useSpots();
   const {addRemoveSpotFeatureFromTag, getFeatureDisplayComponent} = useTags();
 
   /* Render Functions */
@@ -35,7 +33,7 @@ const AddRemoveTagFeatures = () => {
     const spot = spots[spotId];
     const selectedTagCopy = JSON.parse(JSON.stringify(selectedTag));
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
-    const isReadOnly = isReadOnlySpot(spot.properties.id);
+    const isReadOnly = isSpotReadOnly(spot);
 
     if (!isEmpty(spot) && !isEmpty(spot.properties)) {
       return (

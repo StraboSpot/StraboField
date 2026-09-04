@@ -15,7 +15,6 @@ const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible, se
       <View style={{flex: 1, flexDirection: 'column'}}>
         <MainMenuPanelHeader/>
         <SectionDividerWithRightButton
-          disabled={true}
           dividerText={'Datasets'}
           onPress={() => setIsAddDatasetModalVisible(true)}
         />

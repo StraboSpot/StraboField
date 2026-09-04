@@ -7,6 +7,12 @@ const initialHomeState = {
     imagesDownloadedCount: 0,
     neededImageIds: 0,
   },
+  // Drives the ProgressBar in StatusModal while a project's offline maps are unzipped and moved into place.
+  // progress is 0-1; a non-empty label means an import phase is active and the bar should be shown.
+  mapImportProgress: {
+    progress: 0,
+    label: '',
+  },
   loading: {
     modal: false,
     home: false,
@@ -62,6 +68,9 @@ const homeSlice = createSlice({
     removedLastStatusMessage(state) {
       state.statusMessages = state.statusMessages.slice(0, -1);
     },
+    resetMapImportProgress(state) {
+      state.mapImportProgress = {progress: 0, label: ''};
+    },
     resetHiddenWarnings(state) {
       state.hiddenWarnings = {};
     },
@@ -99,6 +108,9 @@ const homeSlice = createSlice({
     setIsUploadModalVisible(state, action) {
       state.isUploadModalVisible = action.payload;
     },
+    setMapImportProgress(state, action) {
+      state.mapImportProgress = {...state.mapImportProgress, ...action.payload};
+    },
     setLoadingStatus(state, action) {
       const {bool, view} = action.payload;
       state.loading[view] = bool;
@@ -133,6 +145,7 @@ export const {
   removedLastStatusMessage,
   resetHiddenWarnings,
   resetHomeState,
+  resetMapImportProgress,
   setIsBackupModalVisible,
   setGeolocationTimeout,
   setIsMainMenuPanelVisible,
@@ -145,6 +158,7 @@ export const {
   setIsWarningHidden,
   setIsWarningMessagesModalVisible,
   setLoadingStatus,
+  setMapImportProgress,
   setModalValues,
   setModalVisible,
   setShortcutSwitchPositions,

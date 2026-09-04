@@ -40,7 +40,7 @@ const ImageCard = ({
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
+  const {getAllSpotsOnImageBasemap} = useSpots();
 
   /* Local State */
 
@@ -118,8 +118,6 @@ const ImageCard = ({
 
   /* Logic Helpers */
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnlyImage;
-
   const deleteImage = async () => {
     console.log('Deleting image from spot', image.id);
     await deleteImageFromSpot(image.id, spotWithImage || spot);
@@ -131,6 +129,8 @@ const ImageCard = ({
     return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
       : placeholderTitle;
   }
+
+  const getIsSwitchDisabled = () => !isEmpty(getAllSpotsOnImageBasemap(image.id)) || isReadOnlyImage;
 
   /* View */
 

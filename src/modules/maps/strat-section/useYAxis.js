@@ -16,13 +16,14 @@ const useYAxis = () => {
 
   const stratSection = useSelector(state => state.map.stratSection);
   const {convertImagePixelsToLatLong} = useMapCoords();
-  const {getIntervalSpotsThisStratSection} = useSpots();
+  const {getAllIntervalSpotsOnStratSection} = useSpots();
   const {isNegativeColumn} = useStratSection();
 
   /* Derived Variables */
 
-  // Read intervals directly from Redux in pixel coordinates
-  const intervals = getIntervalSpotsThisStratSection(stratSection?.strat_section_id);
+  // Read intervals directly from Redux in pixel coordinates. All of them, so the axis measures the section
+  // itself and does not shrink when a dataset is switched off.
+  const intervals = getAllIntervalSpotsOnStratSection(stratSection?.strat_section_id);
   // Get max Y and min Y across all intervals to support sections spanning positive and negative values
   const {maxY, minY} = intervals.reduce((acc, i) => {
     const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();

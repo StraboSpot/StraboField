@@ -48,11 +48,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         onPress={handleDatasetPressed}
         pad={10}
       >
-        <SwitchWrapper
-          disabled={false}
-          onValueChange={handleToggleActiveDataset}
-          value={isActive}
-        />
+        <SwitchWrapper onValueChange={handleToggleActiveDataset} value={isActive}/>
 
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{truncateText(dataset.name, 18)}</ListItem.Title>

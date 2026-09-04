@@ -18,6 +18,7 @@ import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
+import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {setLoadingStatus} from '../../home/home.slice';
 import {editedSpotProperties} from '../../spots/spots.slice';
 import {
@@ -91,6 +92,7 @@ const IGSNModal = forwardRef(({
   const toast = useToast();
 
   const {sesar} = useSelector(state => state.user);
+  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {selectedAttributes} = useSelector(state => state.spot) || {};
   const spot = useSelector(state => state.spot.selectedSpot) || {};
 
@@ -196,7 +198,8 @@ const IGSNModal = forwardRef(({
   const doShowActionButton = isUploaded
     || (!isEmpty(sesar.sesarToken?.access) && !isUploading && modalPage !== 'picker');
 
-  const isActionDisabled = (!formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode))
+  const isActionDisabled = !isInternetReachable
+    || (!formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode))
     || missingRequiredFields.sample_type || missingRequiredFields.material;
 
   const getSesarTokenAndCodes = async (orcidToken) => {
@@ -308,7 +311,7 @@ const IGSNModal = forwardRef(({
         return {...prev, [failedKey]: 'error'};
       });
       setIsUploading(false);
-      setErrorMessages(err ? [err.toString()] : ['Something went wrong.']);
+      setErrorMessages([err?.message || 'Something went wrong.']);
       setModalPage('error');
     }
   };
@@ -328,6 +331,13 @@ const IGSNModal = forwardRef(({
   const getModalHeight = () => {
     if (modalPage === 'content' && !isStatusView) return '80%';
     return 'auto';
+  };
+
+  const getHeaderTitle = () => {
+    if (modalPage === 'error') return 'Upload Failed';
+    if (isUploading) return 'Uploading Project';
+    if (isUploaded) return 'Upload Complete!';
+    return formValues?.isOnMySesar ? 'Update Sample with SESAR' : 'Register Sample with SESAR';
   };
 
   /* Render Functions */
@@ -387,9 +397,15 @@ const IGSNModal = forwardRef(({
       missingRequiredFields.material && 'Material',
     ].filter(Boolean);
     const isMissingUserCode = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
-    if (isEmpty(missingLabels) && !isMissingUserCode) return null;
+    if (isInternetReachable && isEmpty(missingLabels) && !isMissingUserCode) return null;
     return (
       <>
+        {!isInternetReachable && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            You must be connected to the Internet to register or update a sample with SESAR. Please reconnect and try
+            again.
+          </Text>
+        )}
         {!isEmpty(missingLabels) && (
           <Text style={IGSNModalStyles.requiredLabel}>
             {missingLabels.join(' and ')} {missingLabels.length > 1 ? 'are' : 'is'} required to register a sample with
@@ -411,6 +427,7 @@ const IGSNModal = forwardRef(({
       style={[modalPage === 'error' ? IGSNModalStyles.errorContainer : IGSNModalStyles.successContainer, {alignSelf: 'stretch'}]}>
       {modalPage === 'error' && (
         <>
+          <LottieAnimations doesLoop={false} type={'error'}/>
           <Text style={IGSNModalStyles.statusHeaderText}>There was an error!</Text>
           {errorMessages.map(msg => (
             <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
@@ -426,6 +443,7 @@ const IGSNModal = forwardRef(({
       )}
       {isUploaded && (
         <View style={IGSNModalStyles.successContainer}>
+          <LottieAnimations doesLoop={false} type={'complete'}/>
           <Text style={IGSNModalStyles.statusHeaderText}>Success!</Text>
           {/*<Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>*/}
           {assignedIgsn ? (
@@ -445,14 +463,14 @@ const IGSNModal = forwardRef(({
 
   return (
     <ModalWrapper
-      actionTitle={isUploaded ? 'Done' : formValues?.isOnMySesar ? 'Update' : 'Register'}
+      actionTitle={modalPage === 'error' ? 'OK' : isUploaded ? 'Done' : formValues?.isOnMySesar ? 'Update' : 'Register'}
       cancelTitle={'Close'}
       closeModal={handleClose}
-      disabled={isActionDisabled}
-      headerTitle={isUploading ? 'Uploading Project' : 'Upload Complete!'}
+      disabled={modalPage === 'error' ? false : isActionDisabled}
+      headerTitle={getHeaderTitle()}
       isLoading={isUploading}
       isVisible={isVisible}
-      onActionPressed={isUploaded ? handleClose : registerSample}
+      onActionPressed={modalPage === 'error' || isUploaded ? handleClose : registerSample}
       onCancelPress={handleClose}
       overlayStyleOverride={{
         height: getModalHeight(),

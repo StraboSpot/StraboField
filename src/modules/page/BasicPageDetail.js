@@ -220,8 +220,7 @@ const BasicPageDetail = ({
     return getRequiredLithologyKeys(values, spot);
   };
 
-  // Whether a single field is editable, which is a separate question from whether the form can be saved
-  const getIsFieldDisabled = (fieldName) => {
+  const getIsDisabled = (fieldName) => {
     if (isReadOnly) return true;
     else {
       return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
@@ -363,7 +362,7 @@ const BasicPageDetail = ({
             <Form
               {...formProps}
               formName={formName}
-              getIsDisabled={getIsFieldDisabled}
+              getIsDisabled={getIsDisabled}
               isReadOnly={isReadOnly}
               requiredFields={getRequiredFields(formProps.values)}
               setFieldValueOverride={page.key === PAGE_KEYS.MINERALS

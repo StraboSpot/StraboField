@@ -106,7 +106,11 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex
   /* Render Functions */
 
   const renderProjectItem = ({item}) => {
-    const modifiedTimeAndDate = moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a');
+    // moment() with nothing to read gives the current time, which would report a project as just updated,
+    // so ask whether there is a timestamp at all rather than leaning on the Invalid date check below
+    const modifiedTimeAndDate = item.modified_timestamp
+      ? moment(item.modified_timestamp).format('MMM Do YYYY, h:mm a')
+      : null;
     return (
       <ListItem
         containerStyle={commonStyles.listItem}

@@ -1,4 +1,5 @@
 import * as turf from '@turf/turf';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
@@ -16,13 +17,25 @@ const useSamples = () => {
 
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot} = useSpots();
+  const toast = useToast();
 
 
   /* Exported Functions */
 
   // Create new Sample Spot
   const createRichSample = (spot, selectedSample, sampleImages = []) => {
-    let d = new Date(Date.now());
+    // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
+    // leaving one behind in no dataset
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating a Sample.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
+    // A sample already on the parent Spot is a legacy sample being converted, so it was created with that Spot and
+    // keeps the parent's created date. A brand new sample isn't on the parent Spot yet, so it gets today's date.
+    const isConvertingLegacySample = spot.properties[PAGE_KEYS.SAMPLES]?.some(s => s.id === selectedSample.id);
+    let d = isConvertingLegacySample && spot.properties.date ? new Date(spot.properties.date) : new Date(Date.now());
     d.setMilliseconds(0);
     let geometry = spot.geometry;
     if (spot.properties.lng && spot.properties.lat) {
@@ -46,7 +59,6 @@ const useSamples = () => {
     };
 
     console.log('Creating new Enriched Sample:', newEnrichedSample);
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
 

@@ -13,7 +13,6 @@ import {AvatarWrapper} from '../../shared/ui/avatars';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
 import {useTags} from '../tags';
@@ -33,13 +32,12 @@ const SampleListItem = ({
   const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {isReadOnlySpot} = useProject();
-  const {getSampleSpotIconSource} = useSpots();
+  const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isReadOnlySpot(parentSpot.properties?.id);
+  const isReadOnly = isSpotReadOnly(parentSpot);
   const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 

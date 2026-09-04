@@ -27,7 +27,7 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
 
   const {getSpotsAsFeatures} = useMapFeatures();
   const {addSymbology} = useMapSymbology();
-  const {isReadOnlySpot} = useProject();
+  const {isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -56,7 +56,7 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   const featuresReadOnly = [];
   if (mapMode === MAP_MODES.EDIT) {
     features.forEach((f) => {
-      if (isReadOnlySpot(f.properties.id)) featuresReadOnly.push(f);
+      if (isSpotInReadOnlyDataset(f.properties.id)) featuresReadOnly.push(f);
       else featuresEditable.push(f);
     });
   }

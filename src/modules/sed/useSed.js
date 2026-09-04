@@ -31,7 +31,7 @@ const useSed = () => {
 
   const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {validateSedData} = useSedValidation();
-  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
+  const {getAllSpotsOnStratSection, getSpotWithThisStratSection, isStratInterval} = useSpots();
   const {moveSpotsUpOrDownByPixels, recalculateIntervalGeometry} = useStratSectionCalculations();
 
   /* Internal Functions */
@@ -344,10 +344,10 @@ const useSed = () => {
   const toggleStratSection = (spot) => {
     if (!spot.properties?.sed?.strat_section) createNewStratSection(spot);
     else {
-      const spotsMappedOnThisStratSection = getSpotsMappedOnGivenStratSection(
-        spot.properties.sed.strat_section.strat_section_id);
-      if (spotsMappedOnThisStratSection.length > 0) {
-        alert('Strat Section In Use', 'There are ' + spotsMappedOnThisStratSection.length
+      const stratSectionId = spot.properties.sed.strat_section.strat_section_id;
+      const spotsOnStratSectionCount = getAllSpotsOnStratSection(stratSectionId).length;
+      if (spotsOnStratSectionCount > 0) {
+        alert('Strat Section In Use', 'There are ' + spotsOnStratSectionCount
           + ' Spot(s) mapped on this Spot. Delete these Spots before removing the strat section.');
       }
       else {

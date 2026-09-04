@@ -73,14 +73,7 @@ const ActionButtonsSmallScreen = ({
               toggleDialog={toggleDialog}
             />
           </View>
-          {!isEditToolsDisabled && (
-            <View style={{paddingLeft: 10}}>
-              <DrawActionButtons
-                clickHandler={clickHandler}
-                mapMode={mapMode}
-              />
-            </View>
-          )}
+          {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
         </View>
 
         {(isGeolocateLeft) && <View style={{flex: 1}}/>}

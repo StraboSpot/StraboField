@@ -11,7 +11,7 @@ import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
-  cancelledIntervalDrag,
+  canceledIntervalDrag,
   clearedStratSection,
   savedIntervalDragReordering,
   setFreehandFeatureCoords,
@@ -49,8 +49,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
-  const {getTargetDatasetFromId, isReadOnlySpot} = useProject();
-  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
+  const {getTargetDatasetFromId} = useProject();
+  const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected, isCurrentMapReadOnly} = useSpots();
   const toast = useToast();
   useAutoSave();
 
@@ -65,13 +65,12 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Derived Variables */
 
   const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
-  const imageBasemapSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id) : null;
-  const isReadOnlyBasemap = !!imageBasemapSpot && isReadOnlySpot(imageBasemapSpot.properties?.id);
-  const stratSectionSpot = stratSection ? getSpotWithThisStratSection(stratSection.strat_section_id) : null;
-  const isReadOnlyStratSection = !!stratSectionSpot && isReadOnlySpot(stratSectionSpot.properties?.id);
-  const isCreateToolsDisabled = isEmpty(
-    targetDatasetId) || isReadOnlyProject || isReadOnlyBasemap || isReadOnlyStratSection;
-  const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyBasemap || isReadOnlyStratSection;
+  const isReadOnlyMap = isCurrentMapReadOnly();
+  const isCreateToolsDisabled = isEmpty(targetDatasetId) || isReadOnlyProject || isReadOnlyMap;
+  const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyMap;
+  // Every reason the Edit button is not offered, the missing target dataset included - an edit left running
+  // past any of them has nowhere to save to, and saveEdits would drop it silently
+  const isEditModeUnavailable = isEditToolsDisabled || isEmpty(targetDatasetId);
   const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
 
   /* Side Effects */
@@ -92,10 +91,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   }, [isDragIntervalMode]);
 
   useEffect(() => {
-    if (!isEditToolsDisabled || mapMode !== MAP_MODES.EDIT) return;
+    if (!isEditModeUnavailable || mapMode !== MAP_MODES.EDIT) return;
     mapComponentRef.current?.cancelEdits();
     setMapMode(MAP_MODES.VIEW);
-  }, [isEditToolsDisabled, mapComponentRef, mapMode]);
+  }, [isEditModeUnavailable, mapComponentRef, mapMode]);
 
   useEffect(() => {
     if (!isCreateToolsDisabled || selectingMode) return;
@@ -156,7 +155,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const clickHandler = async (name, value) => {
     if (name !== 'startIntervalDrag' && name !== 'saveReordering' && name !== 'cancelIntervalDrag') {
       if (isDragIntervalMode) setMapMode(MAP_MODES.VIEW);
-      dispatch(cancelledIntervalDrag());
+      dispatch(canceledIntervalDrag());
     }
     switch (name) {
       // Map Actions
@@ -180,7 +179,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         await saveEdits();
         break;
       case 'startEditing':
-        if (!isEditToolsDisabled) mapComponentRef.current?.startEditingMode();
+        if (!isEditModeUnavailable) mapComponentRef.current?.startEditingMode();
         break;
       case 'toggleUserLocation':
         if (value) zoomToCurrentLocation().catch(console.error);
@@ -259,7 +258,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
           dispatch(restoredIntervalDragSnapshot(intervalDragSnapshot));
           if (Platform.OS !== 'web') dispatch(editedOrCreatedSpots(intervalDragSnapshot));
         }
-        dispatch(cancelledIntervalDrag());
+        dispatch(canceledIntervalDrag());
         setMapMode(MAP_MODES.VIEW);
         break;
     }
@@ -302,7 +301,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   // Toggle given dialog between true (visible) and false (hidden)
   const toggleDialog = (dialog) => {
-    dispatch(cancelledIntervalDrag());
+    dispatch(canceledIntervalDrag());
     console.log('Toggle', dialog);
     setDialogs({
       ...dialogs,

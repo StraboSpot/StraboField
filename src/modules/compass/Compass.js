@@ -48,7 +48,9 @@ const Compass = ({
 
   useEffect(() => {
     console.log('UE Compass []');
-    fetchDeclination().catch((err) => {
+    let isMounted = true;
+
+    const declinationReady = fetchDeclination().catch((err) => {
       console.error('Magnetic Declination not available', err);
       const errorMessage = err.message || err;
       if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
@@ -56,10 +58,23 @@ const Compass = ({
           'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
       }
     });
-    subscribeToSensors();
-    subscribeToCalibrationStatus(handleCalibrationStatus);
+
+    const startSensors = () => {
+      if (!isMounted) return; // component unmounted before declination resolved
+      subscribeToSensors();
+      subscribeToCalibrationStatus(handleCalibrationStatus);
+    };
+
+    // Android converts magnetic -> true north in JS by adding this declination, so a reading emitted
+    // before it's fetched would be recorded as magnetic (off by the local declination). Wait for the
+    // fetch to settle before the sensor stream starts. iOS gets true north straight from CoreMotion's
+    // reference frame and doesn't use this value for measurements, so it subscribes immediately.
+    if (Platform.OS === 'android') declinationReady.finally(startSensors);
+    else startSensors();
+
     AppState.addEventListener('change', handleAppStateChange);
     return () => {
+      isMounted = false;
       unsubscribeFromSensors();
       unsubscribeFromCalibrationStatus();
       AppState.addEventListener(

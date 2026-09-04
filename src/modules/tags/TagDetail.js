@@ -4,6 +4,7 @@ import {FlatList} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import TagDetailSummaryText from './TagDetailSummaryText';
 import commonStyles from '../../shared/common.styles';
 import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
 import {NotebookPageAvatar} from '../../shared/ui/avatars';
@@ -11,10 +12,8 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import SamplesSectionList from '../samples/SamplesSectionList';
 import {SpotsListItem, useSpots} from '../spots';
-import TagDetailSummaryText from './TagDetailSummaryText';
 import {useTags} from '../tags';
 
 const TagDetail = ({
@@ -32,10 +31,7 @@ const TagDetail = ({
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  // selectedTag.spots.map((x, index) => console.log(index, x, getSpotById(x)));
-
-  const {isReadOnlySpot} = useProject();
-  const {getSpotById, getSpotWithThisSample} = useSpots();
+  const {getSpotById, getSpotWithThisSample, isSpotReadOnly} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
 
   /* Render Functions */
@@ -80,7 +76,7 @@ const TagDetail = ({
     const spot = getSpotById(feature.parentSpotId);
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
     if (!isEmpty(spot)) {
-      const isReadOnly = isReadOnlySpot(spot.properties.id);
+      const isReadOnly = isSpotReadOnly(spot);
       return (
         <ListItem
           containerStyle={commonStyles.listItem}

@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
-import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 
 const normalizeProject = (project) => {
   if (!project.id) project.id = getNewId();
@@ -27,7 +27,6 @@ const initialProjectState = {
   isTestingMode: false,
   project: {},
   projectTransferProgress: 0,
-  readOnlyDatasetsIds: [],
   selectedTag: {},
   targetDatasetId: undefined,
 };
@@ -261,7 +260,10 @@ const projectSlice = createSlice({
     setActiveDatasetsMultiple(state, action) {
       const datasetIds = action.payload;
       state.activeDatasetsIds = datasetIds;
-      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = datasetIds[0];
+      // Which datasets are shown says nothing about where new Spots belong, and the first of them could well
+      // be read only. Drop a target that is no longer among them rather than substituting one - having no
+      // target at all is a state the app handles
+      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = undefined;
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
@@ -316,8 +318,8 @@ const projectSlice = createSlice({
       let datasetIdsFound = [];
       action.payload.map((spotId) => {
         for (const dataset of Object.values(state.datasets)) {
-          const spotIdFound = dataset.spotIds?.find(id => id === spotId);
-          if (spotIdFound && !datasetIdsFound.includes(dataset.id)) {
+          const isSpotIdFound = dataset.spotIds?.some(id => isSameId(id, spotId));
+          if (isSpotIdFound && !datasetIdsFound.includes(dataset.id)) {
             datasetIdsFound.push(dataset.id);
             break;
           }

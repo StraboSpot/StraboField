@@ -150,13 +150,14 @@ const homeStyles = StyleSheet.create({
     top: 150,
     zIndex: -1,
   },
+  // The divider sits on the draw tools, not the map actions, so it goes away when they do
   smallScreenDrawActionButtons: {
+    borderColor: themes.MEDIUMGREY,
+    borderLeftWidth: 1,
     flexDirection: 'row',
     paddingLeft: 10,
   },
   smallScreenMapActionButtons: {
-    borderColor: themes.MEDIUMGREY,
-    borderRightWidth: 1,
     flexDirection: 'row',
     paddingRight: 10,
   },

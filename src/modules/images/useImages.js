@@ -225,7 +225,7 @@ const useImages = () => {
     try {
       const savedPhoto = await takePicture();
       dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (savedPhoto === 'cancelled') {
+      if (savedPhoto === 'canceled') {
         if (newImages.length > 0) console.log('ALL PHOTOS SAVED', newImages);
         else toast.show('No Photos Saved', {duration: 2000, type: 'warning'});
         dispatch(setLoadingStatus({view: 'home', bool: false}));
@@ -332,7 +332,7 @@ const useImages = () => {
           try {
             if (response.didCancel) {
               stopCameraAnglesCapture();
-              resolve('cancelled');
+              resolve('canceled');
             }
             // react-native-image-picker reports failures as errorCode, not error
             else if (response.errorCode) throw Error(response.errorMessage || response.errorCode);

@@ -1,7 +1,8 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Platform, Text, useWindowDimensions, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
+import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -19,15 +20,14 @@ import {
 import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {SwitchWrapper} from '../../shared/ui/';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
-import {ENLARGED_COMPASS_MODAL_MAX_HEIGHT, getEnlargedCompassModalWidth} from '../compass/compass.constants';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
-import CompassControls from '../compass/CompassControls';
-import {Form, FormikWrapper, useForm} from '../form';
+import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';
@@ -43,15 +43,13 @@ const AddMeasurementModal = ({onPress}) => {
   const dispatch = useDispatch();
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
-  const isCompassEnlarged = useSelector(state => state.compass.isCompassEnlarged);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {height, width} = useWindowDimensions();
   const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
-  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
@@ -64,7 +62,6 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -125,23 +122,26 @@ const AddMeasurementModal = ({onPress}) => {
       id: getNewUUID(),
       type: typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR : typeObj.key,
     };
-    // A single template of a kind fills the form in so it can still be edited. Several of a kind each become
-    // their own measurement on save, so there is no one set of values to show and nothing is filled in.
-    if (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      const planarTemplates = getPlanarTemplates(gotRelevantTemplates);
-      const linearTemplates = getLinearTemplates(gotRelevantTemplates);
-      if (planarTemplates.length === 1) initialValuesTemp = {...initialValuesTemp, ...planarTemplates[0].values};
-      if (linearTemplates.length === 1) {
-        if (!initialValuesTemp.associated_orientation) initialValuesTemp.associated_orientation = [];
-        initialValuesTemp.associated_orientation[0] = {
-          ...linearTemplates[0].values,
-          id: getNewUUID(),
-          type: MEASUREMENT_KEYS.LINEAR,
-        };
+    // Set the initial form values if not multiple templates
+    if (gotRelevantTemplates.length <= 1 || (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR
+      && getPlanarTemplates(gotRelevantTemplates).length <= 1
+      || getLinearTemplates(gotRelevantTemplates).length <= 1)) {
+      if (typeObj.key === MEASUREMENT_KEYS.PLANAR_LINEAR) {
+        if (getPlanarTemplates(gotRelevantTemplates).length === 1) {
+          initialValuesTemp = {...initialValuesTemp, ...getPlanarTemplates(gotRelevantTemplates)[0].values};
+        }
+        if (getLinearTemplates(gotRelevantTemplates).length === 1) {
+          if (!initialValuesTemp.associated_orientation) initialValuesTemp.associated_orientation = [];
+          initialValuesTemp.associated_orientation[0] = {
+            ...getLinearTemplates(gotRelevantTemplates)[0].values,
+            id: getNewUUID(),
+            type: MEASUREMENT_KEYS.LINEAR,
+          };
+        }
       }
-    }
-    else if (gotRelevantTemplates.length === 1) {
-      initialValuesTemp = {...initialValuesTemp, ...gotRelevantTemplates[0].values};
+      else if (gotRelevantTemplates.length === 1) {
+        initialValuesTemp = {...initialValuesTemp, ...gotRelevantTemplates[0].values};
+      }
     }
     setInitialValues(initialValuesTemp);
     setMeasurementTypeForForm(initialValuesTemp.type);
@@ -188,34 +188,29 @@ const AddMeasurementModal = ({onPress}) => {
 
   /* Logic Helpers */
 
-  // A save cleans the values against the survey it was validated with, which reaches only the top level, so the
-  // associated orientation nested under associated_orientation[0] would keep the text its numbers were typed as.
-  // Clean it against the linear survey, the same one validateMeasurement collects its errors from.
-  const cleanAssociatedOrientation = (values) => {
-    const associatedValues = values.associated_orientation?.[0];
-    if (isEmpty(associatedValues)) return values;
-    const {values: cleanedAssociatedValues} = validateForm({
-      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
-      values: associatedValues,
-    });
-    return {...values, associated_orientation: [cleanedAssociatedValues]};
-  };
-
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
       : measurementTypeForForm;
-    // If plane with associated line label the line with its own label, falling back to the plane's
+    // If plane with associated line copy label from plane data to line data
     if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR) {
-      const {associated_orientation: associatedOrientation, label} = formRef.current.values;
-      const lineLabel = associatedOrientation?.[0]?.label || label;
-      if (lineLabel) formRef.current.setFieldValue('associated_orientation[0].label', lineLabel);
+      if (formRef.current.values.associated_orientation?.[0]?.label || formRef.current.values.label) {
+        formRef.current.setFieldValue('associated_orientation[0].label',
+          formRef.current.values.associated_orientation?.[0]?.label);
+      }
     }
     try {
-      // The ref, not the bag: the compass writes its reading and saves in the same tick
-      let {values: editedMeasurementData} = await submitAndShowErrors(formRef);
-      editedMeasurementData = cleanAssociatedOrientation(editedMeasurementData);
-      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation() : spot;
+      await formRef.current.submitForm();
+      let editedMeasurementData = showErrors(formRef.current);
+      // If plane with associated line validate associated line data
+      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
+        validateForm({
+          formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
+          values: editedMeasurementData.associated_orientation[0],
+        });
+      }
+      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
+        : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
 
@@ -255,17 +250,18 @@ const AddMeasurementModal = ({onPress}) => {
           }
           // If an associated measurement from the Quick Entry Modal with multiple templates
           else {
-            const enteredLine = editedMeasurementData.associated_orientation?.[0];
             if (planarTabularTemplates.length === 0) planarTabularTemplates = [editedMeasurementData];
-            // Without linear templates the one entered line is associated to every planar measurement
-            if (linearTemplates.length === 0) linearTemplates = enteredLine ? [enteredLine] : [];
+            if (linearTemplates.length === 0) linearTemplates = editedMeasurementData.associated_orientation;
             planarTabularTemplates.forEach((t) => {
-              const associatedLines = linearTemplates.map(lT => ({...lT.values, ...enteredLine, id: getNewUUID()}));
-              const measurement = {...t.values, ...editedMeasurementData, id: getNewUUID()};
-              // A planar template can carry a line of its own, so clear it when there is none to attach
-              if (isEmpty(associatedLines)) delete measurement.associated_orientation;
-              else measurement.associated_orientation = associatedLines;
-              editedMeasurementsData.push(measurement);
+              const associatedMeasurements = linearTemplates.map(
+                lT => ({...lT.values, ...editedMeasurementData.associated_orientation[0], id: getNewUUID()}));
+              editedMeasurementsData.push(
+                {
+                  ...t.values,
+                  ...editedMeasurementData,
+                  id: getNewUUID(),
+                  associated_orientation: associatedMeasurements,
+                });
             });
           }
         }
@@ -319,28 +315,14 @@ const AddMeasurementModal = ({onPress}) => {
     saveMeasurement().catch(console.error);
   };
 
-  // An associated orientation is nested under associated_orientation[0] and its fields are named with that path,
-  // so validating the planar survey against the top-level values misses it entirely. Validate it against the
-  // linear survey and key its errors to that same path, so they show inline and block the save — without this an
-  // out-of-range trend/plunge/rake or a missing required other_feature saves silently.
-  const validateMeasurement = (formName, values) => {
-    const {errors} = validateForm({formName: formName, values: values});
-    const associatedValues = values.associated_orientation?.[0];
-    if (isEmpty(associatedValues)) return errors;
-    const {errors: associatedErrors} = validateForm({
-      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
-      values: associatedValues,
-    });
-    return Object.entries(associatedErrors).reduce(
-      (acc, [key, message]) => ({...acc, ['associated_orientation[0].' + key]: message}), errors);
-  };
-
   /* Render Functions */
 
   const renderForm = (formProps) => {
     const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
     const assocSurvey = getSurvey(assocFormName);
     const assocChoices = getChoices(assocFormName);
+    let assocFormProps = JSON.parse(JSON.stringify(formProps));
+    assocFormProps.values = {};
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
       : measurementTypeForForm;
@@ -354,7 +336,7 @@ const AddMeasurementModal = ({onPress}) => {
             onPress={onMeasurementTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
-            textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+            textStyle={{color: PRIMARY_TEXT_COLOR}}
           />
         )}
         {!isSelectedAttitude && (
@@ -366,29 +348,25 @@ const AddMeasurementModal = ({onPress}) => {
         )}
         {!isShowTemplates && (
           <>
-            {isManualMeasurement ? (
+            {Platform.OS !== 'web' && (
               <>
-                <CompassControls
-                  isManual={isManualMeasurement}
-                  onToggleManual={setIsManualMeasurement}
-                  showManualToggle={Platform.OS !== 'web'}
-                />
-                <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', padding: 5}}>
+                  <Text style={{}}>Compass</Text>
+                  <SwitchWrapper onValueChange={value => setIsManualMeasurement(value)} value={isManualMeasurement}/>
+                  <Text style={{}}>Manual</Text>
+                </View>
               </>
+
+            )}
+            {isManualMeasurement ? (
+              <AddManualMeasurements formProps={formProps} formRefCurrent={formRef.current} measurementType={typeKey}/>
             ) : (
               <>
-                <View style={compassStyles.compassSection}>
-                  <CompassControls
-                    isManual={isManualMeasurement}
-                    onToggleManual={setIsManualMeasurement}
-                    showManualToggle={Platform.OS !== 'web'}
-                  />
-                  <Compass
-                    formValues={formProps.values}
-                    setMeasurements={setMeasurements}
-                    sliderValue={sliderValue}
-                  />
-                </View>
+                <Compass
+                  formValues={formProps.values}
+                  setMeasurements={setMeasurements}
+                  sliderValue={sliderValue}
+                />
                 <View style={compassStyles.sliderContainer}>
                   <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>
                   <SliderBar
@@ -442,12 +420,9 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
-        disabled={isFormInvalid}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
-        overlayStyleOverride={isCompassEnlarged && !isManualMeasurement
-          ? {maxHeight: ENLARGED_COMPASS_MODAL_MAX_HEIGHT, width: getEnlargedCompassModalWidth(width, height)}
-          : {height: '80%'}}
+        overlayStyleOverride={{height: '80%'}}
         showActionButton={!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement}
         showCancelButton={false}
         showCloseButton
@@ -456,17 +431,18 @@ const AddMeasurementModal = ({onPress}) => {
           {measurementTypeForForm && (
             <FlatList
               ListHeaderComponent={
-                <FormikWrapper
+                <Formik
                   enableReinitialize={true}
-                  formName={formName}
+                  initialStatus={{formName: formName}}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  setIsFormInvalid={setIsFormInvalid}
-                  validate={values => validateMeasurement(formName, values)}
+                  onSubmit={values => console.log('Submitting form...', values)}
+                  validate={values => validateForm({formName: formName, values: values})}
+                  validateOnChange={false}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
-                </FormikWrapper>
+                </Formik>
               }
               bounces={false}
               listKey={'form'}
@@ -482,22 +458,26 @@ const AddMeasurementModal = ({onPress}) => {
     if (choicesViewKey === 'feature_type') {
       relevantFields = survey.filter(f => f.name === choicesViewKey || f.name === 'other_feature');
     }
-    return <Form {...formProps} formName={formProps.status.formName} surveyFragment={relevantFields}/>;
+    return <Form {...{formName: formProps.status.formName, surveyFragment: relevantFields, ...formProps}}/>;
   };
 
   const renderSubformAssoc = (formProps) => {
+    let assocFormProps = JSON.parse(JSON.stringify(formProps));
+    assocFormProps.values = {};
     const assocFormName = [MEASUREMENT_GROUP_KEY, 'linear_orientation'];
+    assocFormProps.status = {formName: assocFormName};
     const assocSurvey = getSurvey(assocFormName);
     let relevantFields = getRelevantFields(assocSurvey, assocChoicesViewKey);
     if (assocChoicesViewKey === 'feature_type') {
       relevantFields = assocSurvey.filter(f => f.name === assocChoicesViewKey || f.name === 'other_feature');
     }
     return (
-      <Form
-        {...formProps}
-        formName={assocFormName}
-        subkey={'associated_orientation'}
-        surveyFragment={relevantFields}
+      <Form {...{
+        formName: assocFormProps.status.formName,
+        ...formProps,
+        subkey: 'associated_orientation',
+        surveyFragment: relevantFields,
+      }}
       />
     );
   };

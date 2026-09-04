@@ -28,7 +28,7 @@ const AddIntervalModal = () => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {getLabel, getSurvey, submitAndShowErrors} = useForm();
-  const {createSpot, getIntervalSpotsThisStratSection} = useSpots();
+  const {createSpot, getActiveIntervalSpotsOnStratSection} = useSpots();
   const {createInterval, isNegativeColumn, orderStratSectionIntervals} = useStratSection();
   const {moveIntervalToAfter} = useStratSectionCalculations();
   const toast = useToast();
@@ -42,8 +42,7 @@ const AddIntervalModal = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
-
-  const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+  const intervals = getActiveIntervalSpotsOnStratSection(stratSection.strat_section_id);
   const isCore = isNegativeColumn();
   const isTargetDatasetMissing = isEmpty(targetDatasetId);
 

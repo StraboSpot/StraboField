@@ -9,7 +9,6 @@ import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import useProject from '../../project/useProject';
 import {useSpots} from '../../spots';
 import {MAP_ACTIONS} from '../home.constants';
 
@@ -28,15 +27,11 @@ const MapActionsOverlay = ({
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {isReadOnlySpot} = useProject();
-  const {getRootSpot, getSpotWithThisStratSection} = useSpots();
+  const {isCurrentMapReadOnly} = useSpots();
 
   /* Derived Variables */
 
-  const imageBasemapSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id) : null;
-  const isReadOnlyBasemap = !!imageBasemapSpot && isReadOnlySpot(imageBasemapSpot.properties?.id);
-  const stratSectionSpot = stratSection ? getSpotWithThisStratSection(stratSection.strat_section_id) : null;
-  const isReadOnlyStratSection = !!stratSectionSpot && isReadOnlySpot(stratSectionSpot.properties?.id);
+  const isReadOnlyMap = isCurrentMapReadOnly();
 
   /* Logic Helpers */
 
@@ -50,7 +45,7 @@ const MapActionsOverlay = ({
     const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
     const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;
     const isReadOnlyHiddenAction = (isReadOnlyProject && ['addTag', 'addToReport'].includes(item.key))
-      || ((isReadOnlyBasemap || isReadOnlyStratSection) && item.key === 'addTag');
+      || (isReadOnlyMap && item.key === 'addTag');
     const isToggleScaleBarUnitsVisible = item.key === 'toggleScaleBarUnits' && !stratSection && !currentImageBasemap;
 
     const otherKeysToHide = new Set(

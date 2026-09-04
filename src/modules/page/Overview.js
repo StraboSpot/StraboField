@@ -150,6 +150,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     Linking.openURL(`https://dev.rockd.org/checkin/${checkinId}`);
   };
 
+  // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
+  // stays where it is for that to be fixed rather than carrying on.
   const saveForm = async () => {
     try {
       const {values: formValues} = await submitAndShowErrors(formRef.current);
@@ -164,20 +166,16 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
         dispatch(editedSpotProperties({field: 'surface_feature', value: formValues}));
       }
-      return Promise.resolve();
+      return true;
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
+      return false;
     }
   };
 
-  const saveFormAndGo = () => {
-    saveForm().then(() => {
-      setIsTraceSurfaceFeatureEdit(false);
-    }, () => {
-      console.error('Error saving form data to Spot');
-    });
+  const saveFormAndGo = async () => {
+    if (await saveForm()) setIsTraceSurfaceFeatureEdit(false);
   };
 
   const saveImagesToSpot = (newImages) => {

@@ -20,14 +20,12 @@ import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {
-  addedDataset,
   addedDatasets,
   addedProjectFromServer,
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
-import useProject from '../../modules/project/useProject';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty, toError} from '../../shared/helpers';
@@ -40,7 +38,11 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-let prevActiveDatasetsIds, prevTargetDatasetId;
+// Stays an array: the capture below is skipped when nothing is active, and downloadDatasets filters it either way
+let prevActiveDatasetsIds = [], prevTargetDatasetId;
+// Read off the downloaded project rather than the one the caller passed - the web auto login starts a
+// download from a bare {id}, so only the server response reliably says whether the project is read only
+let isDownloadedProjectReadOnly = false;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
@@ -57,7 +59,6 @@ const useDownload = () => {
 
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
-  const {createDataset} = useProject();
   const {clearProject} = useResetState();
   const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
 
@@ -67,8 +68,9 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    prevActiveDatasetsIds = undefined;
+    prevActiveDatasetsIds = [];
     prevTargetDatasetId = undefined;
+    isDownloadedProjectReadOnly = false;
   };
 
   /* Internal Functions */
@@ -88,8 +90,19 @@ const useDownload = () => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
-      const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
+      // Ids should be unique, but the server can send one per owner with the rows disagreeing on isReadOnly.
+      // Keep the newest of each and collapse before anything reads them, so the target comes from the same
+      // record the app saves. >= lets a tie fall to the last row sent, and the raw timestamps are compared
+      // because the Date.now() default below would make a row missing one look like the newest of them all
+      const newestDatasetsById = (res?.datasets || []).reduce((acc, dataset) => {
+        const keptDataset = acc[dataset.id];
+        const isNewest = !keptDataset || (dataset.modified_timestamp || 0) >= (keptDataset.modified_timestamp || 0);
+        return isNewest ? {...acc, [dataset.id]: dataset} : acc;
+      }, {});
+      datasetsObjToSave = Object.fromEntries(Object.entries(newestDatasetsById).map(
+        ([id, dataset]) => [id, {...dataset, modified_timestamp: dataset.modified_timestamp || Date.now()}]));
+      const datasets = Object.values(datasetsObjToSave);
 
       // Same project re-downloaded — restore active/target from before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
@@ -101,30 +114,27 @@ const useDownload = () => {
           }
           else dispatch(setActiveDatasetsMultiple(retainedActiveDatasetIds));
           const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
-          if (prevTargetDataset && !prevTargetDataset.isReadOnly) {
+          if (prevTargetDataset && isWritableDataset(prevTargetDataset)) {
             dispatch(setActiveDatasets({bool: true, dataset: prevTargetDatasetId}));
             dispatch(setTargetDataset(prevTargetDatasetId));
           }
           else {
-            const firstWritableDataset = datasets.find(d => retainedActiveDatasetIds.includes(d.id) && !d.isReadOnly)
-              || datasets.find(d => !d.isReadOnly);
+            const firstWritableDataset = datasets.find(
+              d => retainedActiveDatasetIds.includes(d.id) && isWritableDataset(d))
+              || datasets.find(isWritableDataset);
             if (firstWritableDataset) {
               dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
               dispatch(setTargetDataset(firstWritableDataset.id));
             }
+            // Nothing writable to fall back on, so drop the target rather than leave the read only one set
+            else dispatch(setTargetDataset(undefined));
           }
         }
         else setFirstWritableActiveAndTarget(datasets);
       }
       else if (datasets.length >= 1) setFirstWritableActiveAndTarget(datasets);
-      else {
-        const targetDataset = createDataset();
-        dispatch(addedDataset(targetDataset));
-        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
-        dispatch(setTargetDataset(targetDataset.id));
-      }
-      datasetsObjToSave = Object.assign({},
-        ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
+      // No else: a project that arrives with no datasets is left with none. clearProject has already emptied
+      // the target, and adding a dataset is the user's own call from the Datasets page
       await doGetDatasetSpots(datasets, encodedLoginScoped);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
@@ -142,6 +152,7 @@ const useDownload = () => {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
+      isDownloadedProjectReadOnly = !!projectResponse.isReadOnly;
       if (!isEmpty(project)) {
         if (project.id === selectedProject.id) {
           if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
@@ -278,15 +289,23 @@ const useDownload = () => {
     });
   };
 
-  // Sets the first non-read-only dataset as both the active and target dataset
-  // falls back to datasets[0] for the active dataset if all are read-only
+  // A read only project makes every dataset in it read only too, which is the rule useProject's
+  // isReadOnlyDataset applies. Only a writable dataset may be the target, since the target takes new Spots
+  const isWritableDataset = dataset => !isDownloadedProjectReadOnly && !dataset.isReadOnly;
+
+  // Sets the first writable dataset as both the active and target dataset
   const setFirstWritableActiveAndTarget = (datasets) => {
-    const firstWritableDataset = datasets.find(d => !d.isReadOnly);
+    const firstWritableDataset = datasets.find(isWritableDataset);
     if (firstWritableDataset) {
       dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
       dispatch(setTargetDataset(firstWritableDataset.id));
     }
-    else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+    // Every dataset is read only, so show one but record into none - a read only target would take Spots
+    // that could never be edited, and the project is still worth viewing without one
+    else {
+      dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
+      dispatch(setTargetDataset(undefined));
+    }
   };
 
   /* Exported Functions */
@@ -344,6 +363,8 @@ const useDownload = () => {
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
+      // Handed back so callers can tell a finished download from the duplicate request that returns nothing
+      return datasetsObjToSave;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

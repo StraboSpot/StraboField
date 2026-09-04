@@ -31,11 +31,9 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       setImageToView(formValues);
       saveUpdatedImage(formValues);
       closeModal();
-      return Promise.resolve();
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
     }
   };
 

@@ -38,6 +38,7 @@ const ReportModal = ({openSpotInNotebook}) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
 
@@ -59,6 +60,7 @@ const ReportModal = ({openSpotInNotebook}) => {
       <ModalWrapper
         actionTitle={isNewReport ? 'Save' : hasUnsavedChanges ? 'Update' : 'Done'}
         closeModal={confirmCloseModal}
+        disabled={isFormInvalid}
         headerTitle={isReadOnly ? 'View Memo' : isNewReport ? 'Create New Memo' : 'Update Memo'}
         onActionPressed={isNewReport || hasUnsavedChanges ? handleSavePressed : confirmCloseModal}
         onDeletePress={handleDeletePressed}
@@ -71,6 +73,8 @@ const ReportModal = ({openSpotInNotebook}) => {
         <FlatList
           ListHeaderComponent={
             <>
+              <ReportForm initialValues={initialValues} ref={formRef} setIsFormInvalid={setIsFormInvalid}/>
+              <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <ReportForm
                 initialValues={initialValues}
                 isReadOnly={isReadOnly}

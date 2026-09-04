@@ -43,7 +43,7 @@ const NotebookMenu = ({
   const navigation = useNavigation();
   const toast = useToast();
   const {deleteRichSample} = useSamples();
-  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
+  const {checkIsSafeDelete, copySpot, deleteSpot, isSpotOnReadOnlyMap, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
   /* Local State */
@@ -120,6 +120,8 @@ const NotebookMenu = ({
 
   const renderActionItem = ({item}) => {
     if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
+    // A copy keeps image_basemap/strat_section_id, so it would be a new Spot on a read only map
+    else if (item.key === 'copy' && isSpotOnReadOnlyMap(spot)) return;
     else if (item.key === 'rockd' && !isTestingMode
       && (checkedInSpotIds.includes(spot.properties.id)
         || spot.geometry?.type !== 'Point')) return;

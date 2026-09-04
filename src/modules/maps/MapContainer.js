@@ -16,6 +16,7 @@ import Map from './Map';
 import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
+import useStratSection from './strat-section/useStratSection';
 import useMap from './useMap';
 import useMapCoords from './view/useMapCoords';
 import useMapLocation from './view/useMapLocation';
@@ -25,6 +26,7 @@ import {isEmpty} from '../../shared/helpers';
 import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {isStratInterval} from '../spots/spots.helpers';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
 const MapContainer = forwardRef(({
@@ -126,6 +128,7 @@ const MapContainer = forwardRef(({
     switchToEditing,
   });
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
+  const {activateDatasetsWithIntervals} = useStratSection();
   const {setMapView, zoomToSpotsNow} = useMapView();
   const {getTilesFromHost} = useServerRequests();
 
@@ -208,20 +211,23 @@ const MapContainer = forwardRef(({
     if (currentBasemap?.source !== 'macrostrat') setIsShowMacrostratOverlay(false);
   }, [currentBasemap, isZoomToCenterOffline]);
 
+  // Whenever a strat section becomes the current map, make sure every dataset holding one of its intervals
+  // is active, otherwise the column draws with gaps. Keyed on the id so editing the section's settings,
+  // which replaces the object, does not run it again.
+  useEffect(() => {
+    if (stratSection) activateDatasetsWithIntervals(stratSection.strat_section_id);
+  }, [stratSection?.strat_section_id]);
+
   useEffect(() => {
     if (isDragIntervalMode && stratSection) {
-      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
-        ? selectedSpot
-        : null;
+      const interval = isStratInterval(selectedSpot) ? selectedSpot : null;
       startIntervalDrag(0, 0, interval, 0).catch(console.error);
     }
   }, [isDragIntervalMode]);
 
   useEffect(() => {
     if (!intervalDragState && isDragIntervalMode && stratSection) {
-      const interval = selectedSpot?.properties?.surface_feature?.surface_feature_type === 'strat_interval'
-        ? selectedSpot
-        : null;
+      const interval = isStratInterval(selectedSpot) ? selectedSpot : null;
       startIntervalDrag(0, 0, interval, 0).catch(console.error);
     }
   }, [intervalDragState]);

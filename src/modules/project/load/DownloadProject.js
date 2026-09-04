@@ -8,14 +8,11 @@ import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/files/useDownload';
 import {MEDIUM_TEXT_SIZE, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
-import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsStatusMessagesModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
 import ProjectList from '../ProjectList';
-import {setActiveDatasets, setTargetDataset} from '../projects.slice';
-import useProject from '../useProject';
 
 const source = 'server';
 
@@ -26,16 +23,12 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
   const dispatch = useDispatch();
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const {project} = useSelector(state => state.project);
-  const {email} = useSelector(state => state.user);
 
   const {initializeDownload} = useDownload();
-  const {addDataset} = useProject();
 
   /* Local State */
 
-  const [collaborativeDatasetName, setCollaborativeDatasetName] = useState('');
   const [isConfirmOverwriteModalVisible, setIsConfirmOverwriteModalVisible] = useState(false);
-  const [isDatasetNameModalVisible, setIsDatasetNameModalVisible] = useState(false);
   const [projectToDownload, setProjectToDownload] = useState(null);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
 
@@ -54,20 +47,14 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     closeConfirmOverwriteModal();
     try {
       const downloadedDatasets = await initializeDownload(inProjectToDownload);
+      // A duplicate request is ignored and hands back nothing - the download already running owns the follow up
+      if (!downloadedDatasets) return;
+      // A collaborator lands on the Datasets page to see what they downloaded. Owning none of it is fine -
+      // the project is theirs to read, and a dataset of their own is theirs to add here when they want one
       if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {
         dispatch(setIsStatusMessagesModalVisible(false));
         dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
-        const emailFound = Object.values(downloadedDatasets).some(dataset => dataset.owner_email === email);
-        if (emailFound) {
-          console.log('Email found in datasets');
-          setIsDatasetNameModalVisible(false);
-          dispatch(setSidePanelVisible({bool: false}));
-        }
-        else {
-          setTimeout(() => {
-            setIsDatasetNameModalVisible(true);
-          }, 400);
-        }
+        dispatch(setSidePanelVisible({bool: false}));
       }
       else closeMainMenuPanel();
     }
@@ -76,15 +63,6 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
       // auto-login path needs that. Leave the main menu panel open so the project can be picked again.
       console.error('Error downloading project.', err);
     }
-  };
-
-  const onDatasetNameConfirm = async () => {
-    const newDataset = await addDataset(collaborativeDatasetName || 'My Dataset');
-    dispatch(setActiveDatasets({bool: true, dataset: newDataset.id}));
-    dispatch(setTargetDataset(newDataset.id));
-    setIsDatasetNameModalVisible(false);
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
   };
 
   const getTextOverride = () => {
@@ -136,23 +114,6 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
       </View>
 
       {/* Modals */}
-      <TextInputModal
-        buttonText={'Create Dataset'}
-        dialogTitle={'Name Your Dataset'}
-        onActionPressed={onDatasetNameConfirm}
-        onCancelPress={() => {
-          dispatch(setSidePanelVisible({bool: false}));
-          setIsDatasetNameModalVisible(false);
-        }}
-        onChangeText={text => setCollaborativeDatasetName(text)}
-        placeholder={'Enter dataset name...'}
-        value={collaborativeDatasetName}
-        visible={isDatasetNameModalVisible}
-      >
-        <Text style={{textAlign: 'center'}}>
-          If you wish to not create a dataset now one can be created in the Datasets page.
-        </Text>
-      </TextInputModal>
       {isConfirmOverwriteModalVisible && (
         <ConfirmOverwriteModal
           closeModal={closeConfirmOverwriteModal}

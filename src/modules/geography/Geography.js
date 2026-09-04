@@ -65,6 +65,8 @@ const Geography = ({isReadOnly, page}) => {
       (acc, key) => (isEmpty(values[key]) ? acc : {...acc, [key]: parseFloat(values[key])}), {...values});
   };
 
+  // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
+  // stays where it is for that to be fixed rather than carrying on.
   const saveForm = async () => {
     try {
       const {values: geomFormValues} = await submitAndShowErrors(geomFormRef.current);
@@ -93,21 +95,19 @@ const Geography = ({isReadOnly, page}) => {
       const editedSpot = {geometry: geometry, properties: {...geographyProperties}, type: spot.type};
       dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
       dispatch(editedOrCreatedSpot(editedSpot));
-      return Promise.resolve();
+      return true;
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
+      return false;
     }
   };
 
-  const saveFormAndGo = () => {
-    saveForm().then(() => {
+  const saveFormAndGo = async () => {
+    if (await saveForm()) {
       console.log('Finished saving form data to Spot');
       dispatch(setNotebookPageVisibleToPrev());
-    }, () => {
-      console.error('Error saving form data to Spot');
-    });
+    }
   };
 
   /* Render Functions */

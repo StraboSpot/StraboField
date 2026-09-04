@@ -60,8 +60,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
     }
   };
 
-  const isDisabled = id => targetDatasetId && targetDatasetId === id;
-
   /* Render Functions */
 
   const renderDownloadImages = () => {
@@ -103,7 +101,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             <Text style={{color: PRIMARY_TEXT_COLOR, fontSize: PRIMARY_TEXT_SIZE}}>{'Is Visible?'}</Text>
           </View>
         </ListItem.Content>
-        <SwitchWrapper disabled={isDisabled(dataset.id)} onValueChange={handleToggleActiveDataset} value={isActive}/>
+        <SwitchWrapper onValueChange={handleToggleActiveDataset} value={isActive}/>
       </ListItem>
     );
   };
@@ -121,7 +119,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             : isActive || isReadOnly ? themes.MEDIUMGREY
               : themes.SECONDARY_BACKGROUND_COLOR}
           containerStyle={{paddingRight: 10}}
-          disabled={!isActive}
+          disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
           onPress={() => toggleTargetDataset(dataset.id)}
