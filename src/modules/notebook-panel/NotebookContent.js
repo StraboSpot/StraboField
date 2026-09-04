@@ -19,7 +19,6 @@ import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
-import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
@@ -35,13 +34,13 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
-  const {isSpotInReadOnlyDataset} = useProject();
   const {
     getActiveSpotsObj,
     getRecentSpots,
     getRootSpot,
     getSpotWithThisImageBasemap,
     handleSpotSelected,
+    isSpotReadOnly,
     sortSpotsByDateCreated,
   } = useSpots();
 
@@ -55,7 +54,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Derived Variables */
 
-  const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = isSpotReadOnly(spot);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const spotWithThisImageBasemap = spot.properties?.image_basemap
     && getSpotWithThisImageBasemap(spot.properties.image_basemap);

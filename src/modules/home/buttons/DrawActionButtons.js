@@ -6,6 +6,7 @@ import useDrawGeometryToggle from './useDrawGeometryToggle';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
+import useSpots from '../../spots/useSpots';
 import homeStyles from '../home.style';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
@@ -21,8 +22,12 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
     stratSection,
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
+  const {isCurrentMapReadOnly} = useSpots();
 
   /* View */
+
+  // A read only image basemap or strat section takes every draw tool with it, the interval drag included
+  if (isCurrentMapReadOnly()) return null;
 
   return (
     <View style={homeStyles.drawToolsContainer}>

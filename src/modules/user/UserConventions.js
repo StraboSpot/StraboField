@@ -22,9 +22,9 @@ import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/
 import {Form, FormikWrapper, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import useProject from '../project/useProject';
 import {calculateMissingOrientations, getSpotOrientations} from '../spots/spots.helpers';
 import {editedOrCreatedSpots, setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const UserProfile = () => {
   /* Data Hooks */
@@ -41,7 +41,7 @@ const UserProfile = () => {
   const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
   const {submitAndShowErrors} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isSpotReadOnly} = useSpots();
   const toast = useToast();
   const {uploadProfile} = useUpload();
 
@@ -84,7 +84,7 @@ const UserProfile = () => {
     else {
       // Filter out Read Only Spots
       const spotsFiltered = Object.values(spots).filter((spot) => {
-        if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+        if (spot?.properties?.id && !isSpotReadOnly(spot)) return spot;
       });
       if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found. No changes made.', {placement: 'top'});
 

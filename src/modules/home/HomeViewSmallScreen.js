@@ -20,6 +20,7 @@ import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
+import useSpots from '../spots/useSpots';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const Tab = createMaterialTopTabNavigator();
@@ -54,6 +55,7 @@ const HomeViewSmallScreen = forwardRef(({
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
   const {height, width} = useWindowSize();
+  const {isCurrentMapReadOnly} = useSpots();
   const {lockToPortrait} = useDeviceOrientation();
 
   useEffect(() => {
@@ -152,7 +154,7 @@ const HomeViewSmallScreen = forwardRef(({
                   />
                 )}
 
-                {stratSection && (
+                {stratSection && !isCurrentMapReadOnly() && (
                   <IconButton
                     onPress={() => {
                       dispatch(canceledIntervalDrag());

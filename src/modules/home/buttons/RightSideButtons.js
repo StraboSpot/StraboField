@@ -10,6 +10,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import {canceledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
+import useSpots from '../../spots/useSpots';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
@@ -35,6 +36,7 @@ const RightSideButtons = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {isCurrentMapReadOnly} = useSpots();
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
 
   useEffect(() => {
@@ -46,7 +48,7 @@ const RightSideButtons = ({
 
   return (
     <>
-      {stratSection && (
+      {stratSection && !isCurrentMapReadOnly() && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => {

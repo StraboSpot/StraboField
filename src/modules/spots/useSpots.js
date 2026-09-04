@@ -19,7 +19,7 @@ import {
   sortSpotsByDateLastModified,
 } from './spots.helpers';
 import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, restoredSpots, setSelectedSpot} from './spots.slice';
-import {getNewCopyId, getNewId, isEmpty, isEqual, sleep} from '../../shared/helpers';
+import {getNewCopyId, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
@@ -45,6 +45,7 @@ const useSpots = () => {
   const datasets = useSelector(state => state.project.datasets);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds);
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -54,7 +55,7 @@ const useSpots = () => {
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
-  const {getActiveDatasets, getTargetDatasetFromId} = useProject();
+  const {getActiveDatasets, getDatasetIdFromSpotId, getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
   const {addSpotsToTags} = useTags();
   const toast = useToast();
 
@@ -126,6 +127,36 @@ const useSpots = () => {
     };
     collect(spotToDelete);
     return Object.values(collected);
+  };
+
+  // Every Spot whose dataset can make the given Spot read only. Locking always spreads down from the Spot
+  // holding an image basemap or strat section to everything mapped on it, since that map is the Spot's own.
+  // It spreads back up only from a strat section, where adding, resizing or reordering an interval shifts
+  // every Spot on the section above or below it - intervals and anything else drawn there alike, see
+  // moveSpotsUpOrDownByPixels - so one locked Spot anywhere on a section locks all of it. Spots sharing an
+  // image basemap write nothing to each other, so they never lock each other or the Spot holding the image.
+  // Ids already collected end the walk, so maps that somehow reference each other can't loop.
+  const getSpotsThatCanLockSpot = (spot) => {
+    const foundSpots = {};
+    const collectSpot = (spotToCollect) => {
+      if (foundSpots[spotToCollect.properties.id]) return;
+      foundSpots[spotToCollect.properties.id] = spotToCollect;
+      const parentSpot = getSpotWithThisMap(isOnImageBasemap(spotToCollect), isOnStratSection(spotToCollect));
+      if (!isEmpty(parentSpot)) collectSpot(parentSpot);
+      const stratSectionId = spotToCollect.properties?.sed?.strat_section?.strat_section_id;
+      if (stratSectionId) getSpotsMappedOnGivenStratSection(stratSectionId).forEach(collectSpot);
+    };
+    collectSpot(spot);
+    return Object.values(foundSpots);
+  };
+
+  // The Spot holding a given image basemap or strat section, generalizing getSpotWithThisImageBasemap and
+  // getSpotWithThisStratSection. Takes both ids because the map asked about is sometimes the one on screen
+  // and sometimes the one a given Spot sits on, which are not always the same. The geo map has no Spot
+  // holding it, hence no id and no result.
+  const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
+    if (imageBasemapId) return getSpotWithThisImageBasemap(imageBasemapId);
+    return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
   };
 
   const getStratSectionSettings = (stratSectionId) => {
@@ -456,6 +487,32 @@ const useSpots = () => {
     return spotName;
   };
 
+  // Why a Spot is read only, so the notebook can say more than which dataset to unlock. cause is:
+  //   dataset      - the Spot sits in the read only dataset itself
+  //   stratSection - another Spot on the same strat section does, which locks the section as a whole
+  //   map          - the image basemap or strat section it is on belongs to a Spot that does
+  // Only a Spot on the very same section counts as stratSection. A locked Spot reached further up the
+  // chain is a map cause, since this Spot is not on that section and saying otherwise would misdirect.
+  const getReadOnlyReason = (spot) => {
+    if (isEmpty(spot) || isEmpty(readOnlyDatasetsIds)) return undefined;
+    const lockingSpots = getSpotsThatCanLockSpot(spot)
+      .filter(lockingSpot => isSpotInReadOnlyDataset(lockingSpot.properties.id));
+    if (isEmpty(lockingSpots)) return undefined;
+
+    const datasetNames = lockingSpots.reduce((acc, lockingSpot) => {
+      const name = datasets[getDatasetIdFromSpotId(lockingSpot.properties.id)]?.name;
+      return isEmpty(name) || acc.includes(name) ? acc : [...acc, name];
+    }, []).sort();
+
+    const stratSectionId = isOnStratSection(spot) || spot.properties?.sed?.strat_section?.strat_section_id;
+    const isOwnDatasetReadOnly = lockingSpots.some(
+      lockingSpot => isSameId(lockingSpot.properties.id, spot.properties.id));
+    const isLockedBySpotOnSameSection = !!stratSectionId && lockingSpots.some(
+      lockingSpot => isSameId(isOnStratSection(lockingSpot), stratSectionId));
+    const cause = isOwnDatasetReadOnly ? 'dataset' : isLockedBySpotOnSameSection ? 'stratSection' : 'map';
+    return {cause: cause, datasetNames: datasetNames};
+  };
+
   const getRecentSpots = () => {
     const activeSpotIds = Object.keys(getActiveSpotsObj());
     return recentViews.reduce((acc, spotId) => {
@@ -574,6 +631,25 @@ const useSpots = () => {
     }
   };
 
+  // An image basemap or strat section is locked exactly when the Spot holding it is read only. Nothing new
+  // is drawn on a locked map and no interval on it is added, edited or reordered.
+  const isCurrentMapReadOnly = () => isSpotReadOnly(
+    getSpotWithThisMap(currentImageBasemap?.id, stratSection?.strat_section_id));
+
+  // Whether the map a Spot sits on is locked, which is not the same question as the Spot being read only. A
+  // read only Spot on the geo map can still be copied, which is how you fork someone else's observation into
+  // your own dataset; one on a locked map cannot, because the copy would land back on that map.
+  const isSpotOnReadOnlyMap = spot => !isEmpty(spot)
+    && isSpotReadOnly(getSpotWithThisMap(isOnImageBasemap(spot), isOnStratSection(spot)));
+
+  // A Spot is read only when its own dataset is, and equally when any Spot that can lock it is - see
+  // getSpotsThatCanLockSpot for which Spots those are and why the answer differs by map type.
+  const isSpotReadOnly = (spot) => {
+    // This runs once per row of a Spot list, so skip the walk entirely when nothing can be read only
+    if (isEmpty(spot) || isEmpty(readOnlyDatasetsIds)) return false;
+    return getSpotsThatCanLockSpot(spot).some(lockingSpot => isSpotInReadOnlyDataset(lockingSpot.properties.id));
+  };
+
   // Use RecentViews to move those spots to the beginning of the spotsToSort
   // Don't use viewed_timestamp as this is supposed to be removed from Spot objects. Updating viewed_timestamp
   // in slice requires entire spots object to update in redux which breaks editing a feature on the map.
@@ -598,6 +674,7 @@ const useSpots = () => {
     getIntervalSpotsThisStratSection,
     getMappableSpots,
     getNewSpotName,
+    getReadOnlyReason,
     getRecentSpots,
     getRootSpot,
     getSampleSpotIconSource,
@@ -616,11 +693,14 @@ const useSpots = () => {
     getSpotWithThisStratSection,
     getVisibleSpots,
     handleSpotSelected,
+    isCurrentMapReadOnly,
     isOnGeoMap,
     isOnImageBasemap,
     isOnSameImageBasemap,
     isOnSameStratSection,
     isOnStratSection,
+    isSpotOnReadOnlyMap,
+    isSpotReadOnly,
     isStratInterval,
     sortSpotsAlphabetically,
     sortSpotsByDateCreated,

@@ -224,6 +224,7 @@ const useProject = () => {
   };
 
   const isSpotInReadOnlyDataset = (spotId) => {
+    if (isEmpty(readOnlyDatasetsIds)) return false;  // skip the dataset scan in the common case of nothing read only
     const datasetId = getDatasetIdFromSpotId(spotId);
     return readOnlyDatasetsIds.includes(datasetId);
   };
@@ -267,6 +268,7 @@ const useProject = () => {
     getActiveDatasets,
     getAllDeviceProjects,
     getAllServerProjects,
+    getDatasetIdFromSpotId,
     getTargetDatasetFromId,
     initializeNewProject,
     isSpotInReadOnlyDataset,

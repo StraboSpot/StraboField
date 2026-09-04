@@ -3,7 +3,6 @@ import {Text, TextInput, View} from 'react-native';
 
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
@@ -13,6 +12,7 @@ import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.const
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {LABEL_DICTIONARY} from '../../form';
+import {openedMessageModal} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import {getUtmDisplayString} from '../../maps/maps.helpers';
@@ -46,14 +46,15 @@ const NotebookHeader = ({
   const {getCurrentLocation} = useMapLocation();
   const {
     checkSpotName,
+    getReadOnlyReason,
     getRootSpot,
     getSampleSpotIconSource,
     getSpotGeometryIconSource,
     getSpotWithThisImageBasemap,
     getSpotWithThisSample,
     getSpotWithThisStratSection,
+    isCurrentMapReadOnly,
   } = useSpots();
-  const toast = useToast();
 
   /* Local State */
 
@@ -87,6 +88,27 @@ const NotebookHeader = ({
   /* Logic Helpers */
 
   const getCoordText = (lat, lng) => isUtmDisplay ? getUtmDisplayString([lng, lat]) : getLatLngText(lat, lng);
+
+  // Name the dataset to unlock AND why this Spot is affected by it. Without the reason, someone looking at a
+  // Spot in their own open dataset is told to go unlock a dataset that Spot is not even in.
+  const getReadOnlyReasonText = () => {
+    const reason = getReadOnlyReason(spot);
+    if (isEmpty(reason)) return 'Unlock its dataset from the Datasets page.';  // the modal title says the rest
+    const {cause, datasetNames} = reason;
+    const unlockText = datasetNames.length === 1 ? `Unlock dataset ${datasetNames[0]} from the Datasets page.`
+      : `Unlock datasets ${datasetNames.join(', ')} from the Datasets page.`;
+    // Any Spot on a section locks it, not only an interval, and a reorder moves everything on the section
+    if (cause === 'stratSection') {
+      const sectionText = spot.properties?.strat_section_id ? 'Another Spot on this strat section is Read Only'
+        : 'This Spot\'s strat section holds a Read Only Spot';
+      return `${sectionText}, so the whole section is locked. ${unlockText}`;
+    }
+    if (cause === 'map') {
+      const mapText = spot.properties?.image_basemap ? 'image basemap' : 'strat section';
+      return `The ${mapText} this Spot is on belongs to a Read Only Spot. ${unlockText}`;
+    }
+    return `This Spot is in a Read Only dataset. ${unlockText}`;
+  };
 
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
@@ -161,9 +183,11 @@ const NotebookHeader = ({
     }
   };
 
+  // The reason runs to a couple of sentences and lands while the menu panel is animating in, which is more
+  // than a toast's few seconds can carry - so it goes in the message modal, which waits to be dismissed and
+  // can be re-read.
   const goToDatasetsPage = () => {
-    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
-      {duration: 4000, placement: 'top', type: 'warning'});
+    dispatch(openedMessageModal({message: getReadOnlyReasonText(), title: 'Spot is Read Only'}));
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
     if (openMainMenuPanel) openMainMenuPanel();
@@ -310,15 +334,18 @@ const NotebookHeader = ({
             />
           </View>
         )}
-        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
-          <ClearButton
-            onPress={() => {
-              createDefaultGeom();
-              closeNotebookPanel();
-            }}
-            title={'Set in Current View'}
-          />
-        </View>
+        {/* The geometry is placed on the map on screen, so a read only image basemap or strat section is off limits */}
+        {!isCurrentMapReadOnly() && (
+          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+            <ClearButton
+              onPress={() => {
+                createDefaultGeom();
+                closeNotebookPanel();
+              }}
+              title={'Set in Current View'}
+            />
+          </View>
+        )}
       </View>
     );
   };
