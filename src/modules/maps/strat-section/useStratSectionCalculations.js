@@ -278,7 +278,7 @@ const useStratSectionCalculations = () => {
   const moveSpotsUpOrDownByPixels = (stratSectionId, cutoff, pixels, excludedSpotId) => {
     const isCore = stratSection.section_type === 'core';
     const spots = getSpotsMappedOnGivenStratSection(stratSectionId);
-    const spotsFiltered = spots.filter(spot => excludedSpotId && spot.properties.id !== excludedSpotId);
+    const spotsFiltered = spots.filter(spot => spot.properties.id !== excludedSpotId);
     const movedSpots = spotsFiltered
       .filter((spot) => {
         const extent = turf.bbox(spot);
