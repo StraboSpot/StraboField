@@ -10,5 +10,6 @@ MAPS
 
 BACKUP & UPLOADS
 • Simpler uploads: a unified upload screen with more consistent behavior
+• Accurate backup times: backup lists now show the correct timestamps
 
 Thanks for using StraboSpot!

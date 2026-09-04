@@ -55,6 +55,7 @@ const RELEASE_NOTES = [
         title: 'Backup & uploads',
         items: [
           {text: 'Simpler uploads: a unified upload screen with more consistent behavior', commit: '46a29cc00'},
+          {text: 'Accurate backup times: backup lists now show the correct timestamps', commit: '3830bb70a'},
         ],
       },
     ],
