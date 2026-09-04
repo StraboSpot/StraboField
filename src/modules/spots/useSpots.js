@@ -86,16 +86,10 @@ const useSpots = () => {
       if (isOnImageBasemap(newSpot)) {
         const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
         const imageBasemaps = getImageBasemapsInSpot(parentSpot);
-        const nestedImageBasemapSpots = imageBasemaps.reduce((acc, imageBasemap) => {
-          const spotsMappedOnGivenImageBasemap = getSpotsMappedOnGivenImageBasemap(imageBasemap.id);
-          return [...acc, ...spotsMappedOnGivenImageBasemap];
-        }, []) || [];
+        const nestedImageBasemapSpots = imageBasemaps.flatMap(i => getAllSpotsOnImageBasemap(i.id));
         spotNumber = nestedImageBasemapSpots.length + 1;
       }
-      else {
-        const spotsMappedOnGivenStratSection = getSpotsMappedOnGivenStratSection(newSpot.properties.strat_section_id);
-        spotNumber = spotsMappedOnGivenStratSection.length + 1;
-      }
+      else spotNumber = getAllSpotsOnStratSection(newSpot.properties.strat_section_id).length + 1;
     }
     else spotNumber = parseInt(preferences.starting_number_for_spot, 10) || Object.keys(spots).length + 1;
 
@@ -144,7 +138,7 @@ const useSpots = () => {
       const parentSpot = getSpotWithThisMap(isOnImageBasemap(spotToCollect), isOnStratSection(spotToCollect));
       if (!isEmpty(parentSpot)) collectSpot(parentSpot);
       const stratSectionId = spotToCollect.properties?.sed?.strat_section?.strat_section_id;
-      if (stratSectionId) getSpotsMappedOnGivenStratSection(stratSectionId).forEach(collectSpot);
+      if (stratSectionId) getAllSpotsOnStratSection(stratSectionId).forEach(collectSpot);
     };
     collectSpot(spot);
     return Object.values(foundSpots);
@@ -453,7 +447,21 @@ const useSpots = () => {
   // next interval stacks, how far the axes run - comes from every interval on it, so measuring it with
   // getActiveIntervalSpotsOnStratSection would move the column whenever a Dataset is switched off.
   const getAllIntervalSpotsOnStratSection = (stratSectionId) => {
-    return getSpotsMappedOnGivenStratSection(stratSectionId).filter(isStratInterval);
+    return getAllSpotsOnStratSection(stratSectionId).filter(isStratInterval);
+  };
+
+  // Get every Spot mapped on a specific image basemap, active Dataset or not
+  const getAllSpotsOnImageBasemap = (basemapId) => {
+    return Object.values(spots).reduce((acc, s) => {
+      return s.properties?.image_basemap?.toString() === basemapId?.toString() ? [...acc, s] : acc;
+    }, []);
+  };
+
+  // Get every Spot mapped on a specific strat section, active Dataset or not
+  const getAllSpotsOnStratSection = (stratSectionId) => {
+    return Object.values(spots).reduce((acc, s) => {
+      return s.properties?.strat_section_id?.toString() === stratSectionId?.toString() ? [...acc, s] : acc;
+    }, []);
   };
 
   // Get parent Spot for image basemap
@@ -566,20 +574,6 @@ const useSpots = () => {
 
   const getSpotsInMapExtent = () => spotsInMapExtentIds.map(id => spots[id]);
 
-  // Get all the Spots mapped on a specific image basemap
-  const getSpotsMappedOnGivenImageBasemap = (basemapId) => {
-    return Object.values(spots).reduce((acc, s) => {
-      return s.properties?.image_basemap?.toString() === basemapId?.toString() ? [...acc, s] : acc;
-    }, []);
-  };
-
-  // Get all the Spots mapped on a specific strat section
-  const getSpotsMappedOnGivenStratSection = (stratSectionId) => {
-    return Object.values(spots).reduce((acc, s) => {
-      return s.properties?.strat_section_id?.toString() === stratSectionId?.toString() ? [...acc, s] : acc;
-    }, []);
-  };
-
   const getSpotsWithKey = (key) => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties[key]));
   };
@@ -678,6 +672,8 @@ const useSpots = () => {
     getActiveSpotsObj,
     getAllFeaturesFromSpot,
     getAllIntervalSpotsOnStratSection,
+    getAllSpotsOnImageBasemap,
+    getAllSpotsOnStratSection,
     getImageBasemapBySpot,
     getMappableSpots,
     getNewSpotName,
@@ -690,8 +686,6 @@ const useSpots = () => {
     getSpotGeometryIconSource,
     getSpotsByIds,
     getSpotsInMapExtent,
-    getSpotsMappedOnGivenImageBasemap,
-    getSpotsMappedOnGivenStratSection,
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,

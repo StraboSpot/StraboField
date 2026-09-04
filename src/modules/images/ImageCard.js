@@ -39,7 +39,7 @@ const ImageCard = ({
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
+  const {getAllSpotsOnImageBasemap} = useSpots();
 
   /* Local State */
 
@@ -129,7 +129,7 @@ const ImageCard = ({
       : placeholderTitle;
   }
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  const getIsSwitchDisabled = () => !isEmpty(getAllSpotsOnImageBasemap(image.id)) || isReadOnly;
 
   /* View */
 
