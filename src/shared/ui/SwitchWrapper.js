@@ -17,10 +17,14 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
 
   if (Platform.OS === 'web') {
     return (
+      // The web switch is a plain checkbox, and a press on it carries on up to whatever the switch sits in
+      // and fires that too, opening a detail page from a row the switch is only a part of. Every other
+      // pressable stops its own click, so stop this one to keep the press to the switch.
       <Switch
         activeThumbColor={disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}
         activeTrackColor={disabled ? PRIMARY_ACCENT_COLOR_FADED_20 : PRIMARY_ACCENT_COLOR_FADED_40}
         disabled={disabled}
+        onClick={evt => evt.stopPropagation()}
         onValueChange={onValueChange}
         thumbColor={LIGHTGREY}
         trackColor={MEDIUMGREY}
