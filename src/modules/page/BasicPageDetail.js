@@ -46,6 +46,7 @@ const BasicPageDetail = ({
 
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const {sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, submitAndShowErrors, validateForm} = useForm();
@@ -82,6 +83,12 @@ const BasicPageDetail = ({
   // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
   const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
     && !isInternetReachable;
+  // Registering a sample with SESAR needs credentials to do it with, and a user code to register it under unless
+  // it is already on SESAR and reachable to be updated in place
+  const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
+    || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
+  // Every reason the save itself is refused, held at the button rather than failing once it is pressed
+  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -402,7 +409,7 @@ const BasicPageDetail = ({
                 )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={isFormInvalid || isRegisteredSampleOffline}
+                  getIsDisabled={isFormInvalid || isSaveDisabled}
                   save={saveButtonOnPress}
                 />
               </>
