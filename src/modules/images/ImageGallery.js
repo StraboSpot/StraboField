@@ -68,7 +68,7 @@ const ImageGallery = ({openSpotInNotebook}) => {
     return (
       <ImagesList
         images={images}
-        isReadOnly={isReadOnly}
+        isReadOnlyImages={isReadOnly}
         isThumbnailOnly
         onOpenImage={handleOpenImage}
         spotWithImage={section.spot}
