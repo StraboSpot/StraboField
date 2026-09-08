@@ -108,11 +108,6 @@ const projectSlice = createSlice({
       }
       state.project.modified_timestamp = Date.now();
     },
-    clearedDatasets(state) {
-      state.datasets = {};
-      state.activeDatasetsIds = [];
-      state.targetDatasetId = undefined;
-    },
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;
@@ -261,7 +256,10 @@ const projectSlice = createSlice({
     setActiveDatasetsMultiple(state, action) {
       const datasetIds = action.payload;
       state.activeDatasetsIds = datasetIds;
-      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = datasetIds[0];
+      // Which datasets are shown says nothing about where new Spots belong, and the first of them could well
+      // be read only. Drop a target that is no longer among them rather than substituting one - having no
+      // target at all is a state the app handles
+      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = undefined;
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
@@ -364,7 +362,6 @@ export const {
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
-  clearedDatasets,
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,

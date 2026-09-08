@@ -10,14 +10,16 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import {DateInputField, FormikWrapper, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
+import useProject from '../project/useProject';
 
 const Metadata = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {isReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -37,7 +39,7 @@ const Metadata = ({isReadOnly, page}) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
     // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only
     // dataset only its own. rn-vui keeps disabled off the radio it draws, hence the fade
-    const isDatasetReadOnly = readOnlyDatasetsIds.includes(dataset.id);
+    const isDatasetReadOnly = isReadOnlyDataset(dataset.id);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>

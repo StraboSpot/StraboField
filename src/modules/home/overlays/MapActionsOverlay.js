@@ -9,6 +9,7 @@ import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {useSpots} from '../../spots';
 import {MAP_ACTIONS} from '../home.constants';
 
 const MapActionsOverlay = ({
@@ -25,6 +26,12 @@ const MapActionsOverlay = ({
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {isCurrentMapReadOnly} = useSpots();
+
+  /* Derived Variables */
+
+  const isReadOnlyMap = isCurrentMapReadOnly();
+
   /* Logic Helpers */
 
   const isItemVisible = (item) => {
@@ -36,13 +43,15 @@ const MapActionsOverlay = ({
     const isStratSectionVisible = item.key === 'stratSection' && stratSection;
     const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
     const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;
+    // Tagging writes to the Spots it tags, so it goes away with the rest of the editing on a read only map
+    const isReadOnlyHiddenAction = isReadOnlyMap && item.key === 'addTag';
     const isToggleScaleBarUnitsVisible = item.key === 'toggleScaleBarUnits' && !stratSection && !currentImageBasemap;
 
     const otherKeysToHide = new Set(
       ['saveMap', 'stereonet', 'stratSection', 'selectSpots', 'mapMeasurement', 'toggleScaleBarUnits']);
     const isDefaultVisible = !otherKeysToHide.has(item.key);
 
-    return (
+    return !isReadOnlyHiddenAction && (
       isSaveMapVisible
       || isStereonetVisible
       || isStratSectionVisible

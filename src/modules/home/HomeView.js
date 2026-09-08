@@ -20,6 +20,8 @@ const HomeView = forwardRef(({
                                dialogs,
                                distance,
                                endMeasurement,
+                               isCreateToolsDisabled,
+                               isEditToolsDisabled,
                                mapMode,
                                onCancel,
                                onEndDrawPressed,
@@ -53,6 +55,8 @@ const HomeView = forwardRef(({
         closeNotebookPanel={closeNotebookPanel}
         distance={distance}
         endMeasurement={endMeasurement}
+        isCreateToolsDisabled={isCreateToolsDisabled}
+        isEditToolsDisabled={isEditToolsDisabled}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

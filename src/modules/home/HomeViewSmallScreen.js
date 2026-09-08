@@ -33,6 +33,8 @@ const HomeViewSmallScreen = forwardRef(({
                                           dialogs,
                                           distance,
                                           endMeasurement,
+                                          isCreateToolsDisabled,
+                                          isEditToolsDisabled,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -154,7 +156,7 @@ const HomeViewSmallScreen = forwardRef(({
                   />
                 )}
 
-                {stratSection && !isCurrentMapReadOnly() && (
+                {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
                     onPress={() => {
                       dispatch(canceledIntervalDrag());
@@ -182,6 +184,7 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
+                    isEditToolsDisabled={isEditToolsDisabled}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}

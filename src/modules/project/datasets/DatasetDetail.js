@@ -25,7 +25,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
@@ -87,9 +86,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     else console.error('Target dataset or id is undefined!');
   };
 
-  const isDisabled = (id) => {
-    return (activeDatasetsIds.length === 1 && activeDatasetsIds[0] === id) || (targetDatasetId && targetDatasetId === id);
-  };
+  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));

@@ -45,7 +45,6 @@ const useSpots = () => {
   const datasets = useSelector(state => state.project.datasets);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds);
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -55,7 +54,13 @@ const useSpots = () => {
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
-  const {getActiveDatasets, getDatasetIdFromSpotId, getTargetDatasetFromId, isSpotInReadOnlyDataset} = useProject();
+  const {
+    getActiveDatasets,
+    getDatasetIdFromSpotId,
+    getTargetDatasetFromId,
+    isAnythingReadOnly,
+    isSpotInReadOnlyDataset,
+  } = useProject();
   const {addSpotsToTags} = useTags();
   const toast = useToast();
 
@@ -258,6 +263,12 @@ const useSpots = () => {
 
   // Given geojson for a point with coordinates and a number of spots, create that many spots randomly around given point
   const createRandomSpots = (feature, numRandomSpots) => {
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating Spots.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     let newSpots = [];
     Array.from({length: numRandomSpots}, (_, n) => {
       const randomLongOffset = Math.random() * 0.01 * (Math.round(Math.random()) ? 1 : -1);
@@ -282,7 +293,6 @@ const useSpots = () => {
     });
     console.log('Creating', numRandomSpots, 'new random Spots near current location.');
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpots[0].properties.id]));
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
     dispatch(editedOrCreatedSpots(newSpots));
     console.log('Finished creating new random Spot. All Spots: ', spots);
@@ -341,9 +351,14 @@ const useSpots = () => {
       let continuousTaggingList = tags.filter(tag => tag.continuousTagging);
       addSpotsToTags(continuousTaggingList, [newSpot]);
     }
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating Spots.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     console.log('Creating new Spot:', newSpot);
     dispatch(updatedModifiedTimestampsBySpotsIds([newSpot.properties.id]));
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newSpot.properties.id}));
     dispatch(editedOrCreatedSpot(newSpot));
     console.log('Finished creating new Spot. All Spots: ', spots);
@@ -508,7 +523,7 @@ const useSpots = () => {
   // Only a Spot on the very same section counts as stratSection. A locked Spot reached further up the
   // chain is a map cause, since this Spot is not on that section and saying otherwise would misdirect.
   const getReadOnlyReason = (spot) => {
-    if (isEmpty(spot) || isEmpty(readOnlyDatasetsIds)) return undefined;
+    if (isEmpty(spot) || !isAnythingReadOnly) return undefined;
     const lockingSpots = getSpotsThatCanLockSpot(spot)
       .filter(lockingSpot => isSpotInReadOnlyDataset(lockingSpot.properties.id));
     if (isEmpty(lockingSpots)) return undefined;
@@ -645,8 +660,9 @@ const useSpots = () => {
   // A Spot is read only when its own dataset is, and equally when any Spot that can lock it is - see
   // getSpotsThatCanLockSpot for which Spots those are and why the answer differs by map type.
   const isSpotReadOnly = (spot) => {
-    // This runs once per row of a Spot list, so skip the walk entirely when nothing can be read only
-    if (isEmpty(spot) || isEmpty(readOnlyDatasetsIds)) return false;
+    // This runs once per row of a Spot list, so skip the walk entirely when nothing can be read only.
+    // isEmpty stays first: the geo map passes no holding Spot, and has none to lock it
+    if (isEmpty(spot) || !isAnythingReadOnly) return false;
     return getSpotsThatCanLockSpot(spot).some(lockingSpot => isSpotInReadOnlyDataset(lockingSpot.properties.id));
   };
 

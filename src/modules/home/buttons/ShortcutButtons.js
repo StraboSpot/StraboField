@@ -16,6 +16,7 @@ import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
 import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.constants';
 import {setLoadingStatus, setModalVisible} from '../home.slice';
+import useShortcutSwitches from '../useShortcutSwitches';
 
 const ShortcutButtons = ({openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
@@ -27,10 +28,10 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
 
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();
+  const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
   const toast = useToast();
 
   /* Local State */
@@ -99,8 +100,10 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   return (
     <>
       {SHORTCUT_MODALS?.reduce((acc, sm) => {
-        if (shortcutSwitchPositions[sm.key] && (Platform.OS !== 'web' || (Platform.OS === 'web'
-          && sm.key !== MODAL_KEYS.SHORTCUTS.PHOTO && sm.key !== MODAL_KEYS.SHORTCUTS.SKETCH))) {
+        if (!isTargetDatasetMissing && shortcutSwitchPositions[sm.key]
+          && (Platform.OS !== 'web'
+            || (Platform.OS === 'web'
+              && sm.key !== MODAL_KEYS.SHORTCUTS.PHOTO && sm.key !== MODAL_KEYS.SHORTCUTS.SKETCH))) {
           return [...acc, (
             <IconButton
               key={sm.key}

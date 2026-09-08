@@ -21,6 +21,8 @@ const RightSideButtons = ({
                             closeNotebookPanel,
                             distance,
                             endMeasurement,
+                            isCreateToolsDisabled,
+                            isEditToolsDisabled,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -48,7 +50,7 @@ const RightSideButtons = ({
 
   return (
     <>
-      {stratSection && !isCurrentMapReadOnly() && (
+      {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => {
@@ -84,10 +86,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        <DrawActionButtons
-          clickHandler={clickHandler}
-          mapMode={mapMode}
-        />
+        {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );
