@@ -122,6 +122,8 @@ const homeSlice = createSlice({
       state.modalVisible = action.payload.modal;
     },
     setShortcutSwitchPositions(state, action) {
+      // A payload carrying a value sets the switch to it; one without still toggles, so a caller that
+      // wants everything off does not have to know which switches are currently on
       const {switchName, value} = action.payload;
       const nextValue = value ?? !state.shortcutSwitchPosition[switchName];
       state.shortcutSwitchPosition[switchName] = nextValue;

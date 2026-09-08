@@ -44,6 +44,8 @@ const MapActionsOverlay = ({
     const isStratSectionVisible = item.key === 'stratSection' && stratSection;
     const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
     const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;
+    // Tagging and memos write to the Spots they touch, so they go with the rest of the editing - all of it
+    // on a read only project, and tagging alone on a read only map
     const isReadOnlyHiddenAction = (isReadOnlyProject && ['addTag', 'addToReport'].includes(item.key))
       || (isReadOnlyMap && item.key === 'addTag');
     const isToggleScaleBarUnitsVisible = item.key === 'toggleScaleBarUnits' && !stratSection && !currentImageBasemap;

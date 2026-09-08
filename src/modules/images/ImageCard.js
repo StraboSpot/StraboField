@@ -108,6 +108,7 @@ const ImageCard = ({
 
   const handleMissingImage = () => {
     setIsImageMissingOnServer(true);
+    // Nothing to offer on a read only image - the modal only leads to replacing or deleting it
     if (!isReadOnlyImage && !isReadOnlyProject) setIsMissingImageModalVisible(true);
   };
 

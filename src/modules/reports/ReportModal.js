@@ -44,7 +44,10 @@ const ReportModal = ({openSpotInNotebook}) => {
 
   // A new memo can arrive with values already set (the Spot it was created from), so only a saved memo has an id
   const isNewReport = !initialValues.id;
-  const isReadOnly = isReadOnlyProject || (initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
+  // Someone else's memo is theirs to edit, so it opens to read. A memo with no author recorded predates the
+  // stamping and belongs to nobody in particular, so it stays editable
+  const isReadOnly = isReadOnlyProject
+    || (!!initialValues?.straboUserId && initialValues.straboUserId !== straboUserId);
 
   /* Event Handlers */
 
@@ -72,14 +75,16 @@ const ReportModal = ({openSpotInNotebook}) => {
       >
         <FlatList
           ListHeaderComponent={
+            // Each section is rendered once. A second ReportForm would mount its own Formik and take
+            // formRef, so the save would read whichever instance rendered last rather than the one
+            // being typed into
             <>
-              <ReportForm initialValues={initialValues} ref={formRef} setIsFormInvalid={setIsFormInvalid}/>
-              <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
               <ReportForm
                 initialValues={initialValues}
                 isReadOnly={isReadOnly}
                 onDirtyChange={setIsFormDirty}
                 ref={formRef}
+                setIsFormInvalid={setIsFormInvalid}
               />
               {!isNewReport && (
                 <ReportMetadata

@@ -107,11 +107,6 @@ const projectSlice = createSlice({
       }
       state.project.modified_timestamp = Date.now();
     },
-    clearedDatasets(state) {
-      state.datasets = {};
-      state.activeDatasetsIds = [];
-      state.targetDatasetId = undefined;
-    },
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;

@@ -251,6 +251,7 @@ const useMapEditVertex = ({
     return indexOfCoordinatesToUpdate;
   };
 
+  // A Spot with no id yet is one still being drawn, so it is in no dataset to be locked by
   const isEditableSpot = spot => !spot?.properties?.id || !isSpotInReadOnlyDataset(spot.properties.id);
   const getEditableSpots = spotsToFilter => spotsToFilter.filter(isEditableSpot);
 
@@ -513,7 +514,8 @@ const useMapEditVertex = ({
     setSpotEditing(editableSpotToEdit);
     setSpotsEdited([]);
     setSpotsNotEdited(editableMappedSpots);
-    !isEmpty(editableSpotToEdit) ? console.log('Set Spot to edit:', editableSpotToEdit) : console.log('No Spot selected to edit.');
+    !isEmpty(editableSpotToEdit) ? console.log('Set Spot to edit:', editableSpotToEdit)
+      : console.log('No Spot selected to edit.');
     // #114, editing a spot should immediately identify it as the selected spot and hence update the notebook panel.
     setDisplayedSpotsWhileEditing(editableSpotToEdit, [], editableMappedSpots);
     if (!isEmpty(editableSpotToEdit)) {

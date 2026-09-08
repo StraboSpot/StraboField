@@ -40,7 +40,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const handleToggleActiveDataset = async (val) => {
     const value = await toggleActiveDataset(val, dataset);
-    console.log('Value has been switched', value);
+    console.log('Active dataset has been switched', value);
   };
 
   /* Logic Helpers */

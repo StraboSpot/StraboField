@@ -88,7 +88,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
       <ImagesList
         deleteImage={deleteImage}
         images={images}
-        isReadOnly={isReadOnly}
+        isReadOnlyImages={isReadOnly}
         onOpenImage={handleOpenImage}
         onOpenImageProperties={handleOpenImageProperties}
         onPressEmpty={onPressEmpty}

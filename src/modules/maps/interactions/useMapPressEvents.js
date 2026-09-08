@@ -5,6 +5,7 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
+import useProject from '../../project/useProject';
 import {useSpots} from '../../spots';
 import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
@@ -40,13 +41,13 @@ const useMapPressEvents = ({
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const datasets = useSelector(state => state.project.datasets || {});
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
+  const {isReadOnlyDataset} = useProject();
   const {getDrawFeatureAtPress, getSpotAtPress, getSpotsAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
@@ -60,7 +61,8 @@ const useMapPressEvents = ({
 
   /* Derived Variables */
 
-  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
+  // Only one dataset is shown and it is read only, so a long press has no Spot it could offer to edit
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && isReadOnlyDataset(activeDatasetsIds[0]);
   const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset;
 
   /* Internal Functions */

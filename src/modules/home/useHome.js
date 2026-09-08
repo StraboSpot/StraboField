@@ -36,7 +36,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const datasets = useSelector(state => state.project.datasets || {});
   const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
@@ -49,7 +48,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
-  const {getTargetDatasetFromId} = useProject();
+  const {getTargetDatasetFromId, isReadOnlyDataset} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected, isCurrentMapReadOnly} = useSpots();
   const toast = useToast();
   useAutoSave();
@@ -64,7 +63,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   /* Derived Variables */
 
-  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && datasets[activeDatasetsIds[0]]?.isReadOnly;
+  // Only one dataset is shown and it is read only, so nothing on the map is there to be edited
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && isReadOnlyDataset(activeDatasetsIds[0]);
   const isReadOnlyMap = isCurrentMapReadOnly();
   const isCreateToolsDisabled = isEmpty(targetDatasetId) || isReadOnlyProject || isReadOnlyMap;
   const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyMap;

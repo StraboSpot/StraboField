@@ -13,6 +13,7 @@ const ReportMetadata = ({createdBy, createdTimestamp, updatedTimestamp}) => {
 
   /* View */
 
+  // A memo saved before authorship was recorded carries no timestamp, so there is nothing to show
   if (!createdTimestamp) return null;
 
   return (

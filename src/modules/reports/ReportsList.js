@@ -21,16 +21,13 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   /* Derived Variables */
 
-  const reportsToList = (reportsSubset ?? reports).filter(r =>
-    !r.report_privacy
-    || r.report_privacy === 'anyone'
-    || r.report_privacy === 'collaborators'
-    || (r.report_privacy === 'only_me'
-      && (r.straboUserId ? r.straboUserId === straboUserId : straboUserId === owner_straboUserId)),
-  );
-  let reportsToListSorted = JSON.parse(JSON.stringify(reportsToList));
-  reportsToListSorted.sort((a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
-  console.log('Reports to List:', reportsToListSorted);
+  // A memo marked only_me is its author's alone. One saved before authorship was recorded names no author,
+  // so it falls to whoever owns the project
+  const reportsToList = (reportsSubset ?? reports).filter(
+    r => r.report_privacy !== 'only_me'
+      || (r.straboUserId ? r.straboUserId === straboUserId : straboUserId === owner_straboUserId));
+  const reportsToListSorted = [...reportsToList].sort(
+    (a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
 
   /* Event Handlers */
 

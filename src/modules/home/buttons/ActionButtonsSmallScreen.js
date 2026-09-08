@@ -26,6 +26,8 @@ const ActionButtonsSmallScreen = ({
 
   /* Derived Variables */
 
+  // Landscape has always put the geolocate button to the left of the action pill. With the draw tools
+  // gone the pill centers itself, so it goes left there too rather than sitting alone above it
   const isGeolocateLeft = height < width || isEditToolsDisabled;
 
   /* View */
@@ -76,7 +78,7 @@ const ActionButtonsSmallScreen = ({
           {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
         </View>
 
-        {(isGeolocateLeft) && <View style={{flex: 1}}/>}
+        {isGeolocateLeft && <View style={{flex: 1}}/>}
       </View>
     </View>
   );

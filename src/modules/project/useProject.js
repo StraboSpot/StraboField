@@ -63,8 +63,12 @@ const useProject = () => {
       useContinuousTagging: false,
     };
     dispatch(addedProjectDescription(newProject));
+    // The app just made this dataset, so it is writable and it is the only one - nothing for the user to
+    // choose between, and without a target there would be no draw tools on a brand new project
     const defaultDataset = createDataset();
     dispatch(addedDataset(defaultDataset));
+    dispatch(setActiveDatasets({bool: true, dataset: defaultDataset.id}));
+    dispatch(setTargetDataset(defaultDataset.id));
   };
 
   const getDatasetIdFromSpotId = (spotId) => {
@@ -210,6 +214,8 @@ const useProject = () => {
     }
   };
 
+  // No target is a state the app handles, so hand back nothing rather than picking or creating a dataset
+  // on the user's behalf - which dataset takes new Spots stays their choice
   const getTargetDatasetFromId = () => datasets[targetDatasetId];
 
   const initializeNewProject = async (descriptionData) => {
@@ -235,6 +241,7 @@ const useProject = () => {
   const toggleActiveDataset = async (val, dataset) => {
     try {
       dispatch(setActiveDatasets({bool: val, dataset: dataset.id}));
+      // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it
       if (!val && dataset.id === targetDatasetId) dispatch(setTargetDataset(undefined));
       dispatch(clearedSpotsInMapExtentIds());
       if (!val && !isEmpty(selectedSpot) && dataset.spotIds?.includes(selectedSpot.properties.id)) {
@@ -259,8 +266,7 @@ const useProject = () => {
     }
     else {
       const datasetName = datasets[datasetId].name;
-      toast.show(
-        `Target Dataset switched to ${datasetName}!`,
+      toast.show(`Target Dataset switched to ${datasetName}!`,
         {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(datasetId));

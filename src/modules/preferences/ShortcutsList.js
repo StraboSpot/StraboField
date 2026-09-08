@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {FlatList, Platform} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -6,12 +6,12 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
 import {SwitchWrapper} from '../../shared/ui';
 import {AvatarWrapper} from '../../shared/ui/avatars';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setShortcutSwitchPositions} from '../home/home.slice';
+import useShortcutSwitches from '../home/useShortcutSwitches';
 import {SHORTCUT_MODALS} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -20,22 +20,9 @@ const ShortcutsList = () => {
 
   const dispatch = useDispatch();
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
-  const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
-  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+
+  const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
   const toast = useToast();
-
-  /* Derived Variables */
-
-  const isTargetDatasetMissing = isEmpty(targetDatasetId);
-
-  /* Side Effects */
-
-  useEffect(() => {
-    if (!isTargetDatasetMissing) return;
-    if (Object.values(shortcutSwitchPositions).some(Boolean)) {
-      dispatch(setShortcutSwitchPositions({switchName: 'all', value: false}));
-    }
-  }, [dispatch, isTargetDatasetMissing, shortcutSwitchPositions]);
 
   /* Logic Helpers */
 

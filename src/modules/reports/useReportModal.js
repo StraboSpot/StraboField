@@ -40,6 +40,7 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   /* Derived Variables */
 
+  // Whether there is anything to save, so a memo only opened to read offers Done rather than Update
   const hasUnsavedChanges = isFormDirty
     || !isEqual(reportImages, updatedImages)
     || !isEqual(reportSpots, checkedSpotsIds)
@@ -123,6 +124,7 @@ const useReportModal = ({openSpotInNotebook}) => {
       console.log('Saving report ...');
       let {values: editedReport} = await submitAndShowErrors(formRef.current);
       if (!editedReport.id) editedReport.id = getNewId();
+      // Stamped once, on the first save - an edit by anyone else leaves the original author in place
       if (!editedReport.straboUserId || !editedReport.created_by) {
         editedReport.straboUserId = straboUserId;
         editedReport.created_by = userName;
