@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -16,6 +16,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   const dispatch = useDispatch();
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {name: userName, straboUserId} = useSelector(state => state.user);
 
   const {submitAndShowErrors} = useForm();
 
@@ -24,18 +25,23 @@ const useReportModal = ({openSpotInNotebook}) => {
   const formRef = useRef(null);
 
   const reportSpots = report?.spots ? JSON.parse(JSON.stringify(report?.spots)) : [];
-
   const [checkedSpotsIds, setCheckedSpotsIds] = useState(reportSpots);
 
   const reportTags = report?.tags ? JSON.parse(JSON.stringify(report?.tags)) : [];
-
   const [checkedTagsIds, setCheckedTagsIds] = useState(reportTags);
 
   const reportImages = report?.images ? JSON.parse(JSON.stringify(report?.images)) : [];
-
   const [updatedImages, setUpdatedImages] = useState(reportImages);
 
+  const [isFormDirty, setIsFormDirty] = useState(false);
+
   /* Derived Variables */
+
+  // Whether there is anything to save, so a memo only opened to read offers Done rather than Update
+  const hasUnsavedChanges = isFormDirty
+    || !isEqual(reportImages, updatedImages)
+    || !isEqual(reportSpots, checkedSpotsIds)
+    || !isEqual(reportTags, checkedTagsIds);
 
   const initialValues = isEmpty(report) ? {} : report;
 
@@ -64,7 +70,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     const isImageObjChanged = !isEqual(reportImages, updatedImages);
     const isSpotsObjChanged = !isEqual(reportSpots, checkedSpotsIds);
     const isTagsObjChanged = !isEqual(reportTags, checkedTagsIds);
-    if ((formRef.current && formRef.current.dirty) || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
+    if (isFormDirty || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
       alert(
         'Unsaved Changes',
         'Would you like to save your memo before ' + (itemText ? 'navigating to this ' + itemText : 'continuing') + '?',
@@ -114,7 +120,12 @@ const useReportModal = ({openSpotInNotebook}) => {
     try {
       console.log('Saving report ...');
       let {values: editedReport} = await submitAndShowErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewUUID();
+      if (!editedReport.id) editedReport.id = getNewId();
+      // Stamped once, on the first save - an edit by anyone else leaves the original author in place
+      if (!editedReport.straboUserId || !editedReport.created_by) {
+        editedReport.straboUserId = straboUserId;
+        editedReport.created_by = userName;
+      }
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
       editedReport.images = updatedImages;
@@ -180,7 +191,9 @@ const useReportModal = ({openSpotInNotebook}) => {
     handleSpotPressed,
     handleTagChecked,
     handleTagPressed,
+    hasUnsavedChanges,
     initialValues,
+    setIsFormDirty,
     setUpdatedImages,
     updatedImages,
   };

@@ -4,7 +4,6 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ReportsListItem} from '.';
-import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -17,14 +16,16 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   const dispatch = useDispatch();
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {straboUserId} = useSelector(state => state.user);
 
   /* Derived Variables */
 
-  const reportsToList = reportsSubset ? isEmpty(reportsSubset) ? [] : reportsSubset : reports;
-  let reportsToListSorted = JSON.parse(JSON.stringify(reportsToList));
-  reportsToListSorted.sort((a, b) => {
-    return new Date(b.updated_timestamp) - new Date(a.updated_timestamp);
-  });
+  // A memo marked only_me is its author's alone. One saved before authorship was recorded names no author,
+  // so there is nobody to keep it from and it stays listed
+  const reportsToList = (reportsSubset ?? reports).filter(
+    r => r.report_privacy !== 'only_me' || !r.straboUserId || r.straboUserId === straboUserId);
+  const reportsToListSorted = [...reportsToList].sort(
+    (a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
 
   /* Event Handlers */
 
