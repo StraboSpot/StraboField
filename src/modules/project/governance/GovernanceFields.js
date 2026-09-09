@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux';
 import commonStyles from '../../../shared/common.styles';
 import {MEDIUMGREY} from '../../../shared/styles.constants';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import {formStyles} from '../../form';
+import formStyles from '../../form/form.styles';
 
 const GovernanceFields = ({isReadOnly, ownerName, ownerEmail}) => {
 
