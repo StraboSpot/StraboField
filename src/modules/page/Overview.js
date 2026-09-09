@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, Image, Linking, Pressable, SectionList, Text, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -19,7 +18,7 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {ImageModal, ImagePropertiesModal, useImages} from '../images';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -36,7 +35,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
 
-  const {showErrors, validateForm} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {deleteImageFromSpot} = useImages();
   const {getPopulatedPagesKeys} = usePage();
   const {getSpotByImageId} = useSpots();
@@ -47,6 +46,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const formRef = useRef(null);
 
   const [imageToView, setImageToView] = useState({});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
@@ -150,10 +150,11 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     Linking.openURL(`https://dev.rockd.org/checkin/${checkinId}`);
   };
 
+  // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
+  // stays where it is for that to be fixed rather than carrying on.
   const saveForm = async () => {
     try {
-      await formRef.current.submitForm();
-      const formValues = showErrors(formRef.current);
+      const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving form data to Spot ...');
       if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString') {
         const traceValues = {...formValues, 'trace_feature': true};
@@ -165,20 +166,16 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
         dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
         dispatch(editedSpotProperties({field: 'surface_feature', value: formValues}));
       }
-      return Promise.resolve();
+      return true;
     }
     catch (err) {
       console.error('Error submitting form', err);
-      return Promise.reject();
+      return false;
     }
   };
 
-  const saveFormAndGo = () => {
-    saveForm().then(() => {
-      setIsTraceSurfaceFeatureEdit(false);
-    }, () => {
-      console.error('Error saving form data to Spot');
-    });
+  const saveFormAndGo = async () => {
+    if (await saveForm()) setIsTraceSurfaceFeatureEdit(false);
   };
 
   const saveImagesToSpot = (newImages) => {
@@ -309,18 +306,21 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     return (
       <View style={{flex: 1}}>
         <PageHeader hideBackButton pageTitle={pageTitle}/>
-        {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
+        {!isReadOnly && (
+          <SaveAndCancelButtons cancel={cancelFormAndGo} getIsDisabled={isFormInvalid} save={saveFormAndGo}/>
+        )}
         <FlatList
           ListHeaderComponent={
-            <Formik
-              component={formProps => Form({formName: formName, isReadOnly: isReadOnly, ...formProps})}
+            <FormikWrapper
               enableReinitialize={true}
-              initialStatus={{formName: formName}}
+              formName={formName}
               initialValues={initialValues}
               innerRef={formRef}
               onSubmit={onSubmitForm}
-              validate={values => validateForm({formName: formName, values: values})}
-            />
+              setIsFormInvalid={setIsFormInvalid}
+            >
+              {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
+            </FormikWrapper>
           }
         />
       </View>

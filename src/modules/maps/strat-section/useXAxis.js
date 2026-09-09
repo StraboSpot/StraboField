@@ -24,12 +24,13 @@ const useXAxis = (n) => {
 
   const {getChoices, getChoicesByKey, getSurvey} = useForm();
   const {convertImagePixelsToLatLong} = useMapCoords();
-  const {getIntervalSpotsThisStratSection} = useSpots();
+  const {getAllIntervalSpotsOnStratSection} = useSpots();
 
   /* Derived Variables */
 
-  // Flip x-axis to above y=0 when the section extends further negative than positive
-  const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+  // Flip x-axis to above y=0 when the section extends further negative than positive. Measured over all the
+  // intervals so switching a dataset off cannot flip the axis to the other end of the column.
+  const intervals = getAllIntervalSpotsOnStratSection(stratSection.strat_section_id);
   const {maxY, minY} = intervals.reduce((acc, i) => {
     const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
     const ys = coords.flat().map(c => c[1]);

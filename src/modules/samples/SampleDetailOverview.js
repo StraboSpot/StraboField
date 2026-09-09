@@ -12,7 +12,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const SampleDetailOverview = () => {
+const SampleDetailOverview = ({openMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -101,6 +101,12 @@ const SampleDetailOverview = () => {
         isVisible={isIGSNModalVisible}
         onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
         onModalCancel={() => setIsIGSNModalVisible(false)}
+        openLoginPage={() => {
+          setIsIGSNModalVisible(false);
+          setTimeout(() => {
+            openMainMenuPanel();
+          }, 300);
+        }}
         sampleValues={sampleValues}
       />
     </View>

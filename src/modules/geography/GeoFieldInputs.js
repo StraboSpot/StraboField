@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -37,19 +36,15 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
         <View style={{flex: 1, flexDirection: 'row'}}>
           <View style={{flex: 1, flexDirection: 'row', overflow: 'hidden'}}>
             <View style={{flex: 1, paddingRight: 5}}>
-              <Field
-                component={NumberInputField}
+              <NumberInputField
                 editable={!isReadOnly}
-                key={'longitude'}
                 label={'Longitude'}
                 name={'longitude'}
               />
             </View>
             <View style={{flex: 1}}>
-              <Field
-                component={NumberInputField}
+              <NumberInputField
                 editable={!isReadOnly}
-                key={'latitude'}
                 label={'Latitude'}
                 name={'latitude'}
               />

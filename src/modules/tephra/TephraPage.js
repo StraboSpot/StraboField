@@ -1,22 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
-import {ButtonGroup} from '@rn-vui/base';
 import DraggableFlatList, {ShadowDecorator} from 'react-native-draggable-flatlist';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TEPHRA_SUBPAGES} from './tephra.constants';
 import tephraStyles from './tephra.styles';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import {useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
+import SubpageTabs from '../page/SubpageTabs';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -27,9 +27,12 @@ const TephraPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {getSiblingSurvey} = useForm();
+
   /* Local State */
 
   const [data1, setData] = useState([]);
+  const [invalidFields, setInvalidFields] = useState([]);
   const [isDetailView, setIsDetailView] = useState(false);
   const [isReorderingActive, setIsReorderingActive] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
@@ -95,24 +98,29 @@ const TephraPage = ({isReadOnly, page}) => {
   /* Render Functions */
 
   const renderAttributeDetail = () => {
-    const subpages = TEPHRA_SUBPAGES;
+    const subpageKeys = Object.values(TEPHRA_SUBPAGES);
+    const subpageKey = subpageKeys[selectedTypeIndex];
+    // Both tabs edit the same layer, so a layer type left empty on Basic has to hold Save while Additional is
+    // the tab being filled in
+    const siblingSurvey = getSiblingSurvey(['tephra', subpageKey], subpageKeys);
     return (
       <>
         <BasicPageDetail
           PageTabsComponent={
-            <ButtonGroup
-              buttons={Object.values(subpages).map(v => toTitleCase(v.replace(/_/g, ' ')))}
-              containerStyle={tephraStyles.buttonGroupContainer}
+            <SubpageTabs
+              formCategory={'tephra'}
+              invalidFields={invalidFields}
               onPress={i => setSelectedTypeIndex(i)}
-              selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
               selectedIndex={selectedTypeIndex}
-              textStyle={{color: PRIMARY_TEXT_COLOR}}
+              subpageKeys={subpageKeys}
             />
           }
           closeDetailView={() => setIsDetailView(false)}
           isReadOnly={isReadOnly}
-          page={{...page, key: 'tephra', subkey: Object.values(subpages)[selectedTypeIndex]}}
+          page={{...page, key: 'tephra', subkey: subpageKey}}
           selectedFeature={selectedAttribute}
+          setInvalidFields={setInvalidFields}
+          siblingSurvey={siblingSurvey}
         />
       </>
     );

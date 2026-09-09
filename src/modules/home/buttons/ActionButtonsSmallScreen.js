@@ -2,8 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {DrawActionButtons, MapActionButtons, UserLocationButton} from './index';
-import * as themes from '../../../shared/styles.constants';
-import {useWindowSize} from '../../../shared/ui/useWindowSize';
+import MapControlsContainer from '../../maps/controls/MapControlsContainer';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
 
@@ -14,51 +13,40 @@ const ActionButtonsSmallScreen = ({
                                     distance,
                                     onCancel,
                                     endMeasurement,
+                                    hasDrawTools,
                                     mapMode,
                                     onEndDrawPressed,
                                     selectingMode,
                                     toggleDialog,
                                   }) => {
-  /* Data Hooks */
-
-  const {height, width} = useWindowSize();
-
   /* View */
 
+  // Everything above the Mapbox attribution in one column: the map actions along the bottom, the scale bar
+  // and zoom above them on the left, the geolocate button above those, and DrawInfo opposite on the right.
+  // The order holds whatever the target dataset is and whichever tools are showing.
   return (
-    <View>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-        {width < height ? <UserLocationButton clickHandler={clickHandler}/>
-          : <View/> //Added so 'space-between' would work correctly for DrawInfo when no UserLocationButton
-        }
+    <View style={homeStyles.actionButtonsSmallScreenStack}>
+      <View style={homeStyles.mapReadoutsRow}>
+        <View style={homeStyles.mapReadoutsSmallScreen}>
+          <UserLocationButton clickHandler={clickHandler}/>
+          <MapControlsContainer/>
+        </View>
 
-        <DrawInfo
-          clickHandler={clickHandler}
-          distance={distance}
-          endMeasurement={endMeasurement}
-          mapMode={mapMode}
-          onCancel={onCancel}
-          onEndDrawPressed={onEndDrawPressed}
-          selectingMode={selectingMode}
-        />
+        <View style={homeStyles.drawInfoSmallScreen}>
+          <DrawInfo
+            clickHandler={clickHandler}
+            distance={distance}
+            endMeasurement={endMeasurement}
+            mapMode={mapMode}
+            onCancel={onCancel}
+            onEndDrawPressed={onEndDrawPressed}
+            selectingMode={selectingMode}
+          />
+        </View>
       </View>
-      <View style={{flexDirection: 'row', alignItems: 'center', paddingTop: 5}}>
-        {height < width && <UserLocationButton clickHandler={clickHandler}/>}
 
-        <View
-          style={{
-            alignItems: 'center',
-            backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-            borderColor: themes.MEDIUMGREY,
-            borderRadius: 10,
-            borderWidth: 0.5,
-            elevation: 2,
-            flexDirection: 'row',
-            padding: 0,
-            shadowOpacity: 0.3,
-            shadowRadius: 4,
-          }}
-        >
+      <View style={homeStyles.mapActionsPillRow}>
+        <View style={homeStyles.mapActionsPill}>
           <View style={homeStyles.smallScreenMapActionButtons}>
             <MapActionButtons
               dialogClickHandler={dialogClickHandler}
@@ -66,12 +54,7 @@ const ActionButtonsSmallScreen = ({
               toggleDialog={toggleDialog}
             />
           </View>
-          <View style={{paddingLeft: 10}}>
-            <DrawActionButtons
-              clickHandler={clickHandler}
-              mapMode={mapMode}
-            />
-          </View>
+          {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
         </View>
       </View>
     </View>

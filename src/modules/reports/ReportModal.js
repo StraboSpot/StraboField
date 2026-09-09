@@ -1,12 +1,16 @@
 import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
-import {ReportForm, ReportImages, ReportSpots, ReportTags, useReportModal} from '.';
+import {useSelector} from 'react-redux';
+
+import {ReportForm, ReportImages, ReportMetadata, ReportSpots, ReportTags, useReportModal} from '.';
 import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const ReportModal = ({openSpotInNotebook}) => {
   /* Data Hooks */
+
+  const {straboUserId} = useSelector(state => state.user);
 
   const {
     checkIsSafeDelete,
@@ -20,7 +24,9 @@ const ReportModal = ({openSpotInNotebook}) => {
     handleSpotPressed,
     handleTagChecked,
     handleTagPressed,
+    hasUnsavedChanges,
     initialValues,
+    setIsFormDirty,
     setUpdatedImages,
     updatedImages,
   } = useReportModal({openSpotInNotebook: openSpotInNotebook});
@@ -29,11 +35,15 @@ const ReportModal = ({openSpotInNotebook}) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteReportModalVisible, setIsDeleteReportModalVisible] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Derived Variables */
 
   // A new memo can arrive with values already set (the Spot it was created from), so only a saved memo has an id
   const isNewReport = !initialValues.id;
+  // Someone else's memo is theirs to edit, so it opens to read. A memo with no author recorded predates the
+  // stamping and belongs to nobody in particular, so it stays editable
+  const isReadOnly = !!initialValues?.straboUserId && initialValues.straboUserId !== straboUserId;
 
   /* Event Handlers */
 
@@ -47,37 +57,63 @@ const ReportModal = ({openSpotInNotebook}) => {
   return (
     <>
       <ModalWrapper
-        actionTitle={isNewReport ? 'Save' : 'Update'}
+        actionTitle={isNewReport ? 'Save' : hasUnsavedChanges ? 'Update' : 'Done'}
         closeModal={confirmCloseModal}
-        headerTitle={isNewReport ? 'Create New Memo' : 'Update Memo'}
-        onActionPressed={handleSavePressed}
+        disabled={isFormInvalid}
+        headerTitle={isReadOnly ? 'View Memo' : isNewReport ? 'Create New Memo' : 'Update Memo'}
+        onActionPressed={isNewReport || hasUnsavedChanges ? handleSavePressed : confirmCloseModal}
         onDeletePress={handleDeletePressed}
         overlayStyleOverride={{width: '80%'}}
+        showActionButton={!isReadOnly}
         showCancelButton={false}
         showCloseButton
-        showDeleteButton={!isNewReport}
+        showDeleteButton={!isNewReport && !isReadOnly}
       >
         <FlatList
           ListHeaderComponent={
+            // Each section is rendered once. A second ReportForm would mount its own Formik and take
+            // formRef, so the save would read whichever instance rendered last rather than the one
+            // being typed into
             <>
-              <ReportForm initialValues={initialValues} ref={formRef}/>
-              <ReportImages setUpdatedImages={setUpdatedImages} updatedImages={updatedImages}/>
+              <ReportForm
+                initialValues={initialValues}
+                isReadOnly={isReadOnly}
+                onDirtyChange={setIsFormDirty}
+                ref={formRef}
+                setIsFormInvalid={setIsFormInvalid}
+              />
+              {!isNewReport && (
+                <ReportMetadata
+                  createdBy={initialValues.created_by}
+                  createdTimestamp={initialValues.created_timestamp}
+                  updatedTimestamp={initialValues.updated_timestamp}
+                />
+              )}
+              <ReportImages
+                isReadOnly={isReadOnly}
+                setUpdatedImages={setUpdatedImages}
+                updatedImages={updatedImages}
+              />
               <View style={{paddingTop: 10}}/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
                 handleSpotChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
+                isReadOnly={isReadOnly}
               />
               <View style={{paddingTop: 10}}/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}
                 handleTagPressed={handleTagPressed}
+                isReadOnly={isReadOnly}
               />
             </>
           }
           bounces={false}
         />
+
+        {/* Modal */}
         <WarningModal
           cancelTitle={errorMessage ? 'Ok' : 'Cancel'}
           isVisible={isDeleteReportModalVisible}

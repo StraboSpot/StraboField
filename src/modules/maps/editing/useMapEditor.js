@@ -280,9 +280,11 @@ const useMapEditor = ({
     if (!isEmpty(spotsEdited)) {
       const spotIds = spotsEdited.map(s => s.properties.id);
       const targetDataset = getTargetDatasetFromId();
-      dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
-      dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
-      dispatch(editedOrCreatedSpots(spotsEdited));
+      if (!isEmpty(targetDataset)) {
+        dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
+        dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
+        dispatch(editedOrCreatedSpots(spotsEdited));
+      }
     }
     clearEditing();
   };

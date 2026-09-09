@@ -1,14 +1,13 @@
 import React, {useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {useTags} from '../tags';
@@ -24,12 +23,14 @@ const TagDetailModal = ({closeModal}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {validateForm, showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {deleteTag, saveTag} = useTags();
 
   /* Local State */
 
   const formRef = useRef(null);
+
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [tempColor, setTempColor] = useState(selectedTag?.color);
 
   /* Derived Variables */
@@ -85,8 +86,7 @@ const TagDetailModal = ({closeModal}) => {
 
   const saveFormAndClose = async () => {
     try {
-      await formRef.current.submitForm();
-      const formValues = showErrors(formRef.current);
+      const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving tag data to Project ...', formValues);
       let updatedTag = formValues;
       if (!updatedTag.id) updatedTag.id = getNewId();
@@ -109,6 +109,7 @@ const TagDetailModal = ({closeModal}) => {
 
   return (
     <ModalWrapper
+      disabled={isFormInvalid}
       headerTitle={`${actionLabel} ${toTitleCase(label).slice(0, -1)}`}
       onActionPressed={saveFormAndClose}
       onCancelPress={closeModal}
@@ -121,15 +122,15 @@ const TagDetailModal = ({closeModal}) => {
           <>
             <TagColor onTempColorChange={setTempColor} tempColor={tempColor}/>
             <View style={{flex: 1}}>
-              <Formik
-                component={formProps => Form({formName: formName, ...formProps})}
+              <FormikWrapper
                 enableReinitialize={true}
-                initialStatus={{formName: formName}}
+                formName={formName}
                 initialValues={initialValues}
                 innerRef={formRef}
-                onSubmit={() => console.log('Submitting form...')}
-                validate={values => validateForm({formName: formName, values: values})}
-              />
+                setIsFormInvalid={setIsFormInvalid}
+              >
+                {formProps => <Form {...formProps} formName={formName}/>}
+              </FormikWrapper>
             </View>
           </>
         }

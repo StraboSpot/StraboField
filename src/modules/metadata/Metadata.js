@@ -1,15 +1,16 @@
 import React, {useRef} from 'react';
 import {FlatList} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import {MEDIUMGREY} from '../../shared/styles.constants';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {DateInputField, NumberInputField} from '../form';
+import {DateInputField, FormikWrapper, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
+import useProject from '../project/useProject';
 
 const Metadata = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -17,6 +18,8 @@ const Metadata = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {isReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -34,6 +37,9 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderDatasetItem = (dataset) => {
     const isChecked = dataset.spotIds?.includes(spot.properties.id);
+    // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only
+    // dataset only its own. rn-vui keeps disabled off the radio it draws, hence the fade
+    const isDatasetReadOnly = isReadOnlyDataset(dataset.id);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
@@ -44,10 +50,12 @@ const Metadata = ({isReadOnly, page}) => {
               : '(0 spots)'}
           </ListItem.Subtitle>
         </ListItem.Content>
+        {isDatasetReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} type={'ionicon'}/>}
         <ListItem.CheckBox
           checked={isChecked}
           checkedIcon={'radiobox-marked'}
-          disabled={isReadOnly}
+          disabled={isReadOnly || isDatasetReadOnly}
+          disabledStyle={{opacity: 0.5}}
           iconType={'material-community'}
           onPress={() => handleDatasetChecked(dataset)}
           uncheckedIcon={'radiobox-blank'}
@@ -70,52 +78,43 @@ const Metadata = ({isReadOnly, page}) => {
 
   const renderMetadataForm = () => {
     return (
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}
         initialValues={spot.properties}
         innerRef={metadataFormRef}
-        onSubmit={values => console.log('Submitting form...', values)}
       >
-        {() => (
-          <>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={NumberInputField}
-                  editable={false}
-                  key={'id'}
-                  label={'ID'}
-                  name={'id'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'date'}
-                  label={'Date Created'}
-                  name={'date'}
-                />
-              </ListItem.Content>
-            </ListItem>
-            <ListItem containerStyle={commonStyles.listItemFormField}>
-              <ListItem.Content>
-                <Field
-                  component={DateInputField}
-                  isDisplayOnly={true}
-                  isShowTime={true}
-                  key={'modified_timestamp'}
-                  label={'Date Last Modified'}
-                  name={'modified_timestamp'}
-                />
-              </ListItem.Content>
-            </ListItem>
-          </>
-        )}
-      </Formik>
+        <>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <NumberInputField
+                editable={false}
+                label={'ID'}
+                name={'id'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Created'}
+                name={'date'}
+              />
+            </ListItem.Content>
+          </ListItem>
+          <ListItem containerStyle={commonStyles.listItemFormField}>
+            <ListItem.Content>
+              <DateInputField
+                isDisplayOnly={true}
+                isShowTime={true}
+                label={'Date Last Modified'}
+                name={'modified_timestamp'}
+              />
+            </ListItem.Content>
+          </ListItem>
+        </>
+      </FormikWrapper>
     );
   };
 

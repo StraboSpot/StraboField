@@ -23,6 +23,7 @@ import {
   setStatusMessageModalTitle,
 } from '../../modules/home/home.slice';
 import {useImages} from '../../modules/images';
+import {CUSTOM_MAP_SOURCES} from '../../modules/maps/custom-maps/customMaps.constants';
 import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
@@ -49,7 +50,8 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-let tempActiveDatasetsIds, tempTargetDatasetId;
+// Stays an array: the capture below is skipped when nothing is active, and downloadDatasets filters it either way
+let prevActiveDatasetsIds = [], prevTargetDatasetId;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
@@ -79,8 +81,8 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    tempActiveDatasetsIds = undefined;
-    tempTargetDatasetId = undefined;
+    prevActiveDatasetsIds = [];
+    prevTargetDatasetId = undefined;
   };
 
   /* Internal Functions */
@@ -106,13 +108,13 @@ const useDownload = () => {
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
-        const updatedActiveDatasetIds = tempActiveDatasetsIds.reduce((acc, tempActiveDatasetId) => {
-          console.log('Checking if active dataset still exists:', tempActiveDatasetId);
-          return newDatasetIds.includes(tempActiveDatasetId) ? [...acc, tempActiveDatasetId] : acc;
+        const updatedActiveDatasetIds = prevActiveDatasetsIds.reduce((acc, prevActiveDatasetId) => {
+          console.log('Checking if active dataset still exists:', prevActiveDatasetId);
+          return newDatasetIds.includes(prevActiveDatasetId) ? [...acc, prevActiveDatasetId] : acc;
         }, []);
         if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
         else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(tempTargetDatasetId)) dispatch(setTargetDataset(tempTargetDatasetId));
+        if (newDatasetIds.includes(prevTargetDatasetId)) dispatch(setTargetDataset(prevTargetDatasetId));
         else dispatch(setTargetDataset(datasets[0].id));
       }
       else if (datasets.length >= 1) {
@@ -146,8 +148,8 @@ const useDownload = () => {
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       if (!isEmpty(project)) {
         if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) tempActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) tempTargetDatasetId = targetDatasetId;
+          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
+          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
         }
         clearProject();
       }
@@ -259,7 +261,7 @@ const useDownload = () => {
     maps.map(async (map) => {
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === 'strabospot_mymaps') {
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
         if (!isEmpty(endpoint) && isSelected) {
           let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
           if (await testCustomMapUrl(tileEndpoint + map.id)) {

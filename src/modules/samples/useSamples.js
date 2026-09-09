@@ -1,4 +1,5 @@
 import * as turf from '@turf/turf';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
@@ -16,12 +17,21 @@ const useSamples = () => {
 
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot} = useSpots();
+  const toast = useToast();
 
 
   /* Exported Functions */
 
   // Create new Sample Spot
   const createRichSample = (spot, selectedSample, sampleImages = []) => {
+    // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
+    // leaving one behind in no dataset
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating a Sample.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     // A sample already on the parent Spot is a legacy sample being converted, so it was created with that Spot and
     // keeps the parent's created date. A brand new sample isn't on the parent Spot yet, so it gets today's date.
     const isConvertingLegacySample = spot.properties[PAGE_KEYS.SAMPLES]?.some(s => s.id === selectedSample.id);
@@ -49,7 +59,6 @@ const useSamples = () => {
     };
 
     console.log('Creating new Enriched Sample:', newEnrichedSample);
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
 
@@ -87,19 +96,9 @@ const useSamples = () => {
     }
   };
 
-  const onSampleFormChange = (formCurrent, fieldName, fieldValue) => {
-    console.log(fieldName, 'changed to', fieldValue);
-    fieldName === 'collection_date'
-      ? formCurrent.setFieldValue('collection_time', fieldValue)
-      : fieldName === 'collection_time'
-        ? formCurrent.setFieldValue('collection_date', fieldValue)
-        : formCurrent.setFieldValue(fieldName, fieldValue);
-  };
-
   return {
     createRichSample,
     deleteRichSample,
-    onSampleFormChange,
   };
 };
 

@@ -1,3 +1,11 @@
+// An overlay set to an opacity of 0 is meant to be invisible, so read the number before judging it rather than
+// testing it for truth. Only a missing opacity, or one outside 0 to 1 from before that rule was enforced, falls
+// back to fully opaque.
+export const getImageOverlayOpacity = (imageOpacity) => {
+  const opacity = parseFloat(imageOpacity);
+  return opacity >= 0 && opacity <= 1 ? opacity : 1;
+};
+
 // Move Spot up or down by a given number of pixels (a positive number for pixels to move up or negative for down)
 export const moveSpotByPixels = (spot, pixels) => {
   const spotCopyGeom = JSON.parse(JSON.stringify(spot.geometry));

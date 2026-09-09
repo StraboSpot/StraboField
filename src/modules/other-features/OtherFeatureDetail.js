@@ -1,19 +1,16 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {FlatList, Text, TextInput, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {formStyles, SelectInputField, TextInputField, useForm} from '../form';
+import {FormikWrapper, SelectInputField, TextInputField, useForm} from '../form';
 import PageHeader from '../page/PageHeader';
-import {DEFAULT_GEOLOGIC_TYPES} from '../project/project.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 import {useTags} from '../tags';
@@ -31,18 +28,18 @@ const OtherFeatureDetail = ({
   const projectFeatures = useSelector(state => state.project.project?.other_features);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
   const {deleteFeatureTags} = useTags();
 
   /* Local State */
 
   const formRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
 
-  let [otherType, setOtherType] = useState(undefined);
-
-  /* Derived Variables */
-
-  const customFeatureTypes = projectFeatures.filter(feature => !DEFAULT_GEOLOGIC_TYPES.includes(feature));
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Side Effects */
 
@@ -58,7 +55,7 @@ const OtherFeatureDetail = ({
   };
 
   const confirmLeavePage = () => {
-    if (formRef.current && formRef.current.dirty) {
+    if (formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
@@ -69,7 +66,7 @@ const OtherFeatureDetail = ({
           },
           {
             text: 'Yes',
-            onPress: () => saveForm(formCurrent),
+            onPress: () => saveForm(formCurrent, true),
           },
         ],
         {cancelable: false},
@@ -107,10 +104,11 @@ const OtherFeatureDetail = ({
     );
   };
 
-  const saveForm = async (formCurrent) => {
+  // Whether the page is being left is the caller's to say, rather than read back off a ref that may not have
+  // been cleared yet - guessing it wrong refuses an edit whole that was meant to keep all but its bad field
+  const saveForm = async (formCurrent, isLeavingPage) => {
     try {
-      await formCurrent.submitForm();
-      let formValues = showErrors(formRef.current || formCurrent, isEmpty(formRef.current));
+      let {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
       let featureToEdit;
       let otherFeatures = spot.properties.other_features;
       if (otherFeatures && otherFeatures.length > 0) {
@@ -129,6 +127,7 @@ const OtherFeatureDetail = ({
         featureToEdit = selectedFeature;
       }
       if (updateFeature(featureToEdit, otherFeatures, formValues)) {
+        savedValuesRef.current = {...formRef.current.values};
         await formRef.current.resetForm();
         hideFeatureDetail();
       }
@@ -142,15 +141,11 @@ const OtherFeatureDetail = ({
     feature.label = formValues.label || formValues.name;
     feature.name = formValues.name;
     if (formValues.type === 'other') {
-      if (validateAndSetNewType(otherType)) {
-        feature.type = otherType;
-        //let index = projectFeatures[projectFeatures.length - 1].id + 1;
-        let name = otherType;
-        let projectFeaturesCopy = JSON.parse(JSON.stringify(projectFeatures));
-        projectFeaturesCopy.push(name);
-        dispatch(addedCustomFeatureTypes(projectFeaturesCopy));
-      }
-      else return false;
+      // Leaving the page rolls a field in error back to what it was, so the new type can still be missing here
+      // even though the form holds Save until it is named
+      if (isEmpty(formValues.otherType)) return false;
+      feature.type = formValues.otherType;
+      dispatch(addedCustomFeatureTypes([...projectFeatures, formValues.otherType]));
     }
     else feature.type = formValues.type;
     feature.description = formValues.description;
@@ -161,29 +156,20 @@ const OtherFeatureDetail = ({
     return true;
   };
 
-  const validateAndSetNewType = (newType) => {
-    let existingCustomFeatureTypes = customFeatureTypes.filter(feature => feature === newType);
-    if (!isEmpty(existingCustomFeatureTypes)) {
-      alert('Alert!',
-        'The type ' + newType + ' is already being used. Choose a different type name.');
-      setOtherType('');
-      return false;
-    }
-    else if (isEmpty(otherType)) {
-      alert('Alert!', 'The new type being defined is empty');
-      return false;
-    }
-    else return true;
-  };
-
   /* Render Functions */
 
   const renderForm = () => {
     // Validate the feature
     const validateFeature = (values) => {
-      let errors = {};
+      const errors = {};
       if (isEmpty(values.name)) errors.name = 'Feature name cannot be empty';
-      if (!values.type || isEmpty(values.type)) errors.type = 'Feature type cannot be empty';
+      if (isEmpty(values.type)) errors.type = 'Feature type cannot be empty';
+      if (values.type === 'other') {
+        if (isEmpty(values.otherType)) errors.otherType = 'New feature type cannot be empty';
+        else if (projectFeatures.includes(values.otherType)) {
+          errors.otherType = 'The type ' + values.otherType + ' is already being used';
+        }
+      }
       return errors;
     };
 
@@ -191,25 +177,24 @@ const OtherFeatureDetail = ({
       label: selectedFeature.label,
       name: selectedFeature.name,
       type: selectedFeature.type,
+      otherType: '',
       description: selectedFeature.description,
     };
 
     return (
       <View style={{flex: 1}}>
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
           initialValues={initialFeatureValues}
           innerRef={formRef}
-          onSubmit={values => console.log('Submitting form...', values)}
+          setIsFormInvalid={setIsFormInvalid}
           validate={validateFeature}
         >
-          {() => (
+          {formProps => (
             <View>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={TextInputField}
-                    key={'label'}
+                  <TextInputField
                     label={'Label'}
                     name={'label'}
                   />
@@ -217,9 +202,8 @@ const OtherFeatureDetail = ({
               </ListItem>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={TextInputField}
-                    key={'name'}
+                  <TextInputField
+                    isRequired={true}
                     label={'Name'}
                     name={'name'}
                   />
@@ -227,42 +211,30 @@ const OtherFeatureDetail = ({
               </ListItem>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
+                  <SelectInputField
                     choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
-                    component={formProps => (
-                      SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-                    )}
-                    key={'type'}
+                    isRequired={true}
+                    isSingleSelect={true}
                     label={'Feature Type'}
                     name={'type'}
-                    single={true}
                   />
                 </ListItem.Content>
               </ListItem>
-              {formRef.current && formRef.current.values.type === 'other' && (
-                <>
-                  <ListItem containerStyle={commonStyles.listItemFormField}>
-                    <ListItem.Content>
-                      <View style={formStyles.fieldLabelContainer}>
-                        <Text style={formStyles.fieldLabel}>{'Other Feature Type'}</Text>
-                      </View>
-                      <TextInput
-                        onChangeText={newType => setOtherType(newType)}
-                        placeholder={'Type of feature ...'}
-                        placeholderTextColor={themes.MEDIUMGREY}
-                        style={formStyles.fieldValue}
-                        value={otherType || ''}
-                      />
-                    </ListItem.Content>
-                  </ListItem>
-                </>
+              {formProps.values.type === 'other' && (
+                <ListItem containerStyle={commonStyles.listItemFormField}>
+                  <ListItem.Content>
+                    <TextInputField
+                      isRequired={true}
+                      label={'Other Feature Type'}
+                      name={'otherType'}
+                    />
+                  </ListItem.Content>
+                </ListItem>
               )}
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
+                  <TextInputField
                     appearance={'multiline'}
-                    component={TextInputField}
-                    key={'description'}
                     label={'Feature Description'}
                     name={'description'}
                   />
@@ -273,7 +245,7 @@ const OtherFeatureDetail = ({
               )}
             </View>
           )}
-        </Formik>
+        </FormikWrapper>
       </View>
     );
   };
@@ -286,6 +258,7 @@ const OtherFeatureDetail = ({
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={cancelForm}
+          getIsDisabled={isFormInvalid}
           save={() => saveForm(formRef.current)}
         />
       )}

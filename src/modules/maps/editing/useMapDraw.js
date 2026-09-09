@@ -68,16 +68,16 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
       toast.show(TOO_SMALL_MESSAGE);
       return;
     }
-    let isCancelled = false;
+    let isCanceled = false;
     (async () => {
       const feature = await buildFreehandFeature(freehandFeatureCoords);
       // Bail if a new stroke started while building — setDrawFeatures would re-render the map and truncate it.
-      if (isCancelled || !feature || getIsFreehandDrawing()) return;
+      if (isCanceled || !feature || getIsFreehandDrawing()) return;
       // In a selecting mode the area isn't saved, so show just the lasso outline without the vertex points.
       setDrawFeatures(selectingMode ? [feature] : [feature, ...turf.explode(feature).features]);
     })();
     return () => {
-      isCancelled = true;
+      isCanceled = true;
     };
   }, [freehandFeatureCoords]);
 

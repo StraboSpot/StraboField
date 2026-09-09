@@ -26,7 +26,7 @@ const AddRockAlterationOreModal = ({formName, formProps, setChoicesViewKey, surv
         mainKeys={secondKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} surveyFragment={lastKeysFields}/>
     </>
   );
 };

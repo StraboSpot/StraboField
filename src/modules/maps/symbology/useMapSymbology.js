@@ -4,6 +4,7 @@ import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapS
 import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
+import {isStratInterval} from '../../spots/spots.helpers';
 import {useTags} from '../../tags';
 import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
@@ -268,7 +269,7 @@ const useMapSymbology = () => {
   };
 
   const getPolygonSymbology = (feature) => {
-    if (feature.properties.surface_feature && feature.properties.surface_feature.surface_feature_type === 'strat_interval') {
+    if (isStratInterval(feature)) {
       // When the Geologic Unit / Tag Colors switch is on, show the matching tag color for the interval's spot,
       // defaulting to white when there is no matching tag color. Otherwise use the lithology-based fill.
       if (tagTypeForColor) return {fillColor: getTagColor(feature) || 'rgba(255, 255, 255, 1)'};

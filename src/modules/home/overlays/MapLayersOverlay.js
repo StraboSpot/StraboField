@@ -14,11 +14,11 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import {getLiveCustomMaps, getLiveCustomOverlays} from '../../maps/custom-maps/customMaps.helpers';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
 import {BASEMAPS, DEFAULT_MAPS} from '../../maps/maps.constants';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
-import {getCustomMapsWithValidSources, getCustomOverlaysWithValidSources} from '../home.helpers';
 
 // Web has no local tile store, so offline maps are never listed and every basemap comes from its online tile URL.
 const isWeb = Platform.OS === 'web';
@@ -121,7 +121,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const renderCustomMapsList = () => {
     const sectionTitle = 'Custom Basemaps';
-    let customMapsToDisplay = getCustomMapsWithValidSources(customMaps).filter(
+    let customMapsToDisplay = getLiveCustomMaps(customMaps).filter(
       customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
 
     return (
@@ -140,7 +140,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   const renderCustomOverlaysList = () => {
     let sectionTitle = 'Custom Overlays';
-    let customOverlaysToDisplay = getCustomOverlaysWithValidSources(customMaps).filter(
+    let customOverlaysToDisplay = getLiveCustomOverlays(customMaps).filter(
       customMap => customEndpoint.isSelected ? customMap.url[0].includes('192.') : !customMap.url[0].includes('192.'));
 
     return (
@@ -297,7 +297,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
     // Overlays render only from their online tile URL (CustomOverlayLayer/buildTileURL) and their switch is driven by
     // the loaded project's customMaps, so offline overlays stay project-scoped here — unlike basemaps, which use local
     // file tiles and are listed device-wide above.
-    const offlineCustomOverlaysToDisplay = getCustomOverlaysWithValidSources(customMaps).filter(
+    const offlineCustomOverlaysToDisplay = getLiveCustomOverlays(customMaps).filter(
       customOverlay => offlineMaps[customOverlay.id]);
 
     return (

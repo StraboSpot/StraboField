@@ -16,14 +16,14 @@ const IgneousFabric = ({formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
         mainKeys={mainButtonsKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
     </>
   );
 };

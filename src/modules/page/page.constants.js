@@ -37,7 +37,9 @@ import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
 import TernaryPage from '../petrology/TernaryPage';
 import QAQCPage from '../qaqc/QAQC';
 import QAQCOverview from '../qaqc/QAQCOverview';
-import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
+import ReportModal from '../reports/ReportModal';
+import ReportsListModal from '../reports/ReportsListModal';
+import ReportsPage from '../reports/ReportsPage';
 import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
@@ -49,14 +51,12 @@ import IntervalPage from '../sed/IntervalPage';
 import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
 import SpotsRawDataView from '../spots/SpotsRawDataView';
-import {
-  AddTagsToSpotsShortcutModal,
-  FeatureTagsModal,
-  TagsAtSpotList,
-  TagsNotebook,
-  TagsNotebookModal,
-  TagsShortcutModal,
-} from '../tags';
+import AddTagsToSpotsShortcutModal from '../tags/AddTagsToSpotsShortcutModal';
+import FeatureTagsModal from '../tags/FeatureTagsModal';
+import TagsAtSpotList from '../tags/TagsAtSpotList';
+import TagsNotebook from '../tags/TagsNotebook';
+import TagsNotebookModal from '../tags/TagsNotebookModal';
+import TagsShortcutModal from '../tags/TagsShortcutModal';
 import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';

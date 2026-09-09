@@ -11,6 +11,7 @@ import {isEmpty, toError} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
+import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 import {GLYPHS_URL} from '../glyphs/glyphs.constants';
 import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
@@ -238,7 +239,8 @@ const useMapsOffline = () => {
       const tilehost = STRABO_APIS.TILE_HOST;
       const endpointTilehost = customDatabaseEndpoint.isSelected ? getTileBaseUrl() : tilehost;
 
-      if (layerSource === 'map_warper' || layerSource === 'mapbox_styles' || layerSource === 'strabospot_mymaps') {
+      if (layerSource === CUSTOM_MAP_SOURCES.MAP_WARPER || layerSource === CUSTOM_MAP_SOURCES.MAPBOX_STYLES
+        || layerSource === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
         //configure advanced URL for custom map types here.
         //first, figure out what kind of map we are downloading...
 
@@ -247,7 +249,8 @@ const useMapsOffline = () => {
 
         console.log('DownloadMap: ', downloadMap);
 
-        if (downloadMap.source === 'Mapbox Style' || downloadMap.source === 'mapbox_styles') {
+        if (downloadMap.source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES_LEGACY
+          || downloadMap.source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES) {
           layer = 'mapboxstyles';
           const parts = downloadMap.id.split('/');
           username = parts[0];
@@ -257,7 +260,7 @@ const useMapsOffline = () => {
           startZipURL = tilehost + '/asynczip?layer=' + layer + '&extent=' + extentString + '&zoom=' + downloadZoom
             + '&username=' + username + '&id=' + id + '&access_token=' + accessToken;
         }
-        else if (downloadMap.source === 'strabospot_mymaps') {
+        else if (downloadMap.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
           layer = 'strabomymaps';
           id = downloadMap.id;
 

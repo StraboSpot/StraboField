@@ -80,7 +80,7 @@ const ExternalData = ({isReadOnly, page}) => {
               onPress={i => i === 0 ? setProtocol('http://') : setProtocol('https://')}
               selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
               selectedIndex={protocol === 'http://' ? 0 : 1}
-              textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
+              textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
             />
             <ListItem containerStyle={commonStyles.listItem}>
               <ListItem.Content style={{flexDirection: 'row', justifyContent: 'flex-start'}}>

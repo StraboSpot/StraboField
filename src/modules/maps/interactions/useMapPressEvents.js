@@ -5,7 +5,9 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
+import useProject from '../../project/useProject';
 import {useSpots} from '../../spots';
+import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useMapFeatures from '../features/useMapFeatures';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
@@ -36,6 +38,7 @@ const useMapPressEvents = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -43,6 +46,7 @@ const useMapPressEvents = ({
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
+  const {isReadOnlyDataset} = useProject();
   const {getDrawFeatureAtPress, getSpotAtPress, getSpotsAtPress} = useMapFeaturesCalculated(mapRef);
   const {getMeasureFeatures} = useMapMeasure(mapRef);
   const {getSpotWithThisStratSection} = useSpots();
@@ -53,6 +57,11 @@ const useMapPressEvents = ({
   const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
   // What the picker does with the tapped Spot ('select' | 'edit' | 'switch'); holds long-press coords for 'edit'.
   const [spotsAtPressAction, setSpotsAtPressAction] = useState(null);
+
+  /* Derived Variables */
+
+  // Only one dataset is shown and it is read only, so a long press has no Spot it could offer to edit
+  const isSingleActiveReadOnlyDataset = activeDatasetsIds.length === 1 && isReadOnlyDataset(activeDatasetsIds[0]);
 
   /* Internal Functions */
 
@@ -77,7 +86,7 @@ const useMapPressEvents = ({
     console.log('Map long press detected:', e);
     const [screenPointX, screenPointY] = getScreenPoint(e);
 
-    if (mapMode === MAP_MODES.VIEW && !isEmpty(getAllMappedSpots())) {
+    if (mapMode === MAP_MODES.VIEW && !isSingleActiveReadOnlyDataset && !isEmpty(getAllMappedSpots())) {
       const spotsToEdit = await getSpotsAtPress(screenPointX, screenPointY);
       // Several Spots overlap - let the user pick which to edit.
       if (spotsToEdit.length > 1) {
@@ -114,7 +123,6 @@ const useMapPressEvents = ({
       const [x, y] = getScreenPoint(e);
       const clientY = Platform.OS === 'web' ? (e.originalEvent?.clientY ?? y) : y;
       const spotAtPress = await getSpotAtPress(x, y);
-      const isStratInterval = s => s?.properties?.surface_feature?.surface_feature_type === 'strat_interval';
       // Fall back to the previously selected interval (e.g. click fired after snap-line drag
       // lands on a slot boundary where queryRenderedFeatures finds no feature).
       // Read selectedSpot from store directly to get the post-reorder value on web.
@@ -210,8 +218,7 @@ const useMapPressEvents = ({
     // Read directly from store so post-reorder calls get fresh positions, not stale selector values
     const freshSpots = store.getState().spot.spots;
     const intervals = Object.values(freshSpots).filter(s =>
-      s.properties.strat_section_id === stratSection.strat_section_id
-      && s.properties.surface_feature?.surface_feature_type === 'strat_interval',
+      isStratInterval(s) && s.properties.strat_section_id === stratSection.strat_section_id,
     );
     const sorted = [...intervals].sort((a, b) => {
       const extA = turf.bbox(a);

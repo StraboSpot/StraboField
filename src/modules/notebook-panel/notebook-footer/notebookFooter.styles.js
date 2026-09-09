@@ -35,10 +35,9 @@ const notebookFooterStyles = StyleSheet.create({
     zIndex: 10,
   },
   morePagesListItem: {
-    paddingBottom: 5,
-    paddingLeft: 0,
-    paddingRight: 0,
-    paddingTop: 5,
+    marginHorizontal: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 5,
   },
   morePagesListItemTesting: {
     color: themes.ORANGE,
@@ -51,6 +50,11 @@ const notebookFooterStyles = StyleSheet.create({
     fontSize: themes.SMALL_TEXT_SIZE,
     paddingLeft: 5,
     paddingRight: 5,
+  },
+  morePagesSectionHeader: {
+    backgroundColor: themes.PRIMARY_BACKGROUND_COLOR,
+    padding: 0,
+    paddingRight: 10,
   },
 });
 

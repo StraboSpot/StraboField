@@ -53,6 +53,8 @@ const FabricsPage = ({isReadOnly, page}) => {
   const editFabric = (fabric) => {
     setIsDetailView(true);
     setSelectedFabric(fabric);
+    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
+    dispatch(setSelectedAttributes([fabric]));
     dispatch(setModalVisible({modal: null}));
   };
 

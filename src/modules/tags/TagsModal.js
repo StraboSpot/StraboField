@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,7 +12,7 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
-import {SelectInputField} from '../form';
+import {FormikWrapper, SelectInputField} from '../form';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
@@ -132,31 +131,20 @@ const TagsModal = ({
     return (
       <>
         {!isEmpty(tags) && pageKey !== PAGE_KEYS.GEOLOGIC_UNITS && (
-          <Formik
-            initialValues={{}}
-            innerRef={formRef}
-            onSubmit={values => console.log('Submitting form...', values)}
-            validate={fieldValues => setSearchText(fieldValues.searchText)}
-          >
-            {() => (
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
-                      tagType => ({label: getTagLabel(tagType), value: tagType}))}
-                    component={formProps => (
-                      SelectInputField(
-                        {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
-                    )}
-                    key={'searchText'}
-                    label={'Tag Type'}
-                    name={'searchText'}
-                    single={true}
-                  />
-                </ListItem.Content>
-              </ListItem>
-            )}
-          </Formik>
+          <FormikWrapper initialValues={{}} innerRef={formRef}>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <SelectInputField
+                  choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                    tagType => ({label: getTagLabel(tagType), value: tagType}))}
+                  isSingleSelect={true}
+                  label={'Tag Type'}
+                  name={'searchText'}
+                  onValueChanged={(name, value) => setSearchText(value)}
+                />
+              </ListItem.Content>
+            </ListItem>
+          </FormikWrapper>
         )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}

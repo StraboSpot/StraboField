@@ -2,7 +2,6 @@ import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {CheckBox} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import BackupStatusModal from './BackupStatusModal';
@@ -17,6 +16,7 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
+import {FormikWrapper} from '../../form';
 import SelectInputField from '../../form/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
@@ -71,33 +71,30 @@ const BackupProject = () => {
 
   const renderBackupOptions = () => {
     return (
-      <Formik
+      <FormikWrapper
         initialValues={{backupFrequency: backupFrequency?.save, syncFrequency: backupFrequency?.sync}}
         innerRef={preFormRef}
-        onSubmit={values => console.log('Submit: ', values, ' |')}
-        validate={values => dispatch(
-          setBackupFrequency({save: values.backupFrequency, sync: values.syncFrequency}))}
       >
         {({values}) => (
           <View style={{paddingHorizontal: 10}}>
             <View style={{paddingVertical: 5}}>
-              <Field
+              <SelectInputField
                 choices={choices}
-                component={formProps => SelectInputField(
-                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
+                dropdownStyle={{paddingVertical: 5}}
+                isSingleSelect
                 label={'Auto-Save to Device Frequency'}
-                multiSelectStyle={{paddingVertical: 5}}
                 name={'backupFrequency'}
-                single
+                onValueChanged={(name, value) => dispatch(
+                  setBackupFrequency({save: value, sync: values.syncFrequency}))}
               />
-              <Field
+              <SelectInputField
                 choices={choices}
-                component={formProps => SelectInputField(
-                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
+                dropdownStyle={{paddingVertical: 5}}
+                isSingleSelect
                 label={'Auto-Sync to Server Frequency'}
-                multiSelectStyle={{paddingVertical: 5}}
                 name={'syncFrequency'}
-                single
+                onValueChanged={(name, value) => dispatch(
+                  setBackupFrequency({save: values.backupFrequency, sync: value}))}
               />
               {/*<AutoSaveCountdown/>*/}
               {/*<AutoSyncCountdown/>*/}
@@ -120,8 +117,7 @@ const BackupProject = () => {
             </Text>
           </View>
         )}
-      </Formik>
-
+      </FormikWrapper>
     );
   };
 

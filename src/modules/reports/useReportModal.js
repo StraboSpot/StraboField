@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -16,26 +16,32 @@ const useReportModal = ({openSpotInNotebook}) => {
   const dispatch = useDispatch();
   const report = useSelector(state => state.home.modalValues);
   const reports = useSelector(state => state.project.project?.reports) || [];
+  const {name: userName, straboUserId} = useSelector(state => state.user);
 
-  const {showErrors} = useForm();
+  const {submitAndShowErrors} = useForm();
 
   /* Local State */
 
   const formRef = useRef(null);
 
   const reportSpots = report?.spots ? JSON.parse(JSON.stringify(report?.spots)) : [];
-
   const [checkedSpotsIds, setCheckedSpotsIds] = useState(reportSpots);
 
   const reportTags = report?.tags ? JSON.parse(JSON.stringify(report?.tags)) : [];
-
   const [checkedTagsIds, setCheckedTagsIds] = useState(reportTags);
 
   const reportImages = report?.images ? JSON.parse(JSON.stringify(report?.images)) : [];
-
   const [updatedImages, setUpdatedImages] = useState(reportImages);
 
+  const [isFormDirty, setIsFormDirty] = useState(false);
+
   /* Derived Variables */
+
+  // Whether there is anything to save, so a memo only opened to read offers Done rather than Update
+  const hasUnsavedChanges = isFormDirty
+    || !isEqual(reportImages, updatedImages)
+    || !isEqual(reportSpots, checkedSpotsIds)
+    || !isEqual(reportTags, checkedTagsIds);
 
   const initialValues = isEmpty(report) ? {} : report;
 
@@ -64,8 +70,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     const isImageObjChanged = !isEqual(reportImages, updatedImages);
     const isSpotsObjChanged = !isEqual(reportSpots, checkedSpotsIds);
     const isTagsObjChanged = !isEqual(reportTags, checkedTagsIds);
-    if ((formRef.current && formRef.current.dirty) || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
-      const formCurrent = formRef?.current || {};
+    if (isFormDirty || isImageObjChanged || isSpotsObjChanged || isTagsObjChanged) {
       alert(
         'Unsaved Changes',
         'Would you like to save your memo before ' + (itemText ? 'navigating to this ' + itemText : 'continuing') + '?',
@@ -77,8 +82,7 @@ const useReportModal = ({openSpotInNotebook}) => {
           {
             text: 'Yes',
             onPress: async () => {
-              await saveReport(formCurrent);
-              go();
+              if (await saveReport()) go();
             },
           },
         ],
@@ -110,23 +114,34 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const handleTagPressedCont = tag => checkReportChanged('Tag', () => goToTag(tag));
 
+  // Reports whether the memo was saved. A save refused for a field in error has already alerted about it, so the
+  // caller stays where it is for that field to be fixed rather than carrying on and losing the edit.
   const saveReport = async () => {
     try {
       console.log('Saving report ...');
-      await formRef.current.submitForm();
-      let editedReport = showErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewUUID();
+      let {values: editedReport} = await submitAndShowErrors(formRef.current);
+      if (!editedReport.id) editedReport.id = getNewId();
+      // Stamped once, on the first save - an edit by anyone else leaves the original author in place
+      if (!editedReport.straboUserId || !editedReport.created_by) {
+        editedReport.straboUserId = straboUserId;
+        editedReport.created_by = userName;
+      }
       if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
       editedReport.updated_timestamp = Date.now();
       editedReport.images = updatedImages;
       editedReport.spots = checkedSpotsIds;
       editedReport.tags = checkedTagsIds;
-      let updatedReports = reports.filter(r => r.id !== editedReport.id);
-      updatedReports.push({...editedReport});
+      const updatedReports = [...reports];
+      // Saving an edit must leave the memo where it is, so write it back into its own place in the list
+      const i = updatedReports.findIndex(r => r.id === editedReport.id);
+      if (i === -1) updatedReports.push({...editedReport});
+      else updatedReports.splice(i, 1, {...editedReport});
       dispatch(updatedProject({field: 'reports', value: updatedReports}));
+      return true;
     }
     catch (err) {
       console.error('Error saving report data', err);
+      return false;
     }
   };
 
@@ -145,8 +160,7 @@ const useReportModal = ({openSpotInNotebook}) => {
   };
 
   const handleSavePressed = async () => {
-    await saveReport();
-    closeModal();
+    if (await saveReport()) closeModal();
   };
 
   const handleSpotChecked = (spotId) => {
@@ -177,7 +191,9 @@ const useReportModal = ({openSpotInNotebook}) => {
     handleSpotPressed,
     handleTagChecked,
     handleTagPressed,
+    hasUnsavedChanges,
     initialValues,
+    setIsFormDirty,
     setUpdatedImages,
     updatedImages,
   };

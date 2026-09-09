@@ -228,6 +228,9 @@ export const isEqualUnordered = (a, b) => {
   return JSON.stringify(JSON.parse(JSON.stringify(a)).sort()) === JSON.stringify(JSON.parse(JSON.stringify(b)).sort());
 };
 
+// Compare two Spot or dataset ids, which arrive as stored numbers from some callers and as strings from others
+export const isSameId = (a, b) => String(a) === String(b);
+
 // Convert 1 to A, 2 to B, ... 27 to AA, 28 to AB, etc
 export const numToLetter = num => num <= 0 ? '' : numToLetter(Math.floor((num - 1) / 26)) + String.fromCharCode(
   (num - 1) % 26 + 65);

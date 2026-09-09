@@ -38,6 +38,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
   /* Local State */
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Event Handlers */
 
@@ -49,6 +50,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
+      disabled={isFormInvalid}
       isLoading={isLoading}
       onActionPressed={() => saveSample(formRef.current)}
       onFooterButtonPress={onPress}
@@ -66,6 +68,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
               namePostfix={namePostfix}
               namePrefix={namePrefix}
               setChoicesViewKey={setChoicesViewKey}
+              setIsFormInvalid={setIsFormInvalid}
               startingNumber={startingNumber}
             />
             {!choicesViewKey && (

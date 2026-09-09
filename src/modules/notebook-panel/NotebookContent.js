@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -19,7 +19,6 @@ import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
-import useProject from '../project/useProject';
 import {SpotsListItem, useSpots} from '../spots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
@@ -35,23 +34,27 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
-  const {isSpotInReadOnlyDataset} = useProject();
   const {
     getActiveSpotsObj,
     getRecentSpots,
     getRootSpot,
     getSpotWithThisImageBasemap,
     handleSpotSelected,
+    isSpotReadOnly,
     sortSpotsByDateCreated,
   } = useSpots();
 
   /* Local State */
 
+  // The open sample form's current values, registered by the page that renders it so the footer's 'Add Data to
+  // Sample' can carry the edits on screen into the sample it creates
+  const getSampleValuesRef = useRef(null);
+
   const [selectedSample, setSelectedSample] = useState({});
 
   /* Derived Variables */
 
-  const isReadOnly = !isEmpty(spot) && isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = isSpotReadOnly(spot);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const spotWithThisImageBasemap = spot.properties?.image_basemap
     && getSpotWithThisImageBasemap(spot.properties.image_basemap);
@@ -95,6 +98,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     if (page?.key === PAGE_KEYS.SAMPLES) {
       pageProps = {
         ...pageProps,
+        registerGetValues: getSampleValuesRef,
         selectedSample: selectedSample,
         setSelectedSample: setSelectedSample,
       };
@@ -121,6 +125,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
           <NotebookFooter
             isRichSample={spot.properties?.isSample}
             openPage={openPage}
+            registerGetValues={getSampleValuesRef}
             selectedSample={selectedSample}
           />
         </View>

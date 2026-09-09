@@ -8,7 +8,9 @@ import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge} from './compas
 import CompassModule from './CompassModule';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
+import {updatedProject} from '../../modules/project/projects.slice';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 
 let matrixArray = [];
 
@@ -146,7 +148,19 @@ const useCompassCore = () => {
     const result = geomagnetism.model().point([latitude, longitude]);
     console.log('MagDeclination', result);
     magneticDeclination.current = result.decl;
+    recordDeclinationToProject(result.decl);
     return result.decl;
+  };
+  const recordDeclinationToProject = (declination) => {
+    const project = store.getState().project.project;
+    if (isEmpty(project)) return;
+    const current = project.description?.magnetic_declination;
+    const alreadySet = current !== undefined && current !== null && current !== '' && Number(current) !== 0;
+    if (alreadySet) return;
+    store.dispatch(updatedProject({
+      field: 'description',
+      value: {...project.description, magnetic_declination: roundToDecimalPlaces(declination, 2)},
+    }));
   };
 
   const getCurrentCameraAngles = () => {

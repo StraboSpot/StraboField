@@ -11,7 +11,7 @@ import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedSpotProperties} from '../spots/spots.slice';
+import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const EarthquakesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -49,12 +49,14 @@ const EarthquakesPage = ({isReadOnly, page}) => {
     if (!attribute.id) {
       let editedEarthquakeData = JSON.parse(JSON.stringify(spot.properties[page.key]));
       attribute = {...attribute, id: getNewUUID()};
-      editedEarthquakeData[page.key].splice(i, 1, attribute);
+      editedEarthquakeData.splice(i, 1, attribute);
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: page.key, value: editedEarthquakeData}));
     }
     setIsDetailView(true);
     setSelectedAttribute(attribute);
+    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
+    dispatch(setSelectedAttributes([attribute]));
     dispatch(setModalVisible({modal: null}));
   };
 

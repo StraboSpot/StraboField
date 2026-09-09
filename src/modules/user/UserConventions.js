@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -12,7 +11,7 @@ import {setUserData} from './userProfile.slice';
 import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
@@ -20,11 +19,12 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import useProject from '../project/useProject';
-import {editedOrCreatedSpots} from '../spots/spots.slice';
+import {calculateMissingOrientations, getSpotOrientations} from '../spots/spots.helpers';
+import {editedOrCreatedSpots, setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const UserProfile = () => {
   /* Data Hooks */
@@ -32,14 +32,16 @@ const UserProfile = () => {
   const dispatch = useDispatch();
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
   const isConnectionAvailable = useIsConnectionAvailable();
   const connectionTargetText = useConnectionTargetText();
   const {downloadUserProfile} = useDownload();
-  const {hasErrors, validateForm} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {submitAndShowErrors} = useForm();
+  const {isSpotReadOnly} = useSpots();
   const toast = useToast();
   const {uploadProfile} = useUpload();
 
@@ -77,52 +79,45 @@ const UserProfile = () => {
 
   /* Logic Helpers */
 
-  const convertStrikeDipDirection = () => {
+  const calculateMissingStrikesAndDipDirections = () => {
     if (isEmpty(spots)) toast.show('No Spots found.', {placement: 'top'});
     else {
       // Filter out Read Only Spots
       const spotsFiltered = Object.values(spots).filter((spot) => {
-        if (spot?.properties?.id && !isSpotInReadOnlyDataset(spot.properties.id)) return spot;
+        if (spot?.properties?.id && !isSpotReadOnly(spot)) return spot;
       });
-      if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found.  No changes made.', {placement: 'top'});
+      if (isEmpty(spotsFiltered)) toast.show('Only Read Only Spots found. No changes made.', {placement: 'top'});
 
       else {
         const spotsEdited = [];
-        let spotsEditedIds = [];
+        const spotsEditedIds = [];
         spotsFiltered.forEach((s) => {
-          if (s.properties.orientation_data) {
-            let editedMeasurements = JSON.parse(JSON.stringify(s.properties.orientation_data));
-            Object.values(editedMeasurements).forEach((m) => {
-              if (!isEmpty(m.strike) && isEmpty(m.dip_direction)) {
-                const dipDirection = (m.strike + 90) % 360;
-                console.log('Strike', m.strike, '-> Dip Direction', dipDirection);
-                m.dip_direction = dipDirection;
-                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-              }
-              else if (!isEmpty(m.dip_direction) && isEmpty(m.strike)) {
-                const strike = (m.dipDirection - 90) % 360;
-                console.log('Dip direction', m.dip_direction, '-> Strike', strike);
-                m.strike = strike;
-                spotsEditedIds = [...new Set([...spotsEditedIds, s.properties.id.toString()])];
-              }
-            });
-            if (spotsEditedIds.includes(s.properties.id.toString())) {
-              const updatedSpot = JSON.parse(JSON.stringify(s));
-              updatedSpot.properties.orientation_data = editedMeasurements;
-              spotsEdited.push(updatedSpot);
-            }
+          // Don't copy a Spot only to find it holds nothing that could carry a plane
+          if (isEmpty(getSpotOrientations(s))) return;
+          const updatedSpot = JSON.parse(JSON.stringify(s));
+          let isSpotEdited = false;
+          getSpotOrientations(updatedSpot).forEach(({fields, orientation}) => {
+            if (calculateMissingOrientations(orientation, fields)) isSpotEdited = true;
+          });
+          if (isSpotEdited) {
+            spotsEdited.push(updatedSpot);
+            // As stored, not as a string: the dataset holding the Spot is found by matching its own numeric ids
+            spotsEditedIds.push(s.properties.id);
           }
         });
         if (!isEmpty(spotsEdited)) {
           // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
-          //   return spotsEditedIds.includes(s.properties.id.toString()) ? [...acc, s] : acc;
+          //   return spotsEditedIds.includes(s.properties.id) ? [...acc, s] : acc;
           // }, []));
           // console.log('Spots to update', spotsEdited);
           dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
           dispatch(editedOrCreatedSpots(spotsEdited));
-          toast.show('Finished conversions. Spots updated', {placement: 'top', type: 'success'});
+          const selectedAttributesUpdated = getUpdatedSelectedAttributes(spotsEdited);
+          if (selectedAttributesUpdated) dispatch(setSelectedAttributes(selectedAttributesUpdated));
+          const spotsUpdatedText = spotsEdited.length + (spotsEdited.length === 1 ? ' Spot' : ' Spots');
+          toast.show(`Finished calculating. ${spotsUpdatedText} updated.`, {placement: 'top', type: 'success'});
         }
-        else toast.show('No conversions needed. No Spots updated.', {placement: 'top'});
+        else toast.show('No missing values to calculate. No Spots updated.', {placement: 'top'});
       }
     }
   };
@@ -136,27 +131,50 @@ const UserProfile = () => {
 
   const getIsDisabled = () => false;
 
+  // A detail page open in the Notebook renders the record it was handed rather than reading the Spot again, so a
+  // calculated value reaches it only by handing that record back. Returns null unless a record being looked at was
+  // itself calculated, since reselecting reinitializes the open form over anything typed into it.
+  const getUpdatedSelectedAttributes = (spotsEdited) => {
+    if (isEmpty(selectedAttributes)) return null;
+    const spotUpdated = spotsEdited.find(spot => spot.properties.id === selectedSpot?.properties?.id);
+    if (isEmpty(spotUpdated)) return null;
+    const records = getSpotOrientations(spotUpdated).map(({orientation}) => orientation);
+    const selectedAttributesUpdated = selectedAttributes.map(a => records.find(r => r.id === a.id) || a);
+    return isEqual(selectedAttributesUpdated, selectedAttributes) ? null : selectedAttributesUpdated;
+  };
+
   const saveForm = async (formCurrent) => {
     try {
-      await formCurrent.submitForm();
-      let newValues = JSON.parse(JSON.stringify(formCurrent.values));
-      if (hasErrors(formCurrent)) throw Error('Error in form.');
+      // Only ever called from doCleanup as the page closes, so keep the valid fields and roll back just the
+      // bad ones rather than discarding the whole edit on a page the user is already leaving.
+      const {errors, values: formValues} = await submitAndShowErrors(formCurrent, true);
+      // Rolling the bad fields back can leave the form with nothing to save. A toggled convention is already in
+      // state - and so in these values - but its upload is deferred to here, so only stop when there is neither.
+      const hasNothingToSave = isEqual(formValues, formCurrent.initialValues) && !hasUnsavedConventionRef.current;
+      if (!isEmpty(errors) && hasNothingToSave) return;
+      // A save that kept only some of the fields has already been alerted about, so don't announce it as a save
+      const isFullSave = isEmpty(errors);
+      const newValues = JSON.parse(JSON.stringify(formValues));
       const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
-        if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        if (isEmpty(userData.encoded_login)) {
+          if (isFullSave) toast.show('Changes Saved Locally Only!', {type: 'success'});
+        }
         else {
           await uploadProfile(userValuesToUpdate);
           dispatch(clearProfileUploadNeeded());
-          toast.show('Profile uploaded successfully!', {type: 'success'});
-          toast.show('Changes Saved!', {type: 'success'});
+          if (isFullSave) {
+            toast.show('Profile uploaded successfully!', {type: 'success'});
+            toast.show('Changes Saved!', {type: 'success'});
+          }
         }
       }
       else {
         // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
         if (!isEmpty(userData.encoded_login)) dispatch(setProfileUploadNeeded());
         toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
-        toast.show('Changes Saved Locally Only!', {type: 'success'});
+        if (isFullSave) toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
     }
     catch (err) {
@@ -222,17 +240,16 @@ const UserProfile = () => {
   const renderBulkUpdatesSection = () => {
     return (
       <>
-        <SectionDivider dividerText={'Convert Measurements'}/>
-        <OutlineButton
-          onPress={convertStrikeDipDirection}
-          title={'Convert Strike <-> Dip Direction'}
+        <SectionDivider
+          dividerText={'Update Measurements'}
+          subtitle={'Uses an existing strike to calculate a missing dip direction, and the reverse, in every '
+            + 'measurement, associated plane, earthquake and 3D structure in the project. Skips read only datasets '
+            + 'and marks updated Spots as modified.'}
         />
-        <View style={{paddingHorizontal: 10}}>
-          <Text style={[commonStyles.importantText, {paddingHorizontal: 10}]}>
-            *Changes are applied to applicable Spots throughout the entire active project. Modified timestamp are also
-            updated.
-          </Text>
-        </View>
+        <OutlineButton
+          onPress={calculateMissingStrikesAndDipDirections}
+          title={'Calculate Missing\nStrikes and Dip Directions'}
+        />
       </>
     );
   };
@@ -245,16 +262,16 @@ const UserProfile = () => {
         <FlatList
           ListHeaderComponent={
             <>
-              <Formik
-                component={formProps => Form(
-                  {formName: USER_CONVENTIONS_FORM_NAME, getIsDisabled: getIsDisabled, ...formProps})}
+              <FormikWrapper
                 enableReinitialize={true}  // Update values if preferences change while form open
+                formName={USER_CONVENTIONS_FORM_NAME}
                 initialValues={userData}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: USER_CONVENTIONS_FORM_NAME, values: values})}
-                validateOnChange={true}
-              />
+              >
+                {formProps => (
+                  <Form {...formProps} formName={USER_CONVENTIONS_FORM_NAME} getIsDisabled={getIsDisabled}/>
+                )}
+              </FormikWrapper>
               {renderMeasurementInputDefault()}
               {renderUtmDisplay()}
               {renderBulkUpdatesSection()}

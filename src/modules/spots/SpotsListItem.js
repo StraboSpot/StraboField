@@ -3,11 +3,11 @@ import React from 'react';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import useSpots from './useSpots';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import {SpotGeometryAvatar} from '../../shared/ui/avatars';
-import useProject from '../project/useProject';
 import {useTags} from '../tags';
 import SpotDataIcons from './SpotDataIcons';
 import CheckboxList from '../../shared/ui/CheckboxList';
@@ -15,6 +15,7 @@ import CheckboxList from '../../shared/ui/CheckboxList';
 const SpotsListItem = ({
                          doShowSamples,
                          doShowTags,
+                         ignoreReadOnly,
                          isCheckedList,
                          isItemChecked,
                          isSample,
@@ -29,12 +30,12 @@ const SpotsListItem = ({
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {isSpotReadOnly} = useSpots();
   const {addRemoveSpotFromTag, getTagsAtSpot} = useTags();
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+  const isReadOnly = !ignoreReadOnly && isSpotReadOnly(spot);
 
   /* Event Handlers */
 

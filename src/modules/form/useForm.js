@@ -1,8 +1,8 @@
 import moment from 'moment';
 
-import {convertXLSFormLogicToJS, isRequired} from './form.helpers';
+import {getConstraintError, getLogicFunction, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {LABEL_DICTIONARY} from '../form';
 
@@ -80,6 +80,10 @@ const useForm = () => {
     return relevantFields;
   };
 
+  // The surveys of a tabbed record's other tabs - the part of the record the tab named here edits without showing
+  const getSiblingSurvey = ([category, name], subpageKeys) => subpageKeys.filter(k => k !== name)
+    .flatMap(k => getSurvey([category, k]));
+
   // Return the survey object given the form category and name
   const getSurvey = ([category, name]) => {
     const survey = forms.default[category] && forms.default[category][name] && forms.default[category][name].survey || [];
@@ -93,104 +97,108 @@ const useForm = () => {
 
   // Determine if the field should be shown or not by looking at the relevant key-value pair
   const isRelevant = (field, values) => {
-    //console.log('values', values);
     if (isEmpty(field.relevant)) return true;
-    const relevantLogicJS = convertXLSFormLogicToJS(field.relevant);
-    // console.log(field.name, 'relevant:', relevantLogicJS);
-
-    // eslint-disable-next-line no-new-func -- required for dynamic evaluation of XLSForm logic strings
-    const F = new Function('values', 'return ' + relevantLogicJS);
-    return F(values);
+    return getLogicFunction(field.relevant)(values);
   };
 
-  // Remove errors from data, if any, and show alert. Throw error if not leaving page.
+  // Report the errors on a form and hand back the values a save should write: the failing fields rolled back to
+  // what they were, the rest cleaned and kept. Throws when nothing should be saved at all, which is a value the
+  // user has just typed and can still fix.
   const showErrors = (form, isLeavingPage) => {
-    let formValues = {...form.values};
     const errors = form.errors;
     const formName = form.status?.formName || [];
+    // What a save writes is the cleaned values, not the text sitting in the fields
+    let formValues = validateForm({formName: formName, values: form.values}).values;
     if (hasErrors(form)) {
       const errorMessages = Object.entries(errors).map(([key, value]) => {
+        // A subkey'd field is keyed by its path, e.g. associated_orientation[0].plunge. Label it by both halves,
+        // and skip the reversion below, which only reaches top-level fields.
+        if (key.includes('[0].')) {
+          const [subkey, fieldName] = key.split('[0].');
+          return getLabel(subkey, formName) + ' ' + getLabel(fieldName, formName) + ': ' + value;
+        }
         if (form.initialValues[key]) formValues[key] = form.initialValues[key];
         else delete formValues[key];
         return getLabel(key, formName) + ': ' + value;
       });
-      alert('Error Saving', 'Errors found in following fields. Unable to save these changes.'
-        + ' Please fix the following errors.\n\n' + errorMessages.join('\n'));
-      if (!isLeavingPage) throw Error('Found validation errors.');  // If we don't want user to leave the page throw Error
+      // A value the user has just typed stops the save so they can fix it - the field is marked and, on most
+      // forms, Save is held until it is. A value that was already wrong when the form opened is different: it is
+      // not what they were doing, and refusing everything would leave a record that arrived with a bad value
+      // impossible to edit at all, so it keeps its previous value and the rest of the form saves. Leaving the
+      // page always takes that second path. A nested field is excluded from it because the roll-back above only
+      // reaches the top level, so treating it as partial would write the bad value rather than hold it back.
+      const isUnchangedBadValue = key => !key.includes('[0].')
+        && isEqual(form.values[key], form.initialValues[key]);
+      const isPartialSave = isLeavingPage || Object.keys(errors).every(isUnchangedBadValue);
+      if (isPartialSave) {
+        // Rolling those fields back can leave nothing else for this save to write, and a page can have saved
+        // something of its own besides, so name what happened to these fields and claim nothing more than that
+        const hasOtherChanges = !isEqual(formValues, form.initialValues);
+        alert('Some Changes Not Saved', 'These fields have errors and were reset to their previous values.'
+          + (hasOtherChanges ? ' Your other changes were saved.' : '') + '\n\n' + errorMessages.join('\n'));
+      }
+      else {
+        alert('Error Saving', 'Errors found in the following fields. Your changes were not saved.'
+          + ' Please fix them and try again.\n\n' + errorMessages.join('\n'));
+      }
+      if (!isPartialSave) throw Error('Found validation errors.');  // Stops the caller from saving anything
     }
     return formValues;
   };
 
-  const validateForm = ({formName, values}) => {
-    // console.log('Validating', formName, 'with', values);
-    const errors = {};
+  // Submit a form and report its errors the way showErrors does, returning both the errors and the values to save.
+  // Formik rebinds innerRef on every commit, so the bag a save starts with is stale in two ways. Its errors are the
+  // previous render's, which let a value typed and saved without leaving the field validate against errors from
+  // before it was typed, so ask Formik for them directly. Its values are missing anything written in the same tick
+  // as the save, as the compass does with its reading, so take a ref where the caller has one and re-read it after
+  // submitting. Callers need the errors back because the isLeavingPage path alerts without throwing and saves the
+  // valid fields, so only they can tell a whole save from a partial one.
+  const submitAndShowErrors = async (formOrRef, isLeavingPage) => {
+    const getForm = () => formOrRef.current || formOrRef;
+    await getForm().submitForm();
+    const form = getForm();
+    const errors = await form.validateForm();
+    return {errors: errors, values: showErrors({...form, errors: errors}, isLeavingPage)};
+  };
 
-    getSurvey(formName).forEach((fieldModel) => {
+  // Check the values against a form's survey, returning both the errors found and the values to save: strings
+  // trimmed, numbers converted from the text they were typed as, and the fields left empty or made irrelevant by a
+  // choice dropped. Nothing is written back into the values given, so a form can be validated while it is being
+  // typed in without half-typed text being rewritten under the cursor - a decimal entered as '0.' would otherwise
+  // become 0 before the digits after the point could be typed.
+  // A survey given in place of a formName checks fields the form on screen does not show, which is how a tabbed
+  // form checks the other tabs of the record it is one tab of.
+  const validateForm = ({formName, survey, values}) => {
+    const errors = {};
+    const cleanedValues = {...values};
+
+    (survey || getSurvey(formName)).forEach((fieldModel) => {
       const key = fieldModel.name;
-      if (values[key] && typeof values[key] === 'string') values[key] = values[key].trim();
-      if (isEmpty(values[key]) || !isRelevant(fieldModel, values)) delete values[key];
-      if (isEmpty(values[key]) && isRelevant(fieldModel, values) && isRequired(fieldModel, values)) {
+      if (cleanedValues[key] && typeof cleanedValues[key] === 'string') cleanedValues[key] = cleanedValues[key].trim();
+      if (isEmpty(cleanedValues[key]) || !isRelevant(fieldModel, cleanedValues)) delete cleanedValues[key];
+      if (isEmpty(cleanedValues[key]) && isRelevant(fieldModel, cleanedValues)
+        && isRequired(fieldModel, cleanedValues)) {
         errors[key] = 'Required';
       }
       // Checked with isEmpty rather than truthiness so a value of 0 still has its constraints applied
-      else if (!isEmpty(values[key])) {
+      else if (!isEmpty(cleanedValues[key])) {
         if (fieldModel.type === 'integer') {
-          values[key] = isNaN(parseInt(values[key], 10)) ? undefined : parseInt(values[key], 10);
+          cleanedValues[key] = isNaN(parseInt(cleanedValues[key], 10)) ? undefined : parseInt(cleanedValues[key], 10);
         }
         else if (fieldModel.type === 'decimal') {
-          values[key] = isNaN(parseFloat(values[key])) ? undefined : parseFloat(values[key]);
+          cleanedValues[key] = isNaN(parseFloat(cleanedValues[key])) ? undefined : parseFloat(cleanedValues[key]);
         }
-        if (key === 'end_date' && Date.parse(values.start_date) > Date.parse(values.end_date)) {
+        // A date range in the wrong order is one mistake across two fields, so mark both rather than only the
+        // one the survey happens to define it on - whichever of them was just edited has to be able to say so
+        if (key === 'end_date' && Date.parse(cleanedValues.start_date) > Date.parse(cleanedValues.end_date)) {
+          errors.start_date = fieldModel.constraint_message;
           errors[key] = fieldModel.constraint_message;
         }
-        if (fieldModel.constraint) {
-          // Max constraint
-          // Look for <= in constraint, followed by a space and then any number of digits (- preceding the digits is optional)
-          let regexMax = /<=\s(-?\d*)/i;
-          let parsedMaxConstraint = fieldModel.constraint.match(regexMax);
-          if (parsedMaxConstraint) {
-            let max = parseFloat(parsedMaxConstraint[1]);
-            if (!isEmpty(max) && !(values[key] <= max)) {
-              errors[key] = fieldModel.constraint_message || 'Value over max of ' + max;
-            }
-          }
-          else {
-            // Look for < in constraint
-            regexMax = /<\s(-?\d*)/i;
-            parsedMaxConstraint = fieldModel.constraint.match(regexMax);
-            if (parsedMaxConstraint) {
-              let max = parseFloat(parsedMaxConstraint[1]);
-              if (!isEmpty(max) && !(values[key] < max)) {
-                errors[key] = fieldModel.constraint_message || 'Value over max of ' + max;
-              }
-            }
-          }
-          // Min constraint
-          // Look for <= in constraint, followed by a space and then any number of digits (- preceding the digits is optional)
-          let regexMin = />=\s(-?\d*)/i;
-          let parsedMinConstraint = fieldModel.constraint.match(regexMin);
-          if (parsedMinConstraint) {
-            let min = parseFloat(parsedMinConstraint[1]);
-            if (!isEmpty(min) && !(values[key] >= min)) {
-              errors[key] = fieldModel.constraint_message || 'Value below min of ' + min;
-            }
-          }
-          else {
-            // Look for < in constraint
-            regexMin = />\s(-?\d*)/i;
-            parsedMinConstraint = fieldModel.constraint.match(regexMin);
-            if (parsedMinConstraint) {
-              let min = parseFloat(parsedMinConstraint[1]);
-              if (!isEmpty(min) && !(values[key] > min)) {
-                errors[key] = fieldModel.constraint_message || 'Value below min of ' + min;
-              }
-            }
-          }
-        }
+        const constraintError = getConstraintError(fieldModel, cleanedValues[key]);
+        if (constraintError) errors[key] = constraintError;
       }
     });
-    console.log('values after validation:', values, 'Errors:', errors);
-    return errors;
+    return {errors: errors, values: cleanedValues};
   };
 
   return {
@@ -200,10 +208,12 @@ const useForm = () => {
     getLabel,
     getLabels,
     getRelevantFields,
+    getSiblingSurvey,
     getSurvey,
     hasErrors,
     isRelevant,
     showErrors,
+    submitAndShowErrors,
     validateForm,
   };
 };

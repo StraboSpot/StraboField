@@ -1,4 +1,28 @@
 import {isEmpty} from '../../shared/helpers';
+import {DEFAULT_ORIENTATION_FIELDS} from '../compass/compass.helpers';
+import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
+import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
+
+// Fills in whichever half of a strike and dip direction pair is missing, the two being 90 degrees apart, and
+// reports whether it filled in anything. A record holding neither field, such as a line with only a trend and
+// plunge, is left alone.
+export const calculateMissingOrientations = (orientation, orientationFields) => {
+  let isOrientationEdited = false;
+  orientationFields.forEach(({dip_direction: dipDirectionKey, strike: strikeKey}) => {
+    const dipDirection = orientation[dipDirectionKey];
+    const strike = orientation[strikeKey];
+    if (!isEmpty(strike) && isEmpty(dipDirection)) {
+      orientation[dipDirectionKey] = (strike + 90) % 360;
+      isOrientationEdited = true;
+    }
+    else if (!isEmpty(dipDirection) && isEmpty(strike)) {
+      // Wrapped through 360 so a dip direction under 90 gives a strike in range rather than a negative
+      orientation[strikeKey] = (dipDirection - 90 + 360) % 360;
+      isOrientationEdited = true;
+    }
+  });
+  return isOrientationEdited;
+};
 
 export const getImageBasemapsInSpot = (spot) => {
   return spot.properties.images && spot.properties.images.reduce((acc, image) => {
@@ -23,6 +47,22 @@ export const getSpotGeometryIconSource = (spot) => {
     else return require('../../assets/icons/Polygon_pressed.png');
   }
   else return require('../../assets/icons/QuestionMark_pressed.png');
+};
+
+// Every record on a Spot that can hold a plane, each paired with what its own form calls the plane's two fields.
+// A measurement carries its associated planes and lines with it, and a 3D structure names a pair per group.
+export const getSpotOrientations = (spot) => {
+  const {
+    _3d_structures: threeDStructures = [],
+    earthquakes = [],
+    orientation_data: measurements = [],
+  } = spot.properties;
+  return [
+    ...measurements.flatMap(m => [m, ...(m.associated_orientation || [])])
+      .map(orientation => ({fields: DEFAULT_ORIENTATION_FIELDS, orientation})),
+    ...earthquakes.map(orientation => ({fields: EARTHQUAKE_ORIENTATION_FIELDS, orientation})),
+    ...threeDStructures.map(orientation => ({fields: THREE_D_STRUCTURE_ORIENTATION_FIELDS, orientation})),
+  ];
 };
 
 // If feature is mapped on geographical map, not an image basemap or strat section

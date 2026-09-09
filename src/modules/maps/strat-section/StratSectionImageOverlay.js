@@ -2,7 +2,7 @@ import React from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 
-const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
+const StratSectionImageOverlay = ({belowLayerId, coordQuad, id, imageOpacity, url}) => {
   console.log('Rendering StratSectionImageOverlay...');
 
   /* View */
@@ -14,9 +14,9 @@ const StratSectionImageOverlay = ({coordQuad, id, imageOpacity, url}) => {
       url={url}
     >
       <MapboxGL.RasterLayer
-        belowLayerID={'pointLayerSelectedHalo'}
+        belowLayerID={belowLayerId}
         id={'imageOverlayLayer' + id}
-        style={{rasterOpacity: imageOpacity || 1}}
+        style={{rasterOpacity: imageOpacity}}
       />
     </MapboxGL.ImageSource>
   );

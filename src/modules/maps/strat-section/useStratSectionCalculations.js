@@ -18,7 +18,7 @@ const useStratSectionCalculations = () => {
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getIntervalSpotsThisStratSection, getSpotsMappedOnGivenStratSection} = useSpots();
+  const {getAllIntervalSpotsOnStratSection, getAllSpotsOnStratSection} = useSpots();
 
   /* Internal Functions */
 
@@ -84,8 +84,10 @@ const useStratSectionCalculations = () => {
 
   // Get the height (y) of the whole section.
   // For normal sections, returns max Y (top of stack); for core sections, returns min Y (bottom of stack).
+  // Measured over all the intervals, not just the visible ones: this is where a new interval stacks, so
+  // stopping at the highest active one would drop it on top of an interval in an inactive dataset.
   const getSectionHeight = () => {
-    const intervals = getIntervalSpotsThisStratSection(stratSection.strat_section_id);
+    const intervals = getAllIntervalSpotsOnStratSection(stratSection.strat_section_id);
     if (stratSection.section_type === 'core') {
       return intervals.reduce((acc, i) => {
         const coords = i.geometry.coordinates || i.geometry.geometries.map(g => g.coordinates).flat();
@@ -277,9 +279,8 @@ const useStratSectionCalculations = () => {
   // For normal sections, "above" means a spot whose bottom (minY) is at or above the cutoff.
   const moveSpotsUpOrDownByPixels = (stratSectionId, cutoff, pixels, excludedSpotId) => {
     const isCore = stratSection.section_type === 'core';
-    const spots = getSpotsMappedOnGivenStratSection(stratSectionId);
-    const spotsFiltered = spots.filter(spot => excludedSpotId && spot.properties.id !== excludedSpotId);
-    const movedSpots = spotsFiltered
+    const movedSpots = getAllSpotsOnStratSection(stratSectionId)
+      .filter(spot => spot.properties.id !== excludedSpotId)
       .filter((spot) => {
         const extent = turf.bbox(spot);
         return isCore ? extent[3] <= cutoff : extent[1] >= cutoff;
@@ -313,9 +314,8 @@ const useStratSectionCalculations = () => {
     const targetExtent = turf.bbox(targetInterval);
     const targetHeight = targetExtent[3] - targetExtent[1];
 
-    // All spots on this strat section except the target interval
-    const allSpots = getSpotsMappedOnGivenStratSection(stratSectionId);
-    let updatedSpots = allSpots
+    // Every Spot on the section except the target interval, copied so the steps below can move them
+    let updatedSpots = getAllSpotsOnStratSection(stratSectionId)
       .filter(s => s.properties.id !== targetInterval.properties.id)
       .map(s => JSON.parse(JSON.stringify(s)));
 

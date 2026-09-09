@@ -1,15 +1,22 @@
-import React, {forwardRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
-
-import {Formik} from 'formik';
 
 import {REPORT_FORM_NAME, REPORT_MAIN_FORM_KEYS} from './reports.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import {Form, FormikWrapper, useForm} from '../form';
 
-const ReportForm = forwardRef(({initialValues}, formRef) => {
+// Formik holds whether the form has been typed in, but the modal needs it to decide what its action button
+// says, and a ref would not re-render it. This reports the flag back out as it changes.
+const DirtyReporter = ({isDirty, onDirtyChange}) => {
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+  return null;
+};
+
+const ReportForm = forwardRef(({initialValues, isReadOnly, onDirtyChange, setIsFormInvalid}, formRef) => {
   /* Data Hooks */
-  const {getRelevantFields, getSurvey, validateForm} = useForm();
+  const {getRelevantFields, getSurvey} = useForm();
 
   /* Local State */
 
@@ -23,7 +30,7 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
 
   /* Event Handlers */
 
-  const onMyChange = async (name, value) => {
+  const setFieldValueAndCloseChoices = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
     setChoicesViewKey(null);
   };
@@ -40,11 +47,12 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
         onCancelPress={() => setChoicesViewKey(null)}
       >
         <Text style={{textAlign: 'center'}}>This is a placeholder for the subform</Text>
-        <Form {...{
-          formName: REPORT_FORM_NAME,
-          surveyFragment: relevantFields, ...formProps,
-          onMyChange: onMyChange,
-        }}/>
+        <Form
+          {...formProps}
+          formName={REPORT_FORM_NAME}
+          setFieldValueOverride={setFieldValueAndCloseChoices}
+          surveyFragment={relevantFields}
+        />
       </ModalWrapper>
     );
   };
@@ -52,20 +60,25 @@ const ReportForm = forwardRef(({initialValues}, formRef) => {
   /* View */
 
   return (
-    <Formik
+    <FormikWrapper
+      formName={REPORT_FORM_NAME}
       initialValues={initialValues}
       innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: REPORT_FORM_NAME, values: values})}
-      validateOnChange={false}
+      setIsFormInvalid={setIsFormInvalid}
     >
       {formProps => (
         <View style={{flex: 1}}>
-          <Form {...{formName: REPORT_FORM_NAME, surveyFragment: mainFormKeysFields, ...formProps}}/>
+          <DirtyReporter isDirty={formProps.dirty} onDirtyChange={onDirtyChange}/>
+          <Form
+            {...formProps}
+            formName={REPORT_FORM_NAME}
+            isReadOnly={isReadOnly}
+            surveyFragment={mainFormKeysFields}
+          />
           {choicesViewKey && renderSubform(formProps)}
         </View>
       )}
-    </Formik>
+    </FormikWrapper>
   );
 });
 

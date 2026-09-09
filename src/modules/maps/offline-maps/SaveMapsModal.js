@@ -186,7 +186,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
       const editedError = err.toString().replace('Error: Error: Error:', '');
       setIsError(true);
       setErrorMessage(
-        `${editedError}!\n\n Make sure you are pulling the map from the correct endpoint\n(Home => Miscellaneous => Custom Database Endpoint).`);
+        `${editedError}!\n\n Make sure you are pulling the map from the correct endpoint\n(Home Menu -> Advanced Options -> Custom Database Endpoint).`);
       setShowMainMenu(false);
       setShowLoadingMenu(false);
       setShowLoadingBar(false);

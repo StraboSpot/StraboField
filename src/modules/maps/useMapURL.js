@@ -1,5 +1,6 @@
 import {useSelector} from 'react-redux';
 
+import {CUSTOM_MAP_SOURCES} from './custom-maps/customMaps.constants';
 import {GLYPHS_URL} from './glyphs/glyphs.constants';
 import {MAPBOX_TOKEN} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
@@ -20,13 +21,16 @@ const useMapURL = () => {
   const buildStyleURL = (map) => {
     let tileURL;
     let mapID = map.id.trim();
-    if (map.source === 'map_warper' || map.source === 'strabospot_mymaps') tileURL = map.url[0] + mapID + '/' + map.tilePath;
+    if (map.source === CUSTOM_MAP_SOURCES.MAP_WARPER || map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
+      tileURL = map.url[0] + mapID + '/' + map.tilePath;
+    }
     else {
       // Offline tiles are cached under the styleId only (see getTileFolderName). Offline maps carry
       // source 'direct from filesystem' rather than 'mapbox_styles', so key off a local file:// url plus a
       // '/' in the id to strip the 'username/' prefix. Online (https) Mapbox styles keep the full id.
       const tileId = map.url[0].includes('file://') && mapID.includes('/') ? mapID.split('/').pop() : mapID;
-      tileURL = map.url[0] + tileId + map.tilePath + (map.url[0].includes('https://') ? '?access_token=' + mapboxToken : '');
+      tileURL = map.url[0] + tileId + map.tilePath + (map.url[0].includes(
+        'https://') ? '?access_token=' + mapboxToken : '');
     }
     const styleURL = {
       source: map.source,
@@ -63,7 +67,7 @@ const useMapURL = () => {
   const buildTileURL = (basemap) => {
     let tileUrl = basemap.url[0];
     if (basemap.source === 'osm') tileUrl = tileUrl + basemap.tilePath;
-    else if (basemap.source === 'strabospot_mymaps') tileUrl = tileUrl + basemap.id + '/' + basemap.tilePath;
+    else if (basemap.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) tileUrl = tileUrl + basemap.id + '/' + basemap.tilePath;
     else tileUrl = tileUrl + basemap.id + basemap.tilePath + '?access_token=' + mapboxToken;
     return tileUrl;
   };

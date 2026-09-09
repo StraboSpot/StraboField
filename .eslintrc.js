@@ -60,7 +60,10 @@ module.exports = {
 
     // StraboSpot2 Override React rules
     'react/jsx-filename-extension': [1, {extensions: ['.js', '.jsx']}], // allow .js files to contain JSX code
-    'react/no-unstable-nested-components': ['error', {allowAsProps: true}],
+    // Catches a component defined inline and passed as a prop, e.g. <Formik component={props => <Form {...props}/>}>:
+    // the arrow is a new function each render, so React remounts the subtree instead of updating it. Pass the render
+    // function as children instead. Only fires when the arrow returns JSX, not when it calls Form(...) as a function.
+    'react/no-unstable-nested-components': ['error', {allowAsProps: false}],
     'react-hooks/exhaustive-deps': 'off',
     'react-native/no-inline-styles': 'off',
   },

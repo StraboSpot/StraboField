@@ -12,6 +12,7 @@ const TextInputModal = ({
                           buttonText,
                           children,
                           dialogTitle,
+                          disabled,               // Holds the action button, for an errorMessage that must be fixed
                           errorMessage,
                           keyboardType,
                           multiline,
@@ -30,6 +31,7 @@ const TextInputModal = ({
   return (
     <ModalWrapper
       actionTitle={buttonText || 'Save'}
+      disabled={disabled}
       headerTitle={dialogTitle}
       isVisible={visible}
       onActionPressed={onActionPressed}

@@ -88,7 +88,7 @@ const AddRockSedimentaryModal = ({choices, formName, formProps, setChoicesViewKe
         mainKeys={thirdKeys}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} surveyFragment={lastKeysFields}/>
     </>
   );
 };

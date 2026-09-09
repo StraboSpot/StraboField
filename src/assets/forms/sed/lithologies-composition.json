@@ -1754,6 +1754,11 @@
       "label": "halite - diagenetic"
     },
     {
+      "list_name": "gg6bk97",
+      "name": "other",
+      "label": "other"
+    },
+    {
       "list_name": "el5ss78",
       "name": "bedded",
       "label": "bedded"
@@ -1899,6 +1904,11 @@
       "label": "massive"
     },
     {
+      "list_name": "mo7ce83",
+      "name": "other",
+      "label": "other"
+    },
+    {
       "list_name": "om8xr30",
       "name": "amber",
       "label": "amber"
@@ -1932,6 +1942,11 @@
       "list_name": "om8xr30",
       "name": "tar",
       "label": "tar"
+    },
+    {
+      "list_name": "om8xr30",
+      "name": "other",
+      "label": "other"
     }
   ],
   "settings": [

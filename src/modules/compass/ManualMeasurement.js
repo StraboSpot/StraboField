@@ -2,24 +2,27 @@ import React, {useRef} from 'react';
 import {Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useSelector} from 'react-redux';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
+import {setOrientationFieldValue} from './compass.helpers';
 import compassStyles from './compass.styles';
 import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
-import {NumberInputField} from '../form';
+import {FormikWrapper, NumberInputField} from '../form';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ManualMeasurement = ({
                              addAttributeMeasurement,
+                             initialValues,
                              measurementTypes,
                              setAttributeMeasurements,
                              setSliderValue,
                              sliderValue,
+                             validate,
                            }) => {
   /* Data Hooks */
 
@@ -29,14 +32,20 @@ const ManualMeasurement = ({
 
   const manualFormRef = useRef(null);
 
+  /* Event Handlers */
+
+  // Entering a strike fills in the dip direction and the reverse, as it does for a planar measurement
+  const setFieldValueAndPairedOrientation = (name, value) => setOrientationFieldValue(manualFormRef.current, name, value);
+
   /* View */
 
   return (
-    <Formik
+    <FormikWrapper
       enableReinitialize={true}
-      initialValues={{}}
+      initialValues={initialValues}
       innerRef={manualFormRef}
-      onSubmit={values => console.log('Submitting form...', values)}
+      validate={validate}
+      validateOnMount={true}
     >
       {formProps => (
         <View>
@@ -44,31 +53,27 @@ const ManualMeasurement = ({
             <>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'strike'}
+                  <NumberInputField
                     label={'Strike'}
                     name={'strike'}
+                    setFieldValueOverride={setFieldValueAndPairedOrientation}
                   />
                 </ListItem.Content>
               </ListItem>
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'dip_direction'}
+                  <NumberInputField
                     label={'Azimuthal Dip Direction'}
                     name={'dip_direction'}
+                    setFieldValueOverride={setFieldValueAndPairedOrientation}
                   />
                 </ListItem.Content>
               </ListItem>
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'dip'}
+                  <NumberInputField
                     label={'Dip'}
                     name={'dip'}
                   />
@@ -81,9 +86,7 @@ const ManualMeasurement = ({
             <>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'trend'}
+                  <NumberInputField
                     label={'Trend'}
                     name={'trend'}
                   />
@@ -92,9 +95,7 @@ const ManualMeasurement = ({
               <FlatListItemSeparator/>
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
-                  <Field
-                    component={NumberInputField}
-                    key={'plunge'}
+                  <NumberInputField
                     label={'Plunge'}
                     name={'plunge'}
                   />
@@ -117,12 +118,16 @@ const ManualMeasurement = ({
                     value={sliderValue}
                   />
                 </View>
-                <ActionButton onPress={() => addAttributeMeasurement(formProps.values)} title={'Add to Attribute'}/>
+                <ActionButton
+                  disabled={!isEmpty(formProps.errors)}
+                  onPress={() => addAttributeMeasurement(formProps.values)}
+                  title={'Add to Attribute'}
+                />
               </>
             )}
         </View>
       )}
-    </Formik>
+    </FormikWrapper>
   );
 };
 

@@ -4,7 +4,7 @@ import {Toast} from 'react-native-toast-notifications';
 
 import {PROJECT_SAVE_STATUS} from '../modules/connections/connections.constants';
 import {setProjectSaveStatus} from '../modules/connections/connections.slice';
-import {cancelledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
+import {canceledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
 import {
   addedCustomFeatureTypes,
   addedDataset,
@@ -25,6 +25,7 @@ import {
   editedSpotImages,
   editedSpotProperties,
 } from '../modules/spots/spots.slice';
+import {isAuthenticationError} from '../services/network/serverRequests.helpers';
 import {
   deleteDataset,
   moveSpotToDataset,
@@ -32,25 +33,56 @@ import {
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
 } from '../services/network/serverRequests.web';
-import {isEmpty} from '../shared/helpers';
+import {isEmpty, isSameId, toError} from '../shared/helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends
 let pendingDragSpotIds = new Set();
 
-const alertAuthenticationError = () => {
-  Toast.hideAll();
-  window.alert(
-    'Authentication Error! Changes NOT saved. Your connection has timed out. Please log in to StraboSpot again.');
-  window.location.href = 'https://strabospot.org/';
+// A web edit goes straight to the server, so a failed request means the change is not saved anywhere. Only a
+// refused login is worth sending someone back to sign in for - a timeout, a server error or a rejected payload
+// used to do the same, throwing away both the real cause and whatever they were in the middle of.
+const reportSaveError = (err, toastId) => {
+  console.error('Error saving to the server', err);
+  if (isAuthenticationError(err)) {
+    Toast.hideAll();
+    window.alert(
+      'Authentication Error! Changes NOT saved. Your connection has timed out. Please log in to StraboSpot again.');
+    window.location.href = 'https://strabospot.org/';
+    return;
+  }
+  Toast.update(toastId, 'Changes NOT saved. ' + toError(err).message, {type: 'danger', duration: 6000});
+};
+
+// The server keeps one row per id and rejects the whole save when a single command carries the same id twice
+// ("ON CONFLICT DO UPDATE command cannot affect row a second time"), so anything that has ended up with two of
+// something could never be saved again. Send each id once and say in the log what was left out.
+const withoutDuplicateIds = (items, what) => {
+  const seenIds = new Set();
+  return (items || []).filter((item) => {
+    const id = item?.id ?? item?.properties?.id;
+    if (id === undefined || !seenIds.has(id)) {
+      if (id !== undefined) seenIds.add(id);
+      return true;
+    }
+    console.error(`Not sending a second ${what} with the id ${id} - the server can only hold one of it.`);
+    return false;
+  });
 };
 
 // Remove spotIds and images from dataset because those shouldn't go up to the server
 const cleanDatasets = (datasets) => {
-  return datasets.map((dataset) => {
+  return withoutDuplicateIds(datasets, 'dataset').map((dataset) => {
     const {spotIds, images, ...rest} = dataset;
+    if (rest.spots?.features) rest.spots = {...rest.spots, features: cleanSpots(rest.spots.features)};
     return rest;
   });
 };
+
+
+const cleanSpots = spots => withoutDuplicateIds(spots, 'Spot')
+  .map(spot => (spot.properties?.images
+    ? {...spot, properties: {...spot.properties, images: withoutDuplicateIds(spot.properties.images, 'image')}}
+    : spot));
 
 // Delete dataset, update Project on server DB
 const deleteDatasetListener = async (action, listenerApi) => {
@@ -75,7 +107,7 @@ const deleteDatasetListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -99,7 +131,7 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -130,7 +162,7 @@ const updateProjectListener = async (action, listenerApi) => {
   }
   catch (err) {
     listenerApi.dispatch(setProjectSaveStatus(PROJECT_SAVE_STATUS.ERROR));
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -164,7 +196,7 @@ const uploadProjectDatasetDeleteSpotListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -195,7 +227,10 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   if (action.type.includes('spot/editedOrCreatedSpots')) {
     const spotIds = action.payload.map(s => s.properties.id);
     const spotIdsGroupedByDatasetId = spotIds.reduce((acc, spotId) => {
-      const dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+      const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
+      // A Spot belongs to no dataset for a moment at times (e.g. a just-split line before Save Edits adds it to
+      // the target dataset); it goes up with the dataset it joins, so skip it here
+      if (!dataset) return acc;
       const datasetId = dataset.id;
       if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
       else return {...acc, [datasetId]: [spotId]};
@@ -214,7 +249,12 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     const spot = newState.spot.spots[spotId];
 
     // Get dataset for spot
-    let dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+    let dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
+    // Nothing to send while the Spot belongs to no dataset, as above, and no sibling Spot to send it with here
+    if (!dataset) {
+      Toast.hideAll();
+      return;
+    }
     dataset = {...dataset, spots: turf.featureCollection([spot])};
 
     // Create object to send to server
@@ -236,7 +276,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
@@ -256,7 +296,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
   const datasets = Object.values(newState.project.datasets);
 
   const spotIdsGroupedByDatasetId = spotIds.reduce((acc, spotId) => {
-    const dataset = datasets.find(d => d.spotIds?.find(id => id === spotId));
+    const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     if (!dataset) return acc;
     const datasetId = dataset.id;
     if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
@@ -277,11 +317,11 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
-    alertAuthenticationError();
+    reportSaveError(err, toastId);
   }
 };
 
-const cancelledIntervalDragListener = () => {
+const canceledIntervalDragListener = () => {
   pendingDragSpotIds = new Set();
 };
 
@@ -299,7 +339,7 @@ listenerMiddleware.startListening({
 
 // Batch-save interval reorder changes when drag mode ends
 listenerMiddleware.startListening({actionCreator: savedIntervalDragReordering, effect: intervalDragModeEndedListener});
-listenerMiddleware.startListening({actionCreator: cancelledIntervalDrag, effect: cancelledIntervalDragListener});
+listenerMiddleware.startListening({actionCreator: canceledIntervalDrag, effect: canceledIntervalDragListener});
 
 // Don't need to do addedSpotsFromDevice until can add from device on web
 // listenerMiddleware.startListening({actionCreator: addedSpotsFromDevice, effect: updatedProjectDatasetSpotListener});

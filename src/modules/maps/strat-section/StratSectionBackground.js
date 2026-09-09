@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
+import {getImageOverlayOpacity} from './stratSection.helpers';
 import StratSectionImageOverlay from './StratSectionImageOverlay';
 import XAxes from './XAxes';
 import YAxis from './YAxis';
@@ -21,12 +22,16 @@ const StratSectionBackground = () => {
 
   /* Render Functions */
 
+  // Every overlay names the layer it sits below, which pins the group to the bottom of the stack with the axes and
+  // everything else drawn over it. Highest draw order first: that one goes below the axes and each of the rest below
+  // the one before it, so an overlay's anchor always exists by the time it is added - which web requires, since it
+  // cannot anchor to a layer that is not there yet. A missing draw order counts as 0 rather than sorting undefined.
   const renderImageOverlays = () => {
     const stratSectionSpot = getSpotWithThisStratSection(stratSection.strat_section_id);
     const stratSectionImagesSorted = JSON.parse(JSON.stringify(stratSection.images || [])).sort(
-      (a, b) => a.z_index - b.z_index);
+      (a, b) => (b.z_index || 0) - (a.z_index || 0));
 
-    return stratSectionSpot && stratSectionImagesSorted.map((oI) => {
+    return stratSectionSpot && stratSectionImagesSorted.map((oI, index) => {
       const image = stratSectionSpot.properties.images.find(i => i.id === oI.id);
       let imageCopy = JSON.parse(JSON.stringify(image));
       if (oI.image_height) imageCopy.height = oI.image_height;
@@ -38,9 +43,10 @@ const StratSectionBackground = () => {
       const url = getLocalImageURI(image.id);
       return (
         <StratSectionImageOverlay
+          belowLayerId={index === 0 ? 'yAxisLayer' : 'imageOverlayLayer' + stratSectionImagesSorted[index - 1].id}
           coordQuad={coordQuad}
           id={oI.id}
-          imageOpacity={oI.image_opacity}
+          imageOpacity={getImageOverlayOpacity(oI.image_opacity)}
           key={'imageOverlay' + oI.id + (image.modified_timestamp || '')}
           url={url}
         />
@@ -52,14 +58,14 @@ const StratSectionBackground = () => {
 
   return (
     <>
-      {/* Image Overlay Layers */}
-      {renderImageOverlays()}
-
       {/* Y Axis */}
       <YAxis/>
 
       {/* X Axes */}
-      {<XAxes/>}
+      <XAxes/>
+
+      {/* Image Overlay Layers, added after the axes so they have yAxisLayer to anchor themselves below */}
+      {renderImageOverlays()}
     </>
   );
 };

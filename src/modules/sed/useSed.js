@@ -11,7 +11,7 @@ import {
   STRUCTURE_SUBPAGES,
   Y_MULTIPLIER,
 } from './sed.constants';
-import {onSedFormChange} from './sed.helpers';
+import {isLithologyRequiredForInterval, setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
@@ -29,9 +29,9 @@ const useSed = () => {
   const dispatch = useDispatch();
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getLabel, getLabels, showErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {validateSedData} = useSedValidation();
-  const {getSpotWithThisStratSection, getSpotsMappedOnGivenStratSection, isStratInterval} = useSpots();
+  const {getAllSpotsOnStratSection, getSpotWithThisStratSection, isStratInterval} = useSpots();
   const {moveSpotsUpOrDownByPixels, recalculateIntervalGeometry} = useStratSectionCalculations();
 
   /* Internal Functions */
@@ -183,6 +183,7 @@ const useSed = () => {
 
   /* Exported Functions */
 
+  // Reports whether the feature was deleted, so the page it was deleted from only closes on one that was
   const deleteSedFeature = (key, spot, selectedFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
@@ -195,6 +196,7 @@ const useSed = () => {
       // ToDo Check if any spots mapped on this strat section before deleting
       // console.log('Delete not implemented yet.');
       alert('Notice', 'Unable to delete. This feature has not been implemented yet.');
+      return false;
     }
     else if (pageKey === PAGE_KEYS.BEDDING) {
       if (editedSedData[pageKey].beds) {
@@ -204,11 +206,18 @@ const useSed = () => {
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
     else {
-      editedSedData[pageKey] = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
+      const remainingFeatures = editedSedData[pageKey].filter(type => type.id !== selectedFeature.id);
+      if (pageKey === PAGE_KEYS.LITHOLOGIES && isEmpty(remainingFeatures) && isLithologyRequiredForInterval(spot)) {
+        alert('Cannot Remove', 'At least one lithology is required for '
+          + getLabel(editedSedData.character, ['sed', 'interval']) + ' intervals.');
+        return false;
+      }
+      editedSedData[pageKey] = remainingFeatures;
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
+    return true;
   };
 
   const getBeddingTitle = (bedding) => {
@@ -251,7 +260,7 @@ const useSed = () => {
   };
 
   const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage) => {
-    await saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds');
+    return saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds');
   };
 
   const saveSedFeature = async (key, spot, formCurrent, isLeavingPage, subKey) => {
@@ -261,8 +270,7 @@ const useSed = () => {
     else if (Object.values(INTERPRETATIONS_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.INTERPRETATIONS;
 
     try {
-      await formCurrent.submitForm();
-      let editedFeatureData = showErrors(formCurrent, isLeavingPage);
+      let {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
       let editedSpot = JSON.parse(JSON.stringify(spot));
       let editedSedData = editedSpot.properties.sed ? JSON.parse(JSON.stringify(editedSpot.properties.sed)) : {};
       if (subKey) {
@@ -316,6 +324,8 @@ const useSed = () => {
       if (stratSection?.strat_section_id && stratSection.strat_section_id === stratSectionSettings?.strat_section_id) {
         dispatch(setStratSection(stratSectionSettings));
       }
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
     }
     catch (err) {
       // console.error('Error saving', pageKey, err);
@@ -334,10 +344,10 @@ const useSed = () => {
   const toggleStratSection = (spot) => {
     if (!spot.properties?.sed?.strat_section) createNewStratSection(spot);
     else {
-      const spotsMappedOnThisStratSection = getSpotsMappedOnGivenStratSection(
-        spot.properties.sed.strat_section.strat_section_id);
-      if (spotsMappedOnThisStratSection.length > 0) {
-        alert('Strat Section In Use', 'There are ' + spotsMappedOnThisStratSection.length
+      const stratSectionId = spot.properties.sed.strat_section.strat_section_id;
+      const spotsOnStratSectionCount = getAllSpotsOnStratSection(stratSectionId).length;
+      if (spotsOnStratSectionCount > 0) {
+        alert('Strat Section In Use', 'There are ' + spotsOnStratSectionCount
           + ' Spot(s) mapped on this Spot. Delete these Spots before removing the strat section.');
       }
       else {
@@ -364,10 +374,10 @@ const useSed = () => {
     getIntervalTitle,
     getSedRockTitle,
     getStratSectionTitle,
-    onSedFormChange,
     saveSedBedFeature,
     saveSedFeature,
     saveSedFeatureValuesFromTemplates,
+    setSedFieldValue,
     toggleStratSection,
   };
 };

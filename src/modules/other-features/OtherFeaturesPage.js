@@ -51,6 +51,8 @@ const OtherFeaturesPage = ({isReadOnly, page}) => {
   const editFeature = (feature) => {
     setSelectedFeature(feature);
     setIsFeatureDetailVisible(true);
+    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
+    dispatch(setSelectedAttributes([feature]));
   };
 
   /* Render Functions */

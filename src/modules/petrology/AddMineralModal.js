@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';
@@ -13,14 +12,12 @@ import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {ChoiceButtons, Form, MainButtons, useForm} from '../form';
+import {ChoiceButtons, Form, FormikWrapper, MainButtons, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
-
-let tempValues = {};
 
 const AddMineralModal = () => {
   /* Data Hooks */
@@ -30,7 +27,7 @@ const AddMineralModal = () => {
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
-  const {onMineralChange, savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
+  const {savePetFeature, savePetFeatureValuesFromTemplates, setMineralFieldValue} = usePetrology();
 
   /* Local State */
 
@@ -38,6 +35,7 @@ const AddMineralModal = () => {
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewId()});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
 
@@ -87,6 +85,8 @@ const AddMineralModal = () => {
   };
 
   const onViewTypePress = (i) => {
+    // The form unmounts while a mineral lookup is showing, so hold on to what has been entered
+    if (formRef.current) setInitialValues(formRef.current.values);
     if (selectedTypeIndex === i) setSelectedTypeIndex(null);
     else setSelectedTypeIndex(i);
   };
@@ -94,26 +94,32 @@ const AddMineralModal = () => {
   /* Logic Helpers */
 
   const addMineral = (mineralInfo) => {
-    setInitialValues({
-      ...tempValues,
+    setInitialValues(currentValues => ({
+      ...currentValues,
       id: getNewId(),
       mineral_abbrev: mineralInfo.Abbreviation,
       full_mineral_name: mineralInfo.Label,
-    });
+    }));
     setSelectedTypeIndex(null);
   };
 
-  const saveMineral = () => {
-    if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
-    else savePetFeature(petKey, spot, formRef.current);
-    formRef.current?.setFieldValue('id', getNewId());
-    if (SMALL_SCREEN) onCloseModalPressed();
+  // Await the save so a failed one stops here: it alerts and throws when the form has errors, and rolling the id
+  // over or closing the modal would then lose what was entered.
+  const saveMineral = async () => {
+    try {
+      if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
+      else await savePetFeature(petKey, spot, formRef.current);
+      formRef.current?.setFieldValue('id', getNewId());
+      if (SMALL_SCREEN) onCloseModalPressed();
+    }
+    catch (err) {
+      console.error('Error saving mineral', err);
+    }
   };
 
   /* Render Functions */
 
   const renderAddMineral = () => {
-    tempValues = formRef.current?.values || {};
     return (
       <>
         {!choicesViewKey && !areMultipleTemplates && (
@@ -137,12 +143,12 @@ const AddMineralModal = () => {
   const renderForm = (formProps) => {
     return (
       <>
-        <Form {...{
-          formName: formName,
-          onMyChange: (name, value) => onMineralChange(formProps, name, value),
-          surveyFragment: firstKeysFields,
-          ...formProps,
-        }}/>
+        <Form
+          {...formProps}
+          formName={formName}
+          setFieldValueOverride={(name, value) => setMineralFieldValue(formProps, name, value)}
+          surveyFragment={firstKeysFields}
+        />
         <LittleSpacer/>
         <ChoiceButtons
           choiceFieldKey={igOrMetKey}
@@ -169,7 +175,7 @@ const AddMineralModal = () => {
           />
         )}
         <LittleSpacer/>
-        <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       </>
     );
   };
@@ -181,18 +187,19 @@ const AddMineralModal = () => {
           <FlatList
             ListHeaderComponent={
               <View style={{flex: 1}}>
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
+                  formName={formName}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
+                  setIsFormInvalid={setIsFormInvalid}
                 >
                   {formProps => (
                     <View style={{flex: 1}}>
                       {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                     </View>
                   )}
-                </Formik>
+                </FormikWrapper>
               </View>
             }
             bounces={false}
@@ -204,7 +211,7 @@ const AddMineralModal = () => {
 
   const renderSubform = (formProps) => {
     const relevantFields = getRelevantFields(survey, choicesViewKey);
-    return <Form {...{formName: formName, surveyFragment: relevantFields, ...formProps}}/>;
+    return <Form {...formProps} formName={formName} surveyFragment={relevantFields}/>;
   };
 
   /* View */
@@ -213,6 +220,7 @@ const AddMineralModal = () => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
       closeModal={onCloseModalPressed}
+      disabled={isFormInvalid}
       headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
       onActionPressed={saveMineral}
       showActionButton={!isShowTemplates && isEmpty(selectedTypeIndex) && !choicesViewKey}

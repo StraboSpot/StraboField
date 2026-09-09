@@ -1,13 +1,13 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Text, View} from 'react-native';
 
-import {Formik} from 'formik';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Form, useForm} from '../form';
+import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
-import {FormFlatList} from '../../shared/ui';
+import {isEmpty} from '../../shared/helpers';
 
 const formName = ['settings', 'project_settings'];
 
@@ -18,19 +18,39 @@ const ProjectPrivacy = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
 
   const {validateForm} = useForm();
+  const toast = useToast();
 
   /* Local State */
 
   const formRef = useRef(null);
+  const hasSavedRef = useRef(false);
+
+  /* Side Effects */
+
+  // Whether a project is public has consequences worth confirming, and the change is written as it is made, so
+  // confirm the visit once on the way out
+  useEffect(() => {
+    return () => {
+      if (hasSavedRef.current) toast.show('Privacy Settings Saved', {type: 'success'});
+    };
+  }, []);
 
   /* Event Handlers */
 
-  const onMyChange = async (name, value) => {
+  // This form writes on every change, so an invalid value must not reach the project. Formik's values lag a render
+  // behind the field just changed, so validate the change on top of them, put what it finds under the field, and
+  // save what validating cleans up rather than the text as typed. Alerting per keystroke would be unusable.
+  const setFieldValueAndSavePreferences = async (name, value) => {
     await formRef.current.setFieldValue(name, value);
-    await formRef.current.submitForm();
-    const updatedValues = {...formRef.current.values, [name]: value};
+    const {errors, values: updatedValues} = validateForm({
+      formName: formName,
+      values: {...formRef.current.values, [name]: value},
+    });
+    formRef.current.setErrors(errors);
+    if (!isEmpty(errors)) return;
     console.log('Saving privacy preferences to Project ...', updatedValues);
     dispatch(updatedProject({field: 'preferences', value: updatedValues}));
+    hasSavedRef.current = true;
   };
 
   /* View */
@@ -38,22 +58,22 @@ const ProjectPrivacy = () => {
   // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
     <FormFlatList>
-      <Formik
+      <FormikWrapper
         enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
+        formName={formName}
         initialValues={preferences}
         innerRef={formRef}
-        onSubmit={values => console.log('Submitting form...', values)}
-        validate={values => validateForm({formName: formName, values: values})}
         validateOnChange={false}
       >
-        {formProps => <Form {...{
-          ...formProps,
-          formName: formName,
-          onMyChange: onMyChange,
-          renderInline: true,
-          setFieldValue: onMyChange,
-        }}/>}
-      </Formik>
+        {formProps => (
+          <Form
+            {...formProps}
+            formName={formName}
+            renderInline={true}
+            setFieldValueOverride={setFieldValueAndSavePreferences}
+          />
+        )}
+      </FormikWrapper>
       <View style={{justifyContent: 'flex-start', alignItems: 'center', padding: 10}}>
         <Text style={commonStyles.standardDescriptionText}>
           *Public datasets are accessible at StraboSpot.org/search. Privacy settings are reversible and update when

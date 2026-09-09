@@ -26,6 +26,8 @@ const Home = forwardRef(({
     dialogs,
     distance,
     endMeasurement,
+    hasDrawTools,
+    isCreateToolsDisabled,
     mapMode,
     onCancel,
     onEndDrawPressed,
@@ -46,6 +48,8 @@ const Home = forwardRef(({
           dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
+          hasDrawTools={hasDrawTools}
+          isCreateToolsDisabled={isCreateToolsDisabled}
           mapMode={mapMode}
           onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
@@ -74,6 +78,8 @@ const Home = forwardRef(({
         dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
+        hasDrawTools={hasDrawTools}
+        isCreateToolsDisabled={isCreateToolsDisabled}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

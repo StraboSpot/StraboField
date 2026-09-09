@@ -13,7 +13,7 @@ const usePetrology = () => {
 
   const dispatch = useDispatch();
 
-  const {getLabel, getLabels, getSurvey, showErrors} = useForm();
+  const {getLabel, getLabels, getSurvey, submitAndShowErrors} = useForm();
 
   /* Exported Functions */
 
@@ -66,25 +66,9 @@ const usePetrology = () => {
       + (item.based_on && (' - ' + getLabels(item.based_on, formName).toUpperCase()));
   };
 
-  const onMineralChange = async (formCurrent, name, value) => {
-    console.log(name, 'changed to', value);
-    if (name === 'mineral_abbrev') {
-      const foundFullName = getFullMineralNameFromAbbrev(value);
-      if (foundFullName) await formCurrent.setFieldValue('full_mineral_name', foundFullName);
-      await formCurrent.setFieldValue('mineral_abbrev', value);
-    }
-    else if (name === 'full_mineral_name') {
-      const foundAbbrev = getAbbrevFromFullMineralName(value);
-      if (foundAbbrev) await formCurrent.setFieldValue('mineral_abbrev', foundAbbrev);
-      await formCurrent.setFieldValue('full_mineral_name', value);
-    }
-    else await formCurrent.setFieldValue(name, value);
-  };
-
   const savePetFeature = async (key, spot, formCurrent, isLeavingPage) => {
     try {
-      await formCurrent.submitForm();
-      const editedFeatureData = showErrors(formCurrent, isLeavingPage);
+      const {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
       console.log('Saving', key, 'data to Spot ...');
       const spotId = spot.properties.id;
       if (editedFeatureData.rock_type && (key === PAGE_KEYS.ROCK_TYPE_IGNEOUS
@@ -101,6 +85,8 @@ const usePetrology = () => {
         dispatch(editedSpotProperties({field: 'pet', value: editedPetData, spotId: spotId}));
       }
       // await formCurrent.resetForm();
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
     }
     catch (err) {
       console.error('Error saving', key, err);
@@ -117,14 +103,29 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
+  const setMineralFieldValue = async (formCurrent, name, value) => {
+    console.log(name, 'changed to', value);
+    if (name === 'mineral_abbrev') {
+      const foundFullName = getFullMineralNameFromAbbrev(value);
+      if (foundFullName) await formCurrent.setFieldValue('full_mineral_name', foundFullName);
+      await formCurrent.setFieldValue('mineral_abbrev', value);
+    }
+    else if (name === 'full_mineral_name') {
+      const foundAbbrev = getAbbrevFromFullMineralName(value);
+      if (foundAbbrev) await formCurrent.setFieldValue('mineral_abbrev', foundAbbrev);
+      await formCurrent.setFieldValue('full_mineral_name', value);
+    }
+    else await formCurrent.setFieldValue(name, value);
+  };
+
   return {
     deletePetFeature,
     getMineralTitle,
     getPetRockTitle,
     getReactionTextureTitle,
-    onMineralChange,
     savePetFeature,
     savePetFeatureValuesFromTemplates,
+    setMineralFieldValue,
   };
 };
 

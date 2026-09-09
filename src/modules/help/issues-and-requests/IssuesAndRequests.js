@@ -5,8 +5,8 @@ import {useSelector} from 'react-redux';
 
 import issuesAndRequestsStyles from './issuesAndRequests.styles';
 import {SUPPORT_PATHS} from '../../../services/network/urls.constants';
-import {FormFlatList} from '../../../shared/ui';
 import UrlLinkButton from '../../../shared/ui/buttons/UrlLinkButton';
+import {FormFlatList} from '../../form';
 
 const IssuesAndRequests = () => {
   /* Data Hooks */

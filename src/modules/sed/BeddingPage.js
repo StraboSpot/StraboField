@@ -1,18 +1,16 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty} from '../../shared/helpers';
-import {FormFlatList} from '../../shared/ui';
+import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {Form, useForm} from '../form';
+import {Form, FormFlatList, FormikWrapper} from '../form';
 import {setModalVisible} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicListItem from '../page/BasicListItem';
@@ -30,14 +28,18 @@ const BeddingPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {validateForm} = useForm();
   const {saveSedFeature} = useSed();
 
   /* Local State */
 
   const beddingSharedRef = useRef(null);
+  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
+  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
+  // this ref holding the form as it was before it.
+  const savedValuesRef = useRef(null);
 
   const [isDetailView, setIsDetailView] = useState(false);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [selectedAttribute, setSelectedAttribute] = useState({});
 
   /* Derived Variables */
@@ -63,7 +65,7 @@ const BeddingPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const addAttribute = async () => {
-    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
+    if (beddingSharedRef.current?.dirty && !isEqual(beddingSharedRef.current.values, savedValuesRef.current)) {
       alert('Unsaved Changes',
         'Would you like to save your general bedding data and continue?',
         [
@@ -71,6 +73,7 @@ const BeddingPage = ({isReadOnly, page}) => {
           {
             text: 'Yes', onPress: async () => {
               await saveSedFeature(page.key, spot, beddingSharedRef.current);
+              savedValuesRef.current = {...beddingSharedRef.current.values};
               setIsDetailView(true);
               setSelectedAttribute({id: getNewUUID()});
               dispatch(setModalVisible({modal: null}));
@@ -88,7 +91,7 @@ const BeddingPage = ({isReadOnly, page}) => {
   };
 
   const confirmLeavePage = () => {
-    if (beddingSharedRef.current && beddingSharedRef.current.dirty) {
+    if (beddingSharedRef.current?.dirty && !isEqual(beddingSharedRef.current.values, savedValuesRef.current)) {
       const formCurrent = beddingSharedRef.current;
       alert('Unsaved Changes',
         'Would you like to save your interval before continuing?',
@@ -116,6 +119,7 @@ const BeddingPage = ({isReadOnly, page}) => {
 
   const saveBeddingShared = async (formCurrent) => {
     await saveSedFeature(page.key, spot, formCurrent);
+    savedValuesRef.current = {...formCurrent.values};
     await formCurrent.resetForm();
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
@@ -185,19 +189,19 @@ const BeddingPage = ({isReadOnly, page}) => {
             <>
               <SaveAndCancelButtons
                 cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                getIsDisabled={isFormInvalid}
                 save={() => saveBeddingShared(beddingSharedRef.current)}
               />
-              <Formik
+              <FormikWrapper
                 enableReinitialize={true}
+                formName={formName}
                 initialValues={bedding}
                 innerRef={beddingSharedRef}
                 onReset={() => console.log('Resetting form...')}
-                onSubmit={() => console.log('Submitting form...')}
-                validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={false}
+                setIsFormInvalid={setIsFormInvalid}
               >
-                {formProps => <Form {...{...formProps, isReadOnly: isReadOnly, formName: formName}}/>}
-              </Formik>
+                {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
+              </FormikWrapper>
             </>
           )}
         </FormFlatList>

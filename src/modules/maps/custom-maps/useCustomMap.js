@@ -1,5 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
 
+import {CUSTOM_MAP_SOURCES} from './customMaps.constants';
 import {normalizeCustomMapId} from './customMaps.helpers';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
@@ -40,7 +41,7 @@ const useCustomMap = () => {
   const getProviderInfo = (source) => {
     const providerInfo = {...MAP_PROVIDERS[source]};
     // Only My Maps are served by a custom database endpoint; Mapbox styles must keep pointing at api.mapbox.com.
-    if (customDatabaseEndpoint.isSelected && source === 'strabospot_mymaps') {
+    if (customDatabaseEndpoint.isSelected && source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
       const serverUrl = customDatabaseEndpoint.endpoint;
       const lastOccur = serverUrl.lastIndexOf('/');
       providerInfo.url = [serverUrl.substring(0, lastOccur) + '/geotiff/tiles/'];
@@ -97,7 +98,7 @@ const useCustomMap = () => {
     let testTileUrl = tileUrl.replace(/({z}\/{x}\/{y})/, '0/0/0');
     // Test against customMap.id, not map.id: normalizeCustomMapId trimmed it, and validating a different string
     // than the one being saved would let an id pasted with stray whitespace through.
-    if (map.source === 'strabospot_mymaps') {
+    if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
       if (!isEmpty(customDatabaseEndpoint.endpoint) && customDatabaseEndpoint.isSelected) {
         const customEndpointTest = customDatabaseEndpoint.endpoint.replace('/db', '/strabo_mymaps_check/');
         testTileUrl = customEndpointTest + customMap.id;

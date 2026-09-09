@@ -20,7 +20,7 @@ import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
 import AddingNewSpots from '../preferences/AddingNewSpots';
-import Miscellaneous from '../preferences/Miscellaneous';
+import AdvancedOptions from '../preferences/AdvancedOptions';
 import BackupProject from '../project/backup/BackupProject';
 import ExportProject from '../project/backup/ExportProject';
 import CustomFeatureTypes from '../project/CustomFeatureTypes';
@@ -179,7 +179,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS:
         return <AddingNewSpots/>;
       case MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS:
-        return <Miscellaneous/>;
+        return <AdvancedOptions/>;
 
       // Help
       case MAIN_MENU_ITEMS.HELP.ABOUT:
