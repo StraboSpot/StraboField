@@ -77,7 +77,7 @@ function playText(release, version) {
   const lines = release.groups.map(g => `• ${g.title}: ${g.items.map(i => label(i.text)).join('; ')}`);
   const kept = [];
   let truncated = false;
-  const fits = (extra) => header.length + [...kept, extra].join('\n').length <= PLAY_LIMIT;
+  const fits = extra => header.length + [...kept, extra].join('\n').length <= PLAY_LIMIT;
   for (const line of lines) {
     if (fits(line)) kept.push(line);
     else {
@@ -98,8 +98,8 @@ function playText(release, version) {
 // WHAT_TO_TEST.md: a tester-facing rendering of the same curated highlights — a heading per group,
 // a bullet per item — for paste into TestFlight / Play testing notes.
 function whatToTestText(release, version, versionCode) {
-  const header = `# What to Test — StraboField ${version} (build ${versionCode})\n\n` +
-    'New in this build — please exercise each area and report anything off, with your device model and OS version.\n';
+  const header = `# What to Test — StraboField ${version} (build ${versionCode})\n\n`
+    + 'New in this build — please exercise each area and report anything off, with your device model and OS version.\n';
   if (!release.groups.length) return `${header}\n- General stability and reliability improvements.\n`;
   const blocks = release.groups.map(g =>
     [`## ${g.title}`, ...g.items.map(i => `- ${i.text}`)].join('\n'),
@@ -136,7 +136,7 @@ function main() {
   write(playFile, play);
   write(whatToTestFile, whatToTest);
 
-  const rel = (p) => path.relative(ROOT, p);
+  const rel = p => path.relative(ROOT, p);
   console.log(`\n📝 Store notes for v${release.version} (versionCode ${versionCode}) from src/assets/releaseNotes.js\n`);
   console.log(`── App Store Connect ── ${rel(appFile)}   [${appStore.length}/${APP_STORE_LIMIT} chars]`);
   console.log(appStore);
