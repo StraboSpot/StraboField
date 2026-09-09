@@ -137,29 +137,30 @@ const SaveAndExportModalContent = ({
                 checkedColor={MEDIUMGREY}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 disabled
+                disabledTitleStyle={{color: DARKGREY}}
+                textStyle={{fontSize: SMALL_TEXT_SIZE}}
                 title={'Project Data (Spots, Datasets, Tags, Geologic Units, Memos, etc.)'}
-                titleStyle={{color: DARKGREY, fontSize: SMALL_TEXT_SIZE}}
               />
               <CheckBox
                 checked={backupOptions.images}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 onPress={() => setBackupOptions(prev => ({...prev, images: !prev.images}))}
+                textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                 title={'Images (Spots & Memos)'}
-                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
               />
               <CheckBox
                 checked={backupOptions.offlineTiles}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 onPress={() => setBackupOptions(prev => ({...prev, offlineTiles: !prev.offlineTiles}))}
+                textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                 title={'Offline Map Tiles'}
-                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
               />
               <CheckBox
                 checked={backupOptions.customMaps}
                 containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                 onPress={() => setBackupOptions(prev => ({...prev, customMaps: !prev.customMaps}))}
+                textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                 title={'Custom Maps'}
-                titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
               />
               <Text style={{fontSize: SMALL_TEXT_SIZE, color: DARKGREY, marginTop: 4, marginBottom: 4}}>
                 Note: User settings (Mapbox token, credentials) are not included in backups.
