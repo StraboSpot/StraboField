@@ -52,11 +52,10 @@ const Compass = ({
 
     const declinationReady = fetchDeclination().catch((err) => {
       console.error('Magnetic Declination not available', err);
-      const errorMessage = err.message || err;
-      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
-        alert('Location Services Required',
-          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
-      }
+      alert('Magnetic Declination Unavailable',
+        'Could not determine magnetic declination from your location. Enable Location Services, or — on a '
+        + 'device without GPS such as a Wi-Fi-only iPad — enter it manually under Project Description > '
+        + 'Magnetic Declination and the app will apply it to compass measurements.');
       throw err; // rethrow so the Android branch can tell success from failure and not start with declination 0
     });
 
