@@ -12,21 +12,24 @@ import SaveAndExportModalContent from '../../project/backup/SaveAndExportModalCo
 
 const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   /* Data Hooks */
+
   const dispatch = useDispatch();
   const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const {backupTags} = useExport();
 
-  /* Local State */
+  /* Derived Variables */
 
-  const [backingUpStatus, setBackingUpStatus] = useState('');
+  const actionLabel = Platform.OS === 'ios' ? 'Backup' : 'Export';
   const title = isGeologicUnits ? TAG_BACKUP_MESSAGES.TITLE.GEOLOGIC_UNITS : TAG_BACKUP_MESSAGES.TITLE.TAGS;
   const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
     + projectName + '_' + title).replace(/\s/g, '');
+
+  /* Local State */
+
+  const [backingUpStatus, setBackingUpStatus] = useState('');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
-
-  const actionLabel = Platform.OS === 'ios' ? 'Backup' : 'Export';
   const [modalTitle, setModalTitle] = useState(actionLabel + ' ' + title);
 
   /* Event Handlers */
