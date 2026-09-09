@@ -11,7 +11,7 @@ import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shar
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {LABEL_DICTIONARY} from '../../form';
+import {LABEL_DICTIONARY} from '../../form/form.constants';
 import {openedMessageModal} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
@@ -20,8 +20,8 @@ import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
-import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';

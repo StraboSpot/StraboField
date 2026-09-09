@@ -3,7 +3,8 @@ import {ActivityIndicator, Platform, Text} from 'react-native';
 
 import {Image} from '@rn-vui/base';
 
-import {imageStyles, PlaceholderImageIcon} from '.';
+import imageStyles from './image.styles';
+import PlaceholderImageIcon from './PlaceholderImageIcon';
 import {WARNING_COLOR} from '../../shared/styles.constants';
 
 const ImageThumbnail = ({

@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {SpotsListItem} from '../../spots';
+import SpotsListItem from '../../spots/SpotsListItem';
 
 // Modal shown when a map press overlaps more than one Spot, letting the user pick which one to act
 // on (select in view mode, or choose which to edit on a long press).

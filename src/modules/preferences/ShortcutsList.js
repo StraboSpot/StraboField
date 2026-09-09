@@ -6,10 +6,10 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {SwitchWrapper} from '../../shared/ui';
-import {AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {setShortcutSwitchPositions} from '../home/home.slice';
 import useShortcutSwitches from '../home/useShortcutSwitches';
 import {SHORTCUT_MODALS} from '../page/page.constants';

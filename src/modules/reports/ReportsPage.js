@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ReportsList} from '.';
+import ReportsList from './ReportsList';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import {setModalValues, setModalVisible} from '../home/home.slice';

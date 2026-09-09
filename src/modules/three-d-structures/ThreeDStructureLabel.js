@@ -2,7 +2,7 @@ import React from 'react';
 import {Text} from 'react-native';
 
 import {toTitleCase} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 
 const ThreeDStructureLabel = ({item}) => {
   /* Data Hooks */

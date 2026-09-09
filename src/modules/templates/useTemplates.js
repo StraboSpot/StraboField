@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import forms from '../../assets/forms';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const useTemplates = () => {

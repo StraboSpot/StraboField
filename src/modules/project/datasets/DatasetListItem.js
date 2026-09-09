@@ -9,7 +9,7 @@ import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui/';
+import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {

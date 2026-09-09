@@ -7,7 +7,9 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/features/useMapFeatures';
 import homeStyles from '../home.style';
-import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay} from '../overlays';
+import MapActionsOverlay from '../overlays/MapActionsOverlay';
+import MapLayersOverlay from '../overlays/MapLayersOverlay';
+import MapSymbolsOverlay from '../overlays/MapSymbolsOverlay';
 
 const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
   /* Data Hooks */

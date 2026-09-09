@@ -3,15 +3,13 @@ import React, {forwardRef, useEffect, useMemo, useState} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
-import {
-  CustomOverlayLayers,
-  DrawLayers,
-  EditLayers,
-  FeaturesLayers,
-  ImageBasemapLayer,
-  MacrostratMarkerLayer,
-  MeasureLayers,
-} from '.';
+import CustomOverlayLayers from './CustomOverlayLayers';
+import DrawLayers from './DrawLayers';
+import EditLayers from './EditLayers';
+import FeaturesLayers from './FeaturesLayers';
+import ImageBasemapLayer from './ImageBasemapLayer';
+import MacrostratMarkerLayer from './MacrostratMarkerLayer';
+import MeasureLayers from './MeasureLayers';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';

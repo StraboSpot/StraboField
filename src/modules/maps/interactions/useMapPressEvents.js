@@ -6,9 +6,9 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
-import {useSpots} from '../../spots';
 import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import useMapFeatures from '../features/useMapFeatures';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import {MAP_MODES} from '../maps.constants';

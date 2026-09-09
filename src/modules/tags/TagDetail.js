@@ -5,16 +5,17 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import TagDetailSummaryText from './TagDetailSummaryText';
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
-import {NotebookPageAvatar} from '../../shared/ui/avatars';
+import NotebookPageAvatar from '../../shared/ui/avatars/NotebookPageAvatar';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SamplesSectionList from '../samples/SamplesSectionList';
-import {SpotsListItem, useSpots} from '../spots';
-import {useTags} from '../tags';
+import SpotsListItem from '../spots/SpotsListItem';
+import useSpots from '../spots/useSpots';
 
 const TagDetail = ({
                      addRemoveFeatures,

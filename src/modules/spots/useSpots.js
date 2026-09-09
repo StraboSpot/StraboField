@@ -35,7 +35,7 @@ import {
   updatedProject,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const useSpots = () => {
   /* Data Hooks */

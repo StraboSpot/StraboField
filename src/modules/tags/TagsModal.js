@@ -5,6 +5,9 @@ import {ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import TagDetailModal from './TagDetailModal';
+import TagsListItem from './TagsListItem';
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
@@ -12,14 +15,14 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
-import {FormikWrapper, SelectInputField} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import SelectInputField from '../form/SelectInputField';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {TAG_TYPES} from '../project/project.constants';
 import {addedTagToSelectedSpot, setSelectedTag} from '../project/projects.slice';
-import {TagDetailModal, TagsListItem, useTags} from '../tags';
 
 const TagsModal = ({
                      checkedTagsIds,

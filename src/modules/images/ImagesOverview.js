@@ -3,7 +3,7 @@ import React from 'react';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImagesInSpot} from '.';
+import ImagesInSpot from './ImagesInSpot';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';

@@ -4,13 +4,14 @@ import {FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
+import TagDetailModal from './TagDetailModal';
+import TagsAtSpotList from './TagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setModalVisible} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
-import {TagDetailModal, TagsAtSpotList} from '../tags';
 
 const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   /* Data Hooks */

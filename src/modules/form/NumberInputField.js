@@ -4,9 +4,9 @@ import {Platform, Text, TextInput, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
+import formStyles from './form.styles';
 import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
-import {formStyles} from '../form';
 
 const NumberInputField = ({
                             editable = true,

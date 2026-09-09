@@ -1,7 +1,8 @@
 import React from 'react';
 
-import {ImagesList, useImages} from '../images';
-import {useSpots} from '../spots';
+import ImagesList from '../images/ImagesList';
+import useImages from '../images/useImages';
+import useSpots from '../spots/useSpots';
 
 const ImageBasemapsList = ({closeManMenuPanel}) => {
   console.log('Rendering ImageBasemaps...');

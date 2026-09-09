@@ -4,11 +4,11 @@ import {SectionList, Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {useTags} from '.';
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_FILTER_LABELS, TAG_FILTERS} from './query/tagQuery.constants';
 import {TAG_SECTIONS} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

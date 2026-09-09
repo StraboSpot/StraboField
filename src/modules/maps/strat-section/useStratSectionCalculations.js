@@ -7,8 +7,8 @@ import alert from '../../../shared/ui/alert';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {X_INTERVAL, Y_MULTIPLIER} from '../../sed/sed.constants';
 import {getBasicLithologyIndex, getSiliciclasticGrainSize} from '../../sed/sed.helpers';
-import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedOrCreatedSpots} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import {addedIntervalDragChangedSpotIds} from '../maps.slice';
 
 const useStratSectionCalculations = () => {

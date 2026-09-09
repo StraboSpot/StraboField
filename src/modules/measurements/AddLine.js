@@ -2,7 +2,8 @@ import React from 'react';
 
 import {ADD_LINE_FIRST_KEYS, ADD_LINE_LAST_KEYS, ADD_LINE_MAIN_BUTTONS_KEYS} from './measurements.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 
 const AddLine = ({formName, formProps, isManualMeasurement, isPlanarLinear, setChoicesViewKey, survey}) => {
   /* Derived Variables */

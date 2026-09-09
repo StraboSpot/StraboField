@@ -5,7 +5,9 @@ import {ListItem} from '@rn-vui/base';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import {FormFlatList, FormikWrapper, TextInputField} from '../form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import TextInputField from '../form/TextInputField';
 
 const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight, isFillHeight}) => {
   /* Derived Variables */

@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';

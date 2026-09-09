@@ -2,9 +2,9 @@ import {LITHOLOGY_INTERVAL_CHARACTERS} from './sed.constants';
 import {getSiliciclasticGrainSize, getSiliciclasticGrainSizeKey} from './sed.helpers';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {useSpots} from '../spots';
+import useSpots from '../spots/useSpots';
 
 const useSedValidation = () => {
   /* Data Hooks */

@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
-import {SwitchWrapper} from '../../shared/ui';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {setForceOffline} from '../connections/connections.slice';
 
 // Dev-only preference: simulate no connection while staying connected to Metro/debugger.

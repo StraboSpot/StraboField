@@ -3,8 +3,10 @@ import {Animated, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {DrawActionButtons, ShortcutButtons} from './';
+import useDeviceOrientation from '../useDeviceOrientation';
+import DrawActionButtons from './DrawActionButtons';
 import NotebookButton from './NotebookButton';
+import ShortcutButtons from './ShortcutButtons';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import {canceledIntervalDrag} from '../../maps/maps.slice';
@@ -13,7 +15,6 @@ import useSpots from '../../spots/useSpots';
 import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
-import useDeviceOrientation from '../useDeviceOrientation';
 
 const RightSideButtons = ({
                             animateRightSide,

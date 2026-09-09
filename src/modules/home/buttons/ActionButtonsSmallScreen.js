@@ -1,7 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {DrawActionButtons, MapActionButtons, UserLocationButton} from './index';
+import DrawActionButtons from './DrawActionButtons';
+import MapActionButtons from './MapActionButtons';
+import UserLocationButton from './UserLocationButton';
 import MapControlsContainer from '../../maps/controls/MapControlsContainer';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';

@@ -18,15 +18,17 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {FormikWrapper, SelectInputField, useForm} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import SelectInputField from '../form/SelectInputField';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const RockPage = ({isReadOnly, page}) => {
   /* Data Hooks */

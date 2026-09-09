@@ -21,13 +21,14 @@ import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measu
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui/';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
-import {Form, useForm} from '../form';
+import Form from '../form/Form';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';

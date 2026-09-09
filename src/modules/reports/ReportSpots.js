@@ -12,8 +12,9 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {imageStyles} from '../images';
-import {SpotsList, SpotsListItem} from '../spots';
+import imageStyles from '../images/image.styles';
+import SpotsList from '../spots/SpotsList';
+import SpotsListItem from '../spots/SpotsListItem';
 
 const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly}) => {
   /* Data Hooks */

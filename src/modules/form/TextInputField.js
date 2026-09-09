@@ -4,8 +4,8 @@ import {Text, TextInput, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
+import formStyles from './form.styles';
 import * as themes from '../../shared/styles.constants';
-import {formStyles} from '../form';
 
 const TextInputField = ({
                           appearance,

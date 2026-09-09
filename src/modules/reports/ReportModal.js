@@ -3,9 +3,15 @@ import {FlatList, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {ReportComments, ReportForm, ReportImages, ReportMetadata, ReportSpots, ReportTags, useReportModal} from '.';
-import {WarningModal} from '../../shared/ui/modals';
+import ReportComments from './ReportComments';
+import ReportForm from './ReportForm';
+import ReportImages from './ReportImages';
+import ReportMetadata from './ReportMetadata';
+import ReportSpots from './ReportSpots';
+import ReportTags from './ReportTags';
+import useReportModal from './useReportModal';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import WarningModal from '../../shared/ui/modals/WarningModal';
 
 const ReportModal = ({openSpotInNotebook}) => {
   /* Data Hooks */

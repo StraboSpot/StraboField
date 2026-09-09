@@ -9,7 +9,7 @@ import FreehandVertexSpacing from './FreehandVertexSpacing';
 import {DEFAULT_GEOMETRIES, POINT_BUTTONS_TEXT, TAP_FREEHAND_BUTTONS_TEXT} from './preferences.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/helpers';
-import {AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {DRAW_ACTION_IMAGES} from '../home/buttons/drawActionButtons.constants';

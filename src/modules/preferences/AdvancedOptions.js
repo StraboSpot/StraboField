@@ -10,7 +10,7 @@ import ResetWarnings from './ResetWarnings';
 import TestingMode from './TestingMode';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {FormikWrapper} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
 
 const AdvancedOptions = () => {
   /* Data Hooks */

@@ -4,7 +4,8 @@ import {ScrollView} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 
 import commonStyles from '../../shared/common.styles';
-import {FormikWrapper, TextInputField} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import TextInputField from '../form/TextInputField';
 
 const QAQCForm = ({formRef, initialQAQCValues, isReadOnly, appearance = 'full', customHeight}) => {
   /* Local State */

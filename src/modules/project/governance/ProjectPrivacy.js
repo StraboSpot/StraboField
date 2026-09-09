@@ -6,7 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
-import {Form, FormFlatList, FormikWrapper, useForm} from '../../form';
+import Form from '../../form/Form';
+import FormFlatList from '../../form/FormFlatList';
+import FormikWrapper from '../../form/FormikWrapper';
+import useForm from '../../form/useForm';
 import {updatedProject} from '../projects.slice';
 
 const formName = ['settings', 'project_settings'];

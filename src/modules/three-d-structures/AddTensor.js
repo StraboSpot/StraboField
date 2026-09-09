@@ -2,7 +2,7 @@ import React from 'react';
 
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from './threeDStructures.constants';
 import {setOrientationFieldValue} from '../compass/compass.helpers';
-import {Form} from '../form';
+import Form from '../form/Form';
 
 const AddTensor = ({formName, formProps}) => {
   /* Event Handlers */

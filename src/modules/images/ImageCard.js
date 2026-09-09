@@ -4,16 +4,19 @@ import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
+import imageStyles from './image.styles';
+import ImageThumbnail from './ImageThumbnail';
+import useImages from './useImages';
+import useImageThumbnails from './useImageThumbnails';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const ImageCard = ({
                      areImageThumbnailsLoading,

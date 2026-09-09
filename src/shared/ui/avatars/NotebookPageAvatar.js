@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {AvatarWrapper} from './';
+import AvatarWrapper from './AvatarWrapper';
 import usePage from '../../../modules/page/usePage';
 
 const NotebookPageAvatar = ({pageKey}) => {
