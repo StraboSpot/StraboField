@@ -8,8 +8,8 @@ import styles from './preferences.styles';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {setTestingMode} from '../project/projects.slice';
 
 const errorMessage = 'Wrong Password!';

@@ -7,9 +7,9 @@ import {REPORT_FORM_NAME} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {updatedProject} from '../project/projects.slice';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const ReportsListItem = ({
                            doShowTags,

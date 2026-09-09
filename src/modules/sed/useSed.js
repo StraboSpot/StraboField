@@ -15,13 +15,13 @@ import {isLithologyRequiredForInterval, setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
 import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {clearedStratSection, setStratSection} from '../maps/maps.slice';
 import useStratSectionCalculations from '../maps/strat-section/useStratSectionCalculations';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {useSpots} from '../spots';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const useSed = () => {
   /* Data Hooks */

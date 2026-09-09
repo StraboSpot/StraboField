@@ -2,9 +2,9 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
+import TagsModal from './TagsModal';
 import {isEmpty} from '../../shared/helpers';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {TagsModal} from '../tags';
 
 const TagsNotebookModal = ({isFeatureLevelTagging}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);

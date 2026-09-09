@@ -5,7 +5,7 @@ import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymb
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
 import {isStratInterval} from '../../spots/spots.helpers';
-import {useTags} from '../../tags';
+import useTags from '../../tags/useTags';
 import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
 

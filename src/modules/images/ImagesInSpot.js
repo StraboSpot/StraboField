@@ -2,12 +2,15 @@ import React, {useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ImageModal, ImagePropertiesModal, ImagesList, useImages} from '.';
+import ImageModal from './ImageModal';
+import ImagePropertiesModal from './ImagePropertiesModal';
+import ImagesList from './ImagesList';
+import useImages from './useImages';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
-import {useSpots} from '../spots';
 import {editedSpotProperties} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEmpty, saveImages}) => {
   /* Data Hooks */

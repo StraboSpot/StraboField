@@ -2,15 +2,13 @@ import React, {useMemo} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {
-  CustomOverlayLayers,
-  DrawLayers,
-  EditLayers,
-  FeaturesLayers,
-  ImageBasemapLayer,
-  MacrostratMarkerLayer,
-  MeasureLayers,
-} from '.';
+import CustomOverlayLayers from './CustomOverlayLayers';
+import DrawLayers from './DrawLayers';
+import EditLayers from './EditLayers';
+import FeaturesLayers from './FeaturesLayers';
+import ImageBasemapLayer from './ImageBasemapLayer';
+import MacrostratMarkerLayer from './MacrostratMarkerLayer';
+import MeasureLayers from './MeasureLayers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import MapControlsContainer from '../controls/MapControlsContainer';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';

@@ -1,7 +1,8 @@
 import React from 'react';
 
 import {ADD_FABRIC_KEYS, ADD_FABRIC_FIELDS} from './fabric.constants';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 
 const {firstKeys, lastKeys} = ADD_FABRIC_KEYS.igneous_rock;
 const mainButtonsKeys = ADD_FABRIC_FIELDS.igneous_rock;

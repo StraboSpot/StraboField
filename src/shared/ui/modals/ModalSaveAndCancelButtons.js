@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {overlayStyles} from '../../../modules/home/overlays';
+import overlayStyles from './overlay.styles';
 import {MAX_CONTENT_WIDTH} from '../../styles.constants';
 import ActionButton from '../buttons/ActionButton';
 import DeleteButton from '../buttons/DeleteButton';

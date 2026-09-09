@@ -10,7 +10,7 @@ import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {formStyles} from '../form';
+import formStyles from '../form/form.styles';
 import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly, page}) => {

@@ -8,8 +8,8 @@ import {
   GRAIN_SIZE_KEYS,
   LITHOLOGIES_KEYS,
 } from './stratSection.constants';
-import {useForm} from '../../form';
-import {useSpots} from '../../spots';
+import useForm from '../../form/useForm';
+import useSpots from '../../spots/useSpots';
 import useMapCoords from '../view/useMapCoords';
 
 const s = 20; // spacing between multiple x axes

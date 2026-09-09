@@ -9,11 +9,14 @@ import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
-import {FormikWrapper, SelectInputField, TextInputField, useForm} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import SelectInputField from '../form/SelectInputField';
+import TextInputField from '../form/TextInputField';
+import useForm from '../form/useForm';
 import PageHeader from '../page/PageHeader';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const OtherFeatureDetail = ({
                               featureTypes,

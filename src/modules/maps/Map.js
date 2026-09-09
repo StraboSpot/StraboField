@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import MapControlsContainer from './controls/MapControlsContainer';
 import VertexDrag from './editing/VertexDrag';
 import useMapMoveEvents from './interactions/useMapMoveEvents';
-import {MapLayers} from './layers';
+import MapLayers from './layers/MapLayers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
 import SnapLineLayer from './strat-section/SnapLineLayer';

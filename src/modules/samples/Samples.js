@@ -5,8 +5,8 @@ import SamplesSectionList from './SamplesSectionList';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {useSpots} from '../spots';
 import SpotQuery from '../spots/SpotQuery';
+import useSpots from '../spots/useSpots';
 
 const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
   /* Data Hooks */

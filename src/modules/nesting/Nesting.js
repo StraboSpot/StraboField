@@ -11,7 +11,8 @@ import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {SpotsListItem, useSpots} from '../spots';
+import SpotsListItem from '../spots/SpotsListItem';
+import useSpots from '../spots/useSpots';
 
 const Nesting = ({page}) => {
   console.log('Rendering Nesting');

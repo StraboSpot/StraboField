@@ -6,8 +6,8 @@ import {ListItem} from '@rn-vui/base';
 import tagStyles from './tags.styles';
 import commonStyles from '../../shared/common.styles';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 
 const TagsOverflowMenuModal = ({
                                  closeMenu,

@@ -23,13 +23,13 @@ import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {useSpots} from '../spots';
 import {
   clearedSelectedSpots,
   editedOrCreatedSpots,
   restoredIntervalDragSnapshot,
   setIntersectedSpotsForTagging,
 } from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
   /* Data Hooks */

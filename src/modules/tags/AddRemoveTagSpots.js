@@ -3,13 +3,13 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
-import {SpotsList} from '../spots';
-import {useTags} from '../tags';
+import SpotsList from '../spots/SpotsList';
 
 const AddRemoveTagSpots = () => {
   /* Data Hooks */

@@ -4,12 +4,12 @@ import {FlatList, Platform} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {overlayStyles} from './index';
 import commonStyles from '../../../shared/common.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {useSpots} from '../../spots';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import useSpots from '../../spots/useSpots';
 import {MAP_ACTIONS} from '../home.constants';
 
 const MapActionsOverlay = ({

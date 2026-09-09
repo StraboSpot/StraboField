@@ -3,8 +3,6 @@ import {View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import {Form, FormikWrapper, FormSlider, MainButtons, useForm} from '../form';
 import {
   SAMPLE_FIRST_KEYS,
   SAMPLE_FORM_NAME,
@@ -12,6 +10,12 @@ import {
   SAMPLE_ORIENTED_KEY,
   SAMPLE_TYPE_KEY,
 } from './samples.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import FormSlider from '../form/FormSlider';
+import MainButtons from '../form/MainButtons';
+import useForm from '../form/useForm';
 
 const SampleModalForm = ({
                            choicesViewKey,

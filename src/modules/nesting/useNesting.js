@@ -2,7 +2,7 @@ import {useSelector} from 'react-redux';
 
 import {isWithin} from './nesting.helpers';
 import {isEmpty} from '../../shared/helpers';
-import {useSpots} from '../spots';
+import useSpots from '../spots/useSpots';
 
 const useNesting = () => {
   /* Data Hooks */

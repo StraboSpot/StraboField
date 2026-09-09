@@ -13,7 +13,8 @@ import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
-import {FormikWrapper, TextInputField} from '../../form';
+import FormikWrapper from '../../form/FormikWrapper';
+import TextInputField from '../../form/TextInputField';
 
 const TagColorPickerModal = ({closeModal, onColorSelect, tempColor}) => {
   /* Local State */

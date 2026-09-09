@@ -5,7 +5,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
-import {Form, FormikWrapper, useForm} from '../../form';
+import Form from '../../form/Form';
+import FormikWrapper from '../../form/FormikWrapper';
+import useForm from '../../form/useForm';
 import {setIsProjectLoadSelectionModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';

@@ -11,22 +11,26 @@ import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
-import {Form, FormikWrapper, useForm} from '../form';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 import {setModalVisible} from '../home/home.slice';
-import {ImageModal, ImagePropertiesModal, useImages} from '../images';
+import ImageModal from '../images/ImageModal';
+import ImagePropertiesModal from '../images/ImagePropertiesModal';
+import useImages from '../images/useImages';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
-import {useSpots} from '../spots';
 import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   /* Data Hooks */

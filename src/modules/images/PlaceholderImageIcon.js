@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon, Image} from '@rn-vui/base';
 
-import {imageStyles} from './index';
+import imageStyles from './image.styles';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 

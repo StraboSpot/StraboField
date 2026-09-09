@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import usePetrology from '../petrology/usePetrology';
 import useSed from '../sed/useSed';
 

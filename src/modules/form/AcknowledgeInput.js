@@ -4,9 +4,9 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
-import {formStyles} from '.';
+import formStyles from './form.styles';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui/';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 
 const AcknowledgeInput = ({
                             disabled = false,

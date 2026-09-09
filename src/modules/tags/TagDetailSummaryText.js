@@ -4,8 +4,8 @@ import {Pressable, Text, View} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import TagColorIcon from './color/TagColorIcon';
-import {tagsStyles} from './index';
 import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
+import tagsStyles from './tags.styles';
 import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';

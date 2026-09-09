@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 
 import commonStyles from '../../shared/common.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
-import {NumberInputField} from '../form';
+import NumberInputField from '../form/NumberInputField';
 import useMapLocation from '../maps/view/useMapLocation';
 
 const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {

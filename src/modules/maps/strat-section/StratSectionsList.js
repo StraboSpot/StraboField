@@ -11,8 +11,8 @@ import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import {setLoadingStatus} from '../../home/home.slice';
-import {useSpots} from '../../spots';
 import {setSelectedSpot} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import {setStratSection} from '../maps.slice';
 
 const StratSectionsList = ({closeManMenuPanel}) => {

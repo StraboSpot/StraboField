@@ -5,7 +5,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {updatedProject} from './projects.slice';
 import {isEmpty} from '../../shared/helpers';
-import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
+import Form from '../form/Form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 
 const formName = ['settings', 'naming_conventions'];
 

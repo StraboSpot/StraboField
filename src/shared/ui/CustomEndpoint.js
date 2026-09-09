@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Input} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {SwitchWrapper} from '.';
+import SwitchWrapper from './SwitchWrapper';
 import uiStyles from './ui.styles';
 import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../modules/connections/connections.slice';
 import {updateCustomMap} from '../../modules/maps/maps.slice';

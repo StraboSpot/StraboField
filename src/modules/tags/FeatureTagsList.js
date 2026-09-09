@@ -3,9 +3,9 @@ import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
-import {useTags} from './index';
+import useTags from './useTags';
 import {isEmpty} from '../../shared/helpers';
-import {NotebookPageAvatar} from '../../shared/ui/avatars';
+import NotebookPageAvatar from '../../shared/ui/avatars/NotebookPageAvatar';
 
 function FeatureTagsList({
                            featureId,

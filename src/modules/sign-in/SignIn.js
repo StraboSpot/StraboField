@@ -11,7 +11,7 @@ import {SECONDARY_BACKGROUND_COLOR, WHITE} from '../../shared/styles.constants';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
-import {MessageModal} from '../../shared/ui/modals';
+import MessageModal from '../../shared/ui/modals/MessageModal';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import SplashScreen from '../splash-screen/SplashScreen';
 

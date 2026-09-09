@@ -5,6 +5,7 @@ import {CheckBox, Icon, ListItem} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 import MultiSelect from 'react-native-multiple-select';
 
+import formStyles from './form.styles';
 import useColumnLayout from './useColumnLayout';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -16,7 +17,6 @@ import {
   SECONDARY_BACKGROUND_COLOR,
   WARNING_COLOR,
 } from '../../shared/styles.constants';
-import {formStyles} from '../form';
 
 const SelectInputField = ({
                             appearance,

@@ -3,7 +3,7 @@ import {useDispatch} from 'react-redux';
 import {ROCK_FIRST_ORDER_CLASS_FIELDS} from './petrology.constants';
 import {getAbbrevFromFullMineralName, getFullMineralNameFromAbbrev} from './petrology.helpers';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';

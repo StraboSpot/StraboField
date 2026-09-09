@@ -16,7 +16,7 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
-import {FormikWrapper} from '../../form';
+import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';

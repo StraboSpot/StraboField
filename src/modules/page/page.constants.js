@@ -10,7 +10,7 @@ import FabricsPage from '../fabrics/FabricsPage';
 import Geography from '../geography/Geography';
 import AddEarthquakeModal from '../geomorph/AddEarthquakeModal';
 import EarthquakesPage from '../geomorph/EarthquakesPage';
-import ImagesOverview from '../images/ImagesOverview'; // import {ImagesOverview, ImagesViewPage} from '../images'; errors in web
+import ImagesOverview from '../images/ImagesOverview';
 import ImagesPage from '../images/ImagesPage';
 import AddIntervalModal from '../maps/strat-section/AddIntervalModal';
 import AddMeasurementModal from '../measurements/AddMeasurementModal';

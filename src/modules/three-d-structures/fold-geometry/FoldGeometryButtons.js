@@ -3,10 +3,10 @@ import {View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
-import {FOLD_GEOMETRY_KEYS, FOLD_ICONS} from './';
+import {FOLD_GEOMETRY_KEYS, FOLD_ICONS} from './fold-geometry.constants';
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {formStyles} from '../../form';
+import formStyles from '../../form/form.styles';
 
 const FoldGeometryButtons = ({formProps, setChoicesViewKey}) => {
   /* Render Functions */

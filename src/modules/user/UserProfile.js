@@ -25,7 +25,9 @@ import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMe
 import {persistor} from '../../store/ConfigureStore';
 import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
-import {Form, FormikWrapper, useForm} from '../form';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 

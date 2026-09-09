@@ -5,8 +5,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 
+import formStyles from './form.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {formStyles} from '../form';
 
 const DateInputField = ({
                           isDisplayOnly,

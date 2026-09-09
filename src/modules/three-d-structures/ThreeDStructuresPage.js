@@ -10,7 +10,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';

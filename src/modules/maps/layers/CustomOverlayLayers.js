@@ -2,7 +2,7 @@ import React, {useMemo} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {CustomOverlayLayer} from '.';
+import CustomOverlayLayer from './CustomOverlayLayer';
 
 const CustomOverlayLayers = ({basemap}) => {
   /* Data Hooks */
