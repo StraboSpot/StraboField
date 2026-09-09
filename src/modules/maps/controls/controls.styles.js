@@ -18,17 +18,17 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     paddingLeft: 4,
   },
+  // Large screens keep the geolocate button in the bottom left corner, so the bar starts clear of it
   scaleZoomContainer: {
     bottom: 30,
     left: 70,
     position: 'absolute',
     zIndex: 1,
   },
+  // Small screens lay this out in the map action button column rather than over the map, so it is not
+  // positioned at all - the column places it. See SMALL_SCREEN_MAP_STACK
   scaleZoomContainerSmall: {
-    bottom: 75,
-    left: 75,
-    position: 'absolute',
-    zIndex: 1,
+    alignItems: 'flex-start',
   },
   zoomContainer: {
     justifyContent: 'center',

@@ -16,6 +16,13 @@ const homeStyles = StyleSheet.create({
   actionButtonsSmallScreenContainerPortrait: {
     bottom: 30,
   },
+  // The one column holding everything above the attribution. Full width so the readouts stay at the left
+  // edge and the pill stays centred however wide the pill is, and gap spaces the rows without anyone
+  // having to know how tall the others are
+  actionButtonsSmallScreenStack: {
+    alignSelf: 'stretch',
+    gap: themes.SMALL_SCREEN_MAP_STACK.GAP,
+  },
   addIntervalButton: {
     position: 'absolute',
     right: SMALL_SCREEN ? 10 : 60,
@@ -74,6 +81,11 @@ const homeStyles = StyleSheet.create({
     right: 10,
     zIndex: -1,
   },
+  // DrawInfo shares a row with the readouts on the left so that it sits directly above the draw tools at
+  // the right of the pill, rather than a row further up
+  drawInfoSmallScreen: {
+    paddingRight: themes.SMALL_SCREEN_MAP_STACK.EDGE_INSET,
+  },
   drawSaveAndCancelButtons: {
     bottom: 100,
     position: 'absolute',
@@ -91,9 +103,14 @@ const homeStyles = StyleSheet.create({
   iconButton: {
     top: 5,
   },
-  iconSizeSmallScreen: {
-    height: 40,
+  // Tightens the row of map buttons and closes the pill up around them: the icons carry a wide band of
+  // transparent padding, so their ink is only about 25 of the 55 they draw at. Taking that out of the
+  // layout leaves the icon drawing full size and still a 55 point touch target. Goes on the Pressable,
+  // never on the icon - rn-vui's Image also hands that style to the child sizing its overflow-hidden
+  // container, so a negative margin there shaves the sides off the icon instead
+  iconSpacingSmallScreen: {
     marginHorizontal: -2,
+    marginVertical: -7,
   },
   imageSliderContainer: {
     alignItems: 'center',
@@ -109,6 +126,36 @@ const homeStyles = StyleSheet.create({
     left: 10,
     position: 'absolute',
     zIndex: -1,
+  },
+  mapActionsPill: {
+    alignItems: 'center',
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderColor: themes.MEDIUMGREY,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    elevation: 2,
+    flexDirection: 'row',
+    // The buttons are laid out tighter than they draw, so they reach past the pill. Android clips a
+    // rounded background's children unless told not to, and clipping them is the whole problem
+    overflow: 'visible',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  mapActionsPillRow: {
+    alignItems: 'center',
+  },
+  // The row directly above the pill: the readouts on the left, DrawInfo on the right. flex-end sits them
+  // both on the pill rather than leaving DrawInfo floating when the readouts are taller
+  mapReadoutsRow: {
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  // The scale bar, the zoom and the geolocate button above them, all held to the left edge
+  mapReadoutsSmallScreen: {
+    alignItems: 'flex-start',
+    gap: themes.SMALL_SCREEN_MAP_STACK.GAP,
+    paddingLeft: themes.SMALL_SCREEN_MAP_STACK.EDGE_INSET,
   },
   mapboxAttributionPosition: {
     bottom: Platform.OS === 'ios' ? 0 : 7,

@@ -2,8 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {DrawActionButtons, MapActionButtons, UserLocationButton} from './index';
-import * as themes from '../../../shared/styles.constants';
-import {useWindowSize} from '../../../shared/ui/useWindowSize';
+import MapControlsContainer from '../../maps/controls/MapControlsContainer';
 import homeStyles from '../home.style';
 import DrawInfo from '../pop-ups/DrawInfo';
 
@@ -14,60 +13,40 @@ const ActionButtonsSmallScreen = ({
                                     distance,
                                     onCancel,
                                     endMeasurement,
-                                    isEditToolsDisabled,
+                                    hasDrawTools,
                                     mapMode,
                                     onEndDrawPressed,
                                     selectingMode,
                                     toggleDialog,
                                   }) => {
-  /* Data Hooks */
-
-  const {height, width} = useWindowSize();
-
-  /* Derived Variables */
-
-  // Landscape has always put the geolocate button to the left of the action pill. With the draw tools
-  // gone the pill centers itself, so it goes left there too rather than sitting alone above it
-  const isGeolocateLeft = height < width || isEditToolsDisabled;
-
   /* View */
 
+  // Everything above the Mapbox attribution in one column: the map actions along the bottom, the scale bar
+  // and zoom above them on the left, the geolocate button above those, and DrawInfo opposite on the right.
+  // The order holds whatever the target dataset is and whichever tools are showing.
   return (
-    <View style={isGeolocateLeft && {alignSelf: 'stretch'}}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-        {width < height && !isEditToolsDisabled ? <UserLocationButton clickHandler={clickHandler}/>
-          : <View/> //Added so 'space-between' would work correctly for DrawInfo when no UserLocationButton
-        }
+    <View style={homeStyles.actionButtonsSmallScreenStack}>
+      <View style={homeStyles.mapReadoutsRow}>
+        <View style={homeStyles.mapReadoutsSmallScreen}>
+          <UserLocationButton clickHandler={clickHandler}/>
+          <MapControlsContainer/>
+        </View>
 
-        <DrawInfo
-          clickHandler={clickHandler}
-          distance={distance}
-          endMeasurement={endMeasurement}
-          mapMode={mapMode}
-          onCancel={onCancel}
-          onEndDrawPressed={onEndDrawPressed}
-          selectingMode={selectingMode}
-        />
+        <View style={homeStyles.drawInfoSmallScreen}>
+          <DrawInfo
+            clickHandler={clickHandler}
+            distance={distance}
+            endMeasurement={endMeasurement}
+            mapMode={mapMode}
+            onCancel={onCancel}
+            onEndDrawPressed={onEndDrawPressed}
+            selectingMode={selectingMode}
+          />
+        </View>
       </View>
-      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingTop: 5}}>
-        {isGeolocateLeft && (
-          <View style={{flex: 1, alignItems: 'flex-start'}}><UserLocationButton clickHandler={clickHandler}/></View>
-        )}
 
-        <View
-          style={{
-            alignItems: 'center',
-            backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-            borderColor: themes.MEDIUMGREY,
-            borderRadius: 10,
-            borderWidth: 0.5,
-            elevation: 2,
-            flexDirection: 'row',
-            padding: 0,
-            shadowOpacity: 0.3,
-            shadowRadius: 4,
-          }}
-        >
+      <View style={homeStyles.mapActionsPillRow}>
+        <View style={homeStyles.mapActionsPill}>
           <View style={homeStyles.smallScreenMapActionButtons}>
             <MapActionButtons
               dialogClickHandler={dialogClickHandler}
@@ -75,10 +54,8 @@ const ActionButtonsSmallScreen = ({
               toggleDialog={toggleDialog}
             />
           </View>
-          {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
+          {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
         </View>
-
-        {isGeolocateLeft && <View style={{flex: 1}}/>}
       </View>
     </View>
   );

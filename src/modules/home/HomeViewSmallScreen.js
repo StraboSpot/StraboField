@@ -33,8 +33,8 @@ const HomeViewSmallScreen = forwardRef(({
                                           dialogs,
                                           distance,
                                           endMeasurement,
+                                          hasDrawTools,
                                           isCreateToolsDisabled,
-                                          isEditToolsDisabled,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -184,7 +184,7 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
-                    isEditToolsDisabled={isEditToolsDisabled}
+                    hasDrawTools={hasDrawTools}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}
