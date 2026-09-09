@@ -16,7 +16,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import FormikWrapper from '../form/FormikWrapper';
-import SelectInputField from '../form/SelectInputField';
+import SelectInputField from '../form/inputs/SelectInputField';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';

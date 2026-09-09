@@ -5,10 +5,10 @@ import {CheckBox, Icon, ListItem} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 import MultiSelect from 'react-native-multiple-select';
 
-import formStyles from './form.styles';
+import FieldLabel from './FieldLabel';
 import useColumnLayout from './useColumnLayout';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/helpers';
 import {
   DARKGREY,
   PRIMARY_ACCENT_COLOR,
@@ -16,7 +16,8 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
   WARNING_COLOR,
-} from '../../shared/styles.constants';
+} from '../../../shared/styles.constants';
+import formStyles from '../form.styles';
 
 const SelectInputField = ({
                             appearance,
@@ -85,9 +86,10 @@ const SelectInputField = ({
     return isSelected ? 'checkbox-marked' : 'checkbox-blank-outline';
   };
 
+  // A multi-select field holds an array, which is named by its one choice or counted where it holds several
   const getChoiceLabel = (itemValue) => {
-    if (typeof itemValue === 'object' && Array.isArray(itemValue) && itemValue.length > 1) return 'Multiple Selected';
-    else if (typeof itemValue === 'object' && Array.isArray(itemValue) && itemValue.length === 1) {
+    if (Array.isArray(itemValue)) {
+      if (itemValue.length > 1) return 'Multiple Selected';
       itemValue = itemValue[0];
     }
     const choiceFound = allChoices.find(choice => choice.value === itemValue);
@@ -191,20 +193,12 @@ const SelectInputField = ({
 
   const renderFieldLabel = () => {
     return (
-      <View style={formStyles.fieldLabelContainer}>
-        <Text style={formStyles.fieldLabel}>
-          {label}
-          {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
-        </Text>
-        {placeholder && (
-          <Icon
-            color={PRIMARY_ACCENT_COLOR}
-            name={'information-circle-outline'}
-            onPress={() => onShowFieldInfo(label, placeholder)}
-            type={'ionicon'}
-          />
-        )}
-      </View>
+      <FieldLabel
+        isRequired={isRequired}
+        label={label}
+        onShowFieldInfo={onShowFieldInfo}
+        placeholder={placeholder}
+      />
     );
   };
 
@@ -242,6 +236,8 @@ const SelectInputField = ({
   };
 
   const renderMultiSelect = () => {
+    const selectedLabel = isEmpty(value) ? placeholderText : getChoiceLabel(value);
+
     return (
       <>
         {renderFieldLabel()}
@@ -256,11 +252,11 @@ const SelectInputField = ({
             items={allChoices}
             onSelectedItemsChange={fieldValueChanged}
             searchIcon={false}
-            searchInputPlaceholderText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
-            selectText={isEmpty(value) ? placeholderText : getChoiceLabel(value)}
+            searchInputPlaceholderText={selectedLabel}
+            selectText={selectedLabel}
             selectedItemIconColor={PRIMARY_TEXT_COLOR}
             selectedItemTextColor={PRIMARY_TEXT_COLOR}
-            selectedItems={isEmpty(value) || typeof value === 'object' ? value : [value]}
+            selectedItems={selectedValues}
             single={isSingleSelect}
             styleDropdownMenu={formStyles.dropdownContainer}
             styleDropdownMenuSubsection={formStyles.dropdownSelectedContainer}

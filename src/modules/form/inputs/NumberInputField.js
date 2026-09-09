@@ -1,12 +1,12 @@
 import React from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, TextInput} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
-import formStyles from './form.styles';
-import {isEmpty} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
+import FieldLabel from './FieldLabel';
+import {isEmpty} from '../../../shared/helpers';
+import * as themes from '../../../shared/styles.constants';
+import formStyles from '../form.styles';
 
 const NumberInputField = ({
                             editable = true,
@@ -45,31 +45,16 @@ const NumberInputField = ({
     setValue(name, numberText);
   };
 
-  /* Logic Helpers */
-
-  const getDisplayValue = () => {
-    if (!isEmpty(value)) return value.toString();
-    return value || '';
-  };
-
   /* View */
 
   return (
     <>
-      <View style={formStyles.fieldLabelContainer}>
-        <Text style={formStyles.fieldLabel}>
-          {label}
-          {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
-        </Text>
-        {placeholder && (
-          <Icon
-            color={themes.PRIMARY_ACCENT_COLOR}
-            name={'information-circle-outline'}
-            onPress={() => onShowFieldInfo(label, placeholder)}
-            type={'ionicon'}
-          />
-        )}
-      </View>
+      <FieldLabel
+        isRequired={isRequired}
+        label={label}
+        onShowFieldInfo={onShowFieldInfo}
+        placeholder={placeholder}
+      />
       <TextInput
         editable={editable}
         keyboardType={keyboardType}
@@ -78,7 +63,7 @@ const NumberInputField = ({
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
         style={formStyles.fieldValue}
-        value={getDisplayValue()}
+        value={isEmpty(value) ? '' : value.toString()}
       />
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>

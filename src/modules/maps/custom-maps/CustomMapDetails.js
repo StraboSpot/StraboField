@@ -23,7 +23,7 @@ import SliderBar from '../../../shared/ui/SliderBar';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';
-import TextInputField from '../../form/TextInputField';
+import TextInputField from '../../form/inputs/TextInputField';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';

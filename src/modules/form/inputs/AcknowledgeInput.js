@@ -1,12 +1,11 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
-import formStyles from './form.styles';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import SwitchWrapper from '../../shared/ui/SwitchWrapper';
+import FieldLabel from './FieldLabel';
+import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
+import formStyles from '../form.styles';
 
 const AcknowledgeInput = ({
                             disabled = false,
@@ -35,20 +34,14 @@ const AcknowledgeInput = ({
         <View style={{justifyContent: 'center'}}>
           <SwitchWrapper disabled={disabled} onValueChange={bool => setValue(name, bool)} value={value}/>
         </View>
-        <View style={[formStyles.fieldLabelContainer, {flex: 1, paddingLeft: 5}]}>
-          <Text style={[formStyles.fieldLabel, {fontWeight: 'normal'}]}>
-            {label}
-            {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
-          </Text>
-          {placeholder && (
-            <Icon
-              color={PRIMARY_ACCENT_COLOR}
-              name={'information-circle-outline'}
-              onPress={() => onShowFieldInfo(label, placeholder)}
-              type={'ionicon'}
-            />
-          )}
-        </View>
+        <FieldLabel
+          containerStyle={formStyles.acknowledgeLabelContainer}
+          isRequired={isRequired}
+          label={label}
+          labelStyle={formStyles.acknowledgeLabel}
+          onShowFieldInfo={onShowFieldInfo}
+          placeholder={placeholder}
+        />
       </View>
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>

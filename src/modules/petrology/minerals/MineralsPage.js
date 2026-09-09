@@ -10,7 +10,7 @@ import {getNewCopyId, isEmpty} from '../../../shared/helpers';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import FormikWrapper from '../../form/FormikWrapper';
-import SelectInputField from '../../form/SelectInputField';
+import SelectInputField from '../../form/inputs/SelectInputField';
 import {setModalVisible} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';
 import BasicPageDetail from '../../page/BasicPageDetail';

@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Appearance, Platform, Text, View} from 'react-native';
+import {Appearance, Platform, Text} from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 
-import formStyles from './form.styles';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import FieldLabel from './FieldLabel';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import formStyles from '../form.styles';
 
 const DateInputField = ({
                           isDisplayOnly,
@@ -32,17 +33,20 @@ const DateInputField = ({
   /* Derived Variables */
 
   const setValue = setFieldValueOverride || setFieldValue;
-  let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a') : isShowTime ? moment(value).format(
-    'MM/DD/YYYY, h:mm:ss a') : moment(value).format('MM/DD/YYYY') : undefined;
+  const title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
+      : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
+        : moment(value).format('MM/DD/YYYY')
+    : undefined;
 
   /* Side Effects */
 
+  // The picker is told what color to draw its text, so it has to be told again when the device theme changes
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({colorScheme: newColorScheme}) => {
       setColorScheme(newColorScheme);
     });
     return () => subscription.remove();
-  }, [colorScheme]);
+  }, []);
 
   /* Event Handlers */
 
@@ -81,52 +85,47 @@ const DateInputField = ({
 
   const renderDatePicker = () => {
     return (
-      // <View style={{}}>
       <DateTimePicker
         display={Platform.OS === 'ios' ? 'spinner' : 'default'}
         mode={isShowTimeOnly ? 'time' : 'date'}
         neutralButton={{label: 'Clear', textColor: 'grey'}} // Android only
         onChange={changeDate}
-        textColor={colorScheme === 'dark' && 'black'}
+        textColor={colorScheme === 'dark' ? 'black' : undefined}
         value={date}
       />
-      // </View>
     );
   };
 
   const renderDatePickerDialogBox = () => {
-    return (<ModalWrapper
-      actionTitle={'Set Date'}
-      headerTitle={'Pick ' + label}
-      isVisible={isDatePickerModalVisible}
-      onActionPressed={onSavePressed}
-      overlayStyleOverride={{width: 350, maxHeight: 350}}
-      showCancelButton={false}
-    >
-      {renderDatePicker()}
-    </ModalWrapper>);
+    return (
+      <ModalWrapper
+        actionTitle={'Set Date'}
+        headerTitle={'Pick ' + label}
+        isVisible={isDatePickerModalVisible}
+        onActionPressed={onSavePressed}
+        overlayStyleOverride={{width: 350, maxHeight: 350}}
+        showCancelButton={false}
+      >
+        {renderDatePicker()}
+      </ModalWrapper>
+    );
   };
 
   /* View */
 
-  return (<>
-    {label && (<View style={formStyles.fieldLabelContainer}>
-      <Text style={formStyles.fieldLabel}>
-        {label}
-        {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
+  return (
+    <>
+      {label && <FieldLabel isRequired={isRequired} label={label}/>}
+      <Text
+        onPress={isDisplayOnly ? undefined : () => setIsDatePickerModalVisible(true)}
+        style={formStyles.fieldValue}
+      >
+        {title}
       </Text>
-    </View>)}
-    {isDisplayOnly ? (<Text style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}>
-      {title}
-    </Text>) : (<Text
-      onPress={() => setIsDatePickerModalVisible(true)}
-      style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}
-    >
-      {title}
-    </Text>)}
-    {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
-    {Platform.OS === 'ios' ? renderDatePickerDialogBox() : isDatePickerModalVisible && renderDatePicker()}
-  </>);
+      {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
+      {Platform.OS === 'ios' ? renderDatePickerDialogBox() : isDatePickerModalVisible && renderDatePicker()}
+    </>
+  );
 };
 
 export default DateInputField;

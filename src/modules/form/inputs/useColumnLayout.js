@@ -1,7 +1,7 @@
 import {useState} from 'react';
 
 import {getFittingColumnWidths, getRowsOfColumns, getStretchedColumnWidths} from './columns.helpers';
-import {SMALL_SCREEN_WIDTH} from '../../shared/styles.constants';
+import {SMALL_SCREEN_WIDTH} from '../../../shared/styles.constants';
 
 // Measures items at their natural width, then lays them out in rows of columns that fill their container.
 // Items that fit on a single row keep their natural width and are spread across it. Items that need more than

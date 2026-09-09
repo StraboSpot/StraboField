@@ -19,7 +19,7 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import FormikWrapper from '../../form/FormikWrapper';
-import SelectInputField from '../../form/SelectInputField';
+import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';

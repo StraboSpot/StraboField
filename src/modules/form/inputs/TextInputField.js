@@ -1,11 +1,11 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Text, TextInput} from 'react-native';
 
-import {Icon} from '@rn-vui/base';
 import {useField, useFormikContext} from 'formik';
 
-import formStyles from './form.styles';
-import * as themes from '../../shared/styles.constants';
+import FieldLabel from './FieldLabel';
+import * as themes from '../../../shared/styles.constants';
+import formStyles from '../form.styles';
 
 const TextInputField = ({
                           appearance,
@@ -57,20 +57,12 @@ const TextInputField = ({
   return (
     <>
       {label && (
-        <View style={formStyles.fieldLabelContainer}>
-          <Text style={formStyles.fieldLabel}>
-            {label}
-            {isRequired && <Text style={formStyles.fieldRequired}> *</Text>}
-          </Text>
-          {placeholder && (
-            <Icon
-              color={themes.PRIMARY_ACCENT_COLOR}
-              name={'information-circle-outline'}
-              onPress={() => onShowFieldInfo(label, placeholder)}
-              type={'ionicon'}
-            />
-          )}
-        </View>
+        <FieldLabel
+          isRequired={isRequired}
+          label={label}
+          onShowFieldInfo={onShowFieldInfo}
+          placeholder={placeholder}
+        />
       )}
       <TextInput
         autoCapitalize={autoCapitalize}

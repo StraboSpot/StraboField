@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {useField, useFormikContext} from 'formik';
 import moment from 'moment';
 import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import formStyles from './form.styles';
+import FieldLabel from './FieldLabel';
+import formStyles from '../form.styles';
 
 const DateInputField = ({
                           isDisplayOnly,
+                          isRequired,
                           isShowTime,
                           isShowTimeOnly,
                           label,
@@ -29,7 +31,7 @@ const DateInputField = ({
   /* Derived Variables */
 
   const setValue = setFieldValueOverride || setFieldValue;
-  let title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
+  const title = value ? isShowTimeOnly ? moment(value).format('h:mm:ss a')
       : isShowTime ? moment(value).format('MM/DD/YYYY, h:mm:ss a')
         : moment(value).format('MM/DD/YYYY')
     : undefined;
@@ -79,12 +81,8 @@ const DateInputField = ({
 
   return (
     <>
-      {label && (
-        <View style={formStyles.fieldLabelContainer}>
-          <Text style={formStyles.fieldLabel}>{label}</Text>
-        </View>
-      )}
-      {isDisplayOnly ? <Text style={{...formStyles.fieldValue, paddingTop: 5, paddingBottom: 5}}>{title}</Text>
+      {label && <FieldLabel isRequired={isRequired} label={label}/>}
+      {isDisplayOnly ? <Text style={formStyles.fieldValue}>{title}</Text>
         : renderDatePickerWeb()}
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}
     </>

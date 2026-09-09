@@ -8,9 +8,9 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import DateInputField from '../form/DateInputField';
 import FormikWrapper from '../form/FormikWrapper';
-import TextInputField from '../form/TextInputField';
+import DateInputField from '../form/inputs/DateInputField';
+import TextInputField from '../form/inputs/TextInputField';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
