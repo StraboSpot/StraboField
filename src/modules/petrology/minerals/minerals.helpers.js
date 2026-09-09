@@ -15,7 +15,9 @@ const getFullMineralNameFromAbbrev = abbrev => ABBREVIATIONS_WITH_LABELS[abbrev.
 
 export const getMineralTitle = (item) => {
   if (item.full_mineral_name && item.mineral_abbrev) return item.full_mineral_name + ' (' + item.mineral_abbrev + ')';
-  else return item.full_mineral_name || '(' + item.mineral_abbrev + ')' || 'Unknown';
+  else if (item.full_mineral_name) return item.full_mineral_name;
+  else if (item.mineral_abbrev) return '(' + item.mineral_abbrev + ')';
+  else return 'Unknown';
 };
 
 export const setMineralFieldValue = async (formCurrent, name, value) => {
