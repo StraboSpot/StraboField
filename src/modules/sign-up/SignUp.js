@@ -115,24 +115,6 @@ const SignUp = ({navigation}) => {
 
   /* Logic Helpers */
 
-  const getModalStyles = () => {
-    // You can customize modal appearance based on status type
-    switch (statusType) {
-      case 'success':
-        return {
-          headerStyle: {backgroundColor: '#d4edda'},
-          titleStyle: {color: '#155724'},
-        };
-      case 'error':
-        return {
-          headerStyle: {backgroundColor: '#f8d7da'},
-          titleStyle: {color: '#721c24'},
-        };
-      default:
-        return {};
-    }
-  };
-
   const signUp = async () => {
     console.log('ConnectedValue', userData.password.value);
     setIsLoading(true);
@@ -279,7 +261,6 @@ const SignUp = ({navigation}) => {
           isVisible={statusDialog}
           onActionPressed={() => setStatusDialog(false)}
           showCancelButton={false}
-          {...getModalStyles()}
         >
           <ScrollView style={{maxHeight: 200}}>
             <Text style={{

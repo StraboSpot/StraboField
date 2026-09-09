@@ -74,7 +74,7 @@ const SampleListItem = ({
       )}
       <ListItem.Content style={sampleStyles.listContentContainer}>
         <View>
-          <ListItem.Title titleStyle={{...commonStyles.listItemTitle, textAlign: 'left'}}>
+          <ListItem.Title style={{...commonStyles.listItemTitle, textAlign: 'left'}}>
             {sampleMetadata.sample_id_name || 'Unknown'}
           </ListItem.Title>
           {isShowSubtitle && (
