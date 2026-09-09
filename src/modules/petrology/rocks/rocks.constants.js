@@ -1,6 +1,4 @@
-import {PAGE_KEYS} from '../page/pageKeys.constants';
-
-export const IGNEOUS_ROCK_CLASSES = {PLUTONIC: 'plutonic', VOLCANIC: 'volcanic'};
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
 
 export const ADD_ROCK_KEYS = {
   alteration_ore: {
@@ -31,19 +29,6 @@ export const ADD_ROCK_KEYS = {
     fourthKeys: ['zone'],
     lastKeys: ['notes_metamorphic'],
   },
-  mineral: {
-    firstKeys: ['mineral_abbrev', 'full_mineral_name'],
-    igOrMetKey: 'igneous_or_metamorphic',
-    igButtonsKeys: ['habit', 'textural_setting_igneous'],
-    metButtonsKeys: ['habit_met', 'textural_setting_metamorphic'],
-    lastKeys: ['average_grain_size_mm', 'maximum_grain_size_mm', 'modal', 'mineral_notes'],
-  },
-  reaction: {
-    firstKeys: ['reactions'],
-    basedOnKey: 'based_on',
-    basedOnOtherKey: 'other_based_on',
-    lastKeys: ['notes'],
-  },
   sedimentary: {
     firstKeys: ['primary_lithology'],
     siliciclasticKeys: ['siliciclastic_type'],
@@ -67,6 +52,8 @@ export const FAULT_SECTION_TITLE = {
   [PAGE_KEYS.ROCK_TYPE_FAULT]: 'Fault & Shear Zone Rocks',
 };
 
+export const IGNEOUS_ROCK_CLASSES = {PLUTONIC: 'plutonic', VOLCANIC: 'volcanic'};
+
 export const IGNEOUS_SECTION_TITLES = {
   plutonic: 'Plutonic Rocks',
   volcanic: 'Volcanic Rocks',
@@ -78,13 +65,13 @@ export const METAMORPHIC_SECTION_TITLE = {
   deprecated: 'Metamorphic Rocks (Deprecated Version)',
 };
 
-export const SEDIMENTARY_SECTION_TITLE = {
-  [PAGE_KEYS.LITHOLOGIES]: 'Sedimentary Rocks',
-};
-
 export const ROCK_FIRST_ORDER_CLASS_FIELDS = {
   igneous: ['plutonic_rock_type', 'volcanic_rock_type'],
   metamorphic: ['metamorphic_rock_type'],
   alteration_or: ['ore_type'],
   fault: ['fault_rock'],
+};
+
+export const SEDIMENTARY_SECTION_TITLE = {
+  [PAGE_KEYS.LITHOLOGIES]: 'Sedimentary Rocks',
 };

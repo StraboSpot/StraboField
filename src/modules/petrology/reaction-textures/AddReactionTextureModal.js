@@ -3,21 +3,21 @@ import {FlatList, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ADD_ROCK_KEYS} from './petrology.constants';
-import usePetrology from './usePetrology';
-import {getNewId, isEmpty} from '../../shared/helpers';
-import {SMALL_SCREEN} from '../../shared/styles.constants';
-import LittleSpacer from '../../shared/ui/LittleSpacer';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import ChoiceButtons from '../form/ChoiceButtons';
-import Form from '../form/Form';
-import formStyles from '../form/form.styles';
-import FormikWrapper from '../form/FormikWrapper';
-import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {ADD_REACTION_TEXTURE_KEYS} from './reactionTextures.constants';
+import {getNewId, isEmpty} from '../../../shared/helpers';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
+import LittleSpacer from '../../../shared/ui/LittleSpacer';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import ChoiceButtons from '../../form/ChoiceButtons';
+import Form from '../../form/Form';
+import formStyles from '../../form/form.styles';
+import FormikWrapper from '../../form/FormikWrapper';
+import useForm from '../../form/useForm';
+import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import usePetrology from '../usePetrology';
 
-const {firstKeys, basedOnKey, basedOnOtherKey, lastKeys} = ADD_ROCK_KEYS.reaction;
+const {firstKeys, basedOnKey, basedOnOtherKey, lastKeys} = ADD_REACTION_TEXTURE_KEYS;
 
 const AddReactionTextureModal = () => {
   /* Data Hooks */
@@ -25,7 +25,7 @@ const AddReactionTextureModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getSurvey, getRelevantFields} = useForm();
+  const {getChoices, getRelevantFields, getSurvey} = useForm();
   const {savePetFeature} = usePetrology();
 
   /* Local State */

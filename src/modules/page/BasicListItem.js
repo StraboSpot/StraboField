@@ -6,7 +6,9 @@ import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
-import usePetrology from '../petrology/usePetrology';
+import {getMineralTitle} from '../petrology/minerals/minerals.helpers';
+import {getReactionTextureTitle} from '../petrology/reaction-textures/reactionTextures.helpers';
+import {getPetRockTitle} from '../petrology/rocks/rocks.helpers';
 import useSed from '../sed/useSed';
 
 const BasicListItem = ({
@@ -19,8 +21,7 @@ const BasicListItem = ({
                        }) => {
   /* Data Hooks */
 
-  const {getLabel} = useForm();
-  const {getMineralTitle, getPetRockTitle, getReactionTextureTitle} = usePetrology();
+  const {getLabel, getLabels} = useForm();
   const {getBeddingTitle, getSedRockTitle, getStratSectionTitle} = useSed();
 
   /* Logic Helpers */
@@ -30,12 +31,12 @@ const BasicListItem = ({
       case PAGE_KEYS.MINERALS:
         return getMineralTitle(item);
       case PAGE_KEYS.REACTIONS:
-        return getReactionTextureTitle(item);
+        return getReactionTextureTitle(item, getLabels);
       case PAGE_KEYS.ROCK_TYPE_ALTERATION_ORE:
       case PAGE_KEYS.ROCK_TYPE_IGNEOUS:
       case PAGE_KEYS.ROCK_TYPE_METAMORPHIC:
       case PAGE_KEYS.ROCK_TYPE_FAULT:
-        return getPetRockTitle(item, page.key);
+        return getPetRockTitle(item, page.key, getLabel, getLabels);
       case PAGE_KEYS.ROCK_TYPE_SEDIMENTARY:
         return getSedRockTitle(item);
       case PAGE_KEYS.LITHOLOGIES:

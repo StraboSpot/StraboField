@@ -12,6 +12,14 @@ export const ABBREVIATIONS_WITH_LABELS = (
 );
 console.log('ABBREVIATIONS_WITH_LABELS', ABBREVIATIONS_WITH_LABELS);
 
+export const ADD_MINERAL_KEYS = {
+  firstKeys: ['mineral_abbrev', 'full_mineral_name'],
+  igOrMetKey: 'igneous_or_metamorphic',
+  igButtonsKeys: ['habit', 'textural_setting_igneous'],
+  metButtonsKeys: ['habit_met', 'textural_setting_metamorphic'],
+  lastKeys: ['average_grain_size_mm', 'maximum_grain_size_mm', 'modal', 'mineral_notes'],
+};
+
 export const LABELS_WITH_ABBREVIATIONS = (
   MINERAL_GLOSSARY_INFO.reduce((acc, mineral) => {
     return mineral.Abbreviation ? {...acc, [mineral.Label]: mineral.Abbreviation} : acc;

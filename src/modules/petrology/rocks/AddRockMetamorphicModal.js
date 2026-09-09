@@ -3,6 +3,7 @@ import {ScrollView, Text, View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
+import {ADD_ROCK_KEYS} from './rocks.constants';
 import {isEmpty} from '../../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -11,7 +12,6 @@ import Form from '../../form/Form';
 import formStyles from '../../form/form.styles';
 import MainButtons from '../../form/MainButtons';
 import useForm from '../../form/useForm';
-import {ADD_ROCK_KEYS} from '../petrology.constants';
 
 const {firstKeys, secondKeys, thirdKeys, fourthKeys, lastKeys} = ADD_ROCK_KEYS.metamorphic;
 

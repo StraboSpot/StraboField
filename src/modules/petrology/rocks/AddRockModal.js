@@ -9,6 +9,7 @@ import AddRockFaultModal from './AddRockFaultModal';
 import AddRockIgneousModal from './AddRockIgneousModal';
 import AddRockMetamorphicModal from './AddRockMetamorphicModal';
 import AddRockSedimentaryModal from './AddRockSedimentaryModal';
+import {IGNEOUS_ROCK_CLASSES} from './rocks.constants';
 import {getNewId, isEmpty, toTitleCase} from '../../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -19,7 +20,6 @@ import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSed from '../../sed/useSed';
 import TemplatesNotebook from '../../templates/TemplatesNotebook';
-import {IGNEOUS_ROCK_CLASSES} from '../petrology.constants';
 import usePetrology from '../usePetrology';
 
 const AddRockModal = ({modalKey}) => {

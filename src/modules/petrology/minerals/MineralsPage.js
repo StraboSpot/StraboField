@@ -4,6 +4,7 @@ import {FlatList, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getMineralTitle} from './minerals.helpers';
 import commonStyles from '../../../shared/common.styles';
 import {getNewCopyId, isEmpty} from '../../../shared/helpers';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
@@ -17,7 +18,6 @@ import PageHeader from '../../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
-import usePetrology from '../usePetrology';
 
 const MineralsPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -26,7 +26,6 @@ const MineralsPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getMineralTitle} = usePetrology();
   const {getSpotById, getSpotsWithKey} = useSpots();
 
   /* Local State */

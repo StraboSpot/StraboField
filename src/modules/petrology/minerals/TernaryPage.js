@@ -4,10 +4,10 @@ import {Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import {TERNARY_MINERALS} from './minerals/minerals.constants';
-import {roundToDecimalPlaces} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
-import PageHeader from '../page/PageHeader';
+import {TERNARY_MINERALS} from './minerals.constants';
+import {roundToDecimalPlaces} from '../../../shared/helpers';
+import * as themes from '../../../shared/styles.constants';
+import PageHeader from '../../page/PageHeader';
 
 const TernaryPage = ({page}) => {
   /* Data Hooks */

@@ -1,9 +1,9 @@
 import React from 'react';
 
+import {ADD_ROCK_KEYS, IGNEOUS_ROCK_CLASSES} from './rocks.constants';
 import {isEmpty} from '../../../shared/helpers';
 import Form from '../../form/Form';
 import MainButtons from '../../form/MainButtons';
-import {ADD_ROCK_KEYS, IGNEOUS_ROCK_CLASSES} from '../petrology.constants';
 
 const AddRockIgneousModal = ({formName, formProps, setChoicesViewKey, survey}) => {
   /* Derived Variables */

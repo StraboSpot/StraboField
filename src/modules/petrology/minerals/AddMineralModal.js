@@ -4,6 +4,8 @@ import {FlatList, View} from 'react-native';
 import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {ADD_MINERAL_KEYS} from './minerals.constants';
+import {setMineralFieldValue} from './minerals.helpers';
 import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
 import {getNewId, isEmpty} from '../../../shared/helpers';
@@ -18,10 +20,9 @@ import useForm from '../../form/useForm';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import TemplatesNotebook from '../../templates/TemplatesNotebook';
-import {ADD_ROCK_KEYS} from '../petrology.constants';
 import usePetrology from '../usePetrology';
 
-const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
+const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_MINERAL_KEYS;
 
 const AddMineralModal = () => {
   /* Data Hooks */
@@ -31,7 +32,7 @@ const AddMineralModal = () => {
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
-  const {savePetFeature, savePetFeatureValuesFromTemplates, setMineralFieldValue} = usePetrology();
+  const {savePetFeature, savePetFeatureValuesFromTemplates} = usePetrology();
 
   /* Local State */
 

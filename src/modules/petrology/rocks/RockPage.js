@@ -4,6 +4,13 @@ import {SectionList, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {
+  ALTERATION_ORE_SECTION_TITLE,
+  FAULT_SECTION_TITLE,
+  IGNEOUS_SECTION_TITLES,
+  METAMORPHIC_SECTION_TITLE,
+  SEDIMENTARY_SECTION_TITLE,
+} from './rocks.constants';
 import commonStyles from '../../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
@@ -22,13 +29,6 @@ import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {editedSpotProperties} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
-import {
-  ALTERATION_ORE_SECTION_TITLE,
-  FAULT_SECTION_TITLE,
-  IGNEOUS_SECTION_TITLES,
-  METAMORPHIC_SECTION_TITLE,
-  SEDIMENTARY_SECTION_TITLE,
-} from '../petrology.constants';
 
 const RockPage = ({isReadOnly, page}) => {
   /* Data Hooks */

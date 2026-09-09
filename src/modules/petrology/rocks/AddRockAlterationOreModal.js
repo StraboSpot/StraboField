@@ -1,8 +1,8 @@
 import React from 'react';
 
+import {ADD_ROCK_KEYS} from './rocks.constants';
 import Form from '../../form/Form';
 import MainButtons from '../../form/MainButtons';
-import {ADD_ROCK_KEYS} from '../petrology.constants';
 
 const {firstKeys, secondKeys, lastKeys} = ADD_ROCK_KEYS.alteration_ore;
 

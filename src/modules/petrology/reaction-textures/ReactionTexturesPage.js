@@ -4,18 +4,18 @@ import {FlatList, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import usePetrology from './usePetrology';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDivider from '../../shared/ui/SectionDivider';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {setModalVisible} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
-import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/helpers';
+import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import SectionDivider from '../../../shared/ui/SectionDivider';
+import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
+import {setModalVisible} from '../../home/home.slice';
+import BasicListItem from '../../page/BasicListItem';
+import BasicPageDetail from '../../page/BasicPageDetail';
+import PageHeader from '../../page/PageHeader';
+import {setSelectedAttributes} from '../../spots/spots.slice';
+import {getMineralTitle} from '../minerals/minerals.helpers';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -23,8 +23,6 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
-
-  const {getMineralTitle} = usePetrology();
 
   /* Local State */
 
