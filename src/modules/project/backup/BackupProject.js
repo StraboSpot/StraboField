@@ -103,8 +103,8 @@ const BackupProject = () => {
                   checked={isWifiOnlyForImages}
                   containerStyle={{backgroundColor: 'transparent', borderWidth: 0, padding: 4, marginLeft: 0}}
                   onPress={() => dispatch(setWifiOnlyForImages(!isWifiOnlyForImages))}
+                  textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                   title={'Auto sync images on wifi only'}
-                  titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
                 />
               )}
             </View>
