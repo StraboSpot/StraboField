@@ -6,20 +6,20 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
-import {ADD_ROCK_KEYS} from './petrology.constants';
-import usePetrology from './usePetrology';
-import {getNewId, isEmpty} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import LittleSpacer from '../../shared/ui/LittleSpacer';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import ChoiceButtons from '../form/ChoiceButtons';
-import Form from '../form/Form';
-import FormikWrapper from '../form/FormikWrapper';
-import MainButtons from '../form/MainButtons';
-import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
-import TemplatesNotebook from '../templates/TemplatesNotebook';
+import {getNewId, isEmpty} from '../../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import LittleSpacer from '../../../shared/ui/LittleSpacer';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import ChoiceButtons from '../../form/ChoiceButtons';
+import Form from '../../form/Form';
+import FormikWrapper from '../../form/FormikWrapper';
+import MainButtons from '../../form/MainButtons';
+import useForm from '../../form/useForm';
+import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import TemplatesNotebook from '../../templates/TemplatesNotebook';
+import {ADD_ROCK_KEYS} from '../petrology.constants';
+import usePetrology from '../usePetrology';
 
 const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_ROCK_KEYS.mineral;
 

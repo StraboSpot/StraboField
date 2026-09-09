@@ -2,8 +2,8 @@ import React from 'react';
 import {FlatList, View} from 'react-native';
 
 import {MINERALS_BY_CLASS} from './minerals.constants';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
-import SectionDivider from '../../shared/ui/SectionDivider';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 
 const MineralsByRockClass = ({addMineral}) => {
   /* View */

@@ -2,10 +2,10 @@ import React, {useState} from 'react';
 import {FlatList, Linking, Text, View} from 'react-native';
 
 import {MINERAL_GLOSSARY_INFO} from './mineralsGlossary.constants';
-import {chunk} from './petrology.helpers';
-import {isEmpty} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
+import {isEmpty} from '../../../shared/helpers';
+import * as themes from '../../../shared/styles.constants';
+import ClearButton from '../../../shared/ui/buttons/ClearButton';
+import {chunk} from '../petrology.helpers';
 
 const glossaryChunked = chunk(MINERAL_GLOSSARY_INFO, Math.ceil((MINERAL_GLOSSARY_INFO.length + 1) / 2));
 

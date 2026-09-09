@@ -1,8 +1,8 @@
 import React from 'react';
 
-import {ADD_ROCK_KEYS} from './petrology.constants';
-import Form from '../form/Form';
-import MainButtons from '../form/MainButtons';
+import Form from '../../form/Form';
+import MainButtons from '../../form/MainButtons';
+import {ADD_ROCK_KEYS} from '../petrology.constants';
 
 const {firstKeys, lastKeys} = ADD_ROCK_KEYS.fault;
 

@@ -1,4 +1,4 @@
-import {ABBREVIATIONS_WITH_LABELS, LABELS_WITH_ABBREVIATIONS} from './minerals.constants';
+import {ABBREVIATIONS_WITH_LABELS, LABELS_WITH_ABBREVIATIONS} from './minerals/minerals.constants';
 
 export const chunk = (input, size) => {
   return input.reduce((arr, item, idx) => {

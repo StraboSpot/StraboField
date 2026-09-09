@@ -3,9 +3,9 @@ import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 
 import RockPage from './RockPage';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import {setSelectedAttributes} from '../../spots/spots.slice';
 
-const RockAlterationOrePage = ({isReadOnly, page}) => {
+const RockFaultPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ const RockAlterationOrePage = ({isReadOnly, page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE RockAlterationOrePage [page]', page);
+    console.log('UE RockFaultPage [page]', page);
     return () => dispatch(setSelectedAttributes([]));
   }, [page]);
 
@@ -24,4 +24,4 @@ const RockAlterationOrePage = ({isReadOnly, page}) => {
   );
 };
 
-export default RockAlterationOrePage;
+export default RockFaultPage;
