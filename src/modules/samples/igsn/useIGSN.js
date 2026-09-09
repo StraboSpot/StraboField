@@ -14,7 +14,7 @@ const useIGSN = () => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel} = useForm();
-  const {getSesarUserCode, postToSesar, refreshSesarToken, updateSampleWithSesar} = useServerRequests();
+  const {getSesarUserCode, postToSesar, refreshSesarToken, updateOnSesar} = useServerRequests();
 
   /* Internal Functions */
 
@@ -37,30 +37,45 @@ const useIGSN = () => {
   };
 
   const postSampleToSesar = async (xmlSchema, isUpdating) => {
-    const response = isUpdating ? await updateSampleWithSesar(xmlSchema) : await postToSesar(xmlSchema);
+    const response = isUpdating ? await updateOnSesar(xmlSchema) : await postToSesar(xmlSchema);
     const resText = await response.text();
     const json = parseXML(resText);
     console.log('SAMPLE Response json', json);
-    if (response.ok) {
-      const singleResObject = Object.fromEntries(
-        Object.entries(json.results.sample[0]).map(([key, value]) => [key, value[0]]),
-      );
-      console.log(singleResObject);
-      return singleResObject;
+
+    // SESAR replies with XML that parseXML turns into arrays. Treat anything that isn't an unambiguous success as a
+    // failure and throw, so registerSample shows the error view rather than mistaking a rejected sample for a result.
+    // A response can fail three ways: an unreadable/empty body (parseXML returns undefined), a top-level
+    // <results><error>, or a per-sample <error> — the last of which SESAR can return even with a 2xx status.
+    const results = json?.results;
+    if (!results) {
+      throw Error(response.ok
+        ? 'SESAR returned an unreadable response. Please try again.'
+        : `SESAR rejected the sample (status ${response.status}).`);
     }
-    else if (json.results.error) throw Error(json.results.error[0]);
-    else {
-      console.log(json.results.sample[0]);
-      return json.results.sample[0];
-    }
+
+    const sample = results.sample?.[0];
+    const errorText = e => typeof e === 'string' ? e : (e?._ ?? 'SESAR reported an error.');
+    const errors = [
+      ...(Array.isArray(results.error) ? results.error : []),
+      ...(Array.isArray(sample?.error) ? sample.error : []),
+    ].map(errorText).filter(Boolean);
+    if (errors.length > 0) throw Error(errors.join('\n'));
+
+    if (!response.ok || !sample) throw Error(`SESAR rejected the sample (status ${response.status}).`);
+
+    const singleResObject = Object.fromEntries(
+      Object.entries(sample).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
+    );
+    console.log(singleResObject);
+    return singleResObject;
   };
 
   const refreshToken = async (refresh) => {
     try {
       const newTokens = await refreshSesarToken(refresh);
       console.log(newTokens);
-      if (newTokens.error) {
-        console.error('Token refresh failed:', newTokens.error);
+      if (newTokens.error || !newTokens.access || !newTokens.refresh) {
+        console.error('Token refresh failed:', newTokens.error || 'incomplete token response');
         return null;
       }
       dispatch(setSesarToken(newTokens));
@@ -91,6 +106,9 @@ const useIGSN = () => {
     else if (json.results.error) throw Error(json.results.error);
     else {
       const newTokens = await getValidToken(sesarTokens);
+      // getValidToken returns null when the refresh fails, and returns the same (unexpired) token when it had
+      // nothing to refresh — retrying with either would crash on `.access` or recurse forever, so bail to re-auth.
+      if (!newTokens?.access || newTokens.access === sesarTokens.access) throw Error('SESAR_REAUTH_REQUIRED');
       return await getAndSaveSesarCode(newTokens);
     }
   };
@@ -145,7 +163,7 @@ const useIGSN = () => {
     return mappedObj;
   };
 
-  const updateSampleIsSesar = async (mappedArray) => {
+  const updateSampleWithSesar = async (mappedArray) => {
     // console.log('Update sample', updatedSample);
     // const mappedArray = straboSesarMapping(updatedSample);
     // console.log(mappedArray);
@@ -165,7 +183,7 @@ const useIGSN = () => {
     authenticateWithSesar,
     getAndSaveSesarCode,
     straboSesarMapping,
-    updateSampleIsSesar,
+    updateSampleWithSesar,
     uploadSample,
   };
 };

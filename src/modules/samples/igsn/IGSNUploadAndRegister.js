@@ -79,6 +79,11 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, selectedFeatur
       }
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
+        if (!tokens?.access) {
+          dispatch(setInitialSesarState());
+          toast.show('Your SESAR session expired. Please sign in again.', {placement: 'bottom', type: 'danger'});
+          return;
+        }
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
         toast.show(sesarMessage, {
           duration: 3000,
