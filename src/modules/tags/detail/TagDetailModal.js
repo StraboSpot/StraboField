@@ -3,18 +3,18 @@ import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import useTags from './useTags';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import Form from '../form/Form';
-import FormikWrapper from '../form/FormikWrapper';
-import useForm from '../form/useForm';
-import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
-import TagColor from './color/TagColor';
-import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
+import {getNewId, isEmpty, toTitleCase} from '../../../shared/helpers';
+import alert from '../../../shared/ui/alert';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import Form from '../../form/Form';
+import FormikWrapper from '../../form/FormikWrapper';
+import useForm from '../../form/useForm';
+import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import {MODAL_KEYS} from '../../page/pageKeys.constants';
+import TagColor from '../color/TagColor';
+import {TAG_FORM_NAMES, TAG_TYPES} from '../tags.constants';
+import useTags from '../useTags';
 
 const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */

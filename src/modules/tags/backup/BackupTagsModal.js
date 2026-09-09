@@ -4,11 +4,11 @@ import {Platform} from 'react-native';
 import moment from 'moment/moment';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {TAG_BACKUP_ACTIONS, TAG_BACKUP_STATUS, TAG_BACKUP_MESSAGES} from './tags.constants';
-import useExport from '../../services/files/useExport';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
-import SaveAndExportModalContent from '../project/backup/SaveAndExportModalContent';
+import {TAG_BACKUP_ACTIONS, TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS} from './tagBackup.constants';
+import useExport from '../../../services/files/useExport';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import {clearedStatusMessages, setLoadingStatus} from '../../home/home.slice';
+import SaveAndExportModalContent from '../../project/backup/SaveAndExportModalContent';
 
 const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   /* Data Hooks */

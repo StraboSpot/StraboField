@@ -3,8 +3,8 @@ import {FlatList} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import TagDetailModal from './detail/TagDetailModal';
 import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
-import TagDetailModal from './TagDetailModal';
 import TagsAtSpotList from './TagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';

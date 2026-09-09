@@ -3,12 +3,12 @@ import {Pressable, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import TagColorIcon from './color/TagColorIcon';
-import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tags.constants';
-import tagsStyles from './tags.styles';
-import useTags from './useTags';
-import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
+import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tagDetail.constants';
+import commonStyles from '../../../shared/common.styles';
+import {isEmpty, toTitleCase} from '../../../shared/helpers';
+import TagColorIcon from '../color/TagColorIcon';
+import tagsStyles from '../tags.styles';
+import useTags from '../useTags';
 
 const TagDetailSummaryText = ({onPress}) => {
   /* Data Hooks */
@@ -20,10 +20,7 @@ const TagDetailSummaryText = ({onPress}) => {
   let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
   if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
   const notes = selectedTag.notes || undefined;
-  let rockUnitString = TAG_ROCK_UNIT_FIELDS.reduce((acc, field) => {
-    if (selectedTag[field]) return acc + (!isEmpty(acc) ? ' / ' : '') + selectedTag[field];
-    else return acc;
-  }, []);
+  const rockUnitString = TAG_ROCK_UNIT_FIELDS.map(field => selectedTag[field]).filter(Boolean).join(' / ');
   const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
   const subType = subTypeField ? getTagLabel(selectedTag[subTypeField]) : undefined;
 

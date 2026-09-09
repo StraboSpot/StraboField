@@ -5,12 +5,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import TagDetail from './TagDetail';
 import TagDetailModal from './TagDetailModal';
-import {isEmpty} from '../../shared/helpers';
-import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
-import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
+import {isEmpty} from '../../../shared/helpers';
+import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
+import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import {setSelectedAttributes, setSelectedSpot} from '../../spots/spots.slice';
 
 const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
   /* Data Hooks */
@@ -30,6 +30,8 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
   /* Logic Helpers */
 
   const closeDetailModal = () => setIsDetailModalVisible(false);
+
+  const openDetailModal = () => setIsDetailModalVisible(true);
 
   const openFeatureDetail = (spot, feature, featureType) => {
     dispatch(setSelectedSpot(spot));
@@ -58,13 +60,13 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
           addRemoveSpots={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS}));
           }}
-          openFeatureDetail={(spot, feature, featureType) => openFeatureDetail(spot, feature, featureType)}
+          openDetailModal={openDetailModal}
+          openFeatureDetail={openFeatureDetail}
           openSpot={(spot) => {
             dispatch(setSelectedSpot(spot));
             openNotebookPanel();
           }}
           openSpotInNotebook={openSpotInNotebook}
-          setIsDetailModalVisible={() => setIsDetailModalVisible(true)}
         />
       </View>
 

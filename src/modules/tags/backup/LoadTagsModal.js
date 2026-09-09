@@ -5,20 +5,21 @@ import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS, TAG_TYPES} from './tags.constants';
-import useSafeDocumentPicker from '../../services/device/useSafeDocumentPicker';
+import useSafeDocumentPicker from '../../../services/device/useSafeDocumentPicker';
 import {
   DARKGREY,
   MODAL_TEXT_SIZE,
   PRIMARY_TEXT_COLOR,
   PRIMARY_TEXT_SIZE,
   WARNING_COLOR,
-} from '../../shared/styles.constants';
-import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import LottieAnimations from '../../utils/animations/LottieAnimations';
-import {PROJECT_SAVE_STATUS} from '../connections/connections.constants';
-import {setLoadingStatus as setHomeLoadingStatus} from '../home/home.slice';
-import {updatedProject} from '../project/projects.slice';
+} from '../../../shared/styles.constants';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import LottieAnimations from '../../../utils/animations/LottieAnimations';
+import {PROJECT_SAVE_STATUS} from '../../connections/connections.constants';
+import {setLoadingStatus as setHomeLoadingStatus} from '../../home/home.slice';
+import {updatedProject} from '../../project/projects.slice';
+import {TAG_TYPES} from '../tags.constants';
+import {TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS} from './tagBackup.constants';
 
 // Generous on purpose: firing early would report a failure while the save is still genuinely in flight.
 const SERVER_SAVE_TIMEOUT_MS = 60000;

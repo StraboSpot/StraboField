@@ -5,26 +5,26 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import TagDetailSummaryText from './TagDetailSummaryText';
-import useTags from './useTags';
-import commonStyles from '../../shared/common.styles';
-import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
-import NotebookPageAvatar from '../../shared/ui/avatars/NotebookPageAvatar';
-import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
-import ListEmptyText from '../../shared/ui/ListEmptyText';
-import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
-import SamplesSectionList from '../samples/SamplesSectionList';
-import SpotsListItem from '../spots/SpotsListItem';
-import useSpots from '../spots/useSpots';
+import commonStyles from '../../../shared/common.styles';
+import {deepFindFeatureTypeById, isEmpty} from '../../../shared/helpers';
+import NotebookPageAvatar from '../../../shared/ui/avatars/NotebookPageAvatar';
+import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
+import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import SamplesSectionList from '../../samples/SamplesSectionList';
+import SpotsListItem from '../../spots/SpotsListItem';
+import useSpots from '../../spots/useSpots';
+import useTags from '../useTags';
 
 const TagDetail = ({
                      addRemoveFeatures,
                      addRemoveSampleSpots,
                      addRemoveSpots,
+                     openDetailModal,
                      openFeatureDetail,
                      openSpot,
                      openSpotInNotebook,
-                     setIsDetailModalVisible,
                    }) => {
   /* Data Hooks */
 
@@ -72,7 +72,7 @@ const TagDetail = ({
     );
   };
 
-  const renderSpotFeatureItem = (feature) => {
+  const renderSpotFeatureItem = ({item: feature}) => {
     const spot = getSpotById(feature.parentSpotId);
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
     if (!isEmpty(spot)) {
@@ -90,18 +90,15 @@ const TagDetail = ({
             </ListItem.Title>
             <ListItem.Subtitle>{spot.properties.name}</ListItem.Subtitle>
           </ListItem.Content>
-          {isReadOnly ? (
-            <>
-              <Icon
-                containerStyle={{justifyContent: 'center', paddingRight: 5}}
-                name={'lock-closed'}
-                size={12}
-                type={'ionicon'}
-              />
-              <ListItem.Chevron/>
-            </>
-          ) : <ListItem.Chevron/>
-          }
+          {isReadOnly && (
+            <Icon
+              containerStyle={{justifyContent: 'center', paddingRight: 5}}
+              name={'lock-closed'}
+              size={12}
+              type={'ionicon'}
+            />
+          )}
+          <ListItem.Chevron/>
         </ListItem>
       );
     }
@@ -121,7 +118,7 @@ const TagDetail = ({
         extraData={selectedTag}
         keyExtractor={item => 'Feature' + item.id.toString()}
         listKey={'features'}
-        renderItem={({item}) => renderSpotFeatureItem(item)}
+        renderItem={renderSpotFeatureItem}
       />
     );
   };
@@ -135,9 +132,9 @@ const TagDetail = ({
           <SectionDividerWithRightButton
             buttonTitle={'View/Edit'}
             dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
-            onPress={setIsDetailModalVisible}
+            onPress={openDetailModal}
           />
-          {selectedTag && <TagDetailSummaryText onPress={setIsDetailModalVisible}/>}
+          {selectedTag && <TagDetailSummaryText onPress={openDetailModal}/>}
 
           {/* Spots with this Tag */}
           <SectionDividerWithRightButton
@@ -148,8 +145,7 @@ const TagDetail = ({
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No Spots'}/>}
-            data={selectedTag.spots && selectedTag.spots.filter(
-              spotId => spots[spotId] && !spots[spotId].properties.isSample)}
+            data={selectedTag.spots?.filter(spotId => spots[spotId] && !spots[spotId].properties.isSample)}
             keyExtractor={item => 'Spot' + item.toString()}
             listKey={'spots'}
             renderItem={renderSpotItem}
