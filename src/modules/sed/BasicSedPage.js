@@ -8,7 +8,7 @@ import {isLithologyRequiredForInterval} from './sed.helpers';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';

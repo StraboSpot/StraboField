@@ -3,9 +3,9 @@ import React from 'react';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {useTags} from '.';
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_TYPES} from './tags.constants';
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/helpers';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';

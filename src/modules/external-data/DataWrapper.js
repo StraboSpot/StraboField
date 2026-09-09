@@ -6,7 +6,7 @@ import UrlData from './URLData';
 import useExternalData from './useExternalData';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import {WarningModal} from '../../shared/ui/modals';
+import WarningModal from '../../shared/ui/modals/WarningModal';
 
 function DataWrapper({
                        editable,

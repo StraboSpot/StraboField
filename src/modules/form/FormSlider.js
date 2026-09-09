@@ -3,11 +3,11 @@ import {Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
+import useForm from './useForm';
 import commonStyles from '../../shared/common.styles';
 import {SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import SliderBar from '../../shared/ui/SliderBar';
 import uiStyles from '../../shared/ui/ui.styles';
-import {useForm} from '../form';
 
 const FormSlider = ({
                       choices,

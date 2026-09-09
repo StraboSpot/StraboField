@@ -6,7 +6,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../shared/styles.constants';
 import TruncatedText from '../../shared/ui/TruncatedText';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 
 // The tabs of a feature edited across several subpages. The field in error is not always on the tab being shown -
 // choosing a siliciclastic type on Lithology asks for a grain size over on Texture - so each tab holding one is

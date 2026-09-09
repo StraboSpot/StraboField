@@ -1,7 +1,8 @@
 import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
-import {LeftSideButtons, RightSideButtons} from './buttons';
+import LeftSideButtons from './buttons/LeftSideButtons';
+import RightSideButtons from './buttons/RightSideButtons';
 import DeviceInfo from './DeviceInfo';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';

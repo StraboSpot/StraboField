@@ -7,7 +7,7 @@ import StratSectionImageOverlay from './StratSectionImageOverlay';
 import XAxes from './XAxes';
 import YAxis from './YAxis';
 import {getLocalImageURI} from '../../images/imageURIs.helpers';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import useMapCoords from '../view/useMapCoords';
 
 const StratSectionBackground = () => {

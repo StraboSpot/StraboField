@@ -8,7 +8,10 @@ import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {Form, formStyles, MainButtons, useForm} from '../form';
+import Form from '../form/Form';
+import formStyles from '../form/form.styles';
+import MainButtons from '../form/MainButtons';
+import useForm from '../form/useForm';
 
 const {firstKeys, secondKeys, thirdKeys, fourthKeys, lastKeys} = ADD_ROCK_KEYS.metamorphic;
 

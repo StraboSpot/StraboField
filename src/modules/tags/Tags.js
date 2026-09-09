@@ -7,7 +7,9 @@ import BackupTagsModal from './BackupTagsModal';
 import LoadTagsModal from './LoadTagsModal';
 import TagQuery from './query/TagQuery';
 import {TAG_FILTERS} from './query/tagQuery.constants';
+import TagDetailModal from './TagDetailModal';
 import {TAG_TYPES} from './tags.constants';
+import TagsList from './TagsList';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
@@ -16,7 +18,6 @@ import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
-import {TagDetailModal, TagsList} from '../tags';
 
 const Tags = ({
                 closeTagsOverflowMenu,

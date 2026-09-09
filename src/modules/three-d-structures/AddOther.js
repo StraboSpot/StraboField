@@ -13,7 +13,8 @@ import {
   MULLION_MEASUREMENTS_KEYS,
 } from './threeDStructures.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 

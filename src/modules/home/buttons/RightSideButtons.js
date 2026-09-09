@@ -4,8 +4,9 @@ import {Animated, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDeviceOrientation from '../useDeviceOrientation';
-import {DrawActionButtons, ShortcutButtons} from './';
+import DrawActionButtons from './DrawActionButtons';
 import NotebookButton from './NotebookButton';
+import ShortcutButtons from './ShortcutButtons';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import {canceledIntervalDrag} from '../../maps/maps.slice';

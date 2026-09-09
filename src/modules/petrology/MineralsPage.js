@@ -9,14 +9,15 @@ import commonStyles from '../../shared/common.styles';
 import {getNewCopyId, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {FormikWrapper, SelectInputField} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import SelectInputField from '../form/SelectInputField';
 import {setModalVisible} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const MineralsPage = ({isReadOnly, page}) => {
   /* Data Hooks */

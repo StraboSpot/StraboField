@@ -2,8 +2,8 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
+import TagsNotebookModal from './TagsNotebookModal';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
-import {TagsNotebookModal} from '../tags';
 
 const FeatureTagsModal = () => {
   /* Data Hooks */

@@ -4,13 +4,15 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
+import useTags from './useTags';
 import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, FormikWrapper, useForm} from '../form';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
-import {useTags} from '../tags';
 import TagColor from './color/TagColor';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 

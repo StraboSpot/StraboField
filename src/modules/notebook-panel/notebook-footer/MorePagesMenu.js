@@ -6,10 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui';
-import {AvatarWrapper} from '../../../shared/ui/avatars';
+import AvatarWrapper from '../../../shared/ui/avatars/AvatarWrapper';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import usePage from '../../page/usePage';
 import {
   addedNotebookPageOn,

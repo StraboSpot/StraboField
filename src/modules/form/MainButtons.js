@@ -4,9 +4,10 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 
 import {isRequired} from './form.helpers';
+import formStyles from './form.styles';
+import useForm from './useForm';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
-import {formStyles, useForm} from '../form';
 
 const MainButtons = ({
                        formName,

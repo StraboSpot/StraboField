@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';

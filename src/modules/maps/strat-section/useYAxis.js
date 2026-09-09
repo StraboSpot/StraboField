@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 import {EMPTY_LINE_STRING_FEATURE} from './stratSection.constants';
 import useStratSection from './useStratSection';
 import {Y_MULTIPLIER} from '../../sed/sed.constants';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION} from '../maps.constants';
 import useMapCoords from '../view/useMapCoords';
 

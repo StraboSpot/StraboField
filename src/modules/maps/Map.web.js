@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import useMapMouseActions from './interactions/useMapMouseActions.web';
 import useMapMoveEvents from './interactions/useMapMoveEvents';
-import {MapLayers} from './layers';
+import MapLayers from './layers/MapLayers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';

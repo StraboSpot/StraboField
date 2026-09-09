@@ -5,7 +5,9 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {Button, Header, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ActionButtonsSmallScreen, MainMenuButton, ShortcutButtons} from './buttons';
+import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
+import MainMenuButton from './buttons/MainMenuButton';
+import ShortcutButtons from './buttons/ShortcutButtons';
 import {NAVIGATION_OPTIONS} from './home.constants';
 import {setModalVisible} from './home.slice';
 import homeStyles from './home.style';

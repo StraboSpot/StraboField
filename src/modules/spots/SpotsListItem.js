@@ -3,14 +3,14 @@ import React from 'react';
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
+import SpotDataIcons from './SpotDataIcons';
 import useSpots from './useSpots';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {SAMPLES_COLOR} from '../../shared/styles.constants';
-import {SpotGeometryAvatar} from '../../shared/ui/avatars';
-import {useTags} from '../tags';
-import SpotDataIcons from './SpotDataIcons';
+import SpotGeometryAvatar from '../../shared/ui/avatars/SpotGeometryAvatar';
 import CheckboxList from '../../shared/ui/CheckboxList';
+import useTags from '../tags/useTags';
 
 const SpotsListItem = ({
                          doShowSamples,

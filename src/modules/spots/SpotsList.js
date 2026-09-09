@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
-import {SpotsListItem, useSpots} from '.';
 import SpotQuery from './SpotQuery';
+import SpotsListItem from './SpotsListItem';
+import useSpots from './useSpots';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';

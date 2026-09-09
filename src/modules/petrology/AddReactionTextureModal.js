@@ -9,7 +9,11 @@ import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {ChoiceButtons, Form, FormikWrapper, formStyles, useForm} from '../form';
+import ChoiceButtons from '../form/ChoiceButtons';
+import Form from '../form/Form';
+import formStyles from '../form/form.styles';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 

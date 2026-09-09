@@ -3,7 +3,8 @@ import {ActivityIndicator, Platform, Text, View} from 'react-native';
 
 import {Icon, Image} from '@rn-vui/base';
 
-import {ImagePropertiesModal, imageStyles} from '.';
+import imageStyles from './image.styles';
+import ImagePropertiesModal from './ImagePropertiesModal';
 import {getLocalImageURI, getResizedImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
 import placeholderImage from '../../assets/images/noimage.jpg';

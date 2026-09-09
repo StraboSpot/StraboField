@@ -4,9 +4,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
 import {getNewUUID, isEmpty, isSameId} from '../../../shared/helpers';
-import {useForm} from '../../form';
+import useForm from '../../form/useForm';
 import {setActiveDatasets} from '../../project/projects.slice';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {clearedSpotsInMapExtentIds} from '../maps.slice';
 
 const useStratSection = () => {

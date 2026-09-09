@@ -9,13 +9,13 @@ import IGSNModal from './igsn/IGSNModal';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
-import {AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const SampleListItem = ({
                           isCheckedList,

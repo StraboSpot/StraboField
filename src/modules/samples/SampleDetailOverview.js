@@ -7,7 +7,7 @@ import IGSNModal from './igsn/IGSNModal';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';

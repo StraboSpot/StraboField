@@ -4,16 +4,17 @@ import {View} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useSelector} from 'react-redux';
 
-import {SpotsList, SpotsListItem} from './index';
 import {PICKER_KEYS, PICKER_LABELS} from './spots.constants';
+import SpotsList from './SpotsList';
+import SpotsListItem from './SpotsListItem';
 import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import {PRIMARY_BACKGROUND_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import styles from '../../shared/ui/ui.styles';
-import {ImageGallery} from '../images';
-import {ReportsList} from '../reports';
+import ImageGallery from '../images/ImageGallery';
+import ReportsList from '../reports/ReportsList';
 import Samples from '../samples/Samples';
 
 const SpotNavigator = ({closeSpotsNavigator, openNotebookPanel, openSpotInNotebook}) => {

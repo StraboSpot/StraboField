@@ -3,11 +3,12 @@ import {FlatList} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import TagsListItem from './TagsListItem';
+import useTags from './useTags';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {useSpots} from '../spots';
-import {TagsListItem, useTags} from '../tags';
+import useSpots from '../spots/useSpots';
 
 const FeatureTagsAtSpotList = ({openMainMenuPanel, page}) => {
   /* Data Hooks */

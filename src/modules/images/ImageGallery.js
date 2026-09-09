@@ -4,7 +4,8 @@ import {SectionList, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 
-import {ImagesList, imageStyles} from '.';
+import imageStyles from './image.styles';
+import ImagesList from './ImagesList';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -12,8 +13,8 @@ import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {useSpots} from '../spots';
 import SpotQuery from '../spots/SpotQuery';
+import useSpots from '../spots/useSpots';
 
 const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];

@@ -19,7 +19,8 @@ import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
-import {SpotsListItem, useSpots} from '../spots';
+import SpotsListItem from '../spots/SpotsListItem';
+import useSpots from '../spots/useSpots';
 
 const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPanel, zoomToSpots}) => {
   console.log('Rendering NotebookContent...');

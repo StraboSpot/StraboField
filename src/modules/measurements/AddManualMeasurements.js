@@ -14,7 +14,8 @@ import commonStyles from '../../shared/common.styles';
 import SliderBar from '../../shared/ui/SliderBar';
 import {setOrientationFieldValue} from '../compass/compass.helpers';
 import compassStyles from '../compass/compass.styles';
-import {Form, useForm} from '../form';
+import Form from '../form/Form';
+import useForm from '../form/useForm';
 
 const AddManualMeasurements = ({formProps, measurementType, formRefCurrent}) => {
   /* Data Hooks */

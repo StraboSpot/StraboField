@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {TagsModal} from './index';
+import TagsModal from './TagsModal';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const TagsShortcutModal = ({

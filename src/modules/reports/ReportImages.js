@@ -5,7 +5,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getUniqueTitle, isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {AddImageButtons, ImageModal, ImagesList, useImages} from '../images';
+import AddImageButtons from '../images/AddImageButtons';
+import ImageModal from '../images/ImageModal';
+import ImagesList from '../images/ImagesList';
+import useImages from '../images/useImages';
 import {updatedProject} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 

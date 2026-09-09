@@ -9,8 +9,8 @@ import SampleModalGeologicUnits from './SampleModalGeologicUnits';
 import SampleModalImages from './SampleModalImages';
 import useSampleModal from './useSampleModal';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {WarningModal} from '../../shared/ui/modals';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import WarningModal from '../../shared/ui/modals/WarningModal';
 import {setModalVisible} from '../home/home.slice';
 
 const SampleModal = ({onPress, zoomToCurrentLocation}) => {

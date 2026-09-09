@@ -3,7 +3,9 @@ import {Animated} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {MainMenuButton, MapActionButtons, UserLocationButton} from './index';
+import MainMenuButton from './MainMenuButton';
+import MapActionButtons from './MapActionButtons';
+import UserLocationButton from './UserLocationButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import homeStyles from '../home.style';
 

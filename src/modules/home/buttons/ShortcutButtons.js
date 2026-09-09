@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
-import {useImages} from '../../images';
+import useImages from '../../images/useImages';
 import useMapLocation from '../../maps/view/useMapLocation';
 import {SHORTCUT_MODALS} from '../../page/page.constants';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';

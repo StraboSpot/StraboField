@@ -3,7 +3,10 @@ import React, {useMemo, useState} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
 
-import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
+import FeatureHalosLayers from './FeatureHalosLayers';
+import FeaturesNotSelectedLayers from './FeaturesNotSelectedLayers';
+import FeaturesSelectedLayers from './FeaturesSelectedLayers';
+import SampleLayers from './SampleLayers';
 import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
 import useMapFeatures from '../features/useMapFeatures';

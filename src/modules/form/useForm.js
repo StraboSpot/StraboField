@@ -1,10 +1,10 @@
 import moment from 'moment';
 
+import {LABEL_DICTIONARY} from './form.constants';
 import {getConstraintError, getLogicFunction, isRequired} from './form.helpers';
 import * as forms from '../../assets/forms';
 import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {LABEL_DICTIONARY} from '../form';
 
 const useForm = () => {
   /* Exported Functions */

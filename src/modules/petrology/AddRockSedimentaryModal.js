@@ -1,7 +1,9 @@
 import React from 'react';
 
 import {ADD_ROCK_KEYS} from './petrology.constants';
-import {Form, FormSlider, MainButtons} from '../form';
+import Form from '../form/Form';
+import FormSlider from '../form/FormSlider';
+import MainButtons from '../form/MainButtons';
 
 const {
   firstKeys, siliciclasticKeys, dunhamKeys, evaporiteKeys, organicCoalKeys,

@@ -9,7 +9,7 @@ import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui/';
+import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';

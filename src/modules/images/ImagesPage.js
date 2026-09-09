@@ -4,7 +4,8 @@ import {FlatList, View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {AddImageButtons, ImagesInSpot} from '.';
+import AddImageButtons from './AddImageButtons';
+import ImagesInSpot from './ImagesInSpot';
 import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';

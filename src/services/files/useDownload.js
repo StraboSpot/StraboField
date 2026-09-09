@@ -14,7 +14,7 @@ import {
   setLoadingStatus,
   setStatusMessageModalTitle,
 } from '../../modules/home/home.slice';
-import {useImages} from '../../modules/images';
+import useImages from '../../modules/images/useImages';
 import {CUSTOM_MAP_SOURCES} from '../../modules/maps/custom-maps/customMaps.constants';
 import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';

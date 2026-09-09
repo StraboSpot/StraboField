@@ -6,7 +6,7 @@ import moment from 'moment';
 import {DatePicker} from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import {formStyles} from '../form';
+import formStyles from './form.styles';
 
 const DateInputField = ({
                           isDisplayOnly,

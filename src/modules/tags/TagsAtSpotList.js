@@ -3,11 +3,12 @@ import {FlatList} from 'react-native';
 
 import {useDispatch} from 'react-redux';
 
+import TagsListItem from './TagsListItem';
+import useTags from './useTags';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {TagsListItem, useTags} from '../tags';
 
 const TagsAtSpotList = ({openMainMenuPanel, page}) => {
   /* Data Hooks */

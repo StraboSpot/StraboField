@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
 import useMeasurements from './useMeasurements';
 import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 
 const MeasurementLabel = ({isDetail, item}) => {
   /* Data Hooks */

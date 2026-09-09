@@ -2,7 +2,9 @@ import React from 'react';
 
 import {ADD_FABRIC_KEYS, ADD_FABRIC_FIELDS} from './fabric.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, FormSlider, MainButtons} from '../form';
+import Form from '../form/Form';
+import FormSlider from '../form/FormSlider';
+import MainButtons from '../form/MainButtons';
 
 const {firstKeys, lastKeys, tectoniteTypesKey} = ADD_FABRIC_KEYS.fault_rock;
 const mainButtonsKeys = ADD_FABRIC_FIELDS.fault_rock;

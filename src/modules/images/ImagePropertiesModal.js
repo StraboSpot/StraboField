@@ -1,12 +1,15 @@
 import React, {useRef, useState} from 'react';
 import {FlatList, Platform, useWindowDimensions, Text, View} from 'react-native';
 
-import {imageStyles} from '.';
+import imageStyles from './image.styles';
 import {IMAGE_PROPERTIES_FORM_NAME} from './images.constants';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {formStyles, Form, FormikWrapper, useForm} from '../form';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
+import Form from '../form/Form';
+import formStyles from '../form/form.styles';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 
 const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpdatedImage, setImageToView}) => {
   /* Data Hooks */

@@ -4,10 +4,13 @@ import {Text, View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
+import Form from '../form/Form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 
 const formName = ['settings', 'project_settings'];
 

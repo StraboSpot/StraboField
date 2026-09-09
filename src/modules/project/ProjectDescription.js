@@ -6,7 +6,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {PROJECT_DESCRIPTION_FORM_NAME} from './project.constants';
 import {updatedProject} from './projects.slice';
 import alert from '../../shared/ui/alert';
-import {Form, FormFlatList, FormikWrapper, useForm} from '../form';
+import Form from '../form/Form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 
 let timeout;
 

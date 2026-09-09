@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ReportsList} from '.';
+import ReportsList from './ReportsList';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {setModalValues, setModalVisible} from '../home/home.slice';

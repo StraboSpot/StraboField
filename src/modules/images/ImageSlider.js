@@ -4,9 +4,11 @@ import {ActivityIndicator, Platform, View} from 'react-native';
 import {Image} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageSliderStyles, imageStyles, useImages} from '.';
+import imageStyles from './image.styles';
+import imageSliderStyles from './imageSlider.styles';
 import {getResizedImageURI, getLocalImageURI} from './imageURIs.helpers';
 import ImageZoomAndPanWrapper from './ImageZoomAndPanWrapper';
+import useImages from './useImages';
 import placeholderImage from '../../assets/images/noimage.jpg';
 import {isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';

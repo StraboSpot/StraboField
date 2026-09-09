@@ -11,11 +11,15 @@ import commonStyles from '../../../shared/common.styles';
 import {deepObjectExtend, isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-import {Form, FormikWrapper, SelectInputField, TextInputField, useForm} from '../../form';
+import Form from '../../form/Form';
+import FormikWrapper from '../../form/FormikWrapper';
+import SelectInputField from '../../form/SelectInputField';
+import TextInputField from '../../form/TextInputField';
+import useForm from '../../form/useForm';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
-import {useSpots} from '../../spots';
 import {setSelectedSpot} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 
 const formName = ['sed', 'add_interval'];
 
