@@ -4,6 +4,7 @@ import {
   getStrikeAndDip,
   getTrendAndPlunge,
   mod,
+  pointingAxisRow,
 } from './compassMath.helpers';
 
 // Golden-value + invariant tests for the pure compass math. The strike/dip and trend/plunge
@@ -138,6 +139,51 @@ describe('getTrendAndPlunge', () => {
 
   it('pins the vertical case (characterization)', () => {
     expect(getTrendAndPlunge(cartesianToSpherical(0, 0, 1))).toEqual({trend: 270, plunge: 90});
+  });
+});
+
+describe('pointingAxisRow', () => {
+  // Rows tagged so we can see which axis each rotation selects. m1x = device X (right edge),
+  // m2x = device Y (top edge in portrait).
+  const matrix = {
+    m11: 1, m12: 2, m13: 3,
+    m21: 4, m22: 5, m23: 6,
+    m31: 7, m32: 8, m33: 9,
+  };
+
+  it('portrait (0) returns the device Y row unchanged (the original locked behavior)', () => {
+    expect(pointingAxisRow(matrix, 0)).toEqual({a: 4, b: 5, c: 6});
+  });
+
+  it('defaults to portrait when no rotation is supplied', () => {
+    expect(pointingAxisRow(matrix)).toEqual({a: 4, b: 5, c: 6});
+  });
+
+  it('landscape 270 points along +deviceX', () => {
+    expect(pointingAxisRow(matrix, 270)).toEqual({a: 1, b: 2, c: 3});
+  });
+
+  it('landscape 90 points along -deviceX', () => {
+    expect(pointingAxisRow(matrix, 90)).toEqual({a: -1, b: -2, c: -3});
+  });
+
+  it('upside-down 180 points along -deviceY', () => {
+    expect(pointingAxisRow(matrix, 180)).toEqual({a: -4, b: -5, c: -6});
+  });
+
+  it('keeps trend stable when the hold rotates: a lineation the up-edge points at reads the same trend', () => {
+    // Android convention (row = ENU directly). Portrait: device Y (top edge) points due North & level.
+    const portrait = {m11: 1, m12: 0, m13: 0, m21: 0, m22: 1, m23: 0};
+    const rowP = pointingAxisRow(portrait, 0);
+    const trendP = getTrendAndPlunge(cartesianToSpherical(rowP.a, rowP.b, rowP.c)).trend;
+
+    // Landscape (270): now device X is the up-on-screen edge, and it is what points due North & level.
+    const landscape = {m11: 0, m12: 1, m13: 0, m21: -1, m22: 0, m23: 0};
+    const rowL = pointingAxisRow(landscape, 270);
+    const trendL = getTrendAndPlunge(cartesianToSpherical(rowL.a, rowL.b, rowL.c)).trend;
+
+    expect(trendP).toBeCloseTo(0, 6);
+    expect(trendL).toBeCloseTo(trendP, 6);
   });
 });
 
