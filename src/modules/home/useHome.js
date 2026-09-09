@@ -68,6 +68,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const isReadOnlyMap = isCurrentMapReadOnly();
   const isCreateToolsDisabled = isEmpty(targetDatasetId) || isReadOnlyProject || isReadOnlyMap;
   const isEditToolsDisabled = isReadOnlyProject || isSingleActiveReadOnlyDataset || isReadOnlyMap;
+  // Whether the draw tools row shows anything: it needs a target dataset for the draw and edit tools, or a
+  // strat section for the add interval tool. The layout reads the same flag, since the row and the
+  // geolocate button beside it have to agree - asking it two ways is what left the button stranded
+  const hasDrawTools = !isEditToolsDisabled && (!isEmpty(targetDatasetId) || !isEmpty(stratSection));
   // Every reason the Edit button is not offered, the missing target dataset included - an edit left running
   // past any of them has nowhere to save to, and saveEdits would drop it silently
   const isEditModeUnavailable = isEditToolsDisabled || isEmpty(targetDatasetId);
@@ -316,8 +320,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     dialogs,
     distance,
     endMeasurement,
+    hasDrawTools,
     isCreateToolsDisabled,
-    isEditToolsDisabled,
     mapMode,
     onCancel,
     onEndDrawPressed,

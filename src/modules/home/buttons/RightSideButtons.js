@@ -21,8 +21,8 @@ const RightSideButtons = ({
                             closeNotebookPanel,
                             distance,
                             endMeasurement,
+                            hasDrawTools,
                             isCreateToolsDisabled,
-                            isEditToolsDisabled,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -86,7 +86,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        {!isEditToolsDisabled && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
+        {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );

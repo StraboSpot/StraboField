@@ -11,6 +11,7 @@ import {
   MacrostratMarkerLayer,
   MeasureLayers,
 } from '.';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import MapControlsContainer from '../controls/MapControlsContainer';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
@@ -46,7 +47,8 @@ const MapLayers = ({
       {/* Displays the marker when macrostrat view is displayed */}
       {isShowMacrostratOverlay && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
 
-      {!currentImageBasemap && !stratSection && <MapControlsContainer/>}
+      {/* Small screens render this with the map action buttons instead, so it would double up here */}
+      {!SMALL_SCREEN && <MapControlsContainer/>}
 
       {/* Custom Overlay Layer */}
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}

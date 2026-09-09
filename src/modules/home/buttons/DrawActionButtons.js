@@ -9,7 +9,6 @@ import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
-import useSpots from '../../spots/useSpots';
 import homeStyles from '../home.style';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
@@ -27,7 +26,6 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
     stratSection,
   } = useDrawActionButtons({clickHandler, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
-  const {isCurrentMapReadOnly} = useSpots();
 
   /* Derived Variables */
 
@@ -37,44 +35,42 @@ const DrawActionButtons = ({clickHandler, mapMode}) => {
 
   /* View */
 
-  // A read only image basemap or strat section takes every draw tool with it, the interval drag included.
-  // With nothing left to show, render null - an empty row would still paint its divider on small screens.
-  if (isCurrentMapReadOnly() || (!hasTargetDataset && !stratSection)) return null;
-
+  // Whether this row appears at all is useHome's hasDrawTools, since the layout around it has to know too.
+  // What is left here is which of the tools to show, which is the row's own business.
   return (
     <View style={[homeStyles.drawToolsContainer, SMALL_SCREEN && homeStyles.smallScreenDrawActionButtons]}>
       {hasTargetDataset && (
         <>
           <IconButton
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
             onLongPress={handlePointLongPressed}
             onPress={handlePointPressed}
             source={getImageSource(MAP_MODES.DRAW.POINT)}
+            style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
           />
           <IconButton
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
             onLongPress={handleLineLongPressed}
             onPress={handleLinePressed}
             source={getImageSource(MAP_MODES.DRAW.LINE)}
+            style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
           />
           <IconButton
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
             onLongPress={handlePolygonLongPressed}
             onPress={handlePolygonPressed}
             source={getImageSource(MAP_MODES.DRAW.POLYGON)}
+            style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
           />
           <IconButton
-            imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
             onPress={handleEditShapePressed}
             source={getImageSource(MAP_MODES.EDIT)}
+            style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
           />
         </>
       )}
       {stratSection && (
         <IconButton
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
           onPress={handleIntervalDragPressed}
           source={getImageSource(MAP_MODES.INTERVAL_DRAG)}
+          style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       )}
     </View>

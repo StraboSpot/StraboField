@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 import {useSelector} from 'react-redux';
@@ -10,6 +10,7 @@ import {MapLayers} from './layers';
 import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
 import SnapLineLayer from './strat-section/SnapLineLayer';
+import {SMALL_SCREEN} from '../../shared/styles.constants';
 import homeStyles from '../home/home.style';
 import FreehandSketch from '../sketch/FreehandSketch';
 
@@ -40,7 +41,6 @@ const Map = ({
 
   const {
     currentImageBasemap,
-    zoom,
     stratSection,
     vertexStartCoords,
     intervalDragState,
@@ -49,16 +49,6 @@ const Map = ({
 
   const {handleMapMoved} = useMapMoveEvents({mapRef, onMapMoveEnd: updateSpotsInMapExtent});
 
-  /* Local State */
-
-  const [scaleBarZoom, setScaleBarZoom] = useState(zoom);
-
-  /* Event Handlers */
-
-  const onCameraChanged = (e) => {
-    setScaleBarZoom(e.properties.zoom);
-    handleMapMoved(e);     // Update spots in extent and saved view (center and zoom)
-  };
 
   /* Derived Variables */
 
@@ -90,7 +80,7 @@ const Map = ({
 
   return (
     <>
-      {!currentImageBasemap && !stratSection && <MapControlsContainer zoom={scaleBarZoom}/>}
+      {!SMALL_SCREEN && <MapControlsContainer/>}
       <MapboxGL.MapView
         animated={true}
         attributionEnabled={true}
@@ -99,7 +89,7 @@ const Map = ({
         localizeLabels={true}
         logoEnabled={true}
         logoPosition={homeStyles.mapboxLogoPosition}
-        onCameraChanged={onCameraChanged}
+        onCameraChanged={handleMapMoved}   // Update spots in extent and saved view (center and zoom)
         onLongPress={handleMapLongPress}
         onPress={handleMapPress}
         pitchEnabled={false}

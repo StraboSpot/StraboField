@@ -12,6 +12,7 @@ import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
 import useMapView from './view/useMapView';
+import {SMALL_SCREEN, SMALL_SCREEN_MAP_STACK} from '../../shared/styles.constants';
 import FreehandSketch from '../sketch/FreehandSketch';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
@@ -150,7 +151,11 @@ const Map = ({
       <NavigationControl
         position={'bottom-left'}
         showCompass={false}
-        style={{bottom: 75, left: 10, position: 'absolute'}}
+        style={{
+          bottom: SMALL_SCREEN ? SMALL_SCREEN_MAP_STACK.WEB_ZOOM_CONTROLS_BOTTOM : 75,
+          left: SMALL_SCREEN_MAP_STACK.EDGE_INSET,
+          position: 'absolute',
+        }}
         visualizePitch={false}
       />
       <MapLayers
