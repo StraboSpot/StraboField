@@ -265,6 +265,15 @@ export const toDegrees = (radians) => {
   return radians * 180 / Math.PI;
 };
 
+// Safely normalizes any caught value into a native Error instance. Preserves existing Errors (retaining
+// original stack traces and custom properties), converts plain objects to JSON strings to prevent
+// '[object Object]', and provides a fallback message for null/undefined inputs.
+export const toError = (err) => {
+  if (err instanceof Error) return err;
+  if (typeof err === 'object' && err !== null) return new Error(JSON.stringify(err));
+  return new Error(String(err ?? 'Unknown error'));
+};
+
 export const toFixedInteger = (value, dp) => {
   // Returns an integer instead of a string
   return +parseFloat(value).toFixed(dp);

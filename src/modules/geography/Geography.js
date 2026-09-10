@@ -21,7 +21,7 @@ import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
-const Geography = ({isReadOnly}) => {
+const Geography = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -88,8 +88,8 @@ const Geography = ({isReadOnly}) => {
       dispatch(editedOrCreatedSpot(editedSpot));
       return Promise.resolve();
     }
-    catch (e) {
-      console.log('Error submitting form', e);
+    catch (err) {
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -99,7 +99,7 @@ const Geography = ({isReadOnly}) => {
       console.log('Finished saving form data to Spot');
       dispatch(setNotebookPageVisibleToPrev());
     }, () => {
-      console.log('Error saving form data to Spot');
+      console.error('Error saving form data to Spot');
     });
   };
 
@@ -373,7 +373,7 @@ const Geography = ({isReadOnly}) => {
       <FlatList
         ListHeaderComponent={
           <>
-            <PageHeader hideBackButton={!isReadOnly} pageTitle={'Geography'}/>
+            <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
             {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={saveFormAndGo}/>}
             {renderGeometryForm()}
             {renderFormFields()}

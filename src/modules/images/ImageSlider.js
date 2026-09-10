@@ -71,7 +71,7 @@ const ImageSlider = ({route, navigation}) => {
         }
       }
     }
-    catch (e) {
+    catch (err) {
       setImageURI(undefined);
       setIsImageLoading(false);
     }

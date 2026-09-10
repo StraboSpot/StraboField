@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native';
 
 import {getAnimationType} from './animations.helpers';
 
-const LottieAnimation = ({animationStyle, type, doesLoop}) => {
+const LottieAnimation = ({animationStyle, doesLoop, type}) => {
   /* View */
 
   return (
@@ -12,7 +12,7 @@ const LottieAnimation = ({animationStyle, type, doesLoop}) => {
       autoPlay
       loop={doesLoop}
       source={getAnimationType(type)}
-      style={[{width: 100, height: 100, alignSelf: 'center'}, animationStyle]}
+      style={[{alignSelf: 'center', height: 100, width: 100}, animationStyle]}
     />
   );
 };

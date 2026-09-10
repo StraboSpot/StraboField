@@ -28,11 +28,11 @@ const MapActionsOverlay = ({
   /* Logic Helpers */
 
   const isItemVisible = (item) => {
-    const isNative = Platform.OS !== 'web';
     const isIOS = Platform.OS === 'ios';
+    const isWeb = Platform.OS === 'web';
     const hasValidConnection = isConnected && (isInternetReachable || currentBasemap?.source);
-    const isSaveMapVisible = item.key === 'saveMap' && isNative && hasValidConnection;
-    const isStereonetVisible = item.key === 'stereonet' && isIOS;
+    const isSaveMapVisible = item.key === 'saveMap' && !isWeb && hasValidConnection;
+    const isStereonetVisible = item.key === 'stereonet' && (isIOS || isWeb);
     const isStratSectionVisible = item.key === 'stratSection' && stratSection;
     const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
     const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;

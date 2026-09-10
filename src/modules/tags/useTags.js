@@ -26,25 +26,25 @@ const useTags = () => {
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
-  const projectTags = useSelector(state => state.project.project?.tags) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
+  const tags = useSelector(state => state.project.project?.tags) || [];
 
   const {getLabel} = useForm();
 
   /* Internal Functions */
 
-  // link unlink multiple tags and spot features.
+  // Attach or detach one tag across every selected feature of a Spot.
   const addRemoveSpotFeaturesFromTag = (tag, features, spotId, isAlreadyChecked) => {
     if (!tag.features) tag.features = {};
     let featureTagsForSpot = tag.features[spotId] || [];
     features.map((feature) => {
       const index = featureTagsForSpot.findIndex(id => id === feature.id);
-      if (isAlreadyChecked) { // if checked (action is uncheck), then remove from tag from all selected features
+      if (isAlreadyChecked) { // Already checked means the action is uncheck, so remove the tag from every feature
         if (index !== -1) featureTagsForSpot.splice(index, 1);
       }
-      else { // if not checked (action is check), then add tag to all selected features.
+      else { // Not checked means the action is check, so add the tag to every feature
         const featureData = feature.id;
         if (index === -1) featureTagsForSpot.push(featureData);
       }
@@ -65,13 +65,13 @@ const useTags = () => {
     if (isEmpty(selectedSpot)) return [];
     let spotId = selectedSpot.properties.id;
     const featureIdSet = new Set(featuresAtSpot.map(feature => feature.id));
-    return projectTags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
+    return tags.filter(tag => tag.features && !isEmpty(tag.features[spotId])
       && tag.features[spotId].some(featureId => featureIdSet.has(featureId)));
   };
 
   /* Exported Functions */
 
-  // link unlink given tag and spot feature.
+  // Attach or detach one tag on a single feature of a Spot.
   const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
     const featureData = feature.id;
     if (!tag.features) tag.features = {};
@@ -91,7 +91,7 @@ const useTags = () => {
     saveTag({...tag, spots: updatedSpots});
   };
 
-  // tag modal - add remove tags (wrapper method for feature level tagging and spot level tagging).
+  // Entry point for the tag modal: routes to Spot-level, single-feature, or multi-feature tagging.
   const addRemoveTag = (tag, spot, isFeatureLevelTagging, isAlreadyChecked) => {
     const spotId = spot ? spot.properties.id : selectedSpot.properties.id;
     if (!isFeatureLevelTagging) addRemoveSpotFromTag(spotId, tag);
@@ -127,7 +127,7 @@ const useTags = () => {
     if (features.length === 0) return;
     let tagsToUpdate = [];
     let featureIds = features.map(feature => feature.id);
-    projectTags.map((tag) => {
+    tags.map((tag) => {
       let allOtherFeatureIds = [];
       let copyTag = JSON.parse(JSON.stringify(tag));
       if (selectedSpot && copyTag && copyTag.features
@@ -144,13 +144,13 @@ const useTags = () => {
   };
 
   const deleteTag = (tagToDelete) => {
-    let updatedTags = projectTags.filter(tag => tag.id !== tagToDelete.id);
+    let updatedTags = tags.filter(tag => tag.id !== tagToDelete.id);
     dispatch(deletedTagIdFromReports(tagToDelete.id));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));
     dispatch(setSelectedTag({}));
   };
 
-  // to display all features that are currently tagged to the provided tag
+  // Every feature the tag is attached to, across all Spots.
   const getAllTaggedFeatures = (tag) => {
     if (isEmpty(tag)) return [];
     let allTaggedFeatures = [];
@@ -230,19 +230,19 @@ const useTags = () => {
     return 'No Type Specified';
   };
 
-  // to display all tags at given feature.
+  // The tags attached to one feature of a Spot.
   const getTagsAtFeature = (spotId, featureId) => {
     if (!spotId && !isEmpty(selectedSpot)) spotId = selectedSpot.properties.id;
-    let tagsAtFeature = projectTags.filter(
+    let tagsAtFeature = tags.filter(
       tag => tag.features && tag.features[spotId] && tag.features[spotId].includes(featureId));
     if (!isEmpty(tagsAtFeature)) return tagsAtFeature;
     else return [];
   };
 
-  // Get Tags at a Spot given an ID or if no ID specified get tags at the selected Spot
+  // The tags attached to the Spot itself; defaults to the selected Spot.
   const getTagsAtSpot = (spotId) => {
     if (!spotId && !isEmpty(selectedSpot)) spotId = selectedSpot.properties.id;
-    return projectTags.filter(tag => tag.spots && tag.spots.includes(spotId));
+    return tags.filter(tag => tag.spots && tag.spots.includes(spotId));
   };
 
   const getTagSpotsCount = (tag) => {
@@ -253,12 +253,12 @@ const useTags = () => {
   const saveTag = (tagToSave) => {
     let updatedTags;
     if (!Array.isArray(tagToSave)) {
-      updatedTags = projectTags.filter(tag => tag.id !== tagToSave.id);
+      updatedTags = tags.filter(tag => tag.id !== tagToSave.id);
       updatedTags.push(tagToSave);
     }
     else {
       const tagIdsToSave = new Set(tagToSave.map(tag => tag.id));
-      updatedTags = projectTags.filter(tag => !tagIdsToSave.has(tag.id));
+      updatedTags = tags.filter(tag => !tagIdsToSave.has(tag.id));
       updatedTags = tagToSave.concat(updatedTags);
     }
     updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));

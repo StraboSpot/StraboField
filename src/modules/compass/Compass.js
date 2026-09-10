@@ -48,23 +48,38 @@ const Compass = ({
 
   useEffect(() => {
     console.log('UE Compass []');
-    fetchDeclination().catch((err) => {
+    let isMounted = true;
+
+    const declinationReady = fetchDeclination().catch((err) => {
       console.error('Magnetic Declination not available', err);
-      const errorMessage = err.message || err;
-      if (errorMessage.includes('Location permission') || errorMessage.includes('location')) {
-        alert('Location Services Required',
-          'Location services are needed to calculate magnetic declination for accurate orientation measurements. Please enable location services in your device settings.');
-      }
+      alert('Magnetic Declination Unavailable',
+        'Could not determine magnetic declination from your location. Enable Location Services, or — on a '
+        + 'device without GPS such as a Wi-Fi-only iPad — enter it manually under Project Description > '
+        + 'Magnetic Declination and the app will apply it to compass measurements.');
+      throw err; // rethrow so the Android branch can tell success from failure and not start with declination 0
     });
-    subscribeToSensors();
-    subscribeToCalibrationStatus(handleCalibrationStatus);
-    AppState.addEventListener('change', handleAppStateChange);
+
+    const startSensors = () => {
+      if (!isMounted) return; // component unmounted before declination resolved
+      subscribeToSensors();
+      subscribeToCalibrationStatus(handleCalibrationStatus);
+    };
+
+    // Android converts magnetic -> true north in JS by adding this declination. Starting the stream
+    // before the fetch resolves would record magnetic values, and starting it after the fetch FAILS
+    // (declination stuck at 0) would silently record magnetic mislabeled as true. So only start once
+    // declination is known; on failure the user got the alert above and the compass stays unstarted.
+    // iOS gets true north straight from CoreMotion's reference frame and doesn't use this value, so it
+    // subscribes immediately.
+    if (Platform.OS === 'android') declinationReady.then(startSensors).catch(() => {});
+    else startSensors();
+
+    const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
+      isMounted = false;
       unsubscribeFromSensors();
       unsubscribeFromCalibrationStatus();
-      AppState.addEventListener(
-        'change',
-        () => console.log('APP STATE EVENT REMOVED IN COMPASS')).remove();
+      appStateSubscription.remove();
     };
   }, []);
 
@@ -95,12 +110,20 @@ const Compass = ({
     }
 
     // Only show the alert once per compass session - check and set flag atomically
-    if (data.needsCalibration && Platform.OS === 'ios') {
+    if (data.needsCalibration) {
       if (hasShownCalibrationAlert.current) return; // Already shown, ignore this event
       hasShownCalibrationAlert.current = true;  // Set flag IMMEDIATELY before calling alert to prevent race conditions
 
-      alert('Compass Calibration Required',
-        'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+      // The remedy differs by platform: iOS needs a system setting enabled; Android needs the user to
+      // recalibrate the magnetometer (figure-8 motion) and move away from magnetic interference.
+      if (Platform.OS === 'ios') {
+        alert('Compass Calibration Required',
+          'Compass calibration is turned off or needs calibration for accurate orientation measurements. Please enable compass calibration in Settings > Privacy & Security > Location Services > System Services > Compass Calibration.');
+      }
+      else {
+        alert('Compass Needs Calibration',
+          'The magnetometer accuracy is low, so orientation measurements may be inaccurate. Wave the device in a figure-8 motion a few times and move away from metal or magnetic objects.');
+      }
     }
   };
 
@@ -125,8 +148,8 @@ const Compass = ({
       }
       else dispatch(setCompassMeasurements({...compassData, manual: true}));
     }
-    catch (e) {
-      console.log('Error grabbing compass measurement', e);
+    catch (err) {
+      console.error('Error grabbing compass measurement', err);
     }
   };
 

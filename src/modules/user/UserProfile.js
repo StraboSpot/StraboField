@@ -27,7 +27,7 @@ import {persistor} from '../../store/ConfigureStore';
 import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 
 const formName = ['general', 'user_profile'];
@@ -179,9 +179,7 @@ const UserProfile = () => {
     }
     catch (err) {
       console.error('Error saving new profile image:', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error uploading profile image: ' + err));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Uploading Profile Image!'}));
       closeProfileImageModal();
       setIsUploadingProfileImage(false);
     }

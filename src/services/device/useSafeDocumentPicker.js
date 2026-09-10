@@ -51,9 +51,9 @@ const useSafeDocumentPicker = () => {
     try {
       return await pick(options);
     }
-    catch (error) {
+    catch (err) {
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
-      handleError(error);
+      handleError(err);
       // Return null on cancellation or error
       return null;
     }

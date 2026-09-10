@@ -82,7 +82,7 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
       if (Platform.OS !== 'web') toast.show('Outcrop Summary Saved', {type: 'success'});
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -92,8 +92,8 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
       await saveForm(currentForm);
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 

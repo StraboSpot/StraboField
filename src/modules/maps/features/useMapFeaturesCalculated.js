@@ -126,8 +126,8 @@ const useMapFeaturesCalculated = (mapRef) => {
       selectedSpotsIds = [...new Set(selectedSpotsIds)]; // Remove duplicate ids
       selectedSpots = getSpotsByIds(selectedSpotsIds);
     }
-    catch (e) {
-      console.log('Error getting Spots within or intersecting the drawn polygon', e);
+    catch (err) {
+      console.error('Error getting Spots within or intersecting the drawn polygon', err);
     }
     //console.log('Spots in given polygon:', selectedSpots);
     return selectedSpots;
@@ -176,8 +176,8 @@ const useMapFeaturesCalculated = (mapRef) => {
       selectedSpotsIds = [...new Set(selectedSpotsIds)]; // Remove duplicate ids
       selectedSpots = getSpotsByIds(selectedSpotsIds);
     }
-    catch (e) {
-      console.log('Error getting Spots within the bounding box', e);
+    catch (err) {
+      console.error('Error getting Spots within the bounding box', err);
     }
     return selectedSpots;
   };

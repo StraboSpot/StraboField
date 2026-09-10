@@ -13,7 +13,7 @@ import SaveAndExportModalContent from '../project/backup/SaveAndExportModalConte
 const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   /* Data Hooks */
   const dispatch = useDispatch();
-  const currentProject = useSelector(state => state.project.project);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
 
   const {backupTags} = useExport();
 
@@ -22,11 +22,11 @@ const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
   const [backingUpStatus, setBackingUpStatus] = useState('');
   const title = isGeologicUnits ? TAG_BACKUP_MESSAGES.TITLE.GEOLOGIC_UNITS : TAG_BACKUP_MESSAGES.TITLE.TAGS;
   const defaultFileName = (moment(new Date()).format('YYYY-MM-DD_hmma') + '_'
-    + currentProject.description.project_name + '_' + title).replace(/\s/g, '');
+    + projectName + '_' + title).replace(/\s/g, '');
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
 
-  const actionLabel = Platform.OS === 'iOS' ? 'Backup' : 'Export';
+  const actionLabel = Platform.OS === 'ios' ? 'Backup' : 'Export';
   const [modalTitle, setModalTitle] = useState(actionLabel + ' ' + title);
 
   /* Event Handlers */
@@ -62,6 +62,7 @@ const BackupTagsModal = ({closeModal, isGeologicUnits}) => {
       closeModal={closeModal}
       disabled={backupFileName.trim() === '' || isFileNameError}
       headerTitle={modalTitle}
+      isLoading={backingUpStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={backingUpStatus === TAG_BACKUP_STATUS.COMPLETE ? closeModal : handleBackup}
       onCancelPress={closeModal}
       showActionButton={backingUpStatus === '' || backingUpStatus === TAG_BACKUP_STATUS.COMPLETE || backingUpStatus === TAG_BACKUP_STATUS.ERROR}

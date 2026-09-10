@@ -131,10 +131,19 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   };
 
   const updateMapsFromDevice = async () => {
-    setLoading(true);
-    await getSavedMapsFromDevice();
-    console.log('Got maps from device');
-    setLoading(false);
+    try {
+      setLoading(true);
+      await getSavedMapsFromDevice();
+      console.log('Got maps from device');
+    }
+    catch (err) {
+      console.error('Error getting maps from device', err);
+      alert('Error', 'Unable to read the offline maps saved on this device.');
+    }
+    finally {
+      // The maps list is hidden while loading, so a failure that left this set would hide it indefinitely.
+      setLoading(false);
+    }
   };
 
   /* Render Functions */

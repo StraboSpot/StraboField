@@ -62,7 +62,13 @@ import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureMod
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';
 import ThreeDStructuresPage from '../three-d-structures/ThreeDStructuresPage';
 
-export const OVERVIEW_PAGE = {
+/* Page Definitions */
+
+// Each page's key, label, icons and components. Most groups match a section of the notebook's More
+// Pages menu; PET_PAGES and SED_PAGES instead group by where a page's data is stored on a Spot
+// (spot.properties.pet / .sed), which is what BasicOverviewList and the templates screens test for.
+// Display Order below regroups those two for the menu.
+const OVERVIEW_PAGE = {
   key: PAGE_KEYS.OVERVIEW,
   label: 'Overview',
   page_component: Overview,
@@ -79,12 +85,12 @@ export const PRIMARY_PAGES = [
     modal_component: TagsNotebookModal,
     action_label: 'Add Geologic Units',
   }, {
-    key: PAGE_KEYS.NOTES,
-    label: 'Notes',
-    icon_src: require('../../assets/icons/Notes.png'),
-    icon_pressed_src: require('../../assets/icons/Notes_pressed.png'),
-    overview_component: NotesOverview,
-    page_component: NotesPage,
+    key: PAGE_KEYS.IMAGES,
+    label: 'Images',
+    icon_src: require('../../assets/icons/Photo.png'),
+    icon_pressed_src: require('../../assets/icons/Photo_pressed.png'),
+    overview_component: ImagesOverview,
+    page_component: ImagesPage,
   }, {
     key: PAGE_KEYS.MEASUREMENTS,
     label: 'Measurements',
@@ -95,21 +101,12 @@ export const PRIMARY_PAGES = [
     modal_component: AddMeasurementModal,
     action_label: 'Take a Measurement',
   }, {
-    key: PAGE_KEYS.IMAGES,
-    label: 'Images',
-    icon_src: require('../../assets/icons/Photo.png'),
-    icon_pressed_src: require('../../assets/icons/Photo_pressed.png'),
-    overview_component: ImagesOverview,
-    page_component: ImagesPage,
-  }, {
-    key: PAGE_KEYS.TAGS,
-    label: 'Tags',
-    icon_src: require('../../assets/icons/Tag.png'),
-    icon_pressed_src: require('../../assets/icons/Tag_pressed.png'),
-    overview_component: TagsAtSpotList,
-    page_component: TagsNotebook,
-    modal_component: TagsNotebookModal,
-    action_label: 'Add Tags',
+    key: PAGE_KEYS.NOTES,
+    label: 'Notes',
+    icon_src: require('../../assets/icons/Notes.png'),
+    icon_pressed_src: require('../../assets/icons/Notes_pressed.png'),
+    overview_component: NotesOverview,
+    page_component: NotesPage,
   }, {
     key: PAGE_KEYS.SAMPLES,
     label: 'Samples',
@@ -120,16 +117,18 @@ export const PRIMARY_PAGES = [
     modal_component: SampleModal,
     action_label: 'Add a Sample',
   }, {
-    key: PAGE_KEYS.REPORTS,
-    label: 'Memos',
-    icon_src: require('../../assets/icons/Reports.png'),
-    icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
-    page_component: ReportsPage,
-    modal_component: ReportModal,
+    key: PAGE_KEYS.TAGS,
+    label: 'Tags',
+    icon_src: require('../../assets/icons/Tag.png'),
+    icon_pressed_src: require('../../assets/icons/Tag_pressed.png'),
+    overview_component: TagsAtSpotList,
+    page_component: TagsNotebook,
+    modal_component: TagsNotebookModal,
+    action_label: 'Add Tags',
   },
 ];
 
-export const SECONDARY_PAGES = [
+const GENERAL_FEATURES_PAGES = [
   {
     key: PAGE_KEYS.THREE_D_STRUCTURES,
     label: '3D Structures',
@@ -140,6 +139,15 @@ export const SECONDARY_PAGES = [
     page_component: ThreeDStructuresPage,
     modal_component: AddThreeDStructureModal,
     action_label: 'Add a 3D Structure',
+  }, {
+    key: PAGE_KEYS.EARTHQUAKES,
+    label: 'Earthquakes',
+    icon_src: require('../../assets/icons/Earthquake.png'),
+    icon_pressed_src: require('../../assets/icons/Earthquake_pressed.png'),
+    page_component: EarthquakesPage,
+    modal_component: AddEarthquakeModal,
+    overview_component: BasicOverviewList,
+    action_label: 'Add an Earthquake Feature',
   }, {
     key: PAGE_KEYS.FABRICS,
     label: 'Fabrics',
@@ -152,42 +160,11 @@ export const SECONDARY_PAGES = [
   }, {
     key: PAGE_KEYS.OTHER_FEATURES,
     label: 'Other Features',
+    label_singular: 'Other Feature',
     icon_src: require('../../assets/icons/OtherFeatures.png'),
     icon_pressed_src: require('../../assets/icons/OtherFeatures_pressed.png'),
     overview_component: OtherFeaturesOverview,
     page_component: OtherFeaturesPage,
-  }, {
-    key: PAGE_KEYS.DATA,
-    label: 'Data',
-    label_singular: 'Data',
-    icon_src: require('../../assets/icons/Data.png'),
-    icon_pressed_src: require('../../assets/icons/Data_pressed.png'),
-    page_component: ExternalData,
-    overview_component: DataOverview,
-  }, {
-    key: PAGE_KEYS.SITE_SAFETY,
-    label: 'Site Safety Summary',
-    icon_src: require('../../assets/icons/SiteSafety.png'),
-    icon_pressed_src: require('../../assets/icons/SiteSafety_pressed.png'),
-    page_component: SiteSafetyPage,
-  }, {
-    key: PAGE_KEYS.TEPHRA,
-    label: 'Tephra Layers',
-    icon_src: require('../../assets/icons/Tephra.png'),
-    icon_pressed_src: require('../../assets/icons/Tephra_pressed.png'),
-    page_component: TephraPage,
-    overview_component: BasicOverviewList,
-    action_label: 'Add a Tephra Layer',
-    testing: false,
-  }, {
-    key: PAGE_KEYS.EARTHQUAKES,
-    label: 'Earthquakes',
-    icon_src: require('../../assets/icons/Earthquake.png'),
-    icon_pressed_src: require('../../assets/icons/Earthquake_pressed.png'),
-    page_component: EarthquakesPage,
-    modal_component: AddEarthquakeModal,
-    overview_component: BasicOverviewList,
-    action_label: 'Add an Earthquake Feature',
   }, {
     key: PAGE_KEYS.OUTCROP_SUMMARIES,
     label: 'Outcrop Summary',
@@ -196,6 +173,32 @@ export const SECONDARY_PAGES = [
     page_component: OutcropSummaryPage,
     testing: true,
   }, {
+    key: PAGE_KEYS.TEPHRA,
+    label: 'Tephra Layers',
+    icon_src: require('../../assets/icons/Tephra.png'),
+    icon_pressed_src: require('../../assets/icons/Tephra_pressed.png'),
+    page_component: TephraPage,
+    overview_component: BasicOverviewList,
+    action_label: 'Add a Tephra Layer',
+  },
+];
+
+export const SUPPLEMENTAL_PAGES = [
+  {
+    key: PAGE_KEYS.DATA,
+    label: 'Links & Tables',
+    icon_src: require('../../assets/icons/Data.png'),
+    icon_pressed_src: require('../../assets/icons/Data_pressed.png'),
+    page_component: ExternalData,
+    overview_component: DataOverview,
+  }, {
+    key: PAGE_KEYS.REPORTS,
+    label: 'Memos',
+    icon_src: require('../../assets/icons/Reports.png'),
+    icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
+    page_component: ReportsPage,
+    modal_component: ReportModal,
+  }, {
     key: PAGE_KEYS.QAQC,
     label: 'QAQC',
     icon_src: require('../../assets/icons/QAQC.png'),
@@ -203,6 +206,12 @@ export const SECONDARY_PAGES = [
     overview_component: QAQCOverview,
     page_component: QAQCPage,
     testing: true,
+  }, {
+    key: PAGE_KEYS.SITE_SAFETY,
+    label: 'Site Safety Summary',
+    icon_src: require('../../assets/icons/SiteSafety.png'),
+    icon_pressed_src: require('../../assets/icons/SiteSafety_pressed.png'),
+    page_component: SiteSafetyPage,
   },
 ];
 
@@ -214,7 +223,7 @@ export const SUBPAGES = [
   },
   {
     key: PAGE_KEYS.IGSN,
-    label: 'Igsn',
+    label: 'IGSN',
     page_component: IGSNPage,
   },
   {
@@ -295,41 +304,22 @@ export const PET_PAGES = [
   },
 ];
 
-export const SED_PAGES = [
+// Sedimentary Rocks straddles two groups: its data is stored under spot.properties.sed like the
+// Sedimentology pages, but the notebook lists it with the other rock types. Defined on its own so
+// SED_PAGES can take it for the data and ROCK_AND_MINERAL_PAGES for the display.
+const SEDIMENTARY_ROCKS_PAGE = {
+  key: PAGE_KEYS.ROCK_TYPE_SEDIMENTARY,
+  label: 'Sedimentary Rocks',
+  icon_src: require('../../assets/icons/Sedimentary.png'),
+  icon_pressed_src: require('../../assets/icons/Sedimentary_pressed.png'),
+  overview_component: BasicOverviewList,
+  page_component: RockSedimentaryPage,
+  modal_component: AddRockModal,
+  action_label: 'Add a Sedimentary Rock',
+};
+
+const SEDIMENTOLOGY_PAGES = [
   {
-    key: PAGE_KEYS.ROCK_TYPE_SEDIMENTARY,
-    label: 'Sedimentary Rocks',
-    icon_src: require('../../assets/icons/Sedimentary.png'),
-    icon_pressed_src: require('../../assets/icons/Sedimentary_pressed.png'),
-    overview_component: BasicOverviewList,
-    page_component: RockSedimentaryPage,
-    modal_component: AddRockModal,
-    action_label: 'Add a Sedimentary Rock',
-  }, {
-    key: PAGE_KEYS.STRAT_SECTION,
-    label: 'Strat Section',
-    label_singular: 'Strat Section',
-    icon_src: require('../../assets/icons/SedStratColumn.png'),
-    icon_pressed_src: require('../../assets/icons/SedStratColumn_pressed.png'),
-    overview_component: BasicOverviewList,
-    page_component: StratSectionPage,
-  }, {
-    key: PAGE_KEYS.INTERVAL,
-    label: 'Interval',
-    label_singular: 'Interval',
-    icon_src: require('../../assets/icons/SedInterval.png'),
-    icon_pressed_src: require('../../assets/icons/SedInterval_pressed.png'),
-    overview_component: IntervalOverview,
-    page_component: IntervalPage,
-  }, {
-    key: PAGE_KEYS.LITHOLOGIES,
-    label: 'Lithologies',
-    label_singular: 'Lithology',
-    icon_src: require('../../assets/icons/SedLithologies.png'),
-    icon_pressed_src: require('../../assets/icons/SedLithologies_pressed.png'),
-    overview_component: BasicOverviewList,
-    page_component: BasicSedPage,
-  }, {
     key: PAGE_KEYS.BEDDING,
     label: 'Bedding',
     label_singular: 'Bedding',
@@ -337,14 +327,6 @@ export const SED_PAGES = [
     icon_pressed_src: require('../../assets/icons/SedBedding_pressed.png'),
     page_component: BeddingPage,
     overview_component: BasicOverviewList,
-  }, {
-    key: PAGE_KEYS.STRUCTURES,
-    label: 'Structures',
-    label_singular: 'Structure',
-    icon_src: require('../../assets/icons/SedStructure.png'),
-    icon_pressed_src: require('../../assets/icons/SedStructure_pressed.png'),
-    overview_component: BasicOverviewList,
-    page_component: BasicSedPage,
   }, {
     key: PAGE_KEYS.DIAGENESIS,
     label: 'Diagenesis',
@@ -369,12 +351,71 @@ export const SED_PAGES = [
     icon_pressed_src: require('../../assets/icons/SedInterpretation_pressed.png'),
     overview_component: BasicOverviewList,
     page_component: BasicSedPage,
+  }, {
+    key: PAGE_KEYS.INTERVAL,
+    label: 'Interval',
+    label_singular: 'Interval',
+    icon_src: require('../../assets/icons/SedInterval.png'),
+    icon_pressed_src: require('../../assets/icons/SedInterval_pressed.png'),
+    overview_component: IntervalOverview,
+    page_component: IntervalPage,
+  }, {
+    key: PAGE_KEYS.LITHOLOGIES,
+    label: 'Lithologies',
+    label_singular: 'Lithology',
+    icon_src: require('../../assets/icons/SedLithologies.png'),
+    icon_pressed_src: require('../../assets/icons/SedLithologies_pressed.png'),
+    overview_component: BasicOverviewList,
+    page_component: BasicSedPage,
+  }, {
+    key: PAGE_KEYS.STRUCTURES,
+    label: 'Sedimentology Structures',
+    label_singular: 'Sedimentology Structure',
+    icon_src: require('../../assets/icons/SedStructure.png'),
+    icon_pressed_src: require('../../assets/icons/SedStructure_pressed.png'),
+    overview_component: BasicOverviewList,
+    page_component: BasicSedPage,
+  }, {
+    key: PAGE_KEYS.STRAT_SECTION,
+    label: 'Strat Section',
+    label_singular: 'Strat Section',
+    icon_src: require('../../assets/icons/SedStratColumn.png'),
+    icon_pressed_src: require('../../assets/icons/SedStratColumn_pressed.png'),
+    overview_component: BasicOverviewList,
+    page_component: StratSectionPage,
   },
 ];
 
-export const NOTEBOOK_PAGES = [OVERVIEW_PAGE, ...PRIMARY_PAGES, ...SECONDARY_PAGES, ...SUBPAGES, ...PET_PAGES, ...SED_PAGES];
+// The pages whose data is stored under spot.properties.sed. Membership matters here, not order.
+export const SED_PAGES = [SEDIMENTARY_ROCKS_PAGE, ...SEDIMENTOLOGY_PAGES];
 
-export const NOTEBOOK_MODELS = NOTEBOOK_PAGES.reduce((acc, p) => p.modal_component ? [...acc, p] : acc, []);
+/* Display Order */
+
+const ROCK_AND_MINERAL_PAGES = [...PET_PAGES, SEDIMENTARY_ROCKS_PAGE];
+
+// The one place page order is defined: the More Pages menu renders these sections as-is and the Spot
+// Overview orders its sections to match. Pages are sorted alphabetically within each section, so the
+// definitions above do not have to be kept in order. The menu skips the first section's title, since
+// that section opens the list.
+export const PAGES_SECTIONS = [
+  {title: 'General Info', pages: PRIMARY_PAGES},
+  {title: 'General Features', pages: GENERAL_FEATURES_PAGES},
+  {title: 'Rocks & Minerals', pages: ROCK_AND_MINERAL_PAGES},
+  {title: 'Sedimentology', pages: SEDIMENTOLOGY_PAGES},
+  {title: 'Supplemental Data', pages: SUPPLEMENTAL_PAGES},
+].map(section => ({...section, pages: [...section.pages].sort((a, b) => a.label.localeCompare(b.label))}));
+
+export const PAGES_IN_MENU_ORDER = PAGES_SECTIONS.flatMap(section => section.pages);
+
+/* Lookups */
+
+// Every page, for finding one by key. Built from PAGES_IN_MENU_ORDER so a new section cannot be added
+// to the menu without becoming findable here, plus the Overview and subpages the menu never lists.
+export const NOTEBOOK_PAGES = [OVERVIEW_PAGE, ...SUBPAGES, ...PAGES_IN_MENU_ORDER];
+
+const NOTEBOOK_MODALS = NOTEBOOK_PAGES.reduce((acc, p) => p.modal_component ? [...acc, p] : acc, []);
+
+/* Modals */
 
 export const SHORTCUT_MODALS = [
   {
@@ -460,8 +501,18 @@ const OTHER_MODALS = [
   },
 ];
 
-export const MODALS = [...NOTEBOOK_MODELS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
+export const MODALS = [...NOTEBOOK_MODALS, ...SHORTCUT_MODALS, ...OTHER_MODALS];
 
-export const SAMPLES_OVERVIEW_SECTIONS = [PAGE_KEYS.SAMPLES, PAGE_KEYS.IMAGES, PAGE_KEYS.GEOLOGIC_UNITS];
+/* Sample Rules */
 
-export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.SAMPLES, PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.OUTCROP_SUMMARIES, PAGE_KEYS.STRAT_SECTION, PAGE_KEYS.INTERVAL, PAGE_KEYS.INTERPRETATIONS];
+// Which pages a sample gets, not what order they appear in. Both lists are only ever read with
+// .includes(), so reordering either one changes nothing on screen — see PAGES_SECTIONS for order.
+// Kept alphabetical for that reason.
+
+// The pages a sample's Overview always shows, whether or not they hold data
+export const SAMPLE_OVERVIEW_DEFAULT_PAGES = [PAGE_KEYS.GEOLOGIC_UNITS, PAGE_KEYS.IMAGES, PAGE_KEYS.SAMPLES];
+
+// The pages a sample's More Pages menu leaves out. Samples is on both lists: a sample's Overview
+// leads with its own data, but there is no point opening the Samples page from within a sample.
+export const PAGES_HIDDEN_IN_SAMPLE = [PAGE_KEYS.INTERPRETATIONS, PAGE_KEYS.INTERVAL, PAGE_KEYS.OUTCROP_SUMMARIES,
+  PAGE_KEYS.SAMPLES, PAGE_KEYS.SITE_SAFETY, PAGE_KEYS.STRAT_SECTION];

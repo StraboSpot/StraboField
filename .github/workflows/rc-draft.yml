@@ -20,30 +20,52 @@ jobs:
       - name: Fetch all tags
         run: git fetch --tags --force
 
-      - name: Get version and previous bump commit
+      - name: Determine changelog boundary and draft version
         id: meta
         run: |
-          VERSION=$(node -p "require('./package.json').version")
+          PKG_VERSION=$(node -p "require('./package.json').version")
 
-          # Find the most recent commit that changed package.json to a DIFFERENT version
-          # That commit marks the end of the previous version's work
-          PREV_BUMP=$(git log --format="%H" -- package.json | while read hash; do
-            v=$(git show "$hash":package.json | node -p "try{JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).version}catch(e){''}" 2>/dev/null)
-            if [ -n "$v" ] && [ "$v" != "$VERSION" ]; then
-              echo "$hash"
-              break
-            fi
-          done)
+          # Boundary = the highest release / cut-marker tag reachable from HEAD, in version order.
+          # Cut markers (vX.Y.Z-rc, pushed by `npm run cut-rc`) and published releases (vX.Y.Z) both
+          # count; `-rc` sorts before its release, so once a version is published the release wins.
+          # This replaces the old "scan package.json history" approach, which broke because merging
+          # master (the 2.29.x hotfix line) into the rc branch makes package.json's version oscillate.
+          BOUNDARY=$(git tag --merged HEAD \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-rc)?$' \
+            | sort -V | tail -1)
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "prev_bump=$PREV_BUMP" >> $GITHUB_OUTPUT
+          # Draft version = the version currently being collected. Commits AFTER the boundary belong
+          # to the NEXT version, so bump the boundary's patch — unless package.json is already ahead
+          # (a planned minor/major bump), in which case trust package.json.
+          DRAFT_VERSION=$(BOUNDARY="$BOUNDARY" PKG="$PKG_VERSION" node -e '
+            const boundary = (process.env.BOUNDARY || "").replace(/^v/, "").replace(/-rc$/, "");
+            const pkg = process.env.PKG;
+            const bumpPatch = v => { const p = v.split(".").map(Number); p[2] = (p[2] || 0) + 1; return p.join("."); };
+            const cmp = (a, b) => { const A = a.split(".").map(Number), B = b.split(".").map(Number);
+              for (let i = 0; i < 3; i++) { if ((A[i] || 0) !== (B[i] || 0)) return (A[i] || 0) - (B[i] || 0); } return 0; };
+            if (!boundary) { console.log(pkg); process.exit(0); }
+            let next = bumpPatch(boundary);
+            if (cmp(pkg, next) > 0) next = pkg;
+            console.log(next);
+          ')
+
+          echo "Boundary tag: ${BOUNDARY:-<none>}  →  draft version: $DRAFT_VERSION"
+          echo "version=$DRAFT_VERSION" >> $GITHUB_OUTPUT
+          echo "boundary=$BOUNDARY" >> $GITHUB_OUTPUT
 
       - name: Generate Draft Changelog
         run: |
-          PREV=${{ steps.meta.outputs.prev_bump }}
+          BOUNDARY=${{ steps.meta.outputs.boundary }}
           VERSION=${{ steps.meta.outputs.version }}
 
-          changelog=$(git log $PREV..HEAD --pretty=format:"%s" | awk '
+          # Range: commits after the boundary marker up to HEAD. `--no-merges` drops the recurring
+          # "Merge branch 'master'" commits, and `--not <published release tags>` drops any 2.29.x
+          # hotfix commits that rode in on those merges (they are reachable from their own v-tags).
+          RANGE="${BOUNDARY:+$BOUNDARY..}HEAD"
+          RELEASED_TAGS=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*')
+
+          changelog=$(git log $RANGE --no-merges --pretty=format:"%s" ${RELEASED_TAGS:+--not $RELEASED_TAGS} \
+          | grep -v "^chore(release)\|^chore(workflows)\|^chore(pods)\|^chore(docs)" | awk '
           /^feat/ { features[++fc] = $0 }
           /^fix/  { fixes[++bc] = $0 }
           /^chore/ { chores[++cc] = $0 }
@@ -72,6 +94,41 @@ jobs:
             gh release delete "$DRAFT_TAG" --repo ${{ github.repository }} --yes
             git push origin :refs/tags/$DRAFT_TAG || true
           fi
+
+      - name: Prune orphaned draft prereleases above the cut marker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BOUNDARY_VERSION=$(echo "${{ steps.meta.outputs.boundary }}" | sed -E 's/^v//; s/-rc$//')
+          CURRENT="${{ steps.meta.outputs.version }}"
+
+          # Before the first cut marker there is nothing to prune (every draft is legitimately
+          # in play), so bail out rather than risk deleting the running draft.
+          if [ -z "$BOUNDARY_VERSION" ]; then
+            echo "No cut marker yet; nothing to prune."
+            exit 0
+          fi
+
+          # A vX.Y.Z-draft strictly ABOVE the cut marker, other than the one we are about to
+          # (re)create, is an orphan from an out-of-order bump — e.g. a 2.30.6 draft left behind
+          # after the line jumped straight to the 2.31.0 minor. Frozen drafts at or below the
+          # marker are history and stay put; the current draft stays too.
+          gh release list --repo ${{ github.repository }} --limit 100 --json tagName,isDraft \
+            -q '.[] | select(.isDraft) | .tagName' \
+          | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-draft$' \
+          | while read -r TAG; do
+              VER=$(echo "$TAG" | sed -E 's/^v//; s/-draft$//')
+              DROP=$(BV="$BOUNDARY_VERSION" CUR="$CURRENT" VER="$VER" node -e '
+                const cmp = (a, b) => { const A = a.split(".").map(Number), B = b.split(".").map(Number);
+                  for (let i = 0; i < 3; i++) { if ((A[i] || 0) !== (B[i] || 0)) return (A[i] || 0) - (B[i] || 0); } return 0; };
+                const {VER, BV, CUR} = process.env;
+                process.stdout.write(cmp(VER, BV) > 0 && VER !== CUR ? "yes" : "no");')
+              if [ "$DROP" = "yes" ]; then
+                echo "Pruning orphaned draft $TAG"
+                gh release delete "$TAG" --repo ${{ github.repository }} --yes || true
+                git push origin ":refs/tags/$TAG" || true
+              fi
+            done
 
       - name: Create Updated Draft Release
         uses: softprops/action-gh-release@v2

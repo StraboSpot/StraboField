@@ -1,11 +1,12 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
 import issuesAndRequestsStyles from './issuesAndRequests.styles';
 import {SUPPORT_PATHS} from '../../../services/network/urls.constants';
-import UrlLinkButton from '../UrlLinkButton';
+import {FormFlatList} from '../../../shared/ui';
+import UrlLinkButton from '../../../shared/ui/buttons/UrlLinkButton';
 
 const IssuesAndRequests = () => {
   /* Data Hooks */
@@ -21,7 +22,7 @@ const IssuesAndRequests = () => {
   /* View */
 
   return (
-    <View style={issuesAndRequestsStyles.container}>
+    <FormFlatList style={issuesAndRequestsStyles.container}>
       <Text style={issuesAndRequestsStyles.header}>🐞 Report an Issue</Text>
       <Text style={issuesAndRequestsStyles.description}>{message}</Text>
       <UrlLinkButton
@@ -34,7 +35,7 @@ const IssuesAndRequests = () => {
         title={'Email Support'}
         url={SUPPORT_PATHS.EMAIL}
       />
-    </View>
+    </FormFlatList>
   );
 };
 

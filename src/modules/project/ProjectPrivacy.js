@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 import commonStyles from '../../shared/common.styles';
+import {FormFlatList} from '../../shared/ui';
 
 const formName = ['settings', 'project_settings'];
 
@@ -34,8 +35,9 @@ const ProjectPrivacy = () => {
 
   /* View */
 
+  // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
-    <View>
+    <FormFlatList>
       <Formik
         enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
         initialValues={preferences}
@@ -48,6 +50,7 @@ const ProjectPrivacy = () => {
           ...formProps,
           formName: formName,
           onMyChange: onMyChange,
+          renderInline: true,
           setFieldValue: onMyChange,
         }}/>}
       </Formik>
@@ -57,7 +60,7 @@ const ProjectPrivacy = () => {
           project is uploaded.
         </Text>
       </View>
-    </View>
+    </FormFlatList>
   );
 };
 

@@ -1,15 +1,21 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {STEREONET_HEADERS} from './maps.constants';
+import copyToClipboard from '../../shared/copyToClipboard';
 import {getTimeAndDateFromModifiedTimestamp} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
+import {openedMessageModal} from '../home/home.slice';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measurements/measurements.constants';
 
 const useStereonet = () => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const userName = useSelector(state => state.user?.name);
+
+  /* Internal Functions */
+
+  // Report the copy result in the app's own modal rather than a native/browser alert.
+  const showResultModal = (title, message) => dispatch(openedMessageModal({message, title}));
 
   /* Exported Functions */
 
@@ -119,13 +125,9 @@ const useStereonet = () => {
       hasData = true;
     }
 
-    if (hasData) {
-      Clipboard.setString(out);
-      alert('Success!\n\nData has been copied to clipboard.');
-    }
-    else {
-      alert('Error!\n\nYour selected spots contained no valid stereonet data.');
-    }
+    if (!hasData) showResultModal('Error!', 'Your selected Spots contained no valid stereonet data.');
+    else if (await copyToClipboard(out)) showResultModal('Success!', 'Data has been copied to clipboard.');
+    else showResultModal('Error!', 'Unable to copy the data to the clipboard.');
   };
 
   return {

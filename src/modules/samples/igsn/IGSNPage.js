@@ -9,7 +9,7 @@ import useIGSN from './useIGSN';
 import {isEmpty} from '../../../shared/helpers';
 import PageHeader from '../../page/PageHeader';
 
-const IGSNPage = (props) => {
+const IGSNPage = ({page}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -58,7 +58,7 @@ const IGSNPage = (props) => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'IGSN'}/>
+      <PageHeader pageTitle={page.label}/>
       <Text style={{textAlign: 'center', marginTop: 10, fontWeight: '600', fontSize: 18}}>
         Recorded IGSN Metadata on SESAR
       </Text>

@@ -6,9 +6,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     padding: 20,
   },
-  errorText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-  },
   input: {
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderRadius: 15,

@@ -39,8 +39,8 @@ const useMapView = () => {
   const getCenterCoordinates = () => {
     // console.log('Getting initial map center...', center);
     if (currentImageBasemap || stratSection) {
-      if ((selectedSpot?.properties?.image_basemap && selectedSpot?.properties.image_basemap === currentImageBasemap?.id)
-        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id)
+      if (((selectedSpot?.properties?.image_basemap && selectedSpot?.properties.image_basemap === currentImageBasemap?.id)
+        || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id))
         && selectedSpot.geometry?.coordinates) {
         return proj4(PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION, turf.centroid(selectedSpot).geometry.coordinates);
       }
@@ -56,8 +56,11 @@ const useMapView = () => {
 
   // Set initial center and zoom
   const getInitialViewState = () => {
-    const initialCenter = getCenterCoordinates();
+    let initialCenter = getCenterCoordinates();
     const initialZoom = getZoomLevel();
+
+    // Never hand the camera a non-finite coordinate — @rnmapbox Camera throws 'coordinates must contain numbers'
+    if (!Number.isFinite(initialCenter?.[0]) || !Number.isFinite(initialCenter?.[1])) initialCenter = [LONGITUDE, LATITUDE];
 
     const initialViewState = {
       longitude: initialCenter[0],

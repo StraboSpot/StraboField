@@ -12,6 +12,7 @@ import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
 import useMapView from './view/useMapView';
+import FreehandSketch from '../sketch/FreehandSketch';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
 
@@ -163,6 +164,11 @@ const Map = ({
         spotsNotSelected={spotsNotSelected}
         spotsSelected={spotsSelected}
       />
+
+      {/* Sketch Layer */}
+      {(mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE) && (
+        <FreehandSketch mapMode={mapMode}/>
+      )}
     </ReactMapGL>
   );
 };

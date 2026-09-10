@@ -3,6 +3,7 @@ import {Keyboard, Modal, Platform, Pressable, StyleSheet, useWindowDimensions, V
 
 import {ListItem} from '@rn-vui/base';
 import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
@@ -63,12 +64,27 @@ const ModalWrapper = ({
   });
 
   const {height: windowHeight} = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   /* Local State */
 
   const childrenRef = useRef(children);
   childrenRef.current = children;
   const [kbOffset, setKbOffset] = useState(0);
+
+  /* Derived Variables */
+
+  // `isLoading` means an action is mid-flight, so close off both exits. Nothing here cancels the work — dismissing
+  // only hides the UI while it keeps running — so leaving mid-action invites duplicate or racing operations.
+  const canDismiss = !isLoading;
+  const isCloseButtonShown = canDismiss && (showCloseButton || showCancelButton !== false);
+
+  // Clear whichever obstruction is taller: the keyboard when one is open, otherwise the navigation bar. Android
+  // 15+ forces edge-to-edge, so a fullscreen modal draws behind the navigation bar and its footer buttons become
+  // untappable, and a Modal is its own native window so the app's SafeAreaView can't inset it.
+  const fullscreenPaddingBottom = Math.max(kbOffset, insets.bottom);
+
+  /* Side Effects */
 
   // Track the keyboard height for Android small-screen modals (their fullscreen Modal doesn't inset
   // the content), and for any filled-children modal (whose body is a plain View, not a
@@ -83,6 +99,14 @@ const ModalWrapper = ({
       hide.remove();
     };
   }, [isChildrenFilled]);
+
+  /* Event Handlers */
+
+  // Android's back button and back gesture both land here; without it the modal ignores them entirely. Callers
+  // must clear `isLoading` on every path (a `finally`), or the modal has no exit at all while it is set.
+  const handleRequestClose = () => {
+    if (canDismiss) (onBackdropPress || closeModal || onCancelPress)?.();
+  };
 
   /* Logic Helpers */
 
@@ -148,7 +172,7 @@ const ModalWrapper = ({
         headerImage={headerImage}
         headerTitle={headerTitle}
         imageStyle={imageStyle}
-        showCloseButton={showCloseButton || showCancelButton !== false}
+        showCloseButton={isCloseButtonShown}
       />
       {isChildrenFilled ? (
         // Fill the body with the children (which manage their own internal scrolling) so the footer
@@ -195,7 +219,7 @@ const ModalWrapper = ({
             headerImage={headerImage}
             headerTitle={headerTitle}
             imageStyle={imageStyle}
-            showCloseButton={showCloseButton || showCancelButton !== false}
+            showCloseButton={isCloseButtonShown}
           />
           <View style={{flex: 1}}>
             {children}
@@ -220,13 +244,13 @@ const ModalWrapper = ({
       <Modal
         animationType={'fade'}
         onDismiss={onDismiss}
-        onRequestClose={onBackdropPress}
+        onRequestClose={handleRequestClose}
         statusBarTranslucent
         supportedOrientations={['portrait', 'landscape']}
         visible={isVisible}
       >
         <GestureHandlerRootView style={{flex: 1}}>
-          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: kbOffset}]}>
+          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: fullscreenPaddingBottom}]}>
             {renderModalContent()}
           </View>
         </GestureHandlerRootView>
@@ -255,7 +279,7 @@ const ModalWrapper = ({
     <Modal
       animationType={'fade'}
       onDismiss={onDismiss}
-      onRequestClose={onBackdropPress}
+      onRequestClose={handleRequestClose}
       supportedOrientations={['portrait', 'landscape']}
       transparent
       visible={isVisible}

@@ -79,7 +79,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
   };
 
   // Route a finished draw feature to the active selecting mode; returns true when a mode consumed it (false =
-  // caller should create a Spot). 'selectSpots' is freehand-only, so handling it on both draw paths is safe.
+  // caller should create a Spot). Both draw paths are handled since web falls back to tap-to-place polygons.
   const applySelectingMode = async (feature, selectingMode) => {
     if (selectingMode === 'report') selectReports(feature);
     else if (selectingMode === 'stereonet') await getStereonetForFeature(feature);

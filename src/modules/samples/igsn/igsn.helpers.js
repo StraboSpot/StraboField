@@ -95,7 +95,7 @@ export const isTokenExpired = (accessToken) => {
     const accessTokenParsed = JSON.parse(atob(accessToken.split('.')[1]));
     return accessTokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
   }
-  catch (error) {
+  catch (err) {
     return true; // If decoding fails, assume expired
   }
 };

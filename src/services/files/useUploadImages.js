@@ -10,7 +10,7 @@ import {useImages} from '../../modules/images';
 import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
 import useImageSize from '../../modules/images/useImageSize';
 import {removedChangedImageIds, setIsImageTransferring} from '../../modules/project/projects.slice';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toError} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
 
@@ -53,7 +53,7 @@ const useUploadImages = () => {
       dispatch(updatedProjectTransferProgress(0));
     }
     catch (err) {
-      console.log('Error Uploading Image', imageId, err);
+      console.error('Error Uploading Image', imageId, err);
       throw Error('Error Uploading Image', imageId, err);
     }
   };
@@ -154,10 +154,10 @@ const useUploadImages = () => {
       dispatch(addedStatusMessage('Profile Image Uploaded'));
     }
     catch (err) {
-      console.error(`Failed to upload profile image because ${err.Error}`);
+      console.error('Failed to upload profile image', err);
       dispatch(clearedStatusMessages());
       dispatch(addedStatusMessage('Failed to upload profile image'));
-      throw Error();
+      throw toError(err);
     }
   };
 
