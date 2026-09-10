@@ -16,9 +16,9 @@ import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
-import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import PickerOverlay from '../../../shared/ui/modals/PickerOverlay';
+import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {setLoadingStatus} from '../../home/home.slice';
 import {editedSpotProperties} from '../../spots/spots.slice';
 import {
@@ -83,7 +83,7 @@ const IGSNModal = forwardRef(({
     authenticateWithSesar,
     getAndSaveSesarCode,
     straboSesarMapping,
-    updateSampleIsSesar,
+    updateSampleWithSesar,
     uploadSample,
   } = useIGSN();
   const {initializeUpload} = useUpload();
@@ -91,6 +91,7 @@ const IGSNModal = forwardRef(({
   const toast = useToast();
 
   const {sesar} = useSelector(state => state.user);
+  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {selectedAttributes} = useSelector(state => state.spot) || {};
   const spot = useSelector(state => state.spot.selectedSpot) || {};
 
@@ -99,10 +100,10 @@ const IGSNModal = forwardRef(({
   let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
+  const [authMessage, setAuthMessage] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
   const [igsnResult, setIgsnResult] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [mappedSesarValues, setMappedSesarValues] = useState([]);
@@ -111,6 +112,15 @@ const IGSNModal = forwardRef(({
   const [statusMessage, setStatusMessage] = useState('');
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [stepStatuses, setStepStatuses] = useState({sesar: 'idle', upload: 'idle'});
+
+  /* Derived Variables */
+
+  // SESAR requires sample_type and material to register/update a sample. Detect from the raw form
+  // values — the mapped display value is unreliable (getLabel returns 'Unknown' for an empty type).
+  const missingRequiredFields = {
+    material: isEmpty(formValues?.material_type),
+    sample_type: isEmpty(formValues?.sample_type),
+  };
 
   /* Side Effects */
 
@@ -138,6 +148,7 @@ const IGSNModal = forwardRef(({
     console.log('FORM VALUES', formValues);
     if (isEmpty(sesar.sesarToken?.access)) setModalPage('login');
     else {
+      setAuthMessage('');
       setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
       setModalPage('content');
       const sesarMappedObj = formValues ? straboSesarMapping(formValues) : [];
@@ -154,6 +165,7 @@ const IGSNModal = forwardRef(({
       setIsUploaded(false);
       setIsUploading(false);
       setAssignedIgsn('');
+      setAuthMessage('');
       setSesarStepLabel('');
       setStatusMessage('');
     }
@@ -186,12 +198,11 @@ const IGSNModal = forwardRef(({
   /* Logic Helpers */
 
   const doShowActionButton = isUploaded
-    || (!isEmpty(sesar.sesarToken?.access)
-      && !isLoading
-      && !isUploading
-      && modalPage !== 'picker');
+    || (!isEmpty(sesar.sesarToken?.access) && !isUploading && modalPage !== 'picker');
 
-  const isActionDisabled = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
+  const isActionDisabled = !isInternetReachable
+    || (!formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode))
+    || missingRequiredFields.sample_type || missingRequiredFields.material;
 
   const getSesarTokenAndCodes = async (orcidToken) => {
     try {
@@ -203,6 +214,12 @@ const IGSNModal = forwardRef(({
       }
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
+        if (!tokens?.access) {
+          dispatch(setInitialSesarState());
+          setAuthMessage('Your SESAR session expired. Please sign in again.');
+          setModalPage('login');
+          return;
+        }
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
         toast.show(sesarMessage, {
           duration: 3000,
@@ -233,29 +250,32 @@ const IGSNModal = forwardRef(({
   const registerSample = async () => {
     try {
       setIsUploading(true);
-      // setIsLoading(true);
       setStatusMessage('');
       setSesarStepLabel(formValues?.isOnMySesar ? 'Updating sample with SESAR' : 'Sending sample to SESAR');
       setStepStatuses({sesar: 'loading', upload: 'idle'});
 
-      // Step 1: Register/update with SESAR
-      const res = formValues.isOnMySesar
-        ? await updateSampleIsSesar(mappedSesarValues)
-        : await uploadSample(mappedSesarValues);
-      if (res.error && res.error.length > 0) {
-        console.log(res.error[0]);
-        setStepStatuses({sesar: 'error', upload: 'idle'});
-        setModalPage('error');
-        setErrorMessages(res.error);
-        // setIsLoading(false);
+      // Ensure a non-expired SESAR access token before posting. Authenticating one day and registering the next
+      // otherwise sends a stale token (SESAR access tokens live ~1 day) with no refresh, and the upload just fails.
+      // authenticateWithSesar refreshes if needed and dispatches the rotated token; sendToSesar reads it fresh.
+      const validTokens = await authenticateWithSesar(sesar.sesarToken);
+      if (!validTokens?.access) {
+        dispatch(setInitialSesarState());
+        setStepStatuses({sesar: 'idle', upload: 'idle'});
         setIsUploading(false);
+        setAuthMessage('Your SESAR session expired. Please sign in again.');
+        setModalPage('login');
         return;
       }
+
+      // Step 1: Register/update with SESAR. postSampleToSesar throws on any non-success (top-level or per-sample
+      // error, or an unreadable/non-OK response), so reaching this point means SESAR accepted the sample.
+      const res = formValues.isOnMySesar
+        ? await updateSampleWithSesar(mappedSesarValues)
+        : await uploadSample(mappedSesarValues);
 
       setStatusMessage(formValues.isOnMySesar ? 'Sample updated with SESAR!' : 'Sample registered with SESAR!');
       setAssignedIgsn(res.igsn || '');
       setStepStatuses({sesar: 'done', upload: 'loading'});
-      // setIsLoading(false);
 
       // Save sample + IGSN to Redux
       if (spot.properties.isSample) {
@@ -303,9 +323,8 @@ const IGSNModal = forwardRef(({
         const failedKey = Object.keys(prev).find(k => prev[k] === 'loading') || 'upload';
         return {...prev, [failedKey]: 'error'};
       });
-      // setIsLoading(false);
       setIsUploading(false);
-      setErrorMessages(err ? [err.toString()] : ['Something went wrong.']);
+      setErrorMessages([err?.message || 'Something went wrong.']);
       setModalPage('error');
     }
   };
@@ -327,18 +346,37 @@ const IGSNModal = forwardRef(({
     return 'auto';
   };
 
+  // Which step failed determines both the header and the body message: the SESAR register/update step, or the
+  // StraboSpot project upload that runs only after SESAR succeeds. Default to 'sesar' since the SESAR call is first.
+  const getFailedStep = () => stepStatuses.upload === 'error' ? 'upload' : 'sesar';
+
+  const getHeaderTitle = () => {
+    if (modalPage === 'error') {
+      if (getFailedStep() === 'upload') return 'Upload Failed';
+      return formValues?.isOnMySesar ? 'Update Failed' : 'Registration Failed';
+    }
+    if (isUploading) return 'Uploading Project';
+    if (isUploaded) return 'Upload Complete!';
+    return formValues?.isOnMySesar ? 'Update Sample with SESAR' : 'Register Sample with SESAR';
+  };
+
   /* Render Functions */
 
   const renderLoginView = () => (
-    <IGSNUploadAndRegister
-      isIGSNChecked={true}
-      selectedFeature={formValues}
-    />
+    <>
+      {!isEmpty(authMessage) && <Text style={IGSNModalStyles.requiredLabel}>{authMessage}</Text>}
+      <IGSNUploadAndRegister
+        isIGSNChecked={true}
+        selectedFeature={formValues}
+      />
+    </>
   );
 
   const renderContentView = () => (
     <ScrollView style={IGSNModalStyles.contentContainer}>
-      <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      {!isUploaded && isActionDisabled ? renderRequiredFieldsWarning() : (
+        <Text style={IGSNModalStyles.uploadContentDescription}>{statusMessage}</Text>
+      )}
       {isVisible && mappedSesarValues?.map((item) => {
         if (item.sesarKey === 'user_code' && formRef?.current?.values?.isOnMySesar) return null;
         if (item.sesarKey === 'igsn' && isEmpty(item.value)) return null;
@@ -360,9 +398,9 @@ const IGSNModal = forwardRef(({
                   containerStyle={{width: '50%'}}
                   icon={
                     <Icon
-                      color='#00aced'
-                      name='pencil-outline'
-                      type='ionicon'
+                      color={'#00aced'}
+                      name={'pencil-outline'}
+                      type={'ionicon'}
                     />
                   }
                   onPress={() => setIsPickerVisible(true)}
@@ -375,15 +413,58 @@ const IGSNModal = forwardRef(({
     </ScrollView>
   );
 
+  const renderRequiredFieldsWarning = () => {
+    const missingLabels = [
+      missingRequiredFields.sample_type && 'Sample Type',
+      missingRequiredFields.material && 'Material',
+    ].filter(Boolean);
+    const isMissingUserCode = !formValues?.isOnMySesar && isEmpty(sesar.selectedUserCode);
+    if (isInternetReachable && isEmpty(missingLabels) && !isMissingUserCode) return null;
+    return (
+      <>
+        {!isInternetReachable && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            You must be connected to the Internet to register or update a sample with SESAR. Please reconnect and try
+            again.
+          </Text>
+        )}
+        {!isEmpty(missingLabels) && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            {missingLabels.join(' and ')} {missingLabels.length > 1 ? 'are' : 'is'} required to register a sample with
+            SESAR. Please set {missingLabels.length > 1 ? 'these fields' : 'this field'} before registering.
+          </Text>
+        )}
+        {isMissingUserCode && (
+          <Text style={IGSNModalStyles.requiredLabel}>
+            A SESAR user code is required to register a sample. Please select a user code in your MYSESAR account
+            settings before registering.
+          </Text>
+        )}
+      </>
+    );
+  };
+
   const renderStatusView = () => (
     <View
       style={[modalPage === 'error' ? IGSNModalStyles.errorContainer : IGSNModalStyles.successContainer, {alignSelf: 'stretch'}]}>
       {modalPage === 'error' && (
         <>
-          <Text style={IGSNModalStyles.statusHeaderText}>There was an error!</Text>
-          {errorMessages.map(msg => (
+          <LottieAnimations doesLoop={false} type={'error'}/>
+          <Text style={IGSNModalStyles.statusHeaderText}>
+            {getFailedStep() === 'upload'
+              ? 'Registered with SESAR, but the upload to StraboSpot failed.'
+              : formValues?.isOnMySesar
+                ? 'The sample could not be updated with SESAR.'
+                : 'The sample could not be registered with SESAR.'}
+          </Text>
+          {(isEmpty(errorMessages) ? ['Something went wrong. Please try again.'] : errorMessages).map(msg => (
             <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
           ))}
+          {getFailedStep() === 'upload' && assignedIgsn ? (
+            <Text style={IGSNModalStyles.statusMessageText}>
+              IGSN: {assignedIgsn} — your sample is registered, so re-uploading the project later will sync it.
+            </Text>
+          ) : null}
         </>
       )}
       {(isUploading || isUploaded) && (
@@ -395,6 +476,7 @@ const IGSNModal = forwardRef(({
       )}
       {isUploaded && (
         <View style={IGSNModalStyles.successContainer}>
+          <LottieAnimations doesLoop={false} type={'complete'}/>
           <Text style={IGSNModalStyles.statusHeaderText}>Success!</Text>
           {/*<Text style={IGSNModalStyles.statusMessageText}>{statusMessage}</Text>*/}
           {assignedIgsn ? (
@@ -414,14 +496,14 @@ const IGSNModal = forwardRef(({
 
   return (
     <ModalWrapper
-      actionTitle={isUploaded ? 'Done' : formValues?.isOnMySesar ? 'Update' : 'Register'}
+      actionTitle={modalPage === 'error' ? 'OK' : isUploaded ? 'Done' : formValues?.isOnMySesar ? 'Update' : 'Register'}
       cancelTitle={'Close'}
       closeModal={handleClose}
-      disabled={isActionDisabled}
-      headerTitle={isUploading ? 'Uploading Project' : 'Upload Complete!'}
-      isLoading={isLoading}
+      disabled={modalPage === 'error' ? false : isActionDisabled}
+      headerTitle={getHeaderTitle()}
+      isLoading={isUploading}
       isVisible={isVisible}
-      onActionPressed={isUploaded ? handleClose : registerSample}
+      onActionPressed={modalPage === 'error' || isUploaded ? handleClose : registerSample}
       onCancelPress={handleClose}
       overlayStyleOverride={{
         height: getModalHeight(),
@@ -443,7 +525,6 @@ const IGSNModal = forwardRef(({
           <ClearButton onPress={onReset} title={'Reset SESAR Credentials'}/>
         )}
       </View>
-      <Loading isLoading={isLoading} style={{backgroundColor: 'transparent'}}/>
       <PickerOverlay
         closePicker={() => setIsPickerVisible(false)}
         data={[...sesar.userCodes.map(c => c?.sesar_code || c), undefined]}

@@ -13,7 +13,7 @@ import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {SpotsListItem, useSpots} from '../spots';
 
-const Nesting = () => {
+const Nesting = ({page}) => {
   console.log('Rendering Nesting');
 
   /* Data Hooks */
@@ -176,7 +176,7 @@ const Nesting = () => {
 
   return (
     <View style={{flex: 1}}>
-      <PageHeader pageTitle={'Nesting'}/>
+      <PageHeader pageTitle={page.label}/>
       <FlatList
         ListFooterComponent={renderGenerations('Children')}
         ListHeaderComponent={renderGenerations('Parents')}

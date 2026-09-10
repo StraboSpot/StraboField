@@ -14,6 +14,7 @@ const drawGeometryTogglesStyles = StyleSheet.create({
   },
   drawGeometryRow: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
     marginHorizontal: -5,
   },

@@ -76,8 +76,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
   };
 
   const saveUpdatedImage = (updatedImage) => {
-    const imagesFiltered = images.filter(i => i.id !== updatedImage.id);
-    const updatedImages = [...imagesFiltered, updatedImage];
+    const updatedImages = images.map(i => i.id === updatedImage.id ? updatedImage : i);
     dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
@@ -123,6 +122,7 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
         <SketchModal
           image={sketchImage}
           saveImages={saveImages}
+          saveUpdatedImage={saveUpdatedImage}
           setIsSketchModalVisible={setIsSketchModalVisible}
         />
       )}

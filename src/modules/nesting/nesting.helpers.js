@@ -38,8 +38,8 @@ export const isWithin = (spot1, spot2) => {
       });
     }
   }
-  catch (e) {
-    console.error('Error with Spot geometry! Spot 1:', spot1, 'Spot 2:', spot2, 'Error:', e);
+  catch (err) {
+    console.error('Error with Spot geometry! Spot 1:', spot1, 'Spot 2:', spot2, 'Error:', err);
   }
   return boolWithin;
 };

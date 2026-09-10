@@ -20,14 +20,14 @@
       "label": "Metamorphic Rock Type",
       "hint": "Specific metamorphic rock type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "select_multiple dw4vv19",
       "name": "metamorphic_rock_type_less_com",
       "label": "Metamorphic Rock Type (Less Common)",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "selected(${metamorphic_rock_type}, 'less_common_ty')"
     },
     {
@@ -44,7 +44,7 @@
       "label": "Protolith",
       "hint": "Metamorphic protolith",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -58,7 +58,7 @@
       "name": "facies",
       "label": "Facies",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -72,7 +72,7 @@
       "name": "zone",
       "label": "Zone",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

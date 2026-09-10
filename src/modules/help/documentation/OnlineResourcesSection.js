@@ -3,8 +3,8 @@ import {View} from 'react-native';
 
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import {BLUE} from '../../../shared/styles.constants';
+import UrlLinkButton from '../../../shared/ui/buttons/UrlLinkButton';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import UrlLinkButton from '../UrlLinkButton';
 
 const links = [
   {

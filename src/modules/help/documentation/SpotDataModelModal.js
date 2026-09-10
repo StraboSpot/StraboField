@@ -1,18 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
-
-import Clipboard from '@react-native-clipboard/clipboard';
-import JSONTree from 'react-native-json-tree';
 
 import forms from '../../../assets/forms';
 import {isEmpty} from '../../../shared/helpers';
-import ClearButton from '../../../shared/ui/buttons/ClearButton';
-import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
-
-// Since hideRoot is true, level 0 is actually the first visible level
-// Level 0: type, geometry, properties
-// Level 1: contents of properties (what we want to show)
-const shouldExpandNode = (keyName, data, level) => level <= 1;
+import JsonTreeModal from '../../../shared/ui/modals/JsonTreeModal';
 
 const SpotDataModelModal = ({close}) => {
   /* Local State */
@@ -118,7 +108,8 @@ const SpotDataModelModal = ({close}) => {
             else if (formKey === 'lithologies' || formKey === 'composition' || formKey === 'stratification' || formKey === 'texture') {
               return {...acc1, lithologies: {...acc1.lithologies, id: 'uuid', ...survey}};
             }
-            else if (categoryKey === 'pet' || categoryKey === 'sed' || formKey === 'earthquakes') {
+            else if (categoryKey === 'pet' || categoryKey === 'sed' || formKey === 'earthquakes'
+              || formKey === 'outcrop_summaries') {
               return {...acc1, ...{[formKey]: {id: 'uuid', ...survey}}};
             }
             else if (categoryKey === 'tephra') {
@@ -175,24 +166,7 @@ const SpotDataModelModal = ({close}) => {
 
   /* View */
 
-  return (
-    <ModalWrapper
-      closeModal={close}
-      headerTitle={'Spot Data Model Object'}
-      overlayStyleOverride={{width: '40%'}}
-      showActionButton={false}
-      showCancelButton={false}
-      showCloseButton={true}
-    >
-      <ScrollView>
-        <ClearButton
-          onPress={() => Clipboard.setString(JSON.stringify(spotDataModel))}
-          title={'Copy JSON to Clipboard'}
-        />
-        <JSONTree data={spotDataModel} hideRoot shouldExpandNode={shouldExpandNode}/>
-      </ScrollView>
-    </ModalWrapper>
-  );
+  return <JsonTreeModal closeModal={close} data={spotDataModel} headerTitle={'Spot Data Model Object'}/>;
 };
 
 export default SpotDataModelModal;

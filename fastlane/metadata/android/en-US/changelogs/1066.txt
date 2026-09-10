@@ -1,0 +1,8 @@
+StraboField 2.31.0
+
+• Richer Samples with images, measurements & full IGSN support (Get/View IGSN, SESAR sync)
+• Much of the app now works on the web: freehand drawing, stereonet lasso, export & import
+• Better map editing: freehand vertex spacing, extend lines, overlapping-Spot picker, undo delete
+• New dike symbol, Dip/Plunge/Name labels & UTM display
+• Redesigned compass, auto-save with backup status, offline profile sync & Forgot Password
+• Other bug fixes

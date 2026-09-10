@@ -1,11 +1,11 @@
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {useForm} from '../form';
-import {setModalVisible} from '../home/home.slice';
+import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {setSelectedTag, updatedProject} from '../project/projects.slice';
@@ -38,6 +38,16 @@ const useReportModal = ({openSpotInNotebook}) => {
   /* Derived Variables */
 
   const initialValues = isEmpty(report) ? {} : report;
+
+  /* Side Effects */
+
+  // Clear the values on the way out so the next memo doesn't open on top of this one's. The Memos page and this modal
+  // share the 'reports' key, so leftover values would otherwise show a saved memo's title, buttons and checked Spots
+  // when the modal reopens to create a new one.
+  useEffect(() => {
+    console.log('UE useReportModal []');
+    return () => dispatch(setModalValues({}));
+  }, []);
 
   /* Internal Functions */
 
@@ -115,8 +125,8 @@ const useReportModal = ({openSpotInNotebook}) => {
       updatedReports.push({...editedReport});
       dispatch(updatedProject({field: 'reports', value: updatedReports}));
     }
-    catch (e) {
-      console.log('Error saving report data', e);
+    catch (err) {
+      console.error('Error saving report data', err);
     }
   };
 

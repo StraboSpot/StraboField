@@ -167,7 +167,7 @@ const SignUp = ({navigation}) => {
       }
     }
     catch (err) {
-      console.log('error signing up: ', err);
+      console.error('error signing up: ', err);
       setIsLoading(false);
       setStatusDialogTitle('Connection Error');
       setStatusType('error');

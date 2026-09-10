@@ -7,12 +7,7 @@ import useMapURL from './useMapURL';
 import useMapCoords from './view/useMapCoords';
 import {STRABO_APIS} from '../../services/network/urls.constants';
 import useServerRequests from '../../services/network/useServerRequests';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setIsOfflineMapsModalVisible,
-} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 
 const useMap = () => {
   /* Data Hooks */
@@ -32,13 +27,6 @@ const useMap = () => {
     url = customDatabaseEndpoint.isSelected ? url + '/zipcount' : STRABO_APIS.TILE_COUNT;
     console.log(url + '?extent=' + extentString + '&zoom=' + zoomLevel);
     return url + '?extent=' + extentString + '&zoom=' + zoomLevel;
-  };
-
-  const handleError = (message, err) => {
-    dispatch(clearedStatusMessages());
-    dispatch(addedStatusMessage(`${message} \n\n${err}`));
-    dispatch(setIsOfflineMapsModalVisible(false));
-    dispatch(setIsErrorMessagesModalVisible(true));
   };
 
   const setBasemap = async (mapId) => {
@@ -62,9 +50,10 @@ const useMap = () => {
           }
         }
         else {
-          dispatch(clearedStatusMessages());
-          dispatch(addedStatusMessage(`Map ${mapId} not found. Setting basemap to Mapbox Topo.`));
-          dispatch(setIsErrorMessagesModalVisible(true));
+          dispatch(openedMessageModal({
+            message: `Map ${mapId} not found. Setting basemap to Mapbox Topo.`,
+            title: 'Error!',
+          }));
           await setBasemap(null);
         }
       }
@@ -79,7 +68,6 @@ const useMap = () => {
 
   return {
     getExtentAndZoomCall,
-    handleError,
     isDrawMode,
     setBasemap,
   };

@@ -11,7 +11,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const OtherFeaturesPage = ({isReadOnly}) => {
+const OtherFeaturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -68,6 +68,7 @@ const OtherFeaturesPage = ({isReadOnly}) => {
           featureTypes={otherFeatures}
           hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
           isReadOnly={isReadOnly}
+          page={page}
           renderFeature={feature => renderFeature(feature)}
           selectedFeature={selectedFeature}
         />
@@ -80,7 +81,7 @@ const OtherFeaturesPage = ({isReadOnly}) => {
       <View style={{flex: 1}}>
         <PageHeader
           onPressAdd={addFeature}
-          pageTitle={'Other Features'}
+          pageTitle={page.label}
           showAddButton={!isReadOnly}
           showFeaturesTagButton={!isReadOnly}
         />

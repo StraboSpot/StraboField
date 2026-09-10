@@ -11,7 +11,7 @@ const statusBarStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
-    marginTop: -6,
+    marginTop: -3,
   },
   batteryStatusContainer: {
     alignItems: 'center',

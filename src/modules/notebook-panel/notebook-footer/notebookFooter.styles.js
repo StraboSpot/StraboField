@@ -40,6 +40,11 @@ const notebookFooterStyles = StyleSheet.create({
     paddingRight: 0,
     paddingTop: 5,
   },
+  morePagesListItemTesting: {
+    color: themes.ORANGE,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+  },
   morePagesListItemTitle: {
     color: themes.PRIMARY_TEXT_COLOR,
     flex: 1,

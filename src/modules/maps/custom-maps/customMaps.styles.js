@@ -91,6 +91,10 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
   },
+  mapUrlLink: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    textDecorationLine: 'underline',
+  },
   requiredMessage: {
     color: themes.RED,
     fontSize: themes.SMALL_TEXT_SIZE,

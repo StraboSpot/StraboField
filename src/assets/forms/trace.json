@@ -93,7 +93,7 @@
       "hint": "between layers, isograd, other",
       "required": "false",
       "relevant": "${contact_type} = 'metamorphic'",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -125,7 +125,7 @@
       "hint": "dextral, sinistral, normal, reverse, oblique",
       "required": "false",
       "relevant": "${geologic_structure_type} = 'fault' or ${geologic_structure_type} = 'shear_zone' or ${geologic_structure_type} = 'deformation_zo'",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "default": "not_specified"
     },
     {

@@ -13,7 +13,7 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import TextInputModal from '../../shared/ui/TextInputModal';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
@@ -44,9 +44,7 @@ const UrlData = ({
     }
     catch (err) {
       console.error('Error saving edits', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Please make sure you enter a valid url. ' + err));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: 'Please make sure you enter a valid url. ' + err, title: 'Error!'}));
     }
   };
 

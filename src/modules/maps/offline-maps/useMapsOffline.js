@@ -1,13 +1,13 @@
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {checkIfZipStatusReady, getMedian, tile2lat, tile2long} from './offlineMaps.helpers';
-import {addMapFromDevice, clearedMapsFromRedux, setOfflineMap} from './offlineMaps.slice';
+import {checkIfZipStatusReady, getMedian, getTileFolderName, tile2lat, tile2long} from './offlineMaps.helpers';
+import {addMapFromDevice, clearedMapsFromRedux, deletedOfflineMap, setOfflineMap} from './offlineMaps.slice';
 import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {isEmpty} from '../../../shared/helpers';
+import {isEmpty, toError} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
@@ -93,7 +93,7 @@ const useMapsOffline = () => {
         minzoom: 0,
       }],
     };
-    console.log(map);
+    console.log('Offline Map Object:', map);
     return map;
   };
 
@@ -155,11 +155,11 @@ const useMapsOffline = () => {
       // Set a timeout to reject the promise if the condition isn't met in a certain time
       setTimeout(() => {
         clearInterval(interval);
-        reject(new Error('Condition not met in time'));
-      }, 90000); // Timeout after 10 seconds
-    }).catch((error) => {
-      console.error('Error:', error);
-      return Promise.reject(error);
+        reject(new Error(`Timed out after 90 seconds waiting for zip ${zipId} to be ready`));
+      }, 90000);
+    }).catch((err) => {
+      console.error(`Error checking the status of zip ${zipId}`, err);
+      return Promise.reject(err);
     });
   };
 
@@ -289,7 +289,7 @@ const useMapsOffline = () => {
       else dispatch(clearedMapsFromRedux());/**/
     }
     catch (err) {
-      console.log('Error getting saved maps from device', err);
+      console.error('Error getting saved maps from device', err);
     }
   };
 
@@ -301,7 +301,7 @@ const useMapsOffline = () => {
     }
     catch (err) {
       console.error('Error Initializing Saving Map', err);
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -311,8 +311,7 @@ const useMapsOffline = () => {
     notNeededTiles = 0;
     try {
       let result;
-      let mapID = currentBasemap.id;
-      if (currentBasemap.source === 'mapbox_styles') mapID = currentBasemap.id.split('/')[1];
+      const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
       let folderExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID);
       if (!folderExists) {
         console.log('FOLDER DOESN\'T EXIST! ', APP_DIRECTORIES.TILE_CACHE + mapID);
@@ -329,20 +328,56 @@ const useMapsOffline = () => {
   };
 
   const moveTile = async (tile, zipID) => {
-    let mapID = currentBasemap.id;
-    if (currentBasemap.source === 'mapbox_styles') mapID = currentBasemap.id.split('/')[1];
+    const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
     let zipId = zipUID ?? zipID;
     fileCount++;
     let fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID + '/tiles/' + tile);
-    // console.log('foo exists: ', tile.name + ' ' + fileExists);
     if (!fileExists) {
       neededTiles++;
       await moveFile(APP_DIRECTORIES.TILE_TEMP + zipId + '/tiles/' + tile,
         APP_DIRECTORIES.TILE_CACHE + mapID + '/tiles/' + tile);
-      console.log('Tile moved');
     }
     else notNeededTiles++;
     return [fileCount, neededTiles, notNeededTiles];
+  };
+
+  // Called when a custom map's id changes (e.g. a shared Mapbox style re-created under the new user's account). The
+  // tiles themselves are still valid, so move the cache directory rather than making the user download them again.
+  const renameOfflineMapTiles = async (previousId, map) => {
+    const previousFolder = getTileFolderName(previousId, map.source);
+    const newFolder = getTileFolderName(map.id, map.source);
+    console.log('Renaming Offline Map Tiles:', previousFolder, '->', newFolder);
+    if (previousFolder === newFolder) {
+      console.log('Tile folder is unchanged, only the Mapbox account moved. Tiles are already in place.');
+      return;
+    }
+    const previousOfflineMap = offlineMaps[previousFolder];
+    if (!await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + previousFolder)) {
+      console.log('No tiles cached under', previousFolder, '- nothing to move.');
+      return;
+    }
+    if (await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + newFolder)) {
+      console.log('Target folder already has its own tiles:', newFolder, '- leaving', previousFolder, 'in place.');
+      return;
+    }
+    await moveFile(APP_DIRECTORIES.TILE_CACHE + previousFolder, APP_DIRECTORIES.TILE_CACHE + newFolder);
+    // moveFile swallows its errors, so confirm the move landed before re-keying Redux to the new folder.
+    if (!await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + newFolder)) {
+      console.error('Failed to move tiles to', newFolder, '- leaving the offline map keyed to', previousFolder);
+      return;
+    }
+    // Rebuilt rather than re-keyed: the entry embeds the tile path and the layer id. Fields the user owns, or that
+    // describe the download itself, are carried over — these are the same tiles, only the folder they sit in changed.
+    const newOfflineMap = await createOfflineMapObject(newFolder, [map]);
+    console.log('Moved', newOfflineMap.count, 'tiles from', previousFolder, 'to', newFolder);
+    dispatch(deletedOfflineMap(previousFolder));
+    dispatch(setOfflineMap({
+      ...newOfflineMap,
+      date: previousOfflineMap?.date ?? newOfflineMap.date,
+      isOfflineMapVisible: previousOfflineMap?.isOfflineMapVisible ?? newOfflineMap.isOfflineMapVisible,
+      mapId: previousOfflineMap?.mapId ?? newOfflineMap.mapId,
+      name: previousOfflineMap?.name ?? newOfflineMap.name,
+    }));
   };
 
   const saveZipMap = async (startZipURL) => {
@@ -390,11 +425,10 @@ const useMapsOffline = () => {
     try {
       const mapID = mapId ? mapId : currentBasemap.id;
       const customMap = Object.values(customMaps).filter(map => mapID === map.id);
-      console.log(customMap);
+      console.log('Custom Map for Tile Count:', customMap);
       const newOfflineMapsData = await createOfflineMapObject(mapID, customMap);
-      console.log(newOfflineMapsData);
       dispatch(setOfflineMap(newOfflineMapsData));
-      console.log('Map to save to Redux', newOfflineMapsData);
+      console.log('Map to save to Redux:', newOfflineMapsData);
     }
     catch (err) {
       console.error('Error updating map object', err);
@@ -413,6 +447,7 @@ const useMapsOffline = () => {
     initializeSaveMap,
     moveFiles,
     moveTile,
+    renameOfflineMapTiles,
     saveZipMap,
     setOfflineMapTiles,
     switchToOfflineMap,

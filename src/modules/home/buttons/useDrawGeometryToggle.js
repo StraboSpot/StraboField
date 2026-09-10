@@ -1,5 +1,4 @@
 import {useEffect} from 'react';
-import {Platform} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -26,16 +25,14 @@ const useDrawGeometryToggle = () => {
 
   const handleLineLongPressed = () => {
     console.log('long press');
-    if (Platform.OS !== 'web') {
-      dispatch(setDrawGeometries({
-        line: drawGeometries.line === MAP_MODES.DRAW.LINE ? MAP_MODES.DRAW.FREEHANDLINE
-          : MAP_MODES.DRAW.LINE,
-      }));
-    }
+    dispatch(setDrawGeometries({
+      line: drawGeometries.line === MAP_MODES.DRAW.LINE ? MAP_MODES.DRAW.FREEHANDLINE
+        : MAP_MODES.DRAW.LINE,
+    }));
   };
 
   const handlePointLongPressed = () => {
-    if (!currentImageBasemap && !stratSection && Platform.OS !== 'web') {
+    if (!currentImageBasemap && !stratSection) {
       dispatch(setDrawGeometries({
         point: drawGeometries.point === MAP_MODES.DRAW.POINT ? MAP_MODES.DRAW.POINTLOCATION
           : MAP_MODES.DRAW.POINT,
@@ -44,12 +41,10 @@ const useDrawGeometryToggle = () => {
   };
 
   const handlePolygonLongPressed = () => {
-    if (Platform.OS !== 'web') {
-      dispatch(setDrawGeometries({
-        polygon: drawGeometries.polygon === MAP_MODES.DRAW.POLYGON ? MAP_MODES.DRAW.FREEHANDPOLYGON
-          : MAP_MODES.DRAW.POLYGON,
-      }));
-    }
+    dispatch(setDrawGeometries({
+      polygon: drawGeometries.polygon === MAP_MODES.DRAW.POLYGON ? MAP_MODES.DRAW.FREEHANDPOLYGON
+        : MAP_MODES.DRAW.POLYGON,
+    }));
   };
 
   return {

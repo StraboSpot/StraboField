@@ -1,0 +1,1 @@
+• Improvements: Fallback to spot date if collection date is unavailable Needed fo IGSN registration; Prevent sample registration without mandatory fields and provide inline warnings

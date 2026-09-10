@@ -1,11 +1,10 @@
 import React from 'react';
-import {Platform, Pressable, ScrollView, View} from 'react-native';
+import {Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import footerStyles from './notebookFooter.styles';
-import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import {AvatarWrapper} from '../../../shared/ui/avatars';
@@ -24,13 +23,11 @@ const MorePagesMenu = ({
   const dispatch = useDispatch();
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
 
-  const {getRelevantGeneralPages, getRelevantPetPages, getRelevantSedPages} = usePage();
+  const {getRelevantPagesSections} = usePage();
 
   /* Derived Variables */
 
-  const generalPagesToShow = getRelevantGeneralPages(isRichSample);
-  const petPagesToShow = getRelevantPetPages(isRichSample);
-  const sedPagesToShow = getRelevantSedPages(isRichSample);
+  const sectionsToShow = getRelevantPagesSections(isRichSample);
 
   /* Logic Helpers */
 
@@ -64,6 +61,7 @@ const MorePagesMenu = ({
             <ListItem.Title style={footerStyles.morePagesListItemTitle}>
               {page.label}
             </ListItem.Title>
+            {!!page.testing && <Text style={footerStyles.morePagesListItemTesting}>Testing</Text>}
           </Pressable>
           <View style={{paddingLeft: 5, paddingRight: Platform.OS === 'web' ? 10 : 0}}>
             <SwitchWrapper onValueChange={() => togglePageSwitch(page.key)} value={notebookPagesOn.includes(page.key)}/>
@@ -88,19 +86,13 @@ const MorePagesMenu = ({
     >
       <View style={{flex: 1, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, paddingTop: 10}}>
         <ScrollView>
-          {generalPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
-          {!isEmpty(petPagesToShow) && (
-            <>
-              <SectionDivider dividerText={'Rocks & Minerals'}/>
-              {petPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
-            </>
-          )}
-          {!isEmpty(sedPagesToShow) && (
-            <>
-              <SectionDivider dividerText={'Sedimentology'}/>
-              {sedPagesToShow.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
-            </>
-          )}
+          {/* The first section sits right under the modal header, so it has nothing to divide from */}
+          {sectionsToShow.map((section, sectionIndex) => (
+            <React.Fragment key={section.title}>
+              {sectionIndex > 0 && <SectionDivider dividerText={section.title}/>}
+              {section.pages.map((page, i, arr) => renderMenuItem(page, i < arr.length - 1))}
+            </React.Fragment>
+          ))}
         </ScrollView>
       </View>
     </ModalWrapper>

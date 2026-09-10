@@ -15,7 +15,6 @@ import {
   MEASUREMENT_KEYS,
   MEASUREMENT_TYPES,
   PLANAR_COMPASS_FIELDS,
-  TOAST_OPTIONS,
 } from './measurements.constants';
 import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
@@ -48,7 +47,7 @@ const AddMeasurementModal = ({onPress}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+  const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
@@ -74,9 +73,10 @@ const AddMeasurementModal = ({onPress}) => {
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
-  // Compass/Manual input mode is the shared user preference, so this toggle and the one in User Conventions stay in
-  // sync. Fall back to the platform default only while the preference is unset.
-  const isManualMeasurement = defaultManualMeasurement ?? (Platform.OS === 'web');
+  // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
+  // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
+  // sync, defaulting to Compass while it is unset.
+  const isManualMeasurement = Platform.OS === 'web' || (defaultManualMeasurement ?? false);
   const setIsManualMeasurement = value => dispatch(setUserData({default_manual_measurement: value}));
 
   /* Side Effects */
@@ -89,16 +89,14 @@ const AddMeasurementModal = ({onPress}) => {
     };
   }, []);
 
-  // Only Compass input needs the screen locked to portrait; Manual entry does not, so don't fire the lock for it
+  // The compass reads correctly in any hold now (trend/plunge follows the edge that's up as held, strike/dip
+  // never depended on orientation), so instead of forcing portrait we lock to whatever orientation the user
+  // opened it in — the screen then stays put while they move/tilt the tablet to take the reading. Manual
+  // entry needs no lock. Phones (SMALL_SCREEN) stay portrait app-wide.
   useEffect(() => {
     if (SMALL_SCREEN || Platform.OS === 'web') return;
-    if (isManualMeasurement) {
-      unlockOrientation();
-    }
-    else {
-      lockToPortrait();
-      toast.show('Screen orientation LOCKED', {...TOAST_OPTIONS, type: 'lock'});
-    }
+    if (isManualMeasurement) unlockOrientation();
+    else lockToCurrentOrientation();
   }, [isManualMeasurement]);
 
   useLayoutEffect(() => {
@@ -291,7 +289,7 @@ const AddMeasurementModal = ({onPress}) => {
       SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
     }
   };
 

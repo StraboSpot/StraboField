@@ -183,6 +183,16 @@ export const getTimeAndDateFromModifiedTimestamp = (field) => {
   };
 };
 
+// Appends the lowest free suffix when a title is taken: "Outcrop" -> "Outcrop (2)" -> "Outcrop (3)".
+// A copy of a copy counts from the same base, so never "Outcrop (2) (2)".
+export const getUniqueTitle = (title, existingTitles) => {
+  if (!existingTitles.includes(title)) return title;
+  const baseTitle = title.toString().replace(/ \(\d+\)$/, '');
+  let copyNumber = 2;
+  while (existingTitles.includes(baseTitle + ' (' + copyNumber + ')')) copyNumber++;
+  return baseTitle + ' (' + copyNumber + ')';
+};
+
 export const hasSpace = filename => filename.includes(' ');
 
 export const hexToRgb = (hex) => {
@@ -253,6 +263,15 @@ export const sleep = (delay) => {
 
 export const toDegrees = (radians) => {
   return radians * 180 / Math.PI;
+};
+
+// Safely normalizes any caught value into a native Error instance. Preserves existing Errors (retaining
+// original stack traces and custom properties), converts plain objects to JSON strings to prevent
+// '[object Object]', and provides a fallback message for null/undefined inputs.
+export const toError = (err) => {
+  if (err instanceof Error) return err;
+  if (typeof err === 'object' && err !== null) return new Error(JSON.stringify(err));
+  return new Error(String(err ?? 'Unknown error'));
 };
 
 export const toFixedInteger = (value, dp) => {

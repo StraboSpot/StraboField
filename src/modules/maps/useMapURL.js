@@ -1,11 +1,19 @@
 import {useSelector} from 'react-redux';
 
 import {GLYPHS_URL} from './glyphs/glyphs.constants';
+import {MAPBOX_TOKEN} from './maps.constants';
+import {isEmpty} from '../../shared/helpers';
 
 const useMapURL = () => {
   /* Data Hooks */
 
   const userMapboxToken = useSelector(state => state.user.mapboxToken);
+
+  /* Derived Variables */
+
+  // A personal token is only needed for styles in the user's own Mapbox account, so fall back to the app token
+  // rather than sending 'access_token=null'. Matches the fallback useMapsOffline applies to tile downloads.
+  const mapboxToken = isEmpty(userMapboxToken) ? MAPBOX_TOKEN : userMapboxToken;
 
   /* Exported Functions */
 
@@ -14,9 +22,11 @@ const useMapURL = () => {
     let mapID = map.id.trim();
     if (map.source === 'map_warper' || map.source === 'strabospot_mymaps') tileURL = map.url[0] + mapID + '/' + map.tilePath;
     else {
-      tileURL = map.url[0] + (map.source === 'mapbox_styles' && map.url[0].includes('file://') ? mapID.split(
-        '/')[1] : mapID) + map.tilePath + (map.url[0].includes(
-        'https://') ? '?access_token=' + userMapboxToken : '');
+      // Offline tiles are cached under the styleId only (see getTileFolderName). Offline maps carry
+      // source 'direct from filesystem' rather than 'mapbox_styles', so key off a local file:// url plus a
+      // '/' in the id to strip the 'username/' prefix. Online (https) Mapbox styles keep the full id.
+      const tileId = map.url[0].includes('file://') && mapID.includes('/') ? mapID.split('/').pop() : mapID;
+      tileURL = map.url[0] + tileId + map.tilePath + (map.url[0].includes('https://') ? '?access_token=' + mapboxToken : '');
     }
     const styleURL = {
       source: map.source,
@@ -53,8 +63,8 @@ const useMapURL = () => {
   const buildTileURL = (basemap) => {
     let tileUrl = basemap.url[0];
     if (basemap.source === 'osm') tileUrl = tileUrl + basemap.tilePath;
-    if (basemap.source === 'strabospot_mymaps') tileUrl = tileUrl + basemap.id + '/' + basemap.tilePath;
-    else tileUrl = tileUrl + basemap.id + basemap.tilePath + '?access_token=' + userMapboxToken;
+    else if (basemap.source === 'strabospot_mymaps') tileUrl = tileUrl + basemap.id + '/' + basemap.tilePath;
+    else tileUrl = tileUrl + basemap.id + basemap.tilePath + '?access_token=' + mapboxToken;
     return tileUrl;
   };
 

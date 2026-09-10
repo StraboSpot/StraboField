@@ -1,6 +1,6 @@
-import faultRock from './fabrics/fault-rock.json';
-import igneousRock from './fabrics/igneous-rock.json';
-import metamorphicRock from './fabrics/metamorphic-rock.json';
+import igneousFabric from './fabrics/igneous.json';
+import metamorphicFabric from './fabrics/metamorphic.json';
+import structuralFabric from './fabrics/structural.json';
 import geography from './geography.json';
 import geologicUnit from './geologic_unit.json';
 import earthquake from './geomorph/earthquake.json';
@@ -9,6 +9,7 @@ import linearOrientation from './measurement/linear-orientation.json';
 import planarOrientation from './measurement/planar-orientation.json';
 import tabularZoneOrientation from './measurement/tabular-zone-orientation.json';
 import namingConventions from './naming-conventions.json';
+import outcropSummary from './outcrop-summary.json';
 import rockTypeAlterationOreDeprecated from './pet/deprecated/rock-type-alteration-ore.json';
 import rockTypeIgneousDeprecated from './pet/deprecated/rock-type-igneous.json';
 import rockTypeMetamorphicDeprecated from './pet/deprecated/rock-type-metamorphic.json';
@@ -81,14 +82,15 @@ const forms = {
     tensor: tensor,
   },
   fabrics: {
-    fault_rock: faultRock,
-    igneous_rock: igneousRock,
-    metamorphic_rock: metamorphicRock,
+    fault_rock: structuralFabric,
+    igneous_rock: igneousFabric,
+    metamorphic_rock: metamorphicFabric,
   },
   general: {
     earthquakes: earthquake,
     geography: geography,
     images: imageProperties,
+    outcrop_summaries: outcropSummary,
     project_description: projectDescription,
     reports: report,
     samples: sample,

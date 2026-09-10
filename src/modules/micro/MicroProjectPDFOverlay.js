@@ -47,8 +47,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
       setWasExported(true);
       setLoading(false);
     }
-    catch (e) {
-      console.error('Error Exporting Project', e);
+    catch (err) {
+      console.error('Error Exporting Project', err);
       showToast('Error Exporting PDF to Device!', 'danger');
       setIsExportError(true);
       setLoading(false);

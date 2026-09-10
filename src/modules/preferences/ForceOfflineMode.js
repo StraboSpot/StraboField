@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,6 +9,7 @@ import {SwitchWrapper} from '../../shared/ui';
 import {setForceOffline} from '../connections/connections.slice';
 
 // Dev-only preference: simulate no connection while staying connected to Metro/debugger.
+// Native only — there is no offline mode on web.
 const ForceOfflineMode = ({textStyles}) => {
   /* Data Hooks */
 
@@ -21,7 +22,7 @@ const ForceOfflineMode = ({textStyles}) => {
 
   /* View */
 
-  if (!__DEV__) return null;
+  if (!__DEV__ || Platform.OS === 'web') return null;
 
   return (
     <View style={[styles.rowContainer, {paddingHorizontal: 10, paddingVertical: 5}]}>

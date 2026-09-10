@@ -132,7 +132,8 @@ const useForm = () => {
       if (isEmpty(values[key]) && isRelevant(fieldModel, values) && isRequired(fieldModel, values)) {
         errors[key] = 'Required';
       }
-      else if (values[key]) {
+      // Checked with isEmpty rather than truthiness so a value of 0 still has its constraints applied
+      else if (!isEmpty(values[key])) {
         if (fieldModel.type === 'integer') {
           values[key] = isNaN(parseInt(values[key], 10)) ? undefined : parseInt(values[key], 10);
         }

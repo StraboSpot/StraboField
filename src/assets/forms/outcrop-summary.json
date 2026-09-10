@@ -1,0 +1,245 @@
+{
+  "survey": [
+    {
+      "type": "start",
+      "name": "start"
+    },
+    {
+      "type": "end",
+      "name": "end"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_og2iw66",
+      "label": "Outcrop Certainty",
+      "required": "false"
+    },
+    {
+      "type": "note",
+      "name": "outcrop_certainty_note",
+      "label": "An assessment of attributes that provide context to the overall quality of the data collected at a particular outcrop.  Ranges from 5 (most certain) to 1 (least certain). NR stands for Not Reported.",
+      "required": "false"
+    },
+    {
+      "type": "select_one ti5pw19",
+      "name": "attachedness",
+      "label": "Attachedness",
+      "hint": "How clearly is the outcrop attached to the underlying bedrock?\n\n5: Expansive outcrop with clear exposure of bedrock connection.\n1: Isolated outcrop or boulder surrounded by soil.",
+      "required": "false",
+      "appearance": "horizontal-compact"
+    },
+    {
+      "type": "select_one rs0qo34",
+      "name": "lithology",
+      "label": "Lithology",
+      "hint": "How certain is the rock type identification?\n\n5: Completely certain. The rock type or unit is unambiguous (Example: type locality).\n1: Uncertain, the rock type is unclear or has multiple possibilities (Example: four similar sandstones in one field area).",
+      "required": "false",
+      "appearance": "horizontal-compact"
+    },
+    {
+      "type": "select_one ii0sh27",
+      "name": "geometry",
+      "label": "Geometry",
+      "hint": "How certain is the identification of planar or linear features at this outcrop?\n\n5: Clear markers, consistent orientations within the outcrop.\n1: Obscure or overprinted markers, inconsistent or variable orientations.",
+      "required": "false",
+      "appearance": "horizontal-compact"
+    },
+    {
+      "type": "select_one ws5gk47",
+      "name": "kinematics",
+      "label": "Kinematics",
+      "hint": "How certain is the interpreted sense of movement at this outcrop?\n\n5: Clear kinematic indicators with consistent sense of motion.\n1: Poorly preserved or contradictory kinematic indicators.",
+      "required": "false",
+      "appearance": "horizontal-compact"
+    },
+    {
+      "type": "end_group"
+    },
+    {
+      "type": "begin_group",
+      "name": "group_er04g37",
+      "label": "Critical Outcrop",
+      "required": "false"
+    },
+    {
+      "type": "note",
+      "name": "critical_outcrop_note",
+      "label": "An outcrop of particular importance in the project that should be further studied, discussed, or revisited and is likely relevant for any geologist working in the area.",
+      "required": "false"
+    },
+    {
+      "type": "select_multiple hy0et38",
+      "name": "critical_outcrop",
+      "label": "Critical Outcrop Type",
+      "hint": "Anchor\nOutcrop chosen for extended study due to scientific relevance or logistical advantage.\n    Example:  A well exposed outcrop along a road contains enough garnets to perform geochronologic analysis and kinematic indicators for structural analysis.\n\nExemplar\nOutcrop displays the best local example of a unit, geometry, or process that is essential for understanding the field area.\n    Example: An outcrop that clearly shows overprinting relationships between a D1 and D2 fabric present throughout field area.\n\nClarifier\nOutcrop resolves ambiguity, either clarifying something previously unclear, distinguishing between competing interpretations, or provides clear evidence for or against a model.\n    Example:  A faulted outcrop has clear offset markers confirming dextral motion, where other outcrops had unclear kinematics.\n\nConfuser\nOutcrop is difficult to interpret and/or is inconsistent with the working conceptual model.\n    Example:  An outcrop has a mineral that is difficult to identify so further petrologic analysis or consultation from colleagues may be required to understand.",
+      "required": "false",
+      "appearance": "horizontal"
+    },
+    {
+      "type": "text",
+      "name": "why",
+      "label": "Why",
+      "required": "false",
+      "appearance": "multiline",
+      "relevant": "${critical_outcrop} != ''"
+    },
+    {
+      "type": "text",
+      "name": "evidence",
+      "label": "Evidence",
+      "required": "false",
+      "appearance": "multiline",
+      "relevant": "${critical_outcrop} != ''"
+    },
+    {
+      "type": "end_group"
+    }
+  ],
+  "choices": [
+    {
+      "list_name": "ti5pw19",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ti5pw19",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "rs0qo34",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ii0sh27",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "nr",
+      "label": "NR"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "1",
+      "label": "1"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "2",
+      "label": "2"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "3",
+      "label": "3"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "4",
+      "label": "4"
+    },
+    {
+      "list_name": "ws5gk47",
+      "name": "5",
+      "label": "5"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "anchor",
+      "label": "Anchor"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "clarifier",
+      "label": "Clarifier"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "exemplar",
+      "label": "Exemplar"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "confuser",
+      "label": "Confuser"
+    },
+    {
+      "list_name": "hy0et38",
+      "name": "other",
+      "label": "Other"
+    }
+  ]
+}

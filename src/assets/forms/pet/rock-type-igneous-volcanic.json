@@ -20,7 +20,7 @@
       "label": "Volcanic Rock Type",
       "hint": "Specific volcanic rock type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -34,7 +34,7 @@
       "name": "occurence_volcanic",
       "label": "Occurence",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -48,7 +48,7 @@
       "name": "texture_volcanic",
       "label": "Texture",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -95,7 +95,7 @@
       "name": "alteration_volcanic",
       "label": "Modification",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

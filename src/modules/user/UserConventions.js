@@ -18,9 +18,10 @@ import {SwitchWrapper} from '../../shared/ui/';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
-import {showFieldInfo} from '../form/form.helpers';
+import FieldInfoModal from '../form/FieldInfoModal';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {editedOrCreatedSpots} from '../spots/spots.slice';
@@ -30,6 +31,7 @@ const UserProfile = () => {
 
   const dispatch = useDispatch();
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
+  const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const spots = useSelector(state => state.spot.spots);
   const userData = useSelector(state => state.user);
 
@@ -46,6 +48,7 @@ const UserProfile = () => {
   const formRef = useRef(null);
   const hasUnsavedConventionRef = useRef(false);
 
+  const [fieldInfo, setFieldInfo] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
   /* Side Effects */
@@ -131,7 +134,7 @@ const UserProfile = () => {
     if (formCurrent && (formCurrent.dirty || hasUnsavedConventionRef.current)) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !isConnectionAvailable;
+  const getIsDisabled = () => false;
 
   const saveForm = async (formCurrent) => {
     try {
@@ -144,11 +147,14 @@ const UserProfile = () => {
         if (isEmpty(userData.encoded_login)) toast.show('Changes Saved Locally Only!', {type: 'success'});
         else {
           await uploadProfile(userValuesToUpdate);
+          dispatch(clearProfileUploadNeeded());
           toast.show('Profile uploaded successfully!', {type: 'success'});
           toast.show('Changes Saved!', {type: 'success'});
         }
       }
       else {
+        // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
+        if (!isEmpty(userData.encoded_login)) dispatch(setProfileUploadNeeded());
         toast.show(`Not connected to ${connectionTargetText} to upload profile changes`, {type: 'warning'});
         toast.show('Changes Saved Locally Only!', {type: 'success'});
       }
@@ -179,7 +185,34 @@ const UserProfile = () => {
         <Icon
           color={PRIMARY_ACCENT_COLOR}
           name={'information-circle-outline'}
-          onPress={() => showFieldInfo(label, info)}
+          onPress={() => setFieldInfo({label, info})}
+          type={'ionicon'}
+        />
+      </View>
+    );
+  };
+
+  // Coordinate display format. Spots are always stored as WGS84 lat/lng regardless of this setting - it only
+  // changes how coordinates are shown and entered.
+  const renderUtmDisplay = () => {
+    const label = 'Display Coordinates as UTM';
+    const info = 'When on, the Geography page and map readouts show UTM zone, easting and northing instead of '
+      + 'latitude and longitude. Spots are always saved as WGS84 latitude/longitude, so you can switch back and '
+      + 'forth at any time without changing your data. The zone is taken from the coordinate itself and includes '
+      + 'the hemisphere (e.g. 13N).';
+    return (
+      <View style={{alignItems: 'center', flexDirection: 'row', paddingBottom: 10, paddingHorizontal: 10, paddingTop: 5}}>
+        <SwitchWrapper
+          onValueChange={value => onToggleUserConvention('is_utm_display', value)}
+          value={isUtmDisplay}
+        />
+        <Text style={[commonStyles.listItemTitle, {flex: 1, fontWeight: 'bold', paddingLeft: 5}]}>
+          {label}
+        </Text>
+        <Icon
+          color={PRIMARY_ACCENT_COLOR}
+          name={'information-circle-outline'}
+          onPress={() => setFieldInfo({label, info})}
           type={'ionicon'}
         />
       </View>
@@ -208,7 +241,7 @@ const UserProfile = () => {
 
   return (
     <>
-      <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
+      <View style={{flex: 1}}>
         <FlatList
           ListHeaderComponent={
             <>
@@ -223,24 +256,26 @@ const UserProfile = () => {
                 validateOnChange={true}
               />
               {renderMeasurementInputDefault()}
-              {isConnectionAvailable ? (
-                <>
-                  {renderBulkUpdatesSection()}
-                  {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
-                    <View style={userStyles.saveButtonContainer}>
-                      <OutlineButton
-                        loading={isDownloading}
-                        onPress={onDownloadUserProfile}
-                        title={'Download User Conventions'}
-                      />
-                    </View>
-                  )}
-                </>
-              ) : <ConnectionRequiredMessage actionText={'make changes to user conventions'}/>}
+              {renderUtmDisplay()}
+              {renderBulkUpdatesSection()}
+              {!isEmpty(userData.encoded_login) && Platform.OS !== 'web' && (
+                isConnectionAvailable ? (
+                  <View style={userStyles.saveButtonContainer}>
+                    <OutlineButton
+                      loading={isDownloading}
+                      onPress={onDownloadUserProfile}
+                      title={'Download User Conventions'}
+                    />
+                  </View>
+                ) : <ConnectionRequiredMessage actionText={'download user conventions'}/>
+              )}
             </>
           }
         />
       </View>
+
+      {/* Modal */}
+      <FieldInfoModal fieldInfo={fieldInfo} onClose={() => setFieldInfo(null)}/>
     </>
   );
 };

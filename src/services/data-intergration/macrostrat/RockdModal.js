@@ -80,11 +80,12 @@ const RockdModal = ({closeModal, isVisible}) => {
       <View style={{alignItems: 'center', gap: 12}}>
         {macrostratToken ? (
           <>
-            <LottieAnimations
-              doesLoop={isLoading}
-              show={checkInStatus !== 'idle'}
-              type={isLoading ? 'uploading' : checkInStatus === 'error' ? 'error' : 'complete'}
-            />
+            {checkInStatus !== 'idle' && (
+              <LottieAnimations
+                doesLoop={isLoading}
+                type={isLoading ? 'uploading' : checkInStatus === 'error' ? 'error' : 'complete'}
+              />
+            )}
             <Text style={{fontSize: 16, textAlign: 'center'}}>
               {checkInStatus === 'error' ? errorMessage : STATUS_MESSAGES[checkInStatus]}
             </Text>

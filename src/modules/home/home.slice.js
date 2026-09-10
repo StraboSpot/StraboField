@@ -7,18 +7,25 @@ const initialHomeState = {
     imagesDownloadedCount: 0,
     neededImageIds: 0,
   },
+  // Drives the ProgressBar in StatusModal while a project's offline maps are unzipped and moved into place.
+  // progress is 0-1; a non-empty label means an import phase is active and the bar should be shown.
+  mapImportProgress: {
+    progress: 0,
+    label: '',
+  },
   loading: {
     modal: false,
     home: false,
   },
+  messageModal: {isVisible: false, message: '', title: ''},
   modalValues: {},
   modalVisible: null,
   hiddenWarnings: {},
   isBackupModalVisible: false,
   isStatusMessagesModalVisible: false,
-  isErrorMessagesModalVisible: false,
   isProgressModalVisible: false,
   isProjectLoadSelectionModalVisible: false,
+  isSessionExpiredModalVisible: false,
   isOfflineMapModalVisible: false,
   isImageModalVisible: false,
   isMainMenuPanelVisible: false,
@@ -48,8 +55,21 @@ const homeSlice = createSlice({
     clearedStatusMessages(state) {
       state.statusMessages = [];
     },
+    // Only hide. The modal stays mounted through its fade-out, and clearing the text here blanks the header and
+    // body for the ~270ms the animation runs. openedMessageModal always sets all three fields, so leaving the old
+    // text in place can't leak to the next caller.
+    closedMessageModal(state) {
+      state.messageModal.isVisible = false;
+    },
+    openedMessageModal(state, action) {
+      const {message, title} = action.payload;
+      state.messageModal = {isVisible: true, message, title};
+    },
     removedLastStatusMessage(state) {
       state.statusMessages = state.statusMessages.slice(0, -1);
+    },
+    resetMapImportProgress(state) {
+      state.mapImportProgress = {progress: 0, label: ''};
     },
     resetHiddenWarnings(state) {
       state.hiddenWarnings = {};
@@ -63,9 +83,6 @@ const homeSlice = createSlice({
     setIsWarningHidden(state, action) {
       const {key, isHidden} = action.payload;
       state.hiddenWarnings[key] = isHidden;
-    },
-    setIsErrorMessagesModalVisible(state, action) {
-      state.isErrorMessagesModalVisible = action.payload;
     },
     setGeolocationTimeout(state, action) {
       state.geolocationTimeout = action.payload;
@@ -82,11 +99,17 @@ const homeSlice = createSlice({
     setIsProjectLoadSelectionModalVisible(state, action) {
       state.isProjectLoadSelectionModalVisible = action.payload;
     },
+    setIsSessionExpiredModalVisible(state, action) {
+      state.isSessionExpiredModalVisible = action.payload;
+    },
     setIsStatusMessagesModalVisible(state, action) {
       state.isStatusMessagesModalVisible = action.payload;
     },
     setIsUploadModalVisible(state, action) {
       state.isUploadModalVisible = action.payload;
+    },
+    setMapImportProgress(state, action) {
+      state.mapImportProgress = {...state.mapImportProgress, ...action.payload};
     },
     setLoadingStatus(state, action) {
       const {bool, view} = action.payload;
@@ -117,21 +140,25 @@ const homeSlice = createSlice({
 export const {
   addedStatusMessage,
   clearedStatusMessages,
+  closedMessageModal,
+  openedMessageModal,
   removedLastStatusMessage,
   resetHiddenWarnings,
   resetHomeState,
+  resetMapImportProgress,
   setIsBackupModalVisible,
-  setIsErrorMessagesModalVisible,
   setGeolocationTimeout,
   setIsMainMenuPanelVisible,
   setIsOfflineMapsModalVisible,
   setIsProgressModalVisible,
   setIsProjectLoadSelectionModalVisible,
+  setIsSessionExpiredModalVisible,
   setIsStatusMessagesModalVisible,
   setIsUploadModalVisible,
   setIsWarningHidden,
   setIsWarningMessagesModalVisible,
   setLoadingStatus,
+  setMapImportProgress,
   setModalValues,
   setModalVisible,
   setShortcutSwitchPositions,

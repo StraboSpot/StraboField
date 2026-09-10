@@ -48,7 +48,7 @@ const useTemplates = () => {
     let templateObject;
     if (isEmpty(name)) {
       alert('Template name empty', 'Provide a template name.');
-      throw Error;
+      throw Error('Template name is empty.');
     }
     else {
       await formCurrent.submitForm();

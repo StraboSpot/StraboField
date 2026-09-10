@@ -14,7 +14,7 @@
       "label": "Alteration, Ore Rock Type",
       "hint": "Specific alteration/ore rock type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -29,7 +29,7 @@
       "label": "Hydrothermal Alteration",
       "hint": "Hydrothermal alteration type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

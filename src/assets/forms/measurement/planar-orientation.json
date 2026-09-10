@@ -261,7 +261,7 @@
       "label": "Plane Facing",
       "hint": "Orientation of plane relative to original position e.g., upright, overturned, vertical",
       "required": "false",
-      "appearance": "horizontal-compact",
+      "appearance": "horizontal",
       "relevant": "${feature_type} = 'bedding'"
     },
     {

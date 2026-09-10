@@ -24,9 +24,10 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {persistor} from '../../store/ConfigureStore';
+import {clearProfileUploadNeeded, setProfileUploadNeeded} from '../connections/connections.slice';
 import useIsConnectionAvailable, {useConnectionTargetText} from '../connections/useConnectionStatus';
 import {Form, useForm} from '../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
 
 const formName = ['general', 'user_profile'];
@@ -88,7 +89,7 @@ const UserProfile = () => {
     if (formCurrent?.dirty) await saveForm(formCurrent);
   };
 
-  const getIsDisabled = () => !isConnectionAvailable;
+  const getIsDisabled = () => false;
 
   const openProfileImageModal = () => {
     setShouldUpdateImage(false);
@@ -147,10 +148,15 @@ const UserProfile = () => {
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
         await uploadProfile(userValuesToUpdate);
+        dispatch(clearProfileUploadNeeded());
         toast.show('Profile uploaded successfully!', {type: 'success'});
         toast.show('Changes Saved!', {type: 'success'});
       }
-      else toast.show(`Not connected to ${connectionTargetText}. Changes Saved Locally Only`, {type: 'warning'});
+      else {
+        // Flag the local-only changes so ProfileSyncListener uploads them once a connection returns.
+        dispatch(setProfileUploadNeeded());
+        toast.show(`Not connected to ${connectionTargetText}. Changes Saved Locally Only`, {type: 'warning'});
+      }
     }
     catch (err) {
       console.error('Error uploading profile', err);
@@ -173,9 +179,7 @@ const UserProfile = () => {
     }
     catch (err) {
       console.error('Error saving new profile image:', err);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('Error uploading profile image: ' + err));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Uploading Profile Image!'}));
       closeProfileImageModal();
       setIsUploadingProfileImage(false);
     }
@@ -225,7 +229,7 @@ const UserProfile = () => {
   return (
     <>
       {!isEmpty(userData.email) && !isEmpty(userData.encoded_login) && (
-        <View pointerEvents={isConnectionAvailable ? 'auto' : 'none'} style={{flex: 1}}>
+        <View style={{flex: 1}}>
           <FlatList
             ListHeaderComponent={
               <>

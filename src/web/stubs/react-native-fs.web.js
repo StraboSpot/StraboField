@@ -30,7 +30,15 @@ const RNFS = {
   writeFile: noop,
   appendFile: noop,
   exists: noopFalse,
-  readFile: noopEmpty,
+  // Reads the blob: and data: URIs the web document picker hands back. Device paths do not exist on web, so
+  // anything else keeps returning an empty string rather than failing a fetch against a path that is not a URL.
+  readFile: async (source) => {
+    if (typeof source === 'string' && (source.startsWith('blob:') || source.startsWith('data:'))) {
+      const response = await fetch(source);
+      return response.text();
+    }
+    return noopEmpty();
+  },
   readdir: noopArray,
   stat: noopNull,
   getFSInfo: () => Promise.resolve({freeSpace: 0, totalSpace: 0}),

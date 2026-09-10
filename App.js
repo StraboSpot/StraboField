@@ -4,12 +4,14 @@ import {Platform, StatusBar} from 'react-native';
 import * as NetInfo from '@react-native-community/netinfo';
 import {NavigationContainer} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
+import DeviceInfo from 'react-native-device-info';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
 import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
 import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
+import ProfileSyncListener from './src/modules/user/ProfileSyncListener';
 import Routes from './src/routes/Routes';
 import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
 import {RELEASE_NAME} from './src/shared/app.constants';
@@ -21,17 +23,24 @@ import config from './src/utils/config';
 
 let didInit = false;
 
-if (Platform.OS !== 'web') {
+// Web resolves @sentry/react-native to src/web/stubs/sentry.web.js, which is @sentry/react. It shares these
+// options but none of the native ones below, and has no build number to report as dist.
+const sentryOptions = {
+  dsn: config.get('Error_reporting_DSN'),
+  debug: false,
+  environment: __DEV__ ? 'development' : 'production',
+  release: RELEASE_NAME,
+  tracesSampleRate: 0,
+};
+
+if (Platform.OS === 'web') Sentry.init(sentryOptions);
+else {
   Sentry.init({
-    dsn: config.get('Error_reporting_DSN'),
-    enableNative: Platform.OS !== 'web',
+    ...sentryOptions,
+    enableNative: true,
     enableAppHangTracking: false,
-    debug: false,
-    release: RELEASE_NAME,
-    dist: RELEASE_NAME,
+    dist: DeviceInfo.getBuildNumber(), // must match the --dist that scripts/sentry-commands.js uploads with
     autoSessionTracking: true,
-    environment: __DEV__ ? 'development' : 'production',
-    tracesSampleRate: 0,
     enableAutoPerformanceTracing: false,
     enableAutoSessionTracking: false,
     // _experiments: {
@@ -44,7 +53,6 @@ if (Platform.OS !== 'web') {
     ],
   });
 }
-else console.log('SENTRY NOT RUNNING');
 
 NetInfo.configure({
   // reachabilityUrl: 'https://clients3.google.com/generate_204',
@@ -89,6 +97,7 @@ const App = () => {
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
+              <ProfileSyncListener/>
               <MacrostratAuthRedirectHandler/>
               <NavigationContainer linking={linking}>
                 <Routes/>

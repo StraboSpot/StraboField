@@ -19,6 +19,7 @@ export const PAGE_KEYS = {
   NOTES: 'notes',
   QAQC: 'qaqc',
   OTHER_FEATURES: 'other_features',
+  OUTCROP_SUMMARIES: 'outcrop_summaries',
   OVERVIEW: 'overview',
   REACTIONS: 'reactions',
   REPORTS: 'reports',
