@@ -13,7 +13,7 @@ import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import useMapPressEvents from './interactions/useMapPressEvents';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
 import Map from './Map';
-import {SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
+import {DEFAULT_GEOM_VIEW_SHARE, SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
 import useMapsOffline from './offline-maps/useMapsOffline';
 import useStratSection from './strat-section/useStratSection';
@@ -28,6 +28,7 @@ import useImageSize from '../images/useImageSize';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {isStratInterval} from '../spots/spots.helpers';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const MapContainer = forwardRef(({
                                    mapMode,
@@ -130,6 +131,7 @@ const MapContainer = forwardRef(({
   const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
   const {activateDatasetsWithIntervals} = useStratSection();
   const {setMapView, zoomToSpotsNow} = useMapView();
+  const {getRootSpotGeoCoords} = useSpots();
   const {getTilesFromHost} = useServerRequests();
 
   /* Local State */
@@ -306,28 +308,19 @@ const MapContainer = forwardRef(({
   };
 
   const createDefaultGeomContinued = async (defaultGeomType) => {
-    let centerCoords = Platform.OS === 'web' ? await mapRef.current.getCenter().toArray()
+    const centerCoords = Platform.OS === 'web' ? await mapRef.current.getCenter().toArray()
       : await mapRef.current.getCenter();
-    if (centerCoords) {
-      let defaultFeature = turf.point(centerCoords);
-      if (defaultGeomType === 'LineString' || defaultGeomType === 'Polygon') {
-        const centerArea = turf.buffer(defaultFeature, 0.25, {units: 'miles'});
-        defaultFeature = turf.bboxPolygon(turf.bbox(centerArea));
-        if (defaultGeomType === 'LineString') {
-          const defaultFeatureCoords = turf.getCoords(defaultFeature);
-          defaultFeature = turf.lineString([defaultFeatureCoords[0][0], defaultFeatureCoords[0][2]]);
-        }
-      }
-      // copy spot for image basemaps needs conversion of coordinates.
-      if (currentImageBasemap || stratSection) defaultFeature = convertFeatureGeometryToImagePixels(defaultFeature);
-      const selectedSpotCopy = {...selectedSpot, geometry: defaultFeature.geometry};
-      dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpotCopy.properties.id]));
-      dispatch(editedOrCreatedSpot(selectedSpotCopy));
-
-      // Set new geometry ready for editing, set the active vertex to first index of the geometry.
-      startEditing(selectedSpotCopy, turf.explode(selectedSpotCopy).features[0], 0, setMapModeToEdit);
+    if (!centerCoords) {
+      console.warn('Error getting the center of the map');
+      return;
     }
-    else console.warn('Error getting the center of the map');
+    const defaultFeature = getDefaultFeature(defaultGeomType, centerCoords, await getVisibleSpan());
+    const selectedSpotCopy = getSpotWithGeomOnCurrentMap(defaultFeature);
+    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpotCopy.properties.id]));
+    dispatch(editedOrCreatedSpot(selectedSpotCopy));
+
+    // Set new geometry ready for editing, set the active vertex to first index of the geometry.
+    startEditing(selectedSpotCopy, turf.explode(selectedSpotCopy).features[0], 0, setMapModeToEdit);
   };
 
   const endMapMeasurement = () => {
@@ -341,15 +334,52 @@ const MapContainer = forwardRef(({
     // return 16;
   };
 
-  const getExtentString = async () => {
-    const mapBounds = Platform.OS === 'web' ? await mapRef.current.getBounds().toArray()
-      : await mapRef.current.getVisibleBounds();
+  // The shape a Spot gets when it is set in the current view: a point at the center of the map, or a line or polygon
+  // spanning DEFAULT_GEOM_VIEW_SHARE of what is on screen. Measuring the box in the map's own coordinates keeps one
+  // rule for every map type, since the pixel maps are converted afterwards. The line runs corner to corner of the box.
+  const getDefaultFeature = (defaultGeomType, centerCoords, visibleSpan) => {
+    if (defaultGeomType !== 'LineString' && defaultGeomType !== 'Polygon') return turf.point(centerCoords);
+    const [halfWidth, halfHeight] = visibleSpan.map(span => span * DEFAULT_GEOM_VIEW_SHARE / 2);
+    const [lng, lat] = centerCoords;
+    const boxAroundCenter = turf.bboxPolygon([lng - halfWidth, lat - halfHeight, lng + halfWidth, lat + halfHeight]);
+    if (defaultGeomType === 'Polygon') return boxAroundCenter;
+    const boxCoords = turf.getCoords(boxAroundCenter);
+    return turf.lineString([boxCoords[0][0], boxCoords[0][2]]);
+  };
 
-    let right = mapBounds[0][0];
-    let top = mapBounds[0][1];
-    let left = mapBounds[1][0];
-    let bottom = mapBounds[1][1];
+  const getExtentString = async () => {
+    const [[left, bottom], [right, top]] = await getMapBounds();
     return left + ',' + bottom + ',' + right + ',' + top;
+  };
+
+  // The visible corners as [[left, bottom], [right, top]]. The two libraries document opposite orders: mapbox-gl's
+  // toArray is southwest then northeast, @rnmapbox's getVisibleBounds is [[rightLon, topLat], [leftLon, bottomLat]].
+  const getMapBounds = async () => {
+    if (Platform.OS === 'web') return mapRef.current.getBounds().toArray();
+    const [northEast, southWest] = await mapRef.current.getVisibleBounds();
+    return [southWest, northEast];
+  };
+
+  // The selected Spot given this geometry, belonging to whichever map is in view and to no other. An image basemap or
+  // strat section takes all three things createSpot gives a Spot drawn there: pixel coordinates, the property filing
+  // it under that map - miss that and the Spot shows on neither map - and the real world location those pixels cannot
+  // carry. Clearing all three first makes the geo map the exact inverse, and keeps a copy, which inherits them with
+  // no geometry to match, off a map it has no coordinates for.
+  const getSpotWithGeomOnCurrentMap = (feature) => {
+    const {image_basemap, lat, lng, strat_section_id, ...spotProperties} = selectedSpot.properties;
+    const currentPixelMap = currentImageBasemap || stratSection;
+    const geoCoords = currentPixelMap
+      && getRootSpotGeoCoords(currentImageBasemap?.id, stratSection?.strat_section_id);
+    return {
+      ...selectedSpot,
+      geometry: currentPixelMap ? convertFeatureGeometryToImagePixels(feature).geometry : feature.geometry,
+      properties: {
+        ...spotProperties,
+        ...(currentImageBasemap && {image_basemap: currentImageBasemap.id}),
+        ...(stratSection && {strat_section_id: stratSection.strat_section_id}),
+        ...(geoCoords && {lat: geoCoords[1], lng: geoCoords[0]}),
+      },
+    };
   };
 
   const getTileCount = async (zoomLevel) => {
@@ -373,6 +403,12 @@ const MapContainer = forwardRef(({
           + 'endpoint (Home Menu -> Advanced Options -> Custom Database Endpoint).',
       };
     }
+  };
+
+  // How much ground the map is showing, as [width, height] in its own coordinates
+  const getVisibleSpan = async () => {
+    const [[left, bottom], [right, top]] = await getMapBounds();
+    return [right - left, top - bottom];
   };
 
   const startEditingMode = () => {

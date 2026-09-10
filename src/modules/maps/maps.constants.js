@@ -11,6 +11,11 @@ export const UTM_MIN_LATITUDE = -80;    // outside that the polar stereographic 
 export const ZOOM = 14;                 // Default zoom for geographic map and image basemaps
 export const ZOOM_STRAT_SECTION = 18;   // Default zoom for strat sections
 
+// Share of the visible map a default line or polygon spans when a Spot is Set in Current View. Sized from the view
+// rather than a real world distance because an image basemap and a strat section have no real world scale - their
+// coordinates are pixels, an image basemap's running to thousands where a strat section's run to tens.
+export const DEFAULT_GEOM_VIEW_SHARE = 0.25;
+
 // ms to wait for the map viewport to settle (menu close / project load) before fitting to
 // the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
 export const SPOTS_EXTENT_ZOOM_DELAY = 500;
