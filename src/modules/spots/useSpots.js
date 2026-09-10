@@ -330,20 +330,13 @@ const useSpots = () => {
     }
     await checkSpotName(newSpot.properties.name);
 
-    if (newSpot.geometry && (currentImageBasemap || stratSection)) { //newSpot geometry is unavailable when spot is copied.
-      const rootSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id)
-        : getSpotWithThisStratSection(stratSection.strat_section_id);
-      if (rootSpot && rootSpot.geometry) {
-        if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
-          newSpot.properties.lng = rootSpot.properties.lng;
-          newSpot.properties.lat = rootSpot.properties.lat;
-        }
-        else if (isOnGeoMap(rootSpot)) {
-          const center = rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
-            : turf.centroid(rootSpot).geometry.coordinates;
-          newSpot.properties.lng = center[0];
-          newSpot.properties.lat = center[1];
-        }
+    // A Spot created on an image basemap or strat section gets pixel coordinates, so record its real world location
+    // alongside them. A copy arrives with no geometry (see copySpot), so it has no place on this map to record yet.
+    if (newSpot.geometry && (currentImageBasemap || stratSection)) {
+      const geoCoords = getRootSpotGeoCoords(currentImageBasemap?.id, stratSection?.strat_section_id);
+      if (geoCoords) {
+        newSpot.properties.lng = geoCoords[0];
+        newSpot.properties.lat = geoCoords[1];
       }
     }
     // Continuous tagging
@@ -569,6 +562,28 @@ const useSpots = () => {
     return rootSpot;
   };
 
+  // Real world coordinates of the Spot holding an image basemap or strat section. Neither map is georeferenced -
+  // their coordinates are pixels in a space of their own - so that Spot's location is the only real one a Spot on
+  // either map has. A map can hang off a Spot that is itself on another map, so keep walking up until one records
+  // its own lng/lat or stands on the geo map, a holder still on a pixel map having pixels for coordinates itself.
+  const getRootSpotGeoCoords = (imageBasemapId, stratSectionId) => {
+    const visitedSpotIds = new Set();   // a map held by a Spot on itself would otherwise loop forever
+    let rootSpot = getSpotWithThisMap(imageBasemapId, stratSectionId);
+    while (!isEmpty(rootSpot) && !visitedSpotIds.has(rootSpot.properties.id)) {
+      visitedSpotIds.add(rootSpot.properties.id);
+      if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
+        return [rootSpot.properties.lng, rootSpot.properties.lat];
+      }
+      if (isOnGeoMap(rootSpot)) {
+        if (!rootSpot.geometry) return undefined;
+        return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
+          : turf.centroid(rootSpot).geometry.coordinates;
+      }
+      rootSpot = getSpotWithThisMap(rootSpot.properties.image_basemap, rootSpot.properties.strat_section_id);
+    }
+    return undefined;
+  };
+
   const getSampleSpotIconSource = () => require('../../assets/icons/SampleRound.png');
 
   const getSpotById = (spotId) => {
@@ -696,6 +711,7 @@ const useSpots = () => {
     getReadOnlyReason,
     getRecentSpots,
     getRootSpot,
+    getRootSpotGeoCoords,
     getSampleSpotIconSource,
     getSpotById,
     getSpotByImageId,
