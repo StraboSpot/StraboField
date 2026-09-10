@@ -13,7 +13,7 @@ import {canceledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import useSpots from '../../spots/useSpots';
 import {setModalVisible} from '../home.slice';
-import homeStyles from '../home.style';
+import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
 const RightSideButtons = ({

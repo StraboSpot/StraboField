@@ -1,7 +1,7 @@
 import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
-import homeStyles from './home.style';
+import homeStyles from './home.styles';
 import HomeView from './HomeView';
 import HomeViewSmallScreen from './HomeViewSmallScreen';
 import useHome from './useHome';

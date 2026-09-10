@@ -5,8 +5,8 @@ import {ListItem} from '@rn-vui/base';
 
 import commonStyles from '../../shared/common.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
-import NumberInputField from '../form/NumberInputField';
-import TextInputField from '../form/TextInputField';
+import NumberInputField from '../form/inputs/NumberInputField';
+import TextInputField from '../form/inputs/TextInputField';
 import {convertLatLngToUtm} from '../maps/maps.helpers';
 import useMapLocation from '../maps/view/useMapLocation';
 

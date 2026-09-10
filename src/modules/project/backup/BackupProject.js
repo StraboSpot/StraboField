@@ -17,7 +17,7 @@ import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequire
 import uiStyles from '../../../shared/ui/ui.styles';
 import {setBackupFrequency, setWifiOnlyForImages} from '../../connections/connections.slice';
 import FormikWrapper from '../../form/FormikWrapper';
-import SelectInputField from '../../form/SelectInputField';
+import SelectInputField from '../../form/inputs/SelectInputField';
 import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
 

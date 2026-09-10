@@ -7,7 +7,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
-import TextInputField from '../form/TextInputField';
+import TextInputField from '../form/inputs/TextInputField';
 
 const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight, isFillHeight}) => {
   /* Derived Variables */

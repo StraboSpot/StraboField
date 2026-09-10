@@ -1,8 +1,6 @@
 import {useDispatch} from 'react-redux';
 
-import {ROCK_FIRST_ORDER_CLASS_FIELDS} from './petrology.constants';
-import {getAbbrevFromFullMineralName, getFullMineralNameFromAbbrev} from './petrology.helpers';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
+import {getNewId, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -13,7 +11,7 @@ const usePetrology = () => {
 
   const dispatch = useDispatch();
 
-  const {getLabel, getLabels, getSurvey, submitAndShowErrors} = useForm();
+  const {getSurvey, submitAndShowErrors} = useForm();
 
   /* Exported Functions */
 
@@ -34,36 +32,6 @@ const usePetrology = () => {
     }
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
-  };
-
-  const getMineralTitle = (item) => {
-    if (item.full_mineral_name && item.mineral_abbrev) return item.full_mineral_name + ' (' + item.mineral_abbrev + ')';
-    else return item.full_mineral_name || '(' + item.mineral_abbrev + ')' || 'Unknown';
-  };
-
-  const getPetRockTitle = (rock, type) => {
-    const formName = type === 'igneous' ? ['pet', rock.igneous_rock_class] : ['pet', type];
-    const labelsArr = ROCK_FIRST_ORDER_CLASS_FIELDS[type].reduce((acc, fieldName) => {
-      if (rock[fieldName]) {
-        const mainLabel = getLabel(fieldName, formName);
-        const choiceLabels = getLabels(rock[fieldName], formName);
-        return [...acc, toTitleCase(mainLabel) + ' - ' + choiceLabels.toUpperCase()];
-      }
-      else return acc;
-    }, []);
-    if (isEmpty(labelsArr)) {
-      const defaultTitle = type === 'igneous' ? rock.igneous_rock_class
-        : type === 'alteration_or' ? 'Alteration, Ore'
-          : type;
-      return toTitleCase(getLabel(defaultTitle + ' Rock', formName));
-    }
-    else return labelsArr.join(', ');
-  };
-
-  const getReactionTextureTitle = (item) => {
-    const formName = ['pet', 'reactions'];
-    return (item.reactions || 'Unknown')
-      + (item.based_on && (' - ' + getLabels(item.based_on, formName).toUpperCase()));
   };
 
   const savePetFeature = async (key, spot, formCurrent, isLeavingPage) => {
@@ -103,29 +71,10 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
-  const setMineralFieldValue = async (formCurrent, name, value) => {
-    console.log(name, 'changed to', value);
-    if (name === 'mineral_abbrev') {
-      const foundFullName = getFullMineralNameFromAbbrev(value);
-      if (foundFullName) await formCurrent.setFieldValue('full_mineral_name', foundFullName);
-      await formCurrent.setFieldValue('mineral_abbrev', value);
-    }
-    else if (name === 'full_mineral_name') {
-      const foundAbbrev = getAbbrevFromFullMineralName(value);
-      if (foundAbbrev) await formCurrent.setFieldValue('mineral_abbrev', foundAbbrev);
-      await formCurrent.setFieldValue('full_mineral_name', value);
-    }
-    else await formCurrent.setFieldValue(name, value);
-  };
-
   return {
     deletePetFeature,
-    getMineralTitle,
-    getPetRockTitle,
-    getReactionTextureTitle,
     savePetFeature,
     savePetFeatureValuesFromTemplates,
-    setMineralFieldValue,
   };
 };
 

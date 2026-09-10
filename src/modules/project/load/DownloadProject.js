@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import useDownload from '../../../services/files/useDownload';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 const source = 'server';

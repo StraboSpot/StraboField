@@ -15,7 +15,7 @@ import {
   TEXT_WEIGHT_700,
 } from '../../../shared/styles.constants';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {TAG_BACKUP_ACTIONS} from '../../tags/tags.constants';
+import {TAG_BACKUP_ACTIONS} from '../../tags/backup/tagBackup.constants';
 import {TEMPLATE_BACKUP_ACTIONS} from '../../templates/templates.constants';
 
 const SaveAndExportModalContent = ({

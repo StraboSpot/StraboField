@@ -13,7 +13,7 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SliderBar from '../../shared/ui/SliderBar';
 import FormikWrapper from '../form/FormikWrapper';
-import NumberInputField from '../form/NumberInputField';
+import NumberInputField from '../form/inputs/NumberInputField';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ManualMeasurement = ({

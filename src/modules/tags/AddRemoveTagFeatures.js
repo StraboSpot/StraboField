@@ -13,7 +13,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
 import useSpots from '../spots/useSpots';
 
 const AddRemoveTagFeatures = () => {

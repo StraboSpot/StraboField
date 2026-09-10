@@ -11,7 +11,7 @@ import {BACKGROUND, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
 import mapStyles from './maps.styles';
 import SnapLineLayer from './strat-section/SnapLineLayer';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import homeStyles from '../home/home.style';
+import homeStyles from '../home/home.styles';
 import FreehandSketch from '../sketch/FreehandSketch';
 
 MapboxGL.setAccessToken(MAPBOX_TOKEN);
