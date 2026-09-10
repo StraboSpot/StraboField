@@ -13,7 +13,7 @@ import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformati
 import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
-import TextInputField from '../form/TextInputField';
+import TextInputField from '../form/inputs/TextInputField';
 import NoteForm from '../notes/NoteForm';
 import {PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {deletedTemplate} from '../project/projects.slice';

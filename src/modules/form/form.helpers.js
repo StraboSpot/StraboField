@@ -6,19 +6,8 @@ const compiledLogic = new Map();
 
 /* Internal Functions */
 
-// The lowest value an XLSForm constraint string allows, and whether that bound is inclusive, or undefined where it
-// sets no minimum. The inclusive form is matched first and the exclusive form only if there is none, since '>='
-// also contains '>'.
-const getConstraintMinimum = (constraint) => {
-  const inclusiveMatch = constraint.match(/>=\s(-?\d*)/i);
-  const exclusiveMatch = inclusiveMatch ? null : constraint.match(/>\s(-?\d*)/i);
-  const match = inclusiveMatch || exclusiveMatch;
-  return match && {isInclusive: !!inclusiveMatch, min: parseFloat(match[1])};
-};
-
-/* Exported Functions */
-
-export const convertXLSFormLogicToJS = (logic) => {
+// Rewrite an XLSForm logic string as the body of a JS function of the form's values
+const convertXLSFormLogicToJS = (logic) => {
   logic = logic.replace(/not/g, '!');
   logic = logic.replace(/selected\(\${(.*?)}, /g, 'values?.$1?.includes(');
   logic = logic.replace(/\$/g, '');
@@ -30,6 +19,18 @@ export const convertXLSFormLogicToJS = (logic) => {
   logic = logic.replace(/ and /g, ' && ');
   return logic;
 };
+
+// The lowest value an XLSForm constraint string allows, and whether that bound is inclusive, or undefined where it
+// sets no minimum. The inclusive form is matched first and the exclusive form only if there is none, since '>='
+// also contains '>'.
+const getConstraintMinimum = (constraint) => {
+  const inclusiveMatch = constraint.match(/>=\s(-?\d*)/i);
+  const exclusiveMatch = inclusiveMatch ? null : constraint.match(/>\s(-?\d*)/i);
+  const match = inclusiveMatch || exclusiveMatch;
+  return match && {isInclusive: !!inclusiveMatch, min: parseFloat(match[1])};
+};
+
+/* Exported Functions */
 
 // Check a value against an XLSForm constraint string such as '. >= 0 and . <= 360'. An inclusive bound is matched
 // first and the exclusive form only if there is none, since '<=' also contains '<'. A failing minimum overwrites a

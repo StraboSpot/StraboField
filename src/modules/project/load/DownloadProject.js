@@ -11,7 +11,7 @@ import buttonStyles from '../../../shared/ui/buttons/buttons.styles';
 import {setIsStatusMessagesModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 const source = 'server';

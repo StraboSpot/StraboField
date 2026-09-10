@@ -3,11 +3,11 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import BackupTagsModal from './BackupTagsModal';
-import LoadTagsModal from './LoadTagsModal';
+import BackupTagsModal from './backup/BackupTagsModal';
+import LoadTagsModal from './backup/LoadTagsModal';
+import TagDetailModal from './detail/TagDetailModal';
 import TagQuery from './query/TagQuery';
 import {TAG_FILTERS} from './query/tagQuery.constants';
-import TagDetailModal from './TagDetailModal';
 import {TAG_TYPES} from './tags.constants';
 import TagsList from './TagsList';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';

@@ -6,7 +6,7 @@ import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/features/useMapFeatures';
-import homeStyles from '../home.style';
+import homeStyles from '../home.styles';
 import MapActionsOverlay from '../overlays/MapActionsOverlay';
 import MapLayersOverlay from '../overlays/MapLayersOverlay';
 import MapSymbolsOverlay from '../overlays/MapSymbolsOverlay';

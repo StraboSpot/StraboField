@@ -10,7 +10,7 @@ import BackupStatusModal from './BackupStatusModal';
 import UploadModal from './UploadModal';
 import useBackupUpload from './useBackupUpload';
 import * as themes from '../../../shared/styles.constants';
-import homeStyles from '../../home/home.style';
+import homeStyles from '../../home/home.styles';
 
 const useBounceAnimation = (isActive) => {
   const bounceValue = useRef(new Animated.Value(0)).current;

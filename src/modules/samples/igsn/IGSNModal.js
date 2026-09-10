@@ -84,7 +84,7 @@ const IGSNModal = forwardRef(({
     authenticateWithSesar,
     getAndSaveSesarCode,
     straboSesarMapping,
-    updateSampleIsSesar,
+    updateSampleWithSesar,
     uploadSample,
   } = useIGSN();
   const {initializeUpload} = useUpload();
@@ -101,6 +101,7 @@ const IGSNModal = forwardRef(({
   let formValues = sampleValues || formRef?.current?.values || selectedAttributes?.[0];
 
   const [assignedIgsn, setAssignedIgsn] = useState('');
+  const [authMessage, setAuthMessage] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [errorView, setErrorView] = useState(false);
   const [igsnResult, setIgsnResult] = useState(null);
@@ -148,6 +149,7 @@ const IGSNModal = forwardRef(({
     console.log('FORM VALUES', formValues);
     if (isEmpty(sesar.sesarToken?.access)) setModalPage('login');
     else {
+      setAuthMessage('');
       setStatusMessage('Below are the valid relevant fields in your MYSESAR account.');
       setModalPage('content');
       const sesarMappedObj = formValues ? straboSesarMapping(formValues) : [];
@@ -164,6 +166,7 @@ const IGSNModal = forwardRef(({
       setIsUploaded(false);
       setIsUploading(false);
       setAssignedIgsn('');
+      setAuthMessage('');
       setSesarStepLabel('');
       setStatusMessage('');
     }
@@ -213,6 +216,12 @@ const IGSNModal = forwardRef(({
       if (!tokens) throw Error('No SESAR token returned — ORCID sign-in may have failed.');
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
+        if (!tokens?.access) {
+          dispatch(setInitialSesarState());
+          setAuthMessage('Your SESAR session expired. Please sign in again.');
+          setModalPage('login');
+          return;
+        }
         const sesarMessage = tokens.access ? 'SESAR Authenticated!' : 'SESAR NOT Authenticated!';
         toast.show(sesarMessage, {
           duration: 3000,
@@ -247,18 +256,23 @@ const IGSNModal = forwardRef(({
       setSesarStepLabel(formValues?.isOnMySesar ? 'Updating sample with SESAR' : 'Sending sample to SESAR');
       setStepStatuses({sesar: 'loading', upload: 'idle'});
 
-      // Step 1: Register/update with SESAR
-      const res = formValues.isOnMySesar
-        ? await updateSampleIsSesar(mappedSesarValues)
-        : await uploadSample(mappedSesarValues);
-      if (res.error && res.error.length > 0) {
-        console.log(res.error[0]);
-        setStepStatuses({sesar: 'error', upload: 'idle'});
-        setModalPage('error');
-        setErrorMessages(res.error);
+      // Ensure a non-expired SESAR access token before posting. Authenticating one day and registering the next
+      // otherwise sends a stale token (SESAR access tokens live ~1 day) with no refresh, and the upload just fails.
+      // authenticateWithSesar refreshes if needed and dispatches the rotated token; sendToSesar reads it fresh.
+      const validTokens = await authenticateWithSesar(sesar.sesarToken);
+      if (!validTokens?.access) {
+        dispatch(setInitialSesarState());
+        setStepStatuses({sesar: 'idle', upload: 'idle'});
         setIsUploading(false);
+        setAuthMessage('Your SESAR session expired. Please sign in again.');
+        setModalPage('login');
         return;
       }
+
+      // Step 1: Register/update with SESAR. postSampleToSesar throws on any non-success (top-level or per-sample
+      // error, or an unreadable/non-OK response), so reaching this point means SESAR accepted the sample.
+      const res = formValues.isOnMySesar ? await updateSampleWithSesar(mappedSesarValues)
+        : await uploadSample(mappedSesarValues);
 
       setStatusMessage(formValues.isOnMySesar ? 'Sample updated with SESAR!' : 'Sample registered with SESAR!');
       setAssignedIgsn(res.igsn || '');
@@ -333,8 +347,15 @@ const IGSNModal = forwardRef(({
     return 'auto';
   };
 
+  // Which step failed determines both the header and the body message: the SESAR register/update step, or the
+  // StraboSpot project upload that runs only after SESAR succeeds. Default to 'sesar' since the SESAR call is first.
+  const getFailedStep = () => stepStatuses.upload === 'error' ? 'upload' : 'sesar';
+
   const getHeaderTitle = () => {
-    if (modalPage === 'error') return 'Upload Failed';
+    if (modalPage === 'error') {
+      if (getFailedStep() === 'upload') return 'Upload Failed';
+      return formValues?.isOnMySesar ? 'Update Failed' : 'Registration Failed';
+    }
     if (isUploading) return 'Uploading Project';
     if (isUploaded) return 'Upload Complete!';
     return formValues?.isOnMySesar ? 'Update Sample with SESAR' : 'Register Sample with SESAR';
@@ -343,11 +364,14 @@ const IGSNModal = forwardRef(({
   /* Render Functions */
 
   const renderLoginView = () => (
-    <IGSNUploadAndRegister
-      isIGSNChecked={true}
-      openLoginPage={openLoginPage}
-      selectedFeature={formValues}
-    />
+    <>
+      {!isEmpty(authMessage) && <Text style={IGSNModalStyles.requiredLabel}>{authMessage}</Text>}
+      <IGSNUploadAndRegister
+        isIGSNChecked={true}
+        openLoginPage={openLoginPage}
+        selectedFeature={formValues}
+      />
+    </>
   );
 
   const renderContentView = () => (
@@ -428,10 +452,19 @@ const IGSNModal = forwardRef(({
       {modalPage === 'error' && (
         <>
           <LottieAnimations doesLoop={false} type={'error'}/>
-          <Text style={IGSNModalStyles.statusHeaderText}>There was an error!</Text>
-          {errorMessages.map(msg => (
+          <Text style={IGSNModalStyles.statusHeaderText}>
+            {getFailedStep() === 'upload' ? 'Registered with SESAR, but the upload to StraboSpot failed.'
+              : formValues?.isOnMySesar ? 'The sample could not be updated with SESAR.'
+                : 'The sample could not be registered with SESAR.'}
+          </Text>
+          {(isEmpty(errorMessages) ? ['Something went wrong. Please try again.'] : errorMessages).map(msg => (
             <Text key={msg} style={IGSNModalStyles.statusMessageText}>{msg}</Text>
           ))}
+          {getFailedStep() === 'upload' && assignedIgsn ? (
+            <Text style={IGSNModalStyles.statusMessageText}>
+              IGSN: {assignedIgsn} — your sample is registered, so re-uploading the project later will sync it.
+            </Text>
+          ) : null}
         </>
       )}
       {(isUploading || isUploaded) && (

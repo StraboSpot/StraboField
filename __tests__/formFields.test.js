@@ -11,11 +11,11 @@ import {TextInput} from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import ReactTestRenderer, {act} from 'react-test-renderer';
 
-import AcknowledgeInput from '../src/modules/form/AcknowledgeInput';
 import FormikWrapper from '../src/modules/form/FormikWrapper';
-import NumberInputField from '../src/modules/form/NumberInputField';
-import SelectInputField from '../src/modules/form/SelectInputField';
-import TextInputField from '../src/modules/form/TextInputField';
+import AcknowledgeInput from '../src/modules/form/inputs/AcknowledgeInput';
+import NumberInputField from '../src/modules/form/inputs/NumberInputField';
+import SelectInputField from '../src/modules/form/inputs/SelectInputField';
+import TextInputField from '../src/modules/form/inputs/TextInputField';
 
 const render = async (element) => {
   let tree;

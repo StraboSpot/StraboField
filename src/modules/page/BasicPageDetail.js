@@ -19,6 +19,7 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
+import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
@@ -54,7 +55,7 @@ const BasicPageDetail = ({
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, submitAndShowErrors, validateForm} = useForm();
-  const {deletePetFeature, savePetFeature, setMineralFieldValue} = usePetrology();
+  const {deletePetFeature, savePetFeature} = usePetrology();
   const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();

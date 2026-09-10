@@ -10,7 +10,7 @@ import {MAP_MODES} from '../../maps/maps.constants';
 import useProject from '../../project/useProject';
 import EditCancelSaveButtons from '../buttons/EditCancelSaveButtons';
 import IntervalDragCancelSaveButtons from '../buttons/IntervalDragCancelSaveButtons';
-import homeStyles from '../home.style';
+import homeStyles from '../home.styles';
 
 const DrawInfo = ({
                     clickHandler,

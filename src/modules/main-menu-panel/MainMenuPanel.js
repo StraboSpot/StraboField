@@ -40,7 +40,7 @@ import SpotsList from '../spots/SpotsList';
 import AddRemoveTagFeatures from '../tags/AddRemoveTagFeatures';
 import AddRemoveTagSampleSpots from '../tags/AddRemoveTagSampleSpots';
 import AddRemoveTagSpots from '../tags/AddRemoveTagSpots';
-import TagDetailSidePanel from '../tags/TagDetailSidePanel';
+import TagDetailSidePanel from '../tags/detail/TagDetailSidePanel';
 import Tags from '../tags/Tags';
 import Templates from '../templates/Templates';
 import UserConventions from '../user/UserConventions';

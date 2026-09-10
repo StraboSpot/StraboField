@@ -3,8 +3,8 @@ import {Platform, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import BackupTagsModal from './BackupTagsModal';
-import LoadTagsModal from './LoadTagsModal';
+import BackupTagsModal from './backup/BackupTagsModal';
+import LoadTagsModal from './backup/LoadTagsModal';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 

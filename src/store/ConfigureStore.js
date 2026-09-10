@@ -180,4 +180,8 @@ const store = configureStore({
 
 let persistor = persistStore(store);
 
+// Expose the store on global in dev so it can be inspected/dispatched from the debugger console
+// (e.g. store.dispatch(...) to inject a test SESAR token). No-op in release builds.
+if (__DEV__) global.store = store;
+
 export {store, persistor};

@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import TagDetailModal from './TagDetailModal';
+import TagDetailModal from './detail/TagDetailModal';
 import TagsListItem from './TagsListItem';
 import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
@@ -16,7 +16,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import FormikWrapper from '../form/FormikWrapper';
-import SelectInputField from '../form/SelectInputField';
+import SelectInputField from '../form/inputs/SelectInputField';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
