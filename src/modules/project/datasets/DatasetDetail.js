@@ -21,7 +21,7 @@ import FormikWrapper from '../../form/FormikWrapper';
 import DateInputField from '../../form/inputs/DateInputField';
 import NumberInputField from '../../form/inputs/NumberInputField';
 import TextInputField from '../../form/inputs/TextInputField';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';

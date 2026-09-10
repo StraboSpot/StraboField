@@ -8,7 +8,7 @@ import TagDetailModal from './TagDetailModal';
 import {isEmpty} from '../../../shared/helpers';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../../spots/spots.slice';
 

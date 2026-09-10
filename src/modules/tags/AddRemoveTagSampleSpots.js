@@ -7,7 +7,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
 import Samples from '../samples/Samples';
 
 const AddRemoveTagSampleSpots = () => {

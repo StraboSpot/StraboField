@@ -9,7 +9,7 @@ import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
-import homeStyles from '../home.style';
+import homeStyles from '../home.styles';
 
 const DrawActionButtons = ({clickHandler, mapMode}) => {
   /* Data Hooks */

@@ -10,7 +10,7 @@ import MainMenuButton from './buttons/MainMenuButton';
 import ShortcutButtons from './buttons/ShortcutButtons';
 import {NAVIGATION_OPTIONS} from './home.constants';
 import {setModalVisible} from './home.slice';
-import homeStyles from './home.style';
+import homeStyles from './home.styles';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';

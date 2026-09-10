@@ -26,7 +26,7 @@ import FormikWrapper from '../../form/FormikWrapper';
 import TextInputField from '../../form/inputs/TextInputField';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import {selectedCustomMapToEdit} from '../maps.slice';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
