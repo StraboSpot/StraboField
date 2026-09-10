@@ -4,13 +4,13 @@ import {NativeEventEmitter, Platform} from 'react-native';
 import geomagnetism from 'geomagnetism';
 import {useSelector} from 'react-redux';
 
-import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge} from './compassMath.helpers';
+import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod, pointingAxisRow} from './compassMath.helpers';
 import CompassModule from './CompassModule';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
+import {updatedProject} from '../../modules/project/projects.slice';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
-
-let matrixArray = [];
+import {store} from '../../store/ConfigureStore';
 
 const useCompassCore = () => {
   /* Data Hooks */
@@ -24,10 +24,12 @@ const useCompassCore = () => {
 
   const calibrationSubscription = useRef(null);
   const imageCapturedDeclination = useRef(0);
+  const imageCaptureReference = useRef(null); // 'true' | 'magnetic' — reference frame of the captured matrix (iOS)
   const imageCaptureSubscription = useRef(null);
   const magneticDeclination = useRef(0);
   const matrixRawData = useRef(null);
   const rotationMatrixSubscription = useRef(null);
+  const sessionScreenRotation = useRef(null); // hold orientation (0/90/180/270) captured when the compass opened
 
   const [compassData, setCompassData] = useState({
     dip: null,
@@ -48,15 +50,30 @@ const useCompassCore = () => {
 
   const computeCompassData = (matrixRotationData) => {
     const declination = magneticDeclination.current;
+    // Android's matrix is always magnetic-referenced, so JS converts it to true north by adding the
+    // declination. iOS is normally true-referenced (CoreMotion did the conversion), so nothing is added —
+    // except on devices without GPS, where CoreMotion can't resolve true north and the native layer falls
+    // back to a magnetic-referenced matrix (reference: 'magnetic'). There, iOS applies the declination too,
+    // exactly like Android, so a manually-entered declination makes the compass correct without GPS.
+    const applyDeclination = Platform.OS !== 'ios' || matrixRotationData.reference === 'magnetic';
+    const appliedDeclination = applyDeclination ? declination : 0;
 
     const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
     matrixRawData.current = matrix;
+    // Which hold to use for trend/plunge (0/90/180/270). Only trend/plunge needs it — strike/dip and the
+    // camera axis are the screen normal, unchanged by rotating the tablet in its own plane. Captured once
+    // when the compass opens and held for the session, matching the locked screen, so tilting the tablet
+    // to sight a reading can't flip which edge is treated as "up".
+    if (sessionScreenRotation.current == null && matrixRotationData.screenRotation != null) {
+      sessionScreenRotation.current = matrixRotationData.screenRotation;
+    }
+    const screenRotation = sessionScreenRotation.current ?? 0;
     let {magneticHeading, trueHeading} = matrixRotationData;
-    if (Platform.OS !== 'ios') trueHeading = (magneticHeading + declination) % 360;
-    const {strike, dip} = getStrikeAndDipFromMatrix(matrix, declination);
-    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, declination);
+    if (applyDeclination) trueHeading = mod(magneticHeading + appliedDeclination, 360);
+    const {strike, dip} = getStrikeAndDipFromMatrix(matrix, appliedDeclination);
+    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, appliedDeclination, screenRotation);
 
-    const dipDirection = (strike + 90) % 360;
+    const dipDirection = mod(strike + 90, 360);
     setCompassData({
       declination: declination.toFixed(2),
       dip: roundToDecimalPlaces(dip, 0),
@@ -77,7 +94,9 @@ const useCompassCore = () => {
     const ENU_Cam = Platform.OS === 'ios' ? cartesianToSpherical(m32, -m31, -m33)
       : cartesianToSpherical(-m31, -m32, -m33);
     let {plunge, trend} = getTrendAndPlunge(ENU_Cam);
-    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    // declination is 0 when the frame is already true-referenced (iOS with GPS), non-zero when it must be
+    // converted from magnetic (Android always; iOS no-GPS fallback) — the caller resolves which.
+    trend = mod(trend + declination, 360);
     return {plunge, trend};
   };
 
@@ -89,24 +108,27 @@ const useCompassCore = () => {
     const ENU_Pole = Platform.OS === 'ios' ? cartesianToSpherical(-m32, m31, m33)
       : cartesianToSpherical(m31, m32, m33);
     let {strike, dip} = getStrikeAndDip(ENU_Pole);
-    if (Platform.OS !== 'ios') strike = (strike + declination) % 360;
+    strike = mod(strike + declination, 360); // declination resolved by caller (0 when already true north)
     return {strike, dip};
   };
 
-  // Uses the Y axis (m2x row) — the device's long axis (toward the top edge).
-  // Device is pointed at the feature being measured, so Y points toward the target.
-  const getTrendAndPlungeFromMatrix = (matrix, declination) => {
-    const {m21, m22, m23} = matrix;
-    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23)
-      : cartesianToSpherical(m21, m22, m23);
+  // Uses the in-plane device axis that is "up" for the current hold (see pointingAxisRow) — the edge the
+  // user points at the feature. In portrait that's the device's top edge (+Y, the original behavior); in
+  // landscape it's whichever long/short edge is up as held, so the reading follows the tablet's orientation
+  // instead of forcing portrait. The platform massage (iOS reference frame vs Android ENU) is unchanged.
+  const getTrendAndPlungeFromMatrix = (matrix, declination, screenRotation = 0) => {
+    const {a, b, c} = pointingAxisRow(matrix, screenRotation);
+    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-b, a, c)
+      : cartesianToSpherical(a, b, c);
     let {plunge, trend} = getTrendAndPlunge(ENU_TP);
-    if (Platform.OS !== 'ios') trend = (trend + declination) % 360;
+    trend = mod(trend + declination, 360); // declination resolved by caller (0 when already true north)
     return {plunge, trend};
   };
 
-  const handleMatrixRotationData = async (matrixData) => {
+  // Both platforms now average the rotation matrix natively (iOS in CoreMotion, Android over a rolling
+  // window in Compass.java), so there's a single smoothing stage and JS just consumes the result.
+  const handleMatrixRotationData = (matrixData) => {
     try {
-      if (Platform.OS === 'android') matrixData = await matrixAverage(matrixData);
       computeCompassData(matrixData);
     }
     catch (err) {
@@ -114,28 +136,17 @@ const useCompassCore = () => {
     }
   };
 
-  const matrixAverage = async (matrixData) => {
-    matrixArray.push(matrixData);
-    if (matrixArray.length > 5) matrixArray.shift();
-
-    const avg = key => matrixArray.reduce((sum, obj) => sum + obj[key] / matrixArray.length, 0);
-    return {
-      m11: roundToDecimalPlaces(avg('m11'), 3),
-      m12: roundToDecimalPlaces(avg('m12'), 3),
-      m13: roundToDecimalPlaces(avg('m13'), 3),
-      m21: roundToDecimalPlaces(avg('m21'), 3),
-      m22: roundToDecimalPlaces(avg('m22'), 3),
-      m23: roundToDecimalPlaces(avg('m23'), 3),
-      m31: roundToDecimalPlaces(avg('m31'), 3),
-      m32: roundToDecimalPlaces(avg('m32'), 3),
-      m33: roundToDecimalPlaces(avg('m33'), 3),
-      magneticHeading: roundToDecimalPlaces(matrixData.magneticHeading, 0),
-    };
-  };
-
   /* Exported Functions */
 
   const fetchDeclination = async () => {
+    // A declination already on the project — manually entered on a GPS-less device, or auto-recorded on a
+    // previous fetch — is the source of truth: use it and skip the location lookup, which fails when there's
+    // no GPS. This is what lets Wi-Fi-only iPads/tablets work by manual entry.
+    const projectDeclination = getProjectDeclination();
+    if (projectDeclination !== null) {
+      magneticDeclination.current = projectDeclination;
+      return projectDeclination;
+    }
     let longitude, latitude;
     if (!isEmpty(selectedSpot)) [longitude, latitude] = getCentroidOfSelectedSpot();
     else {
@@ -146,12 +157,39 @@ const useCompassCore = () => {
     const result = geomagnetism.model().point([latitude, longitude]);
     console.log('MagDeclination', result);
     magneticDeclination.current = result.decl;
+    recordDeclinationToProject(result.decl);
     return result.decl;
+  };
+
+  // The declination currently stored on the project, or null when it hasn't been set. A blank field
+  // defaults to 0, which we treat as unset — the agonic line (a true 0) is vanishingly rare and still
+  // reads as 0, so nothing is lost by re-deriving it from location when GPS is available.
+  const getProjectDeclination = () => {
+    const {magnetic_declination: stored} = store.getState().project.project?.description ?? {};
+    const value = Number(stored);
+    return Number.isFinite(value) && value !== 0 ? value : null;
+  };
+
+  // Auto-fill the Project Description's Magnetic Declination from the location-derived value, but only when
+  // it hasn't been set yet. A value the user typed (or a prior auto-fill) always wins, so the field stays
+  // freely editable and we never clobber a manual entry. Read live from the store rather than a hook
+  // selector so an async caller doesn't persist against a stale project.
+  const recordDeclinationToProject = (declination) => {
+    const project = store.getState().project.project;
+    if (isEmpty(project) || getProjectDeclination() !== null) return;
+    store.dispatch(updatedProject({
+      field: 'description',
+      value: {...project.description, magnetic_declination: roundToDecimalPlaces(declination, 2)},
+    }));
   };
 
   const getCurrentCameraAngles = () => {
     if (!matrixRawData.current) return {};
-    const {plunge, trend} = getCameraViewFromMatrix(matrixRawData.current, imageCapturedDeclination.current);
+    // Same rule as the live compass: apply the declination on Android always, and on iOS only when the
+    // captured frame was magnetic-referenced (no-GPS fallback); an iOS true-north frame needs no offset.
+    const applyDeclination = Platform.OS !== 'ios' || imageCaptureReference.current === 'magnetic';
+    const declination = applyDeclination ? imageCapturedDeclination.current : 0;
+    const {plunge, trend} = getCameraViewFromMatrix(matrixRawData.current, declination);
     return {
       view_angle_plunge: roundToDecimalPlaces(plunge, 0),
       view_azimuth_trend: roundToDecimalPlaces(trend, 0),
@@ -164,6 +202,7 @@ const useCompassCore = () => {
       const CompassEvents = new NativeEventEmitter(CompassModule);
       imageCaptureSubscription.current = CompassEvents.addListener('rotationMatrix', (matrixData) => {
         matrixRawData.current = Platform.OS === 'ios' ? matrixData.matrix : matrixData;
+        imageCaptureReference.current = matrixData.reference;
       });
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
     }
@@ -178,20 +217,21 @@ const useCompassCore = () => {
     Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
   };
 
+  // Both platforms emit compassCalibrationStatus now: iOS when CoreMotion can't get true north, Android
+  // when the magnetometer reports low/unreliable accuracy.
   const subscribeToCalibrationStatus = (handler) => {
-    if (Platform.OS === 'ios') {
-      try {
-        const CompassEvents = new NativeEventEmitter(CompassModule);
-        calibrationSubscription.current = CompassEvents.addListener('compassCalibrationStatus', handler);
-      }
-      catch (err) {
-        console.error('Error subscribing to calibration status: ' + err);
-      }
+    try {
+      const CompassEvents = new NativeEventEmitter(CompassModule);
+      calibrationSubscription.current = CompassEvents.addListener('compassCalibrationStatus', handler);
+    }
+    catch (err) {
+      console.error('Error subscribing to calibration status: ' + err);
     }
   };
 
   const subscribeToSensors = () => {
     try {
+      sessionScreenRotation.current = null; // re-latch the hold for this fresh compass session
       const CompassEvents = new NativeEventEmitter(CompassModule);
       rotationMatrixSubscription.current = CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
@@ -203,20 +243,19 @@ const useCompassCore = () => {
   };
 
   const unsubscribeFromCalibrationStatus = () => {
-    if (Platform.OS === 'ios') {
-      try {
-        calibrationSubscription.current?.remove();
-        console.log('%cEnded compass calibration status listener.', 'color: red');
-      }
-      catch (err) {
-        console.error('Error unsubscribing from calibration status', err);
-      }
+    try {
+      calibrationSubscription.current?.remove();
+      console.log('%cEnded compass calibration status listener.', 'color: red');
+    }
+    catch (err) {
+      console.error('Error unsubscribing from calibration status', err);
     }
   };
 
   const unsubscribeFromSensors = () => {
     try {
       rotationMatrixSubscription.current?.remove();
+      sessionScreenRotation.current = null;
       Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
       console.log('%cEnded Compass observation and rotationMatrix listener.', 'color: red');
     }
