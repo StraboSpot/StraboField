@@ -348,16 +348,17 @@ const MapContainer = forwardRef(({
   };
 
   const getExtentString = async () => {
-    const [[left, bottom], [right, top]] = await getMapBounds();
-    return left + ',' + bottom + ',' + right + ',' + top;
+    const {east, north, south, west} = await getMapBounds();
+    return west + ',' + south + ',' + east + ',' + north;
   };
 
-  // The visible corners as [[left, bottom], [right, top]]. The two libraries document opposite orders: mapbox-gl's
-  // toArray is southwest then northeast, @rnmapbox's getVisibleBounds is [[rightLon, topLat], [leftLon, bottomLat]].
+  // The map's visible edges. Both libraries hand back a corner pair, in opposite orders: mapbox-gl's toArray is
+  // southwest first, @rnmapbox's getVisibleBounds is northeast first.
   const getMapBounds = async () => {
-    if (Platform.OS === 'web') return mapRef.current.getBounds().toArray();
-    const [northEast, southWest] = await mapRef.current.getVisibleBounds();
-    return [southWest, northEast];
+    let east, north, south, west;
+    if (Platform.OS === 'web') [[west, south], [east, north]] = mapRef.current.getBounds().toArray();
+    else [[east, north], [west, south]] = await mapRef.current.getVisibleBounds();
+    return {east: east, north: north, south: south, west: west};
   };
 
   // The selected Spot given this geometry, belonging to whichever map is in view and to no other. An image basemap or
@@ -407,8 +408,8 @@ const MapContainer = forwardRef(({
 
   // How much ground the map is showing, as [width, height] in its own coordinates
   const getVisibleSpan = async () => {
-    const [[left, bottom], [right, top]] = await getMapBounds();
-    return [right - left, top - bottom];
+    const {east, north, south, west} = await getMapBounds();
+    return [east - west, north - south];
   };
 
   const startEditingMode = () => {
