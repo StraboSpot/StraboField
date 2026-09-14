@@ -45,9 +45,9 @@ describe('discardSpot', () => {
     },
   });
 
-  const discard = (spotToDiscard, spotNumberToRestore) => {
+  const discard = (spotToDiscard, spotNumberToRestore, preloadedState = getPreloadedState()) => {
     const store = configureStore({
-      preloadedState: getPreloadedState(),
+      preloadedState: preloadedState,
       reducer: {
         connections: connectionsReducer,
         home: homeReducer,
@@ -117,5 +117,29 @@ describe('discardSpot', () => {
   it('clears the selected Spot, which would otherwise point at one that is gone', () => {
     const state = discard(spot, 8);
     expect(state.spot.selectedSpot).toEqual({});
+  });
+
+  it('takes the Spot out of the recently viewed list', () => {
+    const state = discard(spot, 8);
+    expect(state.spot.recentViews).not.toContain(spotId);
+  });
+
+  // A tag put on a measurement of the Spot rather than on the Spot itself is held under features, not spots
+  it('unwinds a feature-level tag, dropping features once nothing is left in it', () => {
+    const preloadedState = getPreloadedState();
+    preloadedState.project.project.tags = [{features: {[spotId]: ['m1']}, id: 't1', name: 'Tag 1', type: 'concept'}];
+    const state = discard(spot, 8, preloadedState);
+    expect(state.project.project.tags[0].features).toBeUndefined();
+  });
+
+  // Without a target dataset nothing is filed anywhere, so there may be no references to take back
+  it('discards a Spot that is in no dataset, tag or report', () => {
+    const preloadedState = getPreloadedState();
+    preloadedState.project.datasets = {};
+    preloadedState.project.project.reports = undefined;
+    preloadedState.project.project.tags = [];
+    const state = discard(spot, 8, preloadedState);
+    expect(state.spot.spots[spotId]).toBeUndefined();
+    expect(state.project.project.preferences.starting_number_for_spot).toBe(8);
   });
 });
