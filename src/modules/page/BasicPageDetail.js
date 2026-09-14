@@ -18,7 +18,8 @@ import {Form, useForm} from '../form';
 import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import IGSNModal from '../samples/igsn/IGSNModal';
+// IGSN registration/update is being moved server-side; the SESAR update-on-save modal is disabled for now.
+// import IGSNModal from '../samples/igsn/IGSNModal';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import useSed from '../sed/useSed';
@@ -56,11 +57,12 @@ const BasicPageDetail = ({
   const formRef = useRef(null);
 
   const [initialValues, setInitialValues] = useState(selectedFeature);
-  const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+  // IGSN registration/update moving server-side — SESAR update-on-save modal disabled.
+  // const [igsnFormValues, setIgsnFormValues] = useState(null);
+  // const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   useEffect(() => {
     setIsSaveDisabled(selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN && !isInternetReachable);
@@ -99,11 +101,12 @@ const BasicPageDetail = ({
     if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
   }, [selectedFeature]);
 
-  const onSampleSaved = async (formCurrent) => {
-    console.log('Saving Sample To SESAR', formRef.current?.values);
-    await saveFeature(formCurrent);
-    closeDetailView();
-  };
+  // IGSN registration/update moving server-side — SESAR update-on-save modal disabled.
+  // const onSampleSaved = async (formCurrent) => {
+  //   console.log('Saving Sample To SESAR', formRef.current?.values);
+  //   await saveFeature(formCurrent);
+  //   closeDetailView();
+  // };
 
   const onSubmitForm = (values, {resetForm}) => {
     console.log('Submitting form...', values);
@@ -227,10 +230,11 @@ const BasicPageDetail = ({
   const saveForm = async (formCurrent) => {
     try {
       console.log('Saving form...', formCurrent);
-      if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
-        await updateIGSNAndShowModal(formCurrent);
-        return;
-      }
+      // IGSN registration/update moving server-side — skip the client-side SESAR update modal and just save locally.
+      // if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
+      //   await updateIGSNAndShowModal(formCurrent);
+      //   return;
+      // }
       if (groupKey === 'pet') {
         await savePetFeature(pageKey, spot, formRef.current || formCurrent, isEmpty(formRef.current));
       }
@@ -257,12 +261,13 @@ const BasicPageDetail = ({
     saveTemplate(formValues);
   };
 
-  const updateIGSNAndShowModal = async (formCurrent) => {
-    const values = {...formCurrent.values};
-    await saveFeature(formCurrent);
-    setIgsnFormValues(values);
-    setIsIGSNModalVisible(true);
-  };
+  // IGSN registration/update moving server-side — SESAR update-on-save modal disabled.
+  // const updateIGSNAndShowModal = async (formCurrent) => {
+  //   const values = {...formCurrent.values};
+  //   await saveFeature(formCurrent);
+  //   setIgsnFormValues(values);
+  //   setIsIGSNModalVisible(true);
+  // };
 
   /* Render Functions */
 
@@ -344,6 +349,7 @@ const BasicPageDetail = ({
             </FormFlatList>
           </>
         )}
+        {/* IGSN registration/update moving server-side — SESAR update-on-save modal disabled.
         <IGSNModal
           isVisible={isIGSNModalVisible}
           onIGSNUpdated={closeDetailView}
@@ -352,6 +358,7 @@ const BasicPageDetail = ({
           ref={formRef}
           sampleValues={igsnFormValues}
         />
+        */}
 
         {/*Modal when deleting a sample with an IGSN attached*/}
         <ModalWrapper

@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import IGSNModal from './igsn/IGSNModal';
+// IGSN registration is being moved server-side; the register modal is disabled for now.
+// import {useState} from 'react';
+// import IGSNModal from './igsn/IGSNModal';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
@@ -22,7 +24,8 @@ const SampleDetailOverview = () => {
 
   /* Local State */
 
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+  // IGSN registration moving server-side — register modal disabled.
+  // const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
@@ -50,8 +53,10 @@ const SampleDetailOverview = () => {
   };
 
   const onViewIGSNPressed = () => {
-    if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
+    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    // IGSN registration moving server-side — the "Get IGSN" register path is disabled.
+    // if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    // else setIsIGSNModalVisible(true);
   };
 
   /* Logic Helpers */
@@ -91,18 +96,23 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        <Pressable onPress={onViewIGSNPressed}>
-          <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-            {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
-          </Text>
-        </Pressable>
+        {/* IGSN registration moving server-side; only offer the view link for already-registered samples ("Get IGSN" register entry removed). */}
+        {sampleIGSN && (
+          <Pressable onPress={onViewIGSNPressed}>
+            <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
+              View IGSN Data
+            </Text>
+          </Pressable>
+        )}
       </View>
+      {/* IGSN registration moving server-side — register modal disabled.
       <IGSNModal
         isVisible={isIGSNModalVisible}
         onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
         onModalCancel={() => setIsIGSNModalVisible(false)}
         sampleValues={sampleValues}
       />
+      */}
     </View>
   );
 };

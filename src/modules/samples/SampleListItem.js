@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
-import IGSNModal from './igsn/IGSNModal';
+// IGSN registration is being moved server-side; the register modal is disabled for now.
+// import {useState} from 'react';
+// import IGSNModal from './igsn/IGSNModal';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
@@ -45,13 +47,16 @@ const SampleListItem = ({
 
   /* Local State */
 
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
+  // IGSN registration moving server-side — register modal disabled.
+  // const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Event Handlers */
 
   const handleIGSNButtonPressed = () => {
-    if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
+    dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    // IGSN registration moving server-side — the register path is disabled.
+    // if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+    // else setIsIGSNModalVisible(true);
   };
 
   const handleCheckBoxPressed = () => {
@@ -86,7 +91,8 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+        {/* IGSN registration moving server-side; only show the IGSN badge for already-registered samples (was `isShowIGSN || sampleMetadata.Sample_IGSN`, which showed the "Get IGSN" register prompt). */}
+        {sampleMetadata.Sample_IGSN && (
           <View>
             <IGSNLogo
               item={sampleMetadata}
@@ -108,12 +114,14 @@ const SampleListItem = ({
         </>
       )}
     </ListItem>
+    {/* IGSN registration moving server-side — register modal disabled.
     <IGSNModal
       isVisible={isIGSNModalVisible}
       onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
       onModalCancel={() => setIsIGSNModalVisible(false)}
       sampleValues={sampleMetadata}
     />
+    */}
     </>
   );
 };
