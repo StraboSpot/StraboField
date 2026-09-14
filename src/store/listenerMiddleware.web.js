@@ -232,8 +232,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
       // the target dataset); it goes up with the dataset it joins, so skip it here
       if (!dataset) return acc;
       const datasetId = dataset.id;
-      if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
-      else return {...acc, [datasetId]: [spotId]};
+      return {...acc, [datasetId]: [...(acc[datasetId] || []), spotId]};
     }, {});
     const datasetsToSend = Object.entries(spotIdsGroupedByDatasetId).reduce((acc, [datasetId, spotIdsInDataset]) => {
       const spots = spotIdsInDataset.map(spotIdInDataset => newState.spot.spots[spotIdInDataset]);
@@ -299,8 +298,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
     const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     if (!dataset) return acc;
     const datasetId = dataset.id;
-    if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
-    else return {...acc, [datasetId]: [spotId]};
+    return {...acc, [datasetId]: [...(acc[datasetId] || []), spotId]};
   }, {});
 
   const datasetsToSend = Object.entries(spotIdsGroupedByDatasetId).reduce((acc, [datasetId, spotIdsInDataset]) => {
