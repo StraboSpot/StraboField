@@ -74,6 +74,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       || getAllRelevantPages().some(p => p.key === pageVisible)
       || SUBPAGES.some(p => p.key === pageVisible);
     if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    // A selected sample belongs to the Spot and page it was picked on, and isSample above reads it, so leaving it
+    // set makes every later Spot render as that sample - parent row, sample name and all - long after it is gone.
+    // SamplesPage keeps it right while it is the page showing, so only drop it off that page.
+    if (pageVisible !== PAGE_KEYS.SAMPLES) setSelectedSample({});
   }, [pageVisible, spot]);
 
   /* Logic Helpers */
