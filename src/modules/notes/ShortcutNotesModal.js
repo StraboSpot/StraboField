@@ -1,9 +1,10 @@
 import React, {useRef, useState} from 'react';
 
 import Notes from './Notes';
+import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
+const ShortcutNotesModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   // const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
@@ -51,7 +52,12 @@ const ShortcutNotesModal = ({onPress, zoomToCurrentLocation}) => {
       showCancelButton={false}
       showCloseButton
     >
-      <Notes registerSave={saveRef} zoomToCurrentLocation={zoomToCurrentLocation}/>
+      <Notes
+        openSpotInNotebook={openSpotInNotebook}
+        registerSave={saveRef}
+        zoomToCurrentLocation={zoomToCurrentLocation}
+      />
+      <Loading isLoading={isSaving}/>
     </ModalWrapper>
   );
 };

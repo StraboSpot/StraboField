@@ -87,6 +87,7 @@ const useSamples = () => {
 
     dispatch(setSelectedSpot(newEnrichedSample));
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    return newEnrichedSample;
   };
 
   const deleteRichSample = (sampleToDelete, parentSpot) => {

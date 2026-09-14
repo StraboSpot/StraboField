@@ -5,6 +5,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const TagsShortcutModal = ({
                              onPress,
+                             openSpotInNotebook,
                              zoomToCurrentLocation,
                            }) => {
   /* Render Functions */
@@ -20,7 +21,7 @@ const TagsShortcutModal = ({
         showCancelButton={false}
         showCloseButton={true}
       >
-        <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
+        <TagsModal openSpotInNotebook={openSpotInNotebook} zoomToCurrentLocation={zoomToCurrentLocation}/>
       </ModalWrapper>
     );
   };

@@ -20,6 +20,7 @@ import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measu
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
@@ -31,13 +32,13 @@ import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 import {setUserData} from '../user/userProfile.slice';
 
-const AddMeasurementModal = ({onPress}) => {
+const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -62,6 +63,7 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
+  const [isSaving, setIsSaving] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -73,6 +75,9 @@ const AddMeasurementModal = ({onPress}) => {
 
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
+
+  // The shortcut makes its own Spot at the current location, where the Notebook is editing the Spot it is open on
+  const isShortcutMeasurement = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
 
   // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
   // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
@@ -197,6 +202,9 @@ const AddMeasurementModal = ({onPress}) => {
           formRef.current.values.associated_orientation?.[0]?.label);
       }
     }
+    // Saving is slow enough to look like nothing happened, so say so on the button. ModalWrapper also shuts its
+    // exits while this is set, hence the finally - without it the modal would have no way out.
+    setIsSaving(true);
     try {
       await formRef.current.submitForm();
       let editedMeasurementData = showErrors(formRef.current);
@@ -207,8 +215,7 @@ const AddMeasurementModal = ({onPress}) => {
           values: editedMeasurementData.associated_orientation[0],
         });
       }
-      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
-        : spot;
+      const spotToUpdate = isShortcutMeasurement ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
 
@@ -268,8 +275,6 @@ const AddMeasurementModal = ({onPress}) => {
             t => editedMeasurementsData.push({...t.values, ...editedMeasurementData, id: getNewUUID()}));
         }
         console.log('editedMeasurementData', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
       }
       else {
         if (isSelectedAttitude) {
@@ -279,18 +284,34 @@ const AddMeasurementModal = ({onPress}) => {
         else editedMeasurementsData.push({...editedMeasurementData, id: getNewUUID()});
         console.log('editedMeasurementData', editedMeasurementData);
         console.log('Saving Measurement data to Spot ...', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
       }
+      // The shortcut's new Spot has to be selected before the write below, so that editedSpotProperties is what
+      // leaves it selected: spotToUpdate is the copy taken before the measurement went in, and handing that back
+      // afterwards would blank the page being opened.
+      if (isShortcutMeasurement) openSpotInNotebook(spotToUpdate, PAGE_KEYS.MEASUREMENTS);
+
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
+      dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
+
       if (isSelectedAttitude) {
         dispatch(setSelectedAttributes([editedMeasurementData]));
         onCloseButton();
       }
-      toast.show('Measurement Saved!', {type: 'success', duration: 2000});
-      SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
+      // The shortcut always steps aside; from the Notebook the modal only does so on a small screen, where it
+      // covers the page it just saved to. Both before the toast, which a modal on top would paint over.
+      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+      // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
+      // life - the reason only shortcut saves looked too fast
+      if (isShortcutMeasurement) await zoomToCurrentLocation();
+      // Web reports the real outcome itself - 'Saving changes...' then saved or not saved, from the server - so
+      // a local 'Saved!' there would be both redundant and, on a failed upload, wrong
+      if (Platform.OS !== 'web') toast.show('Measurement Saved!', {type: 'success', duration: 2000});
     }
     catch (err) {
       console.error('Error submitting form', err);
+    }
+    finally {
+      setIsSaving(false);
     }
   };
 
@@ -418,6 +439,7 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        isLoading={isSaving}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
@@ -435,7 +457,7 @@ const AddMeasurementModal = ({onPress}) => {
                   initialValues={initialValues}
                   innerRef={formRef}
                   onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
+                  validate={values => validateForm({formName: formName, values: values}).errors}
                   validateOnChange={false}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
@@ -446,6 +468,7 @@ const AddMeasurementModal = ({onPress}) => {
               listKey={'form'}
             />
           )}
+          <Loading isLoading={isSaving}/>
         </>
       </ModalWrapper>
     );
