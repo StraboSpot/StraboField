@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -28,6 +27,7 @@ import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
 import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
@@ -63,6 +63,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
@@ -208,13 +209,6 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
     try {
       await formRef.current.submitForm();
       let editedMeasurementData = showErrors(formRef.current);
-      // If plane with associated line validate associated line data
-      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
-        validateForm({
-          formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
-          values: editedMeasurementData.associated_orientation[0],
-        });
-      }
       const spotToUpdate = isShortcutMeasurement ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
@@ -334,6 +328,21 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
     saveMeasurement().catch(console.error);
   };
 
+  // Formik validates the survey for the measurement's own type, but a planar+linear measurement carries a linear
+  // half under associated_orientation[0], which is a survey of its own and went unchecked - its required fields
+  // and the constraints on trend, plunge and rake with it. Formik names those fields by path, so their errors are
+  // keyed the same way to reach the field and to be labelled by both halves when they are reported.
+  const validateMeasurement = (values) => {
+    const {errors} = validateForm({formName: [MEASUREMENT_GROUP_KEY, measurementTypeForForm], values: values});
+    if (isEmpty(values.associated_orientation?.[0])) return errors;
+    const {errors: associatedErrors} = validateForm({
+      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
+      values: values.associated_orientation[0],
+    });
+    return Object.entries(associatedErrors).reduce(
+      (acc, [name, message]) => ({...acc, ['associated_orientation[0].' + name]: message}), errors);
+  };
+
   /* Render Functions */
 
   const renderForm = (formProps) => {
@@ -439,6 +448,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        disabled={isFormInvalid}
         isLoading={isSaving}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
@@ -451,18 +461,17 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
           {measurementTypeForForm && (
             <FlatList
               ListHeaderComponent={
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
-                  initialStatus={{formName: formName}}
+                  formName={formName}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values}).errors}
-                  validateOnChange={false}
+                  setIsFormInvalid={setIsFormInvalid}
+                  validate={validateMeasurement}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
-                </Formik>
+                </FormikWrapper>
               }
               bounces={false}
               listKey={'form'}
