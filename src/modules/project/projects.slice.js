@@ -345,6 +345,13 @@ const projectSlice = createSlice({
       state.project[field] = value;
       state.project.modified_timestamp = Date.now();
     },
+    // Sets one preference, leaving the rest as they are now. updatedProject replaces the whole preferences object,
+    // so a caller holding an older copy of it would quietly undo every other setting changed since.
+    updatedProjectPreference(state, action) {
+      const {key, value} = action.payload;
+      state.project.preferences = {...state.project.preferences, [key]: value};
+      state.project.modified_timestamp = Date.now();
+    },
   },
 });
 
@@ -390,6 +397,7 @@ export const {
   updatedDatasetProperties,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
+  updatedProjectPreference,
 } = projectSlice.actions;
 
 export default projectSlice.reducer;

@@ -18,7 +18,14 @@ import {
   sortSpotsByDateCreated,
   sortSpotsByDateLastModified,
 } from './spots.helpers';
-import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, restoredSpots, setSelectedSpot} from './spots.slice';
+import {
+  clearedSelectedSpots,
+  deletedSpot,
+  editedOrCreatedSpot,
+  editedOrCreatedSpots,
+  restoredSpots,
+  setSelectedSpot,
+} from './spots.slice';
 import {getNewCopyId, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
@@ -33,6 +40,7 @@ import {
   restoredSpotReferences,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
+  updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
 import useTags from '../tags/useTags';
@@ -393,6 +401,16 @@ const useSpots = () => {
     }
   };
 
+  // Takes back a Spot made ahead of content that never arrived. Unlike deleteSpot it says nothing and offers no
+  // undo, since the user cancelled rather than deleted. References go with it, as does the Spot number it took -
+  // safe to hand back only because callers hold the screen meanwhile, so nothing else can have claimed it.
+  const discardSpot = (spotToDiscard, spotNumberToRestore) => {
+    console.log('Discarding unused Spot ID', spotToDiscard.properties.id, '...');
+    removeSpotAndReferences(spotToDiscard.properties.id);
+    dispatch(updatedProjectPreference({key: 'starting_number_for_spot', value: spotNumberToRestore}));
+    dispatch(clearedSelectedSpots());
+  };
+
   const getActiveImageBasemaps = () => {
     return Object.values(getActiveSpotsObj()).reduce((acc, spot) => {
       const imageBasemaps = getImageBasemapsInSpot(spot);
@@ -698,6 +716,7 @@ const useSpots = () => {
     createRandomSpots,
     createSpot,
     deleteSpot,
+    discardSpot,
     getActiveImageBasemaps,
     getActiveIntervalSpotsOnStratSection,
     getActiveSpotsObj,
