@@ -106,7 +106,7 @@ const RELEASE_NOTES = [
             commit: '3ce140926',
           },
           {
-            text: 'Get an IGSN: register and manage IGSNs end-to-end, with a Get IGSN button and an upload progress bar',
+            text: 'IGSN registration: updated registration UI, with a Get IGSN button and an upload progress bar',
             commit: '25dadd71b',
           },
           {
@@ -195,9 +195,8 @@ const RELEASE_NOTES = [
         ],
       },
       {
-        title: 'Compass & measurements',
+        title: 'Measurements',
         items: [
-          {text: 'Compass: redesigned dial with animated headings and tick marks', commit: 'a90dd586b'},
           {
             text: 'Measurement mode that sticks: your manual vs. compass preference now syncs and is remembered',
             commit: 'bc7146942',
