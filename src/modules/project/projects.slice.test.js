@@ -1,9 +1,10 @@
-import projectReducer, {updatedModifiedTimestampsBySpotsIds, updatedProjectPreference} from './projects.slice';
 import projectReducer, {
+  addedProjectFromServer,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
+  migrateReportTimestamps,
   movedSpotIdBetweenDatasets,
   updatedModifiedTimestampsBySpotsIds,
   updatedProjectPreference,
