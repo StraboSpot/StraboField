@@ -91,7 +91,7 @@ const ReportModal = ({openSpotInNotebook}) => {
                 <ReportMetadata
                   createdBy={initialValues.created_by}
                   createdTimestamp={initialValues.created_timestamp}
-                  updatedTimestamp={initialValues.updated_timestamp}
+                  modifiedTimestamp={initialValues.modified_timestamp}
                 />
               )}
               <ReportImages

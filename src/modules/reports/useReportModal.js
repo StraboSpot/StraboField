@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewUUID, getTimestampFromId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -120,14 +120,17 @@ const useReportModal = ({openSpotInNotebook}) => {
     try {
       console.log('Saving report ...');
       let {values: editedReport} = await submitAndShowErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewId();
+      if (!editedReport.id) editedReport.id = getNewUUID();
       // Stamped once, on the first save - an edit by anyone else leaves the original author in place
       if (!editedReport.straboUserId || !editedReport.created_by) {
         editedReport.straboUserId = straboUserId;
         editedReport.created_by = userName;
       }
-      if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
-      editedReport.updated_timestamp = Date.now();
+      // A memo made before created_timestamp existed has its creation time in its old numeric id
+      if (!editedReport.created_timestamp) {
+        editedReport.created_timestamp = getTimestampFromId(editedReport.id) || Date.now();
+      }
+      editedReport.modified_timestamp = Date.now();
       editedReport.images = updatedImages;
       editedReport.spots = checkedSpotsIds;
       editedReport.tags = checkedTagsIds;

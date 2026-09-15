@@ -3,6 +3,15 @@ import {createSlice} from '@reduxjs/toolkit';
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 
+// A memo used to stamp its edit time as updated_timestamp, while the rest of the project calls that
+// modified_timestamp. Renamed on the way in - server, import or device - and the old key dropped, so no
+// read site has to know both names.
+export const migrateReportTimestamps = reports => reports?.map((reportToMigrate) => {
+  if (!reportToMigrate) return reportToMigrate;
+  const {updated_timestamp: updatedTimestamp, ...report} = reportToMigrate;
+  return updatedTimestamp && !report.modified_timestamp ? {...report, modified_timestamp: updatedTimestamp} : report;
+});
+
 const normalizeProject = (project) => {
   if (!project.id) project.id = getNewId();
   if (!project.description) project.description = {};
@@ -11,6 +20,7 @@ const normalizeProject = (project) => {
   if (!project.relationship_types) project.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
   if (!project.templates) project.templates = {};
   if (!project.useContinuousTagging) project.useContinuousTagging = false;
+  if (project.reports) project.reports = migrateReportTimestamps(project.reports);
   return project;
 };
 
@@ -145,7 +155,7 @@ const projectSlice = createSlice({
           if (updatedReport.spots?.some(id => isSameId(id, spotId))) {
             updatedReport.spots = updatedReport.spots.filter(id => !isSameId(id, spotId));
             if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
-            updatedReport.updated_timestamp = Date.now();
+            updatedReport.modified_timestamp = Date.now();
           }
           return updatedReport;
         });
@@ -159,8 +169,8 @@ const projectSlice = createSlice({
         const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
-          if (updatedTag.spots?.includes(spotId)) {
-            updatedTag.spots = updatedTag.spots.filter(id => id !== spotId);
+          if (updatedTag.spots?.some(id => isSameId(id, spotId))) {
+            updatedTag.spots = updatedTag.spots.filter(id => !isSameId(id, spotId));
             if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
             updatedTag.modified_timestamp = timestamp;
           }
@@ -184,7 +194,7 @@ const projectSlice = createSlice({
           if (updatedReport.tags?.includes(tagId)) {
             updatedReport.tags = updatedReport.tags.filter(id => id !== tagId);
             if (isEmpty(updatedReport.tags)) delete updatedReport.tags;
-            updatedReport.updated_timestamp = Date.now();
+            updatedReport.modified_timestamp = Date.now();
           }
           return updatedReport;
         });

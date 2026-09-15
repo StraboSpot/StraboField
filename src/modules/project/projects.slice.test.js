@@ -141,7 +141,6 @@ describe('movedSpotIdBetweenDatasets', () => {
 });
 
 describe('updatedModifiedTimestampsBySpotsIds', () => {
-  const spotId = 1756000000001;
   const getState = () => ({
     datasets: {
       12: {id: 12, modified_timestamp: 1, name: 'Dataset 1', spotIds: [spotId]},
@@ -205,5 +204,75 @@ describe('updatedProjectPreference', () => {
   it('marks the project as modified', () => {
     const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
     expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+});
+
+// Memos used to stamp their edit time as updated_timestamp while the rest of the project called it
+// modified_timestamp. Both ways in - the server and a file import through normalizeProject, and the device
+// through the store's persist migration - rename it, so no read site has to know the old name.
+describe('migrateReportTimestamps', () => {
+  const stamp = 1756000000000;
+
+  it('renames an old memo timestamp and drops the old key', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo', updated_timestamp: stamp}]);
+    expect(report.modified_timestamp).toBe(stamp);
+    expect(report).not.toHaveProperty('updated_timestamp');
+  });
+
+  it('leaves a memo that already has the new name alone', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', modified_timestamp: stamp, name: 'Memo'}]);
+    expect(report.modified_timestamp).toBe(stamp);
+  });
+
+  // Whichever wrote last, the new name wins and the stale one goes rather than both surviving
+  it('keeps the new name when a memo somehow carries both', () => {
+    const [report] = migrateReportTimestamps(
+      [{id: 'r1', modified_timestamp: stamp, name: 'Memo', updated_timestamp: 1}]);
+    expect(report.modified_timestamp).toBe(stamp);
+    expect(report).not.toHaveProperty('updated_timestamp');
+  });
+
+  it('leaves a memo with no timestamp at all untouched', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo'}]);
+    expect(report).toEqual({id: 'r1', name: 'Memo'});
+  });
+
+  it('takes a project with no reports without complaining', () => {
+    expect(migrateReportTimestamps(undefined)).toBeUndefined();
+  });
+});
+
+describe('addedProjectFromServer', () => {
+  // The whole point of the rename living in normalizeProject: memos arriving from the server are upgraded
+  // before anything reads them, so the memo list sorts on one field name
+  it('renames memo timestamps on a project coming from the server', () => {
+    const incoming = {
+      id: 1, modified_timestamp: 1,
+      reports: [{id: 'r1', name: 'Old Memo', updated_timestamp: 1756000000000}],
+    };
+    const {project} = projectReducer({project: {}}, addedProjectFromServer(incoming));
+    expect(project.reports[0].modified_timestamp).toBe(1756000000000);
+    expect(project.reports[0]).not.toHaveProperty('updated_timestamp');
+  });
+});
+
+// The store's persist migration hands whatever is on the device to this, and a throw there makes redux-persist
+// rehydrate the project slice as undefined - so it has to survive every shape, not just the expected one
+describe('migrateReportTimestamps on malformed data', () => {
+  it('survives an empty slot in the list', () => {
+    expect(() => migrateReportTimestamps([null, undefined, {id: 'r1'}])).not.toThrow();
+  });
+
+  it('leaves an empty slot as it found it', () => {
+    expect(migrateReportTimestamps([null, {id: 'r1', updated_timestamp: 1}])).toEqual(
+      [null, {id: 'r1', modified_timestamp: 1}]);
+  });
+
+  it('survives a memo whose timestamp is not a number', () => {
+    expect(() => migrateReportTimestamps([{id: 'r1', updated_timestamp: 'not a date'}])).not.toThrow();
+  });
+
+  it('takes an empty list', () => {
+    expect(migrateReportTimestamps([])).toEqual([]);
   });
 });

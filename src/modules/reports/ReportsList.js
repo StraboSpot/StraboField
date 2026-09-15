@@ -25,7 +25,7 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
   const reportsToList = (reportsSubset ?? reports).filter(
     r => r.report_privacy !== 'only_me' || !r.straboUserId || r.straboUserId === straboUserId);
   const reportsToListSorted = [...reportsToList].sort(
-    (a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
+    (a, b) => new Date(b.modified_timestamp) - new Date(a.modified_timestamp));
 
   /* Event Handlers */
 

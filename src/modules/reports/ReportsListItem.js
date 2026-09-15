@@ -44,7 +44,7 @@ const ReportsListItem = ({
     reportSpotsIds = [... new Set([...reportSpotsIds, ...selectedSpots.map(s=>s.properties.id)])];
     console.log('Add selected spot ids', reportSpotsIds, 'to report', report);
     const editedReport = JSON.parse(JSON.stringify(report));
-    editedReport.updated_timestamp = Date.now();
+    editedReport.modified_timestamp = Date.now();
     editedReport.spots = reportSpotsIds;
     let updatedReports = reports.filter(r => r.id !== editedReport.id);
     updatedReports.push({...editedReport});
