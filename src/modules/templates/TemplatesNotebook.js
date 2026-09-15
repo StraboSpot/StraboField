@@ -6,8 +6,9 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
 import {getLinearTemplates, getPlanarTemplates} from './templates.helpers';
+import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
@@ -38,6 +39,8 @@ const TemplatesNotebook = ({
   const dispatch = useDispatch();
   const modalVisible = useSelector(state => state.home.modalVisible);
   const templates = useSelector(state => state.project.project?.templates);
+
+  const {saveTemplateValues} = useTemplates();
 
   /* Local State */
 
@@ -143,34 +146,9 @@ const TemplatesNotebook = ({
   };
 
   const saveTemplate = (values) => {
-    let templateObject;
     if (isEmpty(name)) alert('Template name empty', 'Provide a template name.');
     else {
-      let existingTemplatesCopy = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
-      if (!isEmpty(selectedTemplate.id)) {
-        templateObject = {
-          'id': selectedTemplate.id,
-          'name': name,
-          'values': values,
-        };
-        existingTemplatesCopy = existingTemplatesCopy.filter(templateId => templateObject.id !== templateId.id);
-      }
-      else {
-        templateObject = {
-          'id': getNewUUID(),
-          'name': name,
-          'values': values,
-        };
-      }
-      existingTemplatesCopy.push(templateObject);
-      existingTemplatesCopy = existingTemplatesCopy.sort(
-        (templateA, templateB) => templateA.name.localeCompare(templateB.name));
-      dispatch(addedTemplates({key: templateKey, templates: existingTemplatesCopy}));
-
-      // Update active templates so updated template becomes active
-      const templatesUpdated = activeTemplatesForKey?.filter(t => t.id !== templateObject.id) || [];
-      dispatch(setActiveTemplates({key: templateKey, templates: [...templatesUpdated, templateObject]}));
-
+      saveTemplateValues(templateKey, selectedTemplate, name, values);
       closeTemplates();
     }
   };
