@@ -23,6 +23,8 @@ Guidance for Claude Code when working in this repository.
 - **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
   hand-write the changelog. See [Release Process](#release-process-rc--master).
 - **Package manager is Yarn 4.13.0** (install with `yarn`); npm-script names below run fine via `npm run` or `yarn`.
+- **Ids: UUIDs inside `spot.properties`, numbers only for the server's keys** — never lengthen `getNewId`'s output
+  and never do arithmetic on an id. See the Ids paragraph under [Architecture](#architecture).
 - **CLAUDE.md is auto-edited on commit** by `scripts/update-claude-md.js` (module count + dep versions). Keep the anchor
   lines it matches intact — see the Architecture/Dependencies sections.
 
@@ -171,6 +173,20 @@ via `metro.config.js`.
 **Data model:** Projects → datasets → spots. A **spot** = geometry (Point/LineString/Polygon/GeometryCollection) +
 properties (measurements, images, notes, samples) + modified timestamp, with a parent-child hierarchy via
 `properties.nesting`. Spot CRUD lives in `useSpots.js` (`createSpot`, `editSpot`, `deleteSpot`, `setSelectedSpot`).
+
+**Ids:** `getNewUUID()` for anything the app owns end to end — everything inside `spot.properties` (measurements,
+minerals, rocks, reaction textures, fabrics, 3D structures, other features, sed), plus tags, reports and templates. The
+server treats those as an opaque blob. `getNewId()` (a number) **only** for what the server keys on: Spot, dataset,
+project and image ids, which cannot change without a coordinated backend migration. `getNewId` must never get longer
+either: past `Number.MAX_SAFE_INTEGER` JavaScript drops an integer's low digits and two different ids compare equal.
+It is a millisecond timestamp × 10 that steps past the last id issued, so a burst of mints cannot collide.
+
+Records already in the field keep their old numeric ids, so ids are permanently mixed. That needs no coercion by itself
+— an id's type is stable per record — but **never do arithmetic on an id**: sorting tags by `b.id - a.id` silently
+became a no-op (`NaN`) once ids were UUIDs, which is why tags and reports carry `created_timestamp` /
+`modified_timestamp` instead, and `getTimestampFromId()` recovers a creation time from an old numeric id for records
+that predate those fields. Reach for `isSameId()` only where a type genuinely *changes* in transit — `Object.keys`
+stringifies a numeric key, and the server returns image ids as strings — not as the default way to compare two ids.
 
 **Dynamic forms:** XLSForm-style JSON in `/src/assets/forms/` (`survey` + `choices`), 14 categories, with skip logic,
 constraint validation, and a label dictionary. Rendered by `/src/modules/form/`. To add a field: edit the form JSON, add
