@@ -6,6 +6,7 @@ import Animated, {runOnJS, useAnimatedStyle, useSharedValue} from 'react-native-
 import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
+import {LARGE_TEXT_SIZE, ORANGE} from '../../../shared/styles.constants';
 import {useSpots} from '../../spots';
 import {clearedIntervalDragState} from '../maps.slice';
 
@@ -80,13 +81,13 @@ const SnapLineLayer = () => {
       />
       <Animated.Text
         pointerEvents={'none'}
-        style={[styles.arrowUp, {top: startScreenY - 11}, snapLineAnimStyle]}
+        style={[styles.arrowUp, {top: startScreenY - LARGE_TEXT_SIZE + 2}, snapLineAnimStyle]}
       >
         ▲
       </Animated.Text>
       <Animated.Text
         pointerEvents={'none'}
-        style={[styles.arrowDown, {top: startScreenY + 3}, snapLineAnimStyle]}
+        style={[styles.arrowDown, {top: startScreenY}, snapLineAnimStyle]}
       >
         ▼
       </Animated.Text>
@@ -99,25 +100,25 @@ const SnapLineLayer = () => {
 
 const styles = StyleSheet.create({
   arrowDown: {
-    color: 'orange',
-    fontSize: 10,
+    color: ORANGE,
+    fontSize: LARGE_TEXT_SIZE,
     left: 0,
-    lineHeight: 10,
+    lineHeight: LARGE_TEXT_SIZE,
     position: 'absolute',
     right: 0,
     textAlign: 'center',
   },
   arrowUp: {
-    color: 'orange',
-    fontSize: 10,
+    color: ORANGE,
+    fontSize: LARGE_TEXT_SIZE,
     left: 0,
-    lineHeight: 10,
+    lineHeight: LARGE_TEXT_SIZE,
     position: 'absolute',
     right: 0,
     textAlign: 'center',
   },
   snapLine: {
-    backgroundColor: 'orange',
+    backgroundColor: ORANGE,
     height: 3,
     left: 0,
     position: 'absolute',

@@ -11,6 +11,15 @@ import {setFreehandFeatureCoords} from '../maps/maps.slice';
 
 let freehandFeatureCoords = [];
 
+// True while a stroke is drawing; useMapDraw reads it to defer the preview's map re-render until lift,
+// since any re-render mid-gesture truncates the stroke. Module flag, not state, for that same reason.
+// A stroke over the map dies two ways: that re-render, and the map claiming the gesture. The second is why
+// this canvas must keep the default shouldBlockNativeResponder - do not add a GestureDetector here the way
+// Sketch.js does, or Mapbox's pan handler will seize one-finger strokes on Android.
+let isDrawing = false;
+
+export const getIsFreehandDrawing = () => isDrawing;
+
 const FreehandSketch = ({mapMode}) => {
   /* Data Hooks */
 
@@ -32,6 +41,7 @@ const FreehandSketch = ({mapMode}) => {
   }, []);
 
   useEffect(() => {
+    isDrawing = false; // reset in case a prior gesture was interrupted before onStrokeEnd
     clear();
   }, [mapMode]);
 
@@ -39,16 +49,21 @@ const FreehandSketch = ({mapMode}) => {
 
   const onStrokeChanged = (x, y) => freehandFeatureCoords.push([x, y]);
 
-  const onStrokeEnd = () => dispatch(setFreehandFeatureCoords(freehandFeatureCoords));
+  const onStrokeEnd = () => {
+    isDrawing = false;
+    dispatch(setFreehandFeatureCoords(freehandFeatureCoords));
+    setTimeout(clear, 0); // clear the raw stroke so strokes don't stack; deferred so the library's endPath runs first
+  };
 
   const onStrokeStart = () => {
-    if (freehandFeatureCoords.length > 1) clear();
+    // Never clear() or dispatch mid-gesture — both truncate the stroke; isDrawing lets a late preview build bail.
+    isDrawing = true;
     freehandFeatureCoords = [];
   };
 
   /* Logic Helpers */
 
-  const clear = () => freehandDrawRef.current.clear();
+  const clear = () => freehandDrawRef.current?.clear();
 
   /* View */
 

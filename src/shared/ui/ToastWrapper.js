@@ -1,9 +1,10 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {ToastProvider} from 'react-native-toast-notifications';
 
+import {MEDIUM_TEXT_SIZE} from '../styles.constants';
 import styles from './ui.styles';
 
 const ToastWrapper = ({children}) => {
@@ -31,6 +32,24 @@ const ToastWrapper = ({children}) => {
           <View style={styles.toastContainer}>
             <Icon containerStyle={{paddingEnd: 10}} name={'lock-open'} size={35} type={'material-community'}/>
             <Text>{toast.message}</Text>
+          </View>
+        ),
+        undo: toast => (
+          <View style={[styles.toastContainer, {paddingHorizontal: 16, paddingVertical: 12}]}>
+            <Text style={{flexShrink: 1, fontSize: MEDIUM_TEXT_SIZE}}>{toast.message}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                toast.data?.onUndo?.();
+                toast.onHide();
+              }}
+              style={{paddingHorizontal: 14}}
+            >
+              <Text style={{
+                fontSize: MEDIUM_TEXT_SIZE,
+                fontWeight: 'bold',
+                textDecorationLine: 'underline',
+              }}>{'UNDO'}</Text>
+            </TouchableOpacity>
           </View>
         ),
       }}

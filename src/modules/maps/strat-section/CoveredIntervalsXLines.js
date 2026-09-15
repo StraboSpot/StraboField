@@ -3,12 +3,12 @@ import React from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 
-import useCoveredIntervalXLines from './useCoveredIntevalsXLines';
+import useCoveredIntervalsXLines from './useCoveredIntervalsXLines';
 
 const CoveredIntervalsXLines = ({spotsDisplayed}) => {
   /* Data Hooks */
 
-  const {getIntervalsWithX} = useCoveredIntervalXLines(spotsDisplayed);
+  const {getIntervalsWithX} = useCoveredIntervalsXLines(spotsDisplayed);
 
   /* View */
 

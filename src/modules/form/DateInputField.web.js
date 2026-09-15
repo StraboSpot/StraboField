@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {useDispatch} from 'react-redux';
 
 import {formStyles} from '../form';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../home/home.slice';
+import {openedMessageModal} from '../home/home.slice';
 
 const DateInputField = ({
                           field: {name, value},
@@ -43,18 +43,14 @@ const DateInputField = ({
       if (Date.parse(selectedDate) <= Date.parse(values.end_date)) setFieldValue(name, selectedDate);
       else {
         console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Date Error!\n\nStart Date must be before End Date!'));
-        dispatch(setIsErrorMessagesModalVisible(true));
+        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
       }
     }
     else if (selectedDate && name === 'end_date' && values.start_date) {
       if (Date.parse(values.start_date) <= Date.parse(selectedDate)) setFieldValue(name, selectedDate);
       else {
         console.log('Date Error!', 'Start Date must be before End Date.');
-        dispatch(clearedStatusMessages());
-        dispatch(addedStatusMessage('Date Error!\n\nStart Date must be before End Date!'));
-        dispatch(setIsErrorMessagesModalVisible(true));
+        dispatch(openedMessageModal({message: 'Start Date must be before End Date!', title: 'Date Error!'}));
       }
     }
     else setFieldValue(name, selectedDate);

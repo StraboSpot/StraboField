@@ -24,7 +24,11 @@ const ReportsListModal = () => {
   /* View */
 
   return (
-    <ModalWrapper>
+    <ModalWrapper
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={true}
+    >
       <AddButton onPress={addReport} title={'Create New Memo'}/>
       <ReportsList isCheckedList/>
     </ModalWrapper>

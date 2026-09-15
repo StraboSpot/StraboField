@@ -35,7 +35,7 @@ const useImageSize = () => {
       Image.getSize(imageURI, (imageWidth, imageHeight) => {
         resolve({height: imageHeight, width: imageWidth});
       }, (err) => {
-        console.log('Error getting size of image:', err.message);
+        console.error('Error getting size of image:', err.message);
         reject(err);
       });
     });

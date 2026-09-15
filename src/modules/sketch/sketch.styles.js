@@ -36,6 +36,9 @@ const sketchStyles = StyleSheet.create({
     marginVertical: 20,
     width: 30,
   },
+  warningText: {
+    color: themes.WARNING_COLOR,
+  },
 });
 
 export default sketchStyles;

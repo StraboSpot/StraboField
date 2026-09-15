@@ -1,6 +1,9 @@
 import {createSlice, current} from '@reduxjs/toolkit';
 
-import {isEmpty} from '../../shared/helpers';
+import {getUniqueTitle, isEmpty} from '../../shared/helpers';
+
+// The placeholder editedSpotImages gives an image that arrives with no title of its own
+const UNTITLED_TITLE = /^Untitled \d+$/;
 
 const initialSpotState = {
   intersectedSpotsForTagging: [],
@@ -18,8 +21,18 @@ const spotSlice = createSlice({
       state.spots = action.payload;
     },
     addedSpotsFromServer(state, action) {
-      state.spots = Object.assign({}, ...action.payload.map(spot => ({...state.spots, [spot.properties.id]: spot})));
-      console.log('ADDED Spots:', state.spots, 'in Existing Spots:', current(state));
+      // Merge each downloaded spot in by id, overwriting the local copy.
+      action.payload.forEach((spot) => {
+        state.spots[spot.properties.id] = spot;
+      });
+      // If the currently selected spot was among those refreshed (e.g. keeping the server copy on a
+      // conflict), update it too so the open view shows the new server data instead of the stale copy.
+      if (!isEmpty(state.selectedSpot)) {
+        const refreshedSpot = action.payload.find(
+          spot => spot.properties.id === state.selectedSpot.properties.id,
+        );
+        if (refreshedSpot) state.selectedSpot = refreshedSpot;
+      }
     },
     clearedSelectedSpots(state) {
       state.selectedSpot = {};
@@ -94,19 +107,34 @@ const spotSlice = createSlice({
     editedSpotImages(state, action) {
       let tempImages = [];
       if (state.selectedSpot.properties.images) tempImages = state.selectedSpot.properties.images;
+      // Updated as titles are assigned, so images added together cannot collide either
+      const takenTitles = tempImages.map(image => image.title).filter(title => !isEmpty(title));
       const updatedSpotObj = action.payload.map((image) => {
+        // A copy of an untitled image falls through to the backfill instead of inheriting the
+        // placeholder it was copied from as "Untitled 1 (2)"
+        const isPlaceholder = !isEmpty(image.title) && UNTITLED_TITLE.test(image.title);
+        const title = isEmpty(image.title) || isPlaceholder ? undefined
+          : getUniqueTitle(image.title, takenTitles);
+        if (!isEmpty(title)) takenTitles.push(title);
         return {
           id: image.id,
           height: image.height,
           width: image.width,
           image_type: image.image_type,
+          ...(!isEmpty(title) && {title: title}),
           ...(!isEmpty(image.view_angle_plunge) && {view_angle_plunge: image.view_angle_plunge}),
           ...(!isEmpty(image.view_azimuth_trend) && {view_azimuth_trend: image.view_azimuth_trend}),
         };
       });
       tempImages = [...tempImages, ...updatedSpotObj];
-      const tempImagesWithTitles = tempImages.map((image, i) => {
-        return {...image, title: isEmpty(image.title) ? 'Untitled ' + (i + 1) : image.title.toString()};
+      // Lowest free slot rather than the array index, so an image deliberately titled "Untitled 2"
+      // cannot collide with the backfill
+      let untitledNumber = 1;
+      const tempImagesWithTitles = tempImages.map((image) => {
+        if (!isEmpty(image.title)) return {...image, title: image.title.toString()};
+        while (takenTitles.includes('Untitled ' + untitledNumber)) untitledNumber++;
+        takenTitles.push('Untitled ' + untitledNumber);
+        return {...image, title: 'Untitled ' + untitledNumber};
       });
       state.selectedSpot.properties.images = tempImagesWithTitles;
       state.selectedSpot.properties.modified_timestamp = Date.now();
@@ -116,7 +144,8 @@ const spotSlice = createSlice({
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
-        spotToEdit.properties[field] = value;
+        if (isEmpty(value)) delete spotToEdit.properties[field];
+        else spotToEdit.properties[field] = value;
         spotToEdit.properties.modified_timestamp = Date.now();
         if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
         if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
@@ -133,6 +162,10 @@ const spotSlice = createSlice({
       if (!isEmpty(state.selectedSpot) && Object.keys(spots).includes(state.selectedSpot?.properties?.id)) {
         state.selectedSpot = spots[state.selectedSpot.properties.id];
       }
+    },
+    restoredSpots(state, action) {
+      // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots.
+      state.spots = {...state.spots, ...action.payload};
     },
     setIntersectedSpotsForTagging(state, action) {
       state.intersectedSpotsForTagging = action.payload;
@@ -168,6 +201,7 @@ export const {
   editedSpotProperties,
   resetSpotState,
   restoredIntervalDragSnapshot,
+  restoredSpots,
   setIntersectedSpotsForTagging,
   setSelectedAttributes,
   setSelectedSpot,

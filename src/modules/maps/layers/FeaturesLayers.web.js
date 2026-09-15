@@ -3,13 +3,13 @@ import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
-import {isEmpty} from '../../../shared/helpers';
-import useProject from '../../project/useProject';
-import {MAP_MODES} from '../maps.constants';
-import useMapSymbology from '../symbology/useMapSymbology';
-import useMapFeatures from '../useMapFeatures';
 import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
 import {getUniqFeatures} from './layers.helpers';
+import {isEmpty} from '../../../shared/helpers';
+import useProject from '../../project/useProject';
+import useMapFeatures from '../features/useMapFeatures';
+import {MAP_MODES} from '../maps.constants';
+import useMapSymbology from '../symbology/useMapSymbology';
 
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */

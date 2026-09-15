@@ -14,12 +14,18 @@ const initialMapsState = {
   },
   featureTypesOff: [],
   freehandFeatureCoords: undefined,
+  freehandVertexSpacing: {
+    unit: 'pixels', // 'pixels' | 'distance'
+    pixelSpacing: 20, // screen points between kept vertices
+    distanceSpacing: 50, // meters between kept vertices
+  },
   geometryTypesOff: [],
+  intervalDragChangedSpotIds: [],
   intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
-  labelTypeOn: 'dip',
-  isMapMoved: true,
+  labelTypeOn: 'dipOrName',
+  isMapExtentFilterActive: false,
   isScaleBarMetric: true,
   isShowOnly1stMeas: false,
   isShowSamplesOn: false,
@@ -45,10 +51,14 @@ const mapsSlice = createSlice({
     addedCustomMapsFromBackup(state, action) {
       state.customMaps = action.payload;
     },
+    addedIntervalDragChangedSpotIds(state, action) {
+      state.intervalDragChangedSpotIds = [...new Set([...state.intervalDragChangedSpotIds, ...action.payload])];
+    },
     cancelledIntervalDrag(state) {
       state.isDragIntervalMode = false;
       state.intervalDragState = null;
       state.intervalDragSnapshot = null;
+      state.intervalDragChangedSpotIds = [];
     },
     clearedIntervalDragState(state) {
       state.intervalDragState = null;
@@ -78,6 +88,7 @@ const mapsSlice = createSlice({
       state.isDragIntervalMode = false;
       state.intervalDragState = null;
       state.intervalDragSnapshot = null;
+      state.intervalDragChangedSpotIds = [];
     },
     selectedCustomMapToEdit(state, action) {
       state.selectedCustomMapToEdit = action.payload;
@@ -106,6 +117,9 @@ const mapsSlice = createSlice({
     setFreehandFeatureCoords(state, action) {
       state.freehandFeatureCoords = action.payload;
     },
+    setFreehandVertexSpacing(state, action) {
+      state.freehandVertexSpacing = {...state.freehandVertexSpacing, ...action.payload};
+    },
     setGeometryTypesOff(state, action) {
       console.log('Map Geometry Types Off', action.payload);
       state.geometryTypesOff = action.payload;
@@ -123,8 +137,8 @@ const mapsSlice = createSlice({
         }
       }
     },
-    setIsMapMoved(state, action) {
-      state.isMapMoved = action.payload;
+    setIsMapExtentFilterActive(state, action) {
+      state.isMapExtentFilterActive = action.payload;
     },
     setIsShowOnly1stMeas(state, action) {
       state.isShowOnly1stMeas = action.payload;
@@ -168,6 +182,7 @@ const mapsSlice = createSlice({
     startedIntervalDrag(state, action) {
       state.isDragIntervalMode = true;
       state.intervalDragSnapshot = action.payload;
+      state.intervalDragChangedSpotIds = [];
     },
     updateCustomMap(state, action) {
       state.customMaps[action.payload.id] = action.payload;
@@ -178,6 +193,7 @@ const mapsSlice = createSlice({
 export const {
   addedCustomMap,
   addedCustomMapsFromBackup,
+  addedIntervalDragChangedSpotIds,
   cancelledIntervalDrag,
   clearedIntervalDragState,
   clearedMaps,
@@ -194,10 +210,11 @@ export const {
   setDrawGeometries,
   setFeatureTypesOff,
   setFreehandFeatureCoords,
+  setFreehandVertexSpacing,
   setGeometryTypesOff,
   setIntervalDragState,
   setIntervalDragTargetSlot,
-  setIsMapMoved,
+  setIsMapExtentFilterActive,
   setIsScaleBarMetric,
   setIsShowOnly1stMeas,
   setIsShowSamplesOn,

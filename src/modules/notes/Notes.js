@@ -12,7 +12,7 @@ import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setLoadingStatus} from '../home/home.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
@@ -21,7 +21,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
-const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
+const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -43,18 +43,24 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
   /* Derived Variables */
 
   const page = PRIMARY_PAGES.find(p => p.key === PAGE_KEYS.NOTES);
+  // When a parent supplies a save ref (the Shortcut Notes modal), it renders the sticky Save button
+  // in its footer and expects the note field to fill the body, so we hide the inline Save button here.
+  const isFillLayout = !!registerSave;
 
   /* Side Effects */
 
   useLayoutEffect(() => {
-    console.log('ULE Notes [templates]', templates);
+    console.log('ULE Notes [templates, selectedSpot]', templates);
     if (!isReadOnly && isEmpty(initialNote) && templates.notes && templates.notes.isInUse
       && !isEmpty(templates.notes.active)) {
       const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
+    else {
+      setInitialNotesValues({note: initialNote});
+    }
     return () => confirmLeavePage();
-  }, [templates]);
+  }, [templates, spot?.properties?.id]);
 
   /* Logic Helpers */
 
@@ -106,7 +112,7 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
   };
@@ -117,17 +123,20 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
       if (zoomToCurrentLocation) await zoomToCurrentLocation();
       else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
+
+  // Expose the save action to a parent-owned sticky footer button (see ShortcutNotesModal).
+  if (registerSave) registerSave.current = () => saveFormAndGo(formRef.current);
 
   /* Render Functions */
 
   const renderCancelSaveButtons = () => {
     return (
       <View>
-        <PageHeader hideBackButton={!isReadOnly} pageTitle={'Notes'}/>
+        <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
         {!isReadOnly && <SaveAndCancelButtons cancel={cancelFormAndGo} save={() => saveFormAndGo(formRef.current)}/>}
       </View>
     );
@@ -169,9 +178,10 @@ const Notes = ({isReadOnly, zoomToCurrentLocation}) => {
           <NoteForm
             formRef={formRef}
             initialNotesValues={initialNotesValues}
+            isFillHeight={isFillLayout}
             isReadOnly={isReadOnly}
           />
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE
+          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && !isFillLayout
             && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
         </>
       )}

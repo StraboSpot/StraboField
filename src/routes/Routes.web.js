@@ -34,8 +34,8 @@ const Routes = () => {
         console.log('Project should be loaded');
         setIsLoading(false);
       }
-      catch (e) {
-        console.error('Error with the auto log in.', e);
+      catch (err) {
+        console.error('Error with the auto log in.', err);
         setAutoLogInFailed(true);
         setIsLoading(false);
       }

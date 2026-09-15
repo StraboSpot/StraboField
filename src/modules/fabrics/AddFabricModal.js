@@ -6,12 +6,11 @@ import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {DEFAULT_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_TYPES} from './fabric.constants';
-import FaultRockFabric from './FaultRockFabric';
-import IgneousRockFabric from './IgneousRockFabric';
-import MetamRockFabric from './MetamRockFabric';
+import IgneousFabric from './IgneousFabric';
+import MetamorphicFabric from './MetamorphicFabric';
+import StructuralFabric from './StructuralFabric';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
@@ -89,7 +88,7 @@ const AddFabricModal = () => {
       if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
     }
   };
 
@@ -108,7 +107,7 @@ const AddFabricModal = () => {
           textStyle={{color: PRIMARY_TEXT_COLOR}}
         />
         {types[selectedTypeIndex] === 'fault_rock' && (
-          <FaultRockFabric
+          <StructuralFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}
@@ -117,7 +116,7 @@ const AddFabricModal = () => {
           />
         )}
         {types[selectedTypeIndex] === 'igneous_rock' && (
-          <IgneousRockFabric
+          <IgneousFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}
@@ -126,7 +125,7 @@ const AddFabricModal = () => {
           />
         )}
         {types[selectedTypeIndex] === 'metamorphic_rock' && (
-          <MetamRockFabric
+          <MetamorphicFabric
             choices={choices}
             formName={formProps.status.formName}
             formProps={formProps}
@@ -144,33 +143,31 @@ const AddFabricModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
-        showActionButton={false}
+        onActionPressed={saveFabric}
+        showActionButton={!choicesViewKey}
         showCancelButton={false}
         showCloseButton
       >
-        <>
-          <FlatList
-            ListHeaderComponent={
-              <View style={{flex: 1}}>
-                <Formik
-                  initialValues={{}}
-                  innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
-                  validateOnChange={false}
-                >
-                  {formProps => (
-                    <View style={{flex: 1}}>
-                      {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
-                    </View>
-                  )}
-                </Formik>
-              </View>
-            }
-            bounces={false}
-          />
-        </>
-        {!choicesViewKey && <ActionButton onPress={saveFabric}/>}
+        <FlatList
+          ListHeaderComponent={
+            <View style={{flex: 1}}>
+              <Formik
+                initialValues={{}}
+                innerRef={formRef}
+                onSubmit={values => console.log('Submitting form...', values)}
+                validate={values => validateForm({formName: formName, values: values})}
+                validateOnChange={false}
+              >
+                {formProps => (
+                  <View style={{flex: 1}}>
+                    {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
+                  </View>
+                )}
+              </Formik>
+            </View>
+          }
+          bounces={false}
+        />
       </ModalWrapper>
     );
   };

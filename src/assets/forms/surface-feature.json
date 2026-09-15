@@ -22,9 +22,26 @@
       "relevant": "${surface_feature_type} = 'other'"
     },
     {
-      "type": "calculate",
-      "name": "__version__",
-      "calculation": "'vqnVekzwerzFjUgy2BLhk2'"
+      "type": "select_one wb5nf41",
+      "name": "surface_feature_quality",
+      "label": "Surface Feature Quality",
+      "hint": "Quality of surface feature? Known, approximate, inferred, concealed, questioned",
+      "required": "false",
+      "appearance": "horizontal"
+    },
+    {
+      "type": "text",
+      "name": "other_surface_feature_quality",
+      "label": "Other Surface Feature Quality",
+      "required": "false",
+      "relevant": "${surface_feature_quality} = 'other'"
+    },
+    {
+      "type": "text",
+      "name": "surface_feature_notes",
+      "label": "Notes",
+      "required": "false",
+      "appearance": "multiline"
     }
   ],
   "choices": [
@@ -37,68 +54,108 @@
       "list_name": "qn1ps78",
       "name": "contiguous_outcrop",
       "label": "contiguous outcrop",
-      "order": "1"
+      "order": 1
     },
     {
       "list_name": "qn1ps78",
       "name": "geologic_structure",
       "label": "geologic structure",
-      "order": "2"
+      "order": 2
     },
     {
       "list_name": "qn1ps78",
       "name": "extent_of_mapping",
       "label": "extent of mapping",
-      "order": "3"
+      "order": 3
     },
     {
       "list_name": "qn1ps78",
       "name": "geomorphic_feature",
       "label": "geomorphic feature",
-      "order": "4"
+      "order": 4
     },
     {
       "list_name": "qn1ps78",
       "name": "anthropogenic_feature",
       "label": "anthropogenic feature",
-      "order": "5"
+      "order": 5
     },
     {
       "list_name": "qn1ps78",
       "name": "extent_of_biological_marker",
       "label": "extent of biological marker",
-      "order": "6"
+      "order": 6
     },
     {
       "list_name": "qn1ps78",
       "name": "subjected_to_similar_process",
       "label": "subjected to similar process",
-      "order": "7"
+      "order": 7
     },
     {
       "list_name": "qn1ps78",
       "name": "gradients",
       "label": "gradients",
-      "order": "8"
+      "order": 8
     },
     {
       "list_name": "qn1ps78",
       "name": "strat_interval",
       "label": "strat interval",
-      "order": "9"
+      "order": 9
     },
     {
       "list_name": "qn1ps78",
       "name": "other",
       "label": "other",
-      "order": "10"
+      "order": 10
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "known",
+      "label": "known",
+      "order": "0"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "approximate",
+      "label": "approximate",
+      "order": "1"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "approximate(?)",
+      "label": "questionable approximate",
+      "order": "2"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "inferred",
+      "label": "inferred",
+      "order": "3"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "inferred(?)",
+      "label": "questionable inferred",
+      "order": "4"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "concealed",
+      "label": "concealed",
+      "order": "5"
+    },
+    {
+      "list_name": "wb5nf41",
+      "name": "other",
+      "label": "other",
+      "order": "7"
     }
   ],
   "settings": [
     {
-      "id_string": "surface_feature",
-      "form_title": "Surface Feature",
-      "version": "2 (2021-09-30 16:28:27)"
+      "id_string": "surface_feature"
     }
   ]
 }

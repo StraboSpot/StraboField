@@ -3,6 +3,7 @@ import React, {useRef} from 'react';
 import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {FormFlatList} from '../../shared/ui';
 import {Form, useForm} from '../form';
 import {updatedProject} from './projects.slice';
 
@@ -32,17 +33,28 @@ const NamingConventions = () => {
 
   /* View */
 
+  // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
-    <Formik
-      enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
-      initialValues={preferences}
-      innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: formName, values: values})}
-      validateOnChange={false}
-    >
-      {formProps => <Form {...{...formProps, formName: formName, onMyChange: onMyChange, setFieldValue: onMyChange}}/>}
-    </Formik>
+    <FormFlatList>
+      <Formik
+        enableReinitialize={true}  // Update values if preferences change while form open, like when number incremented
+        initialValues={preferences}
+        innerRef={formRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: formName, values: values})}
+        validateOnChange={false}
+      >
+        {formProps => (
+          <Form {...{
+            ...formProps,
+            formName: formName,
+            onMyChange: onMyChange,
+            renderInline: true,
+            setFieldValue: onMyChange,
+          }}/>
+        )}
+      </Formik>
+    </FormFlatList>
   );
 };
 

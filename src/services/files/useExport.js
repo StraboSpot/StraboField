@@ -5,8 +5,12 @@ import {zip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES, APP_EXPORT_DIRECTORY} from './directories.constants';
+import {getTagsToBackup, getTemplatesToBackup} from './files.helpers';
 import {addedStatusMessage, clearedStatusMessages, removedLastStatusMessage} from '../../modules/home/home.slice';
-import {PAGE_KEYS} from '../../modules/page/pageKeys.constants';
+import {
+  stripMapboxTokenFromCustomMaps,
+  stripMapboxTokenFromProject,
+} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {setBackupFileName} from '../../modules/project/projects.slice';
 import {hasSpace, isEmpty} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
@@ -22,7 +26,6 @@ const useExport = () => {
   const otherMapsDb = useSelector(state => state.map.customMaps);
   const projectDb = useSelector(state => state.project);
   const spotsDb = useSelector(state => state.spot.spots);
-  const userDb = useSelector(state => state.user);
 
   const {
     copyFiles,
@@ -37,14 +40,13 @@ const useExport = () => {
 
   /* Derived Variables */
 
-  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDb));
-  const userDbCopy = JSON.parse(JSON.stringify(userDb));
-  const configDb = {user: userDbCopy, other_maps: otherMapsDbCopy};
+  const otherMapsDbStripped = stripMapboxTokenFromCustomMaps(otherMapsDb);
+  const otherMapsDbCopy = JSON.parse(JSON.stringify(otherMapsDbStripped));
   let dataForExport = {
     mapNamesDb: mapNamesDb,
     mapTilesDb: {},
-    otherMapsDb: otherMapsDb,
-    projectDb: projectDb,
+    otherMapsDb: otherMapsDbStripped,
+    projectDb: {...projectDb, project: stripMapboxTokenFromProject(projectDb.project)},
     spotsDb: spotsDb,
   };
 
@@ -74,9 +76,9 @@ const useExport = () => {
       const exportData = {
         ...dataForExport,
         mapNamesDb: options.offlineTiles ? mapNamesDb : {},
-        otherMapsDb: options.customMaps ? otherMapsDb : {},
+        otherMapsDb: options.customMaps ? otherMapsDbStripped : {},
       };
-      console.log(exportData);
+      console.log('Export Data:', exportData);
       await saveFile(APP_DIRECTORIES.BACKUP_DIR + filename, exportData, 'data.json');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Saving Project Data'));
@@ -159,12 +161,12 @@ const useExport = () => {
 
   const gatherOtherMapsForDistribution = async (exportedFileName, isBeingExported) => {
     try {
-      console.log(configDb);
+      console.log('Custom Maps to Back Up:', otherMapsDbCopy);
       const deviceDir = isBeingExported ? APP_EXPORT_DIRECTORY : APP_DIRECTORIES.BACKUP_DIR;
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Looking for Custom Maps...'));
-      if (!isEmpty(configDb.other_maps)) {
-        await saveFile(deviceDir + exportedFileName, configDb.other_maps, 'other_maps.json');
+      if (!isEmpty(otherMapsDbCopy)) {
+        await saveFile(deviceDir + exportedFileName, otherMapsDbCopy, 'other_maps.json');
         dispatch(removedLastStatusMessage());
         dispatch(addedStatusMessage('Finished Backing Up Custom Maps.'));
       }
@@ -187,22 +189,22 @@ const useExport = () => {
       // Already in this backup (image files are immutable, named by id) — count it, don't re-copy.
       if (await doesDeviceDirExist(targetPath)) {
         imageSuccess++;
-        console.log(imageSuccess, 'Image already in backup:', image_id);
+        console.log(image_id + ': Image already in backup. Count:', imageSuccess);
         return;
       }
       if (await doesDeviceDirExist(sourcePath)) {
         await copyFiles(sourcePath, targetPath);
         imageSuccess++;
-        console.log(imageSuccess, 'Copied image to backup:', image_id);
+        console.log(image_id + ': Copied image to backup. Count:', imageSuccess);
         return;
       }
       // Source file is gone from the device and it isn't already in the backup.
       imageBackupFailures++;
-      console.log(imageBackupFailures, 'Image missing from device, cannot back up:', image_id);
+      console.log(image_id + ': Image missing from device, cannot back up. Failures:', imageBackupFailures);
     }
     catch (err) {
       imageBackupFailures++;
-      console.log(imageBackupFailures, 'ERROR Copying Image', err.toString(), image_id);
+      console.error(image_id + ': ERROR Copying Image.', err.toString(), 'Failures:', imageBackupFailures);
     }
   };
 
@@ -214,12 +216,7 @@ const useExport = () => {
   /* Exported Functions */
 
   const backupTags = async (backupFileName, isGeologicUnits) => {
-
-    const tagsToBackup = (projectDb.project.tags || []).reduce((acc, tag) => {
-      const {spots, features, ...rest} = tag;
-      return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
-      || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
-    }, []);
+    const tagsToBackup = getTagsToBackup(projectDb.project?.tags, isGeologicUnits);
 
     console.log(isGeologicUnits ? 'Geologic Units' : 'Tags', 'to backup:', tagsToBackup);
 
@@ -252,15 +249,7 @@ const useExport = () => {
   };
 
   const backupTemplates = async (backupFileName) => {
-    const rawTemplates = projectDb.project.templates || {};
-    const templatesToBackup = Object.entries(rawTemplates).reduce((acc, [key, value]) => {
-      if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
-      if (key === 'measurementTemplates') return {...acc, measurementTemplates: value};
-      if (value && typeof value === 'object' && Array.isArray(value.templates)) {
-        return {...acc, [key]: {templates: value.templates}};
-      }
-      return acc;
-    }, {});
+    const templatesToBackup = getTemplatesToBackup(projectDb.project?.templates);
 
     console.log('Templates to backup:', templatesToBackup);
 
@@ -323,7 +312,7 @@ const useExport = () => {
     // const dateAndTime = moment(new Date()).format('YYYY-MM-DD_hmma');
     const source = APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json';
     const destination = APP_EXPORT_DIRECTORY + selectedBackupFile;
-    console.log(selectedBackupFile);
+    console.log('Backup File to Export:', selectedBackupFile);
 
     const dataFile = await readFile(APP_DIRECTORIES.BACKUP_DIR + selectedBackupFile + '/data.json');
     const exportedJSON = JSON.parse(dataFile);
@@ -371,7 +360,7 @@ const useExport = () => {
     }
 
     const deleteTempFolder = await deleteFromDevice(APP_EXPORT_DIRECTORY, selectedBackupFile);
-    console.log('Folder', deleteTempFolder);
+    console.log('Temp export folder deleted:', deleteTempFolder);
     console.log('All Done Exporting');
     dispatch(clearedStatusMessages());
     // throw Error('This is an ERROR YEEHAW');

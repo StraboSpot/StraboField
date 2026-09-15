@@ -15,8 +15,10 @@ export const BLUE_FADED_60 = '#1e90ff99';  // Blue at 60% opacity
 export const GREEN = 'green';
 export const RED = 'red';
 export const WHITE = '#ffffff';
+export const WHITE_FADED_90 = '#ffffffE6'; // 90% opacity
 export const BLACK = 'black';
 export const GOLD = '#FFD700';
+export const ORANGE = 'orange'; // (#ffa500)
 //export const REACT_NATIVE_ELEMENTS_BLUE = '#2089dc';
 
 export const PRIMARY_BACKGROUND_COLOR = LIGHTGREY;
@@ -34,7 +36,6 @@ export const POSITIVE_COLOR = GREEN;
 export const NEGATIVE_COLOR = RED;
 export const NEUTRAL_COLOR = PRIMARY_ACCENT_COLOR;
 export const WARNING_COLOR = RED;
-
 
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 
@@ -61,6 +62,12 @@ export const MODAL_BACKDROP = 'rgba(0, 0, 0, 0.5)';
 export const MAIN_MENU_WIDTH = 300;
 export const NOTEBOOK_WIDTH = 400;
 
-export const SMALL_SCREEN = width < 600;
+export const MAX_CONTENT_WIDTH = 400;   // Width past which content is no longer stretched to fill its container
+
+export const SMALL_SCREEN_WIDTH = 600;
+export const SMALL_SCREEN = width < SMALL_SCREEN_WIDTH;
 export const MEDIUM_SCREEN = (width >= 600 && width < 840) || (height >= 480 && height < 900);
 export const LARGE_SCREEN = width > 840 || height > 900;
+
+export const SAMPLES_COLOR = GOLD;
+export const SAMPLES_BORDER_WIDTH = 7.5;

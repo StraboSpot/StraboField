@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 
 import {Icon, Input, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {CUSTOM_MAP_TYPES} from './customMaps.constants';
+import {normalizeCustomMapId} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/helpers';
+import {isEmpty, openUrl} from '../../../shared/helpers';
 import {BLUE, DARKGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {SwitchWrapper} from '../../../shared/ui';
 import alert from '../../../shared/ui/alert';
@@ -23,7 +25,6 @@ import {formStyles} from '../../form';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
-import {CUSTOM_MAP_TYPES} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
 
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
@@ -33,7 +34,6 @@ const CustomMapDetails = () => {
 
   const dispatch = useDispatch();
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
-  const MBAccessToken = useSelector(state => state.user.mapboxToken);
 
   const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
 
@@ -56,7 +56,6 @@ const CustomMapDetails = () => {
         overlay: false,
         id: '',
         source: '',
-        key: MBAccessToken,
       });
     }
   }, [customMapToEdit]);
@@ -67,6 +66,16 @@ const CustomMapDetails = () => {
     setIsLoadingModalVisible(false);
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MAPS.CUSTOM}));
+  };
+
+  const handleUrlPress = async (url) => {
+    try {
+      await openUrl(url);
+    }
+    catch (err) {
+      console.error('Error opening custom map url', url, err);
+      alert('Unable to Open Link', `Could not open ${url} in a browser.`);
+    }
   };
 
   /* Logic Helpers */
@@ -95,15 +104,20 @@ const CustomMapDetails = () => {
       setIsLoadingModalVisible(true);
       setIsLoading(true);
       if (!isEmpty(customMapToEdit)) {
+        const isIdChanged = normalizeCustomMapId(editableCustomMapData.id, editableCustomMapData.source)
+          !== customMapToEdit.id;
         setTitle('Updating Custom Map');
         setMessage(`Updating Existing Map...\n\n${customMapToEdit.title}`);
-        updateMap(editableCustomMapData);
+        // A new id has to go through saveCustomMap so it gets validated and the map (and its cached tiles) move to
+        // the new key. Everything else stays on updateMap, which needs no network.
+        if (isIdChanged) await saveCustomMap(editableCustomMapData, customMapToEdit.id);
+        else updateMap(editableCustomMapData);
       }
       else {
         setTitle('Saving Custom Map');
         setMessage(`Saving New Map...\n\n${editableCustomMapData.title}`);
         const customMap = await saveCustomMap(editableCustomMapData);
-        console.log(customMap);
+        console.log('Saved Custom Map:', customMap);
       }
       setMessage('Success!');
       setIsLoading(false);
@@ -137,17 +151,18 @@ const CustomMapDetails = () => {
   };
 
   const renderMapDetails = () => {
+    const mapUrl = customMapToEdit?.url?.[0];
     return (
       <>
         <SectionDivider dividerText={'Map Details'}/>
         <View>
           {editableCustomMapData?.source === 'mapbox_styles' && (
             <Input
-              containerStyle={{paddingHorizontal: 0}}
+              containerStyle={{paddingHorizontal: 10}}
               errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.id) && 'Style URL is required'}
               errorStyle={customMapStyles.requiredMessage}
               inputContainerStyle={{borderBottomWidth: 0}}
-              inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+              inputStyle={formStyles.fieldValue}
               keyboardType={urlKeyboardType}
               onChangeText={text => setEditableCustomMapData(e => ({...e, id: text}))}
               placeholder={'Style URL'}
@@ -157,11 +172,11 @@ const CustomMapDetails = () => {
           )}
           {editableCustomMapData?.source === 'strabospot_mymaps' && (
             <Input
-              containerStyle={{paddingHorizontal: 0}}
+              containerStyle={{paddingHorizontal: 10}}
               errorMessage={editableCustomMapData && isEmpty(editableCustomMapData.id) && 'Map ID is required'}
               errorStyle={customMapStyles.requiredMessage}
               inputContainerStyle={{borderBottomWidth: 0}}
-              inputStyle={{...formStyles.fieldValue, backgroundColor: 'white'}}
+              inputStyle={formStyles.fieldValue}
               onChangeText={text => setEditableCustomMapData(e => ({...e, id: text}))}
               placeholder={'Strabo My Maps ID'}
               placeholderTextColor={MEDIUMGREY}
@@ -169,9 +184,14 @@ const CustomMapDetails = () => {
             />
           )}
         </View>
-        {!isEmpty(customMapToEdit) && <View style={customMapStyles.mapTypeInfoContainer}>
+        {!isEmpty(mapUrl) && <View style={customMapStyles.mapTypeInfoContainer}>
           <Text style={customMapStyles.mapTypeInfoText}>Map available from:</Text>
-          <Text style={customMapStyles.mapTypeInfoText}>{customMapToEdit?.url[0]}</Text>
+          <Text
+            onPress={() => handleUrlPress(mapUrl)}
+            style={[customMapStyles.mapTypeInfoText, customMapStyles.mapUrlLink]}
+          >
+            {mapUrl}
+          </Text>
         </View>}
       </>
     );
@@ -186,12 +206,12 @@ const CustomMapDetails = () => {
           file from Mapwarper.net and upload it into your Strabo MyMaps account.
         </Text>
       </View>
-      <FlatList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        data={CUSTOM_MAP_TYPES}
-        keyExtractor={item => item.source}
-        renderItem={({item, index}) => renderCustomMapName(item, index)}
-      />
+      {CUSTOM_MAP_TYPES.map((item, index) => (
+        <React.Fragment key={item.source}>
+          {index > 0 && <FlatListItemSeparator/>}
+          {renderCustomMapName(item, index)}
+        </React.Fragment>
+      ))}
       {editableCustomMapData?.source === ''
         && <Text style={customMapStyles.requiredMessage}>Map type is required</Text>}
     </View>
@@ -204,7 +224,6 @@ const CustomMapDetails = () => {
         <View style={{padding: 10}}>
           <Text style={customMapStyles.mapOverviewText}>Type: {customMapToEdit.title}</Text>
           {/*<Text style={customMapStyles.mapOverviewText}>Source: {customMapToEdit?.url[0]}</Text>*/}
-          <Text style={customMapStyles.mapOverviewText}>Id: {customMapToEdit.id}</Text>
         </View>
       </View>
     );
@@ -287,23 +306,30 @@ const CustomMapDetails = () => {
     <>
       <View style={{flex: 1}}>
         {renderSidePanelHeader()}
-        {renderTitle()}
-        {renderOverlaySection()}
-        {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {isEmpty(customMapToEdit)
-          && (editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps={'handled'}
+          style={{flex: 1}}
+        >
+          {renderTitle()}
+          {renderOverlaySection()}
+          {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
+          {(editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
             || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        </ScrollView>
         <View style={customMapStyles.bottomButtonsContainer}>
-          <ActionButton
-            disabled={editableCustomMapData && (isEmpty(editableCustomMapData.title)
-              || isEmpty(editableCustomMapData.id) || editableCustomMapData.source === 'map_warper')}
-            onPress={saveMap}
-            title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-          />
-          <DeleteButton
-            onPress={confirmDeleteMap}
-            title={'Delete Map'}
-          />
+          <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View>
+              {!isEmpty(customMapToEdit) && <DeleteButton onPress={confirmDeleteMap}/>}
+            </View>
+            <ActionButton
+              disabled={editableCustomMapData
+                && (isEmpty(editableCustomMapData.title) || isEmpty(editableCustomMapData.id)
+                  || editableCustomMapData.source === 'map_warper')}
+              onPress={saveMap}
+              title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+            />
+          </View>
         </View>
       </View>
 

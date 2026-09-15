@@ -1,7 +1,7 @@
 import React, {forwardRef, useEffect, useMemo, useState} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import {
   CustomOverlayLayers,
@@ -12,11 +12,10 @@ import {
   MacrostratMarkerLayer,
   MeasureLayers,
 } from '.';
-import {setIsMapMoved} from '../maps.slice';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
 import StratSectionBackground from '../strat-section/StratSectionBackground';
-import useMapView from '../useMapView';
+import useMapView from '../view/useMapView';
 
 const MapLayers = ({
                      basemap,
@@ -29,11 +28,10 @@ const MapLayers = ({
                      showUserLocation,
                      spotsNotSelected,
                      spotsSelected,
-                   }, cameraRef) => {
+                   }, cameraRefCallback) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
-  const {currentImageBasemap, isDragIntervalMode, isMapMoved, stratSection} = useSelector(state => state.map);
+  const {currentImageBasemap, isDragIntervalMode, stratSection} = useSelector(state => state.map);
 
   const {getInitialViewState} = useMapView();
 
@@ -53,7 +51,6 @@ const MapLayers = ({
 
   useEffect(() => {
       // console.log('UE Basemap');
-      if (!isMapMoved) dispatch(setIsMapMoved(true));
       const {longitude, latitude, zoom} = getInitialViewState();
       console.log('Got initial center [' + longitude + ', ' + latitude + '] and zoom', zoom);
       setInitialCenter([longitude, latitude]);
@@ -79,7 +76,7 @@ const MapLayers = ({
         centerCoordinate={initialCenter}
         // followUserLocation={true}   // Can't follow user location if wanting to zoom to extent of Spots
         // followUserMode='normal'
-        ref={cameraRef}
+        ref={cameraRefCallback}
         zoomLevel={initialZoom}
       />
 

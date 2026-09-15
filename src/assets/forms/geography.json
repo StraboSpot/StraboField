@@ -25,7 +25,7 @@
     {
       "type": "decimal",
       "name": "spot_radius",
-      "label": "Radius of Spot (m)",
+      "label": "Radius (m)",
       "required": "false"
     },
     {

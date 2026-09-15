@@ -5,16 +5,11 @@ import * as themes from '../../../shared/styles.constants';
 const igsnStyles = StyleSheet.create({
   IGSNLogo: {
     height: 20,
-    marginRight: 10,
     width: 20,
   },
   IGSNLogoSmall: {
     height: 20,
     width: 20,
-  },
-  logoDisplayContainer: {
-    borderRadius: 10,
-    marginRight: 20,
   },
   mySesarUpdateDisclaimer: {
     fontSize: themes.MEDIUM_TEXT_SIZE,

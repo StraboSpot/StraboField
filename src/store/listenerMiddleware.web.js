@@ -2,6 +2,8 @@ import {createListenerMiddleware, isAnyOf} from '@reduxjs/toolkit';
 import * as turf from '@turf/turf';
 import {Toast} from 'react-native-toast-notifications';
 
+import {PROJECT_SAVE_STATUS} from '../modules/connections/connections.constants';
+import {setProjectSaveStatus} from '../modules/connections/connections.slice';
 import {cancelledIntervalDrag, savedIntervalDragReordering} from '../modules/maps/maps.slice';
 import {
   addedCustomFeatureTypes,
@@ -29,7 +31,7 @@ import {
   updateProject,
   uploadProjectDatasetDeleteSpot,
   uploadProjectDatasetsSpots,
-} from '../services/network/serverAPI';
+} from '../services/network/serverRequests.web';
 import {isEmpty} from '../shared/helpers';
 
 // Spot IDs modified during drag interval mode — flushed to server when mode ends
@@ -101,11 +103,17 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
   }
 };
 
-// Update project on server DB
+// Update project on server DB.
+// A modal is painted over the toast layer, so the toasts below are invisible to a save dispatched from
+// inside one. The outcome is therefore also published as `projectSaveStatus` for those callers to report
+// in place. The toasts still fire regardless — this listener can't tell who dispatched, and non-modal
+// callers need them.
 const updateProjectListener = async (action, listenerApi) => {
   Toast.hideAll();
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Updated Project:', action.payload);
+
+  listenerApi.dispatch(setProjectSaveStatus(PROJECT_SAVE_STATUS.SAVING));
 
   const newState = listenerApi.getState();
   console.log('New State:', newState);
@@ -117,9 +125,11 @@ const updateProjectListener = async (action, listenerApi) => {
     const resJSON = await updateProject(project, encodedLogin);
     console.log('updateProject resJSON', resJSON);
 
+    listenerApi.dispatch(setProjectSaveStatus(PROJECT_SAVE_STATUS.SAVED));
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }
   catch (err) {
+    listenerApi.dispatch(setProjectSaveStatus(PROJECT_SAVE_STATUS.ERROR));
     alertAuthenticationError();
   }
 };

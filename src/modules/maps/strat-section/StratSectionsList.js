@@ -72,7 +72,7 @@ const StratSectionsList = ({closeManMenuPanel}) => {
     <View style={{flex: 1}}>
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={<ListEmptyText text={'No Strat Sections in Visible Datasets'}/>}
+        ListEmptyComponent={<ListEmptyText text={'No Strat Sections in Active Datasets'}/>}
         data={spotsWithStratSection}
         keyExtractor={spot => spot.properties.id.toString()}
         renderItem={({item}) => renderStratSectionItem(item)}

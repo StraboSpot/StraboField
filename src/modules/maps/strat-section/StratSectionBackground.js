@@ -7,7 +7,7 @@ import XAxes from './XAxes';
 import YAxis from './YAxis';
 import {getLocalImageURI} from '../../images/imageURIs.helpers';
 import {useSpots} from '../../spots';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const StratSectionBackground = () => {
   console.log('Rendering StratSectionBackground...');
@@ -34,13 +34,14 @@ const StratSectionBackground = () => {
       // coordQuad = [topLeft, topRight, bottomRight, bottomLeft];
       const coordQuad = getCoordQuad(imageCopy, {x: oI.image_origin_x, y: oI.image_origin_y});
       console.log('Image Overlay coordQuad', coordQuad);
+      // Versioned through the key, not the url — Mapbox reads a file:// url as a path, query and all
       const url = getLocalImageURI(image.id);
       return (
         <StratSectionImageOverlay
           coordQuad={coordQuad}
           id={oI.id}
           imageOpacity={oI.image_opacity}
-          key={'imageOverlay' + oI.id}
+          key={'imageOverlay' + oI.id + (image.modified_timestamp || '')}
           url={url}
         />
       );

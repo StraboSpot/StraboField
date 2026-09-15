@@ -8,6 +8,7 @@ export const MAP_SYMBOLS = {
   'bedding_vertical': require('../../../assets/symbols/bedding_vertical.png'),
   'contact_inclined': require('../../../assets/symbols/contact_inclined.png'),
   'contact_vertical': require('../../../assets/symbols/contact_vertical.png'),
+  'dike': require('../../../assets/symbols/dike.png'),
   'fault': require('../../../assets/symbols/fault.png'),
   'foliation_horizontal': require('../../../assets/symbols/foliation_horizontal.png'),
   'foliation_inclined': require('../../../assets/symbols/foliation_general_inclined.png'),

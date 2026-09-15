@@ -14,11 +14,11 @@ import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import UrlLinkButton from '../../shared/ui/buttons/UrlLinkButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
-import UrlLinkButton from '../help/UrlLinkButton';
 
 const MicroProjectsList = () => {
   /* Data Hooks */

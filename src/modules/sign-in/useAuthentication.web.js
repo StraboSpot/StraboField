@@ -28,8 +28,15 @@ const useAuthentication = () => {
       const credentials = atob(encodedLogin);
       const email = credentials.split(':')[0];
       const password = credentials.split(':')[1];
-      await doAuthenticateUser(email, password);
-      console.log('Passed Authentication Check');
+      try {
+        await doAuthenticateUser(email, password);
+        console.log('Passed Authentication Check');
+      }
+      catch (err) {
+        // doAuthenticateUser has already logged the failure and dispatched logout. Swallow it here so the timer
+        // below still restarts - otherwise one failed check ends the re-authentication loop for good.
+        console.error('Authentication check failed.', err);
+      }
     }
     checkAuthenticationRestartTimer();
   };
@@ -56,7 +63,7 @@ const useAuthentication = () => {
     catch (err) {
       console.error('Authentication Error. Logging Out\n', err);
       dispatch(logout());
-      throw Error;
+      throw err;
     }
   };
 };

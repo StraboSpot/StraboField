@@ -13,7 +13,7 @@ const DeleteButton = ({disabled, onPress, title}) => {
       icon={{
         color: disabled ? MEDIUMGREY : WARNING_COLOR,
         name: 'trash-outline',
-        size: 20,
+        size: 25,
         type: 'ionicon',
       }}
       iconContainerStyle={{paddingRight: 5}}

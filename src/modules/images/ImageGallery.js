@@ -14,12 +14,12 @@ import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
-import SpotFilters from '../spots/SpotFilters';
+import SpotQuery from '../spots/SpotQuery';
 
 const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];
 
-const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
+const ImageGallery = ({openSpotInNotebook}) => {
   console.log('Rendering ImageGallery...');
 
   /* Data Hooks */
@@ -32,25 +32,15 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
-
   const activeSpotsObj = useMemo(() => getActiveSpotsObj(), [getActiveSpotsObj]);
   const activeSpots = useMemo(() => Object.values(activeSpotsObj), [activeSpotsObj]);
 
-  const [spotsSearched, setSpotsSearched] = useState(activeSpots);
+  const [scopeText, setScopeText] = useState('');
   const [spotsSorted, setSpotsSorted] = useState(activeSpots);
-  const [textNoSpots, setTextNoSpots] = useState('No Spots in Visible Datasets');
   const [visibleSectionCount, setVisibleSectionCount] = useState(SECTIONS_PER_PAGE);
 
-  const resetAndSetIsReverseSort = useCallback((val) => {
-    setVisibleSectionCount(SECTIONS_PER_PAGE);
-    setIsReverseSort(val);
-  }, []);
-
-  const resetAndSetSpotsSearched = useCallback((val) => {
-    setVisibleSectionCount(SECTIONS_PER_PAGE);
-    setSpotsSearched(val);
-  }, []);
+  const scopeSuffix = scopeText ? ` ${scopeText}` : '';
+  const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
   const resetAndSetSpotsSorted = useCallback((val) => {
     setVisibleSectionCount(SECTIONS_PER_PAGE);
@@ -94,13 +84,14 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
   const renderSectionHeader = ({spot}) => {
     return (
       <SectionDividerWithRightButton
-        buttonTitle={'View In Spot'}
+        buttonTitle={spot.properties?.isSample ? 'View in Sample' : 'View In Spot'}
         dividerText={spot.properties.name}
         onPress={() => openSpotInNotebook(spot, PAGE_KEYS.IMAGES)}
       />
     );
   };
 
+  /* View */
   const renderSpotsWithImages = () => {
     const spotsWithImages = JSON.parse(JSON.stringify(spotsSorted.filter(spot => !isEmpty(spot.properties.images))));
     sortedSpotsWithImages = spotsWithImages.map((spot) => {
@@ -109,7 +100,6 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
           .localeCompare(imgB?.title?.toString() || 'UntitledB'));  // alphabetize by name
       return {...spot, properties: {...spot.properties, images: sortedImages}};
     });
-    if (isReverseSort) sortedSpotsWithImages = sortedSpotsWithImages.reverse();
     let count = 0;
     const allSpotsAsSections = sortedSpotsWithImages.reduce((acc, spot) => {
       count += spot.properties.images.length;
@@ -119,35 +109,34 @@ const ImageGallery = ({openSpotInNotebook, updateSpotsInMapExtent}) => {
 
     return (
       <>
-        <SpotFilters
+        <SpotQuery
           activeSpots={activeSpots}
-          setIsReverseSort={resetAndSetIsReverseSort}
-          setSpotsSearched={resetAndSetSpotsSearched}
+          isImagesSearch={true}
+          setScopeText={setScopeText}
           setSpotsSorted={resetAndSetSpotsSorted}
-          setTextNoSpots={setTextNoSpots}
-          spotsSearched={spotsSearched}
-          updateSpotsInMapExtent={updateSpotsInMapExtent}
         />
-        <View style={imageStyles.galleryImageContainer}>
-          <LittleSpacer/>
-          <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-            Found {count + (count === 1 ? ' image' : ' images')} in visible Spots
-          </Text>
-          <LittleSpacer/>
-          <SectionList
-            ListEmptyComponent={<ListEmptyText text={textNoSpots + ' with images found'}/>}
-            keyExtractor={(item, index) => item + index}
-            onEndReached={loadMoreSections}
-            onEndReachedThreshold={0.5}
-            renderItem={({item, section}) => renderImagesInSpot(item, section)}
-            renderSectionHeader={({section}) => renderSectionHeader(section)}
-            sections={spotsAsSections}
-            stickySectionHeadersEnabled={true}
-          />
-        </View>
+        {isEmpty(spotsAsSections) ? <ListEmptyText text={`No Images${scopeSuffix}`}/> : (
+          <View style={imageStyles.galleryImageContainer}>
+            <LittleSpacer/>
+            <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
+              {filterPrefix}{count + (count === 1 ? ' Image' : ' Images')}{scopeSuffix}
+            </Text>
+            <LittleSpacer/>
+            <SectionList
+              keyExtractor={(item, index) => item + index}
+              onEndReached={loadMoreSections}
+              onEndReachedThreshold={0.5}
+              renderItem={({item, section}) => renderImagesInSpot(item, section)}
+              renderSectionHeader={({section}) => renderSectionHeader(section)}
+              sections={spotsAsSections}
+              stickySectionHeadersEnabled={true}
+            />
+          </View>
+        )}
       </>
     );
   };
+
 
   /* View */
 

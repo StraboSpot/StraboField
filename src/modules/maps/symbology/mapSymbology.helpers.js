@@ -56,8 +56,8 @@ export const getIconImage = () => {
                   ['all',
                     ['has', 'feature_type', ['get', 'orientation']],
                     ['any',
-                      ['==', ['var', 'feature_type'], 'fault'], ['==', ['var', 'feature_type'], 'fracture'],
-                      ['==', ['var', 'feature_type'], 'vein'],
+                      ['==', ['var', 'feature_type'], 'dike'], ['==', ['var', 'feature_type'], 'fault'],
+                      ['==', ['var', 'feature_type'], 'fracture'], ['==', ['var', 'feature_type'], 'vein'],
                     ],
                   ], ['get', 'feature_type', ['get', 'orientation']],
                   ['case',
@@ -108,6 +108,19 @@ export const getLabel = (labelTypeOn) => {
         ],
       ],
       '',
+    ];
+  }
+  else if (labelTypeOn === 'dipOrName') {
+    return [
+      'case', ['has', 'orientation'],
+      ['case',
+        ['has', 'plunge', ['get', 'orientation']], ['get', 'plunge', ['get', 'orientation']],
+        ['case',
+          ['has', 'dip', ['get', 'orientation']], ['get', 'dip', ['get', 'orientation']],
+          ['get', 'name'],
+        ],
+      ],
+      ['get', 'name'],
     ];
   }
   else return '';

@@ -9,7 +9,7 @@ import {roundToDecimalPlaces} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import PageHeader from '../page/PageHeader';
 
-const TernaryPage = () => {
+const TernaryPage = ({page}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -47,7 +47,7 @@ const TernaryPage = () => {
 
   return (
     <>
-      <PageHeader pageTitle={'Ternary'}/>
+      <PageHeader pageTitle={page.label}/>
       {!((ternary.q > 0 && ternary.a > 0 && ternary.p > 0)
           || (ternary.a > 0 && ternary.p > 0 && ternary.f > 0)
           || (ternary.ol > 0 && ternary.opx > 0 && ternary.cpx > 0)

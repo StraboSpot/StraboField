@@ -254,8 +254,8 @@ const MeasurementDetail = ({
       deleteMeasurements([selectedMeasurement]);
       closeDetailView();
     }
-    catch (e) {
-      console.log('Unable to delete measurement.');
+    catch (err) {
+      console.error('Unable to delete measurement.');
     }
   };
 
@@ -314,8 +314,8 @@ const MeasurementDetail = ({
       if (Platform.OS !== 'web') toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
     }
-    catch (e) {
-      console.log('Error submitting form.', e);
+    catch (err) {
+      console.error('Error submitting form.', err);
       return Promise.reject();
     }
   };
@@ -325,8 +325,8 @@ const MeasurementDetail = ({
       setIsAddingAssociatedMeasurementAfterSave(true);
       await saveForm(formRef.current);
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 
@@ -335,8 +335,8 @@ const MeasurementDetail = ({
       await saveForm(formRef.current);
       closeDetailView();
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 
@@ -345,8 +345,8 @@ const MeasurementDetail = ({
       await saveForm(formRef.current);
       switchSelectedMeasurement(measurement);
     }
-    catch (e) {
-      console.log('Error saving form data to Spot');
+    catch (err) {
+      console.error('Error saving form data to Spot');
     }
   };
 

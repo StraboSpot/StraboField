@@ -12,6 +12,7 @@ const imageStyles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
   },
   cardContainer: {
@@ -25,6 +26,18 @@ const imageStyles = StyleSheet.create({
     justifyContent: 'center',
     margin: 0,
     padding: 0,
+  },
+  cardOverlayIcon: {
+    backgroundColor: themes.WHITE_FADED_90,
+    borderColor: themes.MEDIUMGREY,
+    borderRadius: 10,
+    borderWidth: 2,
+    bottom: 2,
+    padding: 4,
+    position: 'absolute',
+  },
+  cardOverlayIconsContainer: {
+    position: 'relative',
   },
   cardTitle: {
     fontSize: MEDIUM_TEXT_SIZE,
@@ -73,7 +86,18 @@ const imageStyles = StyleSheet.create({
     width: '48%',
   },
   imageModalButtons: {
-    marginTop: 20,
+    marginTop: 10,
+  },
+  imageModalIconBox: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: themes.WHITE,
+    borderColor: themes.MEDIUMGREY,
+    borderRadius: 8,
+    borderWidth: 2,
+    justifyContent: 'center',
+    marginTop: 10,
+    padding: 2,
   },
   imagesListContainer: {
     flex: 1,
@@ -87,7 +111,7 @@ const imageStyles = StyleSheet.create({
     flex: 1,
   },
   rightsideIcons: {
-    bottom: 50,
+    bottom: 20,
     position: 'absolute',
     right: 10,
   },

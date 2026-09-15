@@ -15,14 +15,12 @@ import {
   MEASUREMENT_KEYS,
   MEASUREMENT_TYPES,
   PLANAR_COMPASS_FIELDS,
-  TOAST_OPTIONS,
 } from './measurements.constants';
 import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui/';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import Compass from '../compass/Compass';
@@ -31,23 +29,25 @@ import compassStyles from '../compass/compass.styles';
 import {Form, useForm} from '../form';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
+import {setUserData} from '../user/userProfile.slice';
 
 const AddMeasurementModal = ({onPress}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+  const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
+  const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
   const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
@@ -61,7 +61,6 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
-  const [isManualMeasurement, setIsManualMeasurement] = useState(Platform.OS === 'web');
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -74,19 +73,31 @@ const AddMeasurementModal = ({onPress}) => {
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
+  // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
+  // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
+  // sync, defaulting to Compass while it is unset.
+  const isManualMeasurement = Platform.OS === 'web' || (defaultManualMeasurement ?? false);
+  const setIsManualMeasurement = value => dispatch(setUserData({default_manual_measurement: value}));
+
   /* Side Effects */
 
   useEffect(() => {
     console.log('UE AddMeasurementModal []');
-    if (!SMALL_SCREEN && Platform.OS !== 'web') {
-      lockToPortrait();
-      toast.show('Screen orientation LOCKED', {...TOAST_OPTIONS, type: 'lock'});
-    }
     return () => {
       dispatch(setModalValues({}));
       if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
     };
   }, []);
+
+  // The compass reads correctly in any hold now (trend/plunge follows the edge that's up as held, strike/dip
+  // never depended on orientation), so instead of forcing portrait we lock to whatever orientation the user
+  // opened it in — the screen then stays put while they move/tilt the tablet to take the reading. Manual
+  // entry needs no lock. Phones (SMALL_SCREEN) stay portrait app-wide.
+  useEffect(() => {
+    if (SMALL_SCREEN || Platform.OS === 'web') return;
+    if (isManualMeasurement) unlockOrientation();
+    else lockToCurrentOrientation();
+  }, [isManualMeasurement]);
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
@@ -278,7 +289,7 @@ const AddMeasurementModal = ({onPress}) => {
       SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
     }
     catch (err) {
-      console.log('Error submitting form', err);
+      console.error('Error submitting form', err);
     }
   };
 
@@ -406,9 +417,10 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
-        showActionButton={false}
+        showActionButton={!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement}
         showCancelButton={false}
         showCloseButton
       >
@@ -432,9 +444,6 @@ const AddMeasurementModal = ({onPress}) => {
               bounces={false}
               listKey={'form'}
             />
-          )}
-          {!choicesViewKey && !assocChoicesViewKey && !isShowTemplates && isManualMeasurement && (
-            <ActionButton onPress={saveMeasurement}/>
           )}
         </>
       </ModalWrapper>

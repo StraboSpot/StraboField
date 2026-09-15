@@ -1,0 +1,3 @@
+• Compass: New enlarged mode with redesigned controls, plus a toggle between the classic and updated compass faces.
+• Backup & Sync: More reliable project uploads and a simpler upload screen.
+• Samples: IGSN registration now flags missing required fields inline, and uses the Spot's date when no collection date is set.

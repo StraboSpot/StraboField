@@ -1,0 +1,8 @@
+StraboField 2.31.1
+
+• Compass: Smoother, more accurate compass
+• Samples & IGSN: IGSN required fields; Sample dates
+• Maps: Import progress
+• Backup & uploads: Simpler uploads
+
+Thanks for using StraboSpot!

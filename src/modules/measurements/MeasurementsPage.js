@@ -152,8 +152,15 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   };
 
   const deleteMeasurementsCont = (measurementsToDelete) => {
-    deleteMeasurements(measurementsToDelete);
-    onSelectingCancel();
+    try {
+      deleteMeasurements(measurementsToDelete);
+      onSelectingCancel();
+    }
+    catch (err) {
+      // deleteMeasurements alerts the user and deletes nothing when a feature has associated features. Keep the
+      // selection as it is so they can adjust it and try again.
+      console.error('Unable to delete measurements.', err);
+    }
   };
 
   const editMeasurement = (measurements) => {
@@ -262,13 +269,17 @@ const MeasurementsPage = ({isReadOnly, page}) => {
       <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item, section}) => (
-          <MeasurementItem
-            item={item}
-            onPress={() => onMeasurementPressed(item, section.title)}
-            selectedIds={getIdsOfSelected()}
-          />
-        )}
+        renderItem={({item, section}) => {
+          const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
+          return (
+            <MeasurementItem
+              isSelectMode={multiSelectMode === sectionType}
+              item={item}
+              onPress={() => onMeasurementPressed(item, section.title)}
+              selectedIds={getIdsOfSelected()}
+            />
+          );
+        }}
         renderSectionFooter={({section}) => {
           const sectionType = Object.keys(SECTIONS).find(k => SECTIONS[k].title === section.title);
           return (

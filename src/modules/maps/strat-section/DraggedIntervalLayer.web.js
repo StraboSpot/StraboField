@@ -4,9 +4,10 @@ import * as turf from '@turf/turf';
 import {Layer, Source} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
+import {ORANGE} from '../../../shared/styles.constants';
 import {convertImagePixelsToLatLong} from '../maps.helpers';
 
-const FILL_PAINT = {'fill-color': 'orange', 'fill-opacity': 0.7};
+const FILL_PAINT = {'fill-color': ORANGE, 'fill-opacity': 0.7};
 const BORDER_PAINT = {'line-color': 'white', 'line-width': 3};
 
 const DraggedIntervalLayer = () => {

@@ -1,5 +1,3 @@
-import alert from '../../shared/ui/alert';
-
 export const getBasicLithologyIndex = (lithology) => {
   if (lithology.primary_lithology === 'organic_coal') return 1;
   else if (lithology.mud_silt_grain_size) return 2;
@@ -36,8 +34,6 @@ export const onSedFormChange = (formCurrent, name, value) => {
   }
   formCurrent.setFieldValue(name, value);
 };
-
-export const showFieldInfo = (label, info) => alert(label, info);
 
 export const validateImageOverlay = (values) => {
   let errors = {};

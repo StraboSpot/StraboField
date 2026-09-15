@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {Linking, ScrollView, Text, View} from 'react-native';
 
 import {Card} from '@rn-vui/base';
+import {useSelector} from 'react-redux';
 
 import macrostratOverlayStyles from './macrostratOverlay.styles';
 import useServerRequests from '../../../services/network/useServerRequests';
@@ -10,6 +11,7 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import CloseButton from '../../../shared/ui/buttons/CloseButton';
+import {getUtmDisplayString} from '../maps.helpers';
 
 const MacrostratOverlay = ({
                              isVisible,
@@ -17,6 +19,8 @@ const MacrostratOverlay = ({
                              location,
                            }) => {
   /* Data Hooks */
+
+  const isUtmDisplay = useSelector(state => state.user.is_utm_display);
 
   const {getMacrostratData} = useServerRequests();
 
@@ -174,7 +178,8 @@ const MacrostratOverlay = ({
           <Card.Title>{isEmpty(dataObject.name) ? 'Unnamed' : dataObject.name}</Card.Title>
           {location.coords && (
             <Text style={macrostratOverlayStyles.coordsText}>
-              Lat: {location.coords[1].toFixed(4)}, Lng: {location.coords[0].toFixed(4)}
+              {isUtmDisplay ? getUtmDisplayString(location.coords)
+                : `Lat: ${location.coords[1].toFixed(4)}, Lng: ${location.coords[0].toFixed(4)}`}
             </Text>
           )}
           {renderContent()}

@@ -11,8 +11,8 @@ const files = [
     label: 'userGuide',
     name: 'User Guide',
     icon: 'book-outline',
-    file: Platform.OS === 'ios' ? require('../../../assets/documents/StraboField_User_Manual.pdf')
-      : {uri: 'bundle-assets://StraboField_User_Manual.pdf'},
+    file: Platform.OS === 'ios' ? require('../../../assets/documents/StraboField_Manual_compressed.pdf')
+      : {uri: 'bundle-assets://StraboField_Manual_compressed.pdf'},
   },
   {
     id: 2,

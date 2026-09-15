@@ -11,7 +11,7 @@ import {DateInputField, NumberInputField} from '../form';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 
-const Metadata = ({isReadOnly}) => {
+const Metadata = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -125,7 +125,7 @@ const Metadata = ({isReadOnly}) => {
     <FlatList
       ListHeaderComponent={
         <>
-          <PageHeader pageTitle={'Metadata'}/>
+          <PageHeader pageTitle={page.label}/>
           {renderMetadataForm()}
           {renderDatasets()}
         </>

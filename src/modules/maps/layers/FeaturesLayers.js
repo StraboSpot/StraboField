@@ -6,13 +6,13 @@ import {useSelector} from 'react-redux';
 import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from './index';
 import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
+import useMapFeatures from '../features/useMapFeatures';
 import {MAP_MODES} from '../maps.constants';
+import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
+import {getUniqFeatures} from './layers.helpers';
 import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from '../symbology/mapSymbology.constants';
 import useMapSymbology from '../symbology/useMapSymbology';
-import useMapFeatures from '../useMapFeatures';
-import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
-import {getUniqFeatures} from './layers.helpers';
 
 const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   /* Data Hooks */

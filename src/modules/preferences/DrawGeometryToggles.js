@@ -5,7 +5,8 @@ import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import drawGeometryTogglesStyles from './drawGeometryToggles.styles';
-import {DEFAULT_GEOMETRIES, POINT_BUTTONS_TEXT, SHARP_CURVED_BUTTONS_TEXT} from './preferences.constants';
+import FreehandVertexSpacing from './FreehandVertexSpacing';
+import {DEFAULT_GEOMETRIES, POINT_BUTTONS_TEXT, TAP_FREEHAND_BUTTONS_TEXT} from './preferences.constants';
 import commonStyles from '../../shared/common.styles';
 import {toTitleCase} from '../../shared/helpers';
 import {AvatarWrapper} from '../../shared/ui/avatars';
@@ -44,7 +45,7 @@ const DrawGeometryToggles = () => {
               source={DRAW_ACTION_IMAGES[itemEnum].BUTTON}
             />
             <ButtonGroup
-              buttons={item === MAP_MODES.DRAW.POINT ? POINT_BUTTONS_TEXT : SHARP_CURVED_BUTTONS_TEXT}
+              buttons={item === MAP_MODES.DRAW.POINT ? POINT_BUTTONS_TEXT : TAP_FREEHAND_BUTTONS_TEXT}
               containerStyle={drawGeometryTogglesStyles.drawGeometrySwitch}
               onPress={i => handleTogglePressed(item, i)}
               selectedButtonStyle={drawGeometryTogglesStyles.selectedButton}
@@ -73,6 +74,7 @@ const DrawGeometryToggles = () => {
         keyExtractor={item => item}
         renderItem={renderDrawGeometryToggleButtons}
       />
+      <FreehandVertexSpacing/>
     </>
   );
 };

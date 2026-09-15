@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 
 import {Card, Icon} from '@rn-vui/base';
@@ -7,9 +7,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
-import {MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -22,6 +23,8 @@ const ImageCard = ({
                      isReadOnly,
                      isThumbnailOnly,
                      onOpenImage,
+                     onOpenImageProperties,
+                     saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
                      spotWithImage,
@@ -29,6 +32,7 @@ const ImageCard = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
@@ -42,14 +46,17 @@ const ImageCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isImageMissingOnServer, setIsImageMissingOnServer] = useState(false);
   const [isMissingImageModalVisible, setIsMissingImageModalVisible] = useState(false);
+  const [title, setTitle] = useState(getDisplayTitle);
+
+  /* Derived Variables */
 
   const placeholderTitle = `Untitled ${index + 1}`;
 
-  const [title, setTitle] = useState(
-    image.title && typeof image.title === 'string' && image.title.trim() !== ''
-      ? image.title.toString()
-      : placeholderTitle,
-  );
+  /* Side Effects */
+
+  useEffect(() => {
+    setTitle(getDisplayTitle());
+  }, [image.title, placeholderTitle]);
 
   /* Event Handlers */
 
@@ -60,8 +67,14 @@ const ImageCard = ({
 
   const handleEndEditing = () => {
     if (!isEmpty(title) && title !== image.title) {
-      dispatch(editedSpotImage({...image, title}));
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      const updatedImage = {...image, title};
+      if (modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+        saveUpdatedImage(updatedImage);
+      }
+      else {
+        dispatch(editedSpotImage(updatedImage));
+        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      }
     }
     if (isEmpty(title)) setTitle(undefined);
     setIsEditing(false);
@@ -72,14 +85,12 @@ const ImageCard = ({
   };
 
   const handleImagePressed = async () => {
-    // debugger;
     if (imageThumbnailURIs?.[image.id]) {
       if (onOpenImage) onOpenImage(image);
     }
     else {
       setAreImageThumbnailsLoading({...areImageThumbnailsLoading, [image.id]: true});
       const res = await downloadImageAndSave(image.id);
-      console.log('Got response from downloadImageAndSave', res);
       if (res) {
         console.log('Got Image');
         const uriObj = await getImageThumbnailURIs([image]);
@@ -106,14 +117,19 @@ const ImageCard = ({
 
   /* Logic Helpers */
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
-
   const deleteImage = async () => {
     console.log('Deleting image from spot', image.id);
     await deleteImageFromSpot(image.id, spotWithImage || spot);
     console.log('Deleted image from spot', image.id);
     setIsMissingImageModalVisible(false);
   };
+
+  function getDisplayTitle() {
+    return image.title && typeof image.title === 'string' && image.title.trim() !== '' ? image.title.toString()
+      : placeholderTitle;
+  }
+
+  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
 
   /* View */
 
@@ -178,26 +194,26 @@ const ImageCard = ({
 
         {!isThumbnailOnly && (
           <>
-            {/* Image Basemap icon overlay */}
-            {image.annotated && (
-              <View style={{position: 'relative'}}>
+            {/* Image icon overlays */}
+            <View style={imageStyles.cardOverlayIconsContainer}>
+              {/* Image Properties icon overlay */}
+              <TouchableOpacity
+                onPress={() => onOpenImageProperties?.(image)}
+                style={[imageStyles.cardOverlayIcon, {left: 8}]}
+              >
+                <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={24} type={'ionicon'}/>
+              </TouchableOpacity>
+
+              {/* Image Basemap icon overlay */}
+              {image.annotated && (
                 <TouchableOpacity
                   onPress={() => getImageBasemap(image)}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    borderColor: MEDIUMGREY,
-                    borderRadius: 10,
-                    borderWidth: 2,
-                    bottom: 2,
-                    padding: 4,
-                    position: 'absolute',
-                    right: 8,
-                  }}
+                  style={[imageStyles.cardOverlayIcon, {right: 8}]}
                 >
                   <Icon color={PRIMARY_ACCENT_COLOR} name={'map-outline'} size={24} type={'ionicon'}/>
                 </TouchableOpacity>
-              </View>
-            )}
+              )}
+            </View>
 
             {/* Image Basemap toggle */}
             <View style={{

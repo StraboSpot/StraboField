@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import {isEmpty} from '../../../shared/helpers';
 import {useImages} from '../../images';
 import {getLocalImageURI} from '../../images/imageURIs.helpers';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const ImageBasemapLayer = () => {
   const {currentImageBasemap} = useSelector(state => state.map);
@@ -27,11 +27,14 @@ const ImageBasemapLayer = () => {
     return doesImageExistOnDevice(currentImageBasemap.id).then(doesExist => setDoesImageExist(doesExist));
   };
 
+  // Mapbox reads a file:// url as a path, query and all, so a sketch update goes in the key instead:
+  // remounting builds a new native ImageSource, which re-reads the replaced file from disk
   if (currentImageBasemap && !isEmpty(coordQuad) && doesImageExist) {
     return (
       <MapboxGL.ImageSource
         coordinates={coordQuad}
         id={'currentImageBasemap'}
+        key={'currentImageBasemap' + (currentImageBasemap.modified_timestamp || '')}
         url={getLocalImageURI(currentImageBasemap.id)}>
         <MapboxGL.RasterLayer
           aboveLayerID={'background'}

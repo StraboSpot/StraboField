@@ -9,17 +9,18 @@ import {
   postFormDataRequest,
   postRequest,
   timeoutPromise,
-} from './serverRequestHelpers';
+} from './serverRequests.helpers';
 import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
-import {userAgent} from './userAgent';
+import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import alert from '../../shared/ui/alert';
+import {store} from '../../store/ConfigureStore';
 
 const useServerRequests = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {encoded_login, sesar} = useSelector(state => state.user);
+  const {encoded_login} = useSelector(state => state.user);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
   /* Derived Variables */
@@ -40,12 +41,20 @@ const useServerRequests = () => {
 
   const sendToSesar = async (data, path) => {
     try {
-      return await postRequest(`${SESAR_PATHS.SESAR_API}${path}`, data, bearerAuth(sesar.sesarToken.access),
+      // Read the access token from the store rather than the useSelector closure: registerSample may refresh and
+      // dispatch a new token immediately before posting, and the closure captured at render time would still hold
+      // the stale (expired) one until the next re-render.
+      const accessToken = store.getState().user.sesar.sesarToken.access;
+      return await postRequest(`${SESAR_PATHS.SESAR_API}${path}`, data, bearerAuth(accessToken),
         {'Content-Type': 'application/x-www-form-urlencoded'});
     }
     catch (err) {
+      // Re-throw a clean, user-facing message so the caller (registerSample) surfaces it on the error view.
+      // Previously this swallowed the error and returned undefined, causing a downstream `undefined.text()` crash.
       console.error('Error Posting to SESAR', err);
-      alert('Error Posting to SESAR', err.toString());
+      throw new Error(err?.message === 'Network timeout'
+        ? 'SESAR did not respond (network timeout). Please check your connection and try again.'
+        : 'Unable to reach SESAR. Please check your Internet connection and try again.');
     }
   };
 
@@ -177,12 +186,17 @@ const useServerRequests = () => {
 
   const postToSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
 
-  const refreshSesarToken = async (accessToken) => {
+  const refreshSesarToken = async (refreshTokenValue) => {
     const formData = new FormData();
-    formData.append('refresh', accessToken);
+    formData.append('refresh', refreshTokenValue);
     const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.REFRESH_TOKEN}`, formData, null,
       {'Content-Type': 'application/x-www-form-urlencoded'});
-    return response.json();
+    const json = await response.json();
+    // SESAR returns 401 {detail, code} when the refresh token is invalid or expired. Map it to an `error` shape so
+    // the caller doesn't mistake the failure body for a valid {access, refresh} pair — destructuring that blindly
+    // wipes both stored tokens and locks the user out silently.
+    if (!response.ok) return {code: json.code, error: json.detail || 'SESAR refresh token is invalid or expired'};
+    return json;
   };
 
   const registerUser = (newAccountInfo) => {
@@ -216,7 +230,7 @@ const useServerRequests = () => {
 
   const updateProject = project => postRequest(`${baseUrl}/project`, project, basicAuth());
 
-  const updateSampleWithSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
+  const updateOnSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
 
   const uploadImage = (formdata, isProfileImage) => {
     return new Promise((resolve, reject) => {
@@ -290,9 +304,9 @@ const useServerRequests = () => {
     testCustomMapUrl,
     updateDataset,
     updateDatasetSpots,
+    updateOnSesar,
     updateProfile,
     updateProject,
-    updateSampleWithSesar,
     uploadImage,
     uploadWebImage,
     verifyImagesExistence,

@@ -7,7 +7,7 @@ import useStratSection from './useStratSection';
 import {Y_MULTIPLIER} from '../../sed/sed.constants';
 import {useSpots} from '../../spots';
 import {PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION} from '../maps.constants';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const AXIS_BUFFER = Y_MULTIPLIER / 2; // pixels beyond outermost tick mark
 

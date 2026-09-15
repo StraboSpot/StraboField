@@ -1,45 +1,60 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
+import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
+import BackupStatusModal from './BackupStatusModal';
 import SaveAndExportModal from './SaveAndExportModal';
 import UploadModal from './UploadModal';
+import useBackupUpload from './useBackupUpload';
 import useDevice from '../../../services/device/useDevice';
 import {BLUE} from '../../../shared/styles.constants';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import ConnectionRequiredMessage from '../../../shared/ui/text/ConnectionRequiredMessage';
 import uiStyles from '../../../shared/ui/ui.styles';
-import useIsConnectionAvailable from '../../connections/useConnectionStatus';
-import {addedStatusMessage, clearedStatusMessages, setIsErrorMessagesModalVisible} from '../../home/home.slice';
+import {setBackupFrequency} from '../../connections/connections.slice';
+import SelectInputField from '../../form/SelectInputField';
+import {openedMessageModal} from '../../home/home.slice';
 import MainMenuPanelListItem from '../../main-menu-panel/MainMenuPanelListItem';
-import {setSelectedProject} from '../projects.slice';
 
 const BackupProject = () => {
   console.log('Rendering BackupProject...');
+
+  const preFormRef = useRef(null);
+
+  const FREQUENCY_OPTIONS = [0, 10, 30, 60];
+  const choices = FREQUENCY_OPTIONS.map(choice => (
+    {label: choice === 0 ? 'Off' : choice + ' minutes', value: choice}
+  ));
 
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const activeDatasets = useSelector(state => state.project.activeDatasetsIds);
-  const user = useSelector(state => state.user);
+  const backupFrequency = useSelector(state => state.connections.backupFrequency);
 
-  const isConnectionAvailable = useIsConnectionAvailable();
   const {openURL} = useDevice();
+  const {
+    closeUploadModal,
+    isUploadAutoStart,
+    isUploadAvailable,
+    isUploadModalVisible,
+    openUploadModal,
+    startUploadFromStatus,
+  } = useBackupUpload();
 
   /* Local State */
 
   const [backupAction, setBackupAction] = useState(undefined);
+  const [isBackupStatusModalVisible, setIsBackupStatusModalVisible] = useState(false);
   const [isSaveAndExportModalVisible, setIsSaveAndExportModalVisible] = useState(false);
-  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
 
   /* Event Handlers */
 
-  const onUpload = () => {
-    dispatch(setSelectedProject({source: '', project: ''}));
-    setIsUploadModalVisible(true);
-  };
+  const onUploadFromStatus = () => startUploadFromStatus(() => setIsBackupStatusModalVisible(false));
 
   /* Logic Helpers */
 
@@ -48,11 +63,7 @@ const BackupProject = () => {
       setIsSaveAndExportModalVisible(true);
       setBackupAction(backupActionToSet);
     }
-    else {
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage('There are no visible datasets selected.'));
-      dispatch(setIsErrorMessagesModalVisible(true));
-    }
+    else dispatch(openedMessageModal({message: 'There are no active datasets selected.', title: 'Error!'}));
   };
 
   const exportProject = () => checkForActiveDatasets('export');
@@ -61,10 +72,45 @@ const BackupProject = () => {
 
   /* Render Functions */
 
+  const renderBackupOptions = () => {
+    return (
+      <Formik
+        initialValues={{backupFrequency: backupFrequency?.save}}
+        innerRef={preFormRef}
+        onSubmit={values => console.log('Submit: ', values, ' |')}
+        validate={values => dispatch(setBackupFrequency({save: values.backupFrequency}))}
+      >
+        {() => (
+          <View style={{paddingHorizontal: 10}}>
+            <View style={{paddingVertical: 5}}>
+              <Field
+                choices={choices}
+                component={formProps => SelectInputField(
+                  {setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})}
+                label={'Auto-Save to Device Frequency'}
+                multiSelectStyle={{paddingVertical: 5}}
+                name={'backupFrequency'}
+                single
+              />
+            </View>
+            <Text style={{...uiStyles.sectionDividerText, paddingVertical: 5}}>
+              {Platform.OS === 'ios'
+                ? 'Auto-saves are stored locally in the app\'s directory and can be accessed with the '
+                + '"View/Edit Files on Device" button below.'
+                : 'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed '
+                + 'directly on Android. Use Save or Save & Export to Zip to keep an accessible copy.'}
+            </Text>
+          </View>
+        )}
+      </Formik>
+
+    );
+  };
+
   const renderUploadAndBackupButtons = () => {
     return (
       <>
-        {user.encoded_login && isConnectionAvailable ? <MainMenuPanelListItem onPress={onUpload} title={'Upload'}/>
+        {isUploadAvailable ? <MainMenuPanelListItem onPress={openUploadModal} title={'Upload'}/>
           : <ConnectionRequiredMessage actionText={'upload your project'}/>}
         <FlatListItemSeparator/>
         <MainMenuPanelListItem onPress={saveProject} title={'Save'}/>
@@ -83,6 +129,9 @@ const BackupProject = () => {
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
         {renderUploadAndBackupButtons()}
+        <SectionDivider dividerText={'Backup Options'}/>
+        {renderBackupOptions()}
+        <OutlineButton onPress={() => setIsBackupStatusModalVisible(true)} title={'Show Auto Backup Status'}/>
       </View>
 
       {Platform.OS === 'ios' && (
@@ -105,12 +154,17 @@ const BackupProject = () => {
       )}
 
       {/* Modals */}
+      <BackupStatusModal
+        isVisible={isBackupStatusModalVisible}
+        onClose={() => setIsBackupStatusModalVisible(false)}
+        onUpload={onUploadFromStatus}
+      />
       <SaveAndExportModal
         backupAction={backupAction}
         closeModal={() => setIsSaveAndExportModalVisible(false)}
         isVisible={isSaveAndExportModalVisible}
       />
-      <UploadModal closeModal={() => setIsUploadModalVisible(false)} isVisible={isUploadModalVisible}/>
+      <UploadModal autoStart={isUploadAutoStart} closeModal={closeUploadModal} isVisible={isUploadModalVisible}/>
     </View>
   );
 };

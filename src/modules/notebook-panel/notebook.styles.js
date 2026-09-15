@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import * as themes from '../../shared/styles.constants';
-import {MEDIUMGREY, NOTEBOOK_WIDTH, SMALL_SCREEN} from '../../shared/styles.constants';
+import {MEDIUMGREY, NOTEBOOK_WIDTH, SAMPLES_BORDER_WIDTH, SAMPLES_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
 
 const notebookStyles = StyleSheet.create({
   centerContainer: {
@@ -30,18 +30,12 @@ const notebookStyles = StyleSheet.create({
   dialogTitle: {
     backgroundColor: themes.PRIMARY_ACCENT_COLOR,
   },
-  footerContainer: {
-    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
-    borderTopColor: themes.MEDIUMGREY,
-    borderTopWidth: 0.5,
-  },
   headerContainer: {
     alignItems: 'center',
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     borderBottomColor: themes.MEDIUMGREY,
     borderBottomWidth: 0.5,
     flexDirection: 'row',
-    paddingLeft: 10,
   },
   notebookDrawer: {
     height: '100%',
@@ -55,6 +49,12 @@ const notebookStyles = StyleSheet.create({
     borderLeftColor: MEDIUMGREY,
     borderLeftWidth: 2,
     flex: 1,
+  },
+  sampleBorder: {
+    borderBottomWidth: SAMPLES_BORDER_WIDTH,
+    borderColor: SAMPLES_COLOR,
+    borderLeftWidth: SAMPLES_BORDER_WIDTH,
+    borderRightWidth: SAMPLES_BORDER_WIDTH,
   },
   traceSurfaceFeatureContainer: {
     borderBottomColor: themes.MEDIUMGREY,

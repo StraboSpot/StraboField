@@ -1,0 +1,618 @@
+{
+  "survey": [
+    {
+      "type": "start",
+      "name": "start"
+    },
+    {
+      "type": "end",
+      "name": "end"
+    },
+    {
+      "type": "text",
+      "name": "label",
+      "label": "Label",
+      "required": "false"
+    },
+    {
+      "type": "select_multiple xo3br71",
+      "name": "planar_fab",
+      "label": "Planar fabric",
+      "required": "false"
+    },
+    {
+      "type": "select_multiple ch0pi55",
+      "name": "def_mag_fol",
+      "label": "What defines the planar fabric?",
+      "required": "false",
+      "relevant": "${planar_fab} != ''"
+    },
+    {
+      "type": "text",
+      "name": "min_align",
+      "label": "Mineral alignment",
+      "hint": "Mineral(s) that are aligned:",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'min_align')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_one ct7fo58",
+      "name": "lay_contact",
+      "label": "Layering contact",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'comp_layer')",
+      "appearance": "horizontal"
+    },
+    {
+      "type": "text",
+      "name": "comp_lay_min",
+      "label": "Compositional layering",
+      "hint": "Minerals that define compositional layering:",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'comp_layer')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_enclave",
+      "label": "Characterize enclaves",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'enclaves')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_xeno",
+      "label": "Characterize xenoliths",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'xenoliths')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_plan",
+      "label": "Characterize what defines the planar fabric",
+      "required": "false",
+      "relevant": "selected(${def_mag_fol}, 'other')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple pc7pj90",
+      "name": "lin_fab",
+      "label": "Linear fabric",
+      "required": "false"
+    },
+    {
+      "type": "select_multiple mn6df98",
+      "name": "def_lin_fab",
+      "label": "What defines the linear fabric?",
+      "required": "false",
+      "relevant": "${lin_fab} != ''"
+    },
+    {
+      "type": "text",
+      "name": "lin_min_align",
+      "label": "Mineral alignment",
+      "hint": "Mineral(s) that are aligned:",
+      "required": "false",
+      "relevant": "selected(${def_lin_fab}, 'mineral_alignm')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "lin_enclave",
+      "label": "Characterize enclaves",
+      "required": "false",
+      "relevant": "selected(${def_lin_fab}, 'enclaves')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "lin_xeno",
+      "label": "Characterize xenoliths",
+      "required": "false",
+      "relevant": "selected(${def_lin_fab}, 'xenoliths')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "lin_other",
+      "label": "Characterize what defines the linear fabric",
+      "required": "false",
+      "relevant": "selected(${def_lin_fab}, 'other')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple lg33p50",
+      "name": "add_mag_fab",
+      "label": "Other magmatic fabrics",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "mag_commingle",
+      "label": "Characterize commingling",
+      "required": "false",
+      "relevant": "selected(${add_mag_fab}, 'commingle')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "mag_fold",
+      "label": "Characterize folding",
+      "required": "false",
+      "relevant": "selected(${add_mag_fab}, 'folding')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "mag_boudin",
+      "label": "Characterize boudinage",
+      "required": "false",
+      "relevant": "selected(${add_mag_fab}, 'boudinage')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "mag_mullion",
+      "label": "Characterize mullions",
+      "required": "false",
+      "relevant": "selected(${add_mag_fab}, 'mullions')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "other_fab_char",
+      "label": "Characterize other magmatic fabric",
+      "required": "false",
+      "relevant": "selected(${add_mag_fab}, 'other')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple jl3uv38",
+      "name": "magmatic_str",
+      "label": "Magmatic structures",
+      "required": "false"
+    },
+    {
+      "type": "select_one ek0xc79",
+      "name": "inj_str_type",
+      "label": "Injection structure type",
+      "required": "false",
+      "relevant": "selected(${magmatic_str}, 'inj_str')"
+    },
+    {
+      "type": "text",
+      "name": "vein_min",
+      "label": "Mineral(s) that define vein or dike",
+      "required": "false",
+      "relevant": "selected(${magmatic_str}, 'vein_dike')"
+    },
+    {
+      "type": "text",
+      "name": "vein_arr_min",
+      "label": "Mineral(s) that define vein or dike array",
+      "required": "false",
+      "relevant": "selected(${magmatic_str}, 'vein_dike_arr')"
+    },
+    {
+      "type": "text",
+      "name": "char_mag_str",
+      "label": "Characterize magmatic structures",
+      "required": "false",
+      "relevant": "${magmatic_str} != ''",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple hb9pq45",
+      "name": "grow_vert_ind",
+      "label": "Growth and/or younging or paleovertical indicators",
+      "required": "false"
+    },
+    {
+      "type": "select_multiple qx5bu93",
+      "name": "growth_young_ind",
+      "label": "Growth and/or younging indicators",
+      "required": "false",
+      "relevant": "selected(${grow_vert_ind}, 'grow_young_ind')"
+    },
+    {
+      "type": "text",
+      "name": "char_contact",
+      "label": "Characterize contacts",
+      "required": "false",
+      "relevant": "selected(${growth_young_ind}, 'asymmetric_chi')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_grading",
+      "label": "Characterize grading",
+      "required": "false",
+      "relevant": "selected(${growth_young_ind}, 'mineral_gradin')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_xcut",
+      "label": "Characterize cross-cutting layers",
+      "required": "false",
+      "relevant": "selected(${growth_young_ind}, 'cross_cutting_')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "char_indent",
+      "label": "Characterize indentation",
+      "required": "false",
+      "relevant": "selected(${growth_young_ind}, 'mineral_indent')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "grow_young_char",
+      "label": "Characterize growth and/or younging indicators",
+      "required": "false",
+      "relevant": "selected(${growth_young_ind}, 'other')",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple od9sr94",
+      "name": "paleovert_ind",
+      "label": "Paleovertical indicators",
+      "required": "false",
+      "relevant": "selected(${grow_vert_ind}, 'paleovertical')"
+    },
+    {
+      "type": "text",
+      "name": "char_paleovert",
+      "label": "Characterize paleovertical indicators",
+      "required": "false",
+      "appearance": "multiline"
+    },
+    {
+      "type": "select_multiple lw8uh27",
+      "name": "mag_kin_fab",
+      "label": "Kinematic indicators",
+      "hint": "Indicators of hypersolidus magmatic flow",
+      "required": "false"
+    },
+    {
+      "type": "text",
+      "name": "char_mag_kin_fab",
+      "label": "Characterize kinematic indicators",
+      "required": "false",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "sense_of_shear",
+      "label": "Sense of shear",
+      "hint": "e.g., top-NW, dextral, etc.",
+      "required": "false",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "p_t_d_history",
+      "label": "P-T-d history",
+      "required": "false",
+      "appearance": "multiline"
+    },
+    {
+      "type": "text",
+      "name": "mag_interp_note",
+      "label": "Notes",
+      "required": "false",
+      "appearance": "multiline"
+    },
+    {
+      "type": "calculate",
+      "name": "__version__",
+      "required": "false",
+      "calculation": "'vWMK6YMJe6VLDvaKGpDKzA'"
+    },
+    {
+      "type": "calculate",
+      "name": "_version_",
+      "calculation": "'v7UetHR9i2oQNtMBTay7SB'",
+      "$given_name": "__version__"
+    }
+  ],
+  "choices": [
+    {
+      "list_name": "xo3br71",
+      "name": "foliation",
+      "label": "foliation",
+      "order": "1"
+    },
+    {
+      "list_name": "xo3br71",
+      "name": "layer",
+      "label": "layering",
+      "order": "2"
+    },
+    {
+      "list_name": "xo3br71",
+      "name": "other_p_fab",
+      "label": "other",
+      "order": "3"
+    },
+    {
+      "list_name": "ch0pi55",
+      "name": "min_align",
+      "label": "mineral alignment"
+    },
+    {
+      "list_name": "ch0pi55",
+      "name": "comp_layer",
+      "label": "compositional layering",
+      "order": "1"
+    },
+    {
+      "list_name": "ch0pi55",
+      "name": "enclaves",
+      "label": "enclaves",
+      "order": "2"
+    },
+    {
+      "list_name": "ch0pi55",
+      "name": "xenoliths",
+      "label": "xenoliths",
+      "order": "3"
+    },
+    {
+      "list_name": "ch0pi55",
+      "name": "other",
+      "label": "other",
+      "order": "4"
+    },
+    {
+      "list_name": "ct7fo58",
+      "name": "gradational",
+      "label": "gradational"
+    },
+    {
+      "list_name": "ct7fo58",
+      "name": "sharp",
+      "label": "sharp"
+    },
+    {
+      "list_name": "pc7pj90",
+      "name": "lineation",
+      "label": "lineation",
+      "order": "1"
+    },
+    {
+      "list_name": "pc7pj90",
+      "name": "other",
+      "label": "other",
+      "order": "2"
+    },
+    {
+      "list_name": "mn6df98",
+      "name": "mineral_alignm",
+      "label": "mineral alignment"
+    },
+    {
+      "list_name": "mn6df98",
+      "name": "enclaves",
+      "label": "enclaves"
+    },
+    {
+      "list_name": "mn6df98",
+      "name": "xenoliths",
+      "label": "xenoliths"
+    },
+    {
+      "list_name": "mn6df98",
+      "name": "other",
+      "label": "other"
+    },
+    {
+      "list_name": "lg33p50",
+      "name": "commingle",
+      "label": "commingling",
+      "order": "1"
+    },
+    {
+      "list_name": "lg33p50",
+      "name": "folding",
+      "label": "folding",
+      "order": "2"
+    },
+    {
+      "list_name": "lg33p50",
+      "name": "boudinage",
+      "label": "boudinage",
+      "order": "3"
+    },
+    {
+      "list_name": "lg33p50",
+      "name": "mullions",
+      "label": "mullions",
+      "order": "4"
+    },
+    {
+      "list_name": "lg33p50",
+      "name": "other",
+      "label": "other",
+      "order": "5"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "trough",
+      "label": "trough"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "tube",
+      "label": "tube",
+      "order": "1"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "diapir",
+      "label": "diapir",
+      "order": "2"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "plume_str",
+      "label": "plume structure",
+      "order": "3"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "pipe",
+      "label": "pipe",
+      "order": "4"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "inj_str",
+      "label": "injection structure",
+      "order": "5"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "vein_dike",
+      "label": "vein or dike",
+      "order": "6"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "vein_dike_arr",
+      "label": "vein or dike array",
+      "order": "7"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "cavity",
+      "label": "cavity",
+      "order": "8"
+    },
+    {
+      "list_name": "jl3uv38",
+      "name": "other",
+      "label": "other",
+      "order": "9"
+    },
+    {
+      "list_name": "ek0xc79",
+      "name": "magmatic",
+      "label": "magmatic"
+    },
+    {
+      "list_name": "ek0xc79",
+      "name": "solid_state",
+      "label": "solid state"
+    },
+    {
+      "list_name": "ek0xc79",
+      "name": "solid_state_ov",
+      "label": "solid state overprinting magmatic"
+    },
+    {
+      "list_name": "hb9pq45",
+      "name": "grow_young_ind",
+      "label": "growth and/or younging"
+    },
+    {
+      "list_name": "hb9pq45",
+      "name": "paleovertical",
+      "label": "paleovertical"
+    },
+    {
+      "list_name": "qx5bu93",
+      "name": "asymmetric_chi",
+      "label": "asymmetric chilled vs. hybrid contacts"
+    },
+    {
+      "list_name": "qx5bu93",
+      "name": "mineral_gradin",
+      "label": "mineral grading",
+      "order": "1"
+    },
+    {
+      "list_name": "qx5bu93",
+      "name": "cross_cutting_",
+      "label": "cross-cutting layers",
+      "order": "2"
+    },
+    {
+      "list_name": "qx5bu93",
+      "name": "mineral_indent",
+      "label": "mineral(s) indenting enclaves",
+      "order": "3"
+    },
+    {
+      "list_name": "qx5bu93",
+      "name": "other",
+      "label": "other"
+    },
+    {
+      "list_name": "od9sr94",
+      "name": "tubes",
+      "label": "tubes"
+    },
+    {
+      "list_name": "od9sr94",
+      "name": "layer_indentat",
+      "label": "layer indentation "
+    },
+    {
+      "list_name": "od9sr94",
+      "name": "other",
+      "label": "other"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "imbricate_min",
+      "label": "imbricate minerals"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "asymm_fold",
+      "label": "asymmetric folds",
+      "order": "1"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "asymm_clast",
+      "label": "asymmetric clast",
+      "order": "2"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "s_c",
+      "label": "magmatic S-C structures",
+      "order": "3"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "riedel_shears",
+      "label": "Riedel shears",
+      "order": "4"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "offset_deflect",
+      "label": "offset or deflected marker",
+      "order": "5"
+    },
+    {
+      "list_name": "lw8uh27",
+      "name": "other_kin",
+      "label": "other",
+      "order": "6"
+    }
+  ],
+  "settings": [
+    {
+      "form_title": "Fabrics - Igneous (9/22)",
+      "version": "2 (2022-09-12 17:22:43)"
+    }
+  ]
+}

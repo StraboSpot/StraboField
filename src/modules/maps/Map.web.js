@@ -1,18 +1,18 @@
-import React, {forwardRef, useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {Map as ReactMapGL, NavigationControl} from 'react-map-gl/mapbox';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
+import useMapMouseActions from './interactions/useMapMouseActions.web';
+import useMapMoveEvents from './interactions/useMapMoveEvents';
 import {MapLayers} from './layers';
 import {BACKGROUND, LAYER_IDS_NOT_SELECTED, LAYER_IDS_SELECTED, MAP_MODES, MAPBOX_TOKEN} from './maps.constants';
-import {setIsMapMoved} from './maps.slice';
 import {STRAT_PATTERNS} from './strat-section/stratSection.constants';
 import {MAP_SYMBOLS} from './symbology/mapSymbology.constants';
 import useMap from './useMap';
-import useMapMouseActions from './useMapMouseActions.web';
-import useMapMoveEvents from './useMapMoveEvents';
-import useMapView from './useMapView';
+import useMapView from './view/useMapView';
+import FreehandSketch from '../sketch/FreehandSketch';
 
 const symbols = {...MAP_SYMBOLS, ...STRAT_PATTERNS};
 
@@ -35,27 +35,26 @@ const Map = ({
                isShowMacrostratOverlay,
                location,
                mapMode,
+               mapRef,
                measureFeatures,
                onMapLoad,
                spotsNotSelected,
                spotsSelected,
-             }, forwardedRef) => {
+               updateSpotsInMapExtent,
+             }) => {
   // console.log('Rendering Map...');
 
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
-  const isMapMoved = useSelector(state => state.map.isMapMoved);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isDrawMode} = useMap();
-  const {mapRef} = forwardedRef;
   const {cursor, handleMouseEnter, handleMouseLeave} = useMapMouseActions({editFeatureVertex, mapRef, mapMode});
 
   const [viewState, setViewState] = useState({});
-  const {handleMapMoved} = useMapMoveEvents({setViewState});
+  const {handleMapMoved} = useMapMoveEvents({setViewState, onMapMoveEnd: updateSpotsInMapExtent});
   const {getInitialViewState} = useMapView();
 
   /* Local State */
@@ -108,7 +107,6 @@ const Map = ({
   useEffect(() => {
       // console.log('UE Map', viewState);
       // console.log('Dimensions', useDimensions);
-      if (!isMapMoved) dispatch(setIsMapMoved(true));
       setViewState(getInitialViewState());
     }, [currentImageBasemap, stratSection],
   );
@@ -166,8 +164,13 @@ const Map = ({
         spotsNotSelected={spotsNotSelected}
         spotsSelected={spotsSelected}
       />
+
+      {/* Sketch Layer */}
+      {(mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE) && (
+        <FreehandSketch mapMode={mapMode}/>
+      )}
     </ReactMapGL>
   );
 };
 
-export default forwardRef(Map);
+export default Map;

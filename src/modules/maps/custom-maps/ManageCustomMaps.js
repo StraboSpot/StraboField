@@ -39,7 +39,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   /* Side Effects */
 
   useEffect(() => {
-    const maps = isSelected ? filterCustomEndpointCustomMaps() : filterDefaultCustomMaps();
+    const maps = isSelected ? filterCustomEndpointCustomMaps() : Object.values(customMaps);
     setFilteredMaps(maps);
     console.log('MAPS', maps);
   }, []);
@@ -47,12 +47,18 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
   /* Logic Helpers */
 
   const filterCustomEndpointCustomMaps = () => {
-    return Object.values(customMaps).filter(map => map.url[0].includes('http://'));
+    return Object.values(customMaps).filter((map) => {
+      map.url[0].includes('http://');
+    });
   };
 
-  const filterDefaultCustomMaps = () => {
-    return Object.values(customMaps).filter(map => map.url[0].includes('https://strabospot.org/geotiff/tiles/'));
-  };
+  // const filterDefaultCustomMaps = () => {
+  //   return Object.values(customMaps).filter((map) => {
+  //     console.log('MAP', map);
+  //     // map.url[0].includes('https://strabospot.org/geotiff/tiles/');
+  //     return map.url[0].includes('https://api.mapbox.com/styles/v1/');
+  //   });
+  // };
 
   const viewCustomMap = async (item) => {
     let basemap = item;
@@ -76,7 +82,7 @@ const ManageCustomMaps = ({zoomToCustomMap}) => {
       >
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{item.title}</ListItem.Title>
-          <ListItem.Subtitle>({getMapTypeName(item.source)} - {item.id})</ListItem.Subtitle>
+          <ListItem.Subtitle style={commonStyles.listItemSubtitle}>{getMapTypeName(item.source)}</ListItem.Subtitle>
         </ListItem.Content>
         {(item.source === 'mapbox_styles' || item.source === 'strabospot_mymaps') && (
           <Icon

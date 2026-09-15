@@ -31,6 +31,9 @@ const TextInputField = ({
     if (appearance === 'multiline') {
       style = {...formStyles.fieldValue, ...formStyles.fieldValueMultiline};
     }
+    else if (appearance === 'fill') {
+      style = {...formStyles.fieldValue, ...formStyles.fieldValueFill};
+    }
     else if (appearance === 'full') {
       style = {...formStyles.fieldValue, ...formStyles.fieldValueFull};
     }
@@ -65,7 +68,7 @@ const TextInputField = ({
       <TextInput
         autoCapitalize={autoCapitalize}
         editable={editable}
-        multiline={appearance === 'multiline' || appearance === 'full'}
+        multiline={appearance === 'multiline' || appearance === 'full' || appearance === 'fill'}
         onBlur={(e) => {
           setIsFocused(false);
           onBlur(name)(e);
@@ -78,7 +81,7 @@ const TextInputField = ({
         }}
         placeholder={placeholder}
         placeholderTextColor={themes.MEDIUMGREY}
-        scrollEnabled={appearance !== 'full' || isFocused}
+        scrollEnabled={appearance === 'full' ? isFocused : true}
         style={getInputStyle()}
         value={value || ''}
       />

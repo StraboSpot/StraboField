@@ -1,92 +1,91 @@
 package com.strabospot2;
 
-import android.Manifest;
 import android.content.Context;
-import android.hardware.GeomagneticField;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.util.Log;
+import android.view.Surface;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
+// Orientation comes from the fused TYPE_ROTATION_VECTOR sensor (gyro + accelerometer + magnetometer),
+// which is tilt-compensated and far steadier than the old raw accelerometer + magnetometer +
+// getRotationMatrix path — that used the accelerometer as a gravity estimate, so any hand motion at the
+// moment of capture corrupted the tilt reference (and therefore dip and heading). The rotation vector
+// references the same ENU / magnetic-north world frame that getRotationMatrix produced, so the matrix
+// convention the JS layer consumes is unchanged. Declination (magnetic -> true north) is still applied
+// in JS. The magnetometer is registered separately for its accuracy status only, so a low-accuracy /
+// needs-calibration condition can be surfaced to the user the way iOS already does.
 public class Compass extends ReactContextBaseJavaModule implements SensorEventListener {
-    private boolean sensorsRegistered = false;
-    private static final String PERMISSION_LOCATION_ACCESS = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final int PERMISSION_REQ_CODE = 100;
-    private int listenerCount = 0;
+    private static final int AVERAGE_WINDOW = 5; // ~0.1 s at SENSOR_DELAY_GAME (~50 Hz)
+
     private final ReactApplicationContext context;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private SensorManager sensorManager;
-    private Arguments arguments;
-    private Callback callback;
+    private final SensorManager sensorManager;
+    private final Sensor rotationSensor;
+    private final Sensor magneticSensor;
 
-    private Sensor sensorAccelerometer;
-    private Sensor sensorMagneticField;
-    private final float[] orientation = new float[3];
+    private boolean sensorsRegistered = false;
+    private int listenerCount = 0;
+    private Boolean lastNeedsCalibration = null; // null until the first accuracy report; only emit on change
+
+    // Rolling buffer of the last few rotation matrices, averaged element-wise before use. Averaging the
+    // matrix (rather than the azimuth) is safe across the 0/360 wrap because the elements are continuous
+    // through north. Mirrors the native averaging done on iOS, so JS no longer averages for Android.
+    private final List<float[]> matrixBuffer = new ArrayList<>();
     private final float[] rotationMatrix = new float[9];
-
-    private float[] mGravity = new float[3];
-    private float[] mGeomagnetic = new float[3];
-    float I[] = new float[9];
-
+    private final float[] averagedMatrix = new float[9];
+    private final float[] orientation = new float[3];
 
     Compass(ReactApplicationContext context) {
         super(context);
         this.context = context;
+        this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 
-        this.sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
-        this.sensorAccelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        this.sensorMagneticField = this.sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-    }
-
-    private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
-
-        reactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
+        // Prefer the gyro-fused rotation vector; fall back to the geomagnetic (accel + mag, no gyro)
+        // variant on devices without a gyroscope.
+        Sensor rotation = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        if (rotation == null) rotation = sensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+        this.rotationSensor = rotation;
+        this.magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     @ReactMethod
     public void startSensors() {
-        if (!sensorsRegistered) {
-            if (sensorAccelerometer != null) {
-                boolean accelOk = sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-                Log.d("Compass", "Accelerometer registered: " + accelOk);
-            } else {
-                Log.e("Compass", "Accelerometer not available!");
-            }
-
-            if (sensorMagneticField != null) {
-                boolean magOk = sensorManager.registerListener(this, sensorMagneticField, SensorManager.SENSOR_DELAY_GAME);
-                Log.d("Compass", "MagneticField registered: " + magOk);
-            } else {
-                Log.e("Compass", "Magnetic field sensor not available!");
-            }
-
-            sensorsRegistered = true;
-        } else {
+        if (sensorsRegistered) {
             Log.d("Compass", "Sensors already registered.");
+            return;
         }
+        matrixBuffer.clear();
+        lastNeedsCalibration = null;
+
+        if (rotationSensor != null) {
+            boolean ok = sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_GAME);
+            Log.d("Compass", "Rotation vector registered: " + ok);
+        }
+        else {
+            Log.e("Compass", "No rotation vector sensor available!");
+        }
+
+        // Registered for accuracy status only; its values are not fused into the orientation.
+        if (magneticSensor != null) {
+            sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+        sensorsRegistered = true;
     }
 
     @ReactMethod
@@ -95,85 +94,116 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
             Log.d("Compass", "Sensors were not registered or already stopped.");
             return;
         }
-            sensorManager.unregisterListener(this);
-            sensorsRegistered = false;
-            Log.d("Compass", "All sensors unregistered.");
+        sensorManager.unregisterListener(this);
+        sensorsRegistered = false;
+        // The buffer is cleared in startSensors() before the listener is (re)registered, so it isn't
+        // cleared here — doing so on the module thread could race an in-flight onSensorChanged on the
+        // main thread. Leftover samples never bleed across sessions because start clears them first.
+        Log.d("Compass", "All sensors unregistered.");
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (listenerCount <= 0) return;
-        final float alpha = 0.97f;
+        int type = event.sensor.getType();
+        if (type != Sensor.TYPE_ROTATION_VECTOR && type != Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR) return;
 
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                mGravity[0] = alpha * mGravity[0] + (1 - alpha) * event.values[0];
-                mGravity[1] = alpha * mGravity[1] + (1 - alpha) * event.values[1];
-                mGravity[2] = alpha * mGravity[2] + (1 - alpha) * event.values[2];
-            }
+        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
 
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                mGeomagnetic[0] = alpha * mGeomagnetic[0] + (1 - alpha) * event.values[0];
-                mGeomagnetic[1] = alpha * mGeomagnetic[1] + (1 - alpha) * event.values[1];
-                mGeomagnetic[2] = alpha * mGeomagnetic[2] + (1 - alpha) * event.values[2];
-            }
+        matrixBuffer.add(rotationMatrix.clone());
+        if (matrixBuffer.size() > AVERAGE_WINDOW) matrixBuffer.remove(0);
 
-            boolean success = SensorManager.getRotationMatrix(rotationMatrix, I, mGravity, mGeomagnetic);
-
-            if (success) {
-                SensorManager.getOrientation(rotationMatrix, orientation);
-
-                float azimuth = (float) Math.toDegrees(orientation[0]); // Gets magnetic north
-                azimuth = (azimuth + 360f) % 360f;
-
-                sendAzimuthChangeEvent(azimuth);
-            }
+        for (int i = 0; i < 9; i++) {
+            float sum = 0f;
+            for (float[] m : matrixBuffer) sum += m[i];
+            averagedMatrix[i] = sum / matrixBuffer.size();
         }
 
-    private void sendAzimuthChangeEvent(float magneticHeading) {
+        SensorManager.getOrientation(averagedMatrix, orientation);
+        float magneticHeading = (float) Math.toDegrees(orientation[0]); // magnetic north; JS adds declination
+        magneticHeading = (magneticHeading + 360f) % 360f;
 
+        sendRotationMatrixEvent(magneticHeading);
+    }
+
+    private void sendRotationMatrixEvent(float magneticHeading) {
         WritableMap wm = Arguments.createMap();
 
-        // Transposed Matrix
+        // Transposed to match the matrix convention the JS layer expects (unchanged from the previous
+        // getRotationMatrix implementation): emitted row i = column i of the Android rotation matrix.
         wm.putDouble("magneticHeading", magneticHeading);
-        wm.putDouble("m11", rotationMatrix[0]);
-        wm.putDouble("m12", rotationMatrix[3]);
-        wm.putDouble("m13", rotationMatrix[6]);
-        wm.putDouble("m21", rotationMatrix[1]);
-        wm.putDouble("m22", rotationMatrix[4]);
-        wm.putDouble("m23", rotationMatrix[7]);
-        wm.putDouble("m31", rotationMatrix[2]);
-        wm.putDouble("m32", rotationMatrix[5]);
-        wm.putDouble("m33", rotationMatrix[8]);
+        wm.putDouble("m11", averagedMatrix[0]);
+        wm.putDouble("m12", averagedMatrix[3]);
+        wm.putDouble("m13", averagedMatrix[6]);
+        wm.putDouble("m21", averagedMatrix[1]);
+        wm.putDouble("m22", averagedMatrix[4]);
+        wm.putDouble("m23", averagedMatrix[7]);
+        wm.putDouble("m31", averagedMatrix[2]);
+        wm.putDouble("m32", averagedMatrix[5]);
+        wm.putDouble("m33", averagedMatrix[8]);
 
-        System.out.println(wm);
-        sendEvent(this.context, "rotationMatrix", wm);
+        // How the device is currently held, so JS can pick the "up" edge for trend/plunge. The matrix
+        // stays in the device's natural frame; the display rotation is defined relative to that frame,
+        // so the JS pointingAxisRow mapping (which mirrors remapCoordinateSystem) resolves it correctly
+        // even on tablets whose natural orientation is landscape.
+        wm.putInt("screenRotation", getScreenRotation());
+
+        sendEvent("rotationMatrix", wm);
+    }
+
+    // 0 / 90 / 180 / 270 — the display's rotation from the device's natural orientation.
+    private int getScreenRotation() {
+        try {
+            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager == null || windowManager.getDefaultDisplay() == null) return 0;
+            switch (windowManager.getDefaultDisplay().getRotation()) {
+                case Surface.ROTATION_90: return 90;
+                case Surface.ROTATION_180: return 180;
+                case Surface.ROTATION_270: return 270;
+                default: return 0;
+            }
+        }
+        catch (Exception e) {
+            Log.e("Compass", "Could not read display rotation, defaulting to portrait.", e);
+            return 0;
+        }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        if (sensor.getType() != Sensor.TYPE_MAGNETIC_FIELD) return;
 
+        // LOW / UNRELIABLE means the magnetometer needs a figure-8 recalibration or is near magnetic
+        // interference; MEDIUM / HIGH are trustworthy. Only emit when the state actually flips so the
+        // JS layer isn't spammed on every accuracy report.
+        boolean needsCalibration = accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE
+                || accuracy == SensorManager.SENSOR_STATUS_ACCURACY_LOW;
+        if (lastNeedsCalibration != null && lastNeedsCalibration == needsCalibration) return;
+        lastNeedsCalibration = needsCalibration;
+
+        WritableMap wm = Arguments.createMap();
+        wm.putBoolean("needsCalibration", needsCalibration);
+        sendEvent("compassCalibrationStatus", wm);
     }
 
-    // Required for rn built in EventEmitter Calls.
+    private void sendEvent(String eventName, @Nullable WritableMap params) {
+        context
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
+
+    // Required for the RN built-in EventEmitter. Auto start/stop the sensors with listener count.
     @ReactMethod
     public void addListener(String eventName) {
         listenerCount++;
-        Log.e("Sensor", "Listener added. Total: " + listenerCount);
-
-        if (listenerCount == 1) {
-            startSensors(); // Start only on first listener
-        }
+        if (listenerCount == 1) startSensors();
     }
 
     @ReactMethod
     public void removeListeners(Integer count) {
         listenerCount -= count;
         if (listenerCount < 0) listenerCount = 0;
-        Log.e("Sensor", "Listeners removed. Remaining: " + listenerCount);
-
-        if (listenerCount == 0) {
-            stopSensors(); // Stop only when no listeners remain
-        }
+        if (listenerCount == 0) stopSensors();
     }
 
     @NonNull
@@ -182,4 +212,3 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
         return "Compass";
     }
 }
-

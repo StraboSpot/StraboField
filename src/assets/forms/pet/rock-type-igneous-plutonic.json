@@ -20,7 +20,7 @@
       "label": "Plutonic Rock Type",
       "hint": "Specific plutonic rock type",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "select_one ls02q17",
@@ -55,7 +55,7 @@
       "name": "texture_plutonic",
       "label": "Texture",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",
@@ -88,7 +88,7 @@
       "name": "alteration_plutonic",
       "label": "Modification",
       "required": "false",
-      "appearance": "horizontal-compact"
+      "appearance": "horizontal"
     },
     {
       "type": "text",

@@ -6,13 +6,34 @@ const initialConnectionsState = {
     isSelected: false,
     isVerified: false,
   },
+  isAutoSaving: false,
+  isForceOffline: false,
+  isLocalSaveNeeded: false,
   isOnline: {},
+  isProfileUploadNeeded: false,
+  backupFrequency: {
+    save: 60,
+  },
+  nextAutoSaveTime: null,
+  projectSaveStatus: null,
 };
 
 const connectionsSlice = createSlice({
   name: 'connections',
   initialState: initialConnectionsState,
   reducers: {
+    setAutoSaving(state, action) {
+      state.isAutoSaving = action.payload;
+    },
+    clearLocalSaveNeeded(state) {
+      state.isLocalSaveNeeded = false;
+    },
+    clearProfileUploadNeeded(state) {
+      state.isProfileUploadNeeded = false;
+    },
+    setBackupFrequency(state, action) {
+      state.backupFrequency = action.payload;
+    },
     setCustomDatabaseUrl(state, action) {
       state.databaseEndpoint.endpoint = action.payload;
     },
@@ -21,6 +42,21 @@ const connectionsSlice = createSlice({
     },
     setDatabaseVerify(state, action) {
       state.databaseEndpoint.isVerified = action.payload;
+    },
+    setForceOffline(state, action) {
+      state.isForceOffline = action.payload;
+    },
+    setLocalSaveNeeded(state) {
+      state.isLocalSaveNeeded = true;
+    },
+    setProfileUploadNeeded(state) {
+      state.isProfileUploadNeeded = true;
+    },
+    setProjectSaveStatus(state, action) {
+      state.projectSaveStatus = action.payload;
+    },
+    setNextAutoSaveTime(state, action) {
+      state.nextAutoSaveTime = action.payload;
     },
     setOnlineStatus(state, action) {
       state.isOnline = action.payload;
@@ -32,10 +68,19 @@ const connectionsSlice = createSlice({
 });
 
 export const {
+  clearLocalSaveNeeded,
+  clearProfileUploadNeeded,
+  setAutoSaving,
+  setBackupFrequency,
   setCustomDatabaseUrl,
   setDatabaseIsSelected,
   setDatabaseVerify,
+  setForceOffline,
+  setLocalSaveNeeded,
+  setNextAutoSaveTime,
   setOnlineStatus,
+  setProfileUploadNeeded,
+  setProjectSaveStatus,
   updatedProjectTransferProgress,
 } = connectionsSlice.actions;
 

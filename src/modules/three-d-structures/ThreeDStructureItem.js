@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -16,25 +16,19 @@ function ThreeDStructureItem({
   /* Data Hooks */
 
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
+  const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {setFeaturesSelectedForMultiTagging} = useTags();
 
-  /* Local State */
+  /* Derived Variables */
 
-  const [featureSelectedForTagging, setFeatureSelectedForTagging] = useState(false);
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE ThreeDStructureItem [isMultipleFeaturesTaggingEnabled]', isMultipleFeaturesTaggingEnabled);
-    if (!isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(false);
-  }, [isMultipleFeaturesTaggingEnabled]);
+  const isFeatureSelectedForTagging = selectedFeaturesForTagging.some(f => f.id === item.id);
 
   /* Logic Helpers */
 
   const editFeature = (feature) => {
-    if (isMultipleFeaturesTaggingEnabled) setFeatureSelectedForTagging(setFeaturesSelectedForMultiTagging(feature));
+    if (isMultipleFeaturesTaggingEnabled) setFeaturesSelectedForMultiTagging(feature);
     else edit3dStructure(feature);
   };
 
@@ -42,18 +36,23 @@ function ThreeDStructureItem({
 
   return (
     <ListItem
-      containerStyle={[commonStyles.listItem,
-        {backgroundColor: featureSelectedForTagging ? themes.PRIMARY_ACCENT_COLOR : themes.SECONDARY_BACKGROUND_COLOR}]}
+      containerStyle={[commonStyles.listItem, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}
       key={item.id}
       onPress={() => editFeature(item)}
     >
+      {isMultipleFeaturesTaggingEnabled && (
+        <ListItem.CheckBox
+          checked={isFeatureSelectedForTagging}
+          onPress={() => editFeature(item)}
+        />
+      )}
       <ListItem.Content style={{overflow: 'hidden'}}>
         <ListItem.Title style={commonStyles.listItemTitle}>
           <ThreeDStructureLabel item={item}/>
         </ListItem.Title>
         <FeatureTagsList featureId={item.id} spotId={spot.properties.id}/>
       </ListItem.Content>
-      <ListItem.Chevron/>
+      {!isMultipleFeaturesTaggingEnabled && <ListItem.Chevron/>}
     </ListItem>
   );
 }

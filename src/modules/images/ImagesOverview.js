@@ -8,7 +8,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImages} from '../spots/spots.slice';
 
-const ImagesOverview = ({isReadOnly, onOpenImage, page}) => {
+const ImagesOverview = ({isReadOnly, onOpenImage, onOpenImageProperties, page}) => {
   console.log('Rendering ImagesOverview...');
 
   /* Data Hooks */
@@ -32,6 +32,7 @@ const ImagesOverview = ({isReadOnly, onOpenImage, page}) => {
     <ImagesInSpot
       isReadOnly={isReadOnly}
       onOpenImage={onOpenImage}
+      onOpenImageProperties={onOpenImageProperties}
       onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}
       saveImages={saveImagesToSpot}
     />

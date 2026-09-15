@@ -35,8 +35,8 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       closeModal();
       return Promise.resolve();
     }
-    catch (e) {
-      console.log('Error submitting form', e);
+    catch (err) {
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -51,7 +51,8 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       onSubmit={() => console.log('Submitting form...')}
       validate={values => validateForm({formName: IMAGE_PROPERTIES_FORM_NAME, values: values})}
     >
-      {formProps => <Form formName={IMAGE_PROPERTIES_FORM_NAME} isReadOnly={isReadOnly} renderInline={isInline} {...formProps}/>}
+      {formProps => <Form formName={IMAGE_PROPERTIES_FORM_NAME} isReadOnly={isReadOnly}
+                          renderInline={isInline} {...formProps}/>}
     </Formik>
   );
 
@@ -85,9 +86,9 @@ const ImagePropertiesModal = ({closeModal, image, isReadOnly, isVisible, saveUpd
       showCloseButton
     >
       {/* Web has no scroll container of its own, so wrap the form in a bounded, scrollable FlatList.
-          On native, render the fields inline so ModalWrapper's keyboard-aware FlatList is the single
-          scroll container — nesting FlatLists breaks iOS scroll-to-focused-input (the focused field
-          scrolls out of view instead of just above the keyboard). */}
+       On native, render the fields inline so ModalWrapper's keyboard-aware FlatList is the single
+       scroll container — nesting FlatLists breaks iOS scroll-to-focused-input (the focused field
+       scrolls out of view instead of just above the keyboard). */}
       {Platform.OS === 'web' ? (
         <View style={{flex: 1, minHeight: 0, overflow: 'hidden'}}>
           <FlatList

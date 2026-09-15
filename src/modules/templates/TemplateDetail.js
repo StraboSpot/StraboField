@@ -6,6 +6,7 @@ import {Formik} from 'formik';
 import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
+import {FormFlatList} from '../../shared/ui';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import {Form, formStyles, useForm} from '../form';
 import useTemplates from './useTemplates';
@@ -58,7 +59,7 @@ const TemplateDetail = ({goBack, template, templateType}) => {
       await saveTemplate(formRef.current, templateKey, template, templateName);
       goBack();
     }
-    catch (error) {
+    catch (err) {
     }
   };
 
@@ -101,20 +102,27 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     );
   };
 
-  /* View */
+  const renderTemplateFields = () => {
+    // NoteForm supplies its own FormFlatList, so the notes template must not be wrapped in a second one.
+    if (templateType === 'notes') {
+      return (
+        <>
+          {renderNameField()}
+          <NoteForm
+            appearance={'multiline'}
+            customHeight={300}
+            formRef={formRef}
+            initialNotesValues={template.values}
+          />
+          {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
+        </>
+      );
+    }
 
-  return (
-    <>
-      <SaveAndCancelButtons cancel={goBack} save={saveTemplateAndGo}/>
-      {renderNameField()}
-      {templateType === 'notes' ? (
-        <NoteForm
-          appearance={'multiline'}
-          customHeight={300}
-          formRef={formRef}
-          initialNotesValues={template.values}
-        />
-      ) : (
+    // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
+    return (
+      <FormFlatList>
+        {renderNameField()}
         <Formik
           enableReinitialize={false}  // Update values if preferences change while form open, like when number incremented
           initialValues={template.values}
@@ -123,10 +131,19 @@ const TemplateDetail = ({goBack, template, templateType}) => {
           validate={values => validateForm({formName: formName, values: values})}
           validateOnChange={true}
         >
-          {formProps => <Form {...{...formProps, formName: formName}}/>}
+          {formProps => <Form {...{...formProps, formName: formName, renderInline: true}}/>}
         </Formik>
-      )}
-      {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
+        {template?.id && <DeleteButton onPress={handleDeletePressed} title={'Delete Template'}/>}
+      </FormFlatList>
+    );
+  };
+
+  /* View */
+
+  return (
+    <>
+      <SaveAndCancelButtons cancel={goBack} save={saveTemplateAndGo}/>
+      {renderTemplateFields()}
 
       {/* Child Modal */}
       {isDeleteConfirmModalVisible && renderDeleteConfirmationModal()}

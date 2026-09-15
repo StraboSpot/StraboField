@@ -9,8 +9,8 @@ import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} fr
 import {useImages} from '../../modules/images';
 import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
 import useImageSize from '../../modules/images/useImageSize';
-import {setIsImageTransferring} from '../../modules/project/projects.slice';
-import {isEmpty} from '../../shared/helpers';
+import {removedChangedImageIds, setIsImageTransferring} from '../../modules/project/projects.slice';
+import {isEmpty, toError} from '../../shared/helpers';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
 
@@ -18,6 +18,7 @@ const useUploadImages = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const changedImageIds = useSelector(state => state.project.changedImageIds);
   const spots = useSelector(state => state.spot.spots);
   const user = useSelector(state => state.user);
 
@@ -52,7 +53,7 @@ const useUploadImages = () => {
       dispatch(updatedProjectTransferProgress(0));
     }
     catch (err) {
-      console.log('Error Uploading Image', imageId, err);
+      console.error('Error Uploading Image', imageId, err);
       throw Error('Error Uploading Image', imageId, err);
     }
   };
@@ -61,28 +62,37 @@ const useUploadImages = () => {
 
   const initializeImageUpload = async () => {
     let imagesStatus = {};
-    setImageUploadStatusMessage('');
-    console.log('Looking for Images to Upload in Spots...', spots);
-    setImageUploadStatusMessage('Looking for images to upload in spots...');
-    const images = getAllImages();
-    const imageIds = getImageIds(images);
-    setImageUploadStatusMessage('Checking to see if image files are on server...');
-    const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
-    setImageUploadStatusMessage(`Checking to see if ${neededImages.length} image files are on device...`);
-    console.log('Needed Images from server', neededImages);
-    const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(neededImages, images);
-    console.log('Done verifying images on device', imagesToUpload);
-    if (!isEmpty(imagesToUpload)) {
-      setImageUploadStatusMessage('Uploading needed images to server...');
-      dispatch(setIsImageTransferring(true));
-      imagesStatus = await uploadImages(imagesToUpload);
-      console.log('DONE UPLOADING IMAGES');
+    try {
+      setImageUploadStatusMessage('');
+      console.log('Looking for Images to Upload in Spots...', spots);
+      setImageUploadStatusMessage('Looking for images to upload in spots...');
+      const images = getAllImages();
+      const imageIds = getImageIds(images);
+      setImageUploadStatusMessage('Checking to see if image files are on server...');
+      const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
+      // A sketch update keeps the image's id, so the server reports it as already there
+      const changedImages = changedImageIds.filter(id => imageIds.some(i => i.toString() === id.toString()))
+        .map(id => id.toString());
+      const imagesToSend = [...new Set([...neededImages, ...changedImages])];
+      setImageUploadStatusMessage(`Checking to see if ${imagesToSend.length} image files are on device...`);
+      console.log('Needed Images from server', neededImages, 'plus changed images', changedImages);
+      const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(imagesToSend, images);
+      console.log('Done verifying images on device', imagesToUpload);
+      if (!isEmpty(imagesToUpload)) {
+        setImageUploadStatusMessage('Uploading needed images to server...');
+        dispatch(setIsImageTransferring(true));
+        imagesStatus = await uploadImages(imagesToUpload);
+        console.log('DONE UPLOADING IMAGES');
+      }
+      else setImageUploadStatusMessage('All images for this project are already on server.');
+      if (!isEmpty(imagesNotFoundOnDevice)) {
+        imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+      }
+      return imagesStatus;
     }
-    else setImageUploadStatusMessage('All images for this project are already on server.');
-    if (!isEmpty(imagesNotFoundOnDevice)) {
-      imagesStatus = {...imagesStatus, imagesNotFound: imagesNotFoundOnDevice.length};
+    finally {
+      dispatch(setIsImageTransferring(false));
     }
-    return imagesStatus;
   };
 
   const resetState = () => {
@@ -102,6 +112,7 @@ const useUploadImages = () => {
         // const imageURI = await getImageFile(imageProps.id);
         const resizedImage = await resizeImageForUpload(imageProps);
         await doUploadImage(imageProps.id, resizedImage.uri);
+        dispatch(removedChangedImageIds([imageProps.id]));  // Cleared per image, so a failure retries
         imagesUploadedCount++;
       }
       catch (err) {
@@ -143,10 +154,10 @@ const useUploadImages = () => {
       dispatch(addedStatusMessage('Profile Image Uploaded'));
     }
     catch (err) {
-      console.error(`Failed to upload profile image because ${err.Error}`);
+      console.error('Failed to upload profile image', err);
       dispatch(clearedStatusMessages());
       dispatch(addedStatusMessage('Failed to upload profile image'));
-      throw Error();
+      throw toError(err);
     }
   };
 
@@ -161,7 +172,8 @@ const useUploadImages = () => {
             console.log(`Image ${imageId} EXISTS`);
             return imagesFound.find((image) => {
               if (image.id.toString() === imageId) {
-                imagesToUpload.push({...image, uri: imageURI});
+                // Versioned, since on iOS resizeImageForUpload decodes through RCTImageLoader's cache
+                imagesToUpload.push({...image, uri: getLocalImageURI(image.id, image.modified_timestamp)});
                 // setImagesToUpload(prevState => ([...prevState, imageWithPath]));
                 // return {...image, uri: imageURI};
               }

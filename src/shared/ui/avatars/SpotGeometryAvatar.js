@@ -6,14 +6,14 @@ import {useSpots} from '../../../modules/spots';
 const SpotGeometryAvatar = ({spot}) => {
   /* Data Hooks */
 
-  const {getSpotGeometryIconSource} = useSpots();
+  const {getSampleSpotIconSource, getSpotGeometryIconSource} = useSpots();
 
   /* View */
 
   return (
     <AvatarWrapper
       size={20}
-      source={getSpotGeometryIconSource(spot)}
+      source={spot.properties.isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
     />
   );
 };

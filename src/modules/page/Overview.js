@@ -5,12 +5,13 @@ import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {NOTEBOOK_PAGES, PRIMARY_PAGES} from './page.constants';
+import {PAGES_IN_MENU_ORDER, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
 import PageHeader from './PageHeader';
+import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
-import {SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
+import {SMALL_SCREEN, SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -20,7 +21,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
 import {Form, useForm} from '../form';
 import {setModalVisible} from '../home/home.slice';
-import {ImageModal, useImages} from '../images';
+import {ImageModal, ImagePropertiesModal, useImages} from '../images';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -28,7 +29,7 @@ import SketchModal from '../sketch/SketchModal';
 import {useSpots} from '../spots';
 import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
 
-const Overview = ({isReadOnly, openMainMenuPanel}) => {
+const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -47,7 +48,9 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const [imageToView, setImageToView] = useState({});
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
+  const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
   const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
@@ -55,10 +58,15 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   /* Derived Variables */
 
-  const visiblePagesKeys = [...new Set([...PRIMARY_PAGES.map(p => p.key), ...getPopulatedPagesKeys(spot)])];
-  const sections = visiblePagesKeys.reduce((acc, key) => {
-    const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (page.overview_component) {
+  const defaultPagesKeys = spot.properties?.isSample ? SAMPLE_OVERVIEW_DEFAULT_PAGES : PRIMARY_PAGES.map(p => p.key);
+  const visiblePagesKeys = [...new Set([...defaultPagesKeys, ...getPopulatedPagesKeys(spot)])];
+  // List the sections in the same order as the notebook's More Pages menu, except on a sample, where
+  // Samples leads
+  const orderedPages = spot.properties?.isSample ? [...PAGES_IN_MENU_ORDER.filter(p => p.key === PAGE_KEYS.SAMPLES),
+      ...PAGES_IN_MENU_ORDER.filter(p => p.key !== PAGE_KEYS.SAMPLES)]
+    : PAGES_IN_MENU_ORDER;
+  const sections = orderedPages.reduce((acc, page) => {
+    if (visiblePagesKeys.includes(page.key) && page.overview_component) {
       const sectionOverview = {title: page, data: [page]};
       return [...acc, sectionOverview];
     }
@@ -72,14 +80,35 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
     setIsImageModalVisible(false);
+    setIsImagePropertiesModalVisible(false);
+    setShouldOpenImageProperties(false);
     setImageToView({});
   }, [spot]);
 
   /* Event Handlers */
 
+  const handleCloseImageModal = (isVisible) => {
+    setIsImageModalVisible(isVisible);
+    if (!isVisible) setShouldOpenImageProperties(false);
+  };
+
   const handleOpenImage = (image) => {
+    setShouldOpenImageProperties(false);
     setImageToView(image);
     setIsImageModalVisible(true);
+  };
+
+  // Opening properties from an image card: on small screens show only the standalone properties modal
+  // so the viewer isn't a throwaway host that flashes before the fullscreen properties modal covers
+  // it. On larger screens open the viewer and let it auto-open its nested properties modal (which
+  // stacks reliably over the viewer's modal on iOS, where sibling modals don't).
+  const handleOpenImageProperties = (image) => {
+    setImageToView(image);
+    if (SMALL_SCREEN) setIsImagePropertiesModalVisible(true);
+    else {
+      setShouldOpenImageProperties(true);
+      setIsImageModalVisible(true);
+    }
   };
 
   const handleOpenSketch = (image) => {
@@ -138,8 +167,8 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
       }
       return Promise.resolve();
     }
-    catch (e) {
-      console.log('Error submitting form', e);
+    catch (err) {
+      console.error('Error submitting form', err);
       return Promise.reject();
     }
   };
@@ -148,7 +177,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
     saveForm().then(() => {
       setIsTraceSurfaceFeatureEdit(false);
     }, () => {
-      console.log('Error saving form data to Spot');
+      console.error('Error saving form data to Spot');
     });
   };
 
@@ -160,8 +189,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const saveUpdatedImage = (updatedImage) => {
     const images = spot?.properties?.images || [];
-    const imagesFiltered = images.filter(i => i.id !== updatedImage.id);
-    const updatedImages = [...imagesFiltered, updatedImage];
+    const updatedImages = images.map(i => i.id === updatedImage.id ? updatedImage : i);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
@@ -202,9 +230,14 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   const renderSectionHeader = (page) => {
     if (page.testing && !isTestingMode) return null;
+    else if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return null;
+    const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
     return (
       <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
-        <SectionDivider dividerText={page.label}/>
+        <SectionDivider
+          dividerText={dividerText}
+          leftIcon={page.icon_src && <Image source={page.icon_src} style={{height: 18, width: 18}}/>}
+        />
       </Pressable>
     );
   };
@@ -225,7 +258,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
           paddingHorizontal: 10,
           paddingVertical: 10,
         }}>
-          <Image resizeMode='contain' source={RockdLogo} style={{height: 30, width: 30}}/>
+          <Image resizeMode={'contain'} source={RockdLogo} style={{height: 30, width: 30}}/>
           <Text
             style={{fontSize: SMALL_TEXT_SIZE, fontWeight: TEXT_WEIGHT_500}}
           >
@@ -239,7 +272,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
   const renderSections = () => {
     return (
       <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={'Spot Overview'}/>
+        <PageHeader hideBackButton pageTitle={spot.properties?.isSample ? 'Overview' : 'Spot Overview'}/>
         <SectionList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListHeaderComponent={isTestingMode && renderRockdBadge}
@@ -251,6 +284,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
               <SectionOverview
                 isReadOnly={isReadOnly}
                 onOpenImage={handleOpenImage}
+                onOpenImageProperties={handleOpenImageProperties}
                 openMainMenuPanel={openMainMenuPanel}
                 page={item}
               />
@@ -297,7 +331,7 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
 
   return (
     <View style={{flex: 1}}>
-      {spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
+      {!isSample && spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
         || spot.geometry.type === 'MultiLineString' || spot.geometry.type === 'Polygon'
         || spot.geometry.type === 'MultiPolygon' || spot.geometry.type === 'GeometryCollection') && (
         <View style={notebookStyles.traceSurfaceFeatureContainer}>
@@ -335,12 +369,24 @@ const Overview = ({isReadOnly, openMainMenuPanel}) => {
         onOpenSketch={handleOpenSketch}
         saveUpdatedImage={saveUpdatedImage}
         setImageToView={setImageToView}
-        setIsImageModalVisible={setIsImageModalVisible}
+        setIsImageModalVisible={handleCloseImageModal}
+        shouldOpenProperties={shouldOpenImageProperties}
       />
+      {isImagePropertiesModalVisible && (
+        <ImagePropertiesModal
+          closeModal={() => setIsImagePropertiesModalVisible(false)}
+          image={imageToView}
+          isReadOnly={isReadOnly}
+          isVisible={isImagePropertiesModalVisible}
+          saveUpdatedImage={saveUpdatedImage}
+          setImageToView={setImageToView}
+        />
+      )}
       {isSketchModalVisible && (
         <SketchModal
           image={sketchImage}
           saveImages={saveImagesToSpot}
+          saveUpdatedImage={saveUpdatedImage}
           setIsSketchModalVisible={setIsSketchModalVisible}
         />
       )}

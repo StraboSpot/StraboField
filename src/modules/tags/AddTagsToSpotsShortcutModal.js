@@ -9,7 +9,7 @@ const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
   const renderAddTagsToSpotsShortcutModal = () => {
     return (
       <ModalWrapper
-        overlayStyleOverride={{maxHeight: 600, flex: 1}}
+        isChildrenFilled={true}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton={true}

@@ -59,7 +59,7 @@ const RunQAQC = ({dataset}) => {
             if (uploadStatus.datasets === 'uploaded') {
               try {
                 await runQAQC(dataset, project.id, encodedLogin, toast, toast_id);
-                initializeDownload(project, encodedLogin);
+                await initializeDownload(project, encodedLogin);
               }
               catch (err) {
                 toast.update(toast_id, 'Failed to run QAQC.', {type: 'error', duration: 5000});

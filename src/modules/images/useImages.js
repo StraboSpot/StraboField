@@ -11,17 +11,16 @@ import useCompassCore from '../../services/device/useCompassCore';
 import useDevice from '../../services/device/useDevice';
 import usePermissions from '../../services/device/usePermissions';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewId, isEmpty, toError} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  setIsErrorMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {openedMessageModal, setLoadingStatus} from '../home/home.slice';
 import {setCurrentImageBasemap} from '../maps/maps.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {
+  addedChangedImageId,
+  removedChangedImageIds,
+  updatedModifiedTimestampsBySpotsIds,
+} from '../project/projects.slice';
 import {clearedSelectedSpots, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 
 let imageCount = 0;
@@ -46,6 +45,8 @@ const useImages = () => {
   /* Exported Functions */
 
   const deleteImageFile = async (imageId) => {
+    // Nothing left to re-upload once the file is gone; updateImage re-adds the id straight afterwards
+    dispatch(removedChangedImageIds([imageId]));
     if (Platform.OS !== 'web') {
       const localImageFile = getLocalImageURI(imageId);
       const fileExists = await doesDeviceDirExist(localImageFile);
@@ -56,10 +57,10 @@ const useImages = () => {
   const deleteImageFromSpot = async (imageId, spotWithImage) => {
     const spotsOnImage = Object.values(spots).filter(spot => spot.properties.image_basemap === imageId);
     if (spotsOnImage && spotsOnImage.length >= 1) {
-      dispatch(clearedStatusMessages());
-      dispatch(
-        addedStatusMessage('Image Basemap contains Spots! \n\nDelete the spots, before trying to delete the image'));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({
+        message: 'Delete the spots before trying to delete the image.',
+        title: 'Image Basemap Contains Spots!',
+      }));
       return false;
     }
     else if (spotWithImage) {
@@ -73,9 +74,7 @@ const useImages = () => {
       return true;
     }
     else {
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error deleting image ${imageId}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `Image ${imageId} could not be deleted.`, title: 'Error Deleting Image!'}));
     }
   };
 
@@ -161,9 +160,9 @@ const useImages = () => {
             alert('Missing Image!', 'Unable to find image file on this device.');
           }
         })
-        .catch((e) => {
+        .catch((err) => {
           dispatch(setLoadingStatus({view: 'home', bool: false}));
-          console.error('Image not found', e);
+          console.error('Image not found', err);
         });
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
@@ -208,9 +207,7 @@ const useImages = () => {
             // launchImageLibrary itself. Uncaught, the Promise never settles and the import hangs.
             // Reported here rather than rejected because the caller does not catch.
             console.error('Error Importing Images:', err);
-            dispatch(clearedStatusMessages());
-            dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-            dispatch(setIsErrorMessagesModalVisible(true));
+            dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
             dispatch(setLoadingStatus({view: 'home', bool: false}));
             res(newImages);  // Keep any images already imported
           }
@@ -244,9 +241,7 @@ const useImages = () => {
     }
     catch (err) {
       console.error(`Error Taking Picture: ${err}`);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       return newImages;  // Keep any photos already taken before the error
     }
@@ -261,15 +256,15 @@ const useImages = () => {
     }
     catch (err) {
       console.error(`Error Taking Picture: ${err}`);
-      dispatch(clearedStatusMessages());
-      dispatch(addedStatusMessage(`There was an error getting image:\n${err}`));
-      dispatch(setIsErrorMessagesModalVisible(true));
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       return [];
     }
   };
 
-  const saveFile = async (imageData) => {
+  // An overrideId saves under that id instead of a new one. The destination must be free — copyFile
+  // does not overwrite on iOS.
+  const saveFile = async (imageData, overrideId) => {
     console.log('New image data:', imageData);
     let imgHeight = imageData.height;
     let imgWidth = imageData.width;
@@ -279,7 +274,7 @@ const useImages = () => {
       imgHeight = newImageDimensions.height;
       imgWidth = newImageDimensions.width;
     }
-    let imageId = getNewId();
+    let imageId = overrideId || getNewId();
     let imageURI = getLocalImageURI(imageId);
     try {
       const exists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES);
@@ -295,9 +290,9 @@ const useImages = () => {
     }
     catch (err) {
       imageCount++;
-      console.log('Error on', imageId, ':', err);
+      console.error('Error on', imageId, ':', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      throw Error(err);
+      throw toError(err);
     }
   };
 
@@ -318,9 +313,8 @@ const useImages = () => {
     imageCopy.annotated = annotation;
     if (annotation && !imageCopy.title) imageCopy.title = title;
     if (selectedSpot && selectedSpot.properties && selectedSpot.properties.images) {
-      const updatedImages = selectedSpot.properties.images.filter(image2 => imageCopy.id !== image2.id);
+      const updatedImages = selectedSpot.properties.images.map(i => i.id === imageCopy.id ? imageCopy : i);
       console.log(updatedImages);
-      updatedImages.push(imageCopy);
       dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
       dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
     }
@@ -361,11 +355,26 @@ const useImages = () => {
           }
         });
       }
-      catch (e) {
+      catch (err) {
         dispatch(setLoadingStatus({view: 'home', bool: false}));
-        reject(e);
+        reject(err);
       }
     });
+  };
+
+  // Replaces an image's file but keeps its id, so nothing referring to the image has to be re-pointed;
+  // the new modified_timestamp is what gets past the URI-keyed caches (see getLocalImageURI). The id is
+  // queued as changed because the server reports an id it already has as present. Staged under a temp
+  // id first, so a copy that fails partway leaves the original file intact.
+  const updateImage = async (image, path) => {
+    const stagedId = getNewId();
+    const {height, width} = await saveFile({...image, 'path': path}, stagedId);
+    await deleteImageFile(image.id);
+    await moveFile(APP_DIRECTORIES.IMAGES + stagedId + '.jpg', APP_DIRECTORIES.IMAGES + image.id + '.jpg');
+    const updatedImage = {...image, height: height, width: width, modified_timestamp: Date.now()};
+    dispatch(addedChangedImageId(image.id));
+    if (currentImageBasemap?.id === image.id) dispatch(setCurrentImageBasemap(updatedImage));
+    return updatedImage;
   };
 
   return {
@@ -383,6 +392,7 @@ const useImages = () => {
     saveImageFromDownloadsDir,
     setAnnotation,
     takePicture,
+    updateImage,
   };
 };
 

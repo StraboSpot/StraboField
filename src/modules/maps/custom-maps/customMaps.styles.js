@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   bottomButtonsContainer: {
-    flex: 1,
     justifyContent: 'flex-end',
     paddingBottom: 10,
+    paddingTop: 10,
   },
   itemContainer: {
     alignItems: 'center',
@@ -90,6 +90,10 @@ const styles = StyleSheet.create({
   mapTypeInfoText: {
     lineHeight: 20,
     textAlign: 'center',
+  },
+  mapUrlLink: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    textDecorationLine: 'underline',
   },
   requiredMessage: {
     color: themes.RED,

@@ -8,6 +8,9 @@ gem 'cocoapods', '>= 1.13', '!= 1.15.0', '!= 1.15.1'
 gem 'activesupport', '>= 6.1.7.5', '!= 7.1.0'
 gem 'xcodeproj', '< 1.26.0'
 gem 'concurrent-ruby', '< 1.3.4'
+# json >= 2.10 fails to build its C extension on Ruby 3.2.11 (redeclares
+# rb_hash_bulk_insert/rb_str_to_interned_str); pin to the last version that compiles.
+gem 'json', '2.9.1'
 gem 'fastlane'
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')

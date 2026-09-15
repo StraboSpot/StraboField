@@ -23,6 +23,13 @@ const DrawLayers = ({drawFeatures}) => {
         minZoomLevel={1}
         style={getMapSymbology().pointDraw}
       />
+      <MapboxGL.CircleLayer
+        belowLayerID={'pointLayerDraw'}
+        filter={['==', ['geometry-type'], 'Point']}
+        id={'pointLayerDrawHalo'}
+        minZoomLevel={1}
+        style={getMapSymbology().pointDrawHalo}
+      />
       <MapboxGL.LineLayer
         filter={['==', ['geometry-type'], 'LineString']}
         id={'lineLayerDraw'}

@@ -1,47 +1,52 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Animated, Easing, ImageBackground, Platform, Pressable, View} from 'react-native';
 
 import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import compassStyles from './compass.styles';
+import {mod} from '../../services/device/compassMath.helpers';
 
 const CompassFace = ({compassMeasurementTypes, compassData, grabMeasurements}) => {
   /* Local State */
 
-  const [strikeSpinValue] = useState(new Animated.Value(0));
-  const [trendSpinValue] = useState(new Animated.Value(0));
+  const strikeSpinValue = useRef(new Animated.Value(0)).current;
+  const trendSpinValue = useRef(new Animated.Value(0)).current;
+  const strikeDisplayed = useRef(0);
+  const trendDisplayed = useRef(0);
 
   /* Derived Variables */
 
-  // Interpolated angles
   const strike = compassData?.strike ?? 0;
-  const strikeSpin = strikeSpinValue.interpolate({inputRange: [0, strike], outputRange: ['0deg', strike + 'deg']});
   const trend = compassData?.trend ?? 0;
-  const trendSpin = trendSpinValue.interpolate({inputRange: [0, trend], outputRange: ['0deg', trend + 'deg']});
+  const strikeSpin = strikeSpinValue.interpolate({
+    extrapolate: 'extend',
+    inputRange: [0, 360],
+    outputRange: ['0deg', '360deg'],
+  });
+  const trendSpin = trendSpinValue.interpolate({
+    extrapolate: 'extend',
+    inputRange: [0, 360],
+    outputRange: ['0deg', '360deg'],
+  });
 
   /* Side Effects */
 
-  // Animate STRIKE rotation
+  const animateNeedle = (animatedValue, displayedRef, target) => {
+    const delta = mod(target - displayedRef.current + 180, 360) - 180; // signed shortest turn in (-180, 180]
+    displayedRef.current += delta;
+    Animated.timing(animatedValue, {
+      duration: 200,
+      easing: Easing.out(Easing.quad),
+      toValue: displayedRef.current,
+      useNativeDriver: Platform.OS !== 'web',
+    }).start();
+  };
+
   useEffect(() => {
-    if (strike >= 0) {
-      Animated.timing(strikeSpinValue, {
-        toValue: strike,
-        duration: 250,
-        easing: Easing.linear,
-        useNativeDriver: Platform.OS !== 'web',
-      }).start();
-    }
+    if (strike >= 0) animateNeedle(strikeSpinValue, strikeDisplayed, strike);
   }, [strike]);
 
-  // Animate TREND rotation
   useEffect(() => {
-    if (trend >= 0) {
-      Animated.timing(trendSpinValue, {
-        toValue: trend,
-        duration: 250,
-        easing: Easing.linear,
-        useNativeDriver: Platform.OS !== 'web',
-      }).start();
-    }
+    if (trend >= 0) animateNeedle(trendSpinValue, trendDisplayed, trend);
   }, [trend]);
 
   /* Render Functions */

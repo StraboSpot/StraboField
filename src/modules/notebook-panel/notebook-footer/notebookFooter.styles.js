@@ -4,6 +4,11 @@ import * as themes from '../../../shared/styles.constants';
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
 
 const notebookFooterStyles = StyleSheet.create({
+  footerContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderTopColor: themes.MEDIUMGREY,
+    borderTopWidth: 0.5,
+  },
   footerIconContainer: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -34,6 +39,11 @@ const notebookFooterStyles = StyleSheet.create({
     paddingLeft: 0,
     paddingRight: 0,
     paddingTop: 5,
+  },
+  morePagesListItemTesting: {
+    color: themes.ORANGE,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
   },
   morePagesListItemTitle: {
     color: themes.PRIMARY_TEXT_COLOR,

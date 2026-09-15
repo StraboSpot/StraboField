@@ -1,17 +1,30 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS} from './tags.constants';
+import {TAG_BACKUP_MESSAGES, TAG_BACKUP_STATUS, TAG_TYPES} from './tags.constants';
 import useSafeDocumentPicker from '../../services/device/useSafeDocumentPicker';
-import {DARKGREY, MODAL_TEXT_SIZE, PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE} from '../../shared/styles.constants';
+import {
+  DARKGREY,
+  MODAL_TEXT_SIZE,
+  PRIMARY_TEXT_COLOR,
+  PRIMARY_TEXT_SIZE,
+  WARNING_COLOR,
+} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import LottieAnimations from '../../utils/animations/LottieAnimations';
+import {PROJECT_SAVE_STATUS} from '../connections/connections.constants';
 import {setLoadingStatus as setHomeLoadingStatus} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
+
+// Generous on purpose: firing early would report a failure while the save is still genuinely in flight.
+const SERVER_SAVE_TIMEOUT_MS = 60000;
+// Deliberately non-committal — on a timeout the save may still land, so don't claim it failed.
+const SERVER_SAVE_TIMEOUT_MESSAGE = 'Timed out waiting for the save to be confirmed.'
+  + ' Check your project to be sure the changes were saved.';
 
 const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
@@ -19,6 +32,7 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
   const dispatch = useDispatch();
   const currentTags = useSelector(state => state.project.project?.tags) || [];
+  const projectSaveStatus = useSelector(state => state.connections.projectSaveStatus);
 
   const {safePick} = useSafeDocumentPicker();
 
@@ -26,6 +40,7 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
   const [loadingStatus, setLoadingStatus_] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
 
   /* Derived Variables */
 
@@ -38,16 +53,46 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
       : loadingStatus === TAG_BACKUP_STATUS.COMPLETE
         ? `${title} Imported`
         : 'Import Failed';
+  // Web writes go straight to the server, so the import isn't done until that save comes back
+  const shouldWaitForServerSave = Platform.OS === 'web';
+  // Shown up front and repeated after a rejected file, so both say the same thing
+  const chooseFileText = `Choose a .json file exported from ${title}.`;
+
+  /* Side Effects */
+
+  // Deps are the save status alone: adding loadingStatus would let a stale SAVED finish the next import early.
+  useEffect(() => {
+    if (!shouldWaitForServerSave || loadingStatus !== TAG_BACKUP_STATUS.IN_PROGRESS) return;
+    const isSaved = projectSaveStatus === PROJECT_SAVE_STATUS.SAVED;
+    if (!isSaved && projectSaveStatus !== PROJECT_SAVE_STATUS.ERROR) return;
+
+    setStatusMessage(message => `${message} ${isSaved ? 'Changes saved.' : 'Changes NOT saved.'}`);
+    setLoadingStatus_(isSaved ? TAG_BACKUP_STATUS.COMPLETE : TAG_BACKUP_STATUS.ERROR);
+    dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+  }, [projectSaveStatus]);
+
+  // Bounds the wait above, which resolves only when the server reports back. The modal closes both its exits while
+  // the import is in progress, so a status that never arrives would leave it with no way out.
+  useEffect(() => {
+    if (!shouldWaitForServerSave || loadingStatus !== TAG_BACKUP_STATUS.IN_PROGRESS) return;
+    const timeoutId = setTimeout(() => {
+      setStatusMessage(message => `${message} ${SERVER_SAVE_TIMEOUT_MESSAGE}`);
+      setLoadingStatus_(TAG_BACKUP_STATUS.ERROR);
+      dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+    }, SERVER_SAVE_TIMEOUT_MS);
+    return () => clearTimeout(timeoutId);
+  }, [loadingStatus, shouldWaitForServerSave]);
 
   /* Event Handlers */
 
   const handleLoad = async () => {
+    setValidationMessage('');
     try {
       const result = await safePick({type: [types.json]});
       if (!result) return; // User canceled
 
       const [{name, uri}] = result;
-      if (!name || !uri) throw new Error('Invalid file selected.');
+      if (!name || !uri) return failValidation('Could not read the selected file.');
 
       setLoadingStatus_(TAG_BACKUP_STATUS.IN_PROGRESS);
       dispatch(setHomeLoadingStatus({view: 'home', bool: true}));
@@ -59,26 +104,34 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
         type: [types.json],
       });
 
-      if (localCopy.status !== 'success') throw new Error('Could not access the selected file.');
+      if (localCopy.status !== 'success') return failValidation('Could not read the selected file.');
 
       const fileContent = await RNFS.readFile(localCopy.localUri, 'utf8');
-      const importedTags = JSON.parse(fileContent);
 
-      if (!Array.isArray(importedTags)) throw new Error('File does not contain a valid tags array.');
-
-      const expectedType = isGeologicUnits ? 'geologic_unit' : null;
-      const validTags = importedTags.filter(t => t && typeof t === 'object' && 'id' in t
-        && (isGeologicUnits ? t.type === expectedType : t.type !== 'geologic_unit'));
-      if (validTags.length === 0) {
-        throw new Error(`No valid ${title.toLowerCase()} found in the selected file.`);
+      // The picker's type filter is only a hint (the browser allows All Files), so anything can land here
+      let importedTags;
+      try {
+        importedTags = JSON.parse(fileContent);
       }
+      catch (err) {
+        console.error('Selected file is not valid JSON:', err);
+        return failValidation('The selected file isn\'t valid JSON.');
+      }
+
+      if (!Array.isArray(importedTags)) return failValidation(`The selected file isn't a ${title} backup.`);
+
+      const validTags = importedTags.filter(t => t && typeof t === 'object' && 'id' in t
+        && (isGeologicUnits ? t.type === TAG_TYPES.GEOLOGIC_UNIT : t.type !== TAG_TYPES.GEOLOGIC_UNIT));
+      if (validTags.length === 0) return failValidation(`The selected file has no ${title} in it.`);
 
       const mergedTags = mergeTags(currentTags, validTags);
       dispatch(updatedProject({field: 'tags', value: mergedTags}));
 
       const newCount = validTags.filter(t => !currentTags.find(e => e.id === t.id)).length;
       const mergedCount = validTags.length - newCount;
-      setStatusMessage(`Added ${newCount} new ${title.toLowerCase()}, merged ${mergedCount} existing.`);
+      setStatusMessage(`Added ${newCount} new ${nounForCount(newCount)}, merged ${mergedCount} existing.`);
+      if (shouldWaitForServerSave) return;  // The side effect above reports completion once the server save lands
+
       setLoadingStatus_(TAG_BACKUP_STATUS.COMPLETE);
       dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
     }
@@ -91,6 +144,16 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
   };
 
   /* Logic Helpers */
+
+  // 'Tags' → 'tag' or 'tags' to match the count
+  const nounForCount = count => (count === 1 ? title.slice(0, -1) : title).toLowerCase();
+
+  // A wrong file isn't a failed import — send the user back to the picker with the reason
+  const failValidation = (reason) => {
+    setValidationMessage(`${reason} ${chooseFileText}`);
+    setLoadingStatus_('');
+    dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
+  };
 
   const mergeTags = (existingTags, importedTags) => {
     const merged = [...existingTags];
@@ -111,12 +174,16 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
   const renderContent = () => {
     if (loadingStatus === '') {
-      const instructionText = `Select a JSON file from which to ${actionLabel.toLowerCase()} ${title.toLowerCase()}. `
-        + `${title} with matching IDs will be merged — any new properties will be added, but existing properties will not be overwritten. `
-        + `${title} with new IDs will be added.`;
+      const instructionText = `${chooseFileText} ${title} with matching IDs will be merged — new properties are `
+        + `added, existing ones are kept. ${title} with new IDs will be added.`;
       return (
         <View style={{padding: 16}}>
           <Text style={{fontSize: PRIMARY_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}>{instructionText}</Text>
+          {validationMessage !== '' && (
+            <Text style={{fontSize: PRIMARY_TEXT_SIZE, color: WARNING_COLOR, marginTop: 12}}>
+              {validationMessage}
+            </Text>
+          )}
         </View>
       );
     }
@@ -124,17 +191,11 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
       <View style={{padding: 20, alignItems: 'center'}}>
         <LottieAnimations
           doesLoop={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
-          show
           type={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS ? 'loadingFile'
             : loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? 'complete' : 'error'}
         />
         {statusMessage !== '' && (
-          <Text style={{
-            marginTop: 12,
-            textAlign: 'center',
-            fontSize: MODAL_TEXT_SIZE,
-            color: DARKGREY,
-          }}>
+          <Text style={{fontSize: MODAL_TEXT_SIZE, color: DARKGREY, marginTop: 12, textAlign: 'center'}}>
             {statusMessage}
           </Text>
         )}
@@ -144,14 +205,16 @@ const LoadTagsModal = ({closeModal, isGeologicUnits}) => {
 
   /* View */
 
+  // The action button opens the file picker rather than importing, so it's labeled for what it does
   return (
     <ModalWrapper
-      actionTitle={loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? 'Done' : actionLabel}
+      actionTitle={loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? 'Done' : 'Select File'}
       closeModal={closeModal}
       headerTitle={modalTitle}
+      isLoading={loadingStatus === TAG_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={loadingStatus === TAG_BACKUP_STATUS.COMPLETE ? closeModal : handleLoad}
       onCancelPress={closeModal}
-      showActionButton={loadingStatus === '' || loadingStatus === TAG_BACKUP_STATUS.COMPLETE || loadingStatus === TAG_BACKUP_STATUS.ERROR}
+      showActionButton={loadingStatus !== TAG_BACKUP_STATUS.IN_PROGRESS}
       showCancelButton={loadingStatus === ''}
       showCloseButton
     >

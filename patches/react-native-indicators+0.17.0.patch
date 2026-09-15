@@ -1,0 +1,104 @@
+diff --git a/node_modules/react-native-indicators/src/components/ball-indicator/index.js b/node_modules/react-native-indicators/src/components/ball-indicator/index.js
+index 8c97fbd..5eea78c 100644
+--- a/node_modules/react-native-indicators/src/components/ball-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/ball-indicator/index.js
+@@ -64,7 +64,7 @@ export default class BallIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={[styles.layer, layerStyle]} {...{ key: index }}>
++      <Animated.View style={[styles.layer, layerStyle]} key={index}>
+         <Animated.View style={ballStyle} />
+       </Animated.View>
+     );
+diff --git a/node_modules/react-native-indicators/src/components/bar-indicator/index.js b/node_modules/react-native-indicators/src/components/bar-indicator/index.js
+index ad06a55..133949e 100644
+--- a/node_modules/react-native-indicators/src/components/bar-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/bar-indicator/index.js
+@@ -94,7 +94,7 @@ export default class BarIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <View style={containerStyle} {...{ key: index }}>
++      <View style={containerStyle} key={index}>
+         <Animated.View style={topStyle} />
+         <Animated.View style={bottomStyle} />
+       </View>
+diff --git a/node_modules/react-native-indicators/src/components/dot-indicator/index.js b/node_modules/react-native-indicators/src/components/dot-indicator/index.js
+index b49cbfd..3512e0e 100644
+--- a/node_modules/react-native-indicators/src/components/dot-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/dot-indicator/index.js
+@@ -57,7 +57,7 @@ export default class DotIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={style} {...{ key: index }} />
++      <Animated.View style={style} key={index} />
+     );
+   }
+ 
+diff --git a/node_modules/react-native-indicators/src/components/material-indicator/index.js b/node_modules/react-native-indicators/src/components/material-indicator/index.js
+index bf7edc4..0bde608 100644
+--- a/node_modules/react-native-indicators/src/components/material-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/material-indicator/index.js
+@@ -107,7 +107,7 @@ export default class MaterialIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={styles.layer} {...{ key: index }}>
++      <Animated.View style={styles.layer} key={index}>
+         <Animated.View style={layerStyle}>
+           <Animated.View style={[containerStyle, offsetStyle]} collapsable={false}>
+             <Animated.View style={viewportStyle}>
+diff --git a/node_modules/react-native-indicators/src/components/pulse-indicator/index.js b/node_modules/react-native-indicators/src/components/pulse-indicator/index.js
+index 53bcf92..e452df8 100644
+--- a/node_modules/react-native-indicators/src/components/pulse-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/pulse-indicator/index.js
+@@ -51,7 +51,7 @@ export default class PulseIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={styles.layer} {...{ key: index }}>
++      <Animated.View style={styles.layer} key={index}>
+         <Animated.View style={pulseStyle} />
+       </Animated.View>
+     );
+diff --git a/node_modules/react-native-indicators/src/components/skype-indicator/index.js b/node_modules/react-native-indicators/src/components/skype-indicator/index.js
+index 8a988df..1a0304f 100644
+--- a/node_modules/react-native-indicators/src/components/skype-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/skype-indicator/index.js
+@@ -68,7 +68,7 @@ export default class SkypeIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={[styles.layer, layerStyle]} {...{ key: index }}>
++      <Animated.View style={[styles.layer, layerStyle]} key={index}>
+         <Animated.View style={ballStyle} />
+       </Animated.View>
+     );
+diff --git a/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js b/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js
+index dcde1e5..392e174 100644
+--- a/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js
+@@ -61,7 +61,7 @@ export default class UIActivityIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={[styles.layer, layerStyle]} {...{ key: index }}>
++      <Animated.View style={[styles.layer, layerStyle]} key={index}>
+         <Animated.View style={barStyle} />
+       </Animated.View>
+     );
+diff --git a/node_modules/react-native-indicators/src/components/wave-indicator/index.js b/node_modules/react-native-indicators/src/components/wave-indicator/index.js
+index 2de37d5..1fbe5ce 100644
+--- a/node_modules/react-native-indicators/src/components/wave-indicator/index.js
++++ b/node_modules/react-native-indicators/src/components/wave-indicator/index.js
+@@ -64,7 +64,7 @@ export default class WaveIndicator extends PureComponent {
+     };
+ 
+     return (
+-      <Animated.View style={styles.layer} {...{ key: index }}>
++      <Animated.View style={styles.layer} key={index}>
+         <Animated.View style={waveStyle} />
+       </Animated.View>
+     );

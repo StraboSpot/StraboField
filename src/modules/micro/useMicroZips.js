@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useDevice from '../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {MICRO_PATHS, STRABO_APIS} from '../../services/network/urls.constants';
+import {toError} from '../../shared/helpers';
 import {addedStatusMessage, removedLastStatusMessage} from '../home/home.slice';
 
 const useMicroZips = () => {
@@ -38,7 +39,7 @@ const useMicroZips = () => {
     }
     catch (err) {
       console.error('Unzip Error:', err);
-      throw Error();
+      throw toError(err);
     }
   };
 
@@ -93,6 +94,7 @@ const useMicroZips = () => {
       setShowComplete(true);
     }
     catch (err) {
+      console.error('Error Getting StraboMicro Project:', err);
       throw Error('Error Getting StraboMicro Project');
     }
     finally {

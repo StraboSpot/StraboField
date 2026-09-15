@@ -21,6 +21,13 @@ module.exports = {
     },
   },
   root: true,
+  overrides: [
+    {
+      // Jest globals for test files and test infrastructure (mocks, custom environments).
+      files: ['**/*.test.js', '**/__tests__/**', 'jest/**/*.js'],
+      env: {jest: true},
+    },
+  ],
   rules: {
     // Disable Prettier
     'prettier/prettier': 'off',

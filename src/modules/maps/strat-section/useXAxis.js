@@ -10,7 +10,7 @@ import {
 } from './stratSection.constants';
 import {useForm} from '../../form';
 import {useSpots} from '../../spots';
-import useMapCoords from '../useMapCoords';
+import useMapCoords from '../view/useMapCoords';
 
 const s = 20; // spacing between multiple x axes
 const xCa = 23.3; // Horizontal space between carbonate tick marks

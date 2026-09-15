@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import {resetCompassState} from '../modules/compass/compass.slice';
+import {clearLocalSaveNeeded} from '../modules/connections/connections.slice';
 import {resetHomeState} from '../modules/home/home.slice';
 import {resetMapState} from '../modules/maps/maps.slice';
 import {resetOfflineMapsState} from '../modules/maps/offline-maps/offlineMaps.slice';
@@ -26,6 +27,7 @@ const useResetState = () => {
     dispatch(resetNotebookState());
     dispatch(resetProjectState());
     dispatch(resetSpotState());
+    dispatch(clearLocalSaveNeeded());
     dispatch(setTestingMode(isTestingMode));  // Don't modify isTestingMode state
   };
 

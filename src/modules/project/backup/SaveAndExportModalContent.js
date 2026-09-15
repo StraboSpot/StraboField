@@ -40,7 +40,6 @@ const SaveAndExportModalContent = ({
         : backupAction === TEMPLATE_BACKUP_ACTIONS.BACKUP_TEMPLATES ? 'Templates'
           : 'project';
   const fileExtension = backupAction === 'export' ? '.zip' : '.json';
-  const fileName = backupFileName.replace(/\s/g, '_');
   const subFolder = backupAction === TAG_BACKUP_ACTIONS.BACKUP_TAGS ? 'Tags'
     : backupAction === TAG_BACKUP_ACTIONS.BACKUP_GEOLOGIC_UNITS ? 'GeologicUnits'
       : backupAction === TEMPLATE_BACKUP_ACTIONS.BACKUP_TEMPLATES ? 'Templates'
@@ -48,12 +47,32 @@ const SaveAndExportModalContent = ({
 
   /* Logic Helpers */
 
+  const getInstructionText = () => {
+    if (backupAction === 'save') {
+      return 'All datasets will be saved locally, along with any images and custom maps.';
+    }
+    // Web downloads through the browser, so the file lands wherever the browser is set to put downloads.
+    if (Platform.OS === 'web') {
+      return `Your ${backupActionTitle} will be downloaded as a ${fileExtension} file to your browser's download `
+        + 'location.\n\nFile will be saved as:';
+    }
+    if (Platform.OS === 'ios') {
+      return `Your ${backupActionTitle} will be saved as a ${fileExtension} file into the `
+        + `StraboField/Distribution${subFolder ? '/' + subFolder : ''} folder.\n\nMove it out of StraboField `
+        + 'using the iOS Files app.\n\nFile will be saved as:';
+    }
+    return `Your ${backupActionTitle} will be exported as a ${fileExtension} file into the `
+      + `Downloads\\StraboSpot2\\Backups${subFolder ? '\\' + subFolder : ''} folder.\n\nFile will be saved as:`;
+  };
+
+  // Store the name exactly as it will be written to disk: this field previews it and the Backup modals pass
+  // the same value straight to the export, so what's shown and what's saved must not diverge.
   const validateFileName = (filenameChanged) => {
     const regexp = /^[a-zA-Z0-9-_]*$/; // Check for alphanumeric characters, a dash or underscore (allow empty)
     const fileNameWithUnderscores = filenameChanged.replace(/\s/g, '_');
     if (fileNameWithUnderscores.search(regexp) === -1) setIsFileNameError(true);
     else setIsFileNameError(false);
-    setBackupFileName(filenameChanged);
+    setBackupFileName(fileNameWithUnderscores);
   };
 
   /* Render Functions */
@@ -62,13 +81,14 @@ const SaveAndExportModalContent = ({
     <View style={{padding: 20, alignItems: 'center'}}>
       <LottieAnimations
         doesLoop={backingUpStatus === 'inProgress'}
-        show
         type={backingUpStatus === 'inProgress' ? 'loadingFile'
           : backingUpStatus === 'complete' ? 'complete' : 'error'}
       />
-      <Text style={{marginTop: 12, textAlign: 'center', color: DARKGREY}}>
-        {statusMessages.join('\n')}
-      </Text>
+      {statusMessages.length > 0 && (
+        <Text style={{marginTop: 12, textAlign: 'center', color: DARKGREY}}>
+          {statusMessages.join('\n')}
+        </Text>
+      )}
     </View>
   );
 
@@ -80,15 +100,7 @@ const SaveAndExportModalContent = ({
         <View style={{padding: 16}}>
           {/* Instruction Text */}
           <Text style={{fontSize: PRIMARY_TEXT_SIZE, marginBottom: 12, color: DARKGREY}}>
-            {backupAction === 'save'
-              ? 'All datasets will be saved locally, along with any images and custom maps.'
-              : Platform.OS === 'ios'
-                ? `Your ${backupActionTitle} will be saved as a ${fileExtension} file into the `
-                + `StraboField/Distribution${subFolder ? '/' + subFolder : ''} folder.\n\nMove it out of StraboField `
-                + 'using the iOS Files app.\n\nFile will be saved as:'
-                : `Your ${backupActionTitle} will be exported as a ${fileExtension} file into the `
-                + `Downloads\\StraboSpot2\\Backups${subFolder ? '\\' + subFolder : ''} folder.\n\nFile will be `
-                + 'saved as:'}
+            {getInstructionText()}
           </Text>
 
           {/* File Name Input */}
@@ -106,7 +118,7 @@ const SaveAndExportModalContent = ({
                 backgroundColor: PRIMARY_BACKGROUND_COLOR,
               },
             ]}
-            value={fileName}
+            value={backupFileName}
           />
           {isFileNameError && (
             <Text style={{color: NEGATIVE_COLOR, marginBottom: 8, fontSize: SMALL_TEXT_SIZE}}>

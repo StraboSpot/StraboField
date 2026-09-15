@@ -29,6 +29,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   /* Local State */
 
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState({downloaded: 0, total: 0});
 
   /* Derived Variables */
 
@@ -52,8 +53,9 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   const downloadImages = async () => {
     setIsDownloadingImages(true);
+    setDownloadProgress({downloaded: 0, total: imagesNeededCount});
     try {
-      await initializeDownloadImages(dataset);
+      await initializeDownloadImages(dataset, (downloaded, total) => setDownloadProgress({downloaded, total}));
       await refreshImagesNeededCount();
     }
     catch (err) {
@@ -89,7 +91,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
             />
           )}
           <Text style={{color: WARNING_COLOR, fontSize: PRIMARY_TEXT_SIZE, paddingLeft: 5, textAlign: 'left'}}>
-            {isDownloadingImages ? `Downloading...\n${imagesNeededCount.toString()} images`
+            {isDownloadingImages
+              ? `Downloading...\n${Math.max(downloadProgress.total - downloadProgress.downloaded, 0)} images left`
               : 'Download ' + imagesNeededCount.toString() + '\nNeeded '
               + (imagesNeededCount === 1 ? ' Image' : ' Images')}
           </Text>

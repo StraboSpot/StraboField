@@ -7,10 +7,10 @@ export const TEMPLATE_BACKUP_ACTIONS = {
 export const TEMPLATE_BACKUP_MESSAGES = {
   TITLE: 'Templates',
   STATUS: {
-    ZIPPING: 'Zipping ',
+    ZIPPING: 'Saving ',
     EXPORTING: 'Exporting ',
-    ZIPPED: ' Zipped',
-    EXPORTED: ' Exported to Zip!',
+    ZIPPED: ' Saved',
+    EXPORTED: ' Exported!',
     FAILED: 'Export Failed!',
   },
 };

@@ -39,7 +39,7 @@ const useProject = () => {
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const user = useSelector(state => state.user);
 
-  const {doesDeviceBackupDirExist, readDirectory} = useDevice();
+  const {doesDeviceBackupDirExist, readDeviceJSONFile, readDirectory} = useDevice();
   const {clearProject} = useResetState();
   const {getMyProjects} = useServerRequests();
   const toast = useToast();
@@ -49,7 +49,7 @@ const useProject = () => {
   const createProject = async (descriptionData) => {
     const newDate = new Date().toISOString();
     const id = getNewId();
-    const currentProject = {
+    const newProject = {
       id: id,
       description: descriptionData,
       date: newDate,
@@ -59,7 +59,7 @@ const useProject = () => {
       templates: {},
       useContinuousTagging: false,
     };
-    dispatch(addedProjectDescription(currentProject));
+    dispatch(addedProjectDescription(newProject));
     const defaultDataset = createDataset();
     dispatch(addedDataset(defaultDataset));
   };
@@ -73,8 +73,8 @@ const useProject = () => {
         break;
       }
     }
-    console.log('HERE IS THE DATASET', datasetIdFound);
-    if (!datasetIdFound) console.error('Dataset for Spot ' + spotId + ' not found');
+    // A Spot legitimately maps to no dataset at times (e.g. a just-split line before Save Edits adds it
+    // to the target dataset); the sole caller treats undefined as "not read-only", so return quietly.
     return datasetIdFound;
   };
 
@@ -128,7 +128,7 @@ const useProject = () => {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(clearedStatusMessages());
-      console.log('Error Deleting Dataset.');
+      console.error('Error Deleting Dataset.');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Deleting Dataset.'));
     }
@@ -158,14 +158,34 @@ const useProject = () => {
     //   else return res;
     // });
     // return Promise.resolve(deviceProject);
-    let id = 0;
     const exists = await doesDeviceBackupDirExist(undefined);
     if (exists) {
       const res = await readDirectory(directory);
-      const deviceFiles = res.map((file) => {
-        return {id: id++, fileName: file};
-      });
-      return {projects: deviceFiles};
+      const manualBackupFiles = res.filter(file => file !== 'AutoBackups');
+      // Surface each backup's own last modified_timestamp (from its data.json) rather than leaving it undefined,
+      // which would make moment() in ProjectList render the current time instead of when the project was last saved.
+      const deviceFiles = await Promise.all(manualBackupFiles.map(async (file, index) => {
+        const dataFile = await readDeviceJSONFile(file);
+        const projectData = dataFile?.projectDb?.project || dataFile?.projectDb;
+        return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp || projectData?.date};
+      }));
+      let id = manualBackupFiles.length;
+      const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
+      const autoBackupItems = autoBackupFiles
+        .filter(file => file.endsWith('.json') && /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(file))
+        .sort((a, b) => {
+          const tsA = a.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          const tsB = b.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
+          return tsB.localeCompare(tsA);
+        })
+        .map((file) => {
+          const tsMatch = file.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/);
+          const modified_timestamp = tsMatch[0].replace(/(\d{2})-(\d{2})-(\d{2})$/, '$1:$2:$3');
+          const sanitizedName = file.slice(tsMatch.index + 20, -'.json'.length);
+          const displayName = sanitizedName ? sanitizedName.replace(/_/g, ' ') : 'Auto Backup';
+          return {displayName, fileName: 'AutoBackups/' + file, id: id++, isAutoBackup: true, modified_timestamp};
+        });
+      return {projects: [...deviceFiles, ...autoBackupItems]};
     }
     else console.log('Does not exist');
   };
@@ -237,7 +257,7 @@ const useProject = () => {
       if (!isEmpty(user.name) && val) return 'SWITCHED';  //TODO do we really need this return
     }
     catch (err) {
-      console.log('Error setting switch value.');
+      console.error('Error setting switch value.');
     }
     dispatch(setLoadingStatus({view: 'modal', bool: false}));
   };

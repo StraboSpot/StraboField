@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {PROJECT_DESCRIPTION_FORM_NAME} from './project.constants';
 import {updatedProject} from './projects.slice';
+import {FormFlatList} from '../../shared/ui';
 import alert from '../../shared/ui/alert';
 import {Form, useForm} from '../form';
 
@@ -73,17 +74,25 @@ const ProjectDescription = () => {
 
   /* View */
 
+  // FormFlatList is the single scroll container, so Form renders its fields inline rather than in its own list.
   return (
-    <Formik
-      component={formProps => Form(
-        {...formProps, formName: PROJECT_DESCRIPTION_FORM_NAME, onMyChange: onMyChange, setFieldValue: onMyChange})}
-      enableReinitialize={true}
-      initialValues={projectDescription}
-      innerRef={descriptionFormRef}
-      onSubmit={values => console.log('Submitting form...', values)}
-      validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
-      validateOnChange={true}
-    />
+    <FormFlatList>
+      <Formik
+        component={formProps => Form({
+          ...formProps,
+          formName: PROJECT_DESCRIPTION_FORM_NAME,
+          onMyChange: onMyChange,
+          renderInline: true,
+          setFieldValue: onMyChange,
+        })}
+        enableReinitialize={true}
+        initialValues={projectDescription}
+        innerRef={descriptionFormRef}
+        onSubmit={values => console.log('Submitting form...', values)}
+        validate={values => validateForm({formName: PROJECT_DESCRIPTION_FORM_NAME, values: values})}
+        validateOnChange={true}
+      />
+    </FormFlatList>
   );
 };
 

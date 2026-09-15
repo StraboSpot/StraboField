@@ -33,6 +33,24 @@ export const cartesianToSpherical = (mValue1, mValue2, mValue3) => {
   return {rho: rho, phi: phi, theta: theta};
 };
 
+// Picks which in-plane device axis (as a native-matrix row {a, b, c}) is the "up-on-screen" edge for
+// the current hold, so trend/plunge follows the edge the user actually points instead of a fixed
+// portrait edge. screenRotation is the display's rotation from the device's natural orientation
+// (0/90/180/270), reported by the native layer. The mapping matches Android's
+// SensorManager.remapCoordinateSystem for a display rotation:
+//   0   -> +deviceY (top edge)     90  -> -deviceX
+//   180 -> -deviceY                270 -> +deviceX
+// Portrait (0) returns the device Y row, i.e. the original, portrait-locked behavior unchanged.
+export const pointingAxisRow = (matrix, screenRotation = 0) => {
+  const {m11, m12, m13, m21, m22, m23} = matrix;
+  switch (screenRotation) {
+    case 90: return {a: -m11, b: -m12, c: -m13};
+    case 180: return {a: -m21, b: -m22, c: -m23};
+    case 270: return {a: m11, b: m12, c: m13};
+    default: return {a: m21, b: m22, c: m23};
+  }
+};
+
 export const getHeading = (yaw) => {
   const degrees = yaw * (180 / Math.PI);
   const azimuthDegrees = Math.floor((degrees + 360) % 360);

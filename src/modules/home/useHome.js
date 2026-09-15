@@ -6,6 +6,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
+import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -17,8 +18,9 @@ import {
   setIsScaleBarMetric,
   startedIntervalDrag,
 } from '../maps/maps.slice';
-import useMapLocation from '../maps/useMapLocation';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {useSpots} from '../spots';
 import {
@@ -46,6 +48,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const {getTargetDatasetFromId} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected} = useSpots();
   const toast = useToast();
+  useAutoSave();
 
   /* Local State */
 
@@ -55,12 +58,22 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
+  /* Derived Variables */
+
+  const isEditingOrDrawing = mapMode === MAP_MODES.EDIT || Object.values(MAP_MODES.DRAW).includes(mapMode);
+
   /* Side Effects */
 
   useEffect(() => {
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
   }, [mapMode]);
+
+  // Switching to an image basemap or strat section leaves the current map, so cancel any in-progress
+  // editing or drawing (those changes belong to the map you were on).
+  useEffect(() => {
+    if (isEditingOrDrawing) onCancel();
+  }, [currentImageBasemap, stratSection]);
 
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
@@ -163,17 +176,13 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'addToReport':
         dispatch(setIntersectedSpotsForTagging([]));
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('report');
-        setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
-        if (Platform.OS !== 'web') setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
-        else setDraw(MAP_MODES.DRAW.POLYGON).catch(console.error);
+        setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
       case 'stereonet':
         mapComponentRef.current?.clearSelectedSpots();
@@ -205,6 +214,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
+        // Commit the deferred timestamp bump for spots actually moved during the drag, so only a
+        // real reorder dirties the dataset/project. Nothing moved → nothing to bump.
+        const changedSpotIds = store.getState().map.intervalDragChangedSpotIds;
+        if (changedSpotIds?.length > 0) dispatch(updatedModifiedTimestampsBySpotsIds(changedSpotIds));
         dispatch(savedIntervalDragReordering());
         setMapMode(MAP_MODES.VIEW);
         break;

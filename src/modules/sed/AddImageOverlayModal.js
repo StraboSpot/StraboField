@@ -1,17 +1,17 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {showFieldInfo, validateImageOverlay} from './sed.helpers';
+import {validateImageOverlay} from './sed.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {NumberInputField, SelectInputField, useForm} from '../form';
+import FieldInfoModal from '../form/FieldInfoModal';
 import {setStratSection} from '../maps/maps.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -32,6 +32,8 @@ const AddImageOverlayModal = ({
   /* Local State */
 
   const overlayFormRef = useRef(null);
+
+  const [fieldInfo, setFieldInfo] = useState(null);
 
   /* Event Handlers */
 
@@ -134,10 +136,12 @@ const AddImageOverlayModal = ({
   const renderAddImageOverlayModal = () => {
     return (
       <ModalWrapper
-        buttonTitleRight={!isReadOnly && 'Save'}
         headerTitle={'Add Image Overlay'}
-        onActionPressed={() => isReadOnly ? closeModal() : saveImageOverlay(overlayFormRef?.current?.values)}
-        onCancelPress={() => !isReadOnly && closeModal()}
+        onActionPressed={saveImageOverlay}
+        onCancelPress={closeModal}
+        onDeletePress={deleteImageOverlayConfirm}
+        showActionButton={!isReadOnly}
+        showDeleteButton={!isEmpty(image) && !isReadOnly}
       >
         <Formik
           enableReinitialize={false}
@@ -177,7 +181,7 @@ const AddImageOverlayModal = ({
                         key={'image_origin_x'}
                         label={'Image Origin X Value'}
                         name={'image_origin_x'}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'x value for the bottom left corner of image relative to axes origin (0,0)'}
                       />
                     </ListItem.Content>
@@ -190,7 +194,7 @@ const AddImageOverlayModal = ({
                         key={'image_origin_y'}
                         label={'Image Origin Y Value'}
                         name={'image_origin_y'}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'y value for the bottom left corner of image relative to axes origin (0,0)'}
                       />
                     </ListItem.Content>
@@ -204,7 +208,7 @@ const AddImageOverlayModal = ({
                         label={'Adjusted Image Width'}
                         name={'image_width'}
                         onMyChange={onMyChange}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'height adjusted automatically to maintain aspect ratio'}
                       />
                     </ListItem.Content>
@@ -218,7 +222,7 @@ const AddImageOverlayModal = ({
                         label={'Adjusted Image Height'}
                         name={'image_height'}
                         onMyChange={onMyChange}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'width adjusted automatically to maintain aspect ratio'}
                       />
                     </ListItem.Content>
@@ -231,7 +235,7 @@ const AddImageOverlayModal = ({
                         key={'image_opacity'}
                         label={'Image Opacity'}
                         name={'image_opacity'}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'0-1 with 0 being transparent and 1 opaque'}
                       />
                     </ListItem.Content>
@@ -244,7 +248,7 @@ const AddImageOverlayModal = ({
                         key={'z_index'}
                         label={'Z-Index'}
                         name={'z_index'}
-                        onShowFieldInfo={showFieldInfo}
+                        onShowFieldInfo={(label, info) => setFieldInfo({label, info})}
                         placeholder={'layer ordering'}
                       />
                     </ListItem.Content>
@@ -254,9 +258,9 @@ const AddImageOverlayModal = ({
             </View>
           )}
         </Formik>
-        {!isEmpty(image) && !isReadOnly && (
-          <DeleteButton onPress={deleteImageOverlayConfirm} title={'Remove Image Overlay'}/>
-        )}
+
+        {/* Modal */}
+        <FieldInfoModal fieldInfo={fieldInfo} onClose={() => setFieldInfo(null)}/>
       </ModalWrapper>
     );
   };

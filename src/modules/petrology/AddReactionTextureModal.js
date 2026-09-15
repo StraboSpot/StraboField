@@ -8,7 +8,6 @@ import {ADD_ROCK_KEYS} from './petrology.constants';
 import usePetrology from './usePetrology';
 import {getNewId, isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import {ChoiceButtons, Form, formStyles, useForm} from '../form';
@@ -84,7 +83,8 @@ const AddReactionTextureModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
-        showActionButton={false}
+        onActionPressed={saveReactionTexture}
+        showActionButton={!choicesViewKey}
         showCancelButton={false}
         showCloseButton
       >
@@ -106,7 +106,6 @@ const AddReactionTextureModal = () => {
           }
           bounces={false}
         />
-        {!choicesViewKey && <ActionButton onPress={saveReactionTexture}/>}
       </ModalWrapper>
     );
   };

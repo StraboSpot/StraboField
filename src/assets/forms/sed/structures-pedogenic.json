@@ -96,14 +96,14 @@
     {
       "type": "select_multiple lg4oy98",
       "name": "paleosol_structures",
-      "label": "Paleosol Structures",
+      "label": "Paleosol Features",
       "required": "false",
       "read_only": "false"
     },
     {
       "type": "text",
       "name": "other_structure",
-      "label": "Other Paleosol Structure",
+      "label": "Other Paleosol Feature",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${paleosol_structures}, 'other')"
@@ -223,62 +223,62 @@
     {
       "list_name": "hu6nm09",
       "name": "gelisol",
-      "label": "gelisol"
+      "label": "Gelisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "histosol",
-      "label": "histosol"
+      "label": "Histosol"
     },
     {
       "list_name": "hu6nm09",
       "name": "spodosol",
-      "label": "spodosol"
+      "label": "Spodosol"
     },
     {
       "list_name": "hu6nm09",
       "name": "andisol",
-      "label": "andisol"
+      "label": "Andisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "oxisol",
-      "label": "oxisol"
+      "label": "Oxisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "vertisol",
-      "label": "vertisol"
+      "label": "Vertisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "aridisol",
-      "label": "aridisol"
+      "label": "Aridisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "ultisol",
-      "label": "ultisol"
+      "label": "Ultisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "mollisol",
-      "label": "mollisol"
+      "label": "Mollisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "alfisol",
-      "label": "alfisol"
+      "label": "Alfisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "inceptisol",
-      "label": "inceptisol"
+      "label": "Inceptisol"
     },
     {
       "list_name": "hu6nm09",
       "name": "entisol",
-      "label": "entisol"
+      "label": "Entisol"
     }
   ],
   "settings": [

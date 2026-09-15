@@ -28,9 +28,9 @@ const DocumentationScreen = ({route, navigation}) => {
     try {
       await openUrl(url);
     }
-    catch (error) {
-      console.error(error);
-      alert(error.message);
+    catch (err) {
+      console.error(err);
+      alert(err.message);
     }
   };
 

@@ -1,13 +1,23 @@
 import React from 'react';
 
 import * as turf from '@turf/turf';
-import {Layer, Marker, Source, useMap} from 'react-map-gl/mapbox';
+import {Layer, Source, useMap} from 'react-map-gl/mapbox';
 import {useSelector} from 'react-redux';
 
-const SNAP_LINE_PAINT = {'line-color': 'orange', 'line-width': 3};
+import {LARGE_TEXT_SIZE, ORANGE} from '../../../shared/styles.constants';
+import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 
-const arrowContainerStyle = {display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2};
-const arrowStyle = {color: 'orange', fontSize: 10, lineHeight: 1};
+const SNAP_LINE_PAINT = {'line-color': ORANGE, 'line-width': 3};
+
+const SNAP_ARROWS_LAYOUT = {
+  'text-field': '▲\n▼',
+  'text-font': GLYPH_FONT,
+  'text-allow-overlap': true,
+  'text-ignore-placement': true,
+  'text-line-height': 1,
+  'text-size': LARGE_TEXT_SIZE,
+};
+const SNAP_ARROWS_PAINT = {'text-color': ORANGE};
 
 const SnapLineLayer = () => {
   /* Data Hooks */
@@ -39,16 +49,18 @@ const SnapLineLayer = () => {
           type={'line'}
         />
       </Source>
-      <Marker
-        anchor='center'
-        latitude={lat}
-        longitude={arrowLng}
+      <Source
+        data={turf.point([arrowLng, lat])}
+        id={'snapArrowsSource'}
+        type={'geojson'}
       >
-        <div style={arrowContainerStyle}>
-          <span style={arrowStyle}>▲</span>
-          <span style={arrowStyle}>▼</span>
-        </div>
-      </Marker>
+        <Layer
+          id={'snapArrowsLayer'}
+          layout={SNAP_ARROWS_LAYOUT}
+          paint={SNAP_ARROWS_PAINT}
+          type={'symbol'}
+        />
+      </Source>
     </>
   );
 };

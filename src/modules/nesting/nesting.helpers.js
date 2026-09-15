@@ -16,13 +16,13 @@ export const isWithin = (spot1, spot2) => {
     else if (spot1.geometry.type === 'GeometryCollection') {
       spot1.geometry.geometries.forEach((geometry1) => {
         if (!boolWithin && Object.keys(VALID_TYPES_FOR_BOOLEAN_WITHIN).includes(geometry1.type)
-          && VALID_TYPES_FOR_BOOLEAN_WITHIN[geometry1]?.includes(spot2.geometry.type)) {
-          boolWithin = turf.booleanWithin(geometry1, spot2.geometry.type);
+          && VALID_TYPES_FOR_BOOLEAN_WITHIN[geometry1.type]?.includes(spot2.geometry.type)) {
+          boolWithin = turf.booleanWithin(geometry1, spot2);
         }
         else if (!boolWithin && spot2.geometry.type === 'GeometryCollection') {
           spot2.geometry.geometries.forEach((geometry2) => {
             if (!boolWithin && Object.keys(VALID_TYPES_FOR_BOOLEAN_WITHIN).includes(geometry1.type)
-              && VALID_TYPES_FOR_BOOLEAN_WITHIN[geometry1]?.includes(geometry2)) {
+              && VALID_TYPES_FOR_BOOLEAN_WITHIN[geometry1.type]?.includes(geometry2.type)) {
               boolWithin = turf.booleanWithin(geometry1, geometry2);
             }
           });
@@ -38,8 +38,8 @@ export const isWithin = (spot1, spot2) => {
       });
     }
   }
-  catch (e) {
-    console.error('Error with Spot geometry! Spot 1:', spot1, 'Spot 2:', spot2, 'Error:', e);
+  catch (err) {
+    console.error('Error with Spot geometry! Spot 1:', spot1, 'Spot 2:', spot2, 'Error:', err);
   }
   return boolWithin;
 };

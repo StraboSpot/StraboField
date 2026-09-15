@@ -1,18 +1,13 @@
 import Assets from '../../assets/lottie-animations';
 
-export const getAnimationType = (type) => {
-  switch (type) {
-    case 'uploading':
-      return Assets.lottieFiles.uploading;
-    case 'uploadingCloud':
-      return Assets.lottieFiles.uploadingCloud;
-    case 'complete':
-      return Assets.lottieFiles.uploadingComplete;
-    case 'deleteProject' :
-      return Assets.lottieFiles.fileDelete;
-    case 'error' :
-      return Assets.lottieFiles.error;
-    case 'loadingFile' :
-      return Assets.lottieFiles.loadingFile;
-  }
+const ANIMATIONS = {
+  complete: Assets.lottieFiles.uploadingComplete,
+  deleteProject: Assets.lottieFiles.fileDelete,
+  error: Assets.lottieFiles.error,
+  loadingFile: Assets.lottieFiles.loadingFile,
+  uploading: Assets.lottieFiles.uploading,
+  uploadingCloud: Assets.lottieFiles.uploadingCloud,
 };
+
+// Unknown types fall back to the generic loading animation rather than handing LottieView an undefined source.
+export const getAnimationType = type => ANIMATIONS[type] || ANIMATIONS.loadingFile;

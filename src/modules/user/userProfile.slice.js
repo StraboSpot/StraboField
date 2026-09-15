@@ -6,10 +6,12 @@ import {createSlice} from '@reduxjs/toolkit';
 // const rockdExpiration = 1839181062830;
 
 const initialUserState = {
+  default_manual_measurement: false,
   email: null,
   encoded_login: null,
   image: null,
   isAuthenticated: false,
+  is_utm_display: false,
   mapboxToken: null,
   macrostrat: {
     // token: __DEV__ ? rockedToken : null,
@@ -18,7 +20,10 @@ const initialUserState = {
     expires: null,
     checkedInSpotIds: [],
   },
+
+  measurement_convention: 'strike_dip',
   name: null,
+  orcidToken: null,
   sesar: {
     selectedUserCode: null,
     userCodes: [],
@@ -27,6 +32,7 @@ const initialUserState = {
       refresh: '',
     },
   },
+  straboUserId: null,
 };
 
 // createSlice combines reducers, actions, and constants
