@@ -83,11 +83,13 @@ const projectSlice = createSlice({
     addedSpotToTags(state, action) {
       const {spotId, tagIds} = action.payload;
       if (!isEmpty(state.project.tags)) {
+        const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
           if (tagIds.includes(tag.id)) {
             if (!updatedTag.spots) updatedTag.spots = [];
             updatedTag.spots.push(spotId);
+            updatedTag.modified_timestamp = timestamp;
           }
           return updatedTag;
         });
@@ -154,15 +156,18 @@ const projectSlice = createSlice({
     deletedSpotIdFromTags(state, action) {
       const spotId = action.payload;
       if (!isEmpty(state.project.tags)) {
+        const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
           if (updatedTag.spots?.includes(spotId)) {
             updatedTag.spots = updatedTag.spots.filter(id => id !== spotId);
             if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
+            updatedTag.modified_timestamp = timestamp;
           }
           if (updatedTag.features && updatedTag.features[spotId]) {
             delete updatedTag.features[spotId];
             if (isEmpty(updatedTag.features)) delete updatedTag.features;
+            updatedTag.modified_timestamp = timestamp;
           }
           return updatedTag;
         });
