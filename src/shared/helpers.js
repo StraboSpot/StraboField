@@ -164,13 +164,19 @@ export const getLatLngText = (lat, lng) => {
     + toFixedInteger(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
 };
 
-// Ids are generated in such quick succession when copying that using
-// the getNewId doesn't work since that is based on a timestamp
-export const getNewCopyId = () => Math.floor(10000000000000 + Math.random() * 90000000000000);
-
 // return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 //   c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-export const getNewId = () => Math.floor((new Date().getTime() + Math.random()) * 10);
+
+// Stays a number because Spot, dataset, project and image ids are the server's keys, and stays this length
+// deliberately: past Number.MAX_SAFE_INTEGER JavaScript drops an integer's low digits and two different ids
+// compare equal. A timestamp plus one random digit gave only 11 ids per millisecond, so a burst of mints
+// collided outright; stepping past the last id issued fixes that without costing a digit.
+let lastIdIssued = 0;
+
+export const getNewId = () => {
+  lastIdIssued = Math.max(Math.floor((Date.now() + Math.random()) * 10), lastIdIssued + 1);
+  return lastIdIssued;
+};
 
 export const getNewUUID = () => uuidv4();
 
@@ -181,6 +187,13 @@ export const getTimeAndDateFromModifiedTimestamp = (field) => {
     month: moment(field).format('MM'),
     year: moment(field).format('YYYY'),
   };
+};
+
+// The moment a record with an old numeric id was made. getNewId built those as a millisecond timestamp
+// times ten plus a random digit, so dropping that digit reads the time back. A UUID holds no time at all.
+export const getTimestampFromId = (id) => {
+  const idAsNumber = Number(id);
+  return id && Number.isFinite(idAsNumber) ? Math.floor(idAsNumber / 10) : undefined;
 };
 
 // Appends the lowest free suffix when a title is taken: "Outcrop" -> "Outcrop (2)" -> "Outcrop (3)".

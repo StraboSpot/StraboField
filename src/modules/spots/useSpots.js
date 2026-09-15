@@ -26,7 +26,7 @@ import {
   restoredSpots,
   setSelectedSpot,
 } from './spots.slice';
-import {getNewCopyId, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
@@ -290,7 +290,7 @@ const useSpots = () => {
           coordinates: [feature.geometry.coordinates[0] + randomLongOffset, feature.geometry.coordinates[1] + randomLatOffset],
         },
         properties: {
-          id: getNewCopyId(),
+          id: getNewId(),
           date: d.toISOString(),
           time: d.toISOString(),
           modified_timestamp: Date.now(),

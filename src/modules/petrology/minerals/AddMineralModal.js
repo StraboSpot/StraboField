@@ -8,7 +8,7 @@ import {ADD_MINERAL_KEYS} from './minerals.constants';
 import {setMineralFieldValue} from './minerals.helpers';
 import MineralsByRockClass from './MineralsByRockClass';
 import MineralsGlossary from './MineralsGlossary';
-import {getNewId, isEmpty} from '../../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -39,7 +39,7 @@ const AddMineralModal = () => {
   const formRef = useRef(null);
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
-  const [initialValues, setInitialValues] = useState({id: getNewId()});
+  const [initialValues, setInitialValues] = useState({id: getNewUUID()});
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
@@ -62,7 +62,7 @@ const AddMineralModal = () => {
     console.log('UE AddMineralModal [templates]', templates);
     if (templates[petKey] && templates[petKey].isInUse && templates[petKey].active
       && templates[petKey].active[0] && templates[petKey].active[0].values) {
-      setInitialValues({...templates[petKey].active[0].values, id: getNewId()});
+      setInitialValues({...templates[petKey].active[0].values, id: getNewUUID()});
     }
     return () => dispatch(setModalValues({}));
   }, [templates]);
@@ -101,7 +101,7 @@ const AddMineralModal = () => {
   const addMineral = (mineralInfo) => {
     setInitialValues(currentValues => ({
       ...currentValues,
-      id: getNewId(),
+      id: getNewUUID(),
       mineral_abbrev: mineralInfo.Abbreviation,
       full_mineral_name: mineralInfo.Label,
     }));
@@ -114,7 +114,7 @@ const AddMineralModal = () => {
     try {
       if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
       else await savePetFeature(petKey, spot, formRef.current);
-      formRef.current?.setFieldValue('id', getNewId());
+      formRef.current?.setFieldValue('id', getNewUUID());
       if (SMALL_SCREEN) onCloseModalPressed();
     }
     catch (err) {

@@ -1,6 +1,6 @@
 import {useDispatch} from 'react-redux';
 
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -65,7 +65,7 @@ const usePetrology = () => {
   const savePetFeatureValuesFromTemplates = (key, spot, activeTemplates) => {
     let editedPetData = spot.properties.pet ? JSON.parse(JSON.stringify(spot.properties.pet)) : {};
     if (!editedPetData[key] || !Array.isArray(editedPetData[key])) editedPetData[key] = [];
-    activeTemplates.forEach(t => editedPetData[key].push({...t.values, id: getNewId()}));
+    activeTemplates.forEach(t => editedPetData[key].push({...t.values, id: getNewUUID()}));
     console.log('editedPetData', editedPetData);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));

@@ -13,7 +13,7 @@ import {
 } from './sed.constants';
 import {isLithologyRequiredForInterval, setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
-import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {clearedStratSection, setStratSection} from '../maps/maps.slice';
@@ -336,7 +336,7 @@ const useSed = () => {
   const saveSedFeatureValuesFromTemplates = (key, spot, activeTemplates) => {
     let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
     if (!editedSedData[key] || !Array.isArray(editedSedData[key])) editedSedData[key] = [];
-    activeTemplates.forEach(t => editedSedData[key].push({...t.values, id: getNewId()}));
+    activeTemplates.forEach(t => editedSedData[key].push({...t.values, id: getNewUUID()}));
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };

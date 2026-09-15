@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {getMineralTitle} from './minerals.helpers';
 import commonStyles from '../../../shared/common.styles';
-import {getNewCopyId, isEmpty} from '../../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../../shared/helpers';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import FormikWrapper from '../../form/FormikWrapper';
@@ -65,7 +65,7 @@ const MineralsPage = ({isReadOnly, page}) => {
       const mineralsToCopy = JSON.parse(JSON.stringify(spotToCopy.properties.pet[page.key]));
       mineralsToCopy.forEach((mineral, i) => {
         if (mineral.modal) delete mineralsToCopy[i].modal;
-        mineralsToCopy[i].id = getNewCopyId();
+        mineralsToCopy[i].id = getNewUUID();
       });
       const updatedMinerals = spot.properties?.pet && spot.properties.pet[page.key]
         ? [...spot.properties.pet[page.key], ...mineralsToCopy] : mineralsToCopy;

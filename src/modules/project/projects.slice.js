@@ -118,7 +118,7 @@ const projectSlice = createSlice({
       const {datasetId, spotId} = action.payload;
       const timestamp = Date.now();
       const dataset = state.datasets[datasetId];
-      const updatedSpotIds = dataset.spotIds.filter(id => id !== spotId);
+      const updatedSpotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
       const updatedDataset = {...dataset, modified_timestamp: timestamp, spotIds: updatedSpotIds};
       state.datasets = {...state.datasets, [datasetId]: updatedDataset};
       state.project.modified_timestamp = timestamp;
@@ -127,7 +127,7 @@ const projectSlice = createSlice({
       const spotId = action.payload;
       const timestamp = Date.now();
       const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
+        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
         const updatedDatatset = isEqual(dataset.spotIds, remainingSpotIds) ? dataset
           : {...dataset, modified_timestamp: timestamp, spotIds: remainingSpotIds};
         return {...acc, [datasetId]: updatedDatatset};
@@ -140,8 +140,8 @@ const projectSlice = createSlice({
       if (!isEmpty(state.project.reports)) {
         const updatedReports = state.project.reports.map((report) => {
           let updatedReport = JSON.parse(JSON.stringify(report));
-          if (updatedReport.spots?.includes(spotId)) {
-            updatedReport.spots = updatedReport.spots.filter(id => id !== spotId);
+          if (updatedReport.spots?.some(id => isSameId(id, spotId))) {
+            updatedReport.spots = updatedReport.spots.filter(id => !isSameId(id, spotId));
             if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
             updatedReport.updated_timestamp = Date.now();
           }
@@ -225,7 +225,7 @@ const projectSlice = createSlice({
       const {toDatasetId, spotId} = action.payload;
       const timestamp = Date.now();
       const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
+        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
         const updatedSpotIds = datasetId === toDatasetId.toString() ? [...remainingSpotIds, spotId]
           : remainingSpotIds;
         const updatedDatatset = isEqual(dataset.spotIds, updatedSpotIds) ? dataset

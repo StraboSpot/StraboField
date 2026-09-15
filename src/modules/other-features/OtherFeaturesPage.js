@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import OtherFeatureDetail from './OtherFeatureDetail';
 import OtherFeatureItem from './OtherFeatureItem';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import PageHeader from '../page/PageHeader';
@@ -44,7 +44,7 @@ const OtherFeaturesPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const addFeature = () => {
-    setSelectedFeature({id: getNewId()});
+    setSelectedFeature({id: getNewUUID()});
     setIsFeatureDetailVisible(true);
   };
 
