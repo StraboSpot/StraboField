@@ -18,6 +18,37 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.2',
+    groups: [
+      {
+        title: 'Compass',
+        items: [
+          {text: 'Works without GPS: uses magnetic declination on devices with no GPS fix', commit: 'd645effd7'},
+          {text: 'Hold-aware readings: trend/plunge adjust for landscape and tablet orientation', commit: 'bf0a6c903'},
+          {
+            text: 'Clearer calibration: improved calibration alerts and more consistent behavior across platforms',
+            commit: '4b6e2fbca',
+          },
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'Steadier SESAR: better session handling, offline warnings, and clearer error feedback when registering IGSNs',
+            commit: 'cdbb1ee75',
+          },
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'Custom map details scroll properly on smaller screens', commit: '23f3f0858'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.1',
     groups: [
       {
