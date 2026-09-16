@@ -5,21 +5,24 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {Button, Header, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {ActionButtonsSmallScreen, MainMenuButton, ShortcutButtons} from './buttons';
+import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
+import MainMenuButton from './buttons/MainMenuButton';
+import ShortcutButtons from './buttons/ShortcutButtons';
 import {NAVIGATION_OPTIONS} from './home.constants';
 import {setModalVisible} from './home.slice';
-import homeStyles from './home.style';
+import homeStyles from './home.styles';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
-import {cancelledIntervalDrag} from '../maps/maps.slice';
+import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
+import useSpots from '../spots/useSpots';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
 
 const Tab = createMaterialTopTabNavigator();
@@ -32,6 +35,8 @@ const HomeViewSmallScreen = forwardRef(({
                                           dialogs,
                                           distance,
                                           endMeasurement,
+                                          hasDrawTools,
+                                          isCreateToolsDisabled,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -54,6 +59,7 @@ const HomeViewSmallScreen = forwardRef(({
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
   const {height, width} = useWindowSize();
+  const {isCurrentMapReadOnly} = useSpots();
   const {lockToPortrait} = useDeviceOrientation();
 
   useEffect(() => {
@@ -61,7 +67,7 @@ const HomeViewSmallScreen = forwardRef(({
   }, []);
 
   const toggleSpotNavigator = () => {
-    dispatch(cancelledIntervalDrag());
+    dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
   };
@@ -108,7 +114,7 @@ const HomeViewSmallScreen = forwardRef(({
         />
       ) : (
         <Tab.Navigator
-          screenListeners={{focus: () => dispatch(cancelledIntervalDrag())}}
+          screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
@@ -152,10 +158,10 @@ const HomeViewSmallScreen = forwardRef(({
                   />
                 )}
 
-                {stratSection && (
+                {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
                     onPress={() => {
-                      dispatch(cancelledIntervalDrag());
+                      dispatch(canceledIntervalDrag());
                       dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
                     }}
                     source={require('../../assets/icons/AddIntervalButton.png')}
@@ -180,6 +186,7 @@ const HomeViewSmallScreen = forwardRef(({
                     dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
+                    hasDrawTools={hasDrawTools}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}

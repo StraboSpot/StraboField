@@ -5,12 +5,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ThreeDStructureItem from './ThreeDStructureItem';
 import {THREE_D_STRUCTURE_SECTIONS} from './threeDStructures.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
@@ -50,7 +50,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const add3dStructure = (type) => {
-    const new3dStructure = {id: getNewId(), type: type};
+    const new3dStructure = {id: getNewUUID(), type: type};
     dispatch(setModalValues(new3dStructure));
     dispatch(setModalVisible({modal: page.key}));
   };

@@ -12,7 +12,7 @@ import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
 import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
-import {AvatarWrapper} from '../avatars';
+import AvatarWrapper from '../avatars/AvatarWrapper';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 // Body fills a fullscreen/small-screen modal; shrinks-to-content (and scrolls past the cap) in a

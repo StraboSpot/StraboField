@@ -23,25 +23,33 @@ const useMapMoveEvents = ({mapRef, onMapMoveEnd}) => {
   const cameraChangedTimestampRef = useRef(0);
   const settleTimeoutRef = useRef(null);
 
+  /* Internal Functions */
+
+  const saveMapView = async () => {
+    if (currentImageBasemap || stratSection || !mapRef?.current) return;
+    const newCenter = await mapRef.current.getCenter();
+    const newZoom = await mapRef.current.getZoom();
+    dispatch(setZoom(newZoom));
+    setMapView(newCenter, newZoom);
+  };
+
   /* Exported Functions */
 
   // Update spots in extent and saved view (center and zoom)
   const handleMapMoved = async (e) => {
-    // Trailing debounce: recompute the extent only once the map has settled.
+    // Trailing debounce: recompute the extent, and take the camera's final reading, once the map settles.
+    // Saving here as well as below is what keeps the zoom honest - the throttle can otherwise let a
+    // gesture finish without recording where it ended
     if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
-    settleTimeoutRef.current = setTimeout(() => onMapMoveEnd?.(), MAP_SETTLE_DEBOUNCE_MS);
+    settleTimeoutRef.current = setTimeout(() => {
+      saveMapView().catch(console.error);
+      onMapMoveEnd?.();
+    }, MAP_SETTLE_DEBOUNCE_MS);
 
-    // console.log('Event onMapMoved Timestamp difference', e.timestamp - cameraChangedTimestampRef.current);
+    // Throttled while the gesture is still running, so the readouts keep up without a dispatch per frame
     if (e.timestamp - cameraChangedTimestampRef.current > 1000) {
-      // console.log('Map Moved.');
       cameraChangedTimestampRef.current = e.timestamp;
-      if (!currentImageBasemap && !stratSection && mapRef?.current) {
-        // console.log('Updating View...');
-        const newCenter = await mapRef.current.getCenter();
-        const newZoom = await mapRef.current.getZoom();
-        dispatch(setZoom(newZoom));
-        setMapView(newCenter, newZoom);
-      }
+      await saveMapView();
     }
   };
 

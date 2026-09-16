@@ -2,15 +2,14 @@ import React, {useMemo} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {
-  CustomOverlayLayers,
-  DrawLayers,
-  EditLayers,
-  FeaturesLayers,
-  ImageBasemapLayer,
-  MacrostratMarkerLayer,
-  MeasureLayers,
-} from '.';
+import CustomOverlayLayers from './CustomOverlayLayers';
+import DrawLayers from './DrawLayers';
+import EditLayers from './EditLayers';
+import FeaturesLayers from './FeaturesLayers';
+import ImageBasemapLayer from './ImageBasemapLayer';
+import MacrostratMarkerLayer from './MacrostratMarkerLayer';
+import MeasureLayers from './MeasureLayers';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import MapControlsContainer from '../controls/MapControlsContainer';
 import CoveredIntervalsXLines from '../strat-section/CoveredIntervalsXLines';
 import DraggedIntervalLayer from '../strat-section/DraggedIntervalLayer';
@@ -46,7 +45,8 @@ const MapLayers = ({
       {/* Displays the marker when macrostrat view is displayed */}
       {isShowMacrostratOverlay && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
 
-      {!currentImageBasemap && !stratSection && <MapControlsContainer/>}
+      {/* Small screens render this with the map action buttons instead, so it would double up here */}
+      {!SMALL_SCREEN && <MapControlsContainer/>}
 
       {/* Custom Overlay Layer */}
       {!currentImageBasemap && !stratSection && <CustomOverlayLayers basemap={basemap}/>}

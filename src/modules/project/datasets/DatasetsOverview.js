@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 
 import AddDatasetModal from './AddDatasetModal';
@@ -6,10 +6,7 @@ import DatasetList from './DatasetList';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import MainMenuPanelHeader from '../../main-menu-panel/MainMenuPanelHeader';
 
-const DatasetsPage = ({setDatasetToView}) => {
-  /* Local State */
-
-  const [isAddDatasetModalVisible, setIsAddDatasetModalVisible] = useState(false);
+const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible, setDatasetToView}) => {
 
   /* View */
 

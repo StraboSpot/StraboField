@@ -12,10 +12,11 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {imageStyles} from '../images';
-import {TagsListItem, TagsModal} from '../tags';
+import imageStyles from '../images/image.styles';
+import TagsListItem from '../tags/TagsListItem';
+import TagsModal from '../tags/TagsModal';
 
-const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
+const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed, isReadOnly}) => {
   /* Data Hooks */
 
   const tags = useSelector(state => state.project.project?.tags) || [];
@@ -43,18 +44,20 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
     <>
       <View>
         <SectionDivider dividerText={'Tags'}/>
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
-          <OutlineButton
-            icon={{
-              color: commonStyles.iconColor.color,
-              iconStyle: imageStyles.icon,
-              name: 'plus-minus',
-              type: 'material-community',
-            }}
-            onPress={addAssociatedSpots}
-            title={'Add/Remove Tags'}
-          />
-        </View>
+        {!isReadOnly && (
+          <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
+            <OutlineButton
+              icon={{
+                color: commonStyles.iconColor.color,
+                iconStyle: imageStyles.icon,
+                name: 'plus-minus',
+                type: 'material-community',
+              }}
+              onPress={addAssociatedSpots}
+              title={'Add/Remove Tags'}
+            />
+          </View>
+        )}
 
         <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5}}>
           {isEmpty(checkedTags) && <ListEmptyText text={'No Tags'}/>}
@@ -69,6 +72,7 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed}) => {
         </View>
       </View>
 
+      {/* Modal */}
       {isTagsListModalVisible && (
         <ModalWrapper
           buttonTitleRight={'Done'}

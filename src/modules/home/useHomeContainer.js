@@ -4,8 +4,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setLoadingStatus} from './home.slice';
 import {isEqual} from '../../shared/helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {useSpots} from '../spots';
 import {setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
   /* Data Hooks */

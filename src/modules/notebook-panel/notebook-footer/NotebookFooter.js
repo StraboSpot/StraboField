@@ -14,7 +14,7 @@ import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 import useSamples from '../../samples/useSamples';
 
-const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
+const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSample}) => {
   /* Data Hooks */
 
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
@@ -33,6 +33,23 @@ const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
   const pagesToShow = getAllRelevantPages(isRichSample);
   const notebookPagesValidOn = notebookPagesOn.filter(i => pagesToShow.find(p => p.key === i));
   const notebookPageVisible = !isEmpty(pagesState) && pagesState.slice(-1)[0];
+
+  /* Event Handlers */
+
+  // The new sample is made from whatever is typed in the open sample form, not from the stored version, so an
+  // edit that was never saved is carried into the conversion rather than left behind on a Spot that is about to
+  // give the sample up. Taking the values also leaves nothing unsaved to prompt about, which the conversion
+  // could only have asked once the Spot the answer belonged to had already been replaced.
+  const convertToRichSample = async () => {
+    try {
+      const editedSample = await registerGetValues?.current?.();
+      createRichSample(spot, editedSample || selectedSample);
+    }
+    catch (err) {
+      // The form refused the values and has said why, so leave the sample as it is for the fields to be fixed
+      console.error('Sample not converted to a rich sample', err);
+    }
+  };
 
   /* Logic Helpers */
 
@@ -53,7 +70,7 @@ const NotebookFooter = ({openPage, isRichSample, selectedSample}) => {
               name: 'add',
               size: 20,
             }}
-            onPress={() => createRichSample(spot, selectedSample)}
+            onPress={convertToRichSample}
             title={'Add Data to Sample'}
             titleProps={{style: {color: PRIMARY_ACCENT_COLOR, fontSize: themes.MEDIUM_TEXT_SIZE}}}
           />

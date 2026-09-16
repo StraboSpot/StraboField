@@ -36,13 +36,18 @@
       "type": "integer",
       "name": "Trend",
       "label": "Trend",
-      "required": "false"
+      "hint": "Azimuth in degrees",
+      "required": "false",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0-360."
     },
     {
       "type": "integer",
       "name": "Plunge",
       "label": "Plunge",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0 and . <= 90",
+      "constraint_message": "Value must be a whole number between 0-90."
     },
     {
       "type": "select_one rg23y65",
@@ -68,19 +73,26 @@
       "type": "integer",
       "name": "Strike",
       "label": "Strike",
-      "required": "false"
+      "hint": "Azimuth in degrees",
+      "required": "false",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0-360."
     },
     {
       "type": "integer",
       "name": "Azimuthal_Dip_Direction",
       "label": "Azimuthal Dip Direction",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0-360."
     },
     {
       "type": "integer",
       "name": "Dip",
       "label": "Dip",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0 and . <= 90",
+      "constraint_message": "Value must be a whole number between 0-90."
     },
     {
       "type": "select_one ne4bk50",
@@ -171,6 +183,7 @@
       "type": "integer",
       "name": "fold_fol_strike",
       "label": "Strike",
+      "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
       "constraint_message": "Value must be a whole number between 0-360."

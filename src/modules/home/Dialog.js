@@ -26,9 +26,7 @@ const Dialog = ({
     if (isNotebookPanelVisible || SMALL_SCREEN) {
       if (isNotebookPanelVisible) {
         closeNotebookPanel();
-        if (modalVisible && !Object.keys(MODAL_KEYS.SHORTCUTS).find(s => s.key === modalVisible)) {
-          dispatch(setModalVisible({modal: null}));
-        }
+        if (modalVisible) dispatch(setModalVisible({modal: null}));
       }
       if (Object.values(MODAL_KEYS.SHORTCUTS).includes(modalKey)) dispatch(clearedSelectedSpots());
       dispatch(setModalVisible({modal: modalKey}));
@@ -42,17 +40,14 @@ const Dialog = ({
 
   if (modal?.modal_component) {
     const ModalDisplayed = modal.modal_component;
-    if (modalVisible && !Object.keys(MODAL_KEYS.SHORTCUTS).find(s => s.key === modalVisible)) {
-      return (
-        <ModalDisplayed
-          modalKey={modal.key}
-          onPress={modalHandler}
-          openSpotInNotebook={openSpotInNotebook}
-          zoomToCurrentLocation={zoomToCurrentLocation}
-        />
-      );
-    }
-    else return <ModalDisplayed modalKey={modal.key} onPress={modalHandler}/>;
+    return (
+      <ModalDisplayed
+        modalKey={modal.key}
+        onPress={modalHandler}
+        openSpotInNotebook={openSpotInNotebook}
+        zoomToCurrentLocation={zoomToCurrentLocation}
+      />
+    );
   }
 };
 

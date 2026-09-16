@@ -3,7 +3,7 @@ import {Text} from 'react-native';
 
 import styles from './form.styles';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {LABELS_WITH_ABBREVIATIONS} from '../petrology/minerals.constants';
+import {LABELS_WITH_ABBREVIATIONS} from '../petrology/minerals/minerals.constants';
 
 // Displays a field's hint. fieldInfo is {label, info}; null or undefined hides the modal.
 const FieldInfoModal = ({fieldInfo, onClose}) => {

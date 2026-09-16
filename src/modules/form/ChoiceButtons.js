@@ -3,8 +3,9 @@ import {View} from 'react-native';
 
 import {Button} from '@rn-vui/base';
 
+import formStyles from './form.styles';
+import useForm from './useForm';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
-import {formStyles, useForm} from '../form';
 
 const ChoiceButtons = ({
                          choiceFieldKey,

@@ -21,14 +21,14 @@ const MainMenuPanelListItem = ({onPress, title}) => {
 
   /* Local State */
 
-  const [targetDatasetName, setTargetDatasetName] = useState('');
+  const [targetDatasetName, setTargetDatasetName] = useState('[Not Set]');
 
   /* Side Effects */
 
   useEffect(() => {
     if (title === MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS && !isEmpty(currentProjectId)) {
       const targetDataset = getTargetDatasetFromId();
-      setTargetDatasetName(targetDataset?.name || '');
+      setTargetDatasetName(targetDataset?.name || '[Not Set]');
     }
   }, [currentProjectId, title]);
 

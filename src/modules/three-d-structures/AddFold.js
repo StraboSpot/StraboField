@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import {FoldGeometryButtons} from './fold-geometry';
+import FoldGeometryButtons from './fold-geometry/FoldGeometryButtons';
 import {
   ADD_FOLD_FIRST_KEYS,
   ADD_FOLD_LAST_KEYS,
@@ -10,7 +10,9 @@ import {
   FOLD_MEASUREMENTS_KEYS,
 } from './threeDStructures.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, FormSlider, MainButtons} from '../form';
+import Form from '../form/Form';
+import FormSlider from '../form/FormSlider';
+import MainButtons from '../form/MainButtons';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
@@ -30,7 +32,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
@@ -67,7 +69,7 @@ const AddFold = ({choices, formName, formProps, setChoicesViewKey, survey}) => {
         survey={survey}
       />
       <LittleSpacer/>
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       {isFoldMeasurementsModalVisible && (
         <MeasurementModal
           formName={formName}

@@ -9,11 +9,12 @@ import SampleModalGeologicUnits from './SampleModalGeologicUnits';
 import SampleModalImages from './SampleModalImages';
 import useSampleModal from './useSampleModal';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {WarningModal} from '../../shared/ui/modals';
+import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import WarningModal from '../../shared/ui/modals/WarningModal';
 import {setModalVisible} from '../home/home.slice';
 
-const SampleModal = ({onPress, zoomToCurrentLocation}) => {
+const SampleModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -33,11 +34,12 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     setSampleImages,
     startingNumber,
     toastRef,
-  } = useSampleModal({setIsWarningModalVisible, zoomToCurrentLocation});
+  } = useSampleModal({openSpotInNotebook, setIsWarningModalVisible, zoomToCurrentLocation});
 
   /* Local State */
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Event Handlers */
 
@@ -49,6 +51,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
     <ModalWrapper
       buttonTitleRight={choicesViewKey ? 'Done' : null}
       closeModal={onCloseModalPressed}
+      disabled={isFormInvalid}
       isLoading={isLoading}
       onActionPressed={() => saveSample(formRef.current)}
       onFooterButtonPress={onPress}
@@ -66,6 +69,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
               namePostfix={namePostfix}
               namePrefix={namePrefix}
               setChoicesViewKey={setChoicesViewKey}
+              setIsFormInvalid={setIsFormInvalid}
               startingNumber={startingNumber}
             />
             {!choicesViewKey && (
@@ -80,6 +84,7 @@ const SampleModal = ({onPress, zoomToCurrentLocation}) => {
       />
 
       {SMALL_SCREEN && <Toast ref={toastRef}/>}
+      <Loading isLoading={isLoading}/>
 
       {/* Secondary Modal */}
       <WarningModal

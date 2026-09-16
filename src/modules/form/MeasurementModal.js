@@ -3,7 +3,7 @@ import {Platform, ScrollView, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {useForm} from '.';
+import useForm from './useForm';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ClearButton from '../../shared/ui/buttons/ClearButton';

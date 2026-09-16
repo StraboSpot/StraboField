@@ -9,11 +9,11 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 
 
 const strip = v => (v || '').replace(/^[\^~]/, '');
 
-const react = strip(packageJson.dependencies?.['react']);
+const react = strip(packageJson.dependencies?.react);
 const reactNative = strip(packageJson.dependencies?.['react-native']);
 const reduxToolkit = strip(packageJson.dependencies?.['@reduxjs/toolkit']);
 const rnmapbox = strip(packageJson.dependencies?.['@rnmapbox/maps']);
-const formik = strip(packageJson.dependencies?.['formik']);
+const formik = strip(packageJson.dependencies?.formik);
 const yarn = (packageJson.packageManager || '').replace('yarn@', '');
 
 const modulesDir = path.join(root, 'src', 'modules');

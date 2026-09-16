@@ -89,12 +89,15 @@ const styles = StyleSheet.create({
   },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
-    paddingLeft: 10,
+    paddingHorizontal: 10,
     paddingVertical: 5,
   },
+  // The same treatment a survey note gets in Form, which is the same kind of text: an explanation of the fields
+  // under it rather than one of them
   sectionDividerSubtitle: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
   },
   sectionDividerText: {
     color: PRIMARY_TEXT_COLOR,

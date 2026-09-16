@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {useSpots} from '.';
 import {
   FILTERS,
   FILTER_LABELS,
@@ -14,6 +13,7 @@ import {
   SORT_ORDER,
   SPOT_DATA_FILTERS,
 } from './spots.constants';
+import useSpots from './useSpots';
 import {isEmpty} from '../../shared/helpers';
 import ListQueryBar from '../../shared/ui/ListQueryBar';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';

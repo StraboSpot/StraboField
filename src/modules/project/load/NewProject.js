@@ -6,7 +6,7 @@ import {useDispatch} from 'react-redux';
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
 import NewProjectForm from './NewProjectForm';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 
 const NewProject = ({closeNotebookPanel}) => {
   /* Data Hooks */

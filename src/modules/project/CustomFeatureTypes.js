@@ -13,7 +13,7 @@ import alert from '../../shared/ui/alert';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {useSpots} from '../spots';
+import useSpots from '../spots/useSpots';
 
 const CustomFeatureTypes = () => {
   /* Data Hooks */

@@ -6,8 +6,10 @@ import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/features/useMapFeatures';
-import homeStyles from '../home.style';
-import {MapActionsOverlay, MapLayersOverlay, MapSymbolsOverlay} from '../overlays';
+import homeStyles from '../home.styles';
+import MapActionsOverlay from '../overlays/MapActionsOverlay';
+import MapLayersOverlay from '../overlays/MapLayersOverlay';
+import MapSymbolsOverlay from '../overlays/MapSymbolsOverlay';
 
 const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
   /* Data Hooks */
@@ -31,32 +33,32 @@ const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog}) => {
   return (
     <>
       <IconButton
-        imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
         onPress={() => toggleDialog('mapActionsMenuVisible')}
         source={SMALL_SCREEN ? require('../../../assets/icons/MapActions.png')
           : require('../../../assets/icons/MapActionsButton.png')}
+        style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
       />
       {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff) ? (
         <IconButton
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
           onPress={toggleMapSymbolsOverlay}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')
             : require('../../../assets/icons/SymbolsButton.png')}
+          style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       ) : (
         <IconButton
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
           onPress={toggleMapSymbolsOverlay}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols_pressed.png')
             : require('../../../assets/icons/SymbolsButton_pressed.png')}
+          style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       )}
       {!currentImageBasemap && !stratSection && (
         <IconButton
-          imageStyle={SMALL_SCREEN && homeStyles.iconSizeSmallScreen}
           onPress={() => toggleDialog('baseMapMenuVisible')}
           source={SMALL_SCREEN ? require('../../../assets/icons/Layers.png')
             : require('../../../assets/icons/LayersButton.png')}
+          style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       )}
 

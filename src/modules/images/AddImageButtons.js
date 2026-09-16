@@ -3,8 +3,9 @@ import {Platform, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getImageMetaFromWeb, getSize, resizeFile} from './imageHelpers';
-import {imageStyles, useImages} from './index';
+import {getImageMetaFromWeb, getSize, resizeFile} from './image.helpers';
+import imageStyles from './image.styles';
+import useImages from './useImages';
 import useUpload from '../../services/files/useUpload';
 import commonStyles from '../../shared/common.styles';
 import {getNewId} from '../../shared/helpers';

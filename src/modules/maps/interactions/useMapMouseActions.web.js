@@ -4,7 +4,7 @@ import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {MAP_MODES} from '../maps.constants';
 import {clearedIntervalDragState, setIntervalDragTargetSlot, setVertexEndCoords} from '../maps.slice';
 import useStratSectionCalculations from '../strat-section/useStratSectionCalculations';

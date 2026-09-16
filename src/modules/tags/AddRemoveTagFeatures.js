@@ -4,18 +4,17 @@ import {FlatList, View} from 'react-native';
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {deepFindFeatureTypeById, isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
-import {NotebookPageAvatar} from '../../shared/ui/avatars';
+import NotebookPageAvatar from '../../shared/ui/avatars/NotebookPageAvatar';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
-import useProject from '../project/useProject';
-import {useSpots} from '../spots';
-import {useTags} from '../tags';
+import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
+import useSpots from '../spots/useSpots';
 
 const AddRemoveTagFeatures = () => {
   /* Data Hooks */
@@ -24,8 +23,7 @@ const AddRemoveTagFeatures = () => {
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {isSpotInReadOnlyDataset} = useProject();
-  const {getAllFeaturesFromSpot} = useSpots();
+  const {getAllFeaturesFromSpot, isSpotReadOnly} = useSpots();
   const {addRemoveSpotFeatureFromTag, getFeatureDisplayComponent} = useTags();
 
   /* Render Functions */
@@ -35,7 +33,7 @@ const AddRemoveTagFeatures = () => {
     const spot = spots[spotId];
     const selectedTagCopy = JSON.parse(JSON.stringify(selectedTag));
     const featureType = deepFindFeatureTypeById(spot.properties, feature.id);
-    const isReadOnly = isSpotInReadOnlyDataset(spot.properties.id);
+    const isReadOnly = isSpotReadOnly(spot);
 
     if (!isEmpty(spot) && !isEmpty(spot.properties)) {
       return (

@@ -1,13 +1,15 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {ImageCard, imageStyles, useImageThumbnails} from '.';
+import imageStyles from './image.styles';
+import ImageCard from './ImageCard';
+import useImageThumbnails from './useImageThumbnails';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 
 const ImagesList = ({
                       deleteImage,
                       images,
-                      isReadOnly,
+                      isReadOnlyImages,
                       isThumbnailOnly = false,
                       onOpenImage,
                       onOpenImageProperties,
@@ -40,7 +42,7 @@ const ImagesList = ({
           image={image}
           imageThumbnailURIs={imageThumbnailURIs}
           index={index}
-          isReadOnly={isReadOnly}
+          isReadOnlyImage={isReadOnlyImages}
           isThumbnailOnly={isThumbnailOnly}
           onOpenImage={onOpenImage}
           onOpenImageProperties={onOpenImageProperties}

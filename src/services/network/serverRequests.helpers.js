@@ -43,6 +43,17 @@ const describeUnreadableBody = (response, text) => {
   return 'The server returned a response that could not be read.';
 };
 
+// The one rejection that means the credentials themselves were refused. A caller that recovers from that
+// differently to any other failure - the web save listeners send the user back to sign in - matches on this
+// rather than treating every failed request as an expired session.
+export const AUTHENTICATION_ERROR_MESSAGE
+  = 'This server could not verify that you are authorized to access the document requested. '
+  + 'Either you supplied the wrong credentials (e.g., bad password), or your browser doesn\'t '
+  + 'understand how to supply the credentials required.';
+
+export const isAuthenticationError = err => (err instanceof Error ? err.message : err)
+  === AUTHENTICATION_ERROR_MESSAGE;
+
 const handleError = async (response, auth) => {
   const {status} = response;
 
@@ -60,11 +71,7 @@ const handleError = async (response, auth) => {
     if (isAuthenticated && usedCurrentCreds && !response.url?.includes('userAuthenticate')) {
       store.dispatch(setIsSessionExpiredModalVisible(true));
     }
-    return Promise.reject(
-      'This server could not verify that you are authorized to access the document requested. '
-      + 'Either you supplied the wrong credentials (e.g., bad password), or your browser doesn\'t '
-      + 'understand how to supply the credentials required.',
-    );
+    return Promise.reject(AUTHENTICATION_ERROR_MESSAGE);
   }
 
   const {isJson, json, text} = await readJsonBody(response);
@@ -97,14 +104,43 @@ const isMarkupBody = (response, text) => response.headers.get('content-type')?.i
 
 // Read the body once and parse it without throwing. A response body can only be read once, so the text comes back
 // alongside the result for callers that need to inspect what arrived instead of JSON.
+// A PHP warning printed ahead of the body leaves the data intact with markup glued to its front, and the request
+// itself did what it was asked - a save reported as failed that way is one the user redoes for nothing. So read
+// the data out from where it starts, and report the prefix rather than swallowing it.
 const readJsonBody = async (response) => {
   const text = await response.text();
   try {
     return {isJson: true, json: JSON.parse(text), text};
   }
   catch (err) {
+    const prefixed = readPrefixedJson(response, text);
+    if (prefixed) return {isJson: true, json: prefixed, text};
     console.error(`Non-JSON response from ${response.url}`, err, text.slice(0, 300));
     return {isJson: false, text};
+  }
+};
+
+// A server that prefixes one response prefixes every one of them, so report each address once a session rather
+// than once a save. The console still says so every time, for anyone watching it.
+const reportedPrefixUrls = new Set();
+
+// The data only counts as prefixed if everything from the first bracket on parses as JSON. Anything less - an
+// error page that merely contains a brace - stays unreadable and is reported as such.
+const readPrefixedJson = (response, text) => {
+  const jsonStart = text.search(/[[{]/);
+  if (jsonStart < 1) return undefined;
+  try {
+    const json = JSON.parse(text.slice(jsonStart));
+    const prefix = text.slice(0, jsonStart).trim();
+    console.error(`Response from ${response.url} arrived behind this, and was read anyway:`, prefix);
+    if (!reportedPrefixUrls.has(response.url)) {
+      reportedPrefixUrls.add(response.url);
+      Sentry.captureMessage(`Server prefixed a response from ${response.url}: ${prefix.slice(0, 300)}`);
+    }
+    return json;
+  }
+  catch (err) {
+    return undefined;
   }
 };
 

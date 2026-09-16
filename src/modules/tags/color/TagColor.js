@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 
 import TagColorPickerModal from './TagColorPickerModal';
-import {formStyles} from '../../form';
+import formStyles from '../../form/form.styles';
 
 const TagColor = ({tempColor, onTempColorChange}) => {
   /* Local State */

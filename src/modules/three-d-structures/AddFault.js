@@ -7,7 +7,8 @@ import {
   ADD_FAULT_SECOND_BUTTON_KEYS,
   FAULT_MEASUREMENTS_KEYS,
 } from './threeDStructures.constants';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
@@ -27,7 +28,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
@@ -47,7 +48,7 @@ const AddFault = ({formName, formProps, setChoicesViewKey, survey}) => {
         mainKeys={ADD_FAULT_SECOND_BUTTON_KEYS}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
       {isFaultMeasurementsModalVisible && (
         <MeasurementModal
           formName={formName}

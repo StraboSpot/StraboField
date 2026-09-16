@@ -57,9 +57,7 @@ const DailyNotes = () => {
       />
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={
-          <ListEmptyText text={'No Daily Notes added yet. Add a Daily Note by using the + button above.'}/>
-        }
+        ListEmptyComponent={<ListEmptyText text={'No Daily Notes Found'}/>}
         data={dailyNotes.slice().sort((a, b) => new Date(b.date) - new Date(a.date))}
         keyExtractor={item => item.date}
         renderItem={({item}) => renderDailyNotesListItem(item)}

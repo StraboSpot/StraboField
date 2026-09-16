@@ -2,18 +2,20 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import AddFault from './AddFault';
+import AddFold from './AddFold';
 import AddOther from './AddOther';
 import AddTensor from './AddTensor';
-import {AddFold, FoldGeometryChoices} from './fold-geometry';
+import FoldGeometryChoices from './fold-geometry/FoldGeometryChoices';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {Form, useForm} from '../form';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -28,7 +30,7 @@ const AddThreeDStructureModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -36,6 +38,7 @@ const AddThreeDStructureModal = () => {
 
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
   const [survey, setSurvey] = useState({});
 
@@ -48,7 +51,7 @@ const AddThreeDStructureModal = () => {
 
   useEffect(() => {
     console.log('UE AddThreeDStructureModal [modalValues]', modalValues);
-    const initialValues = isEmpty(modalValues) ? {id: getNewId(), type: THREE_D_STRUCTURE_TYPES.FOLD} : modalValues;
+    const initialValues = isEmpty(modalValues) ? {id: getNewUUID(), type: THREE_D_STRUCTURE_TYPES.FOLD} : modalValues;
     formRef.current?.setValues(initialValues);
     setSelectedTypeIndex(types.indexOf(initialValues.type));
     const formName = [groupKey, initialValues.type];
@@ -76,12 +79,11 @@ const AddThreeDStructureModal = () => {
 
   const save3DStructure = async () => {
     try {
-      await formRef.current.submitForm();
-      const edited3DStructureData = showErrors(formRef.current);
+      const {values: edited3DStructureData} = await submitAndShowErrors(formRef.current);
       console.log('Saving 3D Structure data to Spot ...');
       let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
         : [];
-      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
+      edited3DStructuresData.push({...edited3DStructureData, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
       if (SMALL_SCREEN) closeModal();
@@ -104,7 +106,7 @@ const AddThreeDStructureModal = () => {
             onPress={on3DStructureTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
-            textStyle={{color: PRIMARY_TEXT_COLOR}}
+            textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
           />
           {types[selectedTypeIndex] === THREE_D_STRUCTURE_TYPES.FOLD && (
             <AddFold
@@ -149,6 +151,7 @@ const AddThreeDStructureModal = () => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey && 'Done'}
         closeModal={() => choicesViewKey ? setChoicesViewKey(null) : closeModal()}
+        disabled={isFormInvalid}
         headerTitle={'Add 3D Structure'}
         onActionPressed={save3DStructure}
         showActionButton={!choicesViewKey}
@@ -158,19 +161,18 @@ const AddThreeDStructureModal = () => {
         <FlatList
           ListHeaderComponent={
             <View style={{flex: 1}}>
-              <Formik
+              <FormikWrapper
+                formName={formName}
                 initialValues={{}}
                 innerRef={formRef}
-                onSubmit={values => console.log('Submitting form...', values)}
-                validate={values => validateForm({formName: formName, values: values})}
-                validateOnChange={false}
+                setIsFormInvalid={setIsFormInvalid}
               >
                 {formProps => (
                   <View style={{flex: 1}}>
                     {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
                   </View>
                 )}
-              </Formik>
+              </FormikWrapper>
             </View>
           }
           bounces={false}
@@ -189,7 +191,7 @@ const AddThreeDStructureModal = () => {
         relevantFields = [survey.find(f => f.name === choicesViewKey)];
       }
       return (
-        <Form {...{formName: [groupKey, formRef.current?.values?.type], surveyFragment: relevantFields, ...formProps}}/>
+        <Form {...formProps} formName={[groupKey, formRef.current?.values?.type]} surveyFragment={relevantFields}/>
       );
     }
   };

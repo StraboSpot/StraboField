@@ -2,12 +2,12 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
-import {FormFlatList} from '../../shared/ui';
-import {TextInputField} from '../form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import TextInputField from '../form/inputs/TextInputField';
 
 const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight, isFillHeight}) => {
   /* Derived Variables */
@@ -20,24 +20,19 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full',
   /* Render Functions */
 
   const renderField = fieldAppearance => (
-    <Formik
+    <FormikWrapper
       enableReinitialize={true}
       initialValues={initialNotesValues}
       innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
     >
-      {() => (
-        <Field
-          appearance={fieldAppearance}
-          autoFocus={autoFocus}
-          component={TextInputField}
-          customHeight={customHeight}
-          editable={!isReadOnly}
-          key={'note'}
-          name={'note'}
-        />
-      )}
-    </Formik>
+      <TextInputField
+        appearance={fieldAppearance}
+        autoFocus={autoFocus}
+        customHeight={customHeight}
+        editable={!isReadOnly}
+        name={'note'}
+      />
+    </FormikWrapper>
   );
 
   /* View */

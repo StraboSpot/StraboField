@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
 import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -160,7 +160,9 @@ const useTags = () => {
       features.forEach((featureId) => {
         const feature = getFeature(spotId, featureId);
         if (feature) {
-          feature.parentSpotId = spotId;
+          // Object.entries stringifies the key, and the same field is set from spot.properties.id - a number -
+          // in useSpots getAllFeatures, so convert back rather than leaving parentSpotId typed two ways
+          feature.parentSpotId = Number(spotId);
           feature.label = getFeatureLabel(feature);
           allTaggedFeatures.push(feature);
         }
@@ -251,15 +253,16 @@ const useTags = () => {
   };
 
   const saveTag = (tagToSave) => {
+    const timestamp = Date.now();
     let updatedTags;
     if (!Array.isArray(tagToSave)) {
       updatedTags = tags.filter(tag => tag.id !== tagToSave.id);
-      updatedTags.push(tagToSave);
+      updatedTags.push({...tagToSave, modified_timestamp: timestamp});
     }
     else {
       const tagIdsToSave = new Set(tagToSave.map(tag => tag.id));
       updatedTags = tags.filter(tag => !tagIdsToSave.has(tag.id));
-      updatedTags = tagToSave.concat(updatedTags);
+      updatedTags = tagToSave.map(tag => ({...tag, modified_timestamp: timestamp})).concat(updatedTags);
     }
     updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));

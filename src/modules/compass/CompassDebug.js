@@ -7,7 +7,7 @@ import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import {formatDeg} from './compass.helpers';
 import compassStyles from './compass.styles';
 import {roundToDecimalPlaces} from '../../shared/helpers';
-import {overlayStyles} from '../home/overlays';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
 
 const CompassDebug = ({compassData, matrixRotation}) => {
   /* Data Hooks */

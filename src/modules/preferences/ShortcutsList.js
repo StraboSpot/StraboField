@@ -2,14 +2,16 @@ import React from 'react';
 import {FlatList, Platform} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useToast} from 'react-native-toast-notifications';
+import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
-import {SwitchWrapper} from '../../shared/ui';
-import {AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {setShortcutSwitchPositions} from '../home/home.slice';
+import useShortcutSwitches from '../home/useShortcutSwitches';
 import {SHORTCUT_MODALS} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -17,11 +19,18 @@ const ShortcutsList = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const shortcutSwitchPositions = useSelector(state => state.home.shortcutSwitchPosition);
+
+  const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
+  const toast = useToast();
 
   /* Logic Helpers */
 
   const toggleSwitch = (switchName) => {
+    if (isTargetDatasetMissing && !shortcutSwitchPositions[switchName]) {
+      toast.show('No Target Dataset. A target dataset needs\nto be set before turning on Shortcuts.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     dispatch(setShortcutSwitchPositions({switchName: switchName}));
   };
 

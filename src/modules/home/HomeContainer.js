@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import Home from './Home';
 import {setIsProjectLoadSelectionModalVisible} from './home.slice';
-import homeStyles from './home.style';
+import homeStyles from './home.styles';
 import OverlaysContainer from './OverlaysContainer';
 import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';

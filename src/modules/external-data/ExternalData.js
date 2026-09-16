@@ -10,7 +10,7 @@ import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {formStyles} from '../form';
+import formStyles from '../form/form.styles';
 import PageHeader from '../page/PageHeader';
 
 const ExternalData = ({isReadOnly, page}) => {
@@ -80,7 +80,7 @@ const ExternalData = ({isReadOnly, page}) => {
               onPress={i => i === 0 ? setProtocol('http://') : setProtocol('https://')}
               selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
               selectedIndex={protocol === 'http://' ? 0 : 1}
-              textStyle={{color: themes.PRIMARY_ACCENT_COLOR}}
+              textStyle={{color: themes.PRIMARY_ACCENT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
             />
             <ListItem containerStyle={commonStyles.listItem}>
               <ListItem.Content style={{flexDirection: 'row', justifyContent: 'flex-start'}}>

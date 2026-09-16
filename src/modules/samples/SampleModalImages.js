@@ -1,7 +1,8 @@
 import React from 'react';
 
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {AddImageButtons, ImagesList} from '../images';
+import AddImageButtons from '../images/AddImageButtons';
+import ImagesList from '../images/ImagesList';
 
 const SampleModalImages = ({sampleImages, setSampleImages}) => {
   /* Logic Helpers */

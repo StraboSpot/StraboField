@@ -1,18 +1,19 @@
 import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 
+import {useNavigation} from '@react-navigation/native';
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
 import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shared/helpers';
-import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR} from '../../../shared/styles.constants';
+import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
-import {LABEL_DICTIONARY} from '../../form';
+import {LABEL_DICTIONARY} from '../../form/form.constants';
+import {openedMessageModal} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import {getUtmDisplayString} from '../../maps/maps.helpers';
@@ -20,8 +21,8 @@ import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
-import {useSpots} from '../../spots';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
+import useSpots from '../../spots/useSpots';
 import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
@@ -43,17 +44,19 @@ const NotebookHeader = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const navigation = useNavigation();
   const {getCurrentLocation} = useMapLocation();
   const {
     checkSpotName,
-    getRootSpot,
+    getReadOnlyReason,
+    getRootSpotGeoCoords,
     getSampleSpotIconSource,
     getSpotGeometryIconSource,
     getSpotWithThisImageBasemap,
     getSpotWithThisSample,
-    getSpotWithThisStratSection,
+    handleSpotSelected,
+    isCurrentMapReadOnly,
   } = useSpots();
-  const toast = useToast();
 
   /* Local State */
 
@@ -88,29 +91,41 @@ const NotebookHeader = ({
 
   const getCoordText = (lat, lng) => isUtmDisplay ? getUtmDisplayString([lng, lat]) : getLatLngText(lat, lng);
 
+  // Name the dataset to unlock AND why this Spot is affected by it. Without the reason, someone looking at a
+  // Spot in their own open dataset is told to go unlock a dataset that Spot is not even in.
+  const getReadOnlyReasonText = () => {
+    const reason = getReadOnlyReason(spot);
+    if (isEmpty(reason)) return 'Unlock its dataset from the Datasets page.';  // the modal title says the rest
+    const {cause, datasetNames} = reason;
+    const unlockText = datasetNames.length === 1 ? `Unlock dataset ${datasetNames[0]} from the Datasets page.`
+      : `Unlock datasets ${datasetNames.join(', ')} from the Datasets page.`;
+    // Any Spot on a section locks it, not only an interval, and a reorder moves everything on the section
+    if (cause === 'stratSection') {
+      const sectionText = spot.properties?.strat_section_id ? 'Another Spot on this strat section is Read Only'
+        : 'This Spot\'s strat section holds a Read Only Spot';
+      return `${sectionText}, so the whole section is locked. ${unlockText}`;
+    }
+    if (cause === 'map') {
+      const mapText = spot.properties?.image_basemap ? 'image basemap' : 'strat section';
+      return `The ${mapText} this Spot is on belongs to a Read Only Spot. ${unlockText}`;
+    }
+    return `This Spot is in a Read Only dataset. ${unlockText}`;
+  };
+
   const getSpotCoordText = () => {
     if (spot.geometry && spot.geometry.type) {
       // Creates DMS string for Point coordinates
       if (spot.geometry.type === 'Point') {
-        let lng = spot.geometry.coordinates[0];
-        let lat = spot.geometry.coordinates[1];
+        const lng = spot.geometry.coordinates[0];
+        const lat = spot.geometry.coordinates[1];
         if (spot.properties.image_basemap || spot.properties.strat_section_id) {
-          let pixelDetails = toFixedInteger(lng, 6) + ' X, ' + toFixedInteger(lat, 6) + ' Y';
-          if (isEmpty(spot.properties.lat) || isEmpty(spot.properties.lng)) {
-            const rootSpot = spot.properties.image_basemap ? getRootSpot(spot.properties.image_basemap)
-              : getSpotWithThisStratSection(spot.properties.strat_section_id);
-            if (rootSpot && rootSpot.geometry && rootSpot.geometry.type === 'Point') {
-              lng = rootSpot.geometry.coordinates[0];
-              lat = rootSpot.geometry.coordinates[1];
-              return getCoordText(lat, lng) + '\n' + pixelDetails;
-            }
-          }
-          else {
-            lng = spot.properties.lng;
-            lat = spot.properties.lat;
-            return getCoordText(lat, lng) + '\n' + pixelDetails;
-          }
-          return pixelDetails;
+          const pixelDetails = toFixedInteger(lng, 6) + ' X, ' + toFixedInteger(lat, 6) + ' Y';
+          // The Spot's own lng/lat when it has them, else wherever its map hangs from - getRootSpotGeoCoords walks
+          // that nesting and refuses a holder still on a pixel map, whose own coordinates are pixels too.
+          const geoCoords = !isEmpty(spot.properties.lng) && !isEmpty(spot.properties.lat)
+            ? [spot.properties.lng, spot.properties.lat]
+            : getRootSpotGeoCoords(spot.properties.image_basemap, spot.properties.strat_section_id);
+          return geoCoords ? getCoordText(geoCoords[1], geoCoords[0]) + '\n' + pixelDetails : pixelDetails;
         }
         else return getCoordText(lat, lng);
       }
@@ -161,23 +176,32 @@ const NotebookHeader = ({
     }
   };
 
+  // The reason runs to a couple of sentences and lands while the menu panel is animating in, which is more
+  // than a toast's few seconds can carry - so it goes in the message modal, which waits to be dismissed and
+  // can be re-read.
   const goToDatasetsPage = () => {
-    toast.show('Spot is in a Read Only Dataset. Unlock this dataset from the Datasets page.',
-      {duration: 4000, placement: 'top', type: 'warning'});
+    dispatch(openedMessageModal({message: getReadOnlyReasonText(), title: 'Spot is Read Only'}));
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
     if (openMainMenuPanel) openMainMenuPanel();
   };
 
+  // A GPS reading puts the Spot on the geo map whichever map is on screen. So the properties that only mean something
+  // on a pixel map go - a copy inherits them with no geometry to match, see copySpot - and the open map goes with
+  // them, which handleSpotSelected does and setSelectedSpot does not.
   const setToCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();
     let editedSpot = JSON.parse(JSON.stringify(spot));
     editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
+    delete editedSpot.properties.image_basemap;
+    delete editedSpot.properties.lat;
+    delete editedSpot.properties.lng;
+    delete editedSpot.properties.strat_section_id;
     if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
     if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
     dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
     dispatch(editedOrCreatedSpot(editedSpot));
-    dispatch(setSelectedSpot(editedSpot));
+    handleSpotSelected(editedSpot);
   };
 
   /* Render Functions */
@@ -310,15 +334,21 @@ const NotebookHeader = ({
             />
           </View>
         )}
-        <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
-          <ClearButton
-            onPress={() => {
-              createDefaultGeom();
-              closeNotebookPanel();
-            }}
-            title={'Set in Current View'}
-          />
-        </View>
+        {/* The geometry is placed on the map on screen, so a read only image basemap or strat section is off limits */}
+        {!isCurrentMapReadOnly() && (
+          <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
+            <ClearButton
+              onPress={() => {
+                createDefaultGeom();
+                // The geometry goes onto the map, so show it. On a small screen the Notebook is a tab rather than a
+                // drawer, and closeNotebookPanel only hides it where it stands, blanking the tab being looked at.
+                if (SMALL_SCREEN) navigation.navigate('HomeScreen', {screen: 'Map'});
+                else closeNotebookPanel();
+              }}
+              title={'Set in Current View'}
+            />
+          </View>
+        )}
       </View>
     );
   };

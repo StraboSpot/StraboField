@@ -2,10 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import {Form, FormSlider, MainButtons, useForm} from '../form';
 import {
   SAMPLE_FIRST_KEYS,
   SAMPLE_FORM_NAME,
@@ -13,8 +10,22 @@ import {
   SAMPLE_ORIENTED_KEY,
   SAMPLE_TYPE_KEY,
 } from './samples.constants';
+import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
+import FormSlider from '../form/FormSlider';
+import MainButtons from '../form/MainButtons';
+import useForm from '../form/useForm';
 
-const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setChoicesViewKey, startingNumber}) => {
+const SampleModalForm = ({
+                           choicesViewKey,
+                           formRef,
+                           namePostfix,
+                           namePrefix,
+                           setChoicesViewKey,
+                           setIsFormInvalid,
+                           startingNumber,
+                         }) => {
   /* Data Hooks */
 
   const {getChoices, getRelevantFields, getSurvey} = useForm();
@@ -54,7 +65,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
         mainKeys={SAMPLE_TYPE_KEY}
         setChoicesViewKey={setChoicesViewKey}
       />
-      <Form formName={SAMPLE_FORM_NAME} surveyFragment={firstKeysFields} {...formProps}/>
+      <Form {...formProps} formName={SAMPLE_FORM_NAME} surveyFragment={firstKeysFields}/>
       <FormSlider
         choices={choices}
         fieldKey={SAMPLE_INPLACENESS_KEY}
@@ -69,20 +80,21 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
         onPress={onOrientedButtonPress}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
         selectedIndex={getSelectedOrientedIndex()}
-        textStyle={{color: PRIMARY_TEXT_COLOR}}
+        textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
       />
     </>
   );
 
   const renderSubform = formProps => (
-    <Form formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)} {...formProps}/>
+    <Form {...formProps} formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)}/>
   );
 
   /* View */
 
   return (
-    <Formik
+    <FormikWrapper
       enableReinitialize
+      formName={SAMPLE_FORM_NAME}
       initialValues={{
         inplaceness_of_sample: '5___definitely',
         material_type: 'intact_rock',
@@ -90,7 +102,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
         sample_type: 'individual_sample',
       }}
       innerRef={formRef}
-      onSubmit={values => console.log('Submitting form...', values)}
+      setIsFormInvalid={setIsFormInvalid}
     >
       {formProps => (
         // No flex here: this sits in the modal's scrolling body alongside the images and geologic units
@@ -100,7 +112,7 @@ const SampleModalForm = ({choicesViewKey, formRef, namePostfix, namePrefix, setC
           {choicesViewKey ? renderSubform(formProps) : renderForm(formProps)}
         </View>
       )}
-    </Formik>
+    </FormikWrapper>
   );
 };
 

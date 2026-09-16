@@ -64,6 +64,17 @@ export const NOTEBOOK_WIDTH = 400;
 
 export const MAX_CONTENT_WIDTH = 400;   // Width past which content is no longer stretched to fill its container
 
+// The small screen map stack, read from the bottom of the screen up: the map actions along the bottom, the
+// scale bar and zoom above them on the left, and the geolocate button above those. Laid out as one flex
+// column in ActionButtonsSmallScreen, so all it needs from here is the screen edge inset and the row gap.
+export const SMALL_SCREEN_MAP_STACK = {
+  EDGE_INSET: 10,
+  GAP: 6,
+  // The web map's zoom in/out control is the one piece that cannot join that column - it belongs to the
+  // map, so it is positioned over it and has to clear the column's height by hand
+  WEB_ZOOM_CONTROLS_BOTTOM: 175,
+};
+
 export const SMALL_SCREEN_WIDTH = 600;
 export const SMALL_SCREEN = width < SMALL_SCREEN_WIDTH;
 export const MEDIUM_SCREEN = (width >= 600 && width < 840) || (height >= 480 && height < 900);

@@ -9,7 +9,7 @@ import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import {truncateText} from '../../shared/helpers';
 import {BLACK} from '../../shared/styles.constants';
-import {AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 
 const MainMenuPanelHeader = ({onOverflowMenuPress}) => {
   /* Data Hooks */

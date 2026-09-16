@@ -48,8 +48,8 @@ const DismissibleWarningModal = ({headerTitle, isVisible, message, onCancel, onC
           checked={isDoNotShowChecked}
           containerStyle={{backgroundColor: 'transparent', borderWidth: 0, marginLeft: 0, marginTop: 10, padding: 4}}
           onPress={() => setIsDoNotShowChecked(!isDoNotShowChecked)}
+          textStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
           title={'Don\'t show this again'}
-          titleStyle={{color: PRIMARY_TEXT_COLOR, fontSize: SMALL_TEXT_SIZE}}
         />
       </View>
     </ModalWrapper>

@@ -1,7 +1,9 @@
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
 
-import {ImageCard, useImages, useImageThumbnails} from '../images';
+import ImageCard from '../images/ImageCard';
+import useImages from '../images/useImages';
+import useImageThumbnails from '../images/useImageThumbnails';
 
 const NestingImageCard = ({imageBasemapId, index}) => {
   /* Data Hooks */

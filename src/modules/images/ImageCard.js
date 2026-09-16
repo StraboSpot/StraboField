@@ -4,23 +4,26 @@ import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {imageStyles, ImageThumbnail, useImageThumbnails, useImages} from '.';
+import imageStyles from './image.styles';
+import ImageThumbnail from './ImageThumbnail';
+import useImages from './useImages';
+import useImageThumbnails from './useImageThumbnails';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
-import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const ImageCard = ({
                      areImageThumbnailsLoading,
                      image,
                      imageThumbnailURIs,
                      index,
-                     isReadOnly,
+                     isReadOnlyImage,
                      isThumbnailOnly,
                      onOpenImage,
                      onOpenImageProperties,
@@ -39,7 +42,7 @@ const ImageCard = ({
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getSpotsMappedOnGivenImageBasemap} = useSpots();
+  const {getAllSpotsOnImageBasemap} = useSpots();
 
   /* Local State */
 
@@ -107,7 +110,8 @@ const ImageCard = ({
 
   const handleMissingImage = () => {
     setIsImageMissingOnServer(true);
-    setIsMissingImageModalVisible(true);
+    // Nothing to offer on a read only image - the modal only leads to replacing or deleting it
+    if (!isReadOnlyImage) setIsMissingImageModalVisible(true);
   };
 
   const handleStartEditing = () => {
@@ -129,7 +133,7 @@ const ImageCard = ({
       : placeholderTitle;
   }
 
-  const getIsSwitchDisabled = () => !isEmpty(getSpotsMappedOnGivenImageBasemap(image.id)) || isReadOnly;
+  const getIsSwitchDisabled = () => !isEmpty(getAllSpotsOnImageBasemap(image.id)) || isReadOnlyImage;
 
   /* View */
 
@@ -156,7 +160,7 @@ const ImageCard = ({
             />
           ) : (
             <TouchableOpacity
-              disabled={isReadOnly}
+              disabled={isReadOnlyImage}
               onPress={handleStartEditing}
               style={imageStyles.cardTitleEditingButton}>
               <Text

@@ -2,9 +2,12 @@ import React, {useMemo} from 'react';
 
 import {useSelector} from 'react-redux';
 
-import {FeatureHalosLayers, FeaturesNotSelectedLayers, FeaturesSelectedLayers, SampleLayers} from '.';
+import FeatureHalosLayers from './FeatureHalosLayers';
+import FeaturesNotSelectedLayers from './FeaturesNotSelectedLayers';
 import FeaturesReadOnlyLayers from './FeaturesReadOnlyLayers';
+import FeaturesSelectedLayers from './FeaturesSelectedLayers';
 import {getUniqFeatures} from './layers.helpers';
+import SampleLayers from './SampleLayers';
 import {isEmpty} from '../../../shared/helpers';
 import useProject from '../../project/useProject';
 import useMapFeatures from '../features/useMapFeatures';

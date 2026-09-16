@@ -5,7 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {ADD_FABRIC_FIELDS, DEFAULT_FABRIC_TYPE, DEPRECATED_FABRIC_TYPE} from './fabric.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 
 const FabricListItem = ({
                           editFabric,

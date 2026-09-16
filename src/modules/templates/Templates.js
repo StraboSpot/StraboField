@@ -10,7 +10,7 @@ import useTemplates from './useTemplates';
 import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
-import SidePanelHeader from '../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
 
 const Templates = () => {
   /* Data Hooks */

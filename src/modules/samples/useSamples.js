@@ -1,4 +1,5 @@
 import * as turf from '@turf/turf';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
@@ -6,8 +7,9 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {useSpots} from '../spots';
+import {isOnGeoMap} from '../spots/spots.helpers';
 import {clearedSelectedSpots, editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const useSamples = () => {
   /* Data Hooks */
@@ -15,26 +17,47 @@ const useSamples = () => {
   const dispatch = useDispatch();
 
   const {getTargetDatasetFromId} = useProject();
-  const {deleteSpot} = useSpots();
+  const {deleteSpot, getRootSpotGeoCoords} = useSpots();
+  const toast = useToast();
 
+  /* Internal Functions */
+
+  // A Sample Spot sits on the geo map, so it needs real world coordinates. A parent on an image basemap or strat
+  // section has none of its own to give - its geometry is pixels - so fall back to the Spot holding that map, as
+  // createSpot does. Undefined when there is no location to be had, which the notebook offers two ways to set.
+  const getSampleGeometry = (parentSpot) => {
+    const {image_basemap, lat, lng, strat_section_id} = parentSpot.properties;
+    if (!isEmpty(lng) && !isEmpty(lat)) return turf.point([lng, lat]).geometry;
+    if (!isOnGeoMap(parentSpot)) {
+      const geoCoords = getRootSpotGeoCoords(image_basemap, strat_section_id);
+      if (!geoCoords) return undefined;
+      return turf.point(geoCoords).geometry;
+    }
+    if (isEmpty(parentSpot.geometry)) return undefined;
+    return parentSpot.geometry.type === 'Point' || parentSpot.geometry.type === 'LineString' ? parentSpot.geometry
+      : turf.centroid(parentSpot).geometry;
+  };
 
   /* Exported Functions */
 
   // Create new Sample Spot
   const createRichSample = (spot, selectedSample, sampleImages = []) => {
+    // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
+    // leaving one behind in no dataset
+    const targetDataset = getTargetDatasetFromId();
+    if (isEmpty(targetDataset)) {
+      toast.show('No Target Dataset. A target dataset needs to be set before creating a Sample.',
+        {placement: 'top', type: 'warning'});
+      return;
+    }
     // A sample already on the parent Spot is a legacy sample being converted, so it was created with that Spot and
     // keeps the parent's created date. A brand new sample isn't on the parent Spot yet, so it gets today's date.
     const isConvertingLegacySample = spot.properties[PAGE_KEYS.SAMPLES]?.some(s => s.id === selectedSample.id);
     let d = isConvertingLegacySample && spot.properties.date ? new Date(spot.properties.date) : new Date(Date.now());
     d.setMilliseconds(0);
-    let geometry = spot.geometry;
-    if (spot.properties.lng && spot.properties.lat) {
-      geometry = turf.point([spot.properties.lng, spot.properties.lat]).geometry;
-    }
-    else if (geometry.type !== 'Point' && geometry.type !== 'LineString') geometry = turf.centroid(spot).geometry;
 
     const newEnrichedSample = {
-      geometry: geometry,
+      geometry: getSampleGeometry(spot),
       properties: {
         date: d.toISOString(),
         id: selectedSample.id,
@@ -49,7 +72,6 @@ const useSamples = () => {
     };
 
     console.log('Creating new Enriched Sample:', newEnrichedSample);
-    const targetDataset = getTargetDatasetFromId();
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
 
@@ -65,6 +87,7 @@ const useSamples = () => {
 
     dispatch(setSelectedSpot(newEnrichedSample));
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    return newEnrichedSample;
   };
 
   const deleteRichSample = (sampleToDelete, parentSpot) => {
@@ -87,19 +110,9 @@ const useSamples = () => {
     }
   };
 
-  const onSampleFormChange = (formCurrent, fieldName, fieldValue) => {
-    console.log(fieldName, 'changed to', fieldValue);
-    fieldName === 'collection_date'
-      ? formCurrent.setFieldValue('collection_time', fieldValue)
-      : fieldName === 'collection_time'
-        ? formCurrent.setFieldValue('collection_date', fieldValue)
-        : formCurrent.setFieldValue(fieldName, fieldValue);
-  };
-
   return {
     createRichSample,
     deleteRichSample,
-    onSampleFormChange,
   };
 };
 

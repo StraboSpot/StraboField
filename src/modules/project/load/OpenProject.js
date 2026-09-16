@@ -18,7 +18,7 @@ import {
   setStatusMessageModalTitle,
 } from '../../home/home.slice';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import SidePanelHeader from '../../main-menu-panel/sidePanel/SidePanelHeader';
+import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import ProjectList from '../ProjectList';
 
 const source = 'device';
@@ -91,7 +91,7 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
           onPress={i => setSelectedTabIndex(i)}
           selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
           selectedIndex={selectedTabIndex}
-          textStyle={{color: themes.PRIMARY_TEXT_COLOR}}
+          textStyle={{color: themes.PRIMARY_TEXT_COLOR, fontSize: themes.SMALL_TEXT_SIZE}}
         />
         {selectedTabIndex === 1 && (
           <Text style={[commonStyles.standardDescriptionText, {

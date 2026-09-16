@@ -7,9 +7,9 @@ import {REPORT_FORM_NAME} from './reports.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
-import {useForm} from '../form';
+import useForm from '../form/useForm';
 import {updatedProject} from '../project/projects.slice';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const ReportsListItem = ({
                            doShowTags,
@@ -44,7 +44,7 @@ const ReportsListItem = ({
     reportSpotsIds = [... new Set([...reportSpotsIds, ...selectedSpots.map(s=>s.properties.id)])];
     console.log('Add selected spot ids', reportSpotsIds, 'to report', report);
     const editedReport = JSON.parse(JSON.stringify(report));
-    editedReport.updated_timestamp = Date.now();
+    editedReport.modified_timestamp = Date.now();
     editedReport.spots = reportSpotsIds;
     let updatedReports = reports.filter(r => r.id !== editedReport.id);
     updatedReports.push({...editedReport});

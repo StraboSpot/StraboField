@@ -96,7 +96,9 @@ export const getIconRotation = () => {
 
 // Get the label (Mapbox GL expression)
 export const getLabel = (labelTypeOn) => {
-  if (labelTypeOn === 'name') return ['get', 'name'];
+  // A Spot with multiple measurements is drawn as a feature per measurement, all at the same place, so only the
+  // feature marked to carry the Spot name labels it (see hideRepeatedSpotNameLabels in useMapFeatures)
+  if (labelTypeOn === 'name') return ['case', ['has', 'isSpotNameLabelHidden'], '', ['get', 'name']];
   else if (labelTypeOn === 'dip') {
     return [
       'case', ['has', 'orientation'],
@@ -173,4 +175,13 @@ export const getLabelOffset = () => {
     ],
     ['literal', [0.75, 0]],
   ];
+};
+
+// The rule getLabelOffset applies, in plain JS: the label sits further to the right of a symbol rotated between
+// 60-120 or 240-300, which takes up more horizontal space
+export const isLabelOffsetFurtherRight = (orientation) => {
+  const rotation = orientation?.strike !== undefined ? orientation.strike
+    : orientation?.dip_direction !== undefined ? (orientation.dip_direction - 90) % 360
+      : orientation?.trend !== undefined ? orientation.trend : 0;
+  return (rotation >= 60 && rotation <= 120) || (rotation >= 240 && rotation <= 300);
 };

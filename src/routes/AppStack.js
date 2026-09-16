@@ -5,7 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {NAVIGATION_OPTIONS} from './routes.constants';
 import DocumentationScreen from '../modules/help/documentation/DocumentationScreen';
 import HomeContainer from '../modules/home/HomeContainer';
-import {ImageSlider} from '../modules/images';
+import ImageSlider from '../modules/images/ImageSlider';
 
 const AppStack = () => {
   /* Derived Variables */

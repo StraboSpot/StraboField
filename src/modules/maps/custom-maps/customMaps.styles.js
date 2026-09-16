@@ -74,15 +74,11 @@ const styles = StyleSheet.create({
   loadingMapModalTitleContainer: {
     flex: 1,
   },
-  mapOverviewBboxText: {
-    paddingLeft: 20,
+  // Lined up with the fields above it, which take their gutter from the ListItem they sit in
+  mapTypeErrorMessage: {
+    marginHorizontal: 10,
+    marginVertical: 5,
   },
-  mapOverviewText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: themes.TEXT_WEIGHT_500,
-    padding: 5,
-  },
-  // mapOverview
   mapTypeInfoContainer: {
     alignItems: 'center',
     padding: 10,
@@ -94,11 +90,6 @@ const styles = StyleSheet.create({
   mapUrlLink: {
     color: themes.PRIMARY_ACCENT_COLOR,
     textDecorationLine: 'underline',
-  },
-  requiredMessage: {
-    color: themes.RED,
-    fontSize: themes.SMALL_TEXT_SIZE,
-    margin: 5,
   },
 });
 

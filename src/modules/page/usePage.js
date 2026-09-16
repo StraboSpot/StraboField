@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PAGES_SECTIONS, PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
-import {useTags} from '../tags';
+import useTags from '../tags/useTags';
 
 const usePage = () => {
   /* Data Hooks */

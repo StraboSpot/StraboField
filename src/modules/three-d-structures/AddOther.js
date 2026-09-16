@@ -13,7 +13,8 @@ import {
   MULLION_MEASUREMENTS_KEYS,
 } from './threeDStructures.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 
@@ -36,7 +37,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
 
   return (
     <>
-      <Form {...{surveyFragment: labelField, ...formProps}}/>
+      <Form {...formProps} surveyFragment={labelField}/>
       <MainButtons
         formName={formName}
         formProps={formProps}
@@ -58,7 +59,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
             setMeasurementsGroupField={setOtherMeasurementsGroupField}
             survey={survey}
           />
-          <Form {...{surveyFragment: boudinageKeysFields, ...formProps}}/>
+          <Form {...formProps} surveyFragment={boudinageKeysFields}/>
           {isOtherMeasurementsModalVisible && (
             <MeasurementModal
               formName={formName}
@@ -85,7 +86,7 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
             setMeasurementsGroupField={setOtherMeasurementsGroupField}
             survey={survey}
           />
-          <Form {...{surveyFragment: mullionKeysFields, ...formProps}}/>
+          <Form {...formProps} surveyFragment={mullionKeysFields}/>
           {isOtherMeasurementsModalVisible && (
             <MeasurementModal
               formName={formName}
@@ -98,10 +99,10 @@ const AddOther = ({formName, formProps, setChoicesViewKey, survey}) => {
         </>
       )}
       {formProps.values.feature_type === 'lobate_cuspate' && (
-        <Form {...{surveyFragment: lobateCuspateKeysFields, ...formProps}}/>
+        <Form {...formProps} surveyFragment={lobateCuspateKeysFields}/>
       )}
       <LittleSpacer/>
-      <Form {...{surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} surveyFragment={lastKeysFields}/>
     </>
   );
 };

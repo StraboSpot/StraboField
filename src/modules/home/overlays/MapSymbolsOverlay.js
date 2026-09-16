@@ -4,14 +4,14 @@ import {FlatList, Image} from 'react-native';
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {overlayStyles} from './index';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import {SwitchWrapper} from '../../../shared/ui/';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import {
   setFeatureTypesOff,
   setGeometryTypesOff,

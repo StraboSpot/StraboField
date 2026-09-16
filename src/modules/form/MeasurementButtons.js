@@ -4,7 +4,8 @@ import {Text, View} from 'react-native';
 import {Button} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
-import {formStyles, useForm} from '.';
+import formStyles from './form.styles';
+import useForm from './useForm';
 import {isEmpty, padWithLeadingZeros} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SECONDARY_BACKGROUND_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';

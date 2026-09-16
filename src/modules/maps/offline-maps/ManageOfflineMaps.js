@@ -17,7 +17,7 @@ import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
-import {WarningModal} from '../../../shared/ui/modals';
+import WarningModal from '../../../shared/ui/modals/WarningModal';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';

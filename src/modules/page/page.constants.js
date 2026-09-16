@@ -10,7 +10,7 @@ import FabricsPage from '../fabrics/FabricsPage';
 import Geography from '../geography/Geography';
 import AddEarthquakeModal from '../geomorph/AddEarthquakeModal';
 import EarthquakesPage from '../geomorph/EarthquakesPage';
-import ImagesOverview from '../images/ImagesOverview'; // import {ImagesOverview, ImagesViewPage} from '../images'; errors in web
+import ImagesOverview from '../images/ImagesOverview';
 import ImagesPage from '../images/ImagesPage';
 import AddIntervalModal from '../maps/strat-section/AddIntervalModal';
 import AddMeasurementModal from '../measurements/AddMeasurementModal';
@@ -24,20 +24,22 @@ import ShortcutNotesModal from '../notes/ShortcutNotesModal';
 import OtherFeaturesOverview from '../other-features/OtherFeaturesOverview';
 import OtherFeaturesPage from '../other-features/OtherFeaturesPage';
 import OutcropSummaryPage from '../outcrop-summary/OutcropSummaryPage';
-import AddMineralModal from '../petrology/AddMineralModal';
-import AddReactionTextureModal from '../petrology/AddReactionTextureModal';
-import AddRockModal from '../petrology/AddRockModal';
-import MineralsPage from '../petrology/MineralsPage';
-import ReactionTexturesPage from '../petrology/ReactionTexturesPage';
-import RockAlterationOrePage from '../petrology/RockAlterationOrePage';
-import RockFaultPage from '../petrology/RockFaultPage';
-import RockIgneousPage from '../petrology/RockIgneousPage';
-import RockMetamorphicPage from '../petrology/RockMetamorphicPage';
-import RockSedimentaryPage from '../petrology/RockSedimentaryPage';
-import TernaryPage from '../petrology/TernaryPage';
+import AddMineralModal from '../petrology/minerals/AddMineralModal';
+import MineralsPage from '../petrology/minerals/MineralsPage';
+import TernaryPage from '../petrology/minerals/TernaryPage';
+import AddReactionTextureModal from '../petrology/reaction-textures/AddReactionTextureModal';
+import ReactionTexturesPage from '../petrology/reaction-textures/ReactionTexturesPage';
+import AddRockModal from '../petrology/rocks/AddRockModal';
+import RockAlterationOrePage from '../petrology/rocks/RockAlterationOrePage';
+import RockFaultPage from '../petrology/rocks/RockFaultPage';
+import RockIgneousPage from '../petrology/rocks/RockIgneousPage';
+import RockMetamorphicPage from '../petrology/rocks/RockMetamorphicPage';
+import RockSedimentaryPage from '../petrology/rocks/RockSedimentaryPage';
 import QAQCPage from '../qaqc/QAQC';
 import QAQCOverview from '../qaqc/QAQCOverview';
-import {ReportModal, ReportsListModal, ReportsPage} from '../reports';
+import ReportModal from '../reports/ReportModal';
+import ReportsListModal from '../reports/ReportsListModal';
+import ReportsPage from '../reports/ReportsPage';
 import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
@@ -49,14 +51,12 @@ import IntervalPage from '../sed/IntervalPage';
 import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
 import SpotsRawDataView from '../spots/SpotsRawDataView';
-import {
-  AddTagsToSpotsShortcutModal,
-  FeatureTagsModal,
-  TagsAtSpotList,
-  TagsNotebook,
-  TagsNotebookModal,
-  TagsShortcutModal,
-} from '../tags';
+import AddTagsToSpotsShortcutModal from '../tags/AddTagsToSpotsShortcutModal';
+import FeatureTagsModal from '../tags/FeatureTagsModal';
+import TagsAtSpotList from '../tags/TagsAtSpotList';
+import TagsNotebook from '../tags/TagsNotebook';
+import TagsNotebookModal from '../tags/TagsNotebookModal';
+import TagsShortcutModal from '../tags/TagsShortcutModal';
 import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
 import ThreeDStructuresOverview from '../three-d-structures/ThreeDStructuresOverview';

@@ -12,8 +12,8 @@ import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../shared/styles.constants';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import {useImages} from '../images';
 import {getLocalImageURI} from '../images/imageURIs.helpers';
+import useImages from '../images/useImages';
 
 const ERASER_COLOR = '#00000000';
 const MAX_STROKE_WIDTH = 10;

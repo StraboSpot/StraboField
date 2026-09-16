@@ -4,11 +4,11 @@ import {SectionList, Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {useTags} from '.';
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_FILTER_LABELS, TAG_FILTERS} from './query/tagQuery.constants';
 import {TAG_SECTIONS} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
+import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -113,7 +113,7 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
   const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
     : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
   if (isEmpty(filteredTags)) {
-    return <ListEmptyText text={`No ${label.toLowerCase()} have been added to this project yet`}/>;
+    return <ListEmptyText text={`No ${label} Found`}/>;
   }
   else {
     return (

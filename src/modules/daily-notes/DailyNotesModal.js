@@ -2,14 +2,15 @@ import React, {useRef} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {Field, Formik} from 'formik';
 import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {DateInputField, TextInputField} from '../form';
+import FormikWrapper from '../form/FormikWrapper';
+import DateInputField from '../form/inputs/DateInputField';
+import TextInputField from '../form/inputs/TextInputField';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
@@ -78,41 +79,33 @@ const DailyNotesModal = () => {
         overlayStyleOverride={{height: 'auto'}}
         showDeleteButton={!isEmpty(projectDescription?.daily_setup)}
       >
-        <Formik
+        <FormikWrapper
           enableReinitialize={true}
           initialValues={initialValues}
           innerRef={formRef}
-          onSubmit={() => console.log('Submitting form...')}
-          validateOnChange={true}
         >
-          {() => (
-            <View>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    component={DateInputField}
-                    isDisplayOnly={true}
-                    isShowTime={true}
-                    key={'date'}
-                    label={'Date'}
-                    name={'date'}
-                  />
-                </ListItem.Content>
-              </ListItem>
-              <ListItem containerStyle={commonStyles.listItemFormField}>
-                <ListItem.Content>
-                  <Field
-                    appearance={'multiline'}
-                    component={TextInputField}
-                    key={'notes'}
-                    label={'Notes'}
-                    name={'notes'}
-                  />
-                </ListItem.Content>
-              </ListItem>
-            </View>
-          )}
-        </Formik>
+          <View>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <DateInputField
+                  isDisplayOnly={true}
+                  isShowTime={true}
+                  label={'Date'}
+                  name={'date'}
+                />
+              </ListItem.Content>
+            </ListItem>
+            <ListItem containerStyle={commonStyles.listItemFormField}>
+              <ListItem.Content>
+                <TextInputField
+                  appearance={'multiline'}
+                  label={'Notes'}
+                  name={'notes'}
+                />
+              </ListItem.Content>
+            </ListItem>
+          </View>
+        </FormikWrapper>
       </ModalWrapper>
     );
   };

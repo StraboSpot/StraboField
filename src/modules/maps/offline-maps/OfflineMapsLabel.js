@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import homeStyles from '../../home/home.style';
+import homeStyles from '../../home/home.styles';
 
 const OfflineMapLabel = () => {
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps) || {};

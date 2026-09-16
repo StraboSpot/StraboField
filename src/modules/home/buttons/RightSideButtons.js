@@ -4,14 +4,16 @@ import {Animated, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDeviceOrientation from '../useDeviceOrientation';
-import {DrawActionButtons, ShortcutButtons} from './';
+import DrawActionButtons from './DrawActionButtons';
 import NotebookButton from './NotebookButton';
+import ShortcutButtons from './ShortcutButtons';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
-import {cancelledIntervalDrag} from '../../maps/maps.slice';
+import {canceledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
+import useSpots from '../../spots/useSpots';
 import {setModalVisible} from '../home.slice';
-import homeStyles from '../home.style';
+import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
 const RightSideButtons = ({
@@ -20,6 +22,8 @@ const RightSideButtons = ({
                             closeNotebookPanel,
                             distance,
                             endMeasurement,
+                            hasDrawTools,
+                            isCreateToolsDisabled,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -35,6 +39,7 @@ const RightSideButtons = ({
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
 
+  const {isCurrentMapReadOnly} = useSpots();
   const {lockOrientation, unlockOrientation} = useDeviceOrientation();
 
   useEffect(() => {
@@ -46,11 +51,11 @@ const RightSideButtons = ({
 
   return (
     <>
-      {stratSection && (
+      {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => {
-              dispatch(cancelledIntervalDrag());
+              dispatch(canceledIntervalDrag());
               dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
             }}
             source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
@@ -82,10 +87,7 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        <DrawActionButtons
-          clickHandler={clickHandler}
-          mapMode={mapMode}
-        />
+        {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
       </Animated.View>
     </>
   );

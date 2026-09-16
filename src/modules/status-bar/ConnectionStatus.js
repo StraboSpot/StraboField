@@ -14,7 +14,7 @@ const ConnectionStatus = () => {
   // Subscribe
   useEffect(() => {
     // Dev-only: pretend we're offline while staying connected to Metro/debugger.
-    // Toggle from Preferences > Miscellaneous > "Force Offline (dev)".
+    // Toggle from Home Menu -> Advanced Options -> "Force Offline (dev)".
     if (__DEV__ && isForceOffline) {
       dispatch(setOnlineStatus({isConnected: false, isInternetReachable: false, type: 'none'}));
       return; // don't subscribe, so NetInfo can't overwrite the forced-offline state

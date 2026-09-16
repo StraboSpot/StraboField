@@ -1,0 +1,2 @@
+# Webpack build output — bundled, minified vendor code, not ours to lint
+dist/

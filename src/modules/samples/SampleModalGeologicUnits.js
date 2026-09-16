@@ -9,8 +9,9 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {imageStyles} from '../images';
-import {TagsListItem, TagsModal} from '../tags';
+import imageStyles from '../images/image.styles';
+import TagsListItem from '../tags/TagsListItem';
+import TagsModal from '../tags/TagsModal';
 
 const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
   /* Data Hooks */

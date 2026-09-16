@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 import useMapFeatures from './useMapFeatures';
 import {isEmpty} from '../../../shared/helpers';
 import useNesting from '../../nesting/useNesting';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {PRESS_BOX_PADDING, PRESS_BOX_PADDING_PRECISE} from '../maps.constants';
 import {getClosestSpotDistanceAndIndex} from '../maps.helpers';
 import useMapCoords from '../view/useMapCoords';

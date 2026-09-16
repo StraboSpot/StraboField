@@ -5,6 +5,7 @@ import {isEmpty} from '../../shared/helpers';
 const initialNotebookState = {
   isNotebookPanelVisible: false,
   isSamplesModalVisible: false,
+  morePagesSectionsCollapsed: [],
   notebookPagesOn: ['geologic_unit', 'notes', 'orientation_data', 'images', 'tags', 'samples'],
   // notebookPagesOn: PRIMARY_PAGES.map(p => p.key),  // This worked in Native but not Web
   visibleNotebookPagesStack: [],
@@ -25,6 +26,13 @@ const notebookSlice = createSlice({
     },
     setIsNotebookPanelVisible(state, action) {
       state.isNotebookPanelVisible = action.payload;
+    },
+    setMorePagesSectionsCollapsed(state, action) {
+      const title = action.payload;
+      if (state.morePagesSectionsCollapsed.includes(title)) {
+        state.morePagesSectionsCollapsed = state.morePagesSectionsCollapsed.filter(i => i !== title);
+      }
+      else state.morePagesSectionsCollapsed = [...state.morePagesSectionsCollapsed, title];
     },
     setNotebookPageVisible(state, action) {
       let visibleNotebookPagesStack = state.visibleNotebookPagesStack;
@@ -48,6 +56,7 @@ export const {
   removedNotebookPageOn,
   resetNotebookState,
   setIsNotebookPanelVisible,
+  setMorePagesSectionsCollapsed,
   setNotebookPageVisible,
   setNotebookPageVisibleToPrev,
 } = notebookSlice.actions;

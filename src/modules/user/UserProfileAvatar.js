@@ -9,7 +9,8 @@ import defaultAvatar from '../../assets/images/splash.png';
 import useDevice from '../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import {isEmpty} from '../../shared/helpers';
-import {AvatarAccessoryWrapper, AvatarWrapper} from '../../shared/ui/avatars';
+import AvatarAccessoryWrapper from '../../shared/ui/avatars/AvatarAccessoryWrapper';
+import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 
 const UserProfileAvatar = ({isEditable, openProfileImageModal, shouldUpdateImage, size, tempUserProfileImageURI}) => {
   /* Data Hooks */

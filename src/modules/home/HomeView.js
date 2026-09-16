@@ -1,7 +1,8 @@
 import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
-import {LeftSideButtons, RightSideButtons} from './buttons';
+import LeftSideButtons from './buttons/LeftSideButtons';
+import RightSideButtons from './buttons/RightSideButtons';
 import DeviceInfo from './DeviceInfo';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
@@ -20,6 +21,8 @@ const HomeView = forwardRef(({
                                dialogs,
                                distance,
                                endMeasurement,
+                               hasDrawTools,
+                               isCreateToolsDisabled,
                                mapMode,
                                onCancel,
                                onEndDrawPressed,
@@ -53,6 +56,8 @@ const HomeView = forwardRef(({
         closeNotebookPanel={closeNotebookPanel}
         distance={distance}
         endMeasurement={endMeasurement}
+        hasDrawTools={hasDrawTools}
+        isCreateToolsDisabled={isCreateToolsDisabled}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

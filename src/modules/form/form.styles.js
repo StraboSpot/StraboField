@@ -8,6 +8,15 @@ const platform = Platform.OS === 'ios' ? 'window' : 'screen';
 const {height} = Dimensions.get(platform);
 
 const styles = StyleSheet.create({
+  // The label sits beside the switch rather than above it, so it takes the width the switch leaves and drops the
+  // bold of a label that has a row to itself
+  acknowledgeLabel: {
+    fontWeight: 'normal',
+  },
+  acknowledgeLabelContainer: {
+    flex: 1,
+    paddingLeft: 5,
+  },
   dropdownContainer: {
     marginBottom: -5,
     marginTop: -5,
@@ -42,7 +51,7 @@ const styles = StyleSheet.create({
   },
   fieldError: {
     color: themes.WARNING_COLOR,
-    textAlign: 'center',
+    fontSize: themes.SMALL_TEXT_SIZE,
   },
   fieldInfoText: {
     color: themes.PRIMARY_TEXT_COLOR,
@@ -62,6 +71,9 @@ const styles = StyleSheet.create({
   fieldLabelContainer: {
     flexDirection: 'row',
     width: '100%',
+  },
+  fieldRequired: {
+    color: themes.WARNING_COLOR,
   },
   fieldValue: {
     borderBottomColor: themes.MEDIUMGREY,

@@ -13,7 +13,7 @@ import {
 import {stripMapboxTokenFromCustomMaps} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
 import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
-import {addedDatasets, addedProject, setActiveDatasets, setTargetDataset} from '../../modules/project/projects.slice';
+import {addedDatasets, addedProject, setActiveDatasets} from '../../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
 import {isEmpty} from '../../shared/helpers';
 import {persistor} from '../../store/ConfigureStore';
@@ -217,9 +217,10 @@ const useImport = () => {
     dispatch(addedSpotsFromDevice(spotsDb));
     dispatch(addedProject(projectDb.project || projectDb));
     dispatch(addedDatasets(projectDb.datasets));
+    // Show the first dataset, but pick no target - the first one could be read only, and the target is
+    // where new Spots are filed, so it stays the user's own choice from the Datasets page
     if (Object.values(projectDb.datasets).length > 0 && !isEmpty(Object.values(projectDb.datasets)[0])) {
       dispatch(setActiveDatasets({bool: true, dataset: Object.values(projectDb.datasets)[0].id}));
-      dispatch(setTargetDataset(Object.values(projectDb.datasets)[0].id));
     }
     dispatch(clearLocalSaveNeeded());
     return projectDb.project;

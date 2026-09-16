@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useStratSectionCalculations from './useStratSectionCalculations';
 import {LARGE_TEXT_SIZE, ORANGE} from '../../../shared/styles.constants';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {clearedIntervalDragState} from '../maps.slice';
 
 const SnapLineLayer = () => {

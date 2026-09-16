@@ -12,12 +12,10 @@ const NICE_IMPERIAL_MILES = [0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500,
 const NICE_METRIC_METERS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000];
 const TARGET_WIDTH_PX = 100;
 
-const MapScaleBar = ({zoom: zoomProp}) => {
+const MapScaleBar = () => {
   /* Data Hooks */
-  const {center, isScaleBarMetric, zoom: zoomRedux} = useSelector(state => state.map);
 
-  /* Derived Variables */
-  const zoom = zoomProp ?? zoomRedux;
+  const {center, isScaleBarMetric, zoom} = useSelector(state => state.map);
 
   if (zoom == null) return null;
 

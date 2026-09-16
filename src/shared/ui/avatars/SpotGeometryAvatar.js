@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {AvatarWrapper} from './';
-import {useSpots} from '../../../modules/spots';
+import AvatarWrapper from './AvatarWrapper';
+import useSpots from '../../../modules/spots/useSpots';
 
 const SpotGeometryAvatar = ({spot}) => {
   /* Data Hooks */

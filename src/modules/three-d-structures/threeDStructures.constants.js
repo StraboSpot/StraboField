@@ -1,3 +1,5 @@
+import {getOrientationFields} from '../compass/compass.helpers';
+
 export const THREE_D_STRUCTURE_SECTIONS = {
   // FABRICS: {title: 'Fabrics', key: 'fabric'}, // Hidden here and displayed on Fabrics page as deprecated
   FOLDS: {title: 'Folds', key: 'fold'},
@@ -70,6 +72,16 @@ export const MULLION_MEASUREMENTS_KEYS = {
     quality: 'mullion_linear_measure_quality',
   },
 };
+
+// Every group above that describes a plane, plus the tensor's elliptical fields, which are typed straight into
+// the form and so have no group of their own. Entering either field of a pair can fill in the other.
+export const THREE_D_STRUCTURE_ORIENTATION_FIELDS = getOrientationFields({
+  ...FOLD_MEASUREMENTS_KEYS,
+  ...FAULT_MEASUREMENTS_KEYS,
+  ...BOUDINAGE_MEASUREMENTS_KEYS,
+  ...MULLION_MEASUREMENTS_KEYS,
+  group_elliptical: {strike: 'elliptical_strike', dip_direction: 'elliptical_dip_direction'},
+});
 
 // AddFault keys
 export const ADD_FAULT_FIRST_KEYS = ['label'];

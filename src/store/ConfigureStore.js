@@ -12,7 +12,7 @@ import mainMenuSlice from '../modules/main-menu-panel/mainMenuPanel.slice';
 import mapsSlice from '../modules/maps/maps.slice';
 import offlineMapsSlice from '../modules/maps/offline-maps/offlineMaps.slice';
 import notebookSlice from '../modules/notebook-panel/notebook.slice';
-import projectSlice from '../modules/project/projects.slice';
+import projectSlice, {migrateReportTimestamps} from '../modules/project/projects.slice';
 import spotsSlice from '../modules/spots/spots.slice';
 import userSlice from '../modules/user/userProfile.slice';
 
@@ -123,10 +123,31 @@ const mapConfig = {
   ],
 };
 
+// A project restored from the device bypasses normalizeProject, so memos are renamed here instead. This must
+// not throw: redux-persist answers a failed migration by rehydrating the slice with undefined, and on this app
+// the device copy is the source of truth, so that loses the project - silently, since it only logs the error
+// outside production. Handing back the untouched state costs nothing by comparison; memos then sort by a
+// field they do not have yet until each is next saved, which writes the new name anyway.
+const projectMigrations = {
+  1: (state) => {
+    try {
+      const reports = state?.project?.reports;
+      if (!Array.isArray(reports)) return state;
+      return {...state, project: {...state.project, reports: migrateReportTimestamps(reports)}};
+    }
+    catch (err) {
+      console.error('Could not rename memo timestamps on the stored project.', err);
+      return state;
+    }
+  },
+};
+
 const projectConfig = {
   key: 'project',
+  version: 1,
   storage: AsyncStorage,
   blacklist: ['isImageTransferring'],
+  migrate: createMigrate(projectMigrations, {debug: false}),
   timeout: null,
 };
 

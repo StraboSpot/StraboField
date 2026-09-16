@@ -11,13 +11,13 @@
     {
       "type": "begin_group",
       "name": "group_ei8vf77",
-      "label": "Privacy Setting",
+      "label": "Privacy",
       "required": "false"
     },
     {
       "type": "acknowledge",
       "name": "public",
-      "label": "Make Project Public?",
+      "label": "Publicly Viewable Project?",
       "required": "false",
       "hint": "Public datasets are accessible at StraboSpot.org/search.  Privacy settings are reversible and update when project is uploaded."
     },

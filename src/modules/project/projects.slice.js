@@ -1,7 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
-import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
+
+// A memo used to stamp its edit time as updated_timestamp, while the rest of the project calls that
+// modified_timestamp. Renamed on the way in - server, import or device - and the old key dropped, so no
+// read site has to know both names.
+export const migrateReportTimestamps = reports => reports?.map((reportToMigrate) => {
+  if (!reportToMigrate) return reportToMigrate;
+  const {updated_timestamp: updatedTimestamp, ...report} = reportToMigrate;
+  return updatedTimestamp && !report.modified_timestamp ? {...report, modified_timestamp: updatedTimestamp} : report;
+});
 
 const normalizeProject = (project) => {
   if (!project.id) project.id = getNewId();
@@ -11,6 +20,7 @@ const normalizeProject = (project) => {
   if (!project.relationship_types) project.relationship_types = DEFAULT_RELATIONSHIP_TYPES;
   if (!project.templates) project.templates = {};
   if (!project.useContinuousTagging) project.useContinuousTagging = false;
+  if (project.reports) project.reports = migrateReportTimestamps(project.reports);
   return project;
 };
 
@@ -83,11 +93,13 @@ const projectSlice = createSlice({
     addedSpotToTags(state, action) {
       const {spotId, tagIds} = action.payload;
       if (!isEmpty(state.project.tags)) {
+        const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
           if (tagIds.includes(tag.id)) {
             if (!updatedTag.spots) updatedTag.spots = [];
             updatedTag.spots.push(spotId);
+            updatedTag.modified_timestamp = timestamp;
           }
           return updatedTag;
         });
@@ -108,11 +120,6 @@ const projectSlice = createSlice({
       }
       state.project.modified_timestamp = Date.now();
     },
-    clearedDatasets(state) {
-      state.datasets = {};
-      state.activeDatasetsIds = [];
-      state.targetDatasetId = undefined;
-    },
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;
@@ -123,7 +130,7 @@ const projectSlice = createSlice({
       const {datasetId, spotId} = action.payload;
       const timestamp = Date.now();
       const dataset = state.datasets[datasetId];
-      const updatedSpotIds = dataset.spotIds.filter(id => id !== spotId);
+      const updatedSpotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
       const updatedDataset = {...dataset, modified_timestamp: timestamp, spotIds: updatedSpotIds};
       state.datasets = {...state.datasets, [datasetId]: updatedDataset};
       state.project.modified_timestamp = timestamp;
@@ -132,7 +139,7 @@ const projectSlice = createSlice({
       const spotId = action.payload;
       const timestamp = Date.now();
       const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
+        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
         const updatedDatatset = isEqual(dataset.spotIds, remainingSpotIds) ? dataset
           : {...dataset, modified_timestamp: timestamp, spotIds: remainingSpotIds};
         return {...acc, [datasetId]: updatedDatatset};
@@ -145,10 +152,10 @@ const projectSlice = createSlice({
       if (!isEmpty(state.project.reports)) {
         const updatedReports = state.project.reports.map((report) => {
           let updatedReport = JSON.parse(JSON.stringify(report));
-          if (updatedReport.spots?.includes(spotId)) {
-            updatedReport.spots = updatedReport.spots.filter(id => id !== spotId);
+          if (updatedReport.spots?.some(id => isSameId(id, spotId))) {
+            updatedReport.spots = updatedReport.spots.filter(id => !isSameId(id, spotId));
             if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
-            updatedReport.updated_timestamp = Date.now();
+            updatedReport.modified_timestamp = Date.now();
           }
           return updatedReport;
         });
@@ -159,15 +166,18 @@ const projectSlice = createSlice({
     deletedSpotIdFromTags(state, action) {
       const spotId = action.payload;
       if (!isEmpty(state.project.tags)) {
+        const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
-          if (updatedTag.spots?.includes(spotId)) {
-            updatedTag.spots = updatedTag.spots.filter(id => id !== spotId);
+          if (updatedTag.spots?.some(id => isSameId(id, spotId))) {
+            updatedTag.spots = updatedTag.spots.filter(id => !isSameId(id, spotId));
             if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
+            updatedTag.modified_timestamp = timestamp;
           }
           if (updatedTag.features && updatedTag.features[spotId]) {
             delete updatedTag.features[spotId];
             if (isEmpty(updatedTag.features)) delete updatedTag.features;
+            updatedTag.modified_timestamp = timestamp;
           }
           return updatedTag;
         });
@@ -184,7 +194,7 @@ const projectSlice = createSlice({
           if (updatedReport.tags?.includes(tagId)) {
             updatedReport.tags = updatedReport.tags.filter(id => id !== tagId);
             if (isEmpty(updatedReport.tags)) delete updatedReport.tags;
-            updatedReport.updated_timestamp = Date.now();
+            updatedReport.modified_timestamp = Date.now();
           }
           return updatedReport;
         });
@@ -230,7 +240,7 @@ const projectSlice = createSlice({
       const {toDatasetId, spotId} = action.payload;
       const timestamp = Date.now();
       const updatedDatasets = Object.entries(state.datasets).reduce((acc, [datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => id !== spotId) || [];
+        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
         const updatedSpotIds = datasetId === toDatasetId.toString() ? [...remainingSpotIds, spotId]
           : remainingSpotIds;
         const updatedDatatset = isEqual(dataset.spotIds, updatedSpotIds) ? dataset
@@ -261,7 +271,10 @@ const projectSlice = createSlice({
     setActiveDatasetsMultiple(state, action) {
       const datasetIds = action.payload;
       state.activeDatasetsIds = datasetIds;
-      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = datasetIds[0];
+      // Which datasets are shown says nothing about where new Spots belong, and the first of them could well
+      // be read only. Drop a target that is no longer among them rather than substituting one - having no
+      // target at all is a state the app handles
+      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = undefined;
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
@@ -322,8 +335,8 @@ const projectSlice = createSlice({
       let datasetIdsFound = [];
       action.payload.map((spotId) => {
         for (const dataset of Object.values(state.datasets)) {
-          const spotIdFound = dataset.spotIds?.find(id => id === spotId);
-          if (spotIdFound && !datasetIdsFound.includes(dataset.id)) {
+          const isSpotIdFound = dataset.spotIds?.some(id => isSameId(id, spotId));
+          if (isSpotIdFound && !datasetIdsFound.includes(dataset.id)) {
             datasetIdsFound.push(dataset.id);
             break;
           }
@@ -347,6 +360,13 @@ const projectSlice = createSlice({
       state.project[field] = value;
       state.project.modified_timestamp = Date.now();
     },
+    // Sets one preference, leaving the rest as they are now. updatedProject replaces the whole preferences object,
+    // so a caller holding an older copy of it would quietly undo every other setting changed since.
+    updatedProjectPreference(state, action) {
+      const {key, value} = action.payload;
+      state.project.preferences = {...state.project.preferences, [key]: value};
+      state.project.modified_timestamp = Date.now();
+    },
   },
 });
 
@@ -364,7 +384,6 @@ export const {
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
-  clearedDatasets,
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
@@ -393,6 +412,7 @@ export const {
   updatedDatasetProperties,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
+  updatedProjectPreference,
 } = projectSlice.actions;
 
 export default projectSlice.reducer;

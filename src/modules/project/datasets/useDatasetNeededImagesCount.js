@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {useImages} from '../../images';
+import useImages from '../../images/useImages';
 
 const useDatasetNeededImagesCount = (dataset) => {
   const spots = useSelector(state => state.spot.spots);

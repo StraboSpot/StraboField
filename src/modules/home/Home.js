@@ -1,7 +1,7 @@
 import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
-import homeStyles from './home.style';
+import homeStyles from './home.styles';
 import HomeView from './HomeView';
 import HomeViewSmallScreen from './HomeViewSmallScreen';
 import useHome from './useHome';
@@ -26,6 +26,8 @@ const Home = forwardRef(({
     dialogs,
     distance,
     endMeasurement,
+    hasDrawTools,
+    isCreateToolsDisabled,
     mapMode,
     onCancel,
     onEndDrawPressed,
@@ -46,6 +48,8 @@ const Home = forwardRef(({
           dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
+          hasDrawTools={hasDrawTools}
+          isCreateToolsDisabled={isCreateToolsDisabled}
           mapMode={mapMode}
           onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
@@ -74,6 +78,8 @@ const Home = forwardRef(({
         dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
+        hasDrawTools={hasDrawTools}
+        isCreateToolsDisabled={isCreateToolsDisabled}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

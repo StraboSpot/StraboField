@@ -12,7 +12,8 @@ import {
   ADD_PLANE_VEIN_BUTTONS_KEYS,
 } from './measurements.constants';
 import LittleSpacer from '../../shared/ui/LittleSpacer';
-import {Form, MainButtons} from '../form';
+import Form from '../form/Form';
+import MainButtons from '../form/MainButtons';
 
 const AddPlane = ({formName, formProps, isManualMeasurement, setChoicesViewKey, survey}) => {
   /* Derived Variables */
@@ -33,7 +34,7 @@ const AddPlane = ({formName, formProps, isManualMeasurement, setChoicesViewKey, 
   return (
     <>
       {!isManualMeasurement && (
-        <Form {...{formName: formName, surveyFragment: firstKeysFields, ...formProps}}/>
+        <Form {...formProps} formName={formName} surveyFragment={firstKeysFields}/>
       )}
       <MainButtons
         formName={formName}
@@ -50,7 +51,7 @@ const AddPlane = ({formName, formProps, isManualMeasurement, setChoicesViewKey, 
         />
       )}
       <LittleSpacer/>
-      <Form {...{formName: formName, surveyFragment: lastKeysFields, ...formProps}}/>
+      <Form {...formProps} formName={formName} surveyFragment={lastKeysFields}/>
     </>
   );
 };

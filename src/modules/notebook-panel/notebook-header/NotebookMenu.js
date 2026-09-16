@@ -11,13 +11,13 @@ import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
-import {WarningModal} from '../../../shared/ui/modals';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import WarningModal from '../../../shared/ui/modals/WarningModal';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSamples from '../../samples/useSamples';
-import {useSpots} from '../../spots';
+import useSpots from '../../spots/useSpots';
 import {setInitialSesarState} from '../../user/userProfile.slice';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
@@ -37,12 +37,13 @@ const NotebookMenu = ({
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const {sesarToken} = useSelector(state => state.user.sesar);
 
   const navigation = useNavigation();
   const toast = useToast();
   const {deleteRichSample} = useSamples();
-  const {checkIsSafeDelete, copySpot, deleteSpot, isStratInterval} = useSpots();
+  const {checkIsSafeDelete, copySpot, deleteSpot, isSpotOnReadOnlyMap, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
   /* Local State */
@@ -55,7 +56,7 @@ const NotebookMenu = ({
 
   const type = isSample ? 'Sample' : 'Spot';
   const actions = [
-    ...(!isSample ? [{key: 'copy', title: `Copy this ${type}`}] : []),
+    ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
     {key: 'zoom', title: `Zoom to this ${type}`},
     {key: 'delete', title: `Delete this ${type}`},
     {key: 'geography', title: 'Show Geography'},
@@ -118,7 +119,9 @@ const NotebookMenu = ({
   /* Render Functions */
 
   const renderActionItem = ({item}) => {
-    if (isReadOnly && item.key === 'delete') return;
+    if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
+    // A copy keeps image_basemap/strat_section_id, so it would be a new Spot on a read only map
+    else if (item.key === 'copy' && isSpotOnReadOnlyMap(spot)) return;
     else if (item.key === 'rockd' && !isTestingMode
       && (checkedInSpotIds.includes(spot.properties.id)
         || spot.geometry?.type !== 'Point')) return;
