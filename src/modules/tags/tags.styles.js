@@ -21,6 +21,24 @@ const tagStyles = StyleSheet.create({
     backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
     padding: 10,
   },
+  tagCount: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 3,
+  },
+  tagCountText: {
+    color: themes.DARKGREY,
+    fontSize: themes.SMALL_TEXT_SIZE,
+  },
+  // ListItem.Content aligns to flex-start, which shrinks a child to its content width, so the row is given the
+  // full width to lay its chips out in and to wrap them on a narrow screen
+  tagCountsContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    width: '100%',
+  },
 });
 
 export default tagStyles;

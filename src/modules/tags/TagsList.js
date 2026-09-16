@@ -1,16 +1,18 @@
 import React from 'react';
 import {SectionList, Text, View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_FILTER_LABELS, TAG_FILTERS} from './query/tagQuery.constants';
-import {TAG_SECTIONS} from './tags.constants';
+import {TAG_COUNT_ICON_SIZE, TAG_SECTIONS} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
+import tagsStyles from './tags.styles';
 import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
+import {DARKGREY} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -29,6 +31,12 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
   const {getTagFeaturesCount, getSamplesWithThisTag, getSpotsWithThisTagCount, toggleContinuousTagging} = useTags();
+  const {
+    getSamplesWithThisTag,
+    getSpotsWithThisTagCount,
+    getTagFeaturesCount,
+    toggleContinuousTagging,
+  } = useTags();
 
   const pageKey = type === PAGE_KEYS.GEOLOGIC_UNITS ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
@@ -61,12 +69,31 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
 
   const renderSectionHeader = title => <SectionDivider dividerText={title}/>;
 
+  // What a tag holds, each count beside an icon for what is being counted, so a row says what it means without a
+  // legend above the list. A count of none is left out rather than shown as a zero, which keeps the row short.
+  // Not every kind of record can carry a geologic unit, so those are counted only for an ordinary tag
+  const renderTagCounts = (tag) => {
+    const counts = [
+      {key: 'spots', count: getSpotsWithThisTagCount(tag), icon: 'map-marker'},
+      {key: 'samples', count: getSamplesWithThisTag(tag).length, icon: 'pickaxe'},
+      ...(type === PAGE_KEYS.GEOLOGIC_UNITS ? [] : [
+        {key: 'features', count: getTagFeaturesCount(tag), icon: 'circle-double'},
+      ]),
+    ].filter(c => c.count > 0);
+    if (isEmpty(counts)) return null;
+    return (
+      <View style={tagsStyles.tagCountsContainer}>
+        {counts.map(c => (
+          <View key={c.key} style={tagsStyles.tagCount}>
+            <Icon color={DARKGREY} name={c.icon} size={TAG_COUNT_ICON_SIZE} type={'material-community'}/>
+            <Text style={tagsStyles.tagCountText}>{c.count}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
   const renderTag = (tag) => {
-    const tagSpotCount = getSpotsWithThisTagCount(tag);
-    const tagFeatureCount = getTagFeaturesCount(tag);
-    let taggedSamplesCount = getSamplesWithThisTag(tag).length;
-    const title = type === PAGE_KEYS.GEOLOGIC_UNITS ? tagSpotCount + ' | ' + taggedSamplesCount
-      : tagSpotCount + ' | ' + taggedSamplesCount + ' | ' + tagFeatureCount;
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
@@ -84,9 +111,7 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
         )}
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{getTagTitle(tag)}</ListItem.Title>
-        </ListItem.Content>
-        <ListItem.Content right>
-          <ListItem.Title>{title}</ListItem.Title>
+          {renderTagCounts(tag)}
         </ListItem.Content>
         <ListItem.Chevron/>
       </ListItem>
@@ -112,18 +137,13 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
 
   const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
     : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
-  if (isEmpty(filteredTags)) {
-    return <ListEmptyText text={`No ${label} Found`}/>;
-  }
+  if (isEmpty(filteredTags)) return <ListEmptyText text={`No ${label} Found`}/>;
   else {
     return (
       <>
-        {!isEmpty(dataSectioned) && (
-          <View style={{alignItems: 'flex-end', paddingHorizontal: 10, paddingTop: 10}}>
-            {hasActiveFilters && <Text style={commonStyles.standardDescriptionText}>Filtered Results:</Text>}
-            <Text style={commonStyles.standardDescriptionText}>
-              {pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? '# Tagged Spots | Samples' : '# Tagged Spots | Samples | Features'}
-            </Text>
+        {hasActiveFilters && !isEmpty(dataSectioned) && (
+          <View style={{alignItems: 'flex-start', paddingHorizontal: 10, paddingTop: 10}}>
+            <Text style={commonStyles.standardDescriptionText}>Filtered Results:</Text>
           </View>
         )}
         <View style={{flex: 1}}>
